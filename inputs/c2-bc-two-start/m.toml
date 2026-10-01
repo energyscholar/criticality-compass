@@ -1,0 +1,457 @@
+# THIS IS CC's m.toml (Kernel V8's M for ONE input: what was measured and how).
+# It is NOT the toolset's m.toml (scratch/compass-toolset/m.toml, the study log).
+# inputs/c2-bc-two-start/m.toml - Blume-Capel two-start screen, L = 81 (toolset [C2]);
+# one point per (delta, K): v0 has one point axis, so delta is folded into the label
+schema = 1
+kind = "input"
+id = "c2-bc-two-start"
+instruments = ["two_start"]
+
+[obtained]                     # point label -> truth | navigated | observed
+"d2.0-K1.0" = "observed"
+"d2.0-K1.2" = "observed"
+"d2.0-K1.4" = "observed"
+"d2.0-K1.6" = "observed"
+"d2.0-K1.8" = "observed"
+"d2.0-K2.0" = "observed"
+"d2.0-K2.3" = "observed"
+"d2.0-K2.6" = "observed"
+"d2.0-K3.0" = "observed"
+"d1.95-K1.0" = "observed"
+"d1.95-K1.2" = "observed"
+"d1.95-K1.4" = "observed"
+"d1.95-K1.6" = "observed"
+"d1.95-K1.8" = "observed"
+"d1.95-K2.0" = "observed"
+"d1.95-K2.3" = "observed"
+"d1.95-K2.6" = "observed"
+"d1.95-K3.0" = "observed"
+"d1.9-K1.0" = "observed"
+"d1.9-K1.2" = "observed"
+"d1.9-K1.4" = "observed"
+"d1.9-K1.6" = "observed"
+"d1.9-K1.8" = "observed"
+"d1.9-K2.0" = "observed"
+"d1.9-K2.3" = "observed"
+"d1.9-K2.6" = "observed"
+"d1.9-K3.0" = "observed"
+
+[axes]
+point = [
+  "d2.0-K1.0", "d2.0-K1.2", "d2.0-K1.4", "d2.0-K1.6",
+  "d2.0-K1.8", "d2.0-K2.0", "d2.0-K2.3", "d2.0-K2.6",
+  "d2.0-K3.0", "d1.95-K1.0", "d1.95-K1.2", "d1.95-K1.4",
+  "d1.95-K1.6", "d1.95-K1.8", "d1.95-K2.0", "d1.95-K2.3",
+  "d1.95-K2.6", "d1.95-K3.0", "d1.9-K1.0", "d1.9-K1.2",
+  "d1.9-K1.4", "d1.9-K1.6", "d1.9-K1.8", "d1.9-K2.0",
+  "d1.9-K2.3", "d1.9-K2.6", "d1.9-K3.0",
+]
+size = [81]                                    # length 1: two_start is per (point, size)
+starts = ["vacant", "ordered"]
+main_start = "ordered"                         # required; no single-start instrument here
+
+[relations.start]
+template = "pair"
+axis = "starts"
+pairs = [["vacant", "ordered"]]                # 'vacant -> ordered': A = q(ordered) - q(vacant)
+provenance = "Coupling"
+direction_from = "two runs at the same (delta, K) differing only in the declared initial state"
+
+[interval]
+method = "block"
+b = 100
+resamples = 400
+level = 0.95
+seed = 1500                                    # one plan for the input (the study seeded per K)
+
+[eps]
+two_start = 0.02
+
+[two_start]
+observable = "Q"
+definition = "q = mean s^2 per site (vacancy complement) per snapshot; already per site"
+unit_scale = { "81" = 1 }
+
+[kernel]
+uses = ["A"]
+
+[data]
+format = "npz-v1"                              # one file per (delta, K) holds both starts
+
+[[data.files]]
+point = "d2.0-K1.0"
+size = 81
+start = "ordered"
+path = "c2/d2.0-K1.0.npz"
+arrays.Q = { key = "q_ord" }
+
+[[data.files]]
+point = "d2.0-K1.0"
+size = 81
+start = "vacant"
+path = "c2/d2.0-K1.0.npz"
+arrays.Q = { key = "q_vac" }
+
+[[data.files]]
+point = "d2.0-K1.2"
+size = 81
+start = "ordered"
+path = "c2/d2.0-K1.2.npz"
+arrays.Q = { key = "q_ord" }
+
+[[data.files]]
+point = "d2.0-K1.2"
+size = 81
+start = "vacant"
+path = "c2/d2.0-K1.2.npz"
+arrays.Q = { key = "q_vac" }
+
+[[data.files]]
+point = "d2.0-K1.4"
+size = 81
+start = "ordered"
+path = "c2/d2.0-K1.4.npz"
+arrays.Q = { key = "q_ord" }
+
+[[data.files]]
+point = "d2.0-K1.4"
+size = 81
+start = "vacant"
+path = "c2/d2.0-K1.4.npz"
+arrays.Q = { key = "q_vac" }
+
+[[data.files]]
+point = "d2.0-K1.6"
+size = 81
+start = "ordered"
+path = "c2/d2.0-K1.6.npz"
+arrays.Q = { key = "q_ord" }
+
+[[data.files]]
+point = "d2.0-K1.6"
+size = 81
+start = "vacant"
+path = "c2/d2.0-K1.6.npz"
+arrays.Q = { key = "q_vac" }
+
+[[data.files]]
+point = "d2.0-K1.8"
+size = 81
+start = "ordered"
+path = "c2/d2.0-K1.8.npz"
+arrays.Q = { key = "q_ord" }
+
+[[data.files]]
+point = "d2.0-K1.8"
+size = 81
+start = "vacant"
+path = "c2/d2.0-K1.8.npz"
+arrays.Q = { key = "q_vac" }
+
+[[data.files]]
+point = "d2.0-K2.0"
+size = 81
+start = "ordered"
+path = "c2/d2.0-K2.0.npz"
+arrays.Q = { key = "q_ord" }
+
+[[data.files]]
+point = "d2.0-K2.0"
+size = 81
+start = "vacant"
+path = "c2/d2.0-K2.0.npz"
+arrays.Q = { key = "q_vac" }
+
+[[data.files]]
+point = "d2.0-K2.3"
+size = 81
+start = "ordered"
+path = "c2/d2.0-K2.3.npz"
+arrays.Q = { key = "q_ord" }
+
+[[data.files]]
+point = "d2.0-K2.3"
+size = 81
+start = "vacant"
+path = "c2/d2.0-K2.3.npz"
+arrays.Q = { key = "q_vac" }
+
+[[data.files]]
+point = "d2.0-K2.6"
+size = 81
+start = "ordered"
+path = "c2/d2.0-K2.6.npz"
+arrays.Q = { key = "q_ord" }
+
+[[data.files]]
+point = "d2.0-K2.6"
+size = 81
+start = "vacant"
+path = "c2/d2.0-K2.6.npz"
+arrays.Q = { key = "q_vac" }
+
+[[data.files]]
+point = "d2.0-K3.0"
+size = 81
+start = "ordered"
+path = "c2/d2.0-K3.0.npz"
+arrays.Q = { key = "q_ord" }
+
+[[data.files]]
+point = "d2.0-K3.0"
+size = 81
+start = "vacant"
+path = "c2/d2.0-K3.0.npz"
+arrays.Q = { key = "q_vac" }
+
+[[data.files]]
+point = "d1.95-K1.0"
+size = 81
+start = "ordered"
+path = "c2/d1.95-K1.0.npz"
+arrays.Q = { key = "q_ord" }
+
+[[data.files]]
+point = "d1.95-K1.0"
+size = 81
+start = "vacant"
+path = "c2/d1.95-K1.0.npz"
+arrays.Q = { key = "q_vac" }
+
+[[data.files]]
+point = "d1.95-K1.2"
+size = 81
+start = "ordered"
+path = "c2/d1.95-K1.2.npz"
+arrays.Q = { key = "q_ord" }
+
+[[data.files]]
+point = "d1.95-K1.2"
+size = 81
+start = "vacant"
+path = "c2/d1.95-K1.2.npz"
+arrays.Q = { key = "q_vac" }
+
+[[data.files]]
+point = "d1.95-K1.4"
+size = 81
+start = "ordered"
+path = "c2/d1.95-K1.4.npz"
+arrays.Q = { key = "q_ord" }
+
+[[data.files]]
+point = "d1.95-K1.4"
+size = 81
+start = "vacant"
+path = "c2/d1.95-K1.4.npz"
+arrays.Q = { key = "q_vac" }
+
+[[data.files]]
+point = "d1.95-K1.6"
+size = 81
+start = "ordered"
+path = "c2/d1.95-K1.6.npz"
+arrays.Q = { key = "q_ord" }
+
+[[data.files]]
+point = "d1.95-K1.6"
+size = 81
+start = "vacant"
+path = "c2/d1.95-K1.6.npz"
+arrays.Q = { key = "q_vac" }
+
+[[data.files]]
+point = "d1.95-K1.8"
+size = 81
+start = "ordered"
+path = "c2/d1.95-K1.8.npz"
+arrays.Q = { key = "q_ord" }
+
+[[data.files]]
+point = "d1.95-K1.8"
+size = 81
+start = "vacant"
+path = "c2/d1.95-K1.8.npz"
+arrays.Q = { key = "q_vac" }
+
+[[data.files]]
+point = "d1.95-K2.0"
+size = 81
+start = "ordered"
+path = "c2/d1.95-K2.0.npz"
+arrays.Q = { key = "q_ord" }
+
+[[data.files]]
+point = "d1.95-K2.0"
+size = 81
+start = "vacant"
+path = "c2/d1.95-K2.0.npz"
+arrays.Q = { key = "q_vac" }
+
+[[data.files]]
+point = "d1.95-K2.3"
+size = 81
+start = "ordered"
+path = "c2/d1.95-K2.3.npz"
+arrays.Q = { key = "q_ord" }
+
+[[data.files]]
+point = "d1.95-K2.3"
+size = 81
+start = "vacant"
+path = "c2/d1.95-K2.3.npz"
+arrays.Q = { key = "q_vac" }
+
+[[data.files]]
+point = "d1.95-K2.6"
+size = 81
+start = "ordered"
+path = "c2/d1.95-K2.6.npz"
+arrays.Q = { key = "q_ord" }
+
+[[data.files]]
+point = "d1.95-K2.6"
+size = 81
+start = "vacant"
+path = "c2/d1.95-K2.6.npz"
+arrays.Q = { key = "q_vac" }
+
+[[data.files]]
+point = "d1.95-K3.0"
+size = 81
+start = "ordered"
+path = "c2/d1.95-K3.0.npz"
+arrays.Q = { key = "q_ord" }
+
+[[data.files]]
+point = "d1.95-K3.0"
+size = 81
+start = "vacant"
+path = "c2/d1.95-K3.0.npz"
+arrays.Q = { key = "q_vac" }
+
+[[data.files]]
+point = "d1.9-K1.0"
+size = 81
+start = "ordered"
+path = "c2/d1.9-K1.0.npz"
+arrays.Q = { key = "q_ord" }
+
+[[data.files]]
+point = "d1.9-K1.0"
+size = 81
+start = "vacant"
+path = "c2/d1.9-K1.0.npz"
+arrays.Q = { key = "q_vac" }
+
+[[data.files]]
+point = "d1.9-K1.2"
+size = 81
+start = "ordered"
+path = "c2/d1.9-K1.2.npz"
+arrays.Q = { key = "q_ord" }
+
+[[data.files]]
+point = "d1.9-K1.2"
+size = 81
+start = "vacant"
+path = "c2/d1.9-K1.2.npz"
+arrays.Q = { key = "q_vac" }
+
+[[data.files]]
+point = "d1.9-K1.4"
+size = 81
+start = "ordered"
+path = "c2/d1.9-K1.4.npz"
+arrays.Q = { key = "q_ord" }
+
+[[data.files]]
+point = "d1.9-K1.4"
+size = 81
+start = "vacant"
+path = "c2/d1.9-K1.4.npz"
+arrays.Q = { key = "q_vac" }
+
+[[data.files]]
+point = "d1.9-K1.6"
+size = 81
+start = "ordered"
+path = "c2/d1.9-K1.6.npz"
+arrays.Q = { key = "q_ord" }
+
+[[data.files]]
+point = "d1.9-K1.6"
+size = 81
+start = "vacant"
+path = "c2/d1.9-K1.6.npz"
+arrays.Q = { key = "q_vac" }
+
+[[data.files]]
+point = "d1.9-K1.8"
+size = 81
+start = "ordered"
+path = "c2/d1.9-K1.8.npz"
+arrays.Q = { key = "q_ord" }
+
+[[data.files]]
+point = "d1.9-K1.8"
+size = 81
+start = "vacant"
+path = "c2/d1.9-K1.8.npz"
+arrays.Q = { key = "q_vac" }
+
+[[data.files]]
+point = "d1.9-K2.0"
+size = 81
+start = "ordered"
+path = "c2/d1.9-K2.0.npz"
+arrays.Q = { key = "q_ord" }
+
+[[data.files]]
+point = "d1.9-K2.0"
+size = 81
+start = "vacant"
+path = "c2/d1.9-K2.0.npz"
+arrays.Q = { key = "q_vac" }
+
+[[data.files]]
+point = "d1.9-K2.3"
+size = 81
+start = "ordered"
+path = "c2/d1.9-K2.3.npz"
+arrays.Q = { key = "q_ord" }
+
+[[data.files]]
+point = "d1.9-K2.3"
+size = 81
+start = "vacant"
+path = "c2/d1.9-K2.3.npz"
+arrays.Q = { key = "q_vac" }
+
+[[data.files]]
+point = "d1.9-K2.6"
+size = 81
+start = "ordered"
+path = "c2/d1.9-K2.6.npz"
+arrays.Q = { key = "q_ord" }
+
+[[data.files]]
+point = "d1.9-K2.6"
+size = 81
+start = "vacant"
+path = "c2/d1.9-K2.6.npz"
+arrays.Q = { key = "q_vac" }
+
+[[data.files]]
+point = "d1.9-K3.0"
+size = 81
+start = "ordered"
+path = "c2/d1.9-K3.0.npz"
+arrays.Q = { key = "q_ord" }
+
+[[data.files]]
+point = "d1.9-K3.0"
+size = 81
+start = "vacant"
+path = "c2/d1.9-K3.0.npz"
+arrays.Q = { key = "q_vac" }

@@ -1,0 +1,17 @@
+# instruments/stability.toml - d = y_last - y_prev PER RESAMPLE (W2 rule): A over the chain of
+# size steps
+schema = 1
+kind = "instrument"
+module = "stability"
+operators = ["A"]
+unit = "point"
+reports = []
+arrays = ["G", "E"]
+axes = ["point", "size"]
+relations = ["size"]
+sidecar = ["conjugate", "observable", "block_map"]
+flags = ["H"]
+pipeline = ["stage:reduce", "door:logcoord", "stage:growth", "door:steps", "stage:curvature"]
+
+[columns]
+d = "y"

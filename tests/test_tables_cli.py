@@ -1,0 +1,64 @@
+"""test_tables_cli - bin/cc authoring commands, run as a subprocess inside a temp copy of the repo."""
+import os
+import shutil
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+bad = []
+
+
+def check(name, ok, why=""):
+    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
+    if not ok:
+        bad.append(name)
+
+
+with tempfile.TemporaryDirectory() as t:
+    repo = Path(t) / "repo"
+    shutil.copytree(ROOT, repo, ignore=shutil.ignore_patterns(".git", "__pycache__"))
+
+    def cc(*args):
+        r = subprocess.run([sys.executable, str(repo / "bin" / "cc"), *args], capture_output=True, text=True, cwd=repo)
+        return r.returncode, r.stdout + r.stderr
+
+    rc, out = cc("tables", "fork", "verdict-x-rules", "t1")
+    check("fork copies the set and prints its Next line", rc == 0 and "Next: edit tables/t1/verdict.toml, then bin/cc validate, then bin/cc run --all --tables t1" in out, out)
+    check("the fork is writable", os.access(repo / "tables/t1/verdict.toml", os.W_OK) and os.access(repo / "tables/t1", os.W_OK))
+    rc, out = cc("tables", "fork", "verdict-x-rules", "t1")
+    check("fork refuses an existing target", rc == 1 and "tables/t1 already exists." in out and "Next: pick another name" in out, out)
+    rc, out = cc("tables", "split", "t1", "--column", "stability", "--value", "CROSSING", "--verdict", "REFUSE-WALKING-UNCONFIRMED")
+    check("split touches 14 rows and the copy stays a partition", rc == 0 and "touched 14 rows (19 rows now)" in out and "verdict.toml: clean" in out, out)
+    rc, out = cc("validate")
+    check("the split copy validates clean", rc == 0 and "validate: clean" in out, out)
+    rc, out = cc("tables", "drop", "t1")
+    check("drop removes an unfrozen set", rc == 0 and not (repo / "tables/t1").exists(), out)
+    rc, out = cc("tables", "drop", "verdict-x-rules")
+    check("drop refuses the default set", rc == 1 and "is the default rulebook" in out and "Next:" in out and (repo / "tables/verdict-x-rules").is_dir(), out)
+
+    rc, out = cc("new", "case", "potts-q4")
+    rc2, out2 = cc("validate")
+    check("new case then validate names its TODOs with Next lines", rc == 0 and rc2 == 1 and "cases/potts-q4.toml:family: still TODO\n  Next: replace it with a short description of the model" in out2, out2)
+    rc, out = cc("new", "case", "potts-q4")
+    check("new case refuses an existing file", rc == 1 and "already exists" in out and "Next:" in out, out)
+
+    rc, out = cc("new", "input", "w2b", "--like", "w2-potts", "--points", "6,7")
+    m = (repo / "inputs/w2b/m.toml").read_text()
+    check("new input --points writes the renamed blocks", rc == 0 and 'path = "w2/q6-L27-random.npz"' in m and 'path = "w2/q7-L243-ordered.npz"' in m and 'id = "w2b"' in m, out + m[:300])
+    rc, out = cc("validate")
+    gone = [f"w2/q{q}-L{s}-{st}.npz" for q in (6, 7) for s in (27, 81, 243) for st in ("random", "ordered")]
+    check("validate names every missing data file (12: six per new point)", rc == 1 and all(f"{g} does not exist under the data root" in out for g in gone), out)
+    rc, out = cc("new", "input", "w2c", "--like", "w2-potts", "--points", "6", "--pattern-point", "2")
+    m = (repo / "inputs/w2c/m.toml").read_text()
+    check("a pattern that occurs twice in a file name is not guessed", '"TODO"   # was w2/q2-L27-random.npz' in m, m[-400:])
+    rc, out = cc("new", "input", "w2d", "--like", "w2-potts", "--instruments", "across")
+    rc2, out2 = cc("validate")
+    check("--instruments drops the tables no kept instrument needs", rc == 0 and "w2d/m.toml:two_start" not in out2 and "inputs/w2d/m.toml:relations" not in out2 and "w2d/m.toml:eps" not in out2, out + out2)
+    rc, out = cc("data", "add", "w2-potts")
+    check("data add refuses to overwrite a manifest", rc == 1 and "already exists" in out and "Next:" in out, out)
+    rc, out = cc("tables", "bogus")
+    check("an unknown tables subcommand has a Next line", rc == 1 and "Next:" in out, out)
+print("".join(f"FAILED {b}\n" for b in bad) + "test_tables_cli: " + ("FAILED " + str(len(bad)) if bad else "all passed"))
+sys.exit(1 if bad else 0)

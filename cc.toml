@@ -41,4 +41,8 @@ discards = [
 ]
 blank = ["NOT-MEASURED", "NOT-EVALUATED", "UNRES"]  # shown as BLANK (<value>: <reason>)
 blank_refuse = true             # a verdict in the set's `refuse` list shows as BLANK (<verdict>)
-commands = ["show", "explain", "run", "new case", "tables fork", "tables drop", "validate", "help"]
+commands = ["show", "explain", "run", "new case", "tables fork", "tables drop", "validate", "check", "help"]
+
+[check]                         # bin/cc check --fast (the pre-commit hook) skips the `slow` tests
+fast_budget_s = 30              # elapsed time is printed against it; over budget WARNS, never fails
+slow = []                       # each phase appends every test it creates that takes > 5 s alone

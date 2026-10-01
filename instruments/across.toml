@@ -1,0 +1,16 @@
+# instruments/across.toml - linear response R = cov(G, E) over the size chain; growth of ln(s R)
+schema = 1
+kind = "instrument"
+module = "across"
+operators = ["A"]
+unit = "point"
+reports = ["y_steps"]
+arrays = ["G", "E"]
+axes = ["point", "size"]
+relations = ["size"]
+sidecar = ["conjugate", "observable", "block_map"]
+flags = ["H"]
+pipeline = ["stage:reduce", "door:logcoord", "stage:growth"]
+
+[columns]
+y_last = "y"

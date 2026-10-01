@@ -1,0 +1,57 @@
+# THIS IS CC's m.toml (planted test input: one C2 point, two starts)
+# It is NOT the toolset's m.toml.
+schema = 1
+kind = "input"
+id = "p-tiny"
+instruments = ["two_start"]
+
+[obtained]
+"d2.0-K1.0" = "observed"
+
+[axes]
+point = ["d2.0-K1.0"]
+size = [81]
+starts = ["vacant", "ordered"]
+main_start = "ordered"
+
+[relations.start]
+template = "ring"
+axis = "starts"
+pairs = [["vacant", "ordered"]]
+provenance = "Coupling"
+direction_from = "planted"
+
+[interval]
+method = "block"
+b = 100
+resamples = 400
+level = 0.95
+seed = 1500
+
+[eps]
+two_start = 0.02
+
+[two_start]
+observable = "Q"
+definition = "planted"
+unit_scale = { "81" = 1 }
+
+[kernel]
+uses = ["A"]
+
+[data]
+format = "npz-v1"
+
+[[data.files]]
+point = "d2.0-K1.0"
+size = 81
+start = "ordered"
+path = "c2/d2.0-K1.0.npz"
+arrays.Q = { key = "q_ord" }
+
+[[data.files]]
+point = "d2.0-K1.0"
+size = 81
+start = "vacant"
+path = "c2/d2.0-K1.0.npz"
+arrays.Q = { key = "q_vac" }

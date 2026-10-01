@@ -1,0 +1,18 @@
+# instruments/needle.toml - P2 matched velocity + B3a2 sink position (the X8 form)
+schema = 1
+kind = "instrument"
+module = "needle"                              # cc/instruments/needle.py
+operators = ["A"]
+unit = "point"
+reports = ["v_all", "g_final"]                 # reported, never coded
+arrays = ["GL"]                                # 2-D level stacks at matched big and small
+axes = ["point", "size"]
+relations = ["matched"]
+sidecar = ["sinks", "observable", "block_map"]
+flags = []
+pipeline = ["stage:reduce", "door:nodefield", "stage:matched"]
+
+[columns]                                      # column -> the eps key its interval is read against
+velocity = "step"
+d_ord = "sink"
+d_dis = "sink"

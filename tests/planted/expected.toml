@@ -1,0 +1,141 @@
+# expected findings for the planted plugins (data; read by tests/test_declare.py).
+# file = the planted plugin; over = cross-reference overrides (files here); fix = [as planted, as fixed];
+# text = the exact finding block (with its Next line) that the plant must produce.
+schema = 1
+kind = "planted"
+
+[[plant]]
+file = "case-unknown-field.toml"
+fix = ["studies = [\"W2\"]\nextra = 1\n", "studies = [\"W2\"]\n"]
+text = "tests/planted/case-unknown-field.toml:extra: unknown field\n  Next: remove extra, or check its spelling against the schema"
+
+[[plant]]
+file = "case-missing-field.toml"
+fix = ["", "family = \"2D 3-state Potts, square lattice\"\n"]
+text = "tests/planted/case-missing-field.toml:family: missing required field\n  Next: add family = ... to tests/planted/case-missing-field.toml"
+
+[[plant]]
+file = "case-bad-schema.toml"
+fix = ["schema = 2", "schema = 1"]
+text = "tests/planted/case-bad-schema.toml: schema 2 not supported for kind case (supported: 1)\n  Next: set schema = 1"
+
+[[plant]]
+file = "case-class-not-in-alphabet.toml"
+fix = ["class_truth = \"CRITICAL\"", "class_truth = \"POINT\""]
+text = "tests/planted/case-class-not-in-alphabet.toml:class_truth: 'CRITICAL' is not in ['POINT', 'LINE', 'WALKING', 'FIRST-ORDER', 'MULTI', 'BKT-END', 'NOT']\n  Next: use one of: POINT LINE WALKING FIRST-ORDER MULTI BKT-END NOT"
+
+[[plant]]
+file = "case-decoy-no-nondecoy.toml"
+fix = ["decoy_of = \"MULTI\"", "decoy_of = \"none\""]
+text = "tests/planted/case-decoy-no-nondecoy.toml:decoy_of: no non-decoy case has class MULTI\n  Next: add a case of class MULTI, or set decoy_of = \"none\""
+
+[[plant]]
+file = "case-todo-left.toml"
+fix = ["family = \"TODO\"", "family = \"2D 3-state Potts, square lattice\""]
+text = "tests/planted/case-todo-left.toml:family: still TODO\n  Next: replace it with a short description of the model"
+
+[[plant]]
+file = "points-unknown-case.toml"
+fix = ["\"4\" = \"potts-4\"", "\"4\" = \"none\""]
+text = "tests/planted/points-unknown-case.toml:points.\"4\": unknown case 'potts-4'\n  Next: create it with bin/cc new case potts-4, or map the point to an existing case or \"none\""
+
+[[plant]]
+file = "points-missing-point.toml"
+fix = ["", "\"5\" = \"potts-q5\"\n"]
+text = "tests/planted/points-missing-point.toml:points.\"5\": point is not joined\n  Next: add \"5\" = <case id or \"none\"> to [points]"
+
+[[plant]]
+file = "input-unknown-instrument.toml"
+fix = ["instruments = [\"two_start\", \"nosuch\"]", "instruments = [\"two_start\"]"]
+text = "tests/planted/input-unknown-instrument.toml:instruments: 'nosuch' is not in the instrument registry\n  Next: use one of: across needle stability two_start"
+
+[[plant]]
+file = "input-eps-missing.toml"
+fix = ["", "two_start = 0.02\n"]
+text = "tests/planted/input-eps-missing.toml:eps.two_start: eps key missing (a declared instrument's column reads it)\n  Next: add two_start = <margin> to [eps]"
+
+[[plant]]
+file = "input-eps-not-required.toml"
+fix = ["two_start = 0.02\nstep = 0.01\n", "two_start = 0.02\n"]
+text = "tests/planted/input-eps-not-required.toml:eps.step: eps key not required by any declared instrument\n  Next: delete step"
+
+[[plant]]
+file = "input-unknown-template.toml"
+fix = ["template = \"ring\"", "template = \"pair\""]
+text = "tests/planted/input-unknown-template.toml:relations.start.template: unknown template 'ring'\n  Next: use one of: chain pair matched"
+
+[[plant]]
+file = "input-level-on-1d.toml"
+fix = ["arrays.Q = { key = \"q_ord\", level = 0 }", "arrays.Q = { key = \"q_ord\" }"]
+text = "tests/planted/input-level-on-1d.toml:data.files[0].arrays.Q: level given on a 1-D stored array\n  Next: remove level"
+
+[[plant]]
+file = "input-array-kind.toml"
+fix = ["arrays.Z = { key = \"q_ord\" }", "arrays.Q = { key = \"q_ord\" }"]
+text = "tests/planted/input-array-kind.toml:data.files[0].arrays.Z: array kind 'Z' is not in cc.toml [arrays]\n  Next: use one of: G GL E Q"
+
+[[plant]]
+file = "input-data-absent.toml"
+fix = ["path = \"c2/nope.npz\"\narrays.Q = { key = \"q_ord\" }", "path = \"c2/d2.0-K1.0.npz\"\narrays.Q = { key = \"q_ord\" }"]
+text = "tests/planted/input-data-absent.toml:data.files[0].path: c2/nope.npz does not exist under the data root\n  Next: fix the path, or put the file there"
+
+[[plant]]
+file = "input-operators-outside-uses.toml"
+fix = ["uses = []", "uses = [\"A\"]"]
+text = "tests/planted/input-operators-outside-uses.toml:kernel.uses: operators ['A'] of declared instruments are not in kernel.uses\n  Next: add them"
+
+[[plant]]
+file = "manifest-sha-mismatch.toml"
+fix = ["000000", "45e0cf"]
+over = { input = "input-ok.toml" }
+text = "tests/planted/manifest-sha-mismatch.toml: c2/d2.0-K1.0.npz changed since it was pinned\n  Next: if intended, make a new input: bin/cc new input p-tiny-2 --like p-tiny, then bin/cc data add p-tiny-2"
+
+[[plant]]
+file = "instrument-module-door.toml"
+fix = ["module = \"door\"", "module = \"needle\""]
+text = "tests/planted/instrument-module-door.toml:module: 'door' collides with a plumbing or allow-listed module name\n  Next: pick another module name"
+
+[[plant]]
+file = "codes-missing-sign.toml"
+fix = ["", "\"UNRES\" = \"Y\"\n"]
+text = "tests/planted/codes-missing-sign.toml:columns.signature.a.map: missing key 'UNRES'\n  Next: add \"UNRES\" = <code>"
+
+[[plant]]
+file = "codes-foreign-value.toml"
+fix = ["\"POS\" = \"Z\"", "\"POS\" = \"Y\""]
+text = "tests/planted/codes-foreign-value.toml:columns.signature.a.map.\"POS\": 'Z' is not in the alphabet ['X', 'Y']\n  Next: use one of: X Y"
+
+[[plant]]
+file = "verdict-uncovered.toml"
+fix = ["", "\n[[row]]\nwhen.a = [\"Y\"]\nwhen.b = [\"NOT-MEASURED\", \"NOT-EVALUATED\"]\nverdict = \"REFUSE-X\"\nwhy = \"planted: a Y and b null\"\n"]
+over = { codes = "codes-mini.toml" }
+text = "tests/planted/verdict-uncovered.toml: 2 uncovered cells in 1 patterns\n  [[row]]\n  when.a = [\"Y\"]\n  when.b = [\"NOT-MEASURED\", \"NOT-EVALUATED\"]\n  Next: add a [[row]] with one of these when-lines, or widen a neighbouring row"
+
+[[plant]]
+file = "verdict-overlap.toml"
+fix = ["when.b = [\"Q\", \"P\"]", "when.b = [\"Q\"]"]
+over = { codes = "codes-mini.toml" }
+text = "tests/planted/verdict-overlap.toml: rows at lines 14 and 20 overlap on 1 cells, first: {'a': 'Y', 'b': 'P'}\n  Next: narrow one of the two rows so they share no cell"
+
+[[plant]]
+file = "verdict-unread-column.toml"
+fix = ["when.a = [\"Y\"]\nverdict = \"REFUSE-X\"\nwhy = \"planted: a Y\"\n", "when.a = [\"Y\"]\nwhen.b = [\"P\"]\nverdict = \"REFUSE-X\"\nwhy = \"planted: a Y and b P\"\n\n[[row]]\nwhen.a = [\"Y\"]\nwhen.b = [\"Q\"]\nverdict = \"NOT\"\nwhy = \"planted: a Y and b Q\"\n\n[[row]]\nwhen.a = [\"Y\"]\nwhen.b = [\"NOT-MEASURED\", \"NOT-EVALUATED\"]\nverdict = \"REFUSE-X\"\nwhy = \"planted: a Y and b null\"\n"]
+over = { codes = "codes-mini.toml" }
+text = "tests/planted/verdict-unread-column.toml:columns: column 'b' is neither read by a row nor in ignores\n  Next: read it in a row or add it to ignores"
+
+[[plant]]
+file = "verdict-orphan-verdict.toml"
+fix = ["verdicts = [\"NOT\", \"REFUSE-X\", \"MYSTERY\"]", "verdicts = [\"NOT\", \"REFUSE-X\"]"]
+over = { codes = "codes-mini.toml" }
+text = "tests/planted/verdict-orphan-verdict.toml:verdicts: verdict 'MYSTERY' is in none of refuse, class_of or the class names\n  Next: list it in refuse, add it to [class_of], or use a class name"
+
+[[plant]]
+file = "cc-basic-field-missing.toml"
+fix = ["\"verdict\"]", "\"verdict\", \"why\"]"]
+text = "tests/planted/cc-basic-field-missing.toml:basic: field 'why' is in neither keeps nor discards\n  Next: add it to basic.keeps or basic.discards"
+
+[[plant]]
+file = "instrument-ok.toml"
+over = { checks = "checks-no-maths.toml" }
+fix = []
+text = "tests/planted/instrument-ok.toml:module: 'needle' is not under checks.toml [roles].maths\n  Next: add \"cc/instruments/needle.py\" to [roles].maths"

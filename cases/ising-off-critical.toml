@@ -1,0 +1,28 @@
+# cases/ising-off-critical.toml - FIXTURE case, written in phase 2 (taxonomy; never frozen)
+# Drawn from the frozen studies P2, X8; class_truth from the 0862 catalogue schema. Phase 5a
+# replaces it with the released catalogue entry of the same id (A 4.2).
+schema = 1
+kind = "case"
+id = "ising-off-critical"
+family = "2D Ising away from K_c (both phases)"
+mechanism = """no critical structure: the flow runs to a trivial sink (ordered g1 -> 1 or \
+disordered g1 -> 0); finite correlation length"""
+class_truth = "NOT"
+sampler = "ising"
+traps = [
+  "near K_c (0.99, 1.01) the flow looks critical at the first steps and diverges only later",
+  "deep ordered (1.10) the coarsest velocity is SLOW+: an un-sink-aware needle reads MID",
+]
+decoy_of = "none"
+pairs_with = ["ising-2d"]
+sources = []
+status = "in-signature-table"
+studies = ["P2", "X8"]
+
+[controls]
+names = ["K (nn coupling)"]
+range = "K/K_c 0.90, 0.95, 0.98, 0.99, 1.01, 1.02, 1.05, 1.10 (P2, X8)"
+
+[observables]
+list = ["g1 per block level"]
+conjugate_observable = true

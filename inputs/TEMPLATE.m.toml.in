@@ -1,0 +1,67 @@
+# THIS IS CC's m.toml (Kernel V8's M for ONE input: what was measured and how).
+# It is NOT the toolset's m.toml (scratch/compass-toolset/m.toml, the study log).
+# inputs/TEMPLATE.m.toml.in - read by `bin/cc new input <id>` (no --like).
+# Replace every "TODO". DELETE every table no declared instrument needs (see HOWTO, "which
+# tables each instrument needs"): an unused table is refused, as is a missing one.
+schema = 1
+kind = "input"
+id = "<ID>"
+instruments = ["TODO"]                         # needle | across | stability | two_start
+
+[obtained]                                     # one line per point: truth | navigated | observed
+"TODO" = "TODO"
+
+[axes]
+point = ["TODO"]                               # string labels, in declared order
+size = ["TODO"]                                # integers, strictly ascending
+starts = ["TODO"]
+main_start = "TODO"
+
+[observable]
+name = "TODO"
+definition = "TODO"
+levels = ["TODO"]                              # stored levels per size, in axes.size order
+final_size = "TODO"
+
+[block_map]
+name = "TODO"
+factor = "TODO"
+keeps = "TODO"
+discards = "TODO"
+
+[relations.TODO]                               # rename TODO: size | matched | start
+template = "TODO"                              # chain | pair | matched (+ that template's fields)
+axis = "TODO"
+provenance = "TODO"                            # Coupling | Continuation (kernel edge provenance)
+direction_from = "TODO"
+
+[conjugate]
+observable = "TODO"
+conjugate_to = "TODO"
+hamiltonian_knowledge = true
+
+[sinks]
+ordered = "TODO"
+disordered = "TODO"
+
+[two_start]
+observable = "Q"
+definition = "TODO"
+unit_scale = { "TODO" = "TODO" }               # size (quoted) -> declared unit scale
+
+[interval]
+method = "TODO"                                # block (needs b) | iid (needs tau_declared = 1)
+b = "TODO"
+resamples = "TODO"
+level = "TODO"
+seed = "TODO"
+
+[eps]
+TODO = "TODO"                                  # exactly the eps keys the instruments name
+
+[kernel]
+uses = ["TODO"]                                # v0: ["A"]
+
+[data]
+format = "TODO"                                # npz-v1 | npy-v1
+# then one [[data.files]] block per (point, size, start); then `bin/cc data add <ID>`

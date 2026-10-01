@@ -1,0 +1,7 @@
+[roles]
+maths = []
+plumbing = []
+tests = []
+
+[allow]
+modules = ["numpy"]

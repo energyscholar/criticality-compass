@@ -1,0 +1,8 @@
+# inputs/TEMPLATE.points.toml.in - read by `bin/cc new input <id>`; writes inputs/<id>/points.toml
+# (the point -> case JOIN; never frozen).
+schema = 1
+kind = "points"
+input = "<ID>"
+
+[points]                                       # label = case id, or "none" (declared, not omitted)
+"TODO" = "TODO"

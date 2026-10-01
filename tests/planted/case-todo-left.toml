@@ -1,0 +1,28 @@
+# cases/potts-q3.toml - FIXTURE case, written in phase 2 (taxonomy; never frozen)
+# Drawn from the frozen studies W2; class_truth from the 0862 catalogue schema. Phase 5a
+# replaces it with the released catalogue entry of the same id (A 4.2).
+schema = 1
+kind = "case"
+id = "potts-q3"
+family = "TODO"
+mechanism = """S3 permutation-symmetry breaking at an isolated fixed point: one relevant thermal \
+direction, y_t = 6/5"""
+class_truth = "POINT"
+sampler = "potts"
+traps = ["only simulated AT the exact K_c: no needle, a truth-placed point"]
+decoy_of = "none"
+pairs_with = ["ising-2d", "potts-q5"]
+sources = [
+  """~/software/hal-main/library/papers/conformal-finite-size/\
+gorbenkorychkovzan2018-walking-weak-first-order-transitions-and-complex-cfts-ii-potts-q-gt-4.md""",
+]
+status = "in-signature-table"
+studies = ["W2"]
+
+[controls]
+names = ["K (nn coupling)"]
+range = "exact K_c = ln(1 + sqrt 3) only (W2)"
+
+[observables]
+list = ["g1_potts per block level (plurality map)", "E = sum_nn delta"]
+conjugate_observable = true

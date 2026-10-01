@@ -1,0 +1,180 @@
+# THIS IS CC's m.toml (Kernel V8's M for ONE input: what was measured and how).
+# It is NOT the toolset's m.toml (scratch/compass-toolset/m.toml, the study log).
+# inputs/b7-at-line/m.toml - the B7 data (Ashkin-Teller self-dual line, observable
+# p = sigma tau); v0 declares across and stability (along is v0.1)
+schema = 1
+kind = "input"
+id = "b7-at-line"
+instruments = ["across", "stability"]
+
+[obtained]                     # point label -> truth | navigated | observed
+"0.0" = "truth"
+"0.07" = "truth"
+"0.14" = "truth"
+"0.21" = "truth"
+"0.2747" = "truth"
+
+[axes]
+point = ["0.0", "0.07", "0.14", "0.21", "0.2747"]   # L4 on the exact self-dual line, in order
+size = [27, 81, 243]                           # strictly ascending
+starts = ["random"]
+main_start = "random"
+
+[observable]
+name = "g1 of p = sigma tau"
+definition = "open-pair nearest-neighbour correlation of the block lattice (tools/flow.py g1)"
+levels = [2, 3, 4]                             # stored levels per size, in axes.size order
+final_size = 9
+
+[block_map]
+name = "majority3"
+factor = 3
+keeps = "the sign of the local majority; tie-free (odd block)"
+discards = "the magnitude of the local magnetisation"
+
+[relations.size]
+template = "chain"
+axis = "size"
+provenance = "Coupling"
+direction_from = "the declared blocking map: one more blocking step relates L to L/3"
+
+[interval]
+method = "block"
+b = 400                                        # > 6 x tau_int (toolset m.toml [B7])
+resamples = 400
+level = 0.95
+seed = 22                                      # with the size-major file order: B7's own stream
+
+[eps]
+y = 0.25
+
+[conjugate]
+observable = "E"
+conjugate_to = "K (2-spin coupling)"
+hamiltonian_knowledge = true
+
+[kernel]
+uses = ["A"]
+
+[data]
+format = "npz-v1"                              # entry order = resample draw order (size-major)
+
+[[data.files]]
+point = "0.0"
+size = 27
+start = "random"
+path = "b7/L4-0.0000-L27.npz"
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.07"
+size = 27
+start = "random"
+path = "b7/L4-0.0700-L27.npz"
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.14"
+size = 27
+start = "random"
+path = "b7/L4-0.1400-L27.npz"
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.21"
+size = 27
+start = "random"
+path = "b7/L4-0.2100-L27.npz"
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.2747"
+size = 27
+start = "random"
+path = "b7/L4-0.2747-L27.npz"
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.0"
+size = 81
+start = "random"
+path = "b7/L4-0.0000-L81.npz"
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.07"
+size = 81
+start = "random"
+path = "b7/L4-0.0700-L81.npz"
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.14"
+size = 81
+start = "random"
+path = "b7/L4-0.1400-L81.npz"
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.21"
+size = 81
+start = "random"
+path = "b7/L4-0.2100-L81.npz"
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.2747"
+size = 81
+start = "random"
+path = "b7/L4-0.2747-L81.npz"
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.0"
+size = 243
+start = "random"
+path = "b7/L4-0.0000-L243.npz"
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.07"
+size = 243
+start = "random"
+path = "b7/L4-0.0700-L243.npz"
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.14"
+size = 243
+start = "random"
+path = "b7/L4-0.1400-L243.npz"
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.21"
+size = 243
+start = "random"
+path = "b7/L4-0.2100-L243.npz"
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.2747"
+size = 243
+start = "random"
+path = "b7/L4-0.2747-L243.npz"
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }

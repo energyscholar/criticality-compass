@@ -5,13 +5,15 @@ import stat
 import subprocess
 import sys
 import tempfile
+import time
 import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "cc" / "instruments")]
-PHASE = {"show": 4, "explain": 4, "run": 3, "new": 2, "tables": 2, "validate": 2, "freeze": 3,
-         "tabulate": 4, "data": 2}
+PHASE = {"show": 4, "explain": 4, "run": 3, "freeze": 3, "tabulate": 4}
+VERBOSE = False
+SOFT = True   # phase 2 only: instrument modules and door functions do not exist yet (removed in phase 3)
 ADVANCED = [
     ("show <input>", "every reading of an input, and each point's verdict"),
     ("explain <input> <point>", "the whole chain for one point: data -> verdict"),
@@ -25,6 +27,7 @@ ADVANCED = [
     ("tables drop <set> [--with-results]", "delete an unfrozen rulebook"),
     ("tables split <set> --column C --value V --verdict X", "override one cell family"),
     ("validate [--input ID --tables SET | --mvt]", "check every file; each problem has a Next line"),
+    ("check [--fast]", "validate + tests; run it before a commit"),
     ("test [<name> ...]", "run the named tests (default all)"),
     ("mutate <relpath> (--sed E | --py E) -- <test> ...", "run tests against a temporary mutation"),
     ("help [--advanced]", "this text"),
@@ -56,6 +59,7 @@ def help_text(advanced):
   bin/cc tables fork <from> <to>        copy a rulebook so you can edit it
   bin/cc tables drop <set>              delete a rulebook you no longer want
   bin/cc validate                       check every file; each problem says what to do next
+  bin/cc check                          validate + tests + scoreboard; run it before a commit
 
 inputs: {' '.join(inputs())}
 rules in use: {tables}   (cc.toml [defaults] tables)
@@ -69,21 +73,94 @@ def test_scripts():
     return [ROOT / f for f in tomllib.loads((ROOT / "checks.toml").read_text())["roles"]["tests"]]
 
 
-def cmd_test(names):
+def run_tests(names, skip=()):
     allt = test_scripts()
-    picked = [t for t in allt if not names or t.stem in names or t.name in names or str(t.relative_to(ROOT)) in names]
-    missing = [n for n in names if not any(n in (t.stem, t.name, str(t.relative_to(ROOT))) for t in allt)]
+    key = lambda t: (t.stem, t.name, str(t.relative_to(ROOT)))  # noqa: E731
+    picked = [t for t in allt if (not names or set(names) & set(key(t))) and t.stem not in skip]
+    missing = [n for n in names if not any(n in key(t) for t in allt)]
+    res = []
+    for t in picked:
+        t0 = time.time()
+        r = subprocess.run([sys.executable, str(t)], capture_output=True, text=True, cwd=ROOT)
+        res.append((t.stem, r.returncode == 0, (r.stdout + r.stderr).strip().splitlines()[-(99 if VERBOSE else 8):], time.time() - t0))
+    return res, missing, allt
+
+
+def cmd_test(names):
+    global VERBOSE
+    VERBOSE = "-v" in names
+    names = [n for n in names if n != "-v"]
+    res, missing, allt = run_tests(names)
     for n in missing:
         print(f"no test '{n}' in checks.toml [roles].tests\n  Next: bin/cc test <one of: {' '.join(t.stem for t in allt)}>")
-    failed = []
-    for t in picked:
-        r = subprocess.run([sys.executable, str(t)], capture_output=True, text=True, cwd=ROOT)
-        print(f"{'ok  ' if r.returncode == 0 else 'FAIL'} {t.stem}")
-        if r.returncode:
-            failed.append(t.stem)
-            tail = (r.stdout + r.stderr).strip().splitlines()[-8:]
-            print("\n".join("    " + ln for ln in tail))
-    return 1 if failed or missing else 0
+    for stem, ok, tail, _ in res:
+        print(f"{'ok  ' if ok else 'FAIL'} {stem}")
+        print("\n".join("    " + ln for ln in tail) if not ok or VERBOSE else "", end="" if ok and not VERBOSE else "\n")
+    return 1 if missing or not all(ok for _, ok, _, _ in res) else 0
+
+
+def cmd_validate(args):
+    import declare
+    if "--mvt" in args:
+        print("not built until phase 5a")
+        return 1
+    found, soft, n = declare.validate(ROOT, opt(args, "--input"), opt(args, "--tables"), SOFT or "--allow-missing-modules" in args)
+    print("\n".join(declare.fmt(f) for f in found))
+    print("\n".join(f"notice: {f.loc}: {f.msg}" for f in soft if SOFT or "--allow-missing-modules" in args))
+    if "--advanced" in args:
+        print("checked: " + ", ".join(f"{v} {k}" for k, v in sorted(n.items())))
+    print(f"validate: {len(found)} findings" if found else "validate: clean")
+    return 1 if found else 0
+
+
+def cmd_check(args):
+    import declare
+    if "--regolden" in args:
+        print("check never regoldens.\n  Next: bin/cc test --regolden test_golden")
+        return 1
+    t0, fast = time.time(), "--fast" in args
+    found, _, _ = declare.validate(ROOT, soft_ok=SOFT)
+    if found:
+        print("\n".join(declare.fmt(f) for f in found) + "\ncheck: FAILED: validate\n  Next: fix each finding above, then bin/cc check")
+        return 1
+    print("check: validate clean")
+    slow = config()["check"]["slow"] if fast else []
+    res, _, _ = run_tests([], slow)
+    bad = [r for r in res if not r[1]]
+    print(f"check: {len(res) - len(bad)} tests passed, {len(bad)} failed" + (f" (fast: {len(slow)} slow tests skipped; bin/cc check runs them)" if fast else ""))
+    for stem, _, tail, _ in bad:
+        print(f"check: FAILED: {stem}\n" + "\n".join("    " + ln for ln in tail) + f"\n  Next: bin/cc test {stem}")
+    took, budget = time.time() - t0, config()["check"]["fast_budget_s"]
+    if not bad:
+        print(f"check: clean in {took:.0f} s (fast budget {budget} s)")
+        if fast and took > budget:
+            worst = max(res, key=lambda r: r[3])
+            print(f"  Next: move the slowest fast test ({worst[0]}, {worst[3]:.0f} s) to cc.toml [check].slow")
+    return 1 if bad else 0
+
+
+def opt(args, name, default=None):
+    return args[args.index(name) + 1] if name in args and args.index(name) + 1 < len(args) else default
+
+
+def cmd_author(cmd, args):
+    import author
+    sub = args[0] if args else ""
+    a = args[1:]
+    if (cmd, sub) == ("new", "case") and len(a) == 1:
+        return author.new_case(ROOT, a[0])
+    if (cmd, sub) == ("new", "input") and a:
+        return author.new_input(ROOT, a[0], opt(a, "--like"), opt(a, "--points"), opt(a, "--pattern-point"), opt(a, "--instruments"))
+    if (cmd, sub) == ("data", "add") and len(a) == 1:
+        return author.data_add(ROOT, a[0])
+    if (cmd, sub) == ("tables", "fork") and len(a) == 2:
+        return author.fork(ROOT, *a)
+    if (cmd, sub) == ("tables", "drop") and a:
+        return author.drop(ROOT, a[0], "--with-results" in a)
+    if (cmd, sub) == ("tables", "split") and a and opt(a, "--column") and opt(a, "--value") and opt(a, "--verdict"):
+        return author.split(ROOT, a[0], opt(a, "--column"), opt(a, "--value"), opt(a, "--verdict"))
+    print(f"usage: bin/cc {cmd} <...>\n  Next: bin/cc help --advanced")
+    return 1
 
 
 def cmd_mutate(args):
@@ -116,6 +193,8 @@ def cmd_mutate(args):
         for ln in r.stdout.splitlines():
             if ln[:4] in ("ok  ", "FAIL"):
                 print(("GREEN " if ln[:2] == "ok" else "RED   ") + ln[5:])
+            elif ln.startswith("    "):
+                print("      " + ln.strip())   # the last lines of a RED test (a breaker prints BROKEN <id>)
         print(r.stderr, end="")
         return 0
     finally:
@@ -131,6 +210,12 @@ def main(argv):
         return 0
     if cmd == "test":
         return cmd_test(argv[1:])
+    if cmd == "validate":
+        return cmd_validate(argv[1:] + (["--advanced"] if advanced else []))
+    if cmd == "check":
+        return cmd_check(argv[1:])
+    if cmd in ("new", "data", "tables"):
+        return cmd_author(cmd, argv[1:])
     if cmd == "mutate":
         return cmd_mutate(argv[1:])
     if cmd in PHASE:

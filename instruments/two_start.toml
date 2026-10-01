@@ -1,0 +1,17 @@
+# instruments/two_start.toml - two-start difference D = A over the declared start pair, per
+# (point, size)
+schema = 1
+kind = "instrument"
+module = "two_start"
+operators = ["A"]
+unit = "point-size"
+reports = []
+arrays = ["Q"]
+axes = ["point", "size", "starts"]
+relations = ["start"]
+sidecar = ["two_start"]
+flags = []
+pipeline = ["stage:reduce", "door:nodefield", "stage:difference"]
+
+[columns]
+D = "two_start"

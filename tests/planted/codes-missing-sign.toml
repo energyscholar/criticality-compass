@@ -1,0 +1,32 @@
+# planted mini codes: two signature columns over the real registry
+schema = 1
+kind = "codes"
+signs = ["SIG-", "NEG", "SLOW-", "ZERO!", "SLOW+", "POS", "SIG+", "UNRES"]
+null_rank = ["NOT-MEASURED", "NOT-EVALUATED"]
+
+[columns.signature.a]
+from = "needle.velocity"
+alphabet = ["X", "Y"]
+
+[columns.signature.a.map]
+"SIG-" = "X"
+"NEG" = "X"
+"SLOW-" = "X"
+"ZERO!" = "X"
+"SLOW+" = "Y"
+"POS" = "Y"
+"SIG+" = "Y"
+
+[columns.signature.b]
+from = "across.y_last"
+alphabet = ["P", "Q"]
+
+[columns.signature.b.map]
+"SIG-" = "P"
+"NEG" = "P"
+"SLOW-" = "P"
+"ZERO!" = "P"
+"SLOW+" = "Q"
+"POS" = "Q"
+"SIG+" = "Q"
+"UNRES" = "Q"

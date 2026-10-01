@@ -1,0 +1,7 @@
+# planted manifest for input-ok.toml
+schema = 1
+kind = "data-manifest"
+input = "p-tiny"
+
+[files]
+"c2/d2.0-K1.0.npz" = "0000008742964490fa804b664c251360b8352994b2073239ae967d5519d85f8e"

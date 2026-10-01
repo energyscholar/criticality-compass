@@ -1,0 +1,30 @@
+# planted mini verdict table over codes-mini.toml (domain 4 x 4 = 16 cells)
+schema = 1
+kind = "verdict"
+columns = ["a", "b"]
+ignores = []
+verdicts = ["NOT", "REFUSE-X"]
+refuse = ["REFUSE-X"]
+
+[[row]]
+when.a = ["X", "NOT-MEASURED", "NOT-EVALUATED"]
+verdict = "NOT"
+why = "planted: a reads X or is null"
+
+[[row]]
+when.a = ["Y"]
+when.b = ["P"]
+verdict = "REFUSE-X"
+why = "planted: a Y and b P"
+
+[[row]]
+when.a = ["Y"]
+when.b = ["Q"]
+verdict = "NOT"
+why = "planted: a Y and b Q"
+
+[[row]]
+when.a = ["Y"]
+when.b = ["NOT-MEASURED", "NOT-EVALUATED"]
+verdict = "REFUSE-X"
+why = "planted: a Y and b null"
