@@ -1,0 +1,41 @@
+# tests/breakers/off-critical-growth-change.toml - a RULE BREAKER (data)
+schema = 1
+kind = "breaker"
+id = "off-critical-growth-change"
+rule = "a growth exponent that falls between size steps reads OFF and refuses; it is never STABLE"
+why = """Off K_c the response saturates once L passes the correlation length, so the growth of \
+ln R falls from one size step to the next (1.2 then 0.5). The point is not critical: REFUSE."""
+tables = "verdict-x-rules"
+
+[entry]
+kind = "stage"
+instrument = "stability"            # x replaces stage:reduce; the declared door + stage steps run
+column = "d"
+context = { input = "w2-potts", point = "2" }
+
+[entry.x]                            # the recipe for the reduced array (R per size, every row)
+recipe = "growth"
+sizes = [27, 81, 243]
+y_steps = [1.2, 0.5]
+sd = 0.05
+rows = 400
+seed = 7
+
+[cells]
+"needle.velocity" = "ZERO!"
+"needle.d_ord" = "SIG+"
+"needle.d_dis" = "SIG+"
+"across.y_last" = "SIG+"
+"two_start.D" = ["ZERO!"]
+
+[expect]
+cell = "SIG-"
+signature_column = "stability"
+code = "OFF"
+verdict = "REFUSE-OFF"
+not_verdict = ["POINT", "LINE", "WALKING", "FIRST-ORDER"]
+
+[mutation]
+file = "tables/verdict-x-rules/codes.toml"
+intent = "stability SIG- reads STABLE instead of OFF"
+py = '''s.replace('"SIG-" = "OFF"', '"SIG-" = "STABLE"')'''

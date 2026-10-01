@@ -1,0 +1,31 @@
+# tests/breakers/unres-across-not-positive.toml - a RULE BREAKER (data)
+schema = 1
+kind = "breaker"
+id = "unres-across-not-positive"
+rule = "an UNRES across never reaches a positive class"
+why = """An across interval that straddles 0 and +eps says nothing about relevance; with every \
+other column ready for POINT it must still refuse."""
+tables = "verdict-x-rules"
+
+[entry]
+kind = "cells"
+
+[cells]
+"needle.velocity" = "ZERO!"
+"needle.d_ord" = "SIG+"
+"needle.d_dis" = "SIG+"
+"across.y_last" = "UNRES"
+"stability.d" = "ZERO!"
+"two_start.D" = ["ZERO!"]
+
+[expect]
+signature_column = "across"
+code = "UNRES"
+verdict = "REFUSE-UNRES"
+not_verdict = ["POINT", "LINE", "WALKING", "FIRST-ORDER"]
+
+[mutation]
+file = "tables/verdict-x-rules/codes.toml"
+intent = "across UNRES reads RELEVANT"
+py = '''s.replace('"SIG+" = "RELEVANT"\n"UNRES" = "UNRES"',
+                '"SIG+" = "RELEVANT"\n"UNRES" = "RELEVANT"')'''

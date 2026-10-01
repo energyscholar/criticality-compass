@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """cc - Criticality Compass CLI (plumbing). Root = parent of the directory holding this script."""
+import json
 import shutil
 import stat
 import subprocess
@@ -11,9 +12,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "cc" / "instruments")]
-PHASE = {"show": 4, "explain": 4, "run": 3, "freeze": 3, "tabulate": 4}
+PHASE = {"show": 4, "explain": 4, "tabulate": 4}
 VERBOSE = False
-SOFT = True   # phase 2 only: instrument modules and door functions do not exist yet (removed in phase 3)
+TOOLS = Path.home() / "software/scratch/structure-checks"
 ADVANCED = [
     ("show <input>", "every reading of an input, and each point's verdict"),
     ("explain <input> <point>", "the whole chain for one point: data -> verdict"),
@@ -28,7 +29,7 @@ ADVANCED = [
     ("tables split <set> --column C --value V --verdict X", "override one cell family"),
     ("validate [--input ID --tables SET | --mvt]", "check every file; each problem has a Next line"),
     ("check [--fast]", "validate + tests; run it before a commit"),
-    ("test [<name> ...]", "run the named tests (default all)"),
+    ("test [-v] [<name> ...]", "run the named tests (default all)"),
     ("mutate <relpath> (--sed E | --py E) -- <test> ...", "run tests against a temporary mutation"),
     ("help [--advanced]", "this text"),
     ("(v0.1) family", "not in v0"),
@@ -41,7 +42,12 @@ def config():
 
 def inputs():
     d = ROOT / "inputs"
-    return sorted(p.name for p in d.iterdir() if p.is_dir() and not p.name.startswith("TEMPLATE")) if d.is_dir() else []
+    names = [p.name for p in d.iterdir() if p.is_dir() and not p.name.startswith("TEMPLATE")] if d.is_dir() else []
+    return sorted(names)
+
+
+def opt(args, name, default=None):
+    return args[args.index(name) + 1] if name in args and args.index(name) + 1 < len(args) else default
 
 
 def help_text(advanced):
@@ -69,12 +75,10 @@ start: bin/cc show b7-at-line
 """
 
 
-def test_scripts():
-    return [ROOT / f for f in tomllib.loads((ROOT / "checks.toml").read_text())["roles"]["tests"]]
-
-
+# ------------------------------------------------------------------ test, validate, check
 def run_tests(names, skip=()):
-    allt = test_scripts()
+    """Run the scripts of checks.toml [roles].tests by absolute path: [(stem, ok, last lines, seconds)]."""
+    allt = [ROOT / f for f in tomllib.loads((ROOT / "checks.toml").read_text())["roles"]["tests"]]
     key = lambda t: (t.stem, t.name, str(t.relative_to(ROOT)))  # noqa: E731
     picked = [t for t in allt if (not names or set(names) & set(key(t))) and t.stem not in skip]
     missing = [n for n in names if not any(n in key(t) for t in allt)]
@@ -82,20 +86,22 @@ def run_tests(names, skip=()):
     for t in picked:
         t0 = time.time()
         r = subprocess.run([sys.executable, str(t)], capture_output=True, text=True, cwd=ROOT)
-        res.append((t.stem, r.returncode == 0, (r.stdout + r.stderr).strip().splitlines()[-(99 if VERBOSE else 8):], time.time() - t0))
+        lines = (r.stdout + r.stderr).strip().splitlines()
+        res.append((t.stem, r.returncode == 0, lines[-(99 if VERBOSE else 8):], time.time() - t0))
     return res, missing, allt
 
 
 def cmd_test(names):
     global VERBOSE
     VERBOSE = "-v" in names
-    names = [n for n in names if n != "-v"]
-    res, missing, allt = run_tests(names)
+    res, missing, allt = run_tests([n for n in names if n != "-v"])
     for n in missing:
-        print(f"no test '{n}' in checks.toml [roles].tests\n  Next: bin/cc test <one of: {' '.join(t.stem for t in allt)}>")
+        print(f"no test '{n}' in checks.toml [roles].tests\n  Next: bin/cc test <one of: "
+              f"{' '.join(t.stem for t in allt)}>")
     for stem, ok, tail, _ in res:
         print(f"{'ok  ' if ok else 'FAIL'} {stem}")
-        print("\n".join("    " + ln for ln in tail) if not ok or VERBOSE else "", end="" if ok and not VERBOSE else "\n")
+        if not ok or VERBOSE:
+            print("\n".join("    " + ln for ln in tail))
     return 1 if missing or not all(ok for _, ok, _, _ in res) else 0
 
 
@@ -104,9 +110,8 @@ def cmd_validate(args):
     if "--mvt" in args:
         print("not built until phase 5a")
         return 1
-    found, soft, n = declare.validate(ROOT, opt(args, "--input"), opt(args, "--tables"), SOFT or "--allow-missing-modules" in args)
+    found, n = declare.validate(ROOT, opt(args, "--input"), opt(args, "--tables"))
     print("\n".join(declare.fmt(f) for f in found))
-    print("\n".join(f"notice: {f.loc}: {f.msg}" for f in soft if SOFT or "--allow-missing-modules" in args))
     if "--advanced" in args:
         print("checked: " + ", ".join(f"{v} {k}" for k, v in sorted(n.items())))
     print(f"validate: {len(found)} findings" if found else "validate: clean")
@@ -119,15 +124,17 @@ def cmd_check(args):
         print("check never regoldens.\n  Next: bin/cc test --regolden test_golden")
         return 1
     t0, fast = time.time(), "--fast" in args
-    found, _, _ = declare.validate(ROOT, soft_ok=SOFT)
+    found, _ = declare.validate(ROOT)
     if found:
-        print("\n".join(declare.fmt(f) for f in found) + "\ncheck: FAILED: validate\n  Next: fix each finding above, then bin/cc check")
+        print("\n".join(declare.fmt(f) for f in found))
+        print("check: FAILED: validate\n  Next: fix each finding above, then bin/cc check")
         return 1
     print("check: validate clean")
     slow = config()["check"]["slow"] if fast else []
     res, _, _ = run_tests([], slow)
     bad = [r for r in res if not r[1]]
-    print(f"check: {len(res) - len(bad)} tests passed, {len(bad)} failed" + (f" (fast: {len(slow)} slow tests skipped; bin/cc check runs them)" if fast else ""))
+    skipped = f" (fast: {len(slow)} slow tests skipped; bin/cc check runs them)" if fast else ""
+    print(f"check: {len(res) - len(bad)} tests passed, {len(bad)} failed{skipped}")
     for stem, _, tail, _ in bad:
         print(f"check: FAILED: {stem}\n" + "\n".join("    " + ln for ln in tail) + f"\n  Next: bin/cc test {stem}")
     took, budget = time.time() - t0, config()["check"]["fast_budget_s"]
@@ -139,38 +146,149 @@ def cmd_check(args):
     return 1 if bad else 0
 
 
-def opt(args, name, default=None):
-    return args[args.index(name) + 1] if name in args and args.index(name) + 1 < len(args) else default
-
-
+# ------------------------------------------------------------------ authoring
 def cmd_author(cmd, args):
     import author
-    sub = args[0] if args else ""
-    a = args[1:]
+    sub, a = (args[0] if args else ""), args[1:]
     if (cmd, sub) == ("new", "case") and len(a) == 1:
         return author.new_case(ROOT, a[0])
     if (cmd, sub) == ("new", "input") and a:
-        return author.new_input(ROOT, a[0], opt(a, "--like"), opt(a, "--points"), opt(a, "--pattern-point"), opt(a, "--instruments"))
+        return author.new_input(ROOT, a[0], opt(a, "--like"), opt(a, "--points"), opt(a, "--pattern-point"),
+                                opt(a, "--instruments"))
     if (cmd, sub) == ("data", "add") and len(a) == 1:
         return author.data_add(ROOT, a[0])
     if (cmd, sub) == ("tables", "fork") and len(a) == 2:
         return author.fork(ROOT, *a)
     if (cmd, sub) == ("tables", "drop") and a:
         return author.drop(ROOT, a[0], "--with-results" in a)
-    if (cmd, sub) == ("tables", "split") and a and opt(a, "--column") and opt(a, "--value") and opt(a, "--verdict"):
+    if (cmd, sub) == ("tables", "split") and a and all(opt(a, f) for f in ("--column", "--value", "--verdict")):
         return author.split(ROOT, a[0], opt(a, "--column"), opt(a, "--value"), opt(a, "--verdict"))
     print(f"usage: bin/cc {cmd} <...>\n  Next: bin/cc help --advanced")
     return 1
 
 
+# ------------------------------------------------------------------ run, freeze
+def structure_gate():
+    """Run checks.py (the hook cannot see subprocesses). Returns the refusal text, or None when clean."""
+    r = subprocess.run([sys.executable, str(TOOLS / "checks.py"), str(ROOT)], capture_output=True, text=True)
+    found = [ln for ln in r.stdout.splitlines() if ln[:2] in ("C1", "C2", "C3", "C6", "C7", "W0")]
+    for ln in found:
+        if ln.startswith("C7"):
+            key = ln.split()[3]
+            fork = f", then bin/cc tables fork {key.split('/')[1]} <new-name> and edit the copy"
+            return (f"REFUSED: {key} changed after it was frozen.\n"
+                    f"  Next: git checkout -- {key}{fork if key.startswith('tables/') else ''}")
+    if found:
+        return ("\n".join(found) + "\n  Next: fix each finding above; "
+                "science files may not branch (KERNEL-IN-CC.md explains why)")
+    return None
+
+
+def run_one(name, tables, dry):
+    """(refusal text, None) or (None, result): checks first, then the run."""
+    import declare
+    import detect
+    sets = sorted(t.name for t in (ROOT / "tables").glob("*") if t.is_dir())
+    if name not in inputs():
+        return f"no input '{name}'. Inputs: {' '.join(inputs())}\n  Next: bin/cc run <one of these>", None
+    if tables not in sets:
+        return f"no table set '{tables}'. Sets: {' '.join(sets)}\n  Next: bin/cc run {name} --tables <one of these>", None
+    gate = structure_gate()
+    if gate:
+        return gate, None
+    found, _ = declare.validate(ROOT, name, tables)
+    if found:
+        return "\n".join(declare.fmt(f) for f in found), None
+    if f"results/{name}@{tables}.json" in json.loads((ROOT / "FROZEN.json").read_text())["files"] and not dry:
+        return (f"REFUSED: results/{name}@{tables}.json is frozen (a frozen result never changes).\n"
+                f"  Next: bin/cc tables fork {tables} <new-name>, edit tables/<new-name>/verdict.toml, "
+                f"then bin/cc run {name} --tables <new-name>"), None
+    try:
+        return None, detect.run(name, tables, not dry)
+    except ValueError as e:
+        return str(e), None
+
+
+def print_result(res, dry):
+    """The plain listing of a result (phase 3; the show view replaces it in phase 4)."""
+    print(f"run {res['run_id']}" + (" (dry: nothing written)" if dry else f" -> results/{res['run_id']}.json"))
+    for r in res["readings"]:
+        if r["cell"] != "NOT-MEASURED" or r["per_size"]:
+            est = "" if r["estimate"] is None else f"{r['estimate']:.4f} [{r['lo']:.4f}, {r['hi']:.4f}]"
+            per = "".join(f" L{q['size']} {q['estimate']:+.4f} {q['cell']}" for q in r["per_size"] or [])
+            print(f"  {r['unit']['point']:>10} {r['instrument']}.{r['column']} {est}{per} {r['cell'] or ''} "
+                  f"-> {r['code']}")
+    print("\n".join(f"  {s['point']:>10} => {s['verdict']} ({s['verdict_class']})" for s in res["signature"]))
+
+
+def cmd_run(args):
+    tables = opt(args, "--tables") or config()["defaults"]["tables"]
+    pos = [a for a in args if not a.startswith("--") and a != opt(args, "--tables")]
+    names = inputs() if "--all" in args else pos
+    if not names:
+        print(f"no input named.\n  Next: bin/cc run <one of: {' '.join(inputs())}>   (or --all)")
+        return 1
+    bad = 0
+    for name in names:
+        msg, res = run_one(name, tables, "--dry" in args)
+        if res is None:
+            bad += 1
+            print(msg if len(names) == 1 else f"{name}: REFUSED: {msg.splitlines()[0]}")
+            continue
+        print_result(res, "--dry" in args)
+        if len(names) > 1:
+            print(f"{name}: ran")
+    return 1 if bad else 0
+
+
+def freeze_files(rid, read):
+    """The repo files to freeze for one result: itself, what it read, and every file of its table set."""
+    tdir = f"tables/{rid.split('@')[1]}"
+    want = [f"results/{rid}.json", f"results/{rid}.npz"] + [k for k in read if not k.startswith(("~", "tables/"))]
+    return tdir, want + [f"{tdir}/{q.name}" for q in sorted((ROOT / tdir).iterdir())]
+
+
+def cmd_freeze(args):
+    import declare
+    tables = opt(args, "--tables") or config()["defaults"]["tables"]
+    pos = [a for a in args if not a.startswith("--") and a != opt(args, "--tables")]
+    done = (ROOT / "results").is_dir() and "--all" in args
+    ids = sorted(p.stem for p in (ROOT / "results").glob(f"*@{tables}.json")) if done else pos
+    if not ids:
+        print(f"no result to freeze.\n  Next: bin/cc run <input>, then bin/cc freeze <input>@{tables}")
+        return 1
+    for rid in ids:
+        p, (name, tset) = ROOT / "results" / f"{rid}.json", rid.split("@")
+        if not p.is_file():
+            print(f"no result '{rid}'.\n  Next: bin/cc run {name}")
+            return 1
+        read = json.loads(p.read_text())["read"]
+        for k, h in read.items():
+            if declare.sha(Path(k).expanduser() if k.startswith("~") else ROOT / k) != h:
+                print(f"REFUSED: {k} changed since {rid} was run.\n"
+                      f"  Next: bin/cc run {name} --tables {tset} (or restore the file)")
+                return 1
+        frozen = json.loads((ROOT / "FROZEN.json").read_text())
+        tdir, want = freeze_files(rid, read)
+        new = [w for w in want if w not in frozen["files"]]
+        freeze = [sys.executable, str(TOOLS / "freeze.py"), str(ROOT)]
+        subprocess.run(freeze + ["files", *new], check=True, capture_output=True)
+        if tdir not in frozen["dirs"]:
+            subprocess.run(freeze + ["dirs", tdir], check=True, capture_output=True)
+        print(f"froze {len(new)} files, {int(tdir not in frozen['dirs'])} dir for {rid}")
+    return 0
+
+
+# ------------------------------------------------------------------ mutate
 def cmd_mutate(args):
+    """Copy the repo, apply one mutation to the copy, run the named tests there, print RED/GREEN, delete it."""
+    usage = "mutate: need <relpath> (--sed EXPR | --py EXPR) -- <test> ...\n  Next: bin/cc mutate <relpath> --sed EXPR -- <test> ..."
     if "--" not in args:
         print("mutate: no test named.\n  Next: bin/cc mutate <relpath> --sed EXPR -- <test> ...")
         return 1
-    i = args.index("--")
-    head, tests = args[:i], args[i + 1:]
+    head, tests = args[:args.index("--")], args[args.index("--") + 1:]
     if not tests or len(head) != 3 or head[1] not in ("--sed", "--py"):
-        print("mutate: need <relpath> (--sed EXPR | --py EXPR) -- <test> ...\n  Next: bin/cc mutate <relpath> --sed EXPR -- <test> ...")
+        print(usage)
         return 1
     rel, mode, expr = head
     tmp = Path(tempfile.mkdtemp(prefix="cc-mutate-"))
@@ -204,20 +322,16 @@ def cmd_mutate(args):
 def main(argv):
     advanced = "--advanced" in argv
     argv = [a for a in argv if a != "--advanced"]
-    cmd = argv[0] if argv else "help"
+    cmd, rest = (argv[0] if argv else "help"), argv[1:]
     if cmd == "help":
         print(help_text(advanced), end="")
         return 0
-    if cmd == "test":
-        return cmd_test(argv[1:])
-    if cmd == "validate":
-        return cmd_validate(argv[1:] + (["--advanced"] if advanced else []))
-    if cmd == "check":
-        return cmd_check(argv[1:])
+    table = {"test": cmd_test, "run": cmd_run, "freeze": cmd_freeze, "check": cmd_check, "mutate": cmd_mutate,
+             "validate": lambda a: cmd_validate(a + (["--advanced"] if advanced else []))}
+    if cmd in table:
+        return table[cmd](rest)
     if cmd in ("new", "data", "tables"):
-        return cmd_author(cmd, argv[1:])
-    if cmd == "mutate":
-        return cmd_mutate(argv[1:])
+        return cmd_author(cmd, rest)
     if cmd in PHASE:
         print(f"not built until phase {PHASE[cmd]}")
         return 1

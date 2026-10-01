@@ -1,0 +1,31 @@
+# tests/breakers/unres-two-start-not-positive.toml - a RULE BREAKER (data)
+schema = 1
+kind = "breaker"
+id = "unres-two-start-not-positive"
+rule = "an UNRES two-start never reaches a positive class (decision D13: it refuses)"
+why = """W2 q = 5 read two_start UNRES at L 81. Mapping UNRES to INDEP in codes.toml (the one-line \
+alternative to D13) would let it read POINT."""
+tables = "verdict-x-rules"
+
+[entry]
+kind = "cells"
+
+[cells]
+"needle.velocity" = "ZERO!"
+"needle.d_ord" = "SIG+"
+"needle.d_dis" = "SIG+"
+"across.y_last" = "SIG+"
+"stability.d" = "ZERO!"
+"two_start.D" = ["ZERO!", "UNRES", "ZERO!"]
+
+[expect]
+signature_column = "two_start"
+code = "UNRES"
+verdict = "REFUSE-EQUIL"
+not_verdict = ["POINT", "LINE", "WALKING", "FIRST-ORDER"]
+
+[mutation]
+file = "tables/verdict-x-rules/codes.toml"
+intent = "two_start UNRES reads INDEP (the one-line codes.toml alternative to D13)"
+py = '''s.replace('"SIG+" = "COEXIST"\n"UNRES" = "UNRES"',
+                '"SIG+" = "COEXIST"\n"UNRES" = "INDEP"')'''

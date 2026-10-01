@@ -1,0 +1,34 @@
+# tests/breakers/w1-point-estimate-crossing.toml - a RULE BREAKER (data; tests/test_breakers.py)
+schema = 1
+kind = "breaker"
+id = "w1-point-estimate-crossing"
+rule = "a cell is where the INTERVAL sits among the cuts; a point estimate never decides a cell"
+why = """W1 read Potts q = 5 as 'crossing over' from point estimates; W2's intervals said \
+UNRESOLVED. An estimate beyond +eps whose interval reaches below 0 must read UNRES."""
+tables = "verdict-x-rules"
+
+[entry]
+kind = "readout"                     # readout | stage | cells
+instrument = "stability"
+column = "d"
+context = { input = "w2-potts", point = "5" }
+vector = { recipe = "normal", mean = 0.30, sd = 0.25, rows = 400, seed = 5 }
+
+[cells]                              # every other signature source: a sign cell or a null
+"needle.velocity" = "ZERO!"
+"needle.d_ord" = "SIG+"
+"needle.d_dis" = "SIG+"
+"across.y_last" = "SIG+"
+"two_start.D" = ["ZERO!"]           # a point-size column: one cell per size
+
+[expect]
+cell = "UNRES"
+signature_column = "stability"
+code = "UNRES"
+verdict = "REFUSE-UNRES"
+not_verdict = ["POINT", "LINE", "WALKING", "FIRST-ORDER"]
+
+[mutation]                           # must turn THIS breaker red (tests/test_breakers_red.py)
+file = "cc/readout.py"
+intent = "the interval edges become the point estimate: lo = hi = v[0]"
+py = '''s.replace("np.quantile(v[1:], [(1 - level) / 2, (1 + level) / 2])", "(v[0], v[0])")'''

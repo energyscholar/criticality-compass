@@ -1,4 +1,4 @@
-"""test_tables_cli - bin/cc authoring commands, run as a subprocess inside a temp copy of the repo."""
+"""test_tables_cli - bin/cc authoring, run and freeze commands, as a subprocess inside a temp copy of the repo."""
 import os
 import shutil
 import subprocess
@@ -25,40 +25,81 @@ with tempfile.TemporaryDirectory() as t:
         return r.returncode, r.stdout + r.stderr
 
     rc, out = cc("tables", "fork", "verdict-x-rules", "t1")
-    check("fork copies the set and prints its Next line", rc == 0 and "Next: edit tables/t1/verdict.toml, then bin/cc validate, then bin/cc run --all --tables t1" in out, out)
-    check("the fork is writable", os.access(repo / "tables/t1/verdict.toml", os.W_OK) and os.access(repo / "tables/t1", os.W_OK))
+    want = "Next: edit tables/t1/verdict.toml, then bin/cc validate, then bin/cc run --all --tables t1"
+    check("fork copies the set and prints its Next line", rc == 0 and want in out, out)
+    writable = os.access(repo / "tables/t1/verdict.toml", os.W_OK) and os.access(repo / "tables/t1", os.W_OK)
+    check("the fork is writable", writable)
     rc, out = cc("tables", "fork", "verdict-x-rules", "t1")
-    check("fork refuses an existing target", rc == 1 and "tables/t1 already exists." in out and "Next: pick another name" in out, out)
-    rc, out = cc("tables", "split", "t1", "--column", "stability", "--value", "CROSSING", "--verdict", "REFUSE-WALKING-UNCONFIRMED")
-    check("split touches 14 rows and the copy stays a partition", rc == 0 and "touched 14 rows (19 rows now)" in out and "verdict.toml: clean" in out, out)
+    check("fork refuses an existing target",
+          rc == 1 and "tables/t1 already exists." in out and "Next: pick another name" in out, out)
+    rc, out = cc("tables", "split", "t1", "--column", "stability", "--value", "CROSSING",
+                 "--verdict", "REFUSE-WALKING-UNCONFIRMED")
+    check("split touches 14 rows and the copy stays a partition",
+          rc == 0 and "touched 14 rows (19 rows now)" in out and "verdict.toml: clean" in out, out)
     rc, out = cc("validate")
     check("the split copy validates clean", rc == 0 and "validate: clean" in out, out)
     rc, out = cc("tables", "drop", "t1")
     check("drop removes an unfrozen set", rc == 0 and not (repo / "tables/t1").exists(), out)
     rc, out = cc("tables", "drop", "verdict-x-rules")
-    check("drop refuses the default set", rc == 1 and "is the default rulebook" in out and "Next:" in out and (repo / "tables/verdict-x-rules").is_dir(), out)
+    check("drop refuses the default set",
+          rc == 1 and "is the default rulebook" in out and "Next:" in out and (repo / "tables/verdict-x-rules").is_dir(), out)
 
     rc, out = cc("new", "case", "potts-q4")
     rc2, out2 = cc("validate")
-    check("new case then validate names its TODOs with Next lines", rc == 0 and rc2 == 1 and "cases/potts-q4.toml:family: still TODO\n  Next: replace it with a short description of the model" in out2, out2)
+    todo = "cases/potts-q4.toml:family: still TODO\n  Next: replace it with a short description of the model"
+    check("new case then validate names its TODOs with Next lines", rc == 0 and rc2 == 1 and todo in out2, out2)
     rc, out = cc("new", "case", "potts-q4")
     check("new case refuses an existing file", rc == 1 and "already exists" in out and "Next:" in out, out)
 
     rc, out = cc("new", "input", "w2b", "--like", "w2-potts", "--points", "6,7")
     m = (repo / "inputs/w2b/m.toml").read_text()
-    check("new input --points writes the renamed blocks", rc == 0 and 'path = "w2/q6-L27-random.npz"' in m and 'path = "w2/q7-L243-ordered.npz"' in m and 'id = "w2b"' in m, out + m[:300])
+    check("new input --points writes the renamed blocks",
+          rc == 0 and 'id = "w2b"' in m and 'path = "w2/q6-L27-random.npz"' in m
+          and 'path = "w2/q7-L243-ordered.npz"' in m, out + m[:300])
     rc, out = cc("validate")
     gone = [f"w2/q{q}-L{s}-{st}.npz" for q in (6, 7) for s in (27, 81, 243) for st in ("random", "ordered")]
-    check("validate names every missing data file (12: six per new point)", rc == 1 and all(f"{g} does not exist under the data root" in out for g in gone), out)
+    check("validate names every missing data file (12: six per new point)",
+          rc == 1 and all(f"{g} does not exist under the data root" in out for g in gone), out)
     rc, out = cc("new", "input", "w2c", "--like", "w2-potts", "--points", "6", "--pattern-point", "2")
     m = (repo / "inputs/w2c/m.toml").read_text()
-    check("a pattern that occurs twice in a file name is not guessed", '"TODO"   # was w2/q2-L27-random.npz' in m, m[-400:])
+    check("a pattern that occurs twice in a file name is not guessed",
+          '"TODO"   # was w2/q2-L27-random.npz' in m, m[-400:])
     rc, out = cc("new", "input", "w2d", "--like", "w2-potts", "--instruments", "across")
     rc2, out2 = cc("validate")
-    check("--instruments drops the tables no kept instrument needs", rc == 0 and "w2d/m.toml:two_start" not in out2 and "inputs/w2d/m.toml:relations" not in out2 and "w2d/m.toml:eps" not in out2, out + out2)
+    left = [f for f in ("w2d/m.toml:two_start", "inputs/w2d/m.toml:relations", "w2d/m.toml:eps") if f in out2]
+    check("--instruments drops the tables no kept instrument needs", rc == 0 and not left, out + out2)
     rc, out = cc("data", "add", "w2-potts")
     check("data add refuses to overwrite a manifest", rc == 1 and "already exists" in out and "Next:" in out, out)
     rc, out = cc("tables", "bogus")
     check("an unknown tables subcommand has a Next line", rc == 1 and "Next:" in out, out)
+    rc, out = cc("run", "w2")
+    check("run names the inputs when the name is wrong",
+          rc == 1 and "no input 'w2'. Inputs:" in out and "Next:" in out, out)
+
+    rid = "c2-bc-two-start@verdict-x-rules"
+    rc, out = cc("run", "c2-bc-two-start")
+    check("run writes the result JSON and NPZ",
+          rc == 0 and (repo / f"results/{rid}.json").is_file() and (repo / f"results/{rid}.npz").is_file(), out)
+    rc, out = cc("freeze", rid)
+    check("freeze freezes the result, what it read, and the table set",
+          rc == 0 and out.startswith("froze ") and "1 dir for" in out, out)
+    rc, out = cc("run", "c2-bc-two-start")
+    refused = f"REFUSED: results/{rid}.json is frozen (a frozen result never changes)."
+    nxt = ("Next: bin/cc tables fork verdict-x-rules <new-name>, edit tables/<new-name>/verdict.toml, "
+           "then bin/cc run c2-bc-two-start --tables <new-name>")
+    check("a frozen result id is refused with its Next line", rc == 1 and refused in out and nxt in out, out)
+    rc, out = cc("run", "c2-bc-two-start", "--dry")
+    check("a dry run of a frozen id writes nothing and is allowed", rc == 0 and "dry: nothing written" in out, out)
+    rc, out = cc("tables", "drop", "verdict-x-rules")
+    check("a frozen set is never dropped", rc == 1 and "Next:" in out, out)
+    v = repo / "tables/verdict-x-rules/verdict.toml"
+    v.chmod(0o644)
+    v.write_text(v.read_text() + "\n# edited after it was frozen\n")
+    rc, out = cc("run", "w2-potts", "--dry")
+    check("an edited frozen table is refused (C7)",
+          rc == 1 and "REFUSED: tables/verdict-x-rules/verdict.toml changed after it was frozen." in out
+          and "Next: git checkout -- tables/verdict-x-rules/verdict.toml" in out, out)
+    for p in [repo, *repo.rglob("*")]:
+        p.chmod(0o755 if p.is_dir() else 0o644)
 print("".join(f"FAILED {b}\n" for b in bad) + "test_tables_cli: " + ("FAILED " + str(len(bad)) if bad else "all passed"))
 sys.exit(1 if bad else 0)

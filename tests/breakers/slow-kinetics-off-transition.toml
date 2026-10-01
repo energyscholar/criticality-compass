@@ -1,0 +1,35 @@
+# tests/breakers/slow-kinetics-off-transition.toml - a RULE BREAKER (data)
+schema = 1
+kind = "breaker"
+id = "slow-kinetics-off-transition"
+rule = "start-dependence counts as first order only AT the transition; off the window it is NOT"
+why = """C2 at delta 1.9 / 1.95, deep ordered: the vacant start stays vacant (slow kinetics), so D \
+reads SIG+ exactly as at a first-order point. The needle sits at the ordered sink: NOT."""
+tables = "verdict-x-rules"
+
+[entry]
+kind = "stage"
+instrument = "two_start"
+column = "D"
+context = { input = "c2-bc-two-start", point = "d1.95-K3.0", size = 81 }
+x = { recipe = "nodes", means = [0.30, 0.95], sd = 0.02, rows = 400, seed = 3 }   # vacant, ordered
+
+[cells]
+"needle.velocity" = "SLOW+"
+"needle.d_ord" = "ZERO!"
+"needle.d_dis" = "SIG+"
+"across.y_last" = "SIG+"
+"stability.d" = "ZERO!"
+
+[expect]
+cell = "SIG+"
+signature_column = "two_start"
+code = "COEXIST"
+verdict = "NOT"
+not_verdict = ["FIRST-ORDER"]
+
+[mutation]
+file = "tables/verdict-x-rules/verdict.toml"
+intent = "the off-window row gives FIRST-ORDER instead of NOT"
+py = '''s.replace('when.needle = ["DIS", "ORD"]\nverdict = "NOT"',
+                'when.needle = ["DIS", "ORD"]\nverdict = "FIRST-ORDER"')'''

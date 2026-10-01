@@ -1,0 +1,33 @@
+# tests/breakers/coexistence-at-transition.toml - a RULE BREAKER (data)
+schema = 1
+kind = "breaker"
+id = "coexistence-at-transition"
+rule = "two starts that resolve apart (D > eps) AT the window read FIRST-ORDER"
+why = """C2 at delta 2.0: the ordered and vacant starts stay apart at the transition. With the \
+needle MID this is coexistence, a first-order signature."""
+tables = "verdict-x-rules"
+
+[entry]
+kind = "stage"
+instrument = "two_start"
+column = "D"
+context = { input = "c2-bc-two-start", point = "d2.0-K2.0", size = 81 }
+x = { recipe = "nodes", means = [0.30, 0.95], sd = 0.02, rows = 400, seed = 3 }   # vacant, ordered
+
+[cells]
+"needle.velocity" = "ZERO!"
+"needle.d_ord" = "SIG+"
+"needle.d_dis" = "SIG+"
+"across.y_last" = "SIG+"
+"stability.d" = "ZERO!"
+
+[expect]
+cell = "SIG+"
+signature_column = "two_start"
+code = "COEXIST"
+verdict = "FIRST-ORDER"
+
+[mutation]
+file = "tables/verdict-x-rules/codes.toml"
+intent = "two_start SIG+ reads INDEP instead of COEXIST"
+py = '''s.replace('"SIG+" = "COEXIST"', '"SIG+" = "INDEP"')'''

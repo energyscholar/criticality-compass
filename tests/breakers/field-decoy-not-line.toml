@@ -1,0 +1,31 @@
+# tests/breakers/field-decoy-not-line.toml - a RULE BREAKER (data)
+schema = 1
+kind = "breaker"
+id = "field-decoy-not-line"
+rule = "a point stopped AT the ordered sink is NOT, even when across reads MARGINAL and stable"
+why = """The Ising field decoy (h = 0, T < T_c): the flow stops at the ordered sink, the two \
+starts measured on E are blind (INDEP) and across looks marginal. An un-sink-aware needle reads \
+MID, and the row reads LINE. The sink-aware needle reads ORD: NOT."""
+tables = "verdict-x-rules"
+
+[entry]
+kind = "cells"
+
+[cells]
+"needle.velocity" = "ZERO!"
+"needle.d_ord" = "ZERO!"
+"needle.d_dis" = "SIG+"
+"across.y_last" = "ZERO!"
+"stability.d" = "ZERO!"
+"two_start.D" = ["ZERO!", "ZERO!", "ZERO!"]
+
+[expect]
+signature_column = "needle"
+code = "ORD"
+verdict = "NOT"
+not_verdict = ["LINE"]
+
+[mutation]
+file = "tables/verdict-x-rules/codes.toml"
+intent = "the needle ignores the sink: (sink ORD, velocity MID) reads MID"
+py = '''s.replace('"ORD,MID" = "ORD"', '"ORD,MID" = "MID"')'''
