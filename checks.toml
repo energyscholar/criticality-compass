@@ -1,11 +1,14 @@
 # checks.toml - criticality-compass. Every listed file exists; a file is added in the phase
 # (and the edit) that creates it.
 [roles]
-maths = []
-plumbing = ["bin/cc"]
+maths = ["cc/kernel.py", "cc/sign.py", "cc/resample.py"]
+plumbing = ["bin/cc", "cc/admit.py"]
 benchmark = []
 methods = []
-tests = ["tests/test_budget.py"]
+tests = [
+  "tests/test_budget.py",
+  "tests/test_kernel.py", "tests/test_sign.py", "tests/test_resample.py", "tests/test_kernel_rs.py",
+]
 
 [allow]
 modules = ["numpy", "dataclasses", "enum", "kernel", "sign", "resample", "project", "readout"]

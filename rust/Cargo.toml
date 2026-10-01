@@ -1,0 +1,13 @@
+[package]
+name = "kernel-rs"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+name = "kernel_rs"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = { version = "0.23", features = ["extension-module", "abi3-py311"] }
+metatron_kernel_v8 = { git = "https://github.com/Relational-Relativity-Corporation/abr-kernel", rev = "5c7941e0ce644dba844d3732fc25f9063db40f33" }
