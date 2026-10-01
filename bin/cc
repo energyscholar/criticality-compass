@@ -1,0 +1,143 @@
+#!/usr/bin/env python3
+"""cc - Criticality Compass CLI (plumbing). Root = parent of the directory holding this script."""
+import shutil
+import stat
+import subprocess
+import sys
+import tempfile
+import tomllib
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "cc" / "instruments")]
+PHASE = {"show": 4, "explain": 4, "run": 3, "new": 2, "tables": 2, "validate": 2, "freeze": 3,
+         "tabulate": 4, "data": 2}
+ADVANCED = [
+    ("show <input>", "every reading of an input, and each point's verdict"),
+    ("explain <input> <point>", "the whole chain for one point: data -> verdict"),
+    ("run <input> | --all [--tables SET] [--dry]", "measure; --dry writes nothing"),
+    ("freeze <run-id> | --all [--tables SET]", "make a result and what it read read-only"),
+    ("tabulate [--diff A B]", "SIGNATURE-TABLE.md and docs/verdict-table.html"),
+    ("new case <id>", "start a case file from the template"),
+    ("new input <id> [--like X ...]", "start an input from the template"),
+    ("data add <input>", "pin the sha256 of an input's data files"),
+    ("tables fork <from> <to>", "copy a rulebook so you can edit it"),
+    ("tables drop <set> [--with-results]", "delete an unfrozen rulebook"),
+    ("tables split <set> --column C --value V --verdict X", "override one cell family"),
+    ("validate [--input ID --tables SET | --mvt]", "check every file; each problem has a Next line"),
+    ("test [<name> ...]", "run the named tests (default all)"),
+    ("mutate <relpath> (--sed E | --py E) -- <test> ...", "run tests against a temporary mutation"),
+    ("help [--advanced]", "this text"),
+    ("(v0.1) family", "not in v0"),
+]
+
+
+def config():
+    return tomllib.loads((ROOT / "cc.toml").read_text())
+
+
+def inputs():
+    d = ROOT / "inputs"
+    return sorted(p.name for p in d.iterdir() if p.is_dir() and not p.name.startswith("TEMPLATE")) if d.is_dir() else []
+
+
+def help_text(advanced):
+    tables = config()["defaults"]["tables"]
+    if advanced:
+        w = max(len(a) for a, _ in ADVANCED)
+        body = "\n".join(f"  bin/cc {a.ljust(w)}  {b}" for a, b in ADVANCED)
+        return f"cc - Criticality Compass   (ADVANCED)\n\n{body}\n"
+    return f"""cc - Criticality Compass   (BASIC; `bin/cc help --advanced` lists every command)
+
+  bin/cc show <input>                   every reading of an input, and each point's verdict
+  bin/cc explain <input> <point>        the whole chain for one point: data -> verdict
+  bin/cc run <input> | --all [--dry]    measure under the working rules (--dry writes nothing)
+  bin/cc new case <id>                  start a case file (taxonomy) from the template
+  bin/cc tables fork <from> <to>        copy a rulebook so you can edit it
+  bin/cc tables drop <set>              delete a rulebook you no longer want
+  bin/cc validate                       check every file; each problem says what to do next
+
+inputs: {' '.join(inputs())}
+rules in use: {tables}   (cc.toml [defaults] tables)
+BLANK (...) means "CC does not know"; the word in brackets says why.
+
+start: bin/cc show b7-at-line
+"""
+
+
+def test_scripts():
+    return [ROOT / f for f in tomllib.loads((ROOT / "checks.toml").read_text())["roles"]["tests"]]
+
+
+def cmd_test(names):
+    allt = test_scripts()
+    picked = [t for t in allt if not names or t.stem in names or t.name in names or str(t.relative_to(ROOT)) in names]
+    missing = [n for n in names if not any(n in (t.stem, t.name, str(t.relative_to(ROOT))) for t in allt)]
+    for n in missing:
+        print(f"no test '{n}' in checks.toml [roles].tests\n  Next: bin/cc test <one of: {' '.join(t.stem for t in allt)}>")
+    failed = []
+    for t in picked:
+        r = subprocess.run([sys.executable, str(t)], capture_output=True, text=True, cwd=ROOT)
+        print(f"{'ok  ' if r.returncode == 0 else 'FAIL'} {t.stem}")
+        if r.returncode:
+            failed.append(t.stem)
+            tail = (r.stdout + r.stderr).strip().splitlines()[-8:]
+            print("\n".join("    " + ln for ln in tail))
+    return 1 if failed or missing else 0
+
+
+def cmd_mutate(args):
+    if "--" not in args:
+        print("mutate: no test named.\n  Next: bin/cc mutate <relpath> --sed EXPR -- <test> ...")
+        return 1
+    i = args.index("--")
+    head, tests = args[:i], args[i + 1:]
+    if not tests or len(head) != 3 or head[1] not in ("--sed", "--py"):
+        print("mutate: need <relpath> (--sed EXPR | --py EXPR) -- <test> ...\n  Next: bin/cc mutate <relpath> --sed EXPR -- <test> ...")
+        return 1
+    rel, mode, expr = head
+    tmp = Path(tempfile.mkdtemp(prefix="cc-mutate-"))
+    try:
+        copy = tmp / "repo"
+        shutil.copytree(ROOT, copy, ignore=shutil.ignore_patterns(".git", "__pycache__"))
+        for p in [copy, *copy.rglob("*")]:
+            p.chmod(p.stat().st_mode | stat.S_IWUSR)
+        target = copy / rel
+        old = target.read_text()
+        if mode == "--sed":
+            new = subprocess.run(["sed", "-e", expr], input=old, capture_output=True, text=True, check=True).stdout
+        else:
+            new = eval(expr, {"s": old})
+        if new == old:
+            print(f"mutate: the mutation leaves {rel} unchanged.\n  Next: fix the expression so it changes the file")
+            return 1
+        target.write_text(new)
+        r = subprocess.run([sys.executable, str(copy / "bin" / "cc"), "test", *tests], capture_output=True, text=True)
+        for ln in r.stdout.splitlines():
+            if ln[:4] in ("ok  ", "FAIL"):
+                print(("GREEN " if ln[:2] == "ok" else "RED   ") + ln[5:])
+        print(r.stderr, end="")
+        return 0
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+def main(argv):
+    advanced = "--advanced" in argv
+    argv = [a for a in argv if a != "--advanced"]
+    cmd = argv[0] if argv else "help"
+    if cmd == "help":
+        print(help_text(advanced), end="")
+        return 0
+    if cmd == "test":
+        return cmd_test(argv[1:])
+    if cmd == "mutate":
+        return cmd_mutate(argv[1:])
+    if cmd in PHASE:
+        print(f"not built until phase {PHASE[cmd]}")
+        return 1
+    print(f"unknown command '{cmd}'.\n  Next: bin/cc help")
+    return 1
+
+
+sys.exit(main(sys.argv[1:]))

@@ -1,0 +1,18 @@
+# checks.toml - criticality-compass. Every listed file exists; a file is added in the phase
+# (and the edit) that creates it.
+[roles]
+maths = []
+plumbing = ["bin/cc"]
+benchmark = []
+methods = []
+tests = ["tests/test_budget.py"]
+
+[allow]
+modules = ["numpy", "dataclasses", "enum", "kernel", "sign", "resample", "project", "readout"]
+numpy = [
+  "array", "bincount", "zeros", "abs", "maximum", "maximum.at", "searchsorted", "asarray",
+  "atleast_1d", "arange", "log", "mean", "stack", "hstack", "quantile",
+]
+
+# [tables] is deliberately absent: CC's tables are TOML data whose totality and partition are
+# checked by `bin/cc validate` (cc/declare.py), not by checks.py C6.
