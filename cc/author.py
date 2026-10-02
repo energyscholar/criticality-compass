@@ -129,7 +129,41 @@ def restrict(m, keep, reg):
     m["eps"] = {k: v for k, v in m["eps"].items() if k in {e for i in use for e in i["columns"].values()}}
 
 
-def new_input(root, iid, like=None, points=None, pattern=None, instruments=None):
+def retarget(m, data_dir, fmt):
+    """Point every data block at --data-dir and/or name its file by --label-format; a TODO stays TODO unless fmt names it."""
+    for b in m["data"]["files"]:
+        old = b["path"].old if isinstance(b["path"], Was) else b["path"]
+        head, _, name = old.rpartition("/")
+        if isinstance(b["path"], Was) and not fmt:
+            continue
+        name = fmt.format(label=b["point"], size=b["size"], start=b["start"]) if fmt else name
+        b["path"] = f"{data_dir or head}/{name}"
+
+
+def blank(t):
+    """The TODO form of a schema type: a list, a table or a scalar."""
+    return ["TODO"] if t is list else {"TODO": "TODO"} if t is dict else "TODO"
+
+
+def add_instruments(m, ids, reg):
+    """Declare more instruments: write the sidecar tables, relations, eps keys and arrays they need as TODOs."""
+    for i in ids:
+        inst = reg[i]
+        m["instruments"] = m["instruments"] + [i] * (i not in m["instruments"])
+        for k in inst["sidecar"]:
+            m.setdefault(k, {f: blank(t) for f, t in declare.SIDECAR_SHAPE[k].items()})
+        for r in inst["relations"]:
+            m.setdefault("relations", {}).setdefault(
+                r, {"template": "TODO", "axis": "TODO", "provenance": "TODO", "direction_from": "TODO"})
+        for e in inst["columns"].values():
+            m["eps"].setdefault(e, "TODO")
+        m["kernel"]["uses"] = sorted(set(m["kernel"]["uses"]) | set(inst["operators"]))
+        for b in m["data"]["files"]:
+            for a in inst["arrays"]:
+                b["arrays"].setdefault(a, {"key": "TODO"})
+
+
+def new_input(root, iid, like=None, points=None, pattern=None, instruments=None, data_dir=None, fmt=None, add=None):
     root = Path(root)
     d, ins = root / "inputs" / iid, root / "inputs"
     if d.exists():
@@ -145,10 +179,15 @@ def new_input(root, iid, like=None, points=None, pattern=None, instruments=None)
     if not src.is_file():
         names = " ".join(sorted(p.parent.name for p in ins.glob("*/m.toml")))
         return refuse(f"no input '{like}'.", f"bin/cc new input {iid} --like <one of: {names}>")
-    unknown = [i for i in (instruments or "").split(",") if i and i not in reg]
+    unknown = [i for i in (instruments or "").split(",") + (add or "").split(",") if i and i not in reg]
     if unknown:
         return refuse(f"'{unknown[0]}' is not in the instrument registry.",
-                      f"use --instruments <some of: {' '.join(reg)}>")
+                      f"use --instruments / --add-instrument <some of: {' '.join(reg)}>")
+    try:
+        fmt and fmt.format(label="", size=0, start="")
+    except (KeyError, IndexError, ValueError):
+        return refuse(f"--label-format '{fmt}' may use only {{label}}, {{size}} and {{start}}.",
+                      "bin/cc new input x --like y --label-format 'd{label}-L{size}.npz'")
     text = src.read_text()
     m = tomllib.loads(text)
     m["id"] = iid
@@ -156,8 +195,12 @@ def new_input(root, iid, like=None, points=None, pattern=None, instruments=None)
         repoint(m, points.split(","), pattern or m["axes"]["point"][-1])
     if instruments:
         restrict(m, instruments.split(","), reg)
+    if data_dir or fmt:
+        retarget(m, data_dir, fmt)
+    if add:
+        add_instruments(m, [i for i in add.split(",") if i], reg)
     head = "\n".join(text.splitlines()[:2]) + f"\n# inputs/{iid}/m.toml - like {like}\n"
-    changed = bool(points or instruments)
+    changed = bool(points or instruments or data_dir or fmt or add)
     body = text_of(head, m) if changed else re.sub(r'^id = ".*"$', f'id = "{iid}"', text, flags=re.M)
     d.mkdir()
     (d / "m.toml").write_text(body)
@@ -167,6 +210,28 @@ def new_input(root, iid, like=None, points=None, pattern=None, instruments=None)
         f'schema = 1\nkind = "points"\ninput = "{iid}"\n\n[points]\n{pts}\n')
     print(f"wrote inputs/{iid}/m.toml and points.toml (like {like})\n"
           f"  Next: fix every TODO, then bin/cc data add {iid} and bin/cc validate")
+    return 0
+
+
+def new_instrument(root, iid):
+    """instruments/<id>.toml from the template and the stub cc/instruments/<id>.py; both refuse to validate until finished."""
+    root = Path(root)
+    taken = {f.stem for f in (root / "cc").glob("*.py")} | set(declare.Ctx(root).checks["allow"]["modules"]) | declare.RESERVED
+    if not re.fullmatch(r"[a-z][a-z0-9_]*", iid):
+        return refuse(f"'{iid}' is not an instrument id (lower-case letters, digits, underscores: it names a module).",
+                      "bin/cc new instrument eta")
+    if iid in taken:
+        return refuse(f"'{iid}' would shadow a plumbing or allow-listed module (a bare import would find it).",
+                      "pick another id")
+    toml, stub = root / "instruments" / f"{iid}.toml", root / "cc" / "instruments" / f"{iid}.py"
+    if toml.exists() or stub.exists():
+        return refuse(f"instruments/{iid}.toml or cc/instruments/{iid}.py already exists.", "pick another id")
+    toml.write_text((root / "instruments" / "TEMPLATE.toml.in").read_text().replace("<ID>", iid))
+    stub.write_text((root / "instruments" / "TEMPLATE.py.in").read_text().replace("<ID>", iid))
+    print(f"wrote instruments/{iid}.toml and cc/instruments/{iid}.py\n"
+          f'  add this line to checks.toml [roles].maths: "cc/instruments/{iid}.py"\n'
+          f"  Next: replace every TODO in instruments/{iid}.toml, write the stages and delete the TODO-STAGE "
+          f"marker, then bin/cc validate (bin/cc run refuses until it is clean)")
     return 0
 
 

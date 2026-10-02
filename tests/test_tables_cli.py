@@ -50,6 +50,7 @@ with tempfile.TemporaryDirectory() as t:
     rc2, out2 = cc("validate")
     todo = "cases/potts-q4.toml:family: still TODO\n  Next: replace it with a short description of the model"
     check("new case then validate names its TODOs with Next lines", rc == 0 and rc2 == 1 and todo in out2, out2)
+    check("new case writes the breaker_verdict field", 'breaker_verdict = ""' in (repo / "cases/potts-q4.toml").read_text())
     rc, out = cc("new", "case", "potts-q4")
     check("new case refuses an existing file", rc == 1 and "already exists" in out and "Next:" in out, out)
 
@@ -70,6 +71,40 @@ with tempfile.TemporaryDirectory() as t:
     rc2, out2 = cc("validate")
     left = [f for f in ("w2d/m.toml:two_start", "inputs/w2d/m.toml:relations", "w2d/m.toml:eps") if f in out2]
     check("--instruments drops the tables no kept instrument needs", rc == 0 and not left, out + out2)
+    rc, out = cc("new", "input", "w2e", "--like", "w2-potts", "--points", "6", "--data-dir", "w2x",
+                 "--label-format", "d{label}-L{size}-{start}.npz", "--add-instrument", "needle")
+    m = (repo / "inputs/w2e/m.toml").read_text()
+    check("--data-dir and --label-format retarget every block", rc == 0 and 'path = "w2x/d6-L27-random.npz"' in m
+          and 'path = "w2x/d6-L243-ordered.npz"' in m and "w2/q" not in m, out + m[-300:])
+    rc, out = cc("new", "input", "w2f", "--like", "w2-potts", "--label-format", "{bogus}")
+    check("--label-format refuses an unknown field", rc == 1 and "{label}, {size} and {start}" in out, out)
+    rc, out = cc("validate")
+    todo = [f"inputs/w2e/m.toml:{k}: still TODO\n  Next: " for k in (
+        "relations.matched.template", "sinks.ordered", "sinks.disordered", "eps.step", "eps.sink",
+        "data.files[0].arrays.GL.key", "obtained.6")] + ['inputs/w2e/points.toml:points.6: still TODO\n  Next: write a case id']
+    want_n = (m + (repo / "inputs/w2e/points.toml").read_text()).count('"TODO"')
+    got_n = len([x for x in out.splitlines() if x.startswith("inputs/w2e/") and "still TODO" in x])
+    check("--add-instrument writes TODOs that validate names, each with a Next line",
+          rc == 1 and want_n == got_n > 15 and all(t in out for t in todo) and "obtained.6: still TODO\n  Next: write one of: truth" in out, out[:900])
+    rc, out = cc("new", "instrument", "foo")
+    rc2, out2 = cc("validate")
+    check("new instrument writes a template and a stub, and names the checks.toml line",
+          rc == 0 and 'checks.toml [roles].maths: "cc/instruments/foo.py"' in out and "TODO-STAGE" in (repo / "cc/instruments/foo.py").read_text()
+          and "instruments/foo.toml:unit: still TODO" in out2, out + out2[:400])
+    for bad_id, why in (("door", "shadow"), ("Foo", "not an instrument id"), ("foo", "already exists")):
+        rc, out = cc("new", "instrument", bad_id)
+        check(f"new instrument refuses '{bad_id}'", rc == 1 and why in out and "Next:" in out, out)
+    rc, out = cc("run", "w2-potts", "--dry")
+    check("run is refused while an instrument has findings",
+          rc == 1 and out.startswith("REFUSED: the instrument registry has findings.") and "instruments/foo.toml" in out, out)
+    (repo / "instruments/foo.toml").write_text((repo / "instruments/across.toml").read_text().replace('"across"', '"foo"'))
+    ck = repo / "checks.toml"
+    ck.write_text(ck.read_text().replace('"cc/instruments/two_start.py",', '"cc/instruments/two_start.py", "cc/instruments/foo.py",'))
+    rc, out = cc("run", "w2-potts", "--dry")
+    check("run is refused while the stub still holds TODO-STAGE", rc == 1 and "still holds the TODO-STAGE marker" in out, out)
+    (repo / "cc/instruments/foo.py").write_text((repo / "cc/instruments/across.py").read_text())
+    rc, out = cc("run", "w2-potts", "--dry")
+    check("run is accepted once the instrument validates", rc == 0 and "run w2-potts@" in out, out[:600])
     rc, out = cc("data", "add", "w2-potts")
     check("data add refuses to overwrite a manifest", rc == 1 and "already exists" in out and "Next:" in out, out)
     rc, out = cc("tables", "bogus")

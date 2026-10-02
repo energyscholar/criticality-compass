@@ -8,7 +8,8 @@ cc - Criticality Compass   (ADVANCED)
   bin/cc freeze <run-id> | --all [--tables SET]               make a result and what it read read-only
   bin/cc tabulate [--diff A B]                                write SIGNATURE-TABLE.md + docs/verdict-table.html; --diff prints only
   bin/cc new case <id>                                        start a case file from the template
-  bin/cc new input <id> [--like X ...]                        start an input from the template
+  bin/cc new input <id> [--like X ...]                        start an input from the template; --like also takes --points --data-dir --label-format --add-instrument
+  bin/cc new instrument <id>                                  start an instrument (registry file + stub module) from the template
   bin/cc data add <input>                                     pin the sha256 of an input's data files
   bin/cc tables fork <from> <to>                              copy a rulebook so you can edit it
   bin/cc tables drop <set> [--with-results]                   delete an unfrozen rulebook

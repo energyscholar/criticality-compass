@@ -24,7 +24,8 @@ ADVANCED = [
     ("freeze <run-id> | --all [--tables SET]", "make a result and what it read read-only"),
     ("tabulate [--diff A B]", "write SIGNATURE-TABLE.md + docs/verdict-table.html; --diff prints only"),
     ("new case <id>", "start a case file from the template"),
-    ("new input <id> [--like X ...]", "start an input from the template"),
+    ("new input <id> [--like X ...]", "start an input from the template; --like also takes --points --data-dir --label-format --add-instrument"),
+    ("new instrument <id>", "start an instrument (registry file + stub module) from the template"),
     ("data add <input>", "pin the sha256 of an input's data files"),
     ("tables fork <from> <to>", "copy a rulebook so you can edit it"),
     ("tables drop <set> [--with-results]", "delete an unfrozen rulebook"),
@@ -165,7 +166,10 @@ def cmd_author(cmd, args):
         return author.new_case(ROOT, a[0])
     if (cmd, sub) == ("new", "input") and a:
         return author.new_input(ROOT, a[0], opt(a, "--like"), opt(a, "--points"), opt(a, "--pattern-point"),
-                                opt(a, "--instruments"))
+                                opt(a, "--instruments"), opt(a, "--data-dir"), opt(a, "--label-format"),
+                                opt(a, "--add-instrument"))
+    if (cmd, sub) == ("new", "instrument") and len(a) == 1:
+        return author.new_instrument(ROOT, a[0])
     if (cmd, sub) == ("data", "add") and len(a) == 1:
         return author.data_add(ROOT, a[0])
     if (cmd, sub) == ("tables", "fork") and len(a) == 2:
@@ -207,6 +211,9 @@ def run_one(name, tables, dry):
     gate = structure_gate()
     if gate:
         return gate, None
+    half = [f for q in sorted((ROOT / "instruments").glob("*.toml")) for f in declare.check_file(q, ROOT)]
+    if half:   # plan 0864 R11: a half-made instrument must not enter a result
+        return "REFUSED: the instrument registry has findings.\n" + "\n".join(declare.fmt(f) for f in half), None
     found, _ = declare.validate(ROOT, name, tables)
     if found:
         return "\n".join(declare.fmt(f) for f in found), None

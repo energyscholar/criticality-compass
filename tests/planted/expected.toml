@@ -71,6 +71,11 @@ fix = ["arrays.Q = { key = \"q_ord\", level = 0 }", "arrays.Q = { key = \"q_ord\
 text = "tests/planted/input-level-on-1d.toml:data.files[0].arrays.Q: level given on a 1-D stored array\n  Next: remove level"
 
 [[plant]]
+file = "input-levels-contradict.toml"
+fix = ["levels = [2, 2]", "levels = [2, 3]"]
+text = "tests/planted/input-levels-contradict.toml:data.files[1].arrays.G: G stores 3 levels but observable.levels declares 2 for size 81\n  Next: DATA: if the file is right, set observable.levels to its level count; CODE: if this array is not the observable's level stack, give it another array kind (E and Q take any column)"
+
+[[plant]]
 file = "input-array-kind.toml"
 fix = ["arrays.Z = { key = \"q_ord\" }", "arrays.Q = { key = \"q_ord\" }"]
 text = "tests/planted/input-array-kind.toml:data.files[0].arrays.Z: array kind 'Z' is not in cc.toml [arrays]\n  Next: use one of: G GL E Q"

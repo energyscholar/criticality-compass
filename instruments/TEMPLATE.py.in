@@ -1,0 +1,12 @@
+"""<ID>.py - instrument stages (MATHS role: no branch, no literal other than 0 and 1 without a tag).
+Contract: instruments/<ID>.toml. A stage is f(x, ctx) -> dict of float arrays whose leading axis is the
+resample row (R+1; row 0 = point estimate). Admissibility is never decided here: it is a `door:<f>` step
+(cc/door.py) that returns a Null. Use kernel operators over ctx relations and declared projections from project.py."""
+import numpy as np
+import kernel
+import project
+
+
+def reduce(arrays, ctx):  # TODO-STAGE
+    """one resample row: arrays (name -> this row's indexed arrays) -> the reduced values"""
+    return {}

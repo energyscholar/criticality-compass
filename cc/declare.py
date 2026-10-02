@@ -19,7 +19,11 @@ RESERVED = {"door", "declare", "author", "detect", "view", "score", "admit"}
 SIDECARS = ("observable", "block_map", "conjugate", "sinks", "two_start")
 TEMPLATES = {"chain": {"axis": str}, "pair": {"axis": str, "pairs": list},
              "matched": {"axis": str, "big": int, "small": int}}
-HINT = {"family": "a short description of the model", "mechanism": "one sentence on what drives the transition"}
+SECTION_HINT = {"obtained.": "write one of: truth | navigated | observed (cc.toml alphabets.obtained)",
+                "points.": 'write a case id from cases/ (see bin/cc help), or "none"'}
+HINT = {"family": "a short description of the model", "mechanism": "one sentence on what drives the transition",
+        "key": "the array's key in the data file (np.load(path).files lists them)",
+        "template": "one of: chain, pair, all-pairs, matched (and that template's fields)"}
 NUM = (int, float)
 
 
@@ -79,7 +83,7 @@ def inalpha(p, field, v, alpha):
 def todos(p, d, pre=""):
     """Every value still left as the template's "TODO", with a Next line."""
     for k, v in d.items():
-        hint = f"replace it with {HINT.get(k, 'the real value')}"
+        hint = SECTION_HINT.get(pre) or f"replace it with {HINT.get(k, 'the real value')}"
         if v == "TODO":
             yield at(p, pre + k, "still TODO", hint)
         elif isinstance(v, dict):
@@ -254,7 +258,11 @@ def chk_array(p, loc, name, a, b, fp, m, c):
     if got != dims[name]:
         return out + [at(p, at_, f"selects a {got}-D array but {name} is {dims[name]}-D in cc.toml [arrays]", "fix level")]
     bad_levels = lv and name in LEVEL_STACKS and len(shp) == 2 and shp[1] != lv[ax["size"].index(b["size"])]
-    return out + when(bad_levels, p, at_, f"stored levels {shp[-1]} contradict observable.levels", "fix observable.levels")
+    return out + ([at(p, at_, f"{name} stores {shp[-1]} levels but observable.levels declares "
+                      f"{lv[ax['size'].index(b['size'])]} for size {b['size']}",
+                      "DATA: if the file is right, set observable.levels to its level count; CODE: if this array is not "
+                      "the observable's level stack, give it another array kind (E and Q take any column)")]
+                   if bad_levels else [])
 
 
 def chk_data(p, m, c):
@@ -403,6 +411,8 @@ def chk_manifest(p, d, c, stem=None):
 
 
 def chk_instrument(p, d, c, stem=None):
+    if list(todos(p, d)):
+        return list(todos(p, d))   # a template still full of TODOs: report them, nothing else
     req = {"module": str, "operators": list, "unit": str, "reports": list, "arrays": list, "axes": list,
            "relations": list, "sidecar": list, "flags": list, "pipeline": list, "columns": dict}
     out = header(p, d, "instrument") + shape(p, d, req)
@@ -423,6 +433,8 @@ def chk_instrument(p, d, c, stem=None):
                 "pick another module name")
     src = mp.read_text() if mp.is_file() else None
     out += when(src is None, p, "module", f"cc/instruments/{mod}.py does not exist", "write the module")
+    out += when(src is not None and "TODO-STAGE" in src, p, "module", f"cc/instruments/{mod}.py still holds the "
+                "TODO-STAGE marker", "write the stages, then delete the marker line")
     for step in pl:
         kind, _, name = step.partition(":")
         text, where = (src, f"cc/instruments/{mod}.py") if kind == "stage" else (dp.read_text() if dp.is_file() else "", "cc/door.py")

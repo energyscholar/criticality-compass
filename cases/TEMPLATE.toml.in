@@ -12,6 +12,7 @@ sampler = "TODO"               # free text, informational
 traps = ["TODO"]
 decoy_of = "TODO"              # "none", or a class other than class_truth
 pairs_with = []
+breaker_verdict = ""         # optional: the verdict this case must get if it is a pre-registered breaker
 sources = ["TODO"]             # existing files (after ~ expansion)
 status = "declared"
 studies = []
