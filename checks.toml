@@ -4,7 +4,7 @@
 maths = [
   "cc/kernel.py", "cc/sign.py", "cc/resample.py", "cc/project.py", "cc/readout.py",
   "cc/instruments/needle.py", "cc/instruments/across.py", "cc/instruments/stability.py",
-  "cc/instruments/two_start.py",
+  "cc/instruments/two_start.py", "cc/instruments/along.py",
 ]
 plumbing = ["bin/cc", "cc/admit.py", "cc/declare.py", "cc/author.py", "cc/door.py", "cc/detect.py", "cc/view.py", "cc/score.py", "tests/reference/verdict_x.py",
   ".githooks/pre-commit"]
@@ -18,13 +18,14 @@ tests = [
   "tests/test_detect_verdicts.py", "tests/test_breakers.py", "tests/test_breakers_red.py",
   "tests/test_golden.py", "tests/test_verdict_equivalence.py",
   "tests/test_scoreboard.py", "tests/test_view.py", "tests/test_tabulate.py", "tests/test_reverdict.py",
+  "tests/test_along.py",
 ]
 
 [allow]
 modules = ["numpy", "dataclasses", "enum", "kernel", "sign", "resample", "project", "readout"]
 numpy = [
   "array", "bincount", "zeros", "abs", "maximum", "maximum.at", "searchsorted", "asarray",
-  "atleast_1d", "arange", "log", "mean", "stack", "hstack", "quantile",
+  "atleast_1d", "arange", "log", "mean", "stack", "hstack", "quantile", "reshape",
 ]
 
 # [tables] is deliberately absent: CC's tables are TOML data whose totality and partition are

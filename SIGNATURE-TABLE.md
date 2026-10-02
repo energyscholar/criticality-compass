@@ -6,6 +6,11 @@ Written by `bin/cc tabulate`. Truth is joined here only (cc/score.py); no result
 
 | run | point | case | truth | sizes | sink | needle | flow | across | stability | two_start | verdict | class |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
+| b7-at-line-2@v01-rules | 0.0 | `at-self-dual-line` | LINE | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | STABLE (HT) | NOT-MEASURED | REFUSE-NEEDLE-UNMEASURED | REFUSE |
+| b7-at-line-2@v01-rules | 0.07 | `at-self-dual-line` | LINE | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | STABLE (HT) | NOT-MEASURED | REFUSE-NEEDLE-UNMEASURED | REFUSE |
+| b7-at-line-2@v01-rules | 0.14 | `at-self-dual-line` | LINE | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | STABLE (HT) | NOT-MEASURED | REFUSE-NEEDLE-UNMEASURED | REFUSE |
+| b7-at-line-2@v01-rules | 0.21 | `at-self-dual-line` | LINE | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | STABLE (HT) | NOT-MEASURED | REFUSE-NEEDLE-UNMEASURED | REFUSE |
+| b7-at-line-2@v01-rules | 0.2747 | `at-self-dual-line` | LINE | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | UNRES (HT) | NOT-MEASURED | REFUSE-NEEDLE-UNMEASURED | REFUSE |
 | b7-at-line@v01-rules | 0.0 | `at-self-dual-line` | LINE | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | STABLE (HT) | NOT-MEASURED | REFUSE-NEEDLE-UNMEASURED | REFUSE |
 | b7-at-line@v01-rules | 0.07 | `at-self-dual-line` | LINE | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | STABLE (HT) | NOT-MEASURED | REFUSE-NEEDLE-UNMEASURED | REFUSE |
 | b7-at-line@v01-rules | 0.14 | `at-self-dual-line` | LINE | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | STABLE (HT) | NOT-MEASURED | REFUSE-NEEDLE-UNMEASURED | REFUSE |
@@ -57,6 +62,14 @@ Written by `bin/cc tabulate`. Truth is joined here only (cc/score.py); no result
 | x4-ising-field@v01-rules | 0.46 | `ising-field-decoy` | FIRST-ORDER | 27 81 243 | ORD (T) | ORD (T) | FLOWING (T) | NOT-EVALUATED (HT) | NOT-EVALUATED (HT) | UNRES (T) | NOT | NOT |
 | x4-ising-field@v01-rules | 0.5 | `ising-field-decoy` | FIRST-ORDER | 27 81 243 | ORD (T) | ORD (T) | SLOW (T) | NOT-EVALUATED (HT) | NOT-EVALUATED (HT) | INDEP (T) | NOT | NOT |
 | x4-ising-field@v01-rules | 0.55 | `ising-field-decoy` | FIRST-ORDER | 27 81 243 | ORD (T) | ORD (T) | STOPPED (T) | NOT-EVALUATED (HT) | NOT-EVALUATED (HT) | INDEP (T) | NOT | NOT |
+| x7a-bc@v01-rules | 0.0 | `bc-lambda-line` | POINT | 27 81 243 | NEITHER (N) | ORD (N) | FLOWING (N) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT |
+| x7a-bc@v01-rules | 1.0 | `bc-lambda-line` | POINT | 27 81 243 | NEITHER (N) | DIS (N) | FLOWING (N) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT |
+| x7a-bc@v01-rules | 1.5 | `bc-lambda-line` | POINT | 27 81 243 | NEITHER (N) | DIS (N) | FLOWING (N) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT |
+| x7a-bc@v01-rules | 1.8 | `bc-lambda-line` | POINT | 27 81 243 | NEITHER (N) | MID (N) | UNRES (N) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | REFUSE-TWO-START-UNMEASURED | REFUSE |
+| x7a-bc@v01-rules | 1.9 | `bc-lambda-line` | POINT | 27 81 243 | NEITHER (N) | ORD (N) | FLOWING (N) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT |
+| x7a-bc@v01-rules | 1.95 | `bc-lambda-line` | POINT | 27 81 243 | NEITHER (N) | MID (N) | UNRES (N) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | REFUSE-TWO-START-UNMEASURED | REFUSE |
+| x7a-nnn@v01-rules | k2-0.0 | `ising-2d` | POINT | 27 81 243 | NEITHER (T) | MID (T) | UNRES (T) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | REFUSE-TWO-START-UNMEASURED | REFUSE |
+| x7a-nnn@v01-rules | k2-0.1 | `nnn-ising-manifold` | POINT | 27 81 243 | NEITHER (N) | MID (N) | UNRES (N) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | REFUSE-TWO-START-UNMEASURED | REFUSE |
 | x8-ising-needle@v01-rules | 0.90 | `ising-off-critical` | NOT | 81 243 | NEITHER (T) | DIS (T) | FLOWING (T) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT |
 | x8-ising-needle@v01-rules | 0.95 | `ising-off-critical` | NOT | 81 243 | NEITHER (T) | DIS (T) | FLOWING (T) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT |
 | x8-ising-needle@v01-rules | 0.98 | `ising-off-critical` | NOT | 81 243 | NEITHER (T) | DIS (T) | FLOWING (T) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT |
@@ -67,13 +80,15 @@ Written by `bin/cc tabulate`. Truth is joined here only (cc/score.py); no result
 | x8-ising-needle@v01-rules | 1.05 | `ising-off-critical` | NOT | 81 243 | ORD (T) | ORD (T) | FLOWING (T) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT |
 | x8-ising-needle@v01-rules | 1.10 | `ising-off-critical` | NOT | 81 243 | ORD (T) | ORD (T) | SLOW (T) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT |
 
-Verdict class against truth: 8 agree, 45 refused, 3 disagree, 4 no truth
+Verdict class against truth: 8 agree, 54 refused, 7 disagree, 4 no truth
 
 ## Collisions (v01-rules)
 
 - `sink=NOT-MEASURED, needle=NOT-MEASURED, flow=NOT-MEASURED, across=NOT-MEASURED, stability=NOT-MEASURED, two_start=INDEP`: FIRST-ORDER (c2-bc-two-start:d2.0-K1.0, c2-bc-two-start:d2.0-K1.2, c2-bc-two-start:d2.0-K1.4, c2-bc-two-start:d2.0-K1.6, c2-bc-two-start:d2.0-K1.8) vs POINT (c2-bc-two-start:d1.95-K1.0, c2-bc-two-start:d1.95-K1.2, c2-bc-two-start:d1.95-K1.4, c2-bc-two-start:d1.95-K1.6, c2-bc-two-start:d1.95-K1.8, c2-bc-two-start:d1.95-K2.0, c2-bc-two-start:d1.9-K1.0, c2-bc-two-start:d1.9-K1.2, c2-bc-two-start:d1.9-K1.4, c2-bc-two-start:d1.9-K1.6, c2-bc-two-start:d1.9-K1.8, c2-bc-two-start:d1.9-K2.0, c2-bc-two-start:d1.9-K2.3, c2-bc-two-start:d1.9-K2.6)
 - `sink=NOT-MEASURED, needle=NOT-MEASURED, flow=NOT-MEASURED, across=NOT-MEASURED, stability=NOT-MEASURED, two_start=COEXIST`: FIRST-ORDER (c2-bc-two-start:d2.0-K2.0, c2-bc-two-start:d2.0-K2.3, c2-bc-two-start:d2.0-K2.6, c2-bc-two-start:d2.0-K3.0) vs POINT (c2-bc-two-start:d1.95-K2.3, c2-bc-two-start:d1.95-K2.6, c2-bc-two-start:d1.95-K3.0, c2-bc-two-start:d1.9-K3.0)
 - `sink=NEITHER, needle=MID, flow=SLOW, across=UNRES, stability=UNRES, two_start=INDEP`: BKT-END (x3-clock6:0.7014, x3-clock6:0.9008) vs LINE (x2-xy-line:0.5, x2-xy-line:0.7, x3-clock6:0.75, x3-clock6:0.8, x3-clock6:0.85)
+- `sink=NEITHER, needle=ORD, flow=FLOWING, across=NOT-MEASURED, stability=NOT-MEASURED, two_start=NOT-MEASURED`: NOT (x8-ising-needle:1.01) vs POINT (x7a-bc:0.0, x7a-bc:1.9)
+- `sink=NEITHER, needle=DIS, flow=FLOWING, across=NOT-MEASURED, stability=NOT-MEASURED, two_start=NOT-MEASURED`: NOT (x8-ising-needle:0.90, x8-ising-needle:0.95, x8-ising-needle:0.98, x8-ising-needle:0.99) vs POINT (x7a-bc:1.0, x7a-bc:1.5)
 
 ## Rules: verdict-x-rules
 

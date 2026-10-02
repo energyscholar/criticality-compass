@@ -1,0 +1,8 @@
+# inputs/x7a-nnn/points.toml - the point -> case JOIN (taxonomy; never frozen)
+schema = 1
+kind = "points"
+input = "x7a-nnn"
+
+[points]
+"k2-0.0" = "ising-2d"
+"k2-0.1" = "nnn-ising-manifold"

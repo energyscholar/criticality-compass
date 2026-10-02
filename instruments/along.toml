@@ -1,0 +1,22 @@
+# instruments/along.toml - the B7 statistic: A over a declared control pair (sizes as components),
+# ln|Delta|, then A and B over the size chain. Its membership RULE is table-set data
+# (tables/<set>/membership.toml [along]), never here.
+schema = 1
+kind = "instrument"
+module = "along"
+operators = ["A", "B"]
+unit = "pair"
+reports = ["delta"]                            # reported, never coded: Delta per size (row 0 = the estimate)
+arrays = ["G"]
+axes = ["point", "size"]
+relations = ["size", "control"]
+sidecar = ["observable", "block_map"]
+requires = ["needle"]                          # door order only: membership reads the needle's signature code
+door_values = ["REFUSE-OFF-MANIFOLD"]
+flags = []
+pipeline = [
+  "stage:reduce", "door:off_manifold", "door:nodefield", "stage:delta", "door:logcoord", "stage:growth",
+]
+
+[columns]
+y_along = "y"

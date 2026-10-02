@@ -1,0 +1,9 @@
+# planted membership rule: the door table lacks the UNCHECKED rank
+schema = 1
+kind = "membership"
+
+[along]
+reads = "needle"
+map = { DIS = "OFF", ORD = "OFF", MID = "ON", NOT-MEASURED = "UNCHECKED", NOT-EVALUATED = "NOT-EVALUATED" }
+rank = ["OFF", "NOT-EVALUATED", "UNCHECKED", "ON"]
+door = { OFF = "REFUSE-OFF-MANIFOLD", NOT-EVALUATED = "NOT-EVALUATED", ON = "RUN" }

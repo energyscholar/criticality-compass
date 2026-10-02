@@ -89,6 +89,23 @@ def verdict_lines(sig, mode, cfg, pad="  "):
     return [f"{pad}=> verdict {v}" + adv * (mode == "advanced"), f"{pad}   why: {sig['why']}"]
 
 
+def pair_lines(res, mode, cfg):
+    """The control pairs of a result, one line per (pair, column); empty when the input declares no pair instrument."""
+    out = ["pairs (each edge of the declared control relation)"] if res.get("pair_readings") else []
+    for r in res.get("pair_readings", []):
+        a, b = r["unit"]["pair"]
+        items = [("pairs", f"pair {a}->{b}"), ("column", r["column"])]
+        if r["estimate"] is not None:
+            items += [("estimate", f"{r['estimate']:.4g}"), ("lo", f"[{r['lo']:.4g},"), ("hi", f"{r['hi']:.4g}]")]
+        blank = mode == "basic" and r["cell"] in cfg["basic"]["blank"]
+        items += [("cell", shown(r["cell"], r["reason"], mode, cfg)), ("eps", f"eps {r['eps_key']}={r['eps']}")]
+        items += [("reason", f"({r['reason']})")] if r["reason"] and not blank else []
+        items += [("flags", "flags: " + words(r["flags"], cfg))]
+        items += [("vector_key", f"vector {r['vector_key']}")] if r["vector_key"] else []
+        out.append("  " + join_line(items, mode, cfg))
+    return out
+
+
 def show(res, join, mode, note="", tables_dir=None):
     """Every point of a result: a header, one line per signature column, a verdict line and its why."""
     bad = stale(res)
@@ -109,7 +126,7 @@ def show(res, join, mode, note="", tables_dir=None):
         out.append(f"point {pt}{tag}" + (f"   obtained: {sig['obtained']}" if mode == "advanced" else ""))
         out += [column_line(c, feeders(res, pt, c, cols), sig, mode, cfg) for c in res["signature_columns"]]
         out += verdict_lines(sig, mode, cfg)
-    return out
+    return out + pair_lines(res, mode, cfg)
 
 
 # ------------------------------------------------------------------ explain

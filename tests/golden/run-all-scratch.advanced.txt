@@ -56,6 +56,7 @@ point 0.2747   case at-self-dual-line   obtained: truth
   => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 133
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
 b7-at-line: ran
+b7-at-line-2: REFUSED: tables/scratch/membership.toml:along: along runs door:off_manifold on b7-at-line-2 but this set has no rule for it
 run c2-bc-two-start@scratch -> results/c2-bc-two-start@scratch.json
 c2-bc-two-start   rules: scratch   result: results/c2-bc-two-start@scratch.json (not frozen)
   interval: block resamples 400, level 0.95, seed 1500
@@ -536,6 +537,8 @@ point 0.55   case ising-field-decoy   obtained: truth
   => verdict NOT  class NOT, verdict.toml line 25
      why: verdict_x STAGE1: off the window
 x4-ising-field: ran
+x7a-bc: REFUSED: tables/scratch/membership.toml:along: along runs door:off_manifold on x7a-bc but this set has no rule for it
+x7a-nnn: REFUSED: tables/scratch/membership.toml:along: along runs door:off_manifold on x7a-nnn but this set has no rule for it
 run x8-ising-needle@scratch -> results/x8-ising-needle@scratch.json
 x8-ising-needle   rules: scratch   result: results/x8-ising-needle@scratch.json (not frozen)
   interval: iid resamples 400, level 0.95, seed 8
@@ -628,4 +631,4 @@ point 1.10   case ising-off-critical   obtained: truth
   => verdict NOT  class NOT, verdict.toml line 25
      why: verdict_x STAGE1: off the window
 x8-ising-needle: ran
-exit 0
+exit 1

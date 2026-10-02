@@ -1,0 +1,9 @@
+# planted membership rule: the map lacks the NOT-EVALUATED key of the needle's alphabet plus nulls
+schema = 1
+kind = "membership"
+
+[along]
+reads = "needle"
+map = { DIS = "OFF", ORD = "OFF", MID = "ON", NOT-MEASURED = "UNCHECKED" }
+rank = ["OFF", "UNCHECKED", "ON"]
+door = { OFF = "REFUSE-OFF-MANIFOLD", UNCHECKED = "RUN-FLAG-U", ON = "RUN" }

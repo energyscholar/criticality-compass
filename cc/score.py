@@ -124,18 +124,22 @@ def reverdict(res, pt, T):
     return detect.verdict_of(detect.signature_from_cells(view.cells_of(res, pt), T), T)[0]
 
 
-def membership_text(root, name):
-    """The text of a set's membership.toml (empty when it has none): what a door may read from a table set."""
+def membership_of(root, name, declared):
+    """What a set's membership.toml says that an input could have read: the rules of the instruments the input
+    declares, and anything that is not a rule at all. A rule for an instrument the input does not declare moves
+    nothing it ran, so it is not part of what the input read."""
     f = Path(root) / "tables" / name / "membership.toml"
-    return f.read_text() if f.is_file() else ""
+    d = tomllib.loads(f.read_text()) if f.is_file() else {}
+    return {k: v for k, v in d.items() if k not in ("schema", "kind") and (not isinstance(v, dict) or k in declared)}
 
 
 def reverdict_refusal(res, new, root=ROOT):
     """A refusal is a VALUE: the text saying why `res` cannot be re-verdicted under set `new`, else None.
     A set that changes what a door or membership read decided which units ran; those readings are not
     the ones the new set would have measured, so only a re-measure is honest."""
-    old = res["tables"]
-    changed = membership_text(root, old) != membership_text(root, new)
+    m = Path(root) / "inputs" / res["input"] / "m.toml"
+    declared = tomllib.loads(m.read_text()).get("instruments", []) if m.is_file() else []
+    changed = membership_of(root, res["tables"], declared) != membership_of(root, new, declared)
     return None if not changed else (
         f"REFUSED: tables/{new} changes membership.toml, which decided which units of {res['input']} ran.\n"
         f"  Next: re-measure with bin/cc run {res['input']} --tables {new}")
@@ -169,7 +173,9 @@ def reverdict_result(res, T, commit="none"):
     old_id = res["run_id"]
     read = {f"results/{old_id}.json": declare.sha(ROOT / "results" / f"{old_id}.json"),
             **{k: h for k, h in res["read"].items() if not k.startswith("tables/")},
-            **{f"tables/{T.name}/{q.name}": declare.sha(q) for q in T.paths}}
+            **{f"tables/{T.name}/{q.name}": declare.sha(q) for q in T.paths},
+            **({f"tables/{T.name}/membership.toml": declare.sha(T.membership_path)}
+               if T.membership_path and any(k.endswith("/membership.toml") for k in res["read"]) else {})}
     return {**res, "run_id": f"{res['input']}@{T.name}", "tables": T.name, "derived_from": old_id,
             "code_commit": commit, "read": read, "readings": readings, "signature": signature}
 

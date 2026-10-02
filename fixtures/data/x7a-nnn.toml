@@ -1,0 +1,12 @@
+# fixtures/data/x7a-nnn.toml - written by bin/cc data add: sha256 of every data file
+schema = 1
+kind = "data-manifest"
+input = "x7a-nnn"
+
+[files]
+"p3/L27-N8000-s200.npz" = "7c9b358e09b1538e28ca0556f943d9b266f13267338d69e797fa5916e8367b3d"
+"p3/L81-N8000-s200.npz" = "a940f8e1b8a9746152e2d3b40f2b3547877f4c1fb5497d460b1ae5d73ebd6474"
+"p3/L243-N8000-s200.npz" = "7d162b8971c3e80b6a82767a286ff0e26804797d0a39b4400f89623553dfc540"
+"b3/L27.npz" = "a4fc473ff9c632b3dfc53b0ef35535cd5de4f2c824c00d1e5d6bcec860a0f022"
+"b3/L81.npz" = "13d86c0bc0c3b9b6877e9cebd9cf0305f5598de74a32fc0585f052c7bc983657"
+"b3/L243.npz" = "8ec26abe9f7b6f9986a8c7d2cb46a1bc22783d6575bc4fcb420eea5627570ade"

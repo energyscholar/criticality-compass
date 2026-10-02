@@ -48,7 +48,7 @@ text = "tests/planted/points-missing-point.toml:points.\"5\": point is not joine
 [[plant]]
 file = "input-unknown-instrument.toml"
 fix = ["instruments = [\"two_start\", \"nosuch\"]", "instruments = [\"two_start\"]"]
-text = "tests/planted/input-unknown-instrument.toml:instruments: 'nosuch' is not in the instrument registry\n  Next: use one of: across needle stability two_start"
+text = "tests/planted/input-unknown-instrument.toml:instruments: 'nosuch' is not in the instrument registry\n  Next: use one of: across along needle stability two_start"
 
 [[plant]]
 file = "input-eps-missing.toml"
@@ -63,7 +63,7 @@ text = "tests/planted/input-eps-not-required.toml:eps.step: eps key not required
 [[plant]]
 file = "input-unknown-template.toml"
 fix = ["template = \"ring\"", "template = \"pair\""]
-text = "tests/planted/input-unknown-template.toml:relations.start.template: unknown template 'ring'\n  Next: use one of: chain pair matched"
+text = "tests/planted/input-unknown-template.toml:relations.start.template: unknown template 'ring'\n  Next: use one of: chain pair all-pairs matched"
 
 [[plant]]
 file = "input-level-on-1d.toml"
@@ -145,3 +145,25 @@ file = "instrument-ok.toml"
 over = { checks = "checks-no-maths.toml" }
 fix = []
 text = "tests/planted/instrument-ok.toml:module: 'needle' is not under checks.toml [roles].maths\n  Next: add \"cc/instruments/needle.py\" to [roles].maths"
+
+[[plant]]
+file = "membership-missing-key.toml"
+over = { codes = "../../tables/v01-rules/codes.toml" }
+fix = ["NOT-MEASURED = \"UNCHECKED\" }", "NOT-MEASURED = \"UNCHECKED\", NOT-EVALUATED = \"NOT-EVALUATED\" }"]
+text = "tests/planted/membership-missing-key.toml:along.map: missing key 'NOT-EVALUATED'\n  Next: add \"NOT-EVALUATED\" = <membership>"
+
+[[plant]]
+file = "membership-door-keys.toml"
+over = { codes = "../../tables/v01-rules/codes.toml" }
+fix = ["ON = \"RUN\" }", "ON = \"RUN\", UNCHECKED = \"RUN-FLAG-U\" }"]
+text = "tests/planted/membership-door-keys.toml:along.door: keys must equal rank\n  Next: fix the keys"
+
+[[plant]]
+file = "input-along-two-sizes.toml"
+fix = ["size = [27, 81]", "size = [27, 81, 243]"]
+text = "tests/planted/input-along-two-sizes.toml:axes.size: along accumulates B over the size chain and needs exactly 3 sizes, found 2\n  Next: declare three sizes, or do not declare the instrument"
+
+[[plant]]
+file = "instrument-requires-unknown.toml"
+fix = ["requires = [\"nosuch\"]", "requires = [\"needle\"]"]
+text = "tests/planted/instrument-requires-unknown.toml:requires: 'nosuch' must be a registry instrument with no requires of its own\n  Next: name an instrument that is read first (one level in v0.1)"

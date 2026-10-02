@@ -1,5 +1,6 @@
 """detect.py - input -> resample plan -> instruments -> codes -> signature -> verdict (plumbing; methods).
 The staged entry points the breakers and the scoreboard call are the same functions `run` is built from."""
+import dataclasses
 import functools
 import importlib
 import json
@@ -28,6 +29,7 @@ class Reading:
     eps: float = None
     reason: str = None
     vector: object = None
+    door: str = None          # a pair reading: the membership door value that decided whether its unit ran
 
 
 @dataclass
@@ -37,6 +39,8 @@ class Tables:
     verdict: dict
     lines: list
     paths: tuple
+    membership: dict = dataclasses.field(default_factory=dict)   # instrument name -> its rule (membership.toml)
+    membership_path: object = None
 
 
 def refused(msg, nxt):
@@ -62,12 +66,14 @@ def load_tables(name, tables_dir=None):
     if not d.is_dir():
         sets = " ".join(sorted(p.name for p in (ROOT / "tables").glob("*")))
         raise refused(f"no table set '{name}'. Sets: {sets}", "bin/cc tables fork verdict-x-rules <name>")
-    bad = declare.check_file(d / "codes.toml", ROOT) + declare.check_file(d / "verdict.toml", ROOT)
+    mp = d / "membership.toml"
+    bad = [f for q in (d / "codes.toml", d / "verdict.toml", *[mp] * mp.is_file()) for f in declare.check_file(q, ROOT)]
     if bad:
         raise ValueError("\n".join(declare.fmt(f) for f in bad))
     texts = [(d / f).read_text() for f in ("codes.toml", "verdict.toml")]
+    rules = {k: v for k, v in tomllib.loads(mp.read_text()).items() if isinstance(v, dict)} if mp.is_file() else {}
     return Tables(name, tomllib.loads(texts[0]), tomllib.loads(texts[1]), declare.row_lines(texts[1]),
-                  (d / "codes.toml", d / "verdict.toml"))
+                  (d / "codes.toml", d / "verdict.toml"), rules, mp if mp.is_file() else None)
 
 
 def context_for(input_id, instrument_name, point, size=None):
@@ -82,15 +88,21 @@ def read_vector(instrument_name, column, v, ctx):
 
 
 def after(name, x, ctx):
-    """The declared door and stage steps after stage:reduce, then readout: (readings by column, reports)."""
+    """The declared door and stage steps after stage:reduce, then readout: (readings by column, reports).
+    A report is kept as soon as a stage has produced it, so a later refusal does not drop it."""
     inst, mod = instrument(name)
+    seen = {}
     for step in inst["pipeline"][1:]:
         kind, _, fn = step.partition(":")
         x = getattr(door if kind == "door" else mod, fn)(x, ctx)
         if isinstance(x, door.Null):
-            return {c: Reading(None, None, None, x.value, k, ctx.eps[c], x.reason)
-                    for c, k in inst["columns"].items()}, {}
-    return {c: read_vector(name, c, x[c], ctx) for c in inst["columns"]}, {r: x[r] for r in inst["reports"]}
+            return {c: Reading(None, None, None, x.value, k, ctx.eps[c], x.reason, None, ctx.member and ctx.member["door"])
+                    for c, k in inst["columns"].items()}, {r: seen[r] for r in inst["reports"] if r in seen}
+        seen.update({k: v for k, v in x.items() if k in inst["reports"]} if isinstance(x, dict) else {})
+    out = {c: read_vector(name, c, x[c], ctx) for c in inst["columns"]}
+    for r in out.values():
+        r.door = ctx.member and ctx.member["door"]
+    return out, {r: seen[r] for r in inst["reports"]}
 
 
 def after_reduce(name, x, ctx):
@@ -158,6 +170,11 @@ def read_hashes(m, input_id, tables, T, c):
         read[f"instruments/{n}.toml"] = declare.sha(ROOT / "instruments" / f"{n}.toml")
     for path, f in zip(T.paths, ("codes", "verdict")):
         read[f"tables/{tables}/{f}.toml"] = declare.sha(path)
+    if any("door:off_manifold" in c.reg[n]["pipeline"] for n in m["instruments"]):
+        if T.membership_path is None:
+            raise refused(f"tables/{tables} has no membership.toml, and {input_id} declares an instrument whose "
+                          "door reads one", f"copy tables/v01-rules/membership.toml into tables/{tables}/")
+        read[f"tables/{tables}/membership.toml"] = declare.sha(T.membership_path)
     mf = ROOT / "fixtures" / "data" / f"{input_id}.toml"
     if not mf.is_file():
         raise refused(f"no data manifest fixtures/data/{input_id}.toml", f"bin/cc data add {input_id}")
@@ -174,23 +191,36 @@ def read_hashes(m, input_id, tables, T, c):
     return read
 
 
-def measure(m, c, reg):
+def cells_of_rows(rows):
+    """The sign cells of one point as `<instrument>.<column>` -> cell (a list per size for a point-size column)."""
+    return {src: [r.cell for _, r in per] if len(per) > 1 or per[0][0] is not None else per[0][1].cell
+            for _, _, _, _, per, src in rows}
+
+
+def measure(m, c, reg, T):
     """The streaming pass: one resample plan; every unit of every declared instrument reduced row by row,
-    then its door and stage steps and readout. Returns {(instrument, point, size): (readings, reports)}."""
+    then its door and stage steps and readout. Two passes after the stream: instruments with empty `requires`
+    first and coded, then the dependents, whose membership door reads those codes.
+    Returns {(instrument, unit, size): (readings, reports)}."""
     blocks = door.load_blocks(m, c.data_root)
-    pos, sizes = {k: i for i, (k, _) in enumerate(blocks)}, m["axes"]["size"]
-    units = [(n, pt, sz) for n in m["instruments"] for pt in m["axes"]["point"]
-             for sz in (sizes if reg[n][0]["unit"] == "point-size" else [None])]
+    pos = {k: i for i, (k, _) in enumerate(blocks)}
+    units = [(n, u, sz) for n in m["instruments"] for u, sz in door.unit_labels(m, reg[n][0])]
     ctxs = {(n, sz): door.context(m, reg[n][0], sz) for n, _, sz in units}
     acc = {u: [] for u in units}
     for idx in door.resample_plan(m, [len(next(iter(a.values()))) for _, a in blocks]):
         cache = {}
-        for n, pt, sz in units:
+        for n, u, sz in units:
             inst = reg[n][0]
-            keys = door.unit_keys(m, inst, pt, sz)
+            keys = door.unit_keys(m, inst, u, sz)
             arrays = {a: [gather(cache, blocks, idx, pos[k], a) for k in keys] for a in inst["arrays"]}
-            acc[(n, pt, sz)].append(reg[n][1].reduce(arrays, ctxs[(n, sz)]))
-    return {u: after(u[0], np.stack(v), ctxs[(u[0], u[2])]) for u, v in acc.items()}
+            acc[(n, u, sz)].append(reg[n][1].reduce(arrays, ctxs[(n, sz)]))
+    first = {u: after(u[0], np.stack(v), ctxs[(u[0], u[2])]) for u, v in acc.items() if not reg[u[0]][0].get("requires")}
+    codes = {pt: codes_of(cells_of_rows(point_rows(m, c, reg, first, pt)), T) for pt in m["axes"]["point"]}
+    for u, v in acc.items():
+        if reg[u[0]][0].get("requires"):
+            ctx = dataclasses.replace(ctxs[(u[0], u[2])], member=door.member(T.membership, u[0], u[1], codes))
+            first[u] = after(u[0], np.stack(v), ctx)
+    return first
 
 
 def point_rows(m, c, reg, out, pt):
@@ -198,6 +228,8 @@ def point_rows(m, c, reg, out, pt):
     an instrument this input does not declare reads NOT-MEASURED."""
     rows, flagmap = [], c.cfg["obtained_flag"]
     for n, (inst, _) in reg.items():
+        if inst["unit"] == "pair":
+            continue   # a pair instrument has no point row: its readings are pair_readings
         on = n in m["instruments"]
         flags = sorted(set(inst["flags"]) | {flagmap[m["obtained"][pt]]}) if on else []
         sizes = m["axes"]["size"] if on and inst["unit"] == "point-size" else [None]
@@ -208,37 +240,66 @@ def point_rows(m, c, reg, out, pt):
     return rows
 
 
-def reading_dict(row, pt, codes, direct, cols):
+def ukey(unit):
+    """The vector-key form of a unit: point=<label> or pair=<a>-><b>."""
+    return "pair=" + "->".join(unit["pair"]) if "pair" in unit else f"point={unit['point']}"
+
+
+def reading_dict(row, unit, codes, direct, cols):
     """One reading as the result JSON holds it; a point-size reading keeps its numbers per size."""
     n, col, ek, flags, per, src = row
     r0, point_size = per[0][1], len(per) > 1 or per[0][0] is not None
     per_size = [{"size": sz, "estimate": r.estimate, "lo": r.lo, "hi": r.hi, "cell": r.cell,
                  "code": cols[direct[src]]["map"].get(r.cell, r.cell)} for sz, r in per] if point_size else None
-    full = None if point_size or r0.vector is None else f"{n}/{col}/point={pt}"
-    return {"instrument": n, "column": col, "unit": {"point": pt}, "eps_key": ek, "eps": r0.eps,
+    full = None if point_size or r0.vector is None else f"{n}/{col}/{ukey(unit)}"
+    return {"instrument": n, "column": col, "unit": unit, "eps_key": ek, "eps": r0.eps,
             "estimate": None if point_size else r0.estimate, "lo": None if point_size else r0.lo,
             "hi": None if point_size else r0.hi, "cell": None if point_size else r0.cell,
             "code": codes.get(direct.get(src), r0.cell), "per_size": per_size, "flags": flags,
             "reason": r0.reason, "vector_key": full}
 
 
+def pair_results(m, c, reg, out, vectors):
+    """(pair_readings, pairs, reports) of every pair instrument: one reading per (pair, column), one summary row
+    per pair. A pair takes the flags of both its points, the registry flags, and U when its membership was unchecked."""
+    readings, pairs, reports, flagmap = [], [], [], c.cfg["obtained_flag"]
+    for n, (inst, _) in reg.items():
+        if n not in m["instruments"] or inst["unit"] != "pair":
+            continue
+        for pair in door.control_pairs(m):
+            res, reps = out[(n, pair, None)]
+            unit, first = {"pair": list(pair)}, res[next(iter(inst["columns"]))]
+            flags = sorted(set(inst["flags"]) | {flagmap[m["obtained"][pt]] for pt in pair}
+                           | ({"U"} if first.door == "RUN-FLAG-U" else set()))
+            for col, ek in inst["columns"].items():
+                readings.append(reading_dict((n, col, ek, flags, [(None, res[col])], f"{n}.{col}"), unit, {}, {}, {}))
+                if res[col].vector is not None:
+                    vectors[f"{n}/{col}/{ukey(unit)}"] = res[col].vector
+            pairs.append({"pair": list(pair), n: first.cell, "flags": flags})
+            for rn, v in reps.items():
+                key = f"{n}/{rn}/{ukey(unit)}"
+                reports.append({"instrument": n, "name": rn, "unit": unit, "estimate": np.asarray(v)[0].tolist(),
+                                "vector_key": key})
+                vectors[key] = np.asarray(v)
+    return readings, pairs, reports
+
+
 def run(input_id, tables, write, tables_dir=None):
     m, c, T = load_input(input_id), declare.Ctx(ROOT), load_tables(tables, tables_dir)
     reg = {n: instrument(n) for n in sorted(c.reg)}
-    read, out = read_hashes(m, input_id, tables, T, c), measure(m, c, reg)
+    read, out = read_hashes(m, input_id, tables, T, c), measure(m, c, reg, T)
     cols = declare.code_cols(T.codes)
     direct = {s["from"]: n for n, s in cols.items() if isinstance(s["from"], str)}
     readings, reports, vectors, signature = [], [], {}, []
     for pt in m["axes"]["point"]:
-        rows, cells = point_rows(m, c, reg, out, pt), {}
+        rows = point_rows(m, c, reg, out, pt)
+        cells = cells_of_rows(rows)
         for n, col, ek, flags, per, src in rows:
-            point_size = len(per) > 1 or per[0][0] is not None
-            cells[src] = [r.cell for _, r in per] if point_size else per[0][1].cell
             for sz, r in per:
                 if r.vector is not None:
                     vectors[f"{n}/{col}/point={pt}" + (f",size={sz}" if sz else "")] = r.vector
         for n, (inst, _) in reg.items():
-            for rn in inst["reports"] if n in m["instruments"] else []:
+            for rn in inst["reports"] if n in m["instruments"] and inst["unit"] != "pair" else []:
                 v = out[(n, pt, None)][1].get(rn)
                 if v is not None:
                     key = f"{n}/{rn}/point={pt}"
@@ -248,13 +309,14 @@ def run(input_id, tables, write, tables_dir=None):
         codes = codes_of(cells, T)
         sig = {n: codes[n] for n in T.codes["columns"]["signature"]}
         verdict, cls, line, why = verdict_of(sig, T)
-        mine = [reading_dict(row, pt, codes, direct, cols) for row in rows]
+        mine = [reading_dict(row, {"point": pt}, codes, direct, cols) for row in rows]
         flags = {s: sorted({f for rd in mine if f"{rd['instrument']}.{rd['column']}" in sources(s, cols)
                             for f in rd["flags"]}) for s in sig}
         readings += mine
         signature.append({"point": pt, "obtained": m["obtained"][pt], **sig,
                           "flags": {s: f for s, f in flags.items() if f}, "verdict": verdict,
                           "verdict_class": cls, "row_line": line, "why": why})
+    pair_readings, pairs, pair_reports = pair_results(m, c, reg, out, vectors)
     commit = "none"
     if write and (ROOT / ".git").exists():
         r = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True)
@@ -263,8 +325,8 @@ def run(input_id, tables, write, tables_dir=None):
     res = {"schema": 1, "kind": "result", "run_id": rid, "input": input_id, "tables": tables,
            "derived_from": None, "code_commit": commit, "interval": dict(m["interval"]), "read": read,
            "vectors": f"results/{rid}.npz",
-           "readings": readings, "reports": reports, "signature_columns": list(T.codes["columns"]["signature"]),
-           "signature": signature}
+           "readings": readings, "pair_readings": pair_readings, "reports": reports + pair_reports,
+           "signature_columns": list(T.codes["columns"]["signature"]), "signature": signature, "pairs": pairs}
     if write:
         (ROOT / "results").mkdir(exist_ok=True)
         (ROOT / "results" / f"{rid}.json").write_text(json.dumps(res, indent=1) + "\n")

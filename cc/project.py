@@ -20,3 +20,9 @@ def logcoord(v, s):
 def scaled_mean(q, scale):
     """mean of Q over the resample, divided by the declared unit scale."""
     return np.mean(q) / scale
+
+
+def p_delta(v, shape):
+    """Delta per (resample row, size): the signed pair differences re-declared with sizes along the last axis
+    (keeps the signed difference per size and row; discards which two runs it came from)."""
+    return np.reshape(v, shape)

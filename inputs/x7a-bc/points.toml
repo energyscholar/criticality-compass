@@ -1,0 +1,12 @@
+# inputs/x7a-bc/points.toml - the point -> case JOIN (taxonomy; never frozen)
+schema = 1
+kind = "points"
+input = "x7a-bc"
+
+[points]
+"0.0" = "bc-lambda-line"
+"1.0" = "bc-lambda-line"
+"1.5" = "bc-lambda-line"
+"1.8" = "bc-lambda-line"
+"1.9" = "bc-lambda-line"
+"1.95" = "bc-lambda-line"

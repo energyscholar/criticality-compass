@@ -21,6 +21,7 @@ T = "truth point"
 N = "navigated point"
 C = "observed point"
 H = "uses Hamiltonian knowledge"
+U = "membership unchecked (the upstream needle was not measured)"
 
 [obtained_flag]                 # m.toml [obtained] value -> flag code
 truth = "T"
@@ -34,10 +35,11 @@ E = 1                           # the conjugate (energy) per snapshot
 Q = 1                           # the two-start order parameter per snapshot
 
 [basic]                         # BASIC is a DECLARED PROJECTION of the full result
-keeps = ["point", "column", "estimate", "lo", "hi", "cell", "code", "reason", "verdict", "why"]
+keeps = ["point", "column", "estimate", "lo", "hi", "cell", "code", "reason", "verdict", "why", "pairs"]
 discards = [
   "instrument", "unit", "eps_key", "eps", "flags", "obtained", "vector_key",
   "verdict_class", "row_line", "per_size", "read", "code_commit", "interval", "reports", "derived_from",
+  "pair_readings",
 ]
 blank = ["NOT-MEASURED", "NOT-EVALUATED", "UNRES"]  # shown as BLANK (<value>: <reason>)
 blank_refuse = true             # a verdict in the set's `refuse` list shows as BLANK (<verdict>)
@@ -45,4 +47,4 @@ commands = ["show", "explain", "run", "new case", "tables fork", "tables drop", 
 
 [check]                         # bin/cc check --fast (the pre-commit hook) skips the `slow` tests
 fast_budget_s = 30              # elapsed time is printed against it; over budget WARNS, never fails
-slow = ["test_w2", "test_detect_verdicts", "test_breakers_red", "test_view", "test_golden"]   # each phase appends its > 5 s tests
+slow = ["test_w2", "test_detect_verdicts", "test_breakers_red", "test_view", "test_golden", "test_along"]   # each phase appends its > 5 s tests

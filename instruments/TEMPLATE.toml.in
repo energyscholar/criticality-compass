@@ -1,6 +1,6 @@
-# instruments/TEMPLATE.toml.in - read by `bin/cc new instrument <id>`, which substitutes <ID> and writes
-# instruments/<ID>.toml. Replace every "TODO"; validate refuses any TODO left in, and `bin/cc run` refuses
-# while this file has findings (a half-made instrument must not enter a result).
+# instruments/TEMPLATE.toml.in - read by `bin/cc new instrument <id>`, which writes it as instruments/<id>.toml.
+# Replace every "TODO"; validate refuses any TODO left in, and `bin/cc run` refuses while this file has
+# findings (a half-made instrument must not enter a result).
 schema = 1
 kind = "instrument"
 module = "<ID>"                                # cc/instruments/<ID>.py; list it under checks.toml [roles].maths

@@ -14,10 +14,10 @@ SIGNS = ("SIG-", "NEG", "SLOW-", "ZERO!", "SLOW+", "POS", "SIG+", "UNRES")
 RESULT_FIELDS = (  # the result field set that cc.toml [basic] must partition (view.py reads it from here)
     "instrument", "unit", "column", "eps_key", "eps", "estimate", "lo", "hi", "cell", "code", "per_size",
     "flags", "reason", "vector_key", "point", "obtained", "verdict", "verdict_class", "row_line", "why",
-    "read", "code_commit", "interval", "reports", "derived_from")
+    "read", "code_commit", "interval", "reports", "derived_from", "pair_readings", "pairs")
 RESERVED = {"door", "declare", "author", "detect", "view", "score", "admit"}
 SIDECARS = ("observable", "block_map", "conjugate", "sinks", "two_start")
-TEMPLATES = {"chain": {"axis": str}, "pair": {"axis": str, "pairs": list},
+TEMPLATES = {"chain": {"axis": str}, "pair": {"axis": str, "pairs": list}, "all-pairs": {"axis": str},
              "matched": {"axis": str, "big": int, "small": int}}
 SECTION_HINT = {"obtained.": "write one of: truth | navigated | observed (cc.toml alphabets.obtained)",
                 "points.": 'write a case id from cases/ (see bin/cc help), or "none"'}
@@ -346,6 +346,9 @@ def chk_input(p, d, c, stem=None):
     need = lambda key: {x for i in use for x in i[key]}  # noqa: E731
     out += when(not (sz and all(isinstance(x, int) for x in sz) and sz == sorted(set(sz))), p, "axes.size",
                 "sizes must be integers, strictly ascending", "fix the list")
+    out += [at(p, "axes.size", f"{i} accumulates B over the size chain and needs exactly 3 sizes, found {len(sz)}",
+               "declare three sizes, or do not declare the instrument") for i in d["instruments"]
+            if c.reg.get(i, {}).get("unit") == "pair" and len(sz) != 3]
     out += inalpha(p, "axes.main_start", ax["main_start"], ax["starts"])
     miss, extra = sorted(set(ax["point"]) - set(d["obtained"])), sorted(set(d["obtained"]) - set(ax["point"]))
     out += when(miss or extra, p, "obtained", f"keys differ from axes.point (missing {miss}, extra {extra})",
@@ -415,10 +418,13 @@ def chk_instrument(p, d, c, stem=None):
         return list(todos(p, d))   # a template still full of TODOs: report them, nothing else
     req = {"module": str, "operators": list, "unit": str, "reports": list, "arrays": list, "axes": list,
            "relations": list, "sidecar": list, "flags": list, "pipeline": list, "columns": dict}
-    out = header(p, d, "instrument") + shape(p, d, req)
+    out = header(p, d, "instrument") + shape(p, d, req, {"requires": list, "door_values": list})
     if out:
         return out
-    out += inalpha(p, "unit", d["unit"], ("point", "point-size"))
+    out += inalpha(p, "unit", d["unit"], ("point", "pair", "point-size"))
+    out += [at(p, "requires", f"'{r}' must be a registry instrument with no requires of its own",
+               "name an instrument that is read first (one level in v0.1)")
+            for r in d.get("requires", []) if r not in c.reg or c.reg[r].get("requires")]
     for f, alpha in (("operators", ("A", "B")), ("axes", ("point", "size", "starts")), ("sidecar", SIDECARS),
                      ("arrays", tuple(c.cfg["arrays"])), ("flags", tuple(c.cfg["flags"]))):
         out += [x for v in d[f] for x in inalpha(p, f, v, alpha)]
@@ -587,7 +593,44 @@ def chk_verdict(p, d, c, stem=None):
     return out if out else chk_partition(p, cols, [dom[x] for x in cols], [r["when"] for r in d["row"]], text)
 
 
-KIND = {"case": chk_case, "points": chk_points, "input": chk_input, "instrument": chk_instrument,
+def feeding(allc, name):
+    """The instruments a code column is derived from (through its helper columns)."""
+    src = allc[name]["from"]
+    return {src.partition(".")[0]} if isinstance(src, str) else feeding(allc, src[0]) | feeding(allc, src[1])
+
+
+def chk_membership(p, d, c, stem=None):
+    """One section per instrument that runs door:off_manifold: which signature column it reads, and how its codes
+    become membership, a rank and a door value. Keys are checked here, so a gap fails validate and never a run."""
+    out = header(p, d, "membership")
+    codes, bad = load(c.over.get("codes") or Path(c.root, p).parent / "codes.toml", c.root)
+    if out or bad:
+        return out + bad
+    sig, allc, nulls = codes["columns"]["signature"], code_cols(codes), c.alpha["nulls"]
+    for name, r in ((k, v) for k, v in d.items() if k not in ("schema", "kind")):
+        loc, inst = name, c.reg.get(name, {})
+        out += when("door:off_manifold" not in inst.get("pipeline", []), p, loc,
+                    f"'{name}' is not a registry instrument with a door:off_manifold step", "name such an instrument")
+        e = shape(p, r, {"reads": str, "map": dict, "rank": list, "door": dict}, pre=loc + ".")
+        if e or r["reads"] not in sig:
+            out += e + when(not e, p, loc + ".reads", f"'{r['reads']}' is not a signature column", f"use one of: {' '.join(sig)}")
+            continue
+        want = list(sig[r["reads"]]["alphabet"]) + list(nulls)
+        out += [at(p, loc + ".map", f"missing key '{k}'", f'add "{k}" = <membership>') for k in want if k not in r["map"]]
+        out += [at(p, loc + ".map", f"foreign key '{k}'", "remove it") for k in r["map"] if k not in want]
+        out += when(sorted(r["rank"]) != sorted(set(r["map"].values())), p, loc + ".rank",
+                    "must list every membership value of map exactly once", "fix the list")
+        out += when(set(r["door"]) != set(r["rank"]), p, loc + ".door", "keys must equal rank", "fix the keys")
+        ok = {"RUN", "RUN-FLAG-U", *nulls, *inst.get("door_values", [])}
+        out += [at(p, f"{loc}.door.{k}", f"'{v}' is not RUN, RUN-FLAG-U, a null or a door value of {name}",
+                   f"use one of: {' '.join(sorted(ok))}") for k, v in r["door"].items() if v not in ok]
+        out += [at(p, loc + ".reads", f"{name} must list '{i}' in requires (its codes feed '{r['reads']}')",
+                   f"add {i} to requires in instruments/{name}.toml") for i in sorted(feeding(allc, r["reads"]))
+                if i not in inst.get("requires", [])]
+    return out
+
+
+KIND = {"membership": chk_membership, "case": chk_case, "points": chk_points, "input": chk_input, "instrument": chk_instrument,
         "codes": chk_codes, "verdict": chk_verdict, "data-manifest": chk_manifest, "cc": chk_cc}
 
 
@@ -621,9 +664,21 @@ def validate(root=ROOT, input_id=None, tables=None):
         files += sorted(f for f in (root / "cases").glob("*.toml") if not f.name.startswith("TEMPLATE"))
         files += sorted((root / "inputs").glob("*/points.toml"))
     files += [root / "tables" / s / f for s in sets for f in ("codes.toml", "verdict.toml")]
+    files += [f for s in sets if not input_id and (f := root / "tables" / s / "membership.toml").is_file()]
     out, n = [], {}
     for f in files:
         kind = (load(f, root)[0] or {}).get("kind", "?")
         n[kind] = n.get(kind, 0) + 1
         out += check_file(f, root)
-    return out, n
+    return out + (member_need(root, input_id, tables) if input_id and tables else []), n
+
+
+def member_need(root, input_id, tset):
+    """A table set must hold a valid membership rule for every declared instrument that runs door:off_manifold."""
+    m, c = load(root / "inputs" / input_id / "m.toml", root)[0] or {}, Ctx(root)
+    mp = root / "tables" / tset / "membership.toml"
+    have = (load(mp, root)[0] or {}) if mp.is_file() else {}
+    need = [n for n in m.get("instruments", []) if "door:off_manifold" in c.reg.get(n, {}).get("pipeline", [])]
+    return [at(f"tables/{tset}/membership.toml", n, f"{n} runs door:off_manifold on {input_id} but this set has no rule for it",
+               f"copy tables/v01-rules/membership.toml into tables/{tset}/ (a membership rule is table-set data)")
+            for n in need if not isinstance(have.get(n), dict)] + (check_file(mp, root) if need and mp.is_file() else [])

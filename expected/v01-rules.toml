@@ -80,6 +80,25 @@ tables = "v01-rules"
 "0.5" = "NOT"
 "0.55" = "NOT"
 
+[verdicts.b7-at-line-2]              # b7 data + the along instrument: no needle, so every point refuses
+"0.0" = "REFUSE-NEEDLE-UNMEASURED"
+"0.07" = "REFUSE-NEEDLE-UNMEASURED"
+"0.14" = "REFUSE-NEEDLE-UNMEASURED"
+"0.21" = "REFUSE-NEEDLE-UNMEASURED"
+"0.2747" = "REFUSE-NEEDLE-UNMEASURED"
+
+[verdicts.x7a-bc]                    # needle only (no two_start): MID points refuse, off-window points are NOT
+"0.0" = "NOT"
+"1.0" = "NOT"
+"1.5" = "NOT"
+"1.8" = "REFUSE-TWO-START-UNMEASURED"
+"1.9" = "NOT"
+"1.95" = "REFUSE-TWO-START-UNMEASURED"
+
+[verdicts.x7a-nnn]
+"k2-0.0" = "REFUSE-TWO-START-UNMEASURED"
+"k2-0.1" = "REFUSE-TWO-START-UNMEASURED"
+
 [[change]]
 date = "2026-10-01"
 points = ["*"]
@@ -117,3 +136,10 @@ and POS read SLOW) + Q2 (verdict.toml: SLOW with across MARGINAL and stability S
 SLOW cell stays REFUSE-SLOW). The expected effect on the seven v0 inputs is NONE: x2, x3, x4, x8, b7, w2 and \
 c2 points are all UNCHANGED (60 of 60 as under verdict-x-rules). The only movers are on X5 once it is an input \
 (plan 0864 P4/P5: g 0 and g 0.3 NOT to REFUSE-SLOW). A moved v0 point is a finding, never an edit of this file"""
+
+[[change]]
+date = "2026-10-02"
+points = ["b7-at-line-2:*", "x7a-bc:*", "x7a-nnn:*"]
+why = """first lock of the three along inputs (plan 0864 P3), verdicts as observed under v01-rules: none of them \
+measures two_start, so no point reaches a positive class. The along PAIR cells are not in this lock; \
+tests/test_along.py asserts them against the frozen [B7] and X7a numbers. No v0 point moved"""
