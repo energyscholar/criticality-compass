@@ -9,7 +9,7 @@ Read `README.md` first for the words.
 
 ```
 $ bin/cc show w2-potts
-w2-potts   rules: v01-rules   result: results/w2-potts@v01-rules.json (not frozen)
+w2-potts   rules: v01-rules   result: results/w2-potts@v01-rules.json (frozen)
 …
 point 5   case potts-q5
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)

@@ -57,7 +57,7 @@ start: bin/cc show b7-at-line
 
 ```
 $ bin/cc show b7-at-line
-b7-at-line   rules: v01-rules   result: results/b7-at-line@v01-rules.json (not frozen)
+b7-at-line   rules: v01-rules   result: results/b7-at-line@v01-rules.json (frozen)
 point 0.0   case at-self-dual-line
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
   needle     BLANK (NOT-MEASURED: needle is not declared on this input)

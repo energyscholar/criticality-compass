@@ -68,6 +68,9 @@ with tempfile.TemporaryDirectory() as t:
         q.chmod(q.stat().st_mode | 0o200)
     for q in repo.glob("results/*@v01-rules.*"):
         q.unlink()
+    fz = json.loads((repo / "FROZEN.json").read_text())   # the copy is writable: v01-rules results are unfrozen in it
+    fz["files"] = {k: v for k, v in fz["files"].items() if "@v01-rules." not in k}
+    (repo / "FROZEN.json").write_text(json.dumps(fz))
 
     def cc(*a):
         r = subprocess.run([sys.executable, str(repo / "bin" / "cc"), *a], capture_output=True, text=True, cwd=repo)

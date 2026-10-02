@@ -1,5 +1,5 @@
 $ bin/cc show x2-xy-line --advanced
-x2-xy-line   rules: v01-rules   result: results/x2-xy-line@v01-rules.json (not frozen)
+x2-xy-line   rules: v01-rules   result: results/x2-xy-line@v01-rules.json (frozen)
   interval: block resamples 400, level 0.95, seed 62
   code_commit: 4ad79a89e53c5f99d19b7579dee48a4a57ac9121
   read inputs/x2-xy-line/m.toml 77f30b1ab8d6
