@@ -5,7 +5,7 @@
  "input": "w2-potts",
  "tables": "v01-rules",
  "derived_from": null,
- "code_commit": "1c6e32bdcbd59ad151e09ed59866afe2af949a76",
+ "code_commit": "4ad79a89e53c5f99d19b7579dee48a4a57ac9121",
  "interval": {
   "method": "block",
   "b": 400,
