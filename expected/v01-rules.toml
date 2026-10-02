@@ -143,3 +143,52 @@ points = ["b7-at-line-2:*", "x7a-bc:*", "x7a-nnn:*"]
 why = """first lock of the three along inputs (plan 0864 P3), verdicts as observed under v01-rules: none of them \
 measures two_start, so no point reaches a positive class. The along PAIR cells are not in this lock; \
 tests/test_along.py asserts them against the frozen [B7] and X7a numbers. No v0 point moved"""
+
+# ---- the FAMILY lock (plan 0864 P4; read by tests/test_family.py). Declared BEFORE the first family run;
+# a different outcome is a FINDING, never an edit of this lock. Cells not declared in advance are filled
+# "as observed" in a later [[change]].
+[[family]]
+id = "b7-at-line-2"
+verdict = "LINE"
+bracket = "NOT-MEASURED"
+f1 = "VARIES"
+f2 = "MARGINAL"
+
+[[family]]
+id = "x8-ising-compass"
+verdict = "REFUSE-UNCLASSIFIED-v0"
+bracket = "BRACKET"
+f1 = "NOT-MEASURED"
+f2 = "NOT-MEASURED"
+
+[[family]]
+id = "x7a-bc-lambda"
+verdict = "REFUSE-OFF-MANIFOLD"
+bracket = "NON-MONOTONE"
+f1 = "NOT-MEASURED"
+f2 = "REFUSE-OFF-MANIFOLD"
+
+[[family]]
+id = "x7a-nnn-manifold"
+verdict = "REFUSE-UNCLASSIFIED-v0"
+bracket = "BRACKET"
+f1 = "NOT-MEASURED"
+f2 = "NOT-EVALUATED"
+
+[[change]]
+date = "2026-10-02"
+points = ["family:*"]
+why = """DECLARED BEFORE THE FIRST FAMILY RUN (plan 0864 P4, brief outcomes). b7-at-line-2 reads LINE (F4: the \
+boundary along pair read ZERO! in P3, so f2 MARGINAL; f1 VARIES from B7's across y 1.009 vs 1.331; flags T,U). \
+x8-ising-compass has f1 = f2 = NOT-MEASURED, so REFUSE-UNCLASSIFIED-v0 if its bracket reads BRACKET or NO-MID, \
+REFUSE-NON-MONOTONE if NON-MONOTONE. x7a-bc-lambda reads REFUSE-OFF-MANIFOLD. x7a-nnn-manifold is never LINE \
+(its f2 reads NOT-EVALUATED). The bracket cells are locked as observed. No v0 or P3 point verdict moves"""
+
+[[change]]
+date = "2026-10-02"
+points = ["family:*"]
+why = """the family cells as OBSERVED at the first run (plan 0864 P4): every declared outcome held. b7-at-line-2 \
+bracket NOT-MEASURED (no needle declared), f1 VARIES (0.0->0.21 and 0.07->0.21 POS, the other four pairs SLOW+), f2 MARGINAL \
+(the boundary pair 0.14->0.21 reads ZERO!), so LINE on flags T,U. x8-ising-compass bracket BRACKET (DIS x4, MID, ORD x4). \
+x7a-bc-lambda bracket NON-MONOTONE, all five pairs REFUSE-OFF-MANIFOLD. x7a-nnn-manifold bracket BRACKET, its one pair \
+NOT-EVALUATED. No v0 or P3 point verdict moved"""

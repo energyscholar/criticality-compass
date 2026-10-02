@@ -1,0 +1,6 @@
+# families/b7-at-line-2.toml - the B7 family over the exact self-dual line (a family names no table set)
+schema = 1
+kind = "family-decl"
+id = "b7-at-line-2"
+input = "b7-at-line-2"                    # v0.1: one input per family; its axes.point order is the family order
+interior = ["0.0", "0.07", "0.14", "0.21"]    # the endpoint 0.2747 (4-Potts, MULTI) is excluded by declaration ([B4] P1, [B7])

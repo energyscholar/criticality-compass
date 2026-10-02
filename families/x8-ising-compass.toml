@@ -1,0 +1,6 @@
+# families/x8-ising-compass.toml - the Ising K sweep: no across, no along, so f1 = f2 = NOT-MEASURED
+schema = 1
+kind = "family-decl"
+id = "x8-ising-compass"
+input = "x8-ising-needle"                    # v0.1: one input per family; its axes.point order is the family order
+interior = ["0.90", "0.95", "0.98", "0.99", "1.00", "1.01", "1.02", "1.05", "1.10"]

@@ -19,5 +19,6 @@ cc - Criticality Compass   (ADVANCED)
   bin/cc test [-v] [<name> ...]                               run the named tests (default all)
   bin/cc mutate <relpath> (--sed E | --py E) -- <test> ...    run tests against a temporary mutation
   bin/cc help [--advanced]                                    this text
-  bin/cc (v0.1) family                                        not in v0
+  bin/cc family <id> [--tables SET]                           the family verdict (bracket, f1, f2) of a stored result; measures nothing
+  bin/cc new family <id>                                      start a family declaration from the template
 exit 0

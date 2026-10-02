@@ -563,6 +563,17 @@ def chk_rows(p, d, dom):
     return out, read
 
 
+def chk_classes(p, d, c):
+    """refuse, class_of and verdicts agree: every verdict refuses, is classed, or is a class name."""
+    classes, co, refuse = c.alpha["class_truth"], d.get("class_of", {}), set(d["refuse"])
+    out = [at(p, "refuse", f"'{x}' is not in verdicts", "list it in verdicts") for x in sorted(refuse - set(d["verdicts"]))]
+    out += [at(p, "class_of", f"'{x}' is both refusing and classed", "keep it in one") for x in sorted(refuse & set(co))]
+    out += [at(p, f"class_of.{k}", f"'{v}' is not in {classes}", "use a class") for k, v in co.items() if v not in classes]
+    return out + [at(p, "verdicts", f"verdict '{v}' is in none of refuse, class_of or the class names",
+                     "list it in refuse, add it to [class_of], or use a class name")
+                  for v in d["verdicts"] if v not in refuse and v not in co and v not in classes]
+
+
 def chk_verdict(p, d, c, stem=None):
     req = {"columns": list, "ignores": list, "verdicts": list, "refuse": list, "row": list}
     out = header(p, d, "verdict") + shape(p, d, req, {"ignores_reason": str, "class_of": dict})
@@ -577,13 +588,7 @@ def chk_verdict(p, d, c, stem=None):
     out += when(d["ignores"] and not d.get("ignores_reason"), p, "ignores_reason",
                 "required when ignores is not empty", "say why those columns are ignored")
     out += [at(p, "ignores", f"'{x}' is not a column", "fix the list") for x in d["ignores"] if x not in cols]
-    classes, co, refuse = c.alpha["class_truth"], d.get("class_of", {}), set(d["refuse"])
-    out += [at(p, "refuse", f"'{x}' is not in verdicts", "list it in verdicts") for x in sorted(refuse - set(d["verdicts"]))]
-    out += [at(p, "class_of", f"'{x}' is both refusing and classed", "keep it in one") for x in sorted(refuse & set(co))]
-    out += [at(p, f"class_of.{k}", f"'{v}' is not in {classes}", "use a class") for k, v in co.items() if v not in classes]
-    out += [at(p, "verdicts", f"verdict '{v}' is in none of refuse, class_of or the class names",
-               "list it in refuse, add it to [class_of], or use a class name")
-            for v in d["verdicts"] if v not in refuse and v not in co and v not in classes]
+    out += chk_classes(p, d, c)
     if set(cols) != set(dom):
         return out
     rows, read = chk_rows(p, d, dom)
@@ -591,6 +596,87 @@ def chk_verdict(p, d, c, stem=None):
     out += [at(p, "columns", f"column '{x}' is neither read by a row nor in ignores",
                "read it in a row or add it to ignores") for x in cols if x not in read and x not in d["ignores"]]
     return out if out else chk_partition(p, cols, [dom[x] for x in cols], [r["when"] for r in d["row"]], text)
+
+
+def same(p, loc, got, want, what):
+    """A declared list or key set must equal `want` (order ignored)."""
+    return when(sorted(map(str, got)) != sorted(map(str, want)), p, loc, f"{what}: must be exactly {sorted(map(str, want))}",
+                "fix the list")
+
+
+def chk_family(p, d, c, stem=None):
+    """A set's family rule: the three fingerprint sections against the codes, the registry and the alphabets, then the
+    partition over (bracket, f1, f2) (every cell of the product has exactly one row)."""
+    req = {"columns": list, "verdicts": list, "refuse": list, "alphabets": dict, "bracket": dict, "f1": dict, "f2": dict, "row": list}
+    out = header(p, d, "family") + shape(p, d, req, {"class_of": dict})
+    if out:
+        return out
+    cols, al, nulls, b = ["bracket", "f1", "f2"], d["alphabets"], c.alpha["nulls"], d["bracket"]
+    codes, bad = load(c.over.get("codes") or Path(c.root, p).parent / "codes.toml", c.root)
+    if bad:
+        return bad
+    out += same(p, "columns", d["columns"], cols, "columns") + same(p, "alphabets", al, cols, "alphabets")
+    out += [at(p, f"alphabets.{k}", f"must include {x}", f"add {x}") for k in al for x in ("UNRES", *nulls) if x not in al[k]]
+    out += chk_classes(p, d, c)
+    out += shape(p, b, {"reads": str, "rank": dict, "edge_code": dict, "descent_rank": list, "point_code": dict,
+                        "mid_rank": list, "table": dict}, pre="bracket.")
+    out += shape(p, d["f1"], {"reads": str, "relation": str, "eps": str, "code": dict, "rank": list}, pre="f1.")
+    out += shape(p, d["f2"], {"reads": str, "relation": str, "code": dict, "rank": list}, pre="f2.")
+    if out or set(al) != set(cols):
+        return out
+    sig, reg = codes["columns"]["signature"], c.reg
+    out += when(b["reads"] not in sig, p, "bracket.reads", f"'{b['reads']}' is not a signature column", f"use one of: {' '.join(sig)}")
+    out += same(p, "bracket.rank", b["rank"], sig.get(b["reads"], {}).get("alphabet", []), "rank keys = that column's alphabet")
+    out += same(p, "bracket.point_code", b["point_code"], b["rank"], "point_code keys = rank keys")
+    out += same(p, "bracket.edge_code", b["edge_code"], ("SIG-", "UNRES", "SIG+"), "edge_code keys (eps 0 reaches three cells)")
+    out += same(p, "bracket.descent_rank", b["descent_rank"], [*nulls, *set(b["edge_code"].values())], "descent_rank")
+    out += same(p, "bracket.mid_rank", b["mid_rank"], [*nulls, *set(b["point_code"].values())], "mid_rank")
+    out += same(p, "bracket.table", b["table"], [f"{x},{y}" for x in b["descent_rank"] for y in b["mid_rank"]], "table keys (total)")
+    out += [at(p, f'bracket.table."{k}"', f"'{v}' is not in alphabets.bracket", "use a bracket value")
+            for k, v in b["table"].items() if v not in al["bracket"]]
+    inst, _, col = d["f1"]["reads"].partition(".")
+    out += when(col not in reg.get(inst, {}).get("columns", {}), p, "f1.reads", f"'{d['f1']['reads']}' is not a column of a registry instrument",
+                "name <instrument>.<column>")
+    out += when(reg.get(inst, {}).get("columns", {}).get(col, d["f1"]["eps"]) != d["f1"]["eps"], p, "f1.eps",
+                "must be the eps key of that column in the registry", "fix the key")
+    out += when(d["f1"]["relation"] != "all-pairs" or d["f2"]["relation"] != "chain", p, "f1.relation",
+                "f1 reads an all-pairs relation, f2 a chain", "fix the relations")
+    out += when(reg.get(d["f2"]["reads"], {}).get("unit") != "pair", p, "f2.reads", "must be a registry instrument of unit pair", "fix it")
+    extra = reg.get(d["f2"]["reads"], {}).get("door_values", [])
+    for f, keys in (("f1", SIGNS), ("f2", [*SIGNS, *extra])):
+        out += same(p, f"{f}.code", d[f]["code"], keys, f"{f} code keys")
+        out += same(p, f"{f}.rank", d[f]["rank"], al[f], f"{f} rank")
+        out += [at(p, f"{f}.code.{k}", f"'{v}' is not in alphabets.{f}", "use a value of that alphabet")
+                for k, v in d[f]["code"].items() if v not in al[f]]
+    rows, read = chk_rows(p, d, al)
+    out += rows
+    out += [at(p, "columns", f"column '{x}' is not read by any row", "read it in a row") for x in cols if x not in read]
+    return out if out else chk_partition(p, cols, [al[x] for x in cols], [r["when"] for r in d["row"]], Path(c.root, p).read_text())
+
+
+def chk_family_decl(p, d, c, stem=None):
+    """A family declaration: an input, >= 2 interior points of it, and (when it declares a pair instrument) control edges."""
+    import door
+    out = list(todos(p, d))
+    out = out or header(p, d, "family-decl") + shape(p, d, {"id": str, "input": str, "interior": list})
+    out = out or id_check(p, "id", d["id"], stem, "the file name")
+    if out:
+        return out
+    m, bad = load(c.root / "inputs" / d["input"] / "m.toml", c.root)
+    if bad:
+        return [at(p, "input", f"no input '{d['input']}'",
+                   f"use one of: {' '.join(sorted(q.parent.name for q in (c.root / 'inputs').glob('*/m.toml')))}")]
+    pts, inner = m["axes"]["point"], d["interior"]
+    out += when(len(inner) < 2, p, "interior", "a family needs at least two points", "list two or more points of the input")
+    out += [at(p, "interior", f"'{x}' is not a point of {d['input']}", f"use points of {' '.join(pts)}") for x in inner if x not in pts]
+    out += when(len(set(inner)) != len(inner), p, "interior", "a point is listed twice", "list each point once")
+    out += when([x for x in pts if x in inner] != [x for x in inner if x in pts], p, "interior",
+                "interior must follow the input's axes.point order", f"order: {' '.join(pts)}")
+    pair = any(c.reg.get(i, {}).get("unit") == "pair" for i in m["instruments"])
+    edges = {tuple(e) for e in door.control_pairs(m)} if pair else set()
+    return out + [at(p, "interior", f"{a}->{b} is not an edge of {d['input']}'s relations.control",
+                     "declare the control chain over these points, or drop the pair instrument")
+                  for a, b in zip(inner, inner[1:]) if pair and (a, b) not in edges]
 
 
 def feeding(allc, name):
@@ -631,7 +717,8 @@ def chk_membership(p, d, c, stem=None):
 
 
 KIND = {"membership": chk_membership, "case": chk_case, "points": chk_points, "input": chk_input, "instrument": chk_instrument,
-        "codes": chk_codes, "verdict": chk_verdict, "data-manifest": chk_manifest, "cc": chk_cc}
+        "codes": chk_codes, "verdict": chk_verdict, "data-manifest": chk_manifest, "cc": chk_cc,
+        "family": chk_family, "family-decl": chk_family_decl}
 
 
 def check_file(path, root=ROOT, **over):
@@ -664,7 +751,8 @@ def validate(root=ROOT, input_id=None, tables=None):
         files += sorted(f for f in (root / "cases").glob("*.toml") if not f.name.startswith("TEMPLATE"))
         files += sorted((root / "inputs").glob("*/points.toml"))
     files += [root / "tables" / s / f for s in sets for f in ("codes.toml", "verdict.toml")]
-    files += [f for s in sets if not input_id and (f := root / "tables" / s / "membership.toml").is_file()]
+    files += [f for s in sets if not input_id for n in ("membership", "family") if (f := root / "tables" / s / f"{n}.toml").is_file()]
+    files += sorted((root / "families").glob("*.toml")) if not input_id and (root / "families").is_dir() else []
     out, n = [], {}
     for f in files:
         kind = (load(f, root)[0] or {}).get("kind", "?")

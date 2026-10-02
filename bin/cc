@@ -35,7 +35,8 @@ ADVANCED = [
     ("test [-v] [<name> ...]", "run the named tests (default all)"),
     ("mutate <relpath> (--sed E | --py E) -- <test> ...", "run tests against a temporary mutation"),
     ("help [--advanced]", "this text"),
-    ("(v0.1) family", "not in v0"),
+    ("family <id> [--tables SET]", "the family verdict (bracket, f1, f2) of a stored result; measures nothing"),
+    ("new family <id>", "start a family declaration from the template"),
 ]
 
 
@@ -168,6 +169,8 @@ def cmd_author(cmd, args):
         return author.new_input(ROOT, a[0], opt(a, "--like"), opt(a, "--points"), opt(a, "--pattern-point"),
                                 opt(a, "--instruments"), opt(a, "--data-dir"), opt(a, "--label-format"),
                                 opt(a, "--add-instrument"))
+    if (cmd, sub) == ("new", "family") and len(a) == 1:
+        return author.new_family(ROOT, a[0])
     if (cmd, sub) == ("new", "instrument") and len(a) == 1:
         return author.new_instrument(ROOT, a[0])
     if (cmd, sub) == ("data", "add") and len(a) == 1:
@@ -268,6 +271,18 @@ def cmd_reverdict(args):
     import view
     print(f"reverdict {res['derived_from']} -> results/{res['run_id']}.json (no instrument was run)")
     return emit(view.show(res, score.join(pos[0]), MODE, frozen_note(res["run_id"])))
+
+
+def cmd_family(args):
+    import family
+    tables = opt(args, "--tables") or config()["defaults"]["tables"]
+    pos = [a for a in args if not a.startswith("--") and a != tables]
+    if len(pos) != 1:
+        print("usage: bin/cc family <id> [--tables SET]\n  Next: bin/cc help --advanced")
+        return 1
+    msg, got = family.run(ROOT, pos[0], tables)
+    print(msg if got is None else "\n".join(family.show(*got)))
+    return got is None
 
 
 def frozen_note(rid, dry=False):
@@ -451,7 +466,7 @@ def main(argv):
         print(help_text(advanced), end="")
         return 0
     table = {"show": lambda a: cmd_show(a, False), "explain": lambda a: cmd_show(a, True), "tabulate": cmd_tabulate,
-             "test": cmd_test, "run": cmd_run, "reverdict": cmd_reverdict, "freeze": cmd_freeze, "check": cmd_check, "mutate": cmd_mutate,
+             "test": cmd_test, "run": cmd_run, "reverdict": cmd_reverdict, "family": cmd_family, "freeze": cmd_freeze, "check": cmd_check, "mutate": cmd_mutate,
              "validate": lambda a: cmd_validate(a + (["--advanced"] if advanced else []))}
     if cmd in table:
         return table[cmd](rest)

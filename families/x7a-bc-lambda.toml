@@ -1,0 +1,6 @@
+# families/x7a-bc-lambda.toml - the Blume-Capel lambda sweep of X7a: membership by measurement
+schema = 1
+kind = "family-decl"
+id = "x7a-bc-lambda"
+input = "x7a-bc"                    # v0.1: one input per family; its axes.point order is the family order
+interior = ["0.0", "1.0", "1.5", "1.8", "1.9", "1.95"]

@@ -1,0 +1,7 @@
+# families/TEMPLATE.toml.in - read by `bin/cc new family <id>`, which substitutes <ID>. Replace every "TODO";
+# validate refuses any TODO. A family names no table set (`bin/cc family <id> [--tables SET]`; default cc.toml [defaults].tables).
+schema = 1
+kind = "family-decl"
+id = "<ID>"
+input = "TODO"                                 # an input id; its axes.point order is the family order (v0.1: one input)
+interior = ["TODO", "TODO"]                    # >= 2 point labels of that input, in its declared order

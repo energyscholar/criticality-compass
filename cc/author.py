@@ -235,6 +235,19 @@ def new_instrument(root, iid):
     return 0
 
 
+def new_family(root, fid):
+    """families/<id>.toml from the template; validate refuses it until every TODO is replaced."""
+    root, p = Path(root), Path(root) / "families" / f"{fid}.toml"
+    if not re.fullmatch(r"[a-z0-9][a-z0-9-]*", fid):
+        return refuse(f"'{fid}' is not a family id (lower-case letters, digits, hyphens).", "bin/cc new family b7-at-line-2")
+    if p.exists():
+        return refuse(f"families/{fid}.toml already exists.", "edit it, or pick another id")
+    p.write_text((root / "families" / "TEMPLATE.toml.in").read_text().replace("<ID>", fid))
+    print(f"wrote families/{fid}.toml\n  Next: replace every TODO (an input and its interior points), then bin/cc validate "
+          f"and bin/cc family {fid}")
+    return 0
+
+
 def data_add(root, iid):
     root = Path(root)
     p, c = root / "fixtures" / "data" / f"{iid}.toml", declare.Ctx(root)
