@@ -1,0 +1,41 @@
+# cases/xy-low-phase.toml - imported from the catalogue (plan 0863 5a); never frozen
+schema = 1
+kind = "case"
+id = "xy-low-phase"
+family = "2D XY (planar rotor), square lattice, H = -sum cos(theta_i - theta_j)"
+mechanism = """spin-wave Gaussian line of fixed points below T_KT: vortex fugacity irrelevant, \
+eta = T / (2 pi J_R(T)) varies continuously with T"""
+class_truth = "LINE"
+sampler = "xy"
+traps = [
+  """the WHOLE phase is critical: there is no 'across' direction; varying the only control \
+moves ALONG the line""",
+  """as T -> 0 the line approaches the ordered sink: g1 of blocks near 1 can trip the sink \
+test (delta 0.02) and read NOT(ORD)""",
+  """continuous symmetry: block map must keep a direction (sum-and-normalise), majority/\
+plurality maps do not apply""",
+]
+decoy_of = "none"
+pairs_with = ["at-self-dual-line", "clock6-critical-phase", "xy-tkt"]
+sources = [
+  """~/software/has-anyone-looked/library/papers/defect-transitions/\
+hasenbusch2005-2d-xy-kt-transition.md""",
+  """~/software/has-anyone-looked/library/papers/defect-transitions/\
+nelson1977-universal-jump-in-the-superfluid-density-of-two-dimensional-superfluids.md""",
+  """~/software/has-anyone-looked/library/papers/defect-transitions/\
+kosterlitz1973-ordering-metastability-and-phase-transitions-in-2d.md""",
+]
+status = "in-signature-table"
+studies = ["X1", "X2"]
+
+[controls]
+names = ["T = 1/beta"]
+range = "T 0.5, 0.6, 0.7 (below T_KT = 0.89294); L 27-243 (X2)"
+
+[observables]
+list = [
+  "g1_xy of sum-and-normalise blocks per level",
+  "E = sum cos (conjugate to beta)",
+  "M = (sum cos, sum sin)",
+]
+conjugate_observable = true

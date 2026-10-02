@@ -113,14 +113,17 @@ def cmd_test(names):
 
 def cmd_validate(args):
     import declare
-    if "--mvt" in args:
-        print("not built until phase 5a")
-        return 1
     found, n = declare.validate(ROOT, opt(args, "--input"), opt(args, "--tables"))
     print("\n".join(declare.fmt(f) for f in found))
     if "--advanced" in args:
         print("checked: " + ", ".join(f"{v} {k}" for k, v in sorted(n.items())))
     print(f"validate: {len(found)} findings" if found else "validate: clean")
+    if "--mvt" in args:
+        import score
+        print("-- MVT gate (report only; no status is changed)")
+        rep = score.mvt(ROOT)
+        print("\n".join(f"  {'PASS' if ok else 'FAIL'}  {name} :: {detail}" for name, ok, detail in rep))
+        print(f"-- MVT {'PASS' if all(ok for _, ok, _ in rep) else 'FAIL'}")
     return 1 if found else 0
 
 

@@ -1,0 +1,36 @@
+# cases/bc-tricritical.toml - imported from the catalogue (plan 0863 5a); never frozen
+schema = 1
+kind = "case"
+id = "bc-tricritical"
+family = """2D Blume-Capel at its tricritical point delta_t ~ 1.966 (library: Zierenberg \
+2017), T_t ~ 0.61 J"""
+mechanism = """two relevant directions (thermal y_t1 = 9/5 and the crystal-field / dilution \
+direction): the end of the Ising lambda-line where it turns first order"""
+class_truth = "MULTI"
+sampler = "blume_capel"
+traps = [
+  """critical slowing masquerades as metastability: C3 returned a confident WRONG delta_t \
+~ 1.91 (short burn-in, blocks < tau)""",
+  "with tau-aware sampling the honest answer at L = 81 is STOP at the starting bracket (C3b)",
+  "the tricritical point has never been sampled AT delta_t: its own exponents are not on disk",
+]
+decoy_of = "none"
+pairs_with = ["bc-lambda-line", "bc-beyond-tricritical"]
+sources = [
+  """~/software/hal-main/library/papers/multicritical/\
+zierenberg2017-scaling-universality-phase-diagram-2d-blume-capel.md""",
+]
+status = "in-signature-table"
+studies = ["C3", "C3b", "C1b2"]
+
+[controls]
+names = ["K = J/T", "delta"]
+range = """class-change bisection on delta in [1.90, 2.00] at L = 81 (C3, C3b); delta_t itself \
+never sampled"""
+
+[observables]
+list = [
+  "q = mean s^2 (two starts: ordered, vacant)",
+  "g1 per block level",
+]
+conjugate_observable = true

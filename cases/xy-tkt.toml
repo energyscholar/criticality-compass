@@ -1,0 +1,43 @@
+# cases/xy-tkt.toml - imported from the catalogue (plan 0863 5a); never frozen
+schema = 1
+kind = "case"
+id = "xy-tkt"
+family = "2D XY at T_KT = 0.89294(8) (beta 1.1199)"
+mechanism = """end of the spin-wave line: the vortex fugacity is marginal, the flow is \
+logarithmically slow (x = 1/(ln l + C)); infinite-order transition"""
+class_truth = "BKT-END"
+sampler = "xy"
+traps = [
+  """the BKT BREAKER: log-slow flow at L <= 243 can read as STOPPED and the response as \
+MARGINAL -> LINE, or a slow drift as a growth -> POINT/WALKING (bad)""",
+  """finite-size Upsilon is 5% above its limit even at L = 2048 (Hasenbusch Table 1): \
+power-law FSS mislocates it""",
+  "eta_eff at finite L is below 1/4 by the (ln L)^(1/8) factor (card eq 42-43)",
+]
+decoy_of = "none"
+pairs_with = ["xy-low-phase", "clock6-kt-ends", "potts-q5"]
+sources = [
+  """~/software/has-anyone-looked/library/papers/defect-transitions/\
+hasenbusch2005-2d-xy-kt-transition.md""",
+  """~/software/has-anyone-looked/library/papers/defect-transitions/\
+hasenbusch1994-roughening-rg-matching.md""",
+  """~/software/has-anyone-looked/library/papers/defect-transitions/\
+nelson1977-universal-jump-in-the-superfluid-density-of-two-dimensional-superfluids.md""",
+]
+status = "in-signature-table"
+studies = ["X1", "X2"]
+breaker_verdict = """X2 (L <= 243, pre-registered): REFUSE-UNRES = GOOD (no POINT/WALKING). \
+Refusal came from the response growth (y_eff 0.18 [-0.02, 0.35] vs eps 0.25), not the flow \
+(ZERO!); a larger L is predicted to drift to LINE. SYNTHESIS-6."""
+
+[controls]
+names = ["T = 1/beta"]
+range = "T 0.89294 with neighbours 0.7 and 1.1; L 27-243 (X2)"
+
+[observables]
+list = [
+  "g1_xy per level",
+  "E = sum cos",
+  "M",
+]
+conjugate_observable = true

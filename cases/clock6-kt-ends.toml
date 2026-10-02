@@ -1,0 +1,40 @@
+# cases/clock6-kt-ends.toml - imported from the catalogue (plan 0863 5a); never frozen
+schema = 1
+kind = "case"
+id = "clock6-kt-ends"
+family = """2D 6-state clock at its two KT transitions T1 = 0.7014(11) (Z6 order -> critical) \
+and T2 = 0.9008(6) (critical -> disordered)"""
+mechanism = """two ends of one critical phase: at T2 the vortex fugacity turns relevant (as XY \
+T_KT); at T1 the Z6 field turns relevant (dual mechanism)"""
+class_truth = "BKT-END"
+sampler = "clock"
+traps = [
+  """two BKT ends with DIFFERENT mechanisms: T1 (dangerously irrelevant Z6 field, slow \
+crossover) may read LINE or NOT(ORD) at L <= 243""",
+  """card values are from a probability-changing cluster FSS analysis, text layer only \
+(not image-verified)""",
+]
+decoy_of = "none"
+pairs_with = ["xy-tkt", "clock6-critical-phase"]
+sources = [
+  """~/software/has-anyone-looked/library/papers/defect-transitions/\
+tomita2002-pcc-xy-and-clock-models.md""",
+]
+status = "in-signature-table"
+studies = ["X3"]
+breaker_verdict = """X3 (L <= 243, pre-registered): REFUSE-SLOW at T1 and T2 = GOOD (no POINT/\
+WALKING) — but the same cell fired at every critical-phase point (sub-margin resolved flow), so \
+the refusal does not single out the ends. Family lead: ALONG pairs touching an end read SLOW+, \
+interior pairs ZERO!."""
+
+[controls]
+names = ["T = 1/beta"]
+range = "T 0.7014 and 0.9008, neighbours 0.5, 0.75, 0.85, 1.1; L 27-243 (X3)"
+
+[observables]
+list = [
+  "g1 of plurality3 blocks",
+  "E",
+  "M",
+]
+conjugate_observable = true

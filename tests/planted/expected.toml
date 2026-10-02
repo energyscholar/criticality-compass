@@ -26,6 +26,7 @@ text = "tests/planted/case-class-not-in-alphabet.toml:class_truth: 'CRITICAL' is
 
 [[plant]]
 file = "case-decoy-no-nondecoy.toml"
+drop = ["cases/bc-tricritical.toml"]      # the catalogue import gave MULTI its own case: judge without it
 fix = ["decoy_of = \"MULTI\"", "decoy_of = \"none\""]
 text = "tests/planted/case-decoy-no-nondecoy.toml:decoy_of: no non-decoy case has class MULTI\n  Next: add a case of class MULTI, or set decoy_of = \"none\""
 

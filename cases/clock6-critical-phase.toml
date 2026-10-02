@@ -1,0 +1,36 @@
+# cases/clock6-critical-phase.toml - imported from the catalogue (plan 0863 5a); never frozen
+schema = 1
+kind = "case"
+id = "clock6-critical-phase"
+family = "2D 6-state clock, theta = 2 pi k / 6, H = -sum cos(theta_i - theta_j)"
+mechanism = """Z6 anisotropy irrelevant between T1 and T2: an emergent-U(1) critical phase \
+(Gaussian line), eta from 0.113 at T1 to 0.243 at T2"""
+class_truth = "LINE"
+sampler = "clock"
+traps = [
+  """discrete spins: a sum of 9 sixth roots can be exactly zero, so sum-and-normalise is \
+undefined; plurality3 (declared stochastic ties) is used""",
+  "a narrow phase (T 0.70-0.90): pairs of T for the ALONG test sit close to both KT ends",
+  """the same LINE as XY but a different microscopic symmetry: a Detector keyed on the \
+model would separate them; the geometry should not""",
+]
+decoy_of = "none"
+pairs_with = ["xy-low-phase", "clock6-kt-ends", "at-self-dual-line"]
+sources = [
+  """~/software/has-anyone-looked/library/papers/defect-transitions/\
+tomita2002-pcc-xy-and-clock-models.md""",
+]
+status = "in-signature-table"
+studies = ["X3"]
+
+[controls]
+names = ["T = 1/beta"]
+range = "T 0.75, 0.8, 0.85 (T1 = 0.7014 < T < T2 = 0.9008); L 27-243 (X3)"
+
+[observables]
+list = [
+  "g1 of plurality3 block states (unit vectors) per level",
+  "E = sum cos",
+  "M",
+]
+conjugate_observable = true

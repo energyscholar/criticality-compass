@@ -74,6 +74,36 @@ def tabulate(results, root=ROOT, joins=None):
     return "\n".join(out) + "\n", findings
 
 
+# ------------------------------------------------------------------ the MVT gate (clauses of catalogue/check.py)
+DECOYS = (("POINT", "LINE"), ("FIRST-ORDER", "LINE"), ("FIRST-ORDER", "WALKING"))
+
+
+def mvt(root=ROOT):
+    """[(clause, passed, detail)]: the five MVT clauses over the imported cases, against CC's SIGNATURE-TABLE.md."""
+    cs = {f.stem: tomllib.loads(f.read_text()) for f in sorted((Path(root) / "cases").glob("*.toml"))}
+    tab = {k: c for k, c in cs.items() if c["status"] == "in-signature-table"}
+    rep = []
+    for cls in ("POINT", "LINE", "WALKING"):
+        ids = sorted(k for k, c in tab.items() if c["class_truth"] == cls)
+        mech = {tab[k]["mechanism"] for k in ids}
+        rep.append((f"1 {cls}: >= 2 in-table cases with different mechanisms", len(mech) >= 2,
+                    f"{len(ids)} case(s) {ids}, {len(mech)} distinct mechanism(s)"))
+    for ct, dec in DECOYS:
+        ids = sorted(k for k, c in tab.items() if c["class_truth"] == ct and c["decoy_of"] == dec)
+        rep.append((f"2 decoy: a {ct} case imitating {dec}", bool(ids), f"{ids}"))
+    bkt = sorted(k for k, c in tab.items() if c["class_truth"] == "BKT-END" and c.get("breaker_verdict"))
+    rep.append(("3 BKT breaker run, pre-registered verdict scored", bool(bkt), f"{bkt}"))
+    blind = sorted(k for k, c in cs.items() if c.get("blind_seal") and (Path(root) / c["blind_seal"]).is_file())
+    rep.append(("4 >= 1 held-out case declared blind and run", bool(blind), f"{blind}"))
+    t = (Path(root) / "SIGNATURE-TABLE.md").read_text() if (Path(root) / "SIGNATURE-TABLE.md").is_file() else ""
+    miss = sorted(k for k in tab if f"`{k}`" not in t)
+    coll = any(ln.startswith("## Collisions") for ln in t.splitlines())
+    rep.append(("5 signature table enumerated over every in-table case, collisions listed",
+                bool(tab) and coll and not miss,
+                f"{len(tab)} in-table case(s); collisions section {'present' if coll else 'ABSENT'}; missing {miss}"))
+    return rep
+
+
 # ------------------------------------------------------------------ the partition as an array
 def owners(T):
     """(columns, domains, owner): the index of the verdict row that holds every cell of the signature domain."""

@@ -1,0 +1,35 @@
+# cases/potts-q6.toml - imported from the catalogue (plan 0863 5a); never frozen
+schema = 1
+kind = "case"
+id = "potts-q6"
+family = "2D 6-state Potts, square lattice"
+mechanism = """walking: the critical and tricritical Potts fixed points annihilate into a \
+complex pair for q > 4; the flow lingers near them for a length xi before running away"""
+class_truth = "WALKING"
+sampler = "potts"
+traps = [
+  """at L > xi it shows coexistence (D > 0) exactly like a strong first-order transition \
+and the exponent route closes (W3)""",
+  "same mechanism as q = 5: it is NOT a second WALKING mechanism",
+]
+decoy_of = "none"
+pairs_with = ["potts-q5", "potts-q7"]
+sources = [
+  """~/software/hal-main/library/papers/conformal-finite-size/\
+gorbenkorychkovzan2018-walking-weak-first-order-transitions-and-complex-cfts-ii-potts-q-gt-4.md""",
+  """~/software/has-anyone-looked/library/papers/walking/\
+iino2019-detecting-weakly-first-order-potts.md""",
+]
+status = "in-signature-table"
+studies = ["W3"]
+
+[controls]
+names = ["K (nn coupling)"]
+range = "exact K_c = ln(1 + sqrt 6) only; L 81, 243, 729 (W3); xi ~ 159"
+
+[observables]
+list = [
+  "g1_potts per block level",
+  "E = sum_nn delta",
+]
+conjugate_observable = true

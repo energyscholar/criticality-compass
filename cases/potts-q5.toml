@@ -1,33 +1,38 @@
-# cases/potts-q5.toml - FIXTURE case, written in phase 2 (taxonomy; never frozen)
-# Drawn from the frozen studies W2; class_truth from the 0862 catalogue schema. Phase 5a
-# replaces it with the released catalogue entry of the same id (A 4.2).
+# cases/potts-q5.toml - imported from the catalogue (plan 0863 5a); never frozen
 schema = 1
 kind = "case"
 id = "potts-q5"
 family = "2D 5-state Potts, square lattice"
-mechanism = """walking: the critical and tricritical Potts fixed points annihilate into a complex \
-pair for q > 4; the flow lingers near them for a length xi before running away"""
+mechanism = """walking: the critical and tricritical Potts fixed points annihilate into a \
+complex pair for q > 4; the flow lingers near them for a length xi before running away"""
 class_truth = "WALKING"
 sampler = "potts"
 traps = [
-  "at L << xi it is indistinguishable from critical (W2: stability UNRESOLVED)",
-  "a point-estimate 'crossing over' is noise until the interval resolves (W1 -> W2)",
+  """the pre-registered blind spot: at L << xi it is indistinguishable from critical (W1 \
+'crossing over' was point-estimate noise; W2 UNRESOLVED)""",
+  """at L = 729 start-dependence with the FLUCTUATION sign (D < 0) refuses the point but \
+is not coexistence (W3)""",
+  "y above the critical-branch top 3/2 is the structural diagnostic, but it is UNRES at 729 (W3)",
 ]
 decoy_of = "none"
-pairs_with = ["potts-q3"]
+pairs_with = ["potts-q6", "potts-q7", "potts-q3"]
 sources = [
   """~/software/hal-main/library/papers/conformal-finite-size/\
 gorbenkorychkovzan2018-walking-weak-first-order-transitions-and-complex-cfts-ii-potts-q-gt-4.md""",
   """~/software/has-anyone-looked/library/papers/walking/\
 iino2019-detecting-weakly-first-order-potts.md""",
+  "~/software/has-anyone-looked/library/papers/walking/ma2019-shadow-complex-fixed-point-potts.md",
 ]
 status = "in-signature-table"
-studies = ["W2"]
+studies = ["W1", "W2", "W3"]
 
 [controls]
 names = ["K (nn coupling)"]
-range = "exact K_c = ln(1 + sqrt 5) only; L 27-243 (W2); xi ~ 2512 >> every L"
+range = "exact K_c = ln(1 + sqrt 5) only; L 27-729 (W1-W3); xi ~ 2512 >> every L"
 
 [observables]
-list = ["g1_potts per block level", "E = sum_nn delta"]
+list = [
+  "g1_potts per block level",
+  "E = sum_nn delta",
+]
 conjugate_observable = true

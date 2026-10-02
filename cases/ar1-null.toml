@@ -1,0 +1,35 @@
+# cases/ar1-null.toml - imported from the catalogue (plan 0863 5a); never frozen
+schema = 1
+kind = "case"
+id = "ar1-null"
+family = """stationary AR(1) time series, phi = 0.97 fixed (m.toml [A3] ar1-near-critical; \
+fresh set a3e)"""
+mechanism = """no critical structure and no approach: a fixed relaxation time (tau ~ 33 steps) \
+that does not grow"""
+class_truth = "NOT"
+sampler = "ar_series"
+traps = [
+  "u's sampling noise grows as r -> 1, so ZERO! is unreachable: REFUSE-dominant, not NOT (A3 P2)",
+  """the time-series analogue of the critical case (approach-near-critical, phi 0.95 -> \
+0.995) is ALSO refused 50/50 (A8)""",
+]
+decoy_of = "none"
+pairs_with = []
+sources = [
+  """~/software/hal-main/library/papers/ews-foundations/\
+boettiger2012-quantifying-limits-to-detection-of-early-war.md""",
+  "~/software/has-anyone-looked/library/papers/statistics/lakens2017-equivalence-tests-primer.md",
+]
+status = "in-signature-table"
+studies = ["A3", "A8"]
+
+[controls]
+names = ["time (window order)"]
+range = "N = 1000, 3 windows, 50 series (A3, A8 a3e)"
+
+[observables]
+list = [
+  "lag-1 autocorrelation u = -ln(1 - r) per window",
+  "ln variance per window",
+]
+conjugate_observable = false

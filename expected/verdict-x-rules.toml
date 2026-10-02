@@ -59,8 +59,51 @@ tables = "verdict-x-rules"
 "d1.9-K2.6" = "REFUSE-NEEDLE-UNMEASURED"
 "d1.9-K3.0" = "REFUSE-NEEDLE-UNMEASURED"
 
+[verdicts.x2-xy-line]                # frozen X2.txt: LINE points 0.5-0.7 read REFUSE-SLOW (the STAGE3 flaw)
+"0.5" = "REFUSE-SLOW"
+"0.6" = "REFUSE-SLOW"
+"0.7" = "REFUSE-SLOW"
+"0.89294" = "REFUSE-UNRES"           # the BKT breaker: a refusal is the good outcome (X2 Pb)
+"1.1" = "NOT"
+
+[verdicts.x3-clock6]                 # frozen X3.txt: the critical phase and both KT ends read REFUSE-SLOW
+"0.5" = "NOT"
+"0.7014" = "REFUSE-SLOW"
+"0.75" = "REFUSE-SLOW"
+"0.8" = "REFUSE-SLOW"
+"0.85" = "REFUSE-SLOW"
+"0.9008" = "REFUSE-SLOW"
+"1.1" = "NOT"
+
+[verdicts.x4-ising-field]            # frozen X4.txt: the pipeline verdict is NOT at all three; X4_CELL (the
+"0.46" = "NOT"                       # h-crossing, not an instrument of v0) is what calls FIRST-ORDER-LINE
+"0.5" = "NOT"
+"0.55" = "NOT"
+
 [[change]]
 date = "2026-10-01"
 points = ["*"]
 why = """first lock: the verdicts of the four v0 fixtures under verdict-x-rules, as the phase-3 \
 replays and A 9.2's worked rows give them (plan 0863 phase 4)"""
+
+[[change]]
+date = "2026-10-01"
+points = ["x2-xy-line:*", "x3-clock6:*", "x4-ising-field:*"]
+why = """first lock of the three full-signature inputs (plan 0863 phase 5a, amendment A4): each verdict \
+is the verdict the toolset's FROZEN results/X2.txt, X3.txt and X4.txt print for the same point"""
+
+[[change]]
+date = "2026-10-01"
+points = ["x2-xy-line:0.5", "x2-xy-line:0.6", "x2-xy-line:0.7", "x3-clock6:0.75", "x3-clock6:0.8",
+  "x3-clock6:0.85"]
+why = """REFUSE-SLOW at points whose true class is LINE is a KNOWN RULE FLAW (the toolset's STAGE3: \
+the verdict table maps a resolved below-margin flow, SLOW+ or SLOW-, to REFUSE-SLOW, so a critical \
+line whose block flow is small but resolved is refused, never called LINE). Locked as today's \
+behaviour, not as the right answer; a repaired rule is a new table set, not an edit of this lock"""
+
+[[change]]
+date = "2026-10-01"
+points = ["x4-ising-field:*"]
+why = """NOT at a FIRST-ORDER-LINE decoy: the pipeline needle sits at the ORDERED sink, so STAGE1 \
+says NOT. The toolset's X4_CELL turns (NOT, COEXIST) into FIRST-ORDER-LINE from an h-crossing \
+statistic that v0 has no instrument for; verdict-x-rules cannot reach FIRST-ORDER on this data"""

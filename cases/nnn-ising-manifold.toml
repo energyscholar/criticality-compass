@@ -1,0 +1,36 @@
+# cases/nnn-ising-manifold.toml - imported from the catalogue (plan 0863 5a); never frozen
+schema = 1
+kind = "case"
+id = "nnn-ising-manifold"
+family = "2D Ising with nn K1 + diagonal K2 couplings (ferromagnetic K2 > 0)"
+mechanism = """an extra irrelevant coupling: the critical surface K1_c(K2) is a curve of \
+Ising-class points, the K2 direction along it is irrelevant (universality, not a fixed-point \
+line)"""
+class_truth = "POINT"
+sampler = "nnn_ising"
+traps = [
+  """only ONE point on the manifold has ever been acquired: the manifold has no along \
+measurement and no second point""",
+  """the ordered sink (K1 0.40) reads ZERO! velocity 0 +- 0 without a sink-aware needle \
+(B3a REFUSED)""",
+  """the single-point second eigenvalue (det of the 2x2 response) is NOT EVALUATED (B3b): \
+the irrelevant y2 drowns""",
+]
+decoy_of = "LINE"
+pairs_with = ["bc-lambda-line", "ising-2d", "at-self-dual-line"]
+sources = []
+status = "in-signature-table"
+studies = ["B3a", "B3a2", "B3b", "X7"]
+
+[controls]
+names = ["K1 (nn)", "K2 (diagonal)"]
+range = "K2 = 0.1 fixed; K1 0.20-0.40 navigated (B3a, B3a2); one navigated point K1 0.303516 (B3b)"
+
+[observables]
+list = [
+  "g1 per block level",
+  "g1_diag",
+  "E1 (nn bonds)",
+  "E2 (diagonal bonds)",
+]
+conjugate_observable = true

@@ -31,7 +31,7 @@ files = sorted((ROOT / "results").glob("*.json"))
 results = [json.loads(f.read_text()) for f in files]
 md, found = score.tabulate(results)
 rows = [ln for ln in md.splitlines() if ln.startswith("| ") and not ln.startswith(("| run", "|---"))]
-check("one row per (run, point)", len(rows) == sum(len(r["signature"]) for r in results) == 45 and not found, str(found))
+check("one row per (run, point)", len(rows) == sum(len(r["signature"]) for r in results) == 60 and not found, str(found))
 clash = [ln for ln in md.split("## Collisions")[1].splitlines() if ln.startswith("- ")]
 check("x8 1.00 and 1.10 are not a collision", not [c for c in clash if "x8-ising-needle:1.00" in c and "x8-ising-needle:1.10" in c])
 check("the collision list holds the C2 pair", any("FIRST-ORDER (" in c and "c2-bc-two-start:d2.0-K1.0" in c and "POINT (" in c

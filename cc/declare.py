@@ -233,6 +233,9 @@ def stored(c, path, key):
     return c.shapes[(str(path), key)]
 
 
+LEVEL_STACKS = ("G", "GL")      # the array kinds that hold the observable's block levels; E, Q may be any column
+
+
 def chk_array(p, loc, name, a, b, fp, m, c):
     """One declared array of one data block: its key, its level and its shape against cc.toml [arrays]."""
     dims, ax, lv = c.cfg["arrays"], m["axes"], m.get("observable", {}).get("levels")
@@ -250,7 +253,7 @@ def chk_array(p, loc, name, a, b, fp, m, c):
         return out + [at(p, at_, "level given on a 1-D stored array", "remove level")]
     if got != dims[name]:
         return out + [at(p, at_, f"selects a {got}-D array but {name} is {dims[name]}-D in cc.toml [arrays]", "fix level")]
-    bad_levels = lv and len(shp) == 2 and shp[1] != lv[ax["size"].index(b["size"])]
+    bad_levels = lv and name in LEVEL_STACKS and len(shp) == 2 and shp[1] != lv[ax["size"].index(b["size"])]
     return out + when(bad_levels, p, at_, f"stored levels {shp[-1]} contradict observable.levels", "fix observable.levels")
 
 

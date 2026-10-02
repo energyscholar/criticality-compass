@@ -1,6 +1,4 @@
-# cases/ising-off-critical.toml - FIXTURE case, written in phase 2 (taxonomy; never frozen)
-# Drawn from the frozen studies P2, X8; class_truth from the 0862 catalogue schema. Phase 5a
-# replaces it with the released catalogue entry of the same id (A 4.2).
+# cases/ising-off-critical.toml - imported from the catalogue (plan 0863 5a); never frozen
 schema = 1
 kind = "case"
 id = "ising-off-critical"
@@ -10,19 +8,23 @@ disordered g1 -> 0); finite correlation length"""
 class_truth = "NOT"
 sampler = "ising"
 traps = [
-  "near K_c (0.99, 1.01) the flow looks critical at the first steps and diverges only later",
-  "deep ordered (1.10) the coarsest velocity is SLOW+: an un-sink-aware needle reads MID",
+  """close to K_c (0.99, 1.01) the flow is critical-looking at the first steps and only \
+diverges at coarse steps""",
+  """deep ordered (1.10) the coarsest matched velocity is SLOW+ (at the sink): an \
+un-sink-aware needle reads MID (P2 REFUSE non-monotone)""",
 ]
 decoy_of = "none"
 pairs_with = ["ising-2d"]
 sources = []
 status = "in-signature-table"
-studies = ["P2", "X8"]
+studies = ["P1", "P2", "X8"]
 
 [controls]
 names = ["K (nn coupling)"]
-range = "K/K_c 0.90, 0.95, 0.98, 0.99, 1.01, 1.02, 1.05, 1.10 (P2, X8)"
+range = "K/K_c 0.90, 0.95, 0.98, 0.99, 1.01, 1.02, 1.05, 1.10 (P1, P2)"
 
 [observables]
-list = ["g1 per block level"]
+list = [
+  "g1 per block level",
+]
 conjugate_observable = true

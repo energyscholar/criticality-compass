@@ -1,0 +1,33 @@
+# cases/potts-q7.toml - imported from the catalogue (plan 0863 5a); never frozen
+schema = 1
+kind = "case"
+id = "potts-q7"
+family = "2D 7-state Potts, square lattice"
+mechanism = """strong first order: two coexisting phases at K_c, correlation length xi ~ 48 \
+inside the simulated sizes"""
+class_truth = "FIRST-ORDER"
+sampler = "potts"
+traps = [
+  """first-step growth y ~ 2.17 ~ d (the discontinuity fixed point) before trapping: a \
+large RELEVANT exponent, not a critical one""",
+  "after trapping y collapses (-2.48): a naive exponent reading is IRRELEVANT",
+]
+decoy_of = "WALKING"
+pairs_with = ["potts-q6", "potts-q5", "bc-beyond-tricritical"]
+sources = [
+  """~/software/has-anyone-looked/library/papers/walking/\
+iino2019-detecting-weakly-first-order-potts.md""",
+]
+status = "in-signature-table"
+studies = ["W1"]
+
+[controls]
+names = ["K (nn coupling)"]
+range = "exact K_c = ln(1 + sqrt 7) only; L 27, 81, 243 (W1)"
+
+[observables]
+list = [
+  "g1_potts per block level (decimation)",
+  "E = sum_nn delta",
+]
+conjugate_observable = true

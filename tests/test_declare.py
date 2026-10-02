@@ -28,7 +28,13 @@ plants = tomllib.loads((P / "expected.toml").read_text())["plant"]
 check("expected.toml names at least 26 plants", len(plants) >= 26, f"only {len(plants)}")
 for pl in plants:
     name, over, want = pl["file"], pl.get("over", {}), pl["text"]
-    got = found(P / name, over)
+    with tempfile.TemporaryDirectory() as t:       # `drop`: judge the plant in a repo without those cases
+        base = Path(t) / "repo"
+        if pl.get("drop"):
+            shutil.copytree(ROOT, base, ignore=shutil.ignore_patterns(".git", "__pycache__", "results", "rust"))
+            [(base / d).unlink() for d in pl["drop"]]
+        top = base if pl.get("drop") else ROOT
+        got = found(top / "tests" / "planted" / name, over, top)
     check(f"plant {name} gives its finding", want in got, f"wanted\n{want}\n  got {got}")
     if pl["fix"]:
         text = (P / name).read_text()

@@ -1,20 +1,22 @@
-# cases/bc-beyond-tricritical.toml - FIXTURE case, written in phase 2 (taxonomy; never frozen)
-# Drawn from the frozen studies C2; class_truth from the 0862 catalogue schema. Phase 5a
-# replaces it with the released catalogue entry of the same id (A 4.2).
+# cases/bc-beyond-tricritical.toml - imported from the catalogue (plan 0863 5a); never frozen
 schema = 1
 kind = "case"
 id = "bc-beyond-tricritical"
 family = "2D Blume-Capel, delta > delta_t ~ 1.966: the transition line is first order"
-mechanism = """a line of first-order transitions (ordered and vacancy-rich phases coexist along \
-it): a critical-looking manifold that is not critical"""
+mechanism = """a LINE of first-order transitions (ordered and vacancy-rich phases coexist \
+along it): a critical-looking manifold that is not critical"""
 class_truth = "FIRST-ORDER"
 sampler = "blume_capel"
 traps = [
-  "deep ordered, the same SIG+ start-dependence appears at delta 1.9 / 1.95 from slow kinetics",
-  "one delta on the first-order side: a single point of the line, not the line",
+  """deep ordered (K > K_t) the same SIG+ coexistence sign appears at delta 1.9 / 1.95 \
+from slow kinetics: start-dependence is first order ONLY AT the transition""",
+  """only one delta on the first-order side has been simulated: it is a single point of \
+the first-order line, not the line""",
+  """no needle / exponent was run here (an exponent at a first-order point reads ~d before \
+trapping, see potts-q7)""",
 ]
 decoy_of = "LINE"
-pairs_with = ["bc-lambda-line"]
+pairs_with = ["bc-tricritical", "bc-lambda-line", "potts-q7"]
 sources = [
   """~/software/hal-main/library/papers/multicritical/\
 zierenberg2017-scaling-universality-phase-diagram-2d-blume-capel.md""",
@@ -27,5 +29,7 @@ names = ["K = J/T", "delta"]
 range = "delta 2.0; K 1.0-3.0, L = 81, two starts (C2)"
 
 [observables]
-list = ["q = mean s^2 (two starts: ordered, vacant)"]
+list = [
+  "q = mean s^2 (two starts: ordered, vacant)",
+]
 conjugate_observable = true

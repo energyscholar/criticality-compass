@@ -1,0 +1,43 @@
+# cases/ising-field-decoy.toml - imported from the catalogue (plan 0863 5a); never frozen
+schema = 1
+kind = "case"
+id = "ising-field-decoy"
+family = """2D Ising in a uniform field h, below T_c (K 0.46, 0.50, 0.55 > K_c = 0.4407), \
+crossed in h at h = 0"""
+mechanism = """a FIRST-ORDER LINE: at h = 0, T < T_c two ordered phases coexist; crossing h \
+flips the magnetisation discontinuously. A line of transitions that is not a line of fixed \
+points"""
+class_truth = "FIRST-ORDER"
+sampler = "ising_field"
+traps = [
+  """DECOY for LINE: a line of transitions in (T, h) — the Detector must not read LINE \
+along T at h = 0""",
+  """the per-point needle sits at the ORDERED sink (NOT): coexistence is only visible to a \
+two-start test on the operator conjugate to h (M), never on E (h-even)""",
+  """dynamics-dependent: with cluster (SW) moves the two phases are joined by a global \
+flip and the two-start screen is blind; local heat bath required""",
+  """near K_c the surface tension is small: at small L the two starts tunnel (no \
+coexistence seen at L = 27 is finite size, not absence)""",
+  """off h = 0 start-dependence is hysteresis (metastability), not the transition \
+(position rule, C2)""",
+]
+decoy_of = "LINE"
+pairs_with = ["at-self-dual-line", "bc-beyond-tricritical", "potts-q7", "ising-2d"]
+sources = [
+  """~/software/hal-main/library/papers/binder-cumulant/\
+kamieniarzblote1993-universal-ratio-of-magnetization-moments-in-two-dimensional-ising-models.md""",
+]
+status = "in-signature-table"
+studies = ["X4"]
+
+[controls]
+names = ["K = 1/T", "h"]
+range = "h = 0 at K 0.46, 0.50, 0.55; h-path h 0.01, 0.05 at K 0.50; L 27-243 (X4)"
+
+[observables]
+list = [
+  "g1 of majority blocks per level",
+  "E = sum s s",
+  "M = sum s (conjugate to h)",
+]
+conjugate_observable = true

@@ -1,32 +1,45 @@
-# cases/at-self-dual-line.toml - FIXTURE case, written in phase 2 (taxonomy; never frozen)
-# Drawn from the frozen studies B7; class_truth from the 0862 catalogue schema. Phase 5a
-# replaces it with the released catalogue entry of the same id (A 4.2).
+# cases/at-self-dual-line.toml - imported from the catalogue (plan 0863 5a); never frozen
 schema = 1
 kind = "case"
 id = "at-self-dual-line"
-family = "2D Ashkin-Teller, self-dual line sinh 2K = exp(-2 L4)"
-mechanism = """an exactly marginal 4-spin operator: a line of fixed points (c = 1 Gaussian); \
+family = """2D Ashkin-Teller (two Ising layers sigma, tau with 4-spin coupling L4), self-dual \
+line sinh 2K = exp(-2 L4)"""
+mechanism = """an exactly marginal 4-spin operator: a line of fixed points (c = 1 Gaussian), \
 y_t = 2 - 2/g_R varies continuously along it"""
 class_truth = "LINE"
 sampler = "ashkin_teller"
 traps = [
-  "L4 = 0 is two decoupled Ising models: one point of the LINE is itself an Ising POINT",
-  "the 4-Potts end L4 = 0.2747 has log corrections: across y misses exact 1.5 (1.31 in B7)",
-  "sigma is blind along the line; only p = sigma tau sees it",
+  "L4 = 0 is two DECOUPLED Ising models: one point of the LINE is itself an Ising POINT",
+  """the 4-Potts endpoint L4 = 0.2747 is a MULTI point with log corrections: across y \
+misses exact 1.5 (1.31), along reads SLOW+ (B7)""",
+  """the marginal direction drowns at one point (B1 along NOT EVALUATED 8/10, B2 det NOT \
+EVALUATED 4/5): along needs two points both on the line""",
+  "sigma is blind along the line (weak universality: eta_sigma = 1/4 constant); only p sees it",
+  "iid intervals lie (tau_int up to 65): block intervals required (B5 -> B6)",
 ]
 decoy_of = "none"
-pairs_with = ["bc-lambda-line", "ising-2d"]
+pairs_with = ["bc-lambda-line", "nnn-ising-manifold", "ising-2d"]
 sources = [
   """~/software/has-anyone-looked/library/papers/critical-lines/\
 wiseman1993-cluster-method-ashkin-teller.md""",
+  """~/software/has-anyone-looked/library/papers/critical-lines/\
+salas1997-log-corrections-four-state-potts.md""",
+  """~/software/has-anyone-looked/library/papers/critical-lines/\
+jin2012-ashkin-teller-pseudo-first-order.md""",
+  "~/software/hal-main/library/papers/critical-lines/ginsparg1988-applied-cft-c1-moduli.md",
 ]
 status = "in-signature-table"
-studies = ["B7"]
+studies = ["B1", "B2", "B4", "B5", "B6", "B7"]
 
 [controls]
 names = ["K (2-spin)", "L4 (4-spin)"]
-range = "L4 0.0, 0.07, 0.14, 0.21, 0.2747 on the exact self-dual line; L 27-243 (B7)"
+range = "L4 0.0, 0.07, 0.14, 0.21, 0.2747 ON the exact self-dual line; L 9-243 (B1-B7)"
 
 [observables]
-list = ["g1 of p = sigma tau", "E2 (2-spin bonds)"]
+list = [
+  "g1 of sigma",
+  "g1 of p = sigma tau",
+  "E2 (2-spin bonds)",
+  "E4 (4-spin bonds)",
+]
 conjugate_observable = true

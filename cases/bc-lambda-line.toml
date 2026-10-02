@@ -1,30 +1,39 @@
-# cases/bc-lambda-line.toml - FIXTURE case, written in phase 2 (taxonomy; never frozen)
-# Drawn from the frozen studies C2; class_truth from the 0862 catalogue schema. Phase 5a
-# replaces it with the released catalogue entry of the same id (A 4.2).
+# cases/bc-lambda-line.toml - imported from the catalogue (plan 0863 5a); never frozen
 schema = 1
 kind = "case"
 id = "bc-lambda-line"
-family = "2D Blume-Capel (spin 1, crystal field delta), second-order lambda-line delta < delta_t"
-mechanism = """a manifold of Ising-class critical points (one relevant direction each): a line of \
-critical points, not a line of fixed points"""
+family = """2D Blume-Capel (spin 1, crystal field delta = Delta/J), second-order lambda-line \
+delta < delta_t ~ 1.966"""
+mechanism = """a manifold of Ising-class critical points (one relevant direction each); along \
+the manifold the deviation is irrelevant and DECAYS - a line of critical points, not a line of \
+fixed points"""
 class_truth = "POINT"
 sampler = "blume_capel"
 traps = [
-  "deep ordered (K >= 2.3 at delta 1.9 / 1.95) the vacant start stays vacant: D > 0 from kinetics",
+  """the along direction (fingerprint 2) has NEVER been measured on this manifold: POINT \
+vs LINE rests on fingerprint 1 (y ~ 1 constant)""",
+  """deep ordered (K >= 2.3 at delta 1.9/1.95) the vacant start stays vacant: D > 0 with \
+the COEXISTENCE sign from slow kinetics (C2)""",
+  "near delta_t the crossover toward the tricritical y = 9/5 is not resolvable at L <= 243 (C1b2)",
+  "C1a delta 1.95 REFUSED: the K = 3.0 bracket end read DIS from a trapped vacant state",
 ]
 decoy_of = "LINE"
-pairs_with = ["at-self-dual-line", "bc-beyond-tricritical"]
+pairs_with = ["at-self-dual-line", "bc-tricritical", "nnn-ising-manifold"]
 sources = [
   """~/software/hal-main/library/papers/multicritical/\
 zierenberg2017-scaling-universality-phase-diagram-2d-blume-capel.md""",
 ]
 status = "in-signature-table"
-studies = ["C2"]
+studies = ["C1a", "C1a2", "C1b", "C1b2", "C2", "X7"]
 
 [controls]
 names = ["K = J/T", "delta (path D = delta K)"]
-range = "delta 1.9, 1.95; K 1.0-3.0, L = 81, two starts (C2)"
+range = "delta 0.0, 1.0, 1.5, 1.8, 1.9, 1.95; K 0.3-3.0 (C1a, C1a2, C1b, C1b2, C2)"
 
 [observables]
-list = ["q = mean s^2 (two starts: ordered, vacant)"]
+list = [
+  "g1 per block level (sign-of-sum map, vacant block = 0)",
+  "q = mean s^2",
+  "X = E_nn - delta Q (path operator)",
+]
 conjugate_observable = true
