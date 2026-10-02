@@ -295,6 +295,54 @@ point d1.9-K3.0   case bc-lambda-line
   => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
 c2-bc-two-start: ran
+run w1-potts@scratch -> results/w1-potts@scratch.json
+w1-potts   rules: scratch   result: results/w1-potts@scratch.json (not frozen)
+point 2   case ising-2d
+  sink       BLANK (NOT-MEASURED: needle is not declared on this input)
+  needle     BLANK (NOT-MEASURED: needle is not declared on this input)
+  flow       BLANK (NOT-MEASURED: needle is not declared on this input)
+  across     0.8124 [0.724, 0.8921] SIG+ -> RELEVANT
+  stability  0.01441 [-0.1076, 0.1355] ZERO! -> STABLE
+  two_start  INDEP
+  => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
+     why: honest null (not in verdict_x): the needle was not measured or not evaluated
+point 3   case potts-q3
+  sink       BLANK (NOT-MEASURED: needle is not declared on this input)
+  needle     BLANK (NOT-MEASURED: needle is not declared on this input)
+  flow       BLANK (NOT-MEASURED: needle is not declared on this input)
+  across     0.9345 [0.78, 1.088] SIG+ -> RELEVANT
+  stability  -0.06742 [-0.333, 0.1545] BLANK (UNRES: interval straddles 0 and a margin edge)
+  two_start  INDEP
+  => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
+     why: honest null (not in verdict_x): the needle was not measured or not evaluated
+point 4   case none
+  sink       BLANK (NOT-MEASURED: needle is not declared on this input)
+  needle     BLANK (NOT-MEASURED: needle is not declared on this input)
+  flow       BLANK (NOT-MEASURED: needle is not declared on this input)
+  across     1.062 [0.7431, 1.318] SIG+ -> RELEVANT
+  stability  -0.01225 [-0.4642, 0.3572] BLANK (UNRES: interval straddles 0 and a margin edge)
+  two_start  BLANK (UNRES: interval straddles 0 and a margin edge)
+  => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
+     why: honest null (not in verdict_x): the needle was not measured or not evaluated
+point 5   case potts-q5
+  sink       BLANK (NOT-MEASURED: needle is not declared on this input)
+  needle     BLANK (NOT-MEASURED: needle is not declared on this input)
+  flow       BLANK (NOT-MEASURED: needle is not declared on this input)
+  across     1.554 [0.8661, 2.003] SIG+ -> RELEVANT
+  stability  0.3251 [-0.6818, 1.109] BLANK (UNRES: interval straddles 0 and a margin edge)
+  two_start  BLANK (UNRES: interval straddles 0 and a margin edge)
+  => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
+     why: honest null (not in verdict_x): the needle was not measured or not evaluated
+point 7   case potts-q7
+  sink       BLANK (NOT-MEASURED: needle is not declared on this input)
+  needle     BLANK (NOT-MEASURED: needle is not declared on this input)
+  flow       BLANK (NOT-MEASURED: needle is not declared on this input)
+  across     -2.476 [-2.869, -1.946] SIG- -> IRRELEVANT
+  stability  -4.645 [-5.323, -3.675] SIG- -> OFF
+  two_start  COEXIST
+  => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
+     why: honest null (not in verdict_x): the needle was not measured or not evaluated
+w1-potts: ran
 run w2-potts@scratch -> results/w2-potts@scratch.json
 w2-potts   rules: scratch   result: results/w2-potts@scratch.json (not frozen)
 point 2   case ising-2d
@@ -373,6 +421,36 @@ point 5   case potts-q5
   => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
 w2-potts-2: ran
+run w3-potts@scratch -> results/w3-potts@scratch.json
+w3-potts   rules: scratch   result: results/w3-potts@scratch.json (not frozen)
+point 4   case none
+  sink       BLANK (NOT-MEASURED: needle is not declared on this input)
+  needle     BLANK (NOT-MEASURED: needle is not declared on this input)
+  flow       BLANK (NOT-MEASURED: needle is not declared on this input)
+  across     1.195 [0.8917, 1.448] SIG+ -> RELEVANT
+  stability  -0.1349 [-0.5609, 0.2338] BLANK (UNRES: interval straddles 0 and a margin edge)
+  two_start  INDEP
+  => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
+     why: honest null (not in verdict_x): the needle was not measured or not evaluated
+point 5   case potts-q5
+  sink       BLANK (NOT-MEASURED: needle is not declared on this input)
+  needle     BLANK (NOT-MEASURED: needle is not declared on this input)
+  flow       BLANK (NOT-MEASURED: needle is not declared on this input)
+  across     1.894 [1.321, 2.399] SIG+ -> RELEVANT
+  stability  0.6499 [-0.05549, 1.596] BLANK (UNRES: interval straddles 0 and a margin edge)
+  two_start  FLUCT
+  => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
+     why: honest null (not in verdict_x): the needle was not measured or not evaluated
+point 6   case potts-q6
+  sink       BLANK (NOT-MEASURED: needle is not declared on this input)
+  needle     BLANK (NOT-MEASURED: needle is not declared on this input)
+  flow       BLANK (NOT-MEASURED: needle is not declared on this input)
+  across     -0.6528 [-1.11, 0.4518] BLANK (UNRES: interval straddles 0 and a margin edge)
+  stability  -2.108 [-3.033, -0.05688] NEG -> OFF
+  two_start  COEXIST
+  => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
+     why: honest null (not in verdict_x): the needle was not measured or not evaluated
+w3-potts: ran
 run x2-xy-line@scratch -> results/x2-xy-line@scratch.json
 x2-xy-line   rules: scratch   result: results/x2-xy-line@scratch.json (not frozen)
 point 0.5   case xy-low-phase

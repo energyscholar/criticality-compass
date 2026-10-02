@@ -150,6 +150,18 @@ tables = "v02-rules"
 "0.21" = "NEEDLE-UNMEASURED"
 "0.2747" = "NEEDLE-UNMEASURED"
 
+[verdicts.w1-potts]
+"2" = "REFUSE-NEEDLE-UNMEASURED"
+"3" = "REFUSE-NEEDLE-UNMEASURED"
+"4" = "REFUSE-NEEDLE-UNMEASURED"
+"5" = "REFUSE-NEEDLE-UNMEASURED"
+"7" = "REFUSE-NEEDLE-UNMEASURED"
+
+[verdicts.w3-potts]
+"4" = "REFUSE-NEEDLE-UNMEASURED"
+"5" = "REFUSE-NEEDLE-UNMEASURED"
+"6" = "REFUSE-NEEDLE-UNMEASURED"
+
 [order.b7-at-line]
 "0.0" = "NEEDLE-UNMEASURED"
 "0.07" = "NEEDLE-UNMEASURED"
@@ -314,6 +326,42 @@ tables = "v02-rules"
 "0.21" = ["VANISHES", "UNRES"]
 "0.2747" = ["VANISHES", "UNRES"]
 
+[order.w1-potts]
+"2" = "NEEDLE-UNMEASURED"
+"3" = "NEEDLE-UNMEASURED"
+"4" = "NEEDLE-UNMEASURED"
+"5" = "NEEDLE-UNMEASURED"
+"7" = "NEEDLE-UNMEASURED"
+
+[order.w3-potts]
+"4" = "NEEDLE-UNMEASURED"
+"5" = "NEEDLE-UNMEASURED"
+"6" = "NEEDLE-UNMEASURED"
+
+[fluct.w1-potts]
+"2" = ["VANISHES"]
+"3" = ["VANISHES"]
+"4" = ["VANISHES"]
+"5" = ["VANISHES"]
+"7" = ["VANISHES"]
+
+[fluct.w3-potts]
+"4" = ["VANISHES"]
+"5" = ["VANISHES"]
+"6" = ["VANISHES"]
+
+[two_start.w1-potts]
+"2" = ["INDEP"]
+"3" = ["INDEP"]
+"4" = ["UNRES"]
+"5" = ["UNRES"]
+"7" = ["COEXIST"]
+
+[two_start.w3-potts]
+"4" = ["INDEP"]
+"5" = ["FLUCT"]
+"6" = ["COEXIST"]
+
 [[family]]
 id = "b7-at-line-2"
 verdict = "LINE"
@@ -364,3 +412,8 @@ ln var(e), 81 -> 243): w2 q = 2, 3, 4 VANISHES (a continuous transition: the var
 VANISHES or UNRES and NEVER PERSISTS (the pre-registered blind spot: xi >> L); the other inputs never PERSISTS (their \
 points are continuous or off-critical; x4, a first-order line, is not locked). [order.*] of a point the starts leave \
 EQUILIBRATED is CONTINUOUS or EQUILIBRATED-UNRES, never FIRST-ORDER-TUNNELLING. No combined point verdict moves"""
+
+[[change]]
+date = "2026-10-02"
+points = ["w1-potts:*", "w3-potts:*"]
+why = """X9 rung A (0866; LOG E111-E112). DECLARED BEFORE THE REAL RUN, after a DRY run was seen (LOG E111): the frozen Potts data hold no GL, so the needle cannot be declared and order is NEEDLE-UNMEASURED and geometry/combined REFUSE-NEEDLE-UNMEASURED at every point. [two_start.*] and [fluct.*] are the CODES the dry run measured, scored against the ORIGINAL [X9] cell predictions (not re-predicted): X9-1 q <= 4 two_start INDEP + fluct VANISHES; X9-2 q5 never COEXIST; X9-3 q6 COEXIST at 729; X9-4 q7 COEXIST + fluct VANISHES (the trap). X9-1 MISS: w1 q4 two_start reads UNRES, predicted INDEP (recorded, not repaired). All other cells meet their predictions"""

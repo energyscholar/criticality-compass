@@ -1,0 +1,9 @@
+# inputs/w3-potts/points.toml - the point -> case JOIN (taxonomy; never frozen)
+schema = 1
+kind = "points"
+input = "w3-potts"
+
+[points]
+"4" = "none"                             # no potts-q4 case: the existing test_tables_cli and HOWTO use `new case potts-q4`; declared, not omitted
+"5" = "potts-q5"
+"6" = "potts-q6"

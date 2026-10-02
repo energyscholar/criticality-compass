@@ -64,6 +64,13 @@ for f in sorted((ROOT / "expected").glob("*.toml")):
         miss = {p: (w, got[p]) for p, w in want.items() if got[p] not in w}
         check(f"{inp} under {f.stem}: the fluct replay lock (declared before the run)", not miss and set(want) <= set(got), str(miss))
 
+for f in sorted((ROOT / "expected").glob("*.toml")):
+    for inp, want in tomllib.loads(f.read_text()).get("two_start", {}).items():
+        res = json.loads((ROOT / "results" / f"{inp}@{f.stem}.json").read_text())
+        got = {r["unit"]["point"]: r["code"] for r in res["readings"] if r["instrument"] == "two_start"}
+        miss = {p: (w, got[p]) for p, w in want.items() if got[p] not in w}
+        check(f"{inp} under {f.stem}: the two_start cell lock (declared before the run)", not miss and set(want) <= set(got), str(miss))
+
 
 def fluct_code(es):
     """The fluct code of synthetic energy ensembles `es` (one per size of w2-potts-2), through the real stages and resample plan."""
