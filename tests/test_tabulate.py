@@ -33,7 +33,7 @@ files = sorted((ROOT / "results").glob("*.json"))
 results = [json.loads(f.read_text()) for f in files]
 md, found = score.tabulate(results)
 rows = [ln for ln in md.splitlines() if ln.startswith("| ") and not ln.startswith(("| run", "|---"))]
-want = {"verdict-x-rules": 63, "v01-rules": 76}   # points per set: the seven v0 inputs (60), + x5-bilayer (3); v01-rules also the three along inputs (13)
+want = {"verdict-x-rules": 63, "v01-rules": 76, "v02-rules": 76}   # points per set (v02-rules: the same 76, plan 0866 P-A): the seven v0 inputs (60), + x5-bilayer (3); v01-rules also the three along inputs (13)
 have = {t: sum(len(r["signature"]) for r in results if r["tables"] == t) for t in want}
 check("one row per (run, point)", len(rows) == sum(len(r["signature"]) for r in results) == sum(want.values()) and have == want
       and not found, str(found) + str(have))
@@ -68,7 +68,7 @@ with tempfile.TemporaryDirectory() as t:
     check("the D13 flip edits 15 rows", text.count('when.two_start = ["INDEP"]') == 14 and flip != text)
     f.write_text(flip)
     lines, total, moved = score.diff(detect.load_tables("verdict-x-rules"), detect.load_tables("d13", t), results, [])
-    x5 = [("x5-bilayer", pt, "REFUSE-SLOW", "NOT") for pt in ("0.0", "0.3")]   # x5@v01-rules reverdicted under a fork of verdict-x-rules
+    x5 = [("x5-bilayer", pt, "REFUSE-SLOW", "NOT") for pt in ("0.0", "0.3")] * 2   # x5@v01-rules and x5@v02-rules reverdicted under a fork of verdict-x-rules
     check("--diff of the D13 flip: 1 512 cells, no fixture point but x5's two v01-rules refusals", total == 1512 and moved == x5,
           "\n".join(lines[:6]) + str(moved))
 with tempfile.TemporaryDirectory() as t:       # O2/R14: --diff prints and writes nothing (a copy of the repo, never the live tree)

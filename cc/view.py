@@ -89,6 +89,21 @@ def verdict_lines(sig, mode, cfg, pad="  "):
     return [f"{pad}=> verdict {v}" + adv * (mode == "advanced"), f"{pad}   why: {sig['why']}"]
 
 
+def axes_lines(sig, mode, cfg, pad="  "):
+    """The two axes beside the verdict (only a result of a set that has them): BASIC keeps their values, ADVANCED the rows."""
+    if "geometry" not in sig:
+        return []
+    ln = sig["axis_lines"]
+    items = [("geometry", f"geometry {sig['geometry']},"), ("order", f"order {sig['order']}"),
+             ("axis_lines", f"  (geometry.toml line {ln['geometry']}, order.toml line {ln['order']}, compose.toml line {ln['compose']})")]
+    return [f"{pad}   axes: " + join_line(items, mode, cfg)]
+
+
+def witnesses(T, res):
+    """The code columns the order axis reads that no signature column is: its witnesses (fluct)."""
+    return [c for c in T.axes["order"][0]["columns"] if c not in res["signature_columns"]] if T.axes else []
+
+
 def pair_lines(res, mode, cfg):
     """The control pairs of a result, one line per (pair, column); empty when the input declares no pair instrument."""
     out = ["pairs (each edge of the declared control relation)"] if res.get("pair_readings") else []
@@ -125,7 +140,9 @@ def show(res, join, mode, note="", tables_dir=None):
         tag = "" if case is None else f"   case {'' if case == 'none' or (ROOT / 'cases' / (case + '.toml')).is_file() else '?'}{case}"
         out.append(f"point {pt}{tag}" + (f"   obtained: {sig['obtained']}" if mode == "advanced" else ""))
         out += [column_line(c, feeders(res, pt, c, cols), sig, mode, cfg) for c in res["signature_columns"]]
-        out += verdict_lines(sig, mode, cfg)
+        wit = detect.codes_of(cells_of(res, pt), T)
+        out += [column_line(c, feeders(res, pt, c, cols), {**sig, c: wit[c]}, mode, cfg) for c in witnesses(T, res)]
+        out += verdict_lines(sig, mode, cfg) + axes_lines(sig, mode, cfg)
     return out + pair_lines(res, mode, cfg)
 
 
@@ -210,8 +227,8 @@ def explain(res, pt, join, mode, tables_dir=None):
         src = cols[c]["from"]
         return [] if isinstance(src, str) else chain(src[0]) + chain(src[1]) + [c]
     out, traced = [f"explain {res['input']} {pt}   rules: {res['tables']}"], {}
-    for c in res["signature_columns"]:
-        rs = feeders(res, pt, c, cols)
+    for c in res["signature_columns"] + witnesses(T, res):
+        rs, sig = feeders(res, pt, c, cols), {**sig, c: codes[c]}
         live = [r for r in rs if r["cell"] != "NOT-MEASURED"]
         if not live:
             out.append(column_line(c, rs, sig, mode, cfg)[2:])
@@ -239,7 +256,14 @@ def explain(res, pt, join, mode, tables_dir=None):
     row = T.verdict["row"][T.lines.index(sig["row_line"])]
     out.append(f"8 VERDICT   verdict.toml line {sig['row_line']}: "
                + "; ".join(f"when.{k} = [{', '.join(v)}]" for k, v in row["when"].items()))
-    return out + verdict_lines(sig, mode, cfg, pad="            ")
+    out += verdict_lines(sig, mode, cfg, pad="            ")
+    for num, name in (("9", "GEOMETRY"), ("10", "ORDER"), ("11", "COMPOSE")) if "geometry" in sig else ():
+        tab, lines = T.axes[name.lower()]
+        row = tab["row"][lines.index(sig["axis_lines"][name.lower()])]
+        got = row["verdict"].replace("@geometry", f"{sig['geometry']} (the geometry)") if name == "COMPOSE" else row["verdict"]
+        out.append(f"{num:<3}{name:<8}  {name.lower()}.toml line {sig['axis_lines'][name.lower()]}: "
+                   + "; ".join(f"when.{k} = [{', '.join(v)}]" for k, v in row["when"].items()) + f"  => {got}")
+    return out
 
 
 def f2_code_line(text):

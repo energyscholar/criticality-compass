@@ -1,0 +1,52 @@
+# tables/v02-rules/order.toml - the ORDER axis: do the two starts agree at the window? Read from the needle (is
+# the point on the window at all) and two_start ONLY. A declared PARTITION of (needle, two_start); `validate`
+# proves it. Its values carry the honest nulls (ORDER-UNMEASURED, NEEDLE-UNMEASURED) and the position rule
+# (OFF-WINDOW) as VALUES, so no later table has to guess them.
+schema = 1
+kind = "order"
+columns = ["needle", "two_start"]
+values = [
+  "COEXIST-AT-WINDOW", "NOT-EQUILIBRATED", "EQUILIBRATED", "OFF-WINDOW", "ORDER-UNMEASURED", "NEEDLE-UNMEASURED",
+]
+# score: the class each order value stands for, against a case's order_truth (cc/score.py reports the agreement)
+[score]
+"COEXIST-AT-WINDOW" = "FIRST-ORDER"
+"OFF-WINDOW" = "NONE"
+"NOT-EQUILIBRATED" = "REFUSE"
+"EQUILIBRATED" = "REFUSE"
+"ORDER-UNMEASURED" = "REFUSE"
+"NEEDLE-UNMEASURED" = "REFUSE"
+
+[[row]]
+when.needle = ["DIS", "ORD"]
+verdict = "OFF-WINDOW"
+why = "the needle sits at a sink: off the window the two starts say nothing about order (verdict_x STAGE1)"
+
+[[row]]
+when.needle = ["NOT-MEASURED", "NOT-EVALUATED"]
+verdict = "NEEDLE-UNMEASURED"
+why = "honest null: without the needle there is no window to read the starts at"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["COEXIST"]
+verdict = "COEXIST-AT-WINDOW"
+why = "the two starts stay apart (D above the margin) at the window: coexistence"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["FLUCT", "UNRES"]
+verdict = "NOT-EQUILIBRATED"
+why = "D below the margin (a fluctuation, not coexistence) or unresolved: the starts cannot certify equilibrium"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+verdict = "EQUILIBRATED"
+why = "the two starts agree within the margin at the window"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["NOT-MEASURED", "NOT-EVALUATED"]
+verdict = "ORDER-UNMEASURED"
+why = "honest null: the two-start difference was not measured or not evaluated"

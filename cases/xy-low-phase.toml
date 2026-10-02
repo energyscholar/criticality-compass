@@ -6,6 +6,7 @@ family = "2D XY (planar rotor), square lattice, H = -sum cos(theta_i - theta_j)"
 mechanism = """spin-wave Gaussian line of fixed points below T_KT: vortex fugacity irrelevant, \
 eta = T / (2 pi J_R(T)) varies continuously with T"""
 class_truth = "LINE"
+order_truth = "CONTINUOUS"
 sampler = "xy"
 traps = [
   """the WHOLE phase is critical: there is no 'across' direction; varying the only control \

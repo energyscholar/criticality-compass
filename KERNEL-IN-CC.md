@@ -141,6 +141,17 @@ Where a point reads a null (`NOT-MEASURED`, `NOT-EVALUATED`), the edges and pair
 null is plumbing around the maths, and only ranked codes reach A. The family verdict is one lookup in a
 partition of the three columns (`family.toml`), validated total and disjoint, with no priority chain.
 
+## Geometry and order: one verdict as two axes
+
+`v02-rules` reads the signature row twice and composes. The **geometry** axis (`geometry.toml`) is the verdict the rulebook
+gives when the two starts are taken to agree: it reads needle, flow, across and stability and nothing else. The **order**
+axis (`order.toml`) reads needle and two_start and nothing else: COEXIST-AT-WINDOW, NOT-EQUILIBRATED, EQUILIBRATED, and the
+position rule and the honest nulls as values (OFF-WINDOW, NEEDLE-UNMEASURED, ORDER-UNMEASURED). `compose.toml` is a partition
+of (geometry, order); `validate` proves that it gives `verdict.toml`'s verdict on every row of the signature domain, so the
+factorisation is a refactor and nothing else: `bin/cc tabulate --diff v01-rules v02-rules` prints 0 cells and 0 points. What
+it buys is that a coexisting point still has a geometry, and a non-coexisting point still has an order, without a side
+table. No operator is involved: both axes are lookups in tables, so this section changes no kernel declaration.
+
 ## Where structure replaces control
 
 The rule for any code that computes: make a wrong state impossible to reach, rather than catch it after. It is

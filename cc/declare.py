@@ -14,7 +14,7 @@ SIGNS = ("SIG-", "NEG", "SLOW-", "ZERO!", "SLOW+", "POS", "SIG+", "UNRES")
 RESULT_FIELDS = (  # the result field set that cc.toml [basic] must partition (view.py reads it from here)
     "instrument", "unit", "column", "eps_key", "eps", "estimate", "lo", "hi", "cell", "code", "per_size",
     "flags", "reason", "vector_key", "point", "obtained", "verdict", "verdict_class", "row_line", "why",
-    "read", "code_commit", "interval", "reports", "derived_from", "pair_readings", "pairs")
+    "read", "code_commit", "interval", "reports", "derived_from", "pair_readings", "pairs", "geometry", "order", "axis_lines")
 RESERVED = {"door", "declare", "author", "detect", "view", "score", "admit"}
 SIDECARS = ("observable", "block_map", "conjugate", "sinks", "two_start")
 TEMPLATES = {"chain": {"axis": str}, "pair": {"axis": str, "pairs": list}, "all-pairs": {"axis": str},
@@ -128,6 +128,10 @@ def load_truth(path):
     return tomllib.loads(Path(path).read_text())["class_truth"]
 
 
+def load_order_truth(path):
+    return tomllib.loads(Path(path).read_text())["order_truth"]
+
+
 class Ctx:
     """What the checks cross-reference: cc.toml, the registry, checks.toml, the data root (overridable)."""
 
@@ -178,7 +182,7 @@ def chk_case(p, d, c, stem=None):
     req = {"id": str, "family": str, "mechanism": str, "class_truth": str, "controls": dict, "observables": dict,
            "sampler": str, "traps": list, "sources": list, "decoy_of": str, "pairs_with": list, "status": str,
            "studies": list}
-    out = header(p, d, "case") + shape(p, d, req, {"breaker_verdict": str, "blind_seal": str})
+    out = header(p, d, "case") + shape(p, d, req, {"breaker_verdict": str, "blind_seal": str, "order_truth": str})
     if out:
         return out
     out += shape(p, d["controls"], {"names": list, "range": str}, pre="controls.")
@@ -186,6 +190,8 @@ def chk_case(p, d, c, stem=None):
     out += id_check(p, "id", d["id"], stem, "the file name")
     classes, truths, dec = c.alpha["class_truth"], c.truths(), d["decoy_of"]
     out += inalpha(p, "class_truth", d["class_truth"], classes)
+    out += inalpha(p, "order_truth", d["order_truth"], c.alpha["order_truth"]) if "order_truth" in d else when(
+        stem is not None, p, "order_truth", "missing required field", f"add order_truth = ... to {p}")
     out += [] if dec == "none" else inalpha(p, "decoy_of", dec, [x for x in classes if x != d["class_truth"]])
     others = {truths[k] for k in truths if k != d["id"]}
     out += when(dec != "none" and dec in classes and dec not in others, p, "decoy_of",
@@ -716,9 +722,103 @@ def chk_membership(p, d, c, stem=None):
     return out
 
 
+# ---------------------------------------------------------------- the axes: geometry, order, compose
+def axis_cols(p, c):
+    """(code column -> its alphabet followed by the nulls, findings): every helper and signature column an axis may read."""
+    codes, bad = load(c.over.get("codes") or Path(c.root, p).parent / "codes.toml", c.root)
+    return ({k: list(v["alphabet"]) + list(c.alpha["nulls"]) for k, v in code_cols(codes).items()} if codes else {}), bad
+
+
+def chk_axis(p, d, c, kind, vals, extra):
+    """geometry.toml or order.toml: the columns it reads, its values, and a partition of those columns' domain."""
+    out = header(p, d, kind) + shape(p, d, {"columns": list, vals: list, "row": list, **extra}, {"class_of": dict})
+    allc, bad = axis_cols(p, c)
+    if out or bad:
+        return out + bad
+    cols = d["columns"]
+    out += [at(p, "columns", f"'{x}' is not a code column of codes.toml {list(allc)}", "fix the list") for x in cols if x not in allc]
+    if out:
+        return out
+    dom = {x: allc[x] for x in cols}
+    rows, read = chk_rows(p, {**d, "verdicts": d[vals]}, dom)
+    out += rows + [at(p, "columns", f"column '{x}' is not read by any row", "read it in a row or remove it") for x in cols if x not in read]
+    return out if out else chk_partition(p, cols, [dom[x] for x in cols], [r["when"] for r in d["row"]], Path(c.root, p).read_text())
+
+
+def chk_geometry(p, d, c, stem=None):
+    return chk_axis(p, d, c, "geometry", "verdicts", {"refuse": list}) + (chk_classes(p, d, c) if "refuse" in d and "verdicts" in d else [])
+
+
+def chk_order(p, d, c, stem=None):
+    out = chk_axis(p, d, c, "order", "values", {"score": dict})
+    sc, vals = d.get("score", {}), d.get("values", [])
+    return out + same(p, "score", sc, vals, "score keys = the order values") + [
+        at(p, f"score.{k}", f"'{v}' is not in {c.alpha['order_truth']} or REFUSE", "use one of those")
+        for k, v in sc.items() if v not in [*c.alpha["order_truth"], "REFUSE"]]
+
+
+def chk_compose(p, d, c, stem=None):
+    """compose.toml: a partition of (geometry value x order value); a verdict of verdict.toml, or @geometry."""
+    out = header(p, d, "compose") + shape(p, d, {"columns": list, "row": list})
+    tabs = {n: load(Path(c.root, p).parent / f"{n}.toml", c.root) for n in ("geometry", "order", "verdict")}
+    if out or any(b for _, b in tabs.values()):
+        return out + [f for _, b in tabs.values() for f in b]
+    g, o, v = (tabs[n][0] for n in ("geometry", "order", "verdict"))
+    out += same(p, "columns", d["columns"], ["geometry", "order"], "columns")
+    dom = {"geometry": g.get("verdicts", []), "order": o.get("values", [])}
+    rows, read = chk_rows(p, {**d, "verdicts": [*v["verdicts"], "@geometry"]}, dom)
+    out += rows + [at(p, "", f"geometry value '{x}' is not a verdict of verdict.toml", "fix geometry.toml") for x in dom["geometry"] if x not in v["verdicts"]]
+    return out if out else chk_partition(p, ["geometry", "order"], [dom["geometry"], dom["order"]], [r["when"] for r in d["row"]], Path(c.root, p).read_text())
+
+
+def table_values(d, dom, cols, key="verdict"):
+    """The array of every row's `key` over the product of `dom` (column -> alphabet) in the order of `cols`."""
+    owner = np.full([len(dom[x]) for x in cols], -1)
+    for k, row in enumerate(d["row"]):
+        owner[np.ix_(*[[dom[x].index(v) for v in row["when"].get(x, dom[x])] for x in cols])] = k
+    return np.array([r[key] for r in d["row"]])[owner]
+
+
+def lifted(arr, cols, full, dom):
+    """`arr` (over `cols`) as an array over the columns `full`, broadcast along the columns it does not read."""
+    arr = np.transpose(arr, np.argsort([full.index(x) for x in cols]))
+    return arr.reshape([len(dom[x]) if x in cols else 1 for x in full])
+
+
+def factorisation(root, tset):
+    """(findings, rows proved): compose(geometry, order) equals verdict.toml's verdict on every row of the domain of the
+    signature columns and every column an axis reads (a set with none of the three files has nothing to prove)."""
+    t, nulls = Path(root) / "tables" / tset, tomllib.loads((Path(root) / "cc.toml").read_text())["alphabets"]["nulls"]
+    have = [n for n in ("geometry", "order", "compose") if (t / f"{n}.toml").is_file()]
+    at_ = f"tables/{tset}/compose.toml"
+    if not have:
+        return [], 0
+    if len(have) < 3:
+        return [at(at_, "", f"geometry, order and compose go together; this set has only {have}", "add the missing files, or remove these")], 0
+    codes, v, g, o, cm = (tomllib.loads((t / f).read_text()) for f in ("codes.toml", "verdict.toml", "geometry.toml", "order.toml", "compose.toml"))
+    dom = {k: list(x["alphabet"]) + list(nulls) for k, x in code_cols(codes).items()}
+    full = v["columns"] + [x for x in dict.fromkeys(g["columns"] + o["columns"]) if x not in v["columns"]]
+    vv = lifted(table_values(v, dom, v["columns"]), v["columns"], full, dom)
+    gv = lifted(table_values(g, dom, g["columns"]), g["columns"], full, dom)
+    ov = lifted(table_values(o, dom, o["columns"]), o["columns"], full, dom)
+    cdom = {"geometry": g["verdicts"], "order": o["values"]}
+    comp = table_values(cm, cdom, ["geometry", "order"])
+    gi, oi = (np.vectorize(cdom[k].index)(x) for k, x in (("geometry", gv), ("order", ov)))
+    got = np.where(comp[gi, oi] == "@geometry", gv, comp[gi, oi])
+    got, vb = np.broadcast_arrays(got, vv)
+    bad = got != vb
+    if not bad.any():
+        return [], int(vb.size)
+    cell = dict(zip(full, (dom[x][i] for x, i in zip(full, np.argwhere(bad)[0]))))
+    return [at(at_, "", f"compose(geometry, order) differs from verdict.toml on {int(bad.sum())} of {int(vb.size)} rows, first: {cell} "
+                        f"(composed {got[tuple(np.argwhere(bad)[0])]}, verdict {vb[tuple(np.argwhere(bad)[0])]})",
+               "fix geometry.toml, order.toml or compose.toml so the factorisation holds on every row")], 0
+
+
 KIND = {"membership": chk_membership, "case": chk_case, "points": chk_points, "input": chk_input, "instrument": chk_instrument,
         "codes": chk_codes, "verdict": chk_verdict, "data-manifest": chk_manifest, "cc": chk_cc,
-        "family": chk_family, "family-decl": chk_family_decl}
+        "family": chk_family, "family-decl": chk_family_decl, "geometry": chk_geometry, "order": chk_order,
+        "compose": chk_compose}
 
 
 def check_file(path, root=ROOT, **over):
@@ -752,12 +852,15 @@ def validate(root=ROOT, input_id=None, tables=None):
         files += sorted((root / "inputs").glob("*/points.toml"))
     files += [root / "tables" / s / f for s in sets for f in ("codes.toml", "verdict.toml")]
     files += [f for s in sets if not input_id for n in ("membership", "family") if (f := root / "tables" / s / f"{n}.toml").is_file()]
+    files += [f for s in sets for n in ("geometry", "order", "compose") if (f := root / "tables" / s / f"{n}.toml").is_file()]
     files += sorted((root / "families").glob("*.toml")) if not input_id and (root / "families").is_dir() else []
     out, n = [], {}
     for f in files:
         kind = (load(f, root)[0] or {}).get("kind", "?")
         n[kind] = n.get(kind, 0) + 1
         out += check_file(f, root)
+    if not out:
+        out += [x for s in sets for x in factorisation(root, s)[0]]
     return out + (member_need(root, input_id, tables) if input_id and tables else []), n
 
 

@@ -1,0 +1,26 @@
+# tests/breakers-axes/slow-kinetics-off-transition.toml - an AXIS BREAKER (data; read by tests/test_axes.py)
+schema = 1
+kind = "axis-breaker"
+id = "slow-kinetics-off-transition"
+rule = "start-dependence counts as first order only AT the window; off it the order axis reads OFF-WINDOW and the verdict is NOT"
+why = """C2 at delta 1.9 / 1.95, deep ordered: the vacant start stays vacant (slow kinetics), so D reads SIG+ exactly as at a \
+first-order point. The needle sits at the ordered sink, so the order axis is OFF-WINDOW (the position rule as a value), \
+never COEXIST-AT-WINDOW. This is the tests/breakers breaker of the same name, read on the factorised table set."""
+tables = "v02-rules"
+
+[cells]
+"needle.velocity" = "SLOW+"
+"needle.d_ord" = "ZERO!"
+"needle.d_dis" = "SIG+"
+"across.y_last" = "SIG+"
+"stability.d" = "ZERO!"
+"two_start.D" = ["SIG+"]
+
+[expect]
+order = "OFF-WINDOW"
+verdict = "NOT"
+
+[mutation]
+file = "tables/v02-rules/order.toml"
+intent = "the off-window row reads COEXIST-AT-WINDOW instead of OFF-WINDOW"
+py = '''s.replace('verdict = "OFF-WINDOW"', 'verdict = "COEXIST-AT-WINDOW"')'''

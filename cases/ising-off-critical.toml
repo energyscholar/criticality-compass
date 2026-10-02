@@ -6,6 +6,7 @@ family = "2D Ising away from K_c (both phases)"
 mechanism = """no critical structure: the flow runs to a trivial sink (ordered g1 -> 1 or \
 disordered g1 -> 0); finite correlation length"""
 class_truth = "NOT"
+order_truth = "NONE"
 sampler = "ising"
 traps = [
   """close to K_c (0.99, 1.01) the flow is critical-looking at the first steps and only \

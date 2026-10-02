@@ -7,6 +7,7 @@ mechanism = """an extra irrelevant coupling: the critical surface K1_c(K2) is a 
 Ising-class points, the K2 direction along it is irrelevant (universality, not a fixed-point \
 line)"""
 class_truth = "POINT"
+order_truth = "CONTINUOUS"
 sampler = "nnn_ising"
 traps = [
   """only ONE point on the manifold has ever been acquired: the manifold has no along \

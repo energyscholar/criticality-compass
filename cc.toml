@@ -11,6 +11,7 @@ root = "~/software/scratch/compass-toolset/data"   # read-only; every m.toml pat
 
 [alphabets]
 class_truth = ["POINT", "LINE", "WALKING", "FIRST-ORDER", "MULTI", "BKT-END", "NOT"]
+order_truth = ["CONTINUOUS", "FIRST-ORDER", "NONE"]   # a case's true order of the transition (cases/*.toml order_truth)
 status = ["declared", "sampler-tested", "run", "in-signature-table"]    # ordered
 obtained = ["truth", "navigated", "observed"]   # how a point was obtained (m.toml [obtained])
 formats = ["npz-v1", "npy-v1"]
@@ -35,11 +36,11 @@ E = 1                           # the conjugate (energy) per snapshot
 Q = 1                           # the two-start order parameter per snapshot
 
 [basic]                         # BASIC is a DECLARED PROJECTION of the full result
-keeps = ["point", "column", "estimate", "lo", "hi", "cell", "code", "reason", "verdict", "why", "pairs"]
+keeps = ["point", "column", "estimate", "lo", "hi", "cell", "code", "reason", "verdict", "why", "pairs", "geometry", "order"]
 discards = [
   "instrument", "unit", "eps_key", "eps", "flags", "obtained", "vector_key",
   "verdict_class", "row_line", "per_size", "read", "code_commit", "interval", "reports", "derived_from",
-  "pair_readings",
+  "pair_readings", "axis_lines",
 ]
 blank = ["NOT-MEASURED", "NOT-EVALUATED", "UNRES"]  # shown as BLANK (<value>: <reason>)
 blank_refuse = true             # a verdict in the set's `refuse` list shows as BLANK (<verdict>)
@@ -47,4 +48,4 @@ commands = ["show", "explain", "run", "new case", "tables fork", "tables drop", 
 
 [check]                         # bin/cc check --fast (the pre-commit hook) skips the `slow` tests
 fast_budget_s = 30              # elapsed time is printed against it; over budget WARNS, never fails
-slow = ["test_w2", "test_detect_verdicts", "test_breakers_red", "test_view", "test_golden", "test_along"]   # each phase appends its > 5 s tests
+slow = ["test_w2", "test_detect_verdicts", "test_breakers_red", "test_view", "test_golden", "test_along", "test_axes"]   # each phase appends its > 5 s tests

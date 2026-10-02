@@ -7,6 +7,7 @@ line sinh 2K = exp(-2 L4)"""
 mechanism = """an exactly marginal 4-spin operator: a line of fixed points (c = 1 Gaussian), \
 y_t = 2 - 2/g_R varies continuously along it"""
 class_truth = "LINE"
+order_truth = "CONTINUOUS"
 sampler = "ashkin_teller"
 traps = [
   "L4 = 0 is two DECOUPLED Ising models: one point of the LINE is itself an Ising POINT",

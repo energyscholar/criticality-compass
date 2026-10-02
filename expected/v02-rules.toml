@@ -1,0 +1,242 @@
+# expected/v02-rules.toml - the SCOREBOARD LOCK for v02-rules (data; read by tests/test_scoreboard.py,
+# tests/test_family.py and tests/test_axes.py). [verdicts.*] is the v01-rules lock carried over UNCHANGED (the
+# factorisation is a pure refactor); [order.*] is the predicted ORDER column. It is NOT truth: agreement with
+# class_truth / order_truth is reported by bin/cc tabulate (cc/score.py), never here.
+schema = 1
+kind = "expected"
+tables = "v02-rules"
+
+[verdicts.x8-ising-needle]
+"0.90" = "NOT"
+"0.95" = "NOT"
+"0.98" = "NOT"
+"0.99" = "NOT"
+"1.00" = "REFUSE-TWO-START-UNMEASURED"
+"1.01" = "NOT"
+"1.02" = "NOT"
+"1.05" = "NOT"
+"1.10" = "NOT"
+
+[verdicts.b7-at-line]
+"0.0" = "REFUSE-NEEDLE-UNMEASURED"
+"0.07" = "REFUSE-NEEDLE-UNMEASURED"
+"0.14" = "REFUSE-NEEDLE-UNMEASURED"
+"0.21" = "REFUSE-NEEDLE-UNMEASURED"
+"0.2747" = "REFUSE-NEEDLE-UNMEASURED"
+
+[verdicts.w2-potts]
+"2" = "REFUSE-NEEDLE-UNMEASURED"
+"3" = "REFUSE-NEEDLE-UNMEASURED"
+"4" = "REFUSE-NEEDLE-UNMEASURED"
+"5" = "REFUSE-NEEDLE-UNMEASURED"
+
+[verdicts.c2-bc-two-start]           # no needle on this input: every point refuses
+"d2.0-K1.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K1.2" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K1.4" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K1.6" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K1.8" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K2.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K2.3" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K2.6" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K3.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K1.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K1.2" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K1.4" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K1.6" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K1.8" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K2.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K2.3" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K2.6" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K3.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K1.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K1.2" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K1.4" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K1.6" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K1.8" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K2.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K2.3" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K2.6" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K3.0" = "REFUSE-NEEDLE-UNMEASURED"
+
+[verdicts.x2-xy-line]                # frozen X2.txt: LINE points 0.5-0.7 read REFUSE-SLOW (the STAGE3 flaw)
+"0.5" = "REFUSE-SLOW"
+"0.6" = "REFUSE-SLOW"
+"0.7" = "REFUSE-SLOW"
+"0.89294" = "REFUSE-UNRES"           # the BKT breaker: a refusal is the good outcome (X2 Pb)
+"1.1" = "NOT"
+
+[verdicts.x3-clock6]                 # frozen X3.txt: the critical phase and both KT ends read REFUSE-SLOW
+"0.5" = "NOT"
+"0.7014" = "REFUSE-SLOW"
+"0.75" = "REFUSE-SLOW"
+"0.8" = "REFUSE-SLOW"
+"0.85" = "REFUSE-SLOW"
+"0.9008" = "REFUSE-SLOW"
+"1.1" = "NOT"
+
+[verdicts.x4-ising-field]            # frozen X4.txt: the pipeline verdict is NOT at all three; X4_CELL (the
+"0.46" = "NOT"                       # h-crossing, not an instrument of v0) is what calls FIRST-ORDER-LINE
+"0.5" = "NOT"
+"0.55" = "NOT"
+
+[verdicts.b7-at-line-2]              # b7 data + the along instrument: no needle, so every point refuses
+"0.0" = "REFUSE-NEEDLE-UNMEASURED"
+"0.07" = "REFUSE-NEEDLE-UNMEASURED"
+"0.14" = "REFUSE-NEEDLE-UNMEASURED"
+"0.21" = "REFUSE-NEEDLE-UNMEASURED"
+"0.2747" = "REFUSE-NEEDLE-UNMEASURED"
+
+[verdicts.x7a-bc]                    # needle only (no two_start): MID points refuse, off-window points are NOT
+"0.0" = "NOT"
+"1.0" = "NOT"
+"1.5" = "NOT"
+"1.8" = "REFUSE-TWO-START-UNMEASURED"
+"1.9" = "NOT"
+"1.95" = "REFUSE-TWO-START-UNMEASURED"
+
+[verdicts.x7a-nnn]
+"k2-0.0" = "REFUSE-TWO-START-UNMEASURED"
+"k2-0.1" = "REFUSE-TWO-START-UNMEASURED"
+
+[verdicts.x5-bilayer]
+"0.0" = "REFUSE-SLOW"
+"0.1" = "NOT"
+"0.3" = "REFUSE-SLOW"
+
+[order.b7-at-line-2]
+"0.0" = "NEEDLE-UNMEASURED"
+"0.07" = "NEEDLE-UNMEASURED"
+"0.14" = "NEEDLE-UNMEASURED"
+"0.21" = "NEEDLE-UNMEASURED"
+"0.2747" = "NEEDLE-UNMEASURED"
+
+[order.b7-at-line]
+"0.0" = "NEEDLE-UNMEASURED"
+"0.07" = "NEEDLE-UNMEASURED"
+"0.14" = "NEEDLE-UNMEASURED"
+"0.21" = "NEEDLE-UNMEASURED"
+"0.2747" = "NEEDLE-UNMEASURED"
+
+[order.c2-bc-two-start]
+"d2.0-K1.0" = "NEEDLE-UNMEASURED"
+"d2.0-K1.2" = "NEEDLE-UNMEASURED"
+"d2.0-K1.4" = "NEEDLE-UNMEASURED"
+"d2.0-K1.6" = "NEEDLE-UNMEASURED"
+"d2.0-K1.8" = "NEEDLE-UNMEASURED"
+"d2.0-K2.0" = "NEEDLE-UNMEASURED"
+"d2.0-K2.3" = "NEEDLE-UNMEASURED"
+"d2.0-K2.6" = "NEEDLE-UNMEASURED"
+"d2.0-K3.0" = "NEEDLE-UNMEASURED"
+"d1.95-K1.0" = "NEEDLE-UNMEASURED"
+"d1.95-K1.2" = "NEEDLE-UNMEASURED"
+"d1.95-K1.4" = "NEEDLE-UNMEASURED"
+"d1.95-K1.6" = "NEEDLE-UNMEASURED"
+"d1.95-K1.8" = "NEEDLE-UNMEASURED"
+"d1.95-K2.0" = "NEEDLE-UNMEASURED"
+"d1.95-K2.3" = "NEEDLE-UNMEASURED"
+"d1.95-K2.6" = "NEEDLE-UNMEASURED"
+"d1.95-K3.0" = "NEEDLE-UNMEASURED"
+"d1.9-K1.0" = "NEEDLE-UNMEASURED"
+"d1.9-K1.2" = "NEEDLE-UNMEASURED"
+"d1.9-K1.4" = "NEEDLE-UNMEASURED"
+"d1.9-K1.6" = "NEEDLE-UNMEASURED"
+"d1.9-K1.8" = "NEEDLE-UNMEASURED"
+"d1.9-K2.0" = "NEEDLE-UNMEASURED"
+"d1.9-K2.3" = "NEEDLE-UNMEASURED"
+"d1.9-K2.6" = "NEEDLE-UNMEASURED"
+"d1.9-K3.0" = "NEEDLE-UNMEASURED"
+
+[order.w2-potts]
+"2" = "NEEDLE-UNMEASURED"
+"3" = "NEEDLE-UNMEASURED"
+"4" = "NEEDLE-UNMEASURED"
+"5" = "NEEDLE-UNMEASURED"
+
+[order.x2-xy-line]
+"0.5" = "EQUILIBRATED"
+"0.6" = "EQUILIBRATED"
+"0.7" = "EQUILIBRATED"
+"0.89294" = "EQUILIBRATED"
+"1.1" = "OFF-WINDOW"
+
+[order.x3-clock6]
+"0.5" = "OFF-WINDOW"
+"0.7014" = "EQUILIBRATED"
+"0.75" = "EQUILIBRATED"
+"0.8" = "EQUILIBRATED"
+"0.85" = "EQUILIBRATED"
+"0.9008" = "EQUILIBRATED"
+"1.1" = "OFF-WINDOW"
+
+[order.x4-ising-field]
+"0.46" = "OFF-WINDOW"
+"0.5" = "OFF-WINDOW"
+"0.55" = "OFF-WINDOW"
+
+[order.x5-bilayer]
+"0.0" = "EQUILIBRATED"
+"0.1" = "OFF-WINDOW"
+"0.3" = "EQUILIBRATED"
+
+[order.x7a-bc]
+"0.0" = "OFF-WINDOW"
+"1.0" = "OFF-WINDOW"
+"1.5" = "OFF-WINDOW"
+"1.8" = "ORDER-UNMEASURED"
+"1.9" = "OFF-WINDOW"
+"1.95" = "ORDER-UNMEASURED"
+
+[order.x7a-nnn]
+"k2-0.0" = "ORDER-UNMEASURED"
+"k2-0.1" = "ORDER-UNMEASURED"
+
+[order.x8-ising-needle]
+"0.90" = "OFF-WINDOW"
+"0.95" = "OFF-WINDOW"
+"0.98" = "OFF-WINDOW"
+"0.99" = "OFF-WINDOW"
+"1.00" = "ORDER-UNMEASURED"
+"1.01" = "OFF-WINDOW"
+"1.02" = "OFF-WINDOW"
+"1.05" = "OFF-WINDOW"
+"1.10" = "OFF-WINDOW"
+
+[[family]]
+id = "b7-at-line-2"
+verdict = "LINE"
+bracket = "NOT-MEASURED"
+f1 = "VARIES"
+f2 = "MARGINAL"
+
+[[family]]
+id = "x8-ising-compass"
+verdict = "REFUSE-UNCLASSIFIED-v0"
+bracket = "BRACKET"
+f1 = "NOT-MEASURED"
+f2 = "NOT-MEASURED"
+
+[[family]]
+id = "x7a-bc-lambda"
+verdict = "REFUSE-OFF-MANIFOLD"
+bracket = "NON-MONOTONE"
+f1 = "NOT-MEASURED"
+f2 = "REFUSE-OFF-MANIFOLD"
+
+[[family]]
+id = "x7a-nnn-manifold"
+verdict = "REFUSE-UNCLASSIFIED-v0"
+bracket = "BRACKET"
+f1 = "NOT-MEASURED"
+f2 = "NOT-EVALUATED"
+
+[[change]]
+date = "2026-10-02"
+points = ["*"]
+why = """DECLARED BEFORE THE FIRST RUN under v02-rules (plan 0866 P-A, G6). v02-rules = v01-rules + geometry.toml + \
+order.toml + compose.toml; verdict.toml is byte-identical. Every verdict above is the v01-rules lock carried over, so the \
+expected effect is NONE: 0 cells and 0 fixture points change in tabulate --diff v01-rules v02-rules. [order.*] is \
+predicted from the stored v01-rules sign codes (needle, two_start) by hand, not from a v02-rules run: DIS/ORD is \
+OFF-WINDOW, an unmeasured needle NEEDLE-UNMEASURED, MID with COEXIST COEXIST-AT-WINDOW, MID with FLUCT/UNRES \
+NOT-EQUILIBRATED, MID with INDEP EQUILIBRATED, MID with an unmeasured two_start ORDER-UNMEASURED. A moved verdict is a \
+finding, never an edit of this file"""

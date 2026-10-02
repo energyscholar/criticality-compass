@@ -6,6 +6,7 @@ family = "2D 6-state Potts, square lattice"
 mechanism = """walking: the critical and tricritical Potts fixed points annihilate into a \
 complex pair for q > 4; the flow lingers near them for a length xi before running away"""
 class_truth = "WALKING"
+order_truth = "FIRST-ORDER"
 sampler = "potts"
 traps = [
   """at L > xi it shows coexistence (D > 0) exactly like a strong first-order transition \

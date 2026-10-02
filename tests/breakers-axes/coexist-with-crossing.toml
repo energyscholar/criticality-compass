@@ -1,0 +1,27 @@
+# tests/breakers-axes/coexist-with-crossing.toml - an AXIS BREAKER (data; read by tests/test_axes.py)
+schema = 1
+kind = "axis-breaker"
+id = "coexist-with-crossing"
+rule = "under COEXIST the geometry is still read: a crossing exponent is WALKING, and the verdict is the order's FIRST-ORDER"
+why = """The cell verdict_x could not hold: (needle MID, flow STOPPED, across RELEVANT, stability CROSSING) is WALKING on the \
+geometry axis, and the two starts that stay apart say COEXIST-AT-WINDOW on the order axis. Both are readable at once; the \
+composed verdict is FIRST-ORDER because the order decides when the starts coexist."""
+tables = "v02-rules"
+
+[cells]
+"needle.velocity" = "ZERO!"
+"needle.d_ord" = "SIG+"
+"needle.d_dis" = "SIG+"
+"across.y_last" = "SIG+"
+"stability.d" = "SIG+"
+"two_start.D" = ["SIG+"]
+
+[expect]
+geometry = "WALKING"
+order = "COEXIST-AT-WINDOW"
+verdict = "FIRST-ORDER"
+
+[mutation]
+file = "tables/v02-rules/compose.toml"
+intent = "COEXIST-AT-WINDOW passes the geometry through instead of deciding FIRST-ORDER"
+py = '''s.replace('when.order = ["COEXIST-AT-WINDOW"]\nverdict = "FIRST-ORDER"', 'when.order = ["COEXIST-AT-WINDOW"]\nverdict = "@geometry"')'''

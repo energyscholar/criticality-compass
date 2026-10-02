@@ -1,0 +1,39 @@
+# tables/v02-rules/compose.toml - (geometry, order) -> verdict: a declared PARTITION of the product of the two
+# axes' values (data). `validate` proves it disjoint and total, and proves that composing the two axes gives
+# verdict.toml's verdict on EVERY row of the signature domain (verdict.toml itself is unchanged from v01-rules).
+# A verdict "@geometry" means "the geometry's own value". The axes share the needle, so some pairs (for example
+# geometry POINT with order OFF-WINDOW) are never produced by any signature row; a row covers them by the
+# order value alone, and the factorisation proof is over the rows that exist.
+schema = 1
+kind = "compose"
+columns = ["geometry", "order"]
+
+[[row]]
+when.order = ["OFF-WINDOW"]
+verdict = "NOT"
+why = "verdict_x STAGE1: off the window"
+
+[[row]]
+when.order = ["NEEDLE-UNMEASURED"]
+verdict = "REFUSE-NEEDLE-UNMEASURED"
+why = "honest null: the needle was not measured or not evaluated"
+
+[[row]]
+when.order = ["COEXIST-AT-WINDOW"]
+verdict = "FIRST-ORDER"
+why = "verdict_x STAGE2: the two starts coexist at the window, whatever the geometry reads"
+
+[[row]]
+when.order = ["NOT-EQUILIBRATED"]
+verdict = "REFUSE-EQUIL"
+why = "verdict_x STAGE2: an unresolved or fluctuating two-start difference cannot certify equilibrium"
+
+[[row]]
+when.order = ["ORDER-UNMEASURED"]
+verdict = "REFUSE-TWO-START-UNMEASURED"
+why = "honest null: the two-start difference was not measured or not evaluated"
+
+[[row]]
+when.order = ["EQUILIBRATED"]
+verdict = "@geometry"
+why = "the starts agree at the window: the geometry decides"

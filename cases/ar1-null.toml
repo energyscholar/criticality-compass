@@ -7,6 +7,7 @@ fresh set a3e)"""
 mechanism = """no critical structure and no approach: a fixed relaxation time (tau ~ 33 steps) \
 that does not grow"""
 class_truth = "NOT"
+order_truth = "NONE"
 sampler = "ar_series"
 traps = [
   "u's sampling noise grows as r -> 1, so ZERO! is unreachable: REFUSE-dominant, not NOT (A3 P2)",

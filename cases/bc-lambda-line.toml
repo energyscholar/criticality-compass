@@ -8,6 +8,7 @@ mechanism = """a manifold of Ising-class critical points (one relevant direction
 the manifold the deviation is irrelevant and DECAYS - a line of critical points, not a line of \
 fixed points"""
 class_truth = "POINT"
+order_truth = "CONTINUOUS"
 sampler = "blume_capel"
 traps = [
   """the along direction (fingerprint 2) has NEVER been measured on this manifold: POINT \

@@ -8,6 +8,7 @@ mechanism = """a FIRST-ORDER LINE: at h = 0, T < T_c two ordered phases coexist;
 flips the magnetisation discontinuously. A line of transitions that is not a line of fixed \
 points"""
 class_truth = "FIRST-ORDER"
+order_truth = "FIRST-ORDER"
 sampler = "ising_field"
 traps = [
   """DECOY for LINE: a line of transitions in (T, h) — the Detector must not read LINE \

@@ -6,6 +6,7 @@ family = "2D 7-state Potts, square lattice"
 mechanism = """strong first order: two coexisting phases at K_c, correlation length xi ~ 48 \
 inside the simulated sizes"""
 class_truth = "FIRST-ORDER"
+order_truth = "FIRST-ORDER"
 sampler = "potts"
 traps = [
   """first-step growth y ~ 2.17 ~ d (the discontinuity fixed point) before trapping: a \

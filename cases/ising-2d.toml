@@ -6,6 +6,7 @@ family = "2D Ising, square lattice, nearest-neighbour"
 mechanism = """Z2 symmetry breaking at an isolated fixed point: one relevant thermal \
 direction, y_t = 1"""
 class_truth = "POINT"
+order_truth = "CONTINUOUS"
 sampler = "ising"
 traps = [
   """the ordered sink: deep ORD the flow is slow (g1 -> 1) and an un-sink-aware needle \

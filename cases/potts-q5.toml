@@ -6,6 +6,7 @@ family = "2D 5-state Potts, square lattice"
 mechanism = """walking: the critical and tricritical Potts fixed points annihilate into a \
 complex pair for q > 4; the flow lingers near them for a length xi before running away"""
 class_truth = "WALKING"
+order_truth = "FIRST-ORDER"
 sampler = "potts"
 traps = [
   """the pre-registered blind spot: at L << xi it is indistinguishable from critical (W1 \

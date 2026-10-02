@@ -10,7 +10,7 @@ You do not need to read any code to use it. Start with the first hour below. `TU
 from data to verdict, `HOWTO.md` covers the weekly loop and the advanced commands, and `KERNEL-IN-CC.md`
 explains what the instruments compute.
 
-## Glossary (12 terms)
+## Glossary (14 terms)
 
 1. **input**: a directory `inputs/<id>/` holding `m.toml` (what was measured and how: Kernel V8's M) and `points.toml`.
 2. **point**: one labelled place in parameter space, e.g. `"0.07"` or `"d2.0-K1.0"`, with a list of sizes.
@@ -24,6 +24,8 @@ explains what the instruments compute.
 10. **BLANK**: CC does not know (not measured, not evaluated, unresolved, or a refusal). The brackets give the exact reason.
 11. **case**: taxonomy (`cases/<id>.toml`, holding the true class). `points.toml` maps points to cases and is never frozen.
 12. **frozen**: a result, and every file it read, made read-only and hash-checked. To change a frozen thing you fork it.
+13. **geometry**: what the flow says (point, line, walking, ...), read from needle, flow, across and stability only. A rulebook with `geometry.toml` (`v02-rules`) prints it beside the verdict.
+14. **order**: whether the two starts agree at the window (coexist, equilibrated, off the window, ...), read from needle and two_start only (`order.toml`). `compose.toml` turns (geometry, order) into the verdict, and `validate` proves it gives `verdict.toml`'s verdict on every row.
 
 ## The first hour
 

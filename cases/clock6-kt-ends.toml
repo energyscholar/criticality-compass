@@ -7,6 +7,7 @@ and T2 = 0.9008(6) (critical -> disordered)"""
 mechanism = """two ends of one critical phase: at T2 the vortex fugacity turns relevant (as XY \
 T_KT); at T1 the Z6 field turns relevant (dual mechanism)"""
 class_truth = "BKT-END"
+order_truth = "CONTINUOUS"
 sampler = "clock"
 traps = [
   """two BKT ends with DIFFERENT mechanisms: T1 (dangerously irrelevant Z6 field, slow \

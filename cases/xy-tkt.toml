@@ -6,6 +6,7 @@ family = "2D XY at T_KT = 0.89294(8) (beta 1.1199)"
 mechanism = """end of the spin-wave line: the vortex fugacity is marginal, the flow is \
 logarithmically slow (x = 1/(ln l + C)); infinite-order transition"""
 class_truth = "BKT-END"
+order_truth = "CONTINUOUS"
 sampler = "xy"
 traps = [
   """the BKT BREAKER: log-slow flow at L <= 243 can read as STOPPED and the response as \

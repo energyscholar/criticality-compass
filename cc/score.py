@@ -20,6 +20,29 @@ def truths(root=ROOT):
     return {f.stem: declare.load_truth(f) for f in sorted((Path(root) / "cases").glob("*.toml"))}
 
 
+def order_truths(root=ROOT):
+    return {f.stem: declare.load_order_truth(f) for f in sorted((Path(root) / "cases").glob("*.toml"))}
+
+
+def agreement(pairs):
+    """{agree, refused, disagree} over (reading class, truth class) pairs; a reading class REFUSE is refused."""
+    got = ["refused" if r == "REFUSE" else "agree" if r == t else "disagree" for r, t in pairs]
+    return {k: got.count(k) for k in ("agree", "refused", "disagree")}
+
+
+def axis_tallies(rows, T, tr, otr):
+    """The per-axis agreement lines of one table set whose results carry geometry and order. Order is read against
+    order_truth through the set's [score] map; geometry against class_truth, over the points whose order_truth is not
+    FIRST-ORDER (a first-order point has no geometry class to be right about). Points with no case are not scored."""
+    sc, g = T.axes["order"][0]["score"], T.axes["geometry"][0]
+    cls = lambda v: "REFUSE" if v in g["refuse"] else g.get("class_of", {}).get(v, v)  # noqa: E731
+    both = [(sig, case) for sig, case, _ in rows if case != "none" and case in tr]
+    o = agreement([(sc[sig["order"]], otr[case]) for sig, case in both])
+    ge = agreement([(cls(sig["geometry"]), tr[case]) for sig, case in both if otr[case] != "FIRST-ORDER"])
+    return [f"Order against order_truth: " + ", ".join(f"{n} {k}" for k, n in o.items()),
+            f"Geometry against class_truth (order_truth not FIRST-ORDER): " + ", ".join(f"{n} {k}" for k, n in ge.items())]
+
+
 def sizes_of(input_id, root):
     p = Path(root) / "inputs" / input_id / "m.toml"
     return tomllib.loads(p.read_text())["axes"]["size"] if p.is_file() else []
@@ -51,21 +74,24 @@ def tabulate(results, root=ROOT, joins=None):
            "no result file holds it.", ""]
     for tset, rs in sorted(by.items()):
         cols, groups, tally = rs[0]["signature_columns"], {}, {"agree": 0, "refused": 0, "disagree": 0, "no truth": 0}
-        out += [f"## Rules: {tset}", "", "| run | point | case | truth | sizes | " + " | ".join(cols) + " | verdict | class |",
-                "|" + "---|" * (len(cols) + 7)]
+        ax, scored = ["geometry", "order"] * ("geometry" in rs[0]["signature"][0]), []
+        out += [f"## Rules: {tset}", "", "| run | point | case | truth | sizes | " + " | ".join(cols) + " | verdict | class |"
+                + "".join(f" {a} |" for a in ax), "|" + "---|" * (len(cols) + 7 + len(ax))]
         for res in sorted(rs, key=lambda r: r["run_id"]):
             jn = (joins or {}).get(res["input"]) or join(res["input"], root)
             for sig, case, truth in table_rows(res, tr, jn, root, findings):
                 codes = [sig[c] + (f" ({''.join(sig['flags'][c])})" if sig["flags"].get(c) else "") for c in cols]
                 out.append(f"| {res['run_id']} | {sig['point']} | `{case}` | {truth} | "
                            f"{' '.join(map(str, sizes_of(res['input'], root)))} | {' | '.join(codes)} | "
-                           f"{sig['verdict']} | {sig['verdict_class']} |")
+                           f"{sig['verdict']} | {sig['verdict_class']} |" + "".join(f" {sig[a]} |" for a in ax))
+                scored.append((sig, case, truth))
                 groups.setdefault(tuple(sig[c] for c in cols), {}).setdefault(truth, []).append(f"{res['input']}:{sig['point']}")
                 kind = ("no truth" if truth in ("none", "UNJOINED") else "refused" if sig["verdict_class"] == "REFUSE"
                         else "agree" if sig["verdict_class"] == truth else "disagree")
                 tally[kind] += 1
-        out += ["", f"Verdict class against truth: " + ", ".join(f"{n} {k}" for k, n in tally.items()), "",
-                f"## Collisions ({tset})", ""]
+        out += ["", f"Verdict class against truth: " + ", ".join(f"{n} {k}" for k, n in tally.items())]
+        out += axis_tallies(scored, detect.load_tables(tset), tr, order_truths(root)) if ax else []
+        out += ["", f"## Collisions ({tset})", ""]
         clash = [(k, g) for k, g in groups.items() if len({t for t in g if t not in ("none", "UNJOINED")}) > 1]
         out += [f"- `{', '.join(f'{c}={v}' for c, v in zip(cols, k))}`: "
                 + " vs ".join(f"{t} ({', '.join(p)})" for t, p in sorted(g.items()) if t not in ("none", "UNJOINED"))
@@ -169,7 +195,7 @@ def reverdict_result(res, T, commit="none"):
                             for f in rd["flags"]}) for s in sig}
         readings += mine
         signature.append({"point": pt, "obtained": old["obtained"], **sig, "flags": {s: f for s, f in flags.items() if f},
-                          "verdict": verdict, "verdict_class": cls, "row_line": line, "why": why})
+                          "verdict": verdict, "verdict_class": cls, "row_line": line, "why": why, **detect.axes_of(codes, T)})
     old_id = res["run_id"]
     read = {f"results/{old_id}.json": declare.sha(ROOT / "results" / f"{old_id}.json"),
             **{k: h for k, h in res["read"].items() if not k.startswith("tables/")},

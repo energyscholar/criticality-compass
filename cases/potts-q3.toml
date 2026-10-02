@@ -6,6 +6,7 @@ family = "2D 3-state Potts, square lattice"
 mechanism = """S3 permutation-symmetry breaking at an isolated fixed point: one relevant \
 thermal direction, y_t = 6/5"""
 class_truth = "POINT"
+order_truth = "CONTINUOUS"
 sampler = "potts"
 traps = [
   "only ever simulated AT the exact K_c: no needle, no along, a truth-placed point",

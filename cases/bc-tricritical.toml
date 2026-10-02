@@ -7,6 +7,7 @@ family = """2D Blume-Capel at its tricritical point delta_t ~ 1.966 (library: Zi
 mechanism = """two relevant directions (thermal y_t1 = 9/5 and the crystal-field / dilution \
 direction): the end of the Ising lambda-line where it turns first order"""
 class_truth = "MULTI"
+order_truth = "CONTINUOUS"
 sampler = "blume_capel"
 traps = [
   """critical slowing masquerades as metastability: C3 returned a confident WRONG delta_t \

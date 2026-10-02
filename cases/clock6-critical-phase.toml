@@ -6,6 +6,7 @@ family = "2D 6-state clock, theta = 2 pi k / 6, H = -sum cos(theta_i - theta_j)"
 mechanism = """Z6 anisotropy irrelevant between T1 and T2: an emergent-U(1) critical phase \
 (Gaussian line), eta from 0.113 at T1 to 0.243 at T2"""
 class_truth = "LINE"
+order_truth = "CONTINUOUS"
 sampler = "clock"
 traps = [
   """discrete spins: a sum of 9 sixth roots can be exactly zero, so sum-and-normalise is \

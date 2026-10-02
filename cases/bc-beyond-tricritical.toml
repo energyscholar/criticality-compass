@@ -6,6 +6,7 @@ family = "2D Blume-Capel, delta > delta_t ~ 1.966: the transition line is first 
 mechanism = """a LINE of first-order transitions (ordered and vacancy-rich phases coexist \
 along it): a critical-looking manifold that is not critical"""
 class_truth = "FIRST-ORDER"
+order_truth = "FIRST-ORDER"
 sampler = "blume_capel"
 traps = [
   """deep ordered (K > K_t) the same SIG+ coexistence sign appears at delta 1.9 / 1.95 \

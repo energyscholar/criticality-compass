@@ -8,6 +8,7 @@ mechanism = """Z2 x Z2 symmetry breaking at an isolated fixed point of the Ising
 relevant (it drives K_c(g) down), so the critical points do not lie on a line of fixed points; g = 0 is two decoupled \\
 Ising points"""
 class_truth = "POINT"
+order_truth = "CONTINUOUS"
 sampler = "bilayer"
 traps = [
   """a navigated K sits at the needle's MID by construction (A2), but an independent re-reading at the same K and N \\

@@ -15,6 +15,7 @@ import door
 import readout
 
 ROOT = Path(__file__).resolve().parent.parent
+AXES = ("geometry", "order", "compose")
 if str(ROOT / "cc" / "instruments") not in sys.path:
     sys.path.insert(0, str(ROOT / "cc" / "instruments"))
 
@@ -41,6 +42,7 @@ class Tables:
     paths: tuple
     membership: dict = dataclasses.field(default_factory=dict)   # instrument name -> its rule (membership.toml)
     membership_path: object = None
+    axes: dict = dataclasses.field(default_factory=dict)         # geometry / order / compose -> (table, row lines); empty for a set without them
 
 
 def refused(msg, nxt):
@@ -67,13 +69,15 @@ def load_tables(name, tables_dir=None):
         sets = " ".join(sorted(p.name for p in (ROOT / "tables").glob("*")))
         raise refused(f"no table set '{name}'. Sets: {sets}", "bin/cc tables fork verdict-x-rules <name>")
     mp = d / "membership.toml"
-    bad = [f for q in (d / "codes.toml", d / "verdict.toml", *[mp] * mp.is_file()) for f in declare.check_file(q, ROOT)]
+    ax = [d / f"{n}.toml" for n in AXES if (d / f"{n}.toml").is_file()]
+    bad = [f for q in (d / "codes.toml", d / "verdict.toml", *[mp] * mp.is_file(), *ax) for f in declare.check_file(q, ROOT)]
     if bad:
         raise ValueError("\n".join(declare.fmt(f) for f in bad))
     texts = [(d / f).read_text() for f in ("codes.toml", "verdict.toml")]
     rules = {k: v for k, v in tomllib.loads(mp.read_text()).items() if isinstance(v, dict)} if mp.is_file() else {}
+    axes = {q.stem: (tomllib.loads(q.read_text()), declare.row_lines(q.read_text())) for q in ax}
     return Tables(name, tomllib.loads(texts[0]), tomllib.loads(texts[1]), declare.row_lines(texts[1]),
-                  (d / "codes.toml", d / "verdict.toml"), rules, mp if mp.is_file() else None)
+                  (d / "codes.toml", d / "verdict.toml", *ax), rules, mp if mp.is_file() else None, axes)
 
 
 def context_for(input_id, instrument_name, point, size=None):
@@ -149,6 +153,36 @@ def verdict_of(signature, tables):
     raise ValueError(f"no verdict row contains {signature}")
 
 
+def row_of(table, vals):
+    """The index of the one row of a partition table whose `when` holds `vals` (the rows partition, so one matches)."""
+    return next(k for k, row in enumerate(table["row"]) if all(vals[c] in v for c, v in row["when"].items()))
+
+
+def composed(gv, ov, T):
+    """(verdict, index of the compose row) for one (geometry, order): the row's verdict, or the geometry when it says @geometry."""
+    cm, k = T.axes["compose"][0], row_of(T.axes["compose"][0], {"geometry": gv, "order": ov})
+    v = cm["row"][k]["verdict"]
+    return (gv if v == "@geometry" else v), k
+
+
+def axes_of(codes, T):
+    """The geometry and order of one point, and the lines of the three rows that gave them and the verdict:
+    {} for a set without the axes. compose(geometry, order) is the verdict (validate proves it on every row)."""
+    if not T.axes:
+        return {}
+    (g, gl), (o, ol), (_, cl) = (T.axes[n] for n in AXES)
+    gk, ok = row_of(g, codes), row_of(o, codes)
+    gv, ov = g["row"][gk]["verdict"], o["row"][ok]["verdict"]
+    return {"geometry": gv, "order": ov, "axis_lines": {"geometry": gl[gk], "order": ol[ok],
+                                                         "compose": cl[composed(gv, ov, T)[1]]}}
+
+
+def used(T):
+    """The registry columns ('<instrument>.<column>') some code column of this set reads."""
+    cols = declare.code_cols(T.codes)
+    return set().union(*(sources(n, cols) for n in cols))
+
+
 def sources(name, cols):
     """The registry columns ('<instrument>.<column>') a code column is derived from."""
     src = cols[name]["from"]
@@ -168,8 +202,8 @@ def read_hashes(m, input_id, tables, T, c):
     read = {name: declare.sha(ROOT / name)}
     for n in m["instruments"]:
         read[f"instruments/{n}.toml"] = declare.sha(ROOT / "instruments" / f"{n}.toml")
-    for path, f in zip(T.paths, ("codes", "verdict")):
-        read[f"tables/{tables}/{f}.toml"] = declare.sha(path)
+    for path in T.paths:
+        read[f"tables/{tables}/{path.name}"] = declare.sha(path)
     if any("door:off_manifold" in c.reg[n]["pipeline"] for n in m["instruments"]):
         if T.membership_path is None:
             raise refused(f"tables/{tables} has no membership.toml, and {input_id} declares an instrument whose "
@@ -215,7 +249,7 @@ def measure(m, c, reg, T):
             arrays = {a: [gather(cache, blocks, idx, pos[k], a) for k in keys] for a in inst["arrays"]}
             acc[(n, u, sz)].append(reg[n][1].reduce(arrays, ctxs[(n, sz)]))
     first = {u: after(u[0], np.stack(v), ctxs[(u[0], u[2])]) for u, v in acc.items() if not reg[u[0]][0].get("requires")}
-    codes = {pt: codes_of(cells_of_rows(point_rows(m, c, reg, first, pt)), T) for pt in m["axes"]["point"]}
+    codes = {pt: codes_of(cells_of_rows(point_rows(m, c, reg, first, pt, used(T))), T) for pt in m["axes"]["point"]}
     for u, v in acc.items():
         if reg[u[0]][0].get("requires"):
             ctx = dataclasses.replace(ctxs[(u[0], u[2])], member=door.member(T.membership, u[0], u[1], codes))
@@ -223,9 +257,9 @@ def measure(m, c, reg, T):
     return first
 
 
-def point_rows(m, c, reg, out, pt):
-    """Every registry column at one point as (instrument, column, eps key, flags, [(size, Reading)], source);
-    an instrument this input does not declare reads NOT-MEASURED."""
+def point_rows(m, c, reg, out, pt, use):
+    """Every registry column at one point that the table set reads (`use`) as (instrument, column, eps key, flags,
+    [(size, Reading)], source); an instrument this input does not declare reads NOT-MEASURED."""
     rows, flagmap = [], c.cfg["obtained_flag"]
     for n, (inst, _) in reg.items():
         if inst["unit"] == "pair":
@@ -233,7 +267,7 @@ def point_rows(m, c, reg, out, pt):
         on = n in m["instruments"]
         flags = sorted(set(inst["flags"]) | {flagmap[m["obtained"][pt]]}) if on else []
         sizes = m["axes"]["size"] if on and inst["unit"] == "point-size" else [None]
-        for col, ek in inst["columns"].items():
+        for col, ek in ((k, e) for k, e in inst["columns"].items() if f"{n}.{k}" in use):
             none = Reading(None, None, None, "NOT-MEASURED", ek, None, f"{n} is not declared on this input")
             per = [(sz, out[(n, pt, sz)][0][col] if on else none) for sz in sizes]
             rows.append((n, col, ek, flags, per, f"{n}.{col}"))
@@ -292,7 +326,7 @@ def run(input_id, tables, write, tables_dir=None):
     direct = {s["from"]: n for n, s in cols.items() if isinstance(s["from"], str)}
     readings, reports, vectors, signature = [], [], {}, []
     for pt in m["axes"]["point"]:
-        rows = point_rows(m, c, reg, out, pt)
+        rows = point_rows(m, c, reg, out, pt, used(T))
         cells = cells_of_rows(rows)
         for n, col, ek, flags, per, src in rows:
             for sz, r in per:
@@ -315,7 +349,7 @@ def run(input_id, tables, write, tables_dir=None):
         readings += mine
         signature.append({"point": pt, "obtained": m["obtained"][pt], **sig,
                           "flags": {s: f for s, f in flags.items() if f}, "verdict": verdict,
-                          "verdict_class": cls, "row_line": line, "why": why})
+                          "verdict_class": cls, "row_line": line, "why": why, **axes_of(codes, T)})
     pair_readings, pairs, pair_reports = pair_results(m, c, reg, out, vectors)
     commit = "none"
     if write and (ROOT / ".git").exists():

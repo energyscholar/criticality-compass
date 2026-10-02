@@ -6,6 +6,7 @@ id = "<ID>"
 family = "TODO"
 mechanism = "TODO"
 class_truth = "TODO"           # one of cc.toml alphabets.class_truth
+order_truth = "TODO"           # one of cc.toml alphabets.order_truth: CONTINUOUS | FIRST-ORDER | NONE
 controls = { names = ["TODO"], range = "TODO" }
 observables = { list = ["TODO"], conjugate_observable = false }
 sampler = "TODO"               # free text, informational
