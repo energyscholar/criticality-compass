@@ -1,0 +1,18 @@
+$ bin/cc family x7a-bc-lambda
+family x7a-bc-lambda   rules: v01-rules   input: x7a-bc   interior: 0.0 1.0 1.5 1.8 1.9 1.95
+  bracket NON-MONOTONE
+    edge 0.0->1.0 DESCENT
+    edge 1.0->1.5 NO-DESCENT
+    edge 1.5->1.8 NO-DESCENT
+    edge 1.8->1.9 NO-DESCENT
+    edge 1.9->1.95 DESCENT
+  f1      NOT-MEASURED
+  f2      REFUSE-OFF-MANIFOLD
+    0.0->1.0 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+    1.0->1.5 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+    1.5->1.8 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+    1.8->1.9 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+    1.9->1.95 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+  => family verdict REFUSE-OFF-MANIFOLD   class REFUSE, family.toml line 60
+     why: X7a: a member point off the manifold at L 243 (it also explains a non-monotone bracket, so it is read first by partition)
+exit 0

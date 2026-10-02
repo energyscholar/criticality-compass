@@ -1,6 +1,6 @@
 # The kernel in CC
 
-What the four instruments compute, in the kernel's terms, and where the code is built so that a wrong state
+What the five instruments compute, and the family fingerprints, in the kernel's terms, and where the code is built so that a wrong state
 cannot be reached instead of being checked for afterwards. You do not need this to use CC (`README.md` is
 enough). Read it when you want to know what a number means, or before you touch an instrument.
 
@@ -9,15 +9,17 @@ enough). Read it when you want to know what a number means, or before you touch 
 - A **NodeField** is one scalar for each node of a declared set of nodes: the 27, 81 and 243 sizes with one
   number each, or the two starts with one number each.
 - A **declared relation** is a set of nodes and directed edges, each edge with its provenance (here `Coupling`),
-  declared before any data are touched. CC builds every relation from a closed set of three templates, in
+  declared before any data are touched. CC builds every relation from a closed set of four templates, in
   `m.toml`, and the kernel refuses a relation with a cycle. In `explain`, a relation prints as step 3.
 - An **EdgeField** is one scalar for each declared edge.
 - **A** is the one operator that takes a NodeField to an EdgeField: for each declared edge,
   `A(x)[edge] = x[source] - x[target]`, the difference of the two node values. There is no other way to get an
   EdgeField, and no implicit way back; where CC wants a NodeField again it declares a projection and says what the
   projection keeps and discards.
-- **B** (accumulation along continuation) and **R** (circulation) are not used in v0. `kernel.uses = ["A"]` on
-  every input.
+- **B** (accumulation along continuation) is used by one instrument, `along` (below): `B(g)[e] = g[e]` plus the
+  sum of `g[f]` over the edges that continue `e`, so that a step along the size chain accumulates what lies beyond
+  it. **R** (circulation) is not used. `kernel.uses` lists the operators an input's instruments apply: `["A"]`, or
+  `["A", "B"]` when `along` is declared.
 - **M** is what an input declares: its `m.toml`. It says which nodes, which edges, which margins; CC refuses to
   run anything the M did not declare.
 
@@ -39,8 +41,16 @@ matched (big 243, small 81)
 ```
 
 The matched relation pairs a big and a small system at the same block-lattice size, one blocking step apart.
+Two more relations are declared for `along` and the families:
 
-## The four instruments
+```
+control over points          0.0 <- 0.07 <- 0.14 <- 0.21        edges: 0.07 -> 0.0, 0.14 -> 0.07, 0.21 -> 0.14
+all-pairs over points        0.0, 0.07, 0.14, 0.21              edges: every (j -> i) with i before j (6 for 4 points)
+```
+
+An `along` unit is one edge of the control relation, restricted to its two points (edge `b -> a`).
+
+## The five instruments
 
 ### needle: does one more blocking step move the observable, and where does it sit?
 
@@ -94,12 +104,49 @@ The matched relation pairs a big and a small system at the same block-lattice si
   `D = 0.7629 - 0.7659 = -0.00301`, interval `[-0.008733, 0.001665]`, inside the margin of 0.01: `ZERO!`, which
   the table codes INDEP.
 
+### along: how fast does the difference between two neighbouring points grow with size?
+
+- **Relation:** a pair unit, one edge of the declared `control` relation (a chain over the points, `a <- b`), and
+  the `size` chain. **Nodes:** first the observable of the two points at each size (two nodes, one pair, per size),
+  then `ln(s * Delta)` at each size, where `Delta` is the difference of the two points. **Operators:** A over
+  the control edge gives `Delta(L)`; A over the size chain gives the step of `ln(s * Delta)`; B over the size chain
+  accumulates the steps to the top edge; the sum is divided by the log of the size span.
+- **Reads:** `y_along`, the growth exponent of `|Delta|` with system size. Before any of this, a **door** reads
+  whether both points are on the manifold: the pair's membership (from the rulebook's `membership.toml`) decides
+  whether the pair runs at all, and a refused pair is a door value (`REFUSE-OFF-MANIFOLD`), not an error.
+- **Means:** the points are the same line when `Delta` does not grow or shrink with size beyond the margin:
+  `y_along` inside it is `ZERO!`, marginal. Above the margin the points separate as the lattice grows (they sit on
+  different fixed points); below, they come together.
+- **A number:** b7-at-line-2, the pair `0.14->0.21` (`explain b7-at-line-2 0.14->0.21`): `Delta` is `0.05402`,
+  `0.05431` and `0.04232` at sizes 27, 81 and 243, so `ln|Delta|` is `-2.918`, `-2.913`, `-3.162`; A over size
+  gives `0.005433` and `-0.2495`; B accumulates them to `-0.244`; over the log span `2.197` that is `-0.1111`,
+  interval `[-0.2479, 0.005093]`, inside the margin of 0.25: `ZERO!`.
+
+## The family fingerprints
+
+A family reads the points of one input together, from the stored result and its resample vectors; it never
+measures again. Its three columns are built with the same operators:
+
+- **bracket: A over a chain of codes.** Each point's needle code is given a declared rank (DIS 0, MID 1, ORD 2),
+  the ranks are a NodeField over the chain of points in their declared order, and A takes the difference of
+  neighbours. Each difference is placed among the cells for `eps = 0` (three cells), so a step down is
+  `DESCENT` and anything else is `NO-DESCENT`; the bracket is `BRACKET` when no step descends and some point is MID.
+- **f1: all-pairs differences.** The `across` exponent of each interior point, per resample, is a NodeField over
+  the points; A over the `all-pairs` relation gives `y(j) - y(i)` for every pair (6 pairs for 4 points), each with
+  its own interval, coded by its sign cell.
+- **f2: along over the chain.** The `along` cell of each consecutive pair of interior points, coded through
+  `[f2.code]`.
+
+Where a point reads a null (`NOT-MEASURED`, `NOT-EVALUATED`), the edges and pairs that touch it read that null: a
+null is plumbing around the maths, and only ranked codes reach A. The family verdict is one lookup in a
+partition of the three columns (`family.toml`), validated total and disjoint, with no priority chain.
+
 ## Where structure replaces control
 
 The rule for any code that computes: make a wrong state impossible to reach, rather than catch it after. It is
 checked mechanically on every commit (`checks.py`: in the files that do the arithmetic, no `if`, no ternary,
 no `while`, no `try`, no comparison, no `clip` or `max` or `abs` or default-valued `get`, and no numeric
-literal besides 0 and 1 unless the line says where it was declared). In CC it shows in five places:
+literal besides 0 and 1 unless the line says where it was declared). In CC it shows in five places (the families read the same way: a lookup in a partition, nulls carried as values):
 
 1. **The sign cell is a position among declared cuts.** A reading's cell is `sign(lo, hi, eps)`: the position
    of each interval end among the sorted cuts `-eps, 0, +eps`, counted, then looked up in a table. There is no

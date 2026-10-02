@@ -1,0 +1,6 @@
+$ bin/cc explain x7a-bc 1.0->1.5 --advanced
+explain x7a-bc 1.0->1.5   rules: v01-rules
+along   (pair 1.0->1.5)
+  1 MEMBER    membership.toml [along] reads needle: 1.0 DIS -> OFF, 1.5 DIS -> OFF; lowest rank decides -> door REFUSE-OFF-MANIFOLD   flags: navigated point
+  2 READING   REFUSE-OFF-MANIFOLD
+exit 0

@@ -344,8 +344,11 @@ def cmd_show(args, explain):
         print(msg)
         return 1
     points = [s["point"] for s in res["signature"]]
+    pairs = ["->".join(p["pair"]) for p in res.get("pairs", [])]
+    if explain and pos[1] in pairs:
+        return emit(view.explain_pair(res, pos[1], MODE))
     if explain and pos[1] not in points:
-        print(f"{pos[0]} has no point '{pos[1]}'. Points: {' '.join(points)}\n  Next: bin/cc explain {pos[0]} <one of these>")
+        print(f"{pos[0]} has no point '{pos[1]}'. Points: {' '.join(points + pairs)}\n  Next: bin/cc explain {pos[0]} <one of these>")
         return 1
     jn = score.join(pos[0])
     if explain:

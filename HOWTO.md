@@ -10,10 +10,12 @@ cc - Criticality Compass   (ADVANCED)
   bin/cc show <input>                                         every reading of an input, and each point's verdict
   bin/cc explain <input> <point>                              the whole chain for one point: data -> verdict
   bin/cc run <input> | --all [--tables SET] [--dry]           measure; --dry writes nothing
+  bin/cc reverdict <input> --tables SET [--from SET]          re-verdict a stored result under another rulebook; measures nothing
   bin/cc freeze <run-id> | --all [--tables SET]               make a result and what it read read-only
-  bin/cc tabulate [--diff A B]                                SIGNATURE-TABLE.md and docs/verdict-table.html
+  bin/cc tabulate [--diff A B]                                write SIGNATURE-TABLE.md + docs/verdict-table.html; --diff prints only
   bin/cc new case <id>                                        start a case file from the template
-  bin/cc new input <id> [--like X ...]                        start an input from the template
+  bin/cc new input <id> [--like X ...]                        start an input from the template; --like also takes --points --data-dir --label-format --add-instrument
+  bin/cc new instrument <id>                                  start an instrument (registry file + stub module) from the template
   bin/cc data add <input>                                     pin the sha256 of an input's data files
   bin/cc tables fork <from> <to>                              copy a rulebook so you can edit it
   bin/cc tables drop <set> [--with-results]                   delete an unfrozen rulebook
@@ -23,7 +25,8 @@ cc - Criticality Compass   (ADVANCED)
   bin/cc test [-v] [<name> ...]                               run the named tests (default all)
   bin/cc mutate <relpath> (--sed E | --py E) -- <test> ...    run tests against a temporary mutation
   bin/cc help [--advanced]                                    this text
-  bin/cc (v0.1) family                                        not in v0
+  bin/cc family <id> [--tables SET]                           the family verdict (bracket, f1, f2) of a stored result; measures nothing
+  bin/cc new family <id>                                      start a family declaration from the template
 ```
 
 Any command accepts `--advanced` to print the fuller view (the margins, how each point was obtained, per-size
@@ -34,13 +37,17 @@ what is printed, never what is computed.
 
 Taxonomy changes (cases, joins) and rule changes (verdict rows) are data edits. The loop is:
 
-1. **Add or change a case.** `bin/cc new case <id>`, fill the TODOs, map points to it in
+1. **Add or change a case.** `bin/cc new case <id>`, fill the TODOs (a case file has an optional
+   `breaker_verdict` for a pre-registered breaker; leave it empty otherwise), map points to it in
    `inputs/<input>/points.toml`, `bin/cc validate`. No result changes: no result names a case.
-2. **Change verdict rows.** `bin/cc tables fork verdict-x-rules <name>`, edit `tables/<name>/verdict.toml`,
-   `bin/cc validate`.
-3. **Re-run.** `bin/cc run --all --tables <name>` (about ten seconds for the seven inputs).
+2. **Change verdict rows.** `bin/cc tables fork v01-rules <name>`, edit `tables/<name>/verdict.toml`,
+   `bin/cc validate`. (`v01-rules` is the working rulebook, the one `bin/cc help` names under `rules in use`.)
+3. **Re-verdict or re-run.** If your change touched only `verdict.toml` or `codes.toml`, the readings do not change:
+   `bin/cc reverdict <input> --tables <name>` applies the new rules to the stored readings, in seconds, with no
+   measurement (see "Re-verdicting without measuring" below). Otherwise `bin/cc run --all --tables <name>` measures
+   again (about half a minute for the eleven inputs).
 4. **Look.** `bin/cc show <input> --tables <name>`, `bin/cc explain …`, and
-   `bin/cc tabulate --diff verdict-x-rules <name>`.
+   `bin/cc tabulate --diff v01-rules <name>`.
 5. **Freeze what you keep.** `bin/cc freeze --all --tables <name>`. Drop what you do not:
    `bin/cc tables drop <name> --with-results`.
 6. **Before you commit,** `bin/cc check`.
@@ -75,7 +82,20 @@ What the options do:
   the old path in a comment.
 - `--instruments across,stability` keeps only those instruments, and drops the tables no kept instrument needs
   (see the table at the end of this section).
+- `--data-dir <dir>` and `--label-format '<pattern>'` retarget the data map of a `--like` input: the folder under the
+  data root, and the file-name pattern, which may use only `{label}` (the point), `{size}` and `{start}`. Without them
+  the like-input's folder and names are kept. A pattern with any other `{...}` is refused with the form to write.
+- `--add-instrument <id>` adds one instrument to a copy of the like-input: its blocks are written with `TODO`
+  values that `validate` refuses one by one, each with a Next line, so nothing runs half-declared.
 - Without `--like`, CC writes `inputs/TEMPLATE.m.toml.in` with every field `"TODO"`.
+
+A copy of `b7-at-line` that gains the `along` instrument:
+
+```
+$ bin/cc new input b7c --like b7-at-line --add-instrument along
+wrote inputs/b7c/m.toml and points.toml (like b7-at-line)
+  Next: fix every TODO, then bin/cc data add b7c and bin/cc validate
+```
 
 Then:
 
@@ -103,13 +123,15 @@ a missing one is refused and so is an unused one.
 | across | `size` (a chain) | `conjugate`, `observable`, `block_map` | the observable and its conjugate at every size |
 | stability | `size` (a chain) | `conjugate`, `observable`, `block_map` | as across |
 | two_start | `start` (a pair) | `two_start` | one order parameter for each of the two starts, per size |
+| along | `size` (a chain) and `control` (a declared relation over the points) | `observable`, `block_map` | the observable of both points of a pair, at every size |
 
 To change a frozen input, do not edit it. Make `<id>-2` with `--like <id>`, run `data add`, and run it as a new
 input; the old results stay readable.
 
 ## Changing the rules
 
-`bin/cc tables fork verdict-x-rules <name>` copies `codes.toml` and `verdict.toml`. Edit the copy:
+`bin/cc tables fork v01-rules <name>` copies the rulebook: `codes.toml`, `verdict.toml`, and the two files the
+v0.1 instruments read, `membership.toml` and `family.toml` (see below). Edit the copy:
 
 - `verdicts` lists every verdict the rows may give; `refuse` lists the ones that count as refusals. A new class
   of verdict must also be added to `cc.toml [alphabets] class_truth`, or named in the table's `[class_of]`.
@@ -122,7 +144,7 @@ reads V, the verdict is X", and keeps the partition:
 
 ```
 $ bin/cc tables split mine --column two_start --value UNRES --verdict REFUSE-EQUIL
-split touched 3 rows (20 rows now)
+split touched 3 rows (22 rows now)
 tables/mine/verdict.toml: clean
 ```
 
@@ -135,10 +157,231 @@ It rewrites `verdict.toml` in a canonical form: the header comment stays, commen
 put the meaning in each row's `why`. `drop` refuses the default rulebook, and a frozen one (it names the results that depend on it):
 
 ```
-$ bin/cc tables drop verdict-x-rules
-REFUSED: tables/verdict-x-rules is the default rulebook (cc.toml [defaults] tables).
+$ bin/cc tables drop v01-rules
+REFUSED: tables/v01-rules is the default rulebook (cc.toml [defaults] tables).
   Next: change [defaults] tables in cc.toml first, or drop another set
+exit 1
 ```
+
+## Re-verdicting without measuring
+
+A rule change that touches only `verdict.toml` or `codes.toml` cannot change a reading: the intervals and sign
+cells come from the data, the rules only translate them. `reverdict` applies a rulebook to a stored result and
+measures nothing:
+
+```
+$ bin/cc reverdict w2-potts --tables rv
+reverdict w2-potts@v01-rules -> results/w2-potts@rv.json (no instrument was run)
+w2-potts   rules: rv   result: results/w2-potts@rv.json (not frozen)
+…
+point 5   case potts-q5
+  sink       BLANK (NOT-MEASURED: needle is not declared on this input)
+  needle     BLANK (NOT-MEASURED: needle is not declared on this input)
+  flow       BLANK (NOT-MEASURED: needle is not declared on this input)
+  across     1.679 [1.417, 1.932] SIG+ -> RELEVANT
+  stability  0.08076 [-0.3098, 0.5382] BLANK (UNRES: interval straddles 0 and a margin edge)
+  two_start  BLANK (UNRES: interval straddles 0 and a margin edge)
+  => verdict NOT
+     why: honest null (not in verdict_x): the needle was not measured or not evaluated
+```
+
+(Here `tables/rv` is a fork of `v01-rules` in which the "needle not measured" row was changed to `NOT`; the
+`…` hides the other points.) The result is written as `results/<input>@<set>.json` with a field `derived_from`
+naming the result it came from. It has no `.npz` of its own: its resample vectors are the parent's, and
+`freeze` handles that. Without `--from SET`, the readings come from the result under the default rulebook.
+
+`reverdict` refuses when it cannot be sure the readings still hold, and says what to do instead:
+
+- the stored result is missing: run the input first;
+- the target result is frozen: pick another set;
+- the new set differs from the old one in `membership.toml`. Membership decided which units of the input ran
+  at all, so a different rule can mean units that were never measured:
+
+```
+$ bin/cc reverdict b7-at-line-2 --tables rv
+REFUSED: tables/rv changes membership.toml, which decided which units of b7-at-line-2 ran.
+  Next: re-measure with bin/cc run b7-at-line-2 --tables rv
+exit 1
+```
+
+A reverdict under a set reproduces exactly what `run` would have written there (a test compares them), which
+is why it is safe to use for the weekly loop and why it is not a way to avoid re-measuring when the instruments
+change.
+
+## Along, and membership as a door value
+
+The `along` instrument reads a **pair** of points. For each edge of a declared control relation (`[relations.control]`
+in `m.toml`, a chain over the points in their declared order) it takes the difference of the observable of the
+two points at each lattice size, `Delta(L)`; it then takes `ln|Delta|`, A over the size chain, B accumulates the
+step along the chain, and the result is divided by the log of the size span: `y_along`. That is the growth with
+size of the difference between two neighbouring points. It is coded by its sign cell like any reading (the cuts
+are `-0.25 0 +0.25`, `y`). If the sign of `Delta` is not the same at the estimate and at every resample, the logarithm
+is not defined and the pair reads `NOT-EVALUATED`, with its reason.
+
+Not every pair means something: along a line it should be taken between points that are **on the manifold**. A
+point is on it when its needle reads MID, and that is a rule you can change, so it is a table-set file,
+`tables/<set>/membership.toml`:
+
+```
+[along]
+reads = "needle"        # the signature column whose per-point code decides membership
+map = { DIS = "OFF", ORD = "OFF", MID = "ON", NOT-MEASURED = "UNCHECKED", NOT-EVALUATED = "NOT-EVALUATED" }
+rank = ["OFF", "NOT-EVALUATED", "UNCHECKED", "ON"]
+door = { OFF = "REFUSE-OFF-MANIFOLD", NOT-EVALUATED = "NOT-EVALUATED", UNCHECKED = "RUN-FLAG-U", ON = "RUN" }
+```
+
+A pair takes the **lowest-ranked** membership of its two points, and that membership is looked up in `door`. The
+door values:
+
+| membership of the pair | door value | what happens |
+|---|---|---|
+| OFF (a point reads DIS or ORD) | `REFUSE-OFF-MANIFOLD` | the pair is not computed; its reading is BLANK with that value |
+| NOT-EVALUATED | `NOT-EVALUATED` | not computed; the needle of a point could not be evaluated |
+| UNCHECKED (the needle was not measured) | `RUN-FLAG-U` | computed, and the pair carries flag U: membership unchecked |
+| ON (both points read MID) | `RUN` | computed |
+
+Which codes count as ON is a taxonomy decision, and changing it changes which units are measured, which is why a
+reverdict across two different membership files is refused. A set without a membership file for an instrument that
+needs one is refused by `validate`, with the way out:
+
+```
+$ bin/cc validate --input b7-at-line-2 --tables nomem
+tables/nomem/membership.toml:along: along runs door:off_manifold on b7-at-line-2 but this set has no rule for it
+  Next: copy tables/v01-rules/membership.toml into tables/nomem/, or fork from v01-rules (bin/cc tables fork v01-rules <new-name>)
+validate: 1 findings
+exit 1
+```
+
+`show` prints the pairs after the points, and `explain <input> <pair>` gives the pair trace: the membership
+door, `Delta` per size, A then B, the interval against the margin, the cell, and the code the family gives it.
+It reads the stored result; nothing is measured again. A pair that ran:
+
+```
+$ bin/cc explain b7-at-line-2 0.14->0.21
+explain b7-at-line-2 0.14->0.21   rules: v01-rules
+along   (pair 0.14->0.21)
+  1 MEMBER    membership.toml [along] reads needle: 0.14 NOT-MEASURED -> UNCHECKED, 0.21 NOT-MEASURED -> UNCHECKED; lowest rank decides -> door RUN-FLAG-U   flags: truth point, membership unchecked (the upstream needle was not measured)
+  2 DELTA     A over the control edge 0.14->0.21, row 0: 27 0.05402, 81 0.05431, 243 0.04232
+  3 KERNEL    ln|Delta| [-2.918, -2.913, -3.162]; A over size [0.005433, -0.2495]; B at the top edge -0.244; over the log span 2.197: -0.1111
+  4 READING   y_along -0.1111  interval [-0.2479, 0.005093]  (95 %, 400 block resamples)
+  5 SIGN      cuts -0.25 0 +0.25 (eps y): bL 1, bU 2 -> ZERO!
+  6 CODE      family.toml line 52 [f2.code]: ZERO! -> MARGINAL
+```
+
+and one the door refused (on `x7a-bc` the needle reads DIS at both points, so the pair is off the manifold):
+
+```
+$ bin/cc explain x7a-bc 1.0->1.5
+explain x7a-bc 1.0->1.5   rules: v01-rules
+along   (pair 1.0->1.5)
+  1 MEMBER    membership.toml [along] reads needle: 1.0 DIS -> OFF, 1.5 DIS -> OFF; lowest rank decides -> door REFUSE-OFF-MANIFOLD   flags: navigated point
+  2 READING   REFUSE-OFF-MANIFOLD
+```
+
+## Families
+
+A **family** is several points of one input read together (the Tutorial's Part 3 reads one). It has two parts:
+
+- `families/<id>.toml`, the declaration: the input, and the `interior` points in the order along the family. A
+  family names no rulebook. `bin/cc new family <id>` starts one:
+
+```
+$ bin/cc new family b7-demo
+wrote families/b7-demo.toml
+  Next: replace every TODO (an input and its interior points), then bin/cc validate and bin/cc family b7-demo
+```
+
+  Fill every `TODO` (an input and at least two of its points); `validate` refuses any left. One input per family
+  in v0.1, and control edges only if the input declares `along`.
+
+- `tables/<set>/family.toml`, the rules: three columns (`bracket`, `f1`, `f2`), each with an alphabet that includes
+  `UNRES`, `NOT-EVALUATED` and `NOT-MEASURED`; how each column is read (`[bracket]`, `[f1]`, `[f2]`); and `[[row]]`
+  blocks that partition the product of the three alphabets into family verdicts, exactly as `verdict.toml` does for
+  points. `validate` checks the partition is total and disjoint. How an `along` cell becomes an f2 code (ZERO! is
+  MARGINAL, SLOW+ is WEAK, and so on) is the `code` map in `[f2]`; the f1 map is `[f1] code`; neither lives in `codes.toml`.
+
+`bin/cc family <id> [--tables SET]` prints the family verdict from the stored result. It re-measures nothing, and
+refuses with a Next line if the set has no `family.toml` or the input has no result under the set. A family
+whose points the membership door refuses reads that, rather than a class:
+
+```
+$ bin/cc family x7a-bc-lambda
+family x7a-bc-lambda   rules: v01-rules   input: x7a-bc   interior: 0.0 1.0 1.5 1.8 1.9 1.95
+  bracket NON-MONOTONE
+    edge 0.0->1.0 DESCENT
+    edge 1.0->1.5 NO-DESCENT
+    edge 1.5->1.8 NO-DESCENT
+    edge 1.8->1.9 NO-DESCENT
+    edge 1.9->1.95 DESCENT
+  f1      NOT-MEASURED
+  f2      REFUSE-OFF-MANIFOLD
+    0.0->1.0 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+    1.0->1.5 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+    1.5->1.8 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+    1.8->1.9 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+    1.9->1.95 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+  => family verdict REFUSE-OFF-MANIFOLD   class REFUSE, family.toml line 60
+     why: X7a: a member point off the manifold at L 243 (it also explains a non-monotone bracket, so it is read first by partition)
+```
+
+(The Blume-Capel lambda sweep: the needle reads DIS at two points, so no pair is on the manifold and f2 is the
+door value; the family verdict is a refusal, not LINE.)
+
+## A new instrument
+
+`bin/cc new instrument <id>` writes `instruments/<id>.toml` and a stub module `cc/instruments/<id>.py`:
+
+```
+$ bin/cc new instrument foo
+wrote instruments/foo.toml and cc/instruments/foo.py
+  add this line to checks.toml [roles].maths: "cc/instruments/foo.py"
+  Next: replace every TODO in instruments/foo.toml, write the stages and delete the TODO-STAGE marker, then bin/cc validate (bin/cc run refuses until it is clean)
+```
+
+Replace every `TODO` in the registry file, write the stages in the module (the marker `TODO-STAGE` goes when you
+are done), add the module to `checks.toml [roles].maths` as the message says, and run `bin/cc validate`. While
+`instruments/` has any finding, `bin/cc run` is refused: a half-made instrument cannot enter a result. A
+maths module must pass `checks.py` (no branches, see `KERNEL-IN-CC.md`). A name that is not a module name (lower-case letters, digits, underscores) or that already exists is refused.
+
+## Why v01-rules differs from verdict-x-rules
+
+`v01-rules` is `verdict-x-rules` plus two data changes, both from one decision, and nothing else.
+
+1. **c-prime (codes).** In `codes.toml`, a resolved reading inside the margin reads MID, not a side: the needle
+   column's `NEG` and `POS` cells are `MID` (they were `DIS` and `ORD`), and the flow column's `NEG` and `POS`
+   cells are `SLOW` (they were `FLOWING`).
+2. **The SLOW split (verdict).** The row for a needle at MID with a SLOW flow used to refuse always
+   (`REFUSE-SLOW`). Now `SLOW` with `across` MARGINAL and `stability` STABLE is `LINE`, and every other SLOW
+   cell still refuses.
+
+**Why.** X5, a pair of coupled Ising layers at a navigated critical point, read NOT at all three of its points
+while the point is critical: a false negative. The cause was not the needle: at the critical coupling the
+needle is unbiased (its mean velocity was -0.0004 and it read MID in four of four trials). The cause was in
+the rules. At `g = 0` the needle velocity is -0.0118, interval [-0.02263, -0.003361]: wholly below zero but not
+beyond the margin, cell `NEG`. That cell was read as a side of the window (`DIS`) and its flow as `FLOWING`, and the rulebook says that a flowing point
+off the window is NOT. A sign-resolved reading inside the margin is not a flow: it is a reading that is small and
+resolved, which is what `SLOW` says. So c-prime moves it to `MID` and `SLOW`.
+
+The consequence was declared before any run, and the comparison confirms it:
+
+```
+$ bin/cc tabulate --diff verdict-x-rules v01-rules
+6 cells change verdict between verdict-x-rules and v01-rules
+REFUSE-SLOW -> LINE: 6 cells in 1 patterns
+  when.needle = ["MID"]; when.flow = ["SLOW"]; when.across = ["MARGINAL"]; when.stability = ["STABLE"]; when.two_start = ["INDEP"]
+2 fixture points change verdict
+  x5-bilayer:0.0  NOT -> REFUSE-SLOW
+  x5-bilayer:0.3  NOT -> REFUSE-SLOW
+tabulate --diff: wrote nothing (bin/cc tabulate writes SIGNATURE-TABLE.md and docs/verdict-table.html)
+```
+
+The old row refused every SLOW cell: a critical line whose block flow is small but resolved was read as the end
+of a BKT line, never as a line (the STAGE3 flaw of v0). With c-prime more readings reach SLOW, so the row is
+split by `across` and `stability`: a marginal, stable exponent is a line, and every other SLOW cell still
+refuses. Six cells of the rulebook change (SLOW to LINE) and, of the points both sets have a result for, the only ones that
+move are X5's, from NOT to REFUSE-SLOW at two of its three points. Every other point keeps its verdict, and the
+scoreboard locks them.
+X5 does not reach POINT; it goes from three confident false negatives to two honest refusals and one NOT.
 
 ## Freezing
 
@@ -151,12 +394,18 @@ instrument files, its data manifest), plus the rulebook directory it ran under. 
 What stays editable, by design: every `points.toml`, every `cases/*.toml`, `cc.toml`, the templates,
 `expected/`, `tests/golden/`. Taxonomy is never frozen, so a new idea about what a point is never needs a fork.
 
+**Freeze by dependency.** `bin/cc freeze --all --tables v01-rules` freezes each result under that rulebook with the
+files it read, and the rulebook directory once (all of `tables/v01-rules`, so `membership.toml` and `family.toml`
+with it). A **derived** result (from `reverdict`) freezes the parent's vectors too, since it has none of its own.
+A family result is not stored: `bin/cc family` reads the results it names, so freezing those freezes the family.
+
 A frozen id is never re-run; a different table set is a different id:
 
 ```
-$ bin/cc run w2-potts
+$ bin/cc run w2-potts --tables verdict-x-rules
 REFUSED: results/w2-potts@verdict-x-rules.json is frozen (a frozen result never changes).
   Next: bin/cc tables fork verdict-x-rules <new-name>, edit tables/<new-name>/verdict.toml, then bin/cc run w2-potts --tables <new-name>
+exit 1
 ```
 
 `--dry` is always allowed. `freeze` on something already frozen is harmless:
@@ -175,26 +424,32 @@ hash has changed.
 
 ```
 $ bin/cc tabulate
-tabulate: 7 results -> SIGNATURE-TABLE.md, docs/verdict-table.html
+tabulate: 19 results -> SIGNATURE-TABLE.md, docs/verdict-table.html
 ```
 
 `SIGNATURE-TABLE.md` lists every result's points with their codes, verdict and (here, and only here) the
 truth class from the case, so you can see where the rulebook and the taxonomy agree. `docs/verdict-table.html`
 is one static page you can open in a browser: for each rulebook, its rows grouped by verdict class, each row
 with its `why`, its line number, how many signature rows it covers, the fixture points that hit it, and the
-rows no result ever hit.
+rows no result ever hit. (`tabulate` writes both files; `tabulate --diff` writes nothing.)
 
 `bin/cc tabulate --diff A B` compares two rulebooks on every signature row and on every fixture point that has a
 result under both:
 
 ```
-$ bin/cc tabulate --diff verdict-x-rules scratch
-1512 cells change verdict between verdict-x-rules and scratch
-REFUSE-EQUIL -> LINE: 6 cells in 1 patterns
-  when.needle = ["MID"]; when.flow = ["STOPPED"]; when.across = ["MARGINAL"]; when.stability = ["STABLE"]; when.two_start = ["UNRES"]
+$ bin/cc tabulate --diff v01-rules scratch
+1512 cells change verdict between v01-rules and scratch
+REFUSE-EQUIL -> LINE: 12 cells in 1 patterns
+  when.needle = ["MID"]; when.flow = ["STOPPED", "SLOW"]; when.across = ["MARGINAL"]; when.stability = ["STABLE"]; when.two_start = ["UNRES"]
+REFUSE-EQUIL -> NOT: 252 cells in 1 patterns
+  when.needle = ["MID"]; when.flow = ["FLOWING"]; when.two_start = ["UNRES"]
+REFUSE-EQUIL -> POINT: 6 cells in 1 patterns
+  when.needle = ["MID"]; when.flow = ["STOPPED"]; when.across = ["RELEVANT"]; when.stability = ["STABLE"]; when.two_start = ["UNRES"]
 …
+REFUSE-EQUIL -> WALKING: 12 cells in 1 patterns
+  when.needle = ["MID"]; when.flow = ["STOPPED"]; when.across = ["RELEVANT", "MARGINAL"]; when.stability = ["CROSSING"]; when.two_start = ["UNRES"]
 0 fixture points change verdict
-tabulate: 7 results -> SIGNATURE-TABLE.md, docs/verdict-table.html
+tabulate --diff: wrote nothing (bin/cc tabulate writes SIGNATURE-TABLE.md and docs/verdict-table.html)
 ```
 
 (Here `scratch` is the forked rulebook of the Tutorial, with no run yet; after `run --all --tables scratch` the
@@ -230,17 +485,18 @@ reports, and changes nothing, on whether the cases and rulebook are enough to ma
 
 ```
 $ bin/cc validate --mvt
+
 validate: clean
 -- MVT gate (report only; no status is changed)
   PASS  1 POINT: >= 2 in-table cases with different mechanisms :: 4 case(s) ['bc-lambda-line', 'ising-2d', 'nnn-ising-manifold', 'potts-q3'], 4 distinct mechanism(s)
 …
-  FAIL  5 signature table enumerated over every in-table case, collisions listed :: 17 in-table case(s); collisions section present; missing ['ar1-null', 'bc-tricritical', 'nnn-ising-manifold', 'potts-q6', 'potts-q7']
+  FAIL  5 signature table enumerated over every in-table case, collisions listed :: 17 in-table case(s); collisions section present; missing ['ar1-null', 'bc-tricritical', 'potts-q6', 'potts-q7']
 -- MVT FAIL
 ```
 
 ## Tests, mutations and the testing system
 
-`bin/cc check` runs `validate`, every test and the scoreboard (about a minute); `bin/cc check --fast`, which the
+`bin/cc check` runs `validate`, every test and the scoreboard (about seven minutes); `bin/cc check --fast`, which the
 pre-commit hook runs, skips the slow tests. `bin/cc test` runs every test, `bin/cc test <name> …` the named
 ones, `-v` prints each test's lines. Tests are plain scripts, and a test that cannot find its data fails with
 the path; none skips.
@@ -249,11 +505,11 @@ What each kind of test protects (the test files are in `tests/`):
 
 | kind | what it protects | goes red when |
 |---|---|---|
-| unit (kernel, sign, resample, kernel_rs, budget, tables_cli, view) | the arithmetic and the commands | a named change to the code |
-| regression (the four fixture replays, detect_verdicts, verdict_equivalence, tabulate) | the first measurements CC was built to reproduce | a frozen number, cell or verdict moves |
+| unit (kernel, sign, resample, kernel_rs, budget, tables_cli, view, along, family) | the arithmetic and the commands | a named change to the code |
+| regression (the fixture replays, detect_verdicts, verdict_equivalence, tabulate, reverdict, x5) | the first measurements CC was built to reproduce | a frozen number, cell or verdict moves |
 | door breakers (test_declare, `tests/planted/`) | the file checks | a deliberately bad plugin file is accepted, or its message changes |
 | rule breakers (`tests/breakers/*.toml`) | the verdict table's meaning | a synthetic reading gets the wrong verdict |
-| scoreboard lock (`expected/<set>.toml`) | every point's verdict | any point's verdict changes |
+| scoreboard lock (`expected/<set>.toml`) | every point's verdict, and every family's | any point's or family's verdict changes |
 | golden transcripts (`tests/golden/`) | the exact text of each command | any byte of a command's output changes |
 
 **Adding a rule breaker is a data file.** Copy any file in `tests/breakers/`: it states a synthetic reading (a
@@ -269,15 +525,25 @@ differing transcripts under `tests/golden/` and lists every file it wrote. Read 
 before you commit; `bin/cc check` never regoldens. A transcript that changes by a time, a date or a path is a
 bug in the command, not a reason to regolden.
 
-**Mutation.** To see that a test can fail, mutate a copy:
+**Mutation.** To see that a test can fail, mutate a copy (the rule breakers name the rulebook they test, here
+`verdict-x-rules`):
 
 ```
 bin/cc mutate tables/verdict-x-rules/codes.toml --sed 's/"SIG+" = "COEXIST"/"SIG+" = "INDEP"/' -- test_breakers
+RED   test_breakers
+      ok field-decoy-not-line
+      ok off-critical-growth-change
+      ok unres-across-not-positive
+      ok unres-two-start-not-positive
+      ok w1-point-estimate-crossing
+      BROKEN coexistence-at-transition: expected code COEXIST, got INDEP; expected verdict FIRST-ORDER, got POINT
+      BROKEN slow-kinetics-off-transition: expected code COEXIST, got INDEP
+      test_breakers: 5 of 7 ok
 ```
 
 It copies the repo to a temporary directory, applies the edit there (the frozen file too, in the copy only),
 runs the named tests there, prints RED or GREEN for each test, and deletes the copy. Your tree is never changed.
-For this edit it prints `RED   test_breakers`, with two breakers named as broken.
+For this edit it prints `RED   test_breakers`, with the two breakers it breaks named.
 
 ## Routine edits
 
@@ -287,36 +553,39 @@ For this edit it prints `RED   test_breakers`, with two breakers named as broken
 | new model, existing layout | `new input --like --points`; `data add`; its `points.toml` | `m.toml` against the instrument contracts; hashes | none | yes: a new input id |
 | change verdict rows / new class | `tables fork`; the copy's `verdict.toml` (`verdicts`, `refuse`, rows); a new class also in `cc.toml alphabets.class_truth` | partition; class derivation | none | yes: the old set is frozen and untouched |
 | split a verdict | `tables split`, or by hand: one row becomes rows partitioning its cells | partition | none | yes |
+| change what is "on the manifold" | the fork's `membership.toml` | keys equal the column's alphabet plus the nulls | none | yes; re-run, since `reverdict` refuses |
+| change how a family is read | the fork's `family.toml` | partition of the three alphabets | none | yes; `family --tables <set>` |
+| new family | `new family <id>`; fill the `TODO`s | input, points, the set's `family.toml` | none | yes: nothing names a family |
 | remove or rename a case | the case file; the join lines; `pairs_with` lines (validate lists each) | full validate names every stale id | none | yes: `UNJOINED` until fixed |
 | change a frozen input | `new input <id>-2 --like <id>`; `data add` | as for a new model | none | yes |
+| new instrument | `new instrument <id>`; its registry file and module; `checks.toml` | registry file; `checks.py` | yes | yes: a new module name |
 
-A new instrument, or a new kind of sidecar table, is a code change. That is v0.1.
-
-## Known limits of v0
+## Known limits of v0.1
 
 Read these before you trust a verdict.
 
-- **No real input has yet reached a positive class.** The seven inputs hold 60 points; their verdicts are NOT (14 points),
-  REFUSE-NEEDLE-UNMEASURED (36), REFUSE-SLOW (8), REFUSE-TWO-START-UNMEASURED (1) and REFUSE-UNRES (1).
-  POINT, LINE, WALKING and FIRST-ORDER appear in no real result. Only the synthetic rule breakers exercise
-  those rows of the rulebook, so the rows are tested but have never been seen on data. Do not read "no
-  positive" as "nothing is critical".
-- **REFUSE-SLOW on x2 and x3 is a flaw in the rulebook, locked as today's behaviour.** On the XY and clock
-  models, the points whose true class is LINE read a needle at the window and a flow that is resolved but
-  smaller than the margin (`SLOW`). The rulebook's STAGE3 row sends that to REFUSE-SLOW: a critical line whose
-  block flow is small but resolved is refused and never called LINE. That is a line read as if it were the end
-  of a BKT line. `expected/verdict-x-rules.toml` records it with a `why`; the repair is a forked rulebook in
-  v0.1, not an edit of the lock.
-- **x4's FIRST-ORDER-LINE is not reproduced.** In the study, the X4 first-order line came from a separate
+- **No real input has reached a positive class for a single point.** The eleven inputs hold 76 points under
+  `v01-rules`: NOT (19 points), REFUSE-NEEDLE-UNMEASURED (41), REFUSE-SLOW (10), REFUSE-TWO-START-UNMEASURED (5)
+  and REFUSE-UNRES (1). POINT, LINE, WALKING and FIRST-ORDER appear in no real per-point result; only the
+  synthetic rule breakers exercise those rows. One positive **family** verdict exists, LINE for `b7-at-line-2`,
+  and it rests on a boundary cell (the pair `0.14->0.21` reads inside the margin by 0.002; see Tutorial part 3).
+  The other three families refuse (`x8-ising-compass` and `x7a-nnn-manifold` read `REFUSE-UNCLASSIFIED-v0`,
+  `x7a-bc-lambda` reads `REFUSE-OFF-MANIFOLD`). Do not read "no positive" as "nothing is critical".
+- **x5 is REFUSE-SLOW, not POINT.** The navigated critical point of the coupled layers now reads needle MID, flow
+  SLOW and across RELEVANT at `g = 0` and `g = 0.3`. A SLOW flow with a RELEVANT across lands in the refusing SLOW
+  row by ruling (only a MARGINAL across with a STABLE stability leaves it), so those two points refuse. `g = 0.1`
+  reads NOT: its needle reads ORD. Navigation itself, which would stop on a confirmed reading, is not in v0.1.
+- **The x2 and x3 lines are still refused.** Eight points of the XY and clock models, whose true class is LINE, read
+  REFUSE-SLOW: their across and stability read UNRES (x2 0.6 reads RELEVANT and CROSSING), not the MARGINAL and
+  STABLE the new LINE cell needs. The split opened the LINE cell; no real point reaches it yet.
+- **x4's FIRST-ORDER-LINE is not reproduced.** In the study the first-order line came from a separate
   statistic, a table of where the response to the field h crosses, which CC has no instrument for. CC's own
   pipeline puts the needle at the ordered sink there and reads NOT.
-- **The weekly-loop gaps** found by using `new input` and `new case` for the first real inputs:
-  - `new input --like` cannot retarget the data folder or the file-label format (ninety file blocks were
-    written by script), and cannot add an instrument: the needle, the matched relation, the sinks and the
-    margins are written by hand;
-  - the `new case` template has no `breaker_verdict` field;
-  - `obtained` and `points` are written as `TODO` and must be filled by hand;
-  - one message was unhelpful: an observable-levels finding whose real cause was in the code (the check now
-    applies to the two observable kinds that need it).
-- **Along-the-line measurement, and re-verdicting without re-measuring, are v0.1.** Every point is read alone,
-  and a new rulebook is applied by running again (seconds, but a new result id each time).
+- **The family code maps live in `family.toml`.** How an `along` cell becomes an f2 code is `[f2.code]`, and the
+  f1 map is `[f1] code`, in the rulebook's `family.toml`, not in `codes.toml`: a change to either is a change to
+  the family rulebook (and to nothing else).
+- **`new input --like` cannot change the size axis or mix data directories.** `--data-dir` moves every file to one
+  folder; a different set of sizes, or points drawn from two folders, is written by hand.
+- **`bin/cc check --fast` takes about 34 s against its 30 s budget.** The hook runs it before every commit; it
+  prints the slowest fast test and the line to move into `cc.toml [check].slow`, and that move is a maintainer's
+  choice, so the budget is currently exceeded.

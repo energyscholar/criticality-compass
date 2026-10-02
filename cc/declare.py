@@ -768,5 +768,5 @@ def member_need(root, input_id, tset):
     have = (load(mp, root)[0] or {}) if mp.is_file() else {}
     need = [n for n in m.get("instruments", []) if "door:off_manifold" in c.reg.get(n, {}).get("pipeline", [])]
     return [at(f"tables/{tset}/membership.toml", n, f"{n} runs door:off_manifold on {input_id} but this set has no rule for it",
-               f"copy tables/v01-rules/membership.toml into tables/{tset}/ (a membership rule is table-set data)")
+               f"copy tables/v01-rules/membership.toml into tables/{tset}/, or fork from v01-rules (bin/cc tables fork v01-rules <new-name>)")
             for n in need if not isinstance(have.get(n), dict)] + (check_file(mp, root) if need and mp.is_file() else [])

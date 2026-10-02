@@ -240,3 +240,51 @@ def explain(res, pt, join, mode, tables_dir=None):
     out.append(f"8 VERDICT   verdict.toml line {sig['row_line']}: "
                + "; ".join(f"when.{k} = [{', '.join(v)}]" for k, v in row["when"].items()))
     return out + verdict_lines(sig, mode, cfg, pad="            ")
+
+
+def f2_code_line(text):
+    """Line number of the `code =` map inside [f2] of a family.toml (0 when absent)."""
+    head = ""
+    for i, ln in enumerate(text.splitlines()):
+        head = ln if ln.startswith("[") else head
+        if head.startswith("[f2]") and ln.startswith("code ="):
+            return i + 1
+    return 0
+
+
+def explain_pair(res, pair, mode, tables_dir=None):
+    """The numbered trace of one control pair (a label `a->b`): membership door, Delta per size, A then B, the
+    interval against eps, the cell, the family's code. Read from the stored result; nothing is re-measured."""
+    bad = stale(res)
+    if bad:
+        return bad.splitlines()
+    cfg, T, m = config(), detect.load_tables(res["tables"], tables_dir), detect.load_input(res["input"])
+    a, b = pair.split("->")
+    r = next(q for q in res["pair_readings"] if q["unit"]["pair"] == [a, b])
+    sig, rule = {s["point"]: s for s in res["signature"]}, T.membership[r["instrument"]]
+    got = [(pt, sig[pt][rule["reads"]], rule["map"][sig[pt][rule["reads"]]]) for pt in (a, b)]
+    mem = door.member(T.membership, r["instrument"], (a, b), sig)
+    out = [f"explain {res['input']} {pair}   rules: {res['tables']}", f"{r['instrument']}   (pair {pair})",
+           f"  1 MEMBER    membership.toml [{r['instrument']}] reads {rule['reads']}: "
+           + ", ".join(f"{p} {c} -> {x}" for p, c, x in got) + f"; lowest rank decides -> door {mem['door']}"
+           + (f"   flags: {words(r['flags'], cfg)}" if r["flags"] else "")]
+    if r["estimate"] is None:
+        return out + [f"  2 READING   {shown(r['cell'], r['reason'], mode, cfg)}"]
+    delta = next(q for q in res["reports"] if q["vector_key"] == f"{r['instrument']}/delta/pair={pair}")["estimate"]
+    ctx, e, lv = detect.context_for(res["input"], r["instrument"], None), r["eps"], res["interval"]
+    ln = np.log(np.abs(delta))
+    steps = np.diff(ln)
+    bl, bu = (int(v) for v in sign.position(r["lo"], r["hi"], e))
+    fam = T.paths[0].parent / "family.toml"
+    text = fam.read_text() if fam.is_file() else ""
+    code = tomllib.loads(text).get("f2", {}).get("code", {}).get(r["cell"]) if text else None
+    sizes = ", ".join(f"{s} {d:.4g}" for s, d in zip(m["axes"]["size"], delta))
+    return out + [
+        f"  2 DELTA     A over the control edge {a}->{b}, row 0: {sizes}",
+        f"  3 KERNEL    ln|Delta| {nums(ln)}; A over size {nums(steps)}; B at the top edge {steps.sum():.4g}; "
+        f"over the log span {ctx.log_span:.4g}: {steps.sum() / ctx.log_span:.4g}",
+        f"  4 READING   {r['column']} {r['estimate']:.4g}  interval [{r['lo']:.4g}, {r['hi']:.4g}]  "
+        f"({lv['level'] * 100:g} %, {lv['resamples']} {lv['method']} resamples)",
+        f"  5 SIGN      cuts {-e:g} 0 +{e:g} (eps {r['eps_key']}): bL {bl}, bU {bu} -> {shown(r['cell'], None, mode, cfg)}",
+        "  6 CODE      " + (f"family.toml line {f2_code_line(text)} [f2.code]: {r['cell']} -> {code}" if code else
+                            "no family code for this cell in this set (a family's [f2.code] codes a pair)")]

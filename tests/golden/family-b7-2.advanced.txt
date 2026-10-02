@@ -1,0 +1,21 @@
+$ bin/cc family b7-at-line-2 --advanced
+family b7-at-line-2   rules: v01-rules   input: b7-at-line-2   interior: 0.0 0.07 0.14 0.21
+  bracket NOT-MEASURED
+    edge 0.0->0.07 NOT-MEASURED
+    edge 0.07->0.14 NOT-MEASURED
+    edge 0.14->0.21 NOT-MEASURED
+    edge 0.21->0.2747 NOT-MEASURED
+  f1      VARIES
+    0.0->0.07 y_last +0.064 [+0.019, +0.109] SLOW+  -> CONSTANT
+    0.0->0.14 y_last +0.166 [+0.112, +0.224] SLOW+  -> CONSTANT
+    0.07->0.14 y_last +0.102 [+0.054, +0.165] SLOW+  -> CONSTANT
+    0.0->0.21 y_last +0.322 [+0.233, +0.394] POS  -> VARIES
+    0.07->0.21 y_last +0.258 [+0.183, +0.325] POS  -> VARIES
+    0.14->0.21 y_last +0.156 [+0.074, +0.233] SLOW+  -> CONSTANT
+  f2      MARGINAL
+    0.0->0.07 along ZERO!  -> MARGINAL
+    0.07->0.14 along ZERO!  -> MARGINAL
+    0.14->0.21 along ZERO!  -> MARGINAL
+  => family verdict LINE   class LINE, family.toml line 55
+     why: B7 (SYNTHESIS-3): fingerprints 1 and 2 both resolved; X7a: POINT manifolds do not reach f2 MARGINAL
+exit 0

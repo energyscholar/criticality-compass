@@ -1,0 +1,4 @@
+$ bin/cc tables fork v01-rules scratch --advanced
+forked tables/v01-rules to tables/scratch
+  Next: edit tables/scratch/verdict.toml, then bin/cc validate, then bin/cc run --all --tables scratch
+exit 0

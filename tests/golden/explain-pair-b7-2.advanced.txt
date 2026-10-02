@@ -1,0 +1,10 @@
+$ bin/cc explain b7-at-line-2 0.14->0.21 --advanced
+explain b7-at-line-2 0.14->0.21   rules: v01-rules
+along   (pair 0.14->0.21)
+  1 MEMBER    membership.toml [along] reads needle: 0.14 NOT-MEASURED -> UNCHECKED, 0.21 NOT-MEASURED -> UNCHECKED; lowest rank decides -> door RUN-FLAG-U   flags: truth point, membership unchecked (the upstream needle was not measured)
+  2 DELTA     A over the control edge 0.14->0.21, row 0: 27 0.05402, 81 0.05431, 243 0.04232
+  3 KERNEL    ln|Delta| [-2.918, -2.913, -3.162]; A over size [0.005433, -0.2495]; B at the top edge -0.244; over the log span 2.197: -0.1111
+  4 READING   y_along -0.1111  interval [-0.2479, 0.005093]  (95 %, 400 block resamples)
+  5 SIGN      cuts -0.25 0 +0.25 (eps y): bL 1, bU 2 -> ZERO!
+  6 CODE      family.toml line 52 [f2.code]: ZERO! -> MARGINAL
+exit 0

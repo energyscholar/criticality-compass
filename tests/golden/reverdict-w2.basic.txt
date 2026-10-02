@@ -1,0 +1,40 @@
+$ bin/cc reverdict w2-potts --tables rv
+reverdict w2-potts@v01-rules -> results/w2-potts@rv.json (no instrument was run)
+w2-potts   rules: rv   result: results/w2-potts@rv.json (not frozen)
+point 2   case ising-2d
+  sink       BLANK (NOT-MEASURED: needle is not declared on this input)
+  needle     BLANK (NOT-MEASURED: needle is not declared on this input)
+  flow       BLANK (NOT-MEASURED: needle is not declared on this input)
+  across     0.9974 [0.9666, 1.027] SIG+ -> RELEVANT
+  stability  0.01804 [-0.02606, 0.06558] ZERO! -> STABLE
+  two_start  INDEP
+  => verdict NOT
+     why: honest null (not in verdict_x): the needle was not measured or not evaluated
+point 3   case potts-q3
+  sink       BLANK (NOT-MEASURED: needle is not declared on this input)
+  needle     BLANK (NOT-MEASURED: needle is not declared on this input)
+  flow       BLANK (NOT-MEASURED: needle is not declared on this input)
+  across     1.182 [1.125, 1.241] SIG+ -> RELEVANT
+  stability  -0.006195 [-0.1008, 0.07911] ZERO! -> STABLE
+  two_start  INDEP
+  => verdict NOT
+     why: honest null (not in verdict_x): the needle was not measured or not evaluated
+point 4   case none
+  sink       BLANK (NOT-MEASURED: needle is not declared on this input)
+  needle     BLANK (NOT-MEASURED: needle is not declared on this input)
+  flow       BLANK (NOT-MEASURED: needle is not declared on this input)
+  across     1.442 [1.306, 1.561] SIG+ -> RELEVANT
+  stability  -0.00606 [-0.1688, 0.1701] ZERO! -> STABLE
+  two_start  INDEP
+  => verdict NOT
+     why: honest null (not in verdict_x): the needle was not measured or not evaluated
+point 5   case potts-q5
+  sink       BLANK (NOT-MEASURED: needle is not declared on this input)
+  needle     BLANK (NOT-MEASURED: needle is not declared on this input)
+  flow       BLANK (NOT-MEASURED: needle is not declared on this input)
+  across     1.679 [1.417, 1.932] SIG+ -> RELEVANT
+  stability  0.08076 [-0.3098, 0.5382] BLANK (UNRES: interval straddles 0 and a margin edge)
+  two_start  BLANK (UNRES: interval straddles 0 and a margin edge)
+  => verdict NOT
+     why: honest null (not in verdict_x): the needle was not measured or not evaluated
+exit 0

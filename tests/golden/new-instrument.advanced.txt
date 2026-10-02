@@ -1,0 +1,5 @@
+$ bin/cc new instrument foo --advanced
+wrote instruments/foo.toml and cc/instruments/foo.py
+  add this line to checks.toml [roles].maths: "cc/instruments/foo.py"
+  Next: replace every TODO in instruments/foo.toml, write the stages and delete the TODO-STAGE marker, then bin/cc validate (bin/cc run refuses until it is clean)
+exit 0

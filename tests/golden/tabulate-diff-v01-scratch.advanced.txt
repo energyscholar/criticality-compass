@@ -1,0 +1,33 @@
+$ bin/cc tabulate --diff v01-rules scratch --advanced
+1512 cells change verdict between v01-rules and scratch
+REFUSE-EQUIL -> LINE: 12 cells in 1 patterns
+  when.needle = ["MID"]; when.flow = ["STOPPED", "SLOW"]; when.across = ["MARGINAL"]; when.stability = ["STABLE"]; when.two_start = ["UNRES"]
+REFUSE-EQUIL -> NOT: 252 cells in 1 patterns
+  when.needle = ["MID"]; when.flow = ["FLOWING"]; when.two_start = ["UNRES"]
+REFUSE-EQUIL -> POINT: 6 cells in 1 patterns
+  when.needle = ["MID"]; when.flow = ["STOPPED"]; when.across = ["RELEVANT"]; when.stability = ["STABLE"]; when.two_start = ["UNRES"]
+REFUSE-EQUIL -> REFUSE-ACROSS-UNMEASURED: 72 cells in 1 patterns
+  when.needle = ["MID"]; when.flow = ["STOPPED"]; when.across = ["NOT-MEASURED", "NOT-EVALUATED"]; when.two_start = ["UNRES"]
+REFUSE-EQUIL -> REFUSE-FLOW: 252 cells in 1 patterns
+  when.needle = ["MID"]; when.flow = ["UNRES"]; when.two_start = ["UNRES"]
+REFUSE-EQUIL -> REFUSE-FLOW-UNMEASURED: 504 cells in 1 patterns
+  when.needle = ["MID"]; when.flow = ["NOT-MEASURED", "NOT-EVALUATED"]; when.two_start = ["UNRES"]
+REFUSE-EQUIL -> REFUSE-IRRELEVANT: 36 cells in 1 patterns
+  when.needle = ["MID"]; when.flow = ["STOPPED"]; when.across = ["IRRELEVANT"]; when.two_start = ["UNRES"]
+REFUSE-EQUIL -> REFUSE-OFF: 12 cells in 1 patterns
+  when.needle = ["MID"]; when.flow = ["STOPPED"]; when.across = ["RELEVANT", "MARGINAL"]; when.stability = ["OFF"]; when.two_start = ["UNRES"]
+REFUSE-EQUIL -> REFUSE-SLOW: 246 cells in 2 patterns
+  when.needle = ["MID"]; when.flow = ["SLOW"]; when.across = ["RELEVANT", "WEAK", "IRRELEVANT", "UNRES", "NOT-MEASURED", "NOT-EVALUATED"]; when.two_start = ["UNRES"]
+  when.needle = ["MID"]; when.flow = ["SLOW"]; when.across = ["MARGINAL"]; when.stability = ["CROSSING", "OFF", "UNRES", "NOT-MEASURED", "NOT-EVALUATED"]; when.two_start = ["UNRES"]
+REFUSE-EQUIL -> REFUSE-STABILITY-UNMEASURED: 24 cells in 1 patterns
+  when.needle = ["MID"]; when.flow = ["STOPPED"]; when.across = ["RELEVANT", "MARGINAL"]; when.stability = ["NOT-MEASURED", "NOT-EVALUATED"]; when.two_start = ["UNRES"]
+REFUSE-EQUIL -> REFUSE-UNRES: 48 cells in 2 patterns
+  when.needle = ["MID"]; when.flow = ["STOPPED"]; when.across = ["RELEVANT", "MARGINAL", "UNRES"]; when.stability = ["UNRES"]; when.two_start = ["UNRES"]
+  when.needle = ["MID"]; when.flow = ["STOPPED"]; when.across = ["UNRES"]; when.stability = ["STABLE", "CROSSING", "OFF", "NOT-MEASURED", "NOT-EVALUATED"]; when.two_start = ["UNRES"]
+REFUSE-EQUIL -> REFUSE-WEAK: 36 cells in 1 patterns
+  when.needle = ["MID"]; when.flow = ["STOPPED"]; when.across = ["WEAK"]; when.two_start = ["UNRES"]
+REFUSE-EQUIL -> WALKING: 12 cells in 1 patterns
+  when.needle = ["MID"]; when.flow = ["STOPPED"]; when.across = ["RELEVANT", "MARGINAL"]; when.stability = ["CROSSING"]; when.two_start = ["UNRES"]
+0 fixture points change verdict
+tabulate --diff: wrote nothing (bin/cc tabulate writes SIGNATURE-TABLE.md and docs/verdict-table.html)
+exit 0

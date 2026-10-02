@@ -1,0 +1,4 @@
+$ bin/cc reverdict b7-at-line-2 --tables rv
+REFUSED: tables/rv changes membership.toml, which decided which units of b7-at-line-2 ran.
+  Next: re-measure with bin/cc run b7-at-line-2 --tables rv
+exit 1

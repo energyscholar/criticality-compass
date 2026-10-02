@@ -198,3 +198,147 @@ phase = 5
 id = "show-x2"
 argv = ["show", "x2-xy-line"]
 phase = 5
+
+# ---- phase 6 (plan 0864): every command the v0.1 docs show -----------------------------------
+# The v0.1 docs fork from the DEFAULT set (v01-rules); the cases above fork verdict-x-rules and stay as they were.
+
+[[case]]
+id = "family-b7-2"
+argv = ["family", "b7-at-line-2"]
+phase = 6
+
+[[case]]
+id = "family-x7a-bc-lambda"
+argv = ["family", "x7a-bc-lambda"]
+phase = 6
+
+[[case]]
+id = "show-b7-2"
+argv = ["show", "b7-at-line-2"]
+phase = 6
+
+[[case]]
+id = "explain-pair-b7-2"
+argv = ["explain", "b7-at-line-2", "0.14->0.21"]
+phase = 6
+
+[[case]]
+id = "explain-pair-x7a-bc"
+argv = ["explain", "x7a-bc", "1.0->1.5"]
+phase = 6
+
+[[case]]
+id = "validate-no-membership"          # F1: the refusal names the copy to make and the fork
+before = [["tables", "fork", "verdict-x-rules", "nomem"]]
+argv = ["validate", "--input", "b7-at-line-2", "--tables", "nomem"]
+phase = 6
+
+[[case]]
+id = "reverdict-w2"
+before = [["tables", "fork", "v01-rules", "rv"]]
+argv = ["reverdict", "w2-potts", "--tables", "rv"]
+phase = 6
+
+[case.plant]
+"my-rules-v01-edit.toml" = "tables/rv/verdict.toml"
+
+[[case]]
+id = "reverdict-refused"
+before = [["tables", "fork", "v01-rules", "rv"]]
+argv = ["reverdict", "b7-at-line-2", "--tables", "rv"]
+phase = 6
+
+[case.plant]
+"membership-dis-on.toml" = "tables/rv/membership.toml"
+
+[[case]]
+id = "new-family"
+argv = ["new", "family", "b7-demo"]
+phase = 6
+
+[[case]]
+id = "new-instrument"
+argv = ["new", "instrument", "foo"]
+phase = 6
+
+[[case]]
+id = "new-input-add-instrument"
+argv = ["new", "input", "b7c", "--like", "b7-at-line", "--add-instrument", "along"]
+phase = 6
+
+[[case]]
+id = "tables-fork-v01-my-rules"
+argv = ["tables", "fork", "v01-rules", "my-rules"]
+phase = 6
+
+[[case]]
+id = "run-dry-v01-my-rules"
+before = [["tables", "fork", "v01-rules", "my-rules"]]
+argv = ["run", "w2-potts", "--tables", "my-rules", "--dry"]
+phase = 6
+
+[case.plant]
+"my-rules-v01-edit.toml" = "tables/my-rules/verdict.toml"
+
+[[case]]
+id = "tables-fork-v01-scratch"
+argv = ["tables", "fork", "v01-rules", "scratch"]
+phase = 6
+
+[[case]]
+id = "validate-v01-scratch-half"
+before = [["tables", "fork", "v01-rules", "scratch"]]
+argv = ["validate"]
+phase = 6
+
+[case.plant]
+"scratch-half-v01.toml" = "tables/scratch/verdict.toml"
+
+[[case]]
+id = "validate-v01-scratch"
+before = [["tables", "fork", "v01-rules", "scratch"]]
+argv = ["validate"]
+phase = 6
+
+[case.plant]
+"scratch-v01.toml" = "tables/scratch/verdict.toml"
+
+[[case]]
+id = "run-all-v01-scratch"
+before = [["tables", "fork", "v01-rules", "scratch"]]
+argv = ["run", "--all", "--tables", "scratch"]
+phase = 6
+
+[case.plant]
+"scratch-v01.toml" = "tables/scratch/verdict.toml"
+
+[[case]]
+id = "tabulate-diff-v01-scratch"
+before = [["tables", "fork", "v01-rules", "scratch"]]
+argv = ["tabulate", "--diff", "v01-rules", "scratch"]
+phase = 6
+
+[case.plant]
+"scratch-v01.toml" = "tables/scratch/verdict.toml"
+
+[[case]]
+id = "tables-drop-v01-scratch"
+before = [["tables", "fork", "v01-rules", "scratch"], ["run", "--all", "--tables", "scratch"]]
+argv = ["tables", "drop", "scratch", "--with-results"]
+phase = 6
+
+[[case]]
+id = "tables-split-v01"
+before = [["tables", "fork", "v01-rules", "mine"]]
+argv = ["tables", "split", "mine", "--column", "two_start", "--value", "UNRES", "--verdict", "REFUSE-EQUIL"]
+phase = 6
+
+[[case]]
+id = "tabulate-diff-v01-vs-x"          # the v01-rules change, as the docs quote it (plan 0864 Q1 c' + Q2)
+argv = ["tabulate", "--diff", "verdict-x-rules", "v01-rules"]
+phase = 6
+
+[[case]]
+id = "mutate-breakers"
+argv = ["mutate", "tables/verdict-x-rules/codes.toml", "--sed", "s/\"SIG+\" = \"COEXIST\"/\"SIG+\" = \"INDEP\"/", "--", "test_breakers"]
+phase = 6

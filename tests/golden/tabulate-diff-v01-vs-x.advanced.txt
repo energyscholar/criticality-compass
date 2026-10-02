@@ -1,0 +1,9 @@
+$ bin/cc tabulate --diff verdict-x-rules v01-rules --advanced
+6 cells change verdict between verdict-x-rules and v01-rules
+REFUSE-SLOW -> LINE: 6 cells in 1 patterns
+  when.needle = ["MID"]; when.flow = ["SLOW"]; when.across = ["MARGINAL"]; when.stability = ["STABLE"]; when.two_start = ["INDEP"]
+2 fixture points change verdict
+  x5-bilayer:0.0  NOT -> REFUSE-SLOW
+  x5-bilayer:0.3  NOT -> REFUSE-SLOW
+tabulate --diff: wrote nothing (bin/cc tabulate writes SIGNATURE-TABLE.md and docs/verdict-table.html)
+exit 0

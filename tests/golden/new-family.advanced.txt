@@ -1,0 +1,4 @@
+$ bin/cc new family b7-demo --advanced
+wrote families/b7-demo.toml
+  Next: replace every TODO (an input and its interior points), then bin/cc validate and bin/cc family b7-demo
+exit 0

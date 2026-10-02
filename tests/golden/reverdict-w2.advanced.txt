@@ -1,0 +1,51 @@
+$ bin/cc reverdict w2-potts --tables rv --advanced
+reverdict w2-potts@v01-rules -> results/w2-potts@rv.json (no instrument was run)
+w2-potts   rules: rv   result: results/w2-potts@rv.json (not frozen)
+  interval: block resamples 400, level 0.95, seed 31
+  code_commit: none
+  read results/w2-potts@v01-rules.json d19eaf6b4d00
+  read inputs/w2-potts/m.toml 9f77295ee127
+  read instruments/across.toml 8f6803e8af6c
+  read instruments/stability.toml 2fc7bb21b58a
+  read instruments/two_start.toml 30503b8a483a
+  read fixtures/data/w2-potts.toml d8a28f7f37e6
+  read tables/rv/codes.toml 1fd20de97e25
+  read tables/rv/verdict.toml 37c9e5c9d78a
+  read 24 data files, sha256 match the pinned manifest
+point 2   case ising-2d   obtained: truth
+  sink       NOT-MEASURED (needle is not declared on this input)
+  needle     NOT-MEASURED (needle is not declared on this input)
+  flow       NOT-MEASURED (needle is not declared on this input)
+  across     0.9974 [0.9666, 1.027] SIG+ eps y=0.25 -> RELEVANT flags: uses Hamiltonian knowledge, truth point vector across/y_last/point=2
+  stability  0.01804 [-0.02606, 0.06558] ZERO! eps y=0.25 -> STABLE flags: uses Hamiltonian knowledge, truth point vector stability/d/point=2
+  two_start  INDEP eps two_start=0.01 per size: 27 ZERO! INDEP; 81 ZERO! INDEP; 243 ZERO! INDEP flags: truth point
+  => verdict NOT  class NOT, verdict.toml line 153
+     why: honest null (not in verdict_x): the needle was not measured or not evaluated
+point 3   case potts-q3   obtained: truth
+  sink       NOT-MEASURED (needle is not declared on this input)
+  needle     NOT-MEASURED (needle is not declared on this input)
+  flow       NOT-MEASURED (needle is not declared on this input)
+  across     1.182 [1.125, 1.241] SIG+ eps y=0.25 -> RELEVANT flags: uses Hamiltonian knowledge, truth point vector across/y_last/point=3
+  stability  -0.006195 [-0.1008, 0.07911] ZERO! eps y=0.25 -> STABLE flags: uses Hamiltonian knowledge, truth point vector stability/d/point=3
+  two_start  INDEP eps two_start=0.01 per size: 27 ZERO! INDEP; 81 ZERO! INDEP; 243 ZERO! INDEP flags: truth point
+  => verdict NOT  class NOT, verdict.toml line 153
+     why: honest null (not in verdict_x): the needle was not measured or not evaluated
+point 4   case none   obtained: truth
+  sink       NOT-MEASURED (needle is not declared on this input)
+  needle     NOT-MEASURED (needle is not declared on this input)
+  flow       NOT-MEASURED (needle is not declared on this input)
+  across     1.442 [1.306, 1.561] SIG+ eps y=0.25 -> RELEVANT flags: uses Hamiltonian knowledge, truth point vector across/y_last/point=4
+  stability  -0.00606 [-0.1688, 0.1701] ZERO! eps y=0.25 -> STABLE flags: uses Hamiltonian knowledge, truth point vector stability/d/point=4
+  two_start  INDEP eps two_start=0.01 per size: 27 ZERO! INDEP; 81 SLOW+ INDEP; 243 ZERO! INDEP flags: truth point
+  => verdict NOT  class NOT, verdict.toml line 153
+     why: honest null (not in verdict_x): the needle was not measured or not evaluated
+point 5   case potts-q5   obtained: truth
+  sink       NOT-MEASURED (needle is not declared on this input)
+  needle     NOT-MEASURED (needle is not declared on this input)
+  flow       NOT-MEASURED (needle is not declared on this input)
+  across     1.679 [1.417, 1.932] SIG+ eps y=0.25 -> RELEVANT flags: uses Hamiltonian knowledge, truth point vector across/y_last/point=5
+  stability  0.08076 [-0.3098, 0.5382] UNRES eps y=0.25 flags: uses Hamiltonian knowledge, truth point vector stability/d/point=5
+  two_start  UNRES eps two_start=0.01 per size: 27 ZERO! INDEP; 81 UNRES UNRES; 243 ZERO! INDEP flags: truth point
+  => verdict NOT  class NOT, verdict.toml line 153
+     why: honest null (not in verdict_x): the needle was not measured or not evaluated
+exit 0

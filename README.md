@@ -46,8 +46,8 @@ cc - Criticality Compass   (BASIC; `bin/cc help --advanced` lists every command)
   bin/cc validate                       check every file; each problem says what to do next
   bin/cc check                          validate + tests + scoreboard; run it before a commit
 
-inputs: b7-at-line c2-bc-two-start w2-potts x2-xy-line x3-clock6 x4-ising-field x8-ising-needle
-rules in use: verdict-x-rules   (cc.toml [defaults] tables)
+inputs: b7-at-line b7-at-line-2 c2-bc-two-start w2-potts x2-xy-line x3-clock6 x4-ising-field x5-bilayer x7a-bc x7a-nnn x8-ising-needle
+rules in use: v01-rules   (cc.toml [defaults] tables)
 BLANK (...) means "CC does not know"; the word in brackets says why.
 
 start: bin/cc show b7-at-line
@@ -57,7 +57,7 @@ start: bin/cc show b7-at-line
 
 ```
 $ bin/cc show b7-at-line
-b7-at-line   rules: verdict-x-rules   result: results/b7-at-line@verdict-x-rules.json (frozen)
+b7-at-line   rules: v01-rules   result: results/b7-at-line@v01-rules.json (not frozen)
 point 0.0   case at-self-dual-line
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
   needle     BLANK (NOT-MEASURED: needle is not declared on this input)
@@ -67,7 +67,6 @@ point 0.0   case at-self-dual-line
   two_start  BLANK (NOT-MEASURED: two_start is not declared on this input)
   => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point 0.07   case at-self-dual-line
 …
 ```
 
@@ -87,7 +86,7 @@ name any class.
 
 ```
 $ bin/cc explain w2-potts 5
-explain w2-potts 5   rules: verdict-x-rules
+explain w2-potts 5   rules: v01-rules
 sink       BLANK (NOT-MEASURED: needle is not declared on this input)
 …
 across
@@ -99,26 +98,26 @@ across
   6 SIGN      cuts -0.25 0 +0.25 (eps y): bL 3, bU 3 -> SIG+
   7 CODE      across: codes.toml line 107: SIG+ -> RELEVANT
 …
-8 VERDICT   verdict.toml line 133: when.needle = [NOT-MEASURED, NOT-EVALUATED]
+8 VERDICT   verdict.toml line 153: when.needle = [NOT-MEASURED, NOT-EVALUATED]
             => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
                why: honest null (not in verdict_x): the needle was not measured or not evaluated
 ```
 
 `explain` prints the whole chain for one point, from the data files (with their hashes checked) to the
-verdict. The last section names the rulebook file and line that decided: `verdict.toml line 133`.
+verdict. The last section names the rulebook file and line that decided: `verdict.toml line 153`.
 `TUTORIAL.md` reads this output section by section.
 
 ### 5. Open that line
 
-Open `tables/verdict-x-rules/verdict.toml` in Geany and go to line 133. That `[[row]]` is the rule that
+Open `tables/v01-rules/verdict.toml` in Geany and go to line 153. That `[[row]]` is the rule that
 decided: its `when` lines say which codes it covers, `verdict` is the answer, `why` is the reason printed
 above. You cannot edit it, because it is frozen; the next step makes a copy you can.
 
 ### 6. Fork the rulebook
 
 ```
-$ bin/cc tables fork verdict-x-rules my-rules
-forked tables/verdict-x-rules to tables/my-rules
+$ bin/cc tables fork v01-rules my-rules
+forked tables/v01-rules to tables/my-rules
   Next: edit tables/my-rules/verdict.toml, then bin/cc validate, then bin/cc run --all --tables my-rules
 ```
 
@@ -144,7 +143,6 @@ If a row were wrong, each finding would end with a `Next:` line saying what to d
 $ bin/cc run w2-potts --tables my-rules --dry
 run w2-potts@my-rules
 w2-potts   rules: my-rules   result: results/w2-potts@my-rules.json (dry: nothing written)
-point 2   case ising-2d
 …
 point 5   case potts-q5
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
@@ -168,11 +166,13 @@ $ bin/cc tables drop my-rules
 dropped tables/my-rules
 ```
 
-## What v0 can and cannot say
+## What v0.1 can and cannot say
 
-Seven inputs are loaded and 60 points are scored. No real input yet reaches a positive class (POINT, LINE,
-WALKING, FIRST-ORDER): the readings give NOT, or a refusal. Only synthetic test cases reach the positive rows.
-This is a finding, not a bug in the docs; `HOWTO.md` ("Known limits of v0") says what it means.
+Eleven inputs are loaded and 76 points are scored. No real input yet reaches a positive verdict for a single
+point (POINT, LINE, WALKING, FIRST-ORDER): the readings give NOT, or a refusal. Only synthetic test cases
+reach those rows. One positive verdict does exist on real data, and it belongs to a **family**, not a point:
+the points of `b7-at-line-2` taken together read LINE (`bin/cc family b7-at-line-2`, `TUTORIAL.md` part 3).
+This is a finding, not a bug in the docs; `HOWTO.md` ("Known limits of v0.1") says what it means.
 
 ## Before you commit
 
@@ -180,7 +180,7 @@ This is a finding, not a bug in the docs; `HOWTO.md` ("Known limits of v0") says
 bin/cc check
 ```
 
-runs `validate`, every test and the scoreboard, and takes about a minute. In a fresh clone, run
+runs `validate`, every test and the scoreboard, and takes several minutes (about seven). In a fresh clone, run
 `git config core.hooksPath .githooks` once, so that a quicker version of the same check runs for you before
 every commit.
 
@@ -209,6 +209,9 @@ changes, because no result names a case; `bin/cc show w2-potts` now prints the n
 | `instruments/*.toml` | what each instrument measures and its pipeline | the maintainers | once a result read it |
 | `tables/<set>/codes.toml` | sign cell to code, per column | you, in a forked set | with its set |
 | `tables/<set>/verdict.toml` | the rows that map a signature row to a verdict | you, in a forked set | with its set |
+| `tables/<set>/membership.toml` | which needle codes count as "on the manifold" for a pair of points (the along instrument) | you, in a forked set | with its set |
+| `tables/<set>/family.toml` | how the readings along a family of points are coded and looked up (bracket, f1, f2) | you, in a forked set | with its set |
+| `families/<id>.toml` | one family: an input and the points that form it (a family names no rulebook) | you | never |
 | `results/<input>@<set>.json`, `.npz` | one run: readings, cells, codes, verdicts, and the hashes of what it read | `bin/cc run` | after `bin/cc freeze` |
 | `expected/<set>.toml` | the verdict each point is expected to get (the scoreboard lock) | you, as a reviewed edit with a `why` | never |
 | `cc.toml` | defaults, alphabets, what BASIC shows | the maintainers | never |

@@ -1,0 +1,6 @@
+$ bin/cc validate --input b7-at-line-2 --tables nomem --advanced
+tables/nomem/membership.toml:along: along runs door:off_manifold on b7-at-line-2 but this set has no rule for it
+  Next: copy tables/v01-rules/membership.toml into tables/nomem/, or fork from v01-rules (bin/cc tables fork v01-rules <new-name>)
+checked: 1 cc, 1 codes, 1 data-manifest, 1 input, 3 instrument, 1 verdict
+validate: 1 findings
+exit 1

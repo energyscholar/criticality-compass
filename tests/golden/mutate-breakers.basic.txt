@@ -1,0 +1,11 @@
+$ bin/cc mutate tables/verdict-x-rules/codes.toml --sed s/"SIG+" = "COEXIST"/"SIG+" = "INDEP"/ -- test_breakers
+RED   test_breakers
+      ok field-decoy-not-line
+      ok off-critical-growth-change
+      ok unres-across-not-positive
+      ok unres-two-start-not-positive
+      ok w1-point-estimate-crossing
+      BROKEN coexistence-at-transition: expected code COEXIST, got INDEP; expected verdict FIRST-ORDER, got POINT
+      BROKEN slow-kinetics-off-transition: expected code COEXIST, got INDEP
+      test_breakers: 5 of 7 ok
+exit 0

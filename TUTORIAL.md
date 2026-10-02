@@ -1,15 +1,15 @@
 # Tutorial: one point, then one rule change
 
-Two parts. Part 1 follows one point of one input from data files to verdict. Part 2 changes a rule in a
-scratch rulebook and asks CC what moved. Every output below was produced by the command above it; `…`
-marks lines left out. Read `README.md` first for the words.
+Three parts. Part 1 follows one point of one input from data files to verdict. Part 2 changes a rule in a
+scratch rulebook and asks CC what moved. Part 3 reads a family: several points that together say something
+no single point can. Every output below was produced by the command above it; `…` marks lines left out.
+Read `README.md` first for the words.
 
 ## Part 1: the Potts q = 5 point, end to end
 
 ```
 $ bin/cc show w2-potts
-w2-potts   rules: verdict-x-rules   result: results/w2-potts@verdict-x-rules.json (frozen)
-point 2   case ising-2d
+w2-potts   rules: v01-rules   result: results/w2-potts@v01-rules.json (not frozen)
 …
 point 5   case potts-q5
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
@@ -72,19 +72,19 @@ interval lies above +0.25. An interval wholly beyond the margin is the strongest
 ```
   7 CODE      across: codes.toml line 107: SIG+ -> RELEVANT
 stability
-  …
+…
   5 READING   d 0.08076  interval [-0.3098, 0.5382]  (95 %, 400 block resamples, b 400)
   6 SIGN      cuts -0.25 0 +0.25 (eps y): bL 0, bU 3 -> BLANK (UNRES: interval straddles 0 and a margin edge)
   7 CODE      stability: codes.toml line 122: UNRES -> BLANK (UNRES: interval straddles 0 and a margin edge)
 two_start
-  …
+…
   7 CODE      L27 two_start: codes.toml line 136: ZERO! -> INDEP
   7 CODE      L81 two_start: codes.toml line 140: UNRES -> BLANK (UNRES: interval straddles 0 and a margin edge)
   7 CODE      L243 two_start: codes.toml line 136: ZERO! -> INDEP
   7 CODE      combine.rank NOT-MEASURED > NOT-EVALUATED > COEXIST > FLUCT > UNRES > INDEP (first wins) -> BLANK (UNRES: interval straddles 0 and a margin edge)
 ```
 
-The code is the sign cell translated through `tables/verdict-x-rules/codes.toml`; the line number is printed
+The code is the sign cell translated through `tables/v01-rules/codes.toml`; the line number is printed
 so you can open it. `SIG+` for the growth exponent is `RELEVANT`. `stability` asks whether that exponent
 changes from one size step to the next; its interval runs from -0.31 to +0.54, which straddles both zero and a
 margin, so the data cannot say: UNRES, shown as BLANK. `two_start` compares two ways of starting the
@@ -96,14 +96,14 @@ names, the margins and which instrument asked.)
 ### The verdict row and its why
 
 ```
-8 VERDICT   verdict.toml line 133: when.needle = [NOT-MEASURED, NOT-EVALUATED]
+8 VERDICT   verdict.toml line 153: when.needle = [NOT-MEASURED, NOT-EVALUATED]
             => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
                why: honest null (not in verdict_x): the needle was not measured or not evaluated
 ```
 
 `verdict.toml` is a list of rows. Each row says "when the signature row has these codes, the verdict is
 this, and here is why". `bin/cc validate` checks that the rows cover every possible signature
-row exactly once, so exactly one row matches. For this point it is the row at line 133: whenever the needle
+row exactly once, so exactly one row matches. For this point it is the row at line 153: whenever the needle
 is NOT-MEASURED or NOT-EVALUATED, the verdict is a refusal.
 
 Why the refusal? The needle is the instrument that asks whether the observable still moves under one more
@@ -119,17 +119,20 @@ difference cannot certify equilibrium). Suppose you would rather let it pass as 
 
 ### Fork a scratch rulebook
 
+Fork from the working rulebook, `v01-rules` (the one in `rules in use:` of `bin/cc help`), so that your copy
+carries everything the working rules have, including its `membership.toml` and `family.toml`:
+
 ```
-$ bin/cc tables fork verdict-x-rules scratch
-forked tables/verdict-x-rules to tables/scratch
+$ bin/cc tables fork v01-rules scratch
+forked tables/v01-rules to tables/scratch
   Next: edit tables/scratch/verdict.toml, then bin/cc validate, then bin/cc run --all --tables scratch
 ```
 
 ### Make the edit, half way
 
-Open `tables/scratch/verdict.toml` in Geany. The change takes 15 edits: the row that sends
-`when.two_start = ["FLUCT", "UNRES"]` to `REFUSE-EQUIL` must lose its `"UNRES"` (edit 1), and the 14 rows that
-read `when.two_start = ["INDEP"]` must each gain `"UNRES"` (edits 2 to 15). Do only the first one, then
+Open `tables/scratch/verdict.toml` in Geany. The change takes 17 edits: the row that sends
+`when.two_start = ["FLUCT", "UNRES"]` to `REFUSE-EQUIL` must lose its `"UNRES"` (edit 1), and the 16 rows that
+read `when.two_start = ["INDEP"]` must each gain `"UNRES"` (edits 2 to 17). Do only the first one, then
 validate:
 
 ```
@@ -149,7 +152,7 @@ missing pattern as a ready-made `when` block.
 
 ### Finish it
 
-Add `"UNRES"` to the other 14 rows, so each reads `when.two_start = ["INDEP", "UNRES"]`, and validate again:
+Add `"UNRES"` to the other 16 rows, so each reads `when.two_start = ["INDEP", "UNRES"]`, and validate again:
 
 ```
 $ bin/cc validate
@@ -166,52 +169,141 @@ run b7-at-line@scratch -> results/b7-at-line@scratch.json
 x8-ising-needle: ran
 ```
 
-This measures again (about ten seconds in all) and writes seven results under the id `<input>@scratch`. The
-frozen `…@verdict-x-rules` results are untouched. It prints every point of every input as it goes; the lines
-that matter are the tables below.
+This measures again (about half a minute for all eleven inputs) and writes eleven
+results under the id `<input>@scratch`. The `…@v01-rules` results are untouched. It prints every point of every
+input as it goes; the lines that matter are the tables below.
 
 ### Compare
 
 ```
-$ bin/cc tabulate --diff verdict-x-rules scratch
-1512 cells change verdict between verdict-x-rules and scratch
-REFUSE-EQUIL -> LINE: 6 cells in 1 patterns
-  when.needle = ["MID"]; when.flow = ["STOPPED"]; when.across = ["MARGINAL"]; when.stability = ["STABLE"]; when.two_start = ["UNRES"]
+$ bin/cc tabulate --diff v01-rules scratch
+1512 cells change verdict between v01-rules and scratch
+REFUSE-EQUIL -> LINE: 12 cells in 1 patterns
+  when.needle = ["MID"]; when.flow = ["STOPPED", "SLOW"]; when.across = ["MARGINAL"]; when.stability = ["STABLE"]; when.two_start = ["UNRES"]
 REFUSE-EQUIL -> NOT: 252 cells in 1 patterns
   when.needle = ["MID"]; when.flow = ["FLOWING"]; when.two_start = ["UNRES"]
+REFUSE-EQUIL -> POINT: 6 cells in 1 patterns
+  when.needle = ["MID"]; when.flow = ["STOPPED"]; when.across = ["RELEVANT"]; when.stability = ["STABLE"]; when.two_start = ["UNRES"]
 …
 REFUSE-EQUIL -> WALKING: 12 cells in 1 patterns
   when.needle = ["MID"]; when.flow = ["STOPPED"]; when.across = ["RELEVANT", "MARGINAL"]; when.stability = ["CROSSING"]; when.two_start = ["UNRES"]
 0 fixture points change verdict
-…
+tabulate --diff: wrote nothing (bin/cc tabulate writes SIGNATURE-TABLE.md and docs/verdict-table.html)
 ```
 
 1 512 cells of the rulebook (signature rows) change verdict, sorted by the old and new verdict: some become
 LINE, POINT or WALKING, most become other refusals, because the rest of the rulebook still has its say. And
 no fixture point changes verdict. Why: a point is only affected if it reads the needle at the window (MID)
-and the two-start comparison UNRES together. Of the 60 points CC holds, the x2 and x3 points read MID, but
+and the two-start comparison UNRES together. Of the 76 points CC holds, the x2, x3 and x5 points read MID, but
 their two-start comparison is INDEP; the one point whose two-start comparison is UNRES with the needle
-measured (x4, K = 0.46) has the needle ORD, which is NOT either way; and Potts q = 5 has an UNRES two-start
-but no needle at all. A rule can matter a lot to the rulebook and not at all to today's data. `tabulate` also
-rewrites `SIGNATURE-TABLE.md` and `docs/verdict-table.html`, which show the same diff as tables you can open.
-(Run the `run --all` step first, as above, or the "fixture points" line has no scratch results to compare;
-the cell count does not need them.)
+measured (x4, K = 0.46) has the needle ORD, which is NOT either way; Potts q = 5 has an UNRES two-start but no
+needle at all; and the inputs that never measured the two starts (x7a, x8) read NOT-MEASURED, which is not
+UNRES. A rule can matter a lot to the rulebook and not at all to today's data. (`tabulate --diff` writes
+nothing; plain `bin/cc tabulate` writes `SIGNATURE-TABLE.md` and `docs/verdict-table.html`, which show every
+rulebook as tables you can open.) The cell count does not need any results; the "fixture points" line
+compares real results, so run the `run --all` step first, as above, or it has nothing to compare.
 
 ### The one-line alternative, and what it hides
 
 The same verdicts for every point can be had with one line in `tables/scratch/codes.toml`: in the
 `[columns.signature.two_start.map]` table, change `"UNRES" = "UNRES"` to `"UNRES" = "INDEP"`. The rulebook
 then needs no row changes. But the signature row would now say INDEP where the data said UNRES, in `show`,
-in `explain` and in every table: the doubt disappears from the output. The 15-row edit keeps the code honest
-and puts the decision in the rulebook, where `tabulate --diff` can show it. Prefer the long way when the
-choice is a scientific one.
+in `explain` and in every table: the doubt disappears from the output. The 17-edit version keeps the code
+honest and puts the decision in the rulebook, where `tabulate --diff` can show it. Prefer the long way when
+the choice is a scientific one.
 
 ### Clean up
 
 ```
 $ bin/cc tables drop scratch --with-results
-dropped tables/scratch and 14 result files
+dropped tables/scratch and 22 result files
 ```
 
 `drop` never deletes a frozen rulebook or the default one; `--with-results` also deletes the unfrozen results
-that were run under it (a `.json` and a `.npz` for each of seven inputs).
+that were run under it (a `.json` and a `.npz` for each of eleven inputs).
+
+## Part 3: a family
+
+A point is read alone: its needle, its exponent, its stability. Some claims need several points together. The
+B7 line is the example. On the exact self-dual line of the Ashkin-Teller model no single point measures the
+needle, so every point on its own is refused (`bin/cc show b7-at-line-2` says `REFUSE-NEEDLE-UNMEASURED` five
+times). Yet the five points together say something: the exponent of the response changes from point to point
+along the line, and the growth of the difference between neighbouring points does not. That is a **family**.
+
+A family is declared in `families/b7-at-line-2.toml`: the input, and the **interior** points, in the order
+along the line (`0.0 0.07 0.14 0.21`; the endpoint `0.2747` is the four-state Potts point, a different class,
+and is left out by declaration). The rulebook decides what the readings mean: `tables/v01-rules/family.toml`.
+Ask for it:
+
+```
+$ bin/cc family b7-at-line-2
+family b7-at-line-2   rules: v01-rules   input: b7-at-line-2   interior: 0.0 0.07 0.14 0.21
+  bracket NOT-MEASURED
+    edge 0.0->0.07 NOT-MEASURED
+    edge 0.07->0.14 NOT-MEASURED
+    edge 0.14->0.21 NOT-MEASURED
+    edge 0.21->0.2747 NOT-MEASURED
+  f1      VARIES
+    0.0->0.07 y_last +0.064 [+0.019, +0.109] SLOW+  -> CONSTANT
+    0.0->0.14 y_last +0.166 [+0.112, +0.224] SLOW+  -> CONSTANT
+    0.07->0.14 y_last +0.102 [+0.054, +0.165] SLOW+  -> CONSTANT
+    0.0->0.21 y_last +0.322 [+0.233, +0.394] POS  -> VARIES
+    0.07->0.21 y_last +0.258 [+0.183, +0.325] POS  -> VARIES
+    0.14->0.21 y_last +0.156 [+0.074, +0.233] SLOW+  -> CONSTANT
+  f2      MARGINAL
+    0.0->0.07 along ZERO!  -> MARGINAL
+    0.07->0.14 along ZERO!  -> MARGINAL
+    0.14->0.21 along ZERO!  -> MARGINAL
+  => family verdict LINE   class LINE, family.toml line 55
+     why: B7 (SYNTHESIS-3): fingerprints 1 and 2 both resolved; X7a: POINT manifolds do not reach f2 MARGINAL
+```
+
+Read it section by section.
+
+**The bracket.** The bracket asks whether the needle, read along the whole input, only ever moves up through
+the window: each needle code is given a rank (DIS 0, MID 1, ORD 2), A takes the difference between neighbouring
+points, and the bracket is `BRACKET` when no step goes down and some point sits at MID. This input never measured the needle, so every edge and the bracket
+itself read `NOT-MEASURED`. That is a value, not an error, and the family rule allows it: the LINE row accepts
+a bracket that was not measured, which is how a line is read when only its exponents are known.
+
+**f1, the exponent varies.** Fingerprint 1 asks whether the `across` exponent differs between
+points. It takes the difference of the exponent over **every pair** of interior points (6 pairs), each with
+its own interval from the stored resamples, and codes each pair like any other reading: a pair whose interval
+is wholly beyond the margin (`POS`) is `VARIES`, one inside the margin (`SLOW+`) is `CONSTANT`. One resolved
+pair is enough to say the exponent varies, so f1 is `VARIES`, because `0.0->0.21` and `0.07->0.21` are
+resolved. A family never invents a number: each of these is a stored resample difference, and nothing is
+measured again.
+
+**f2, the growth along the line is marginal.** Fingerprint 2 is the `along` instrument:
+for each **consecutive** pair of interior points it reads how the difference of the two points grows with the
+lattice size. The pair is read only if both of its points are on the manifold (the membership door; part of
+`HOWTO.md`). All three pairs read `ZERO!` (inside the margin), which the rulebook codes `MARGINAL`.
+Marginal growth needs every pair, not one.
+
+**The row** (the last two lines). The three columns are looked up in the family rulebook's partition, exactly as
+a point's signature row is looked up in `verdict.toml`: bracket not measured, f1 `VARIES`, f2 `MARGINAL` is
+the row at `family.toml` line 55, `LINE`. Its `why` cites the reasoning: both fingerprints resolved, and the
+POINT manifolds of X7a do not reach f2 `MARGINAL`.
+
+**Why LINE, and how close it is.** Look at the boundary pair, `0.14->0.21`, with the pair trace of `explain`:
+
+```
+$ bin/cc explain b7-at-line-2 0.14->0.21
+explain b7-at-line-2 0.14->0.21   rules: v01-rules
+along   (pair 0.14->0.21)
+  1 MEMBER    membership.toml [along] reads needle: 0.14 NOT-MEASURED -> UNCHECKED, 0.21 NOT-MEASURED -> UNCHECKED; lowest rank decides -> door RUN-FLAG-U   flags: truth point, membership unchecked (the upstream needle was not measured)
+  2 DELTA     A over the control edge 0.14->0.21, row 0: 27 0.05402, 81 0.05431, 243 0.04232
+  3 KERNEL    ln|Delta| [-2.918, -2.913, -3.162]; A over size [0.005433, -0.2495]; B at the top edge -0.244; over the log span 2.197: -0.1111
+  4 READING   y_along -0.1111  interval [-0.2479, 0.005093]  (95 %, 400 block resamples)
+  5 SIGN      cuts -0.25 0 +0.25 (eps y): bL 1, bU 2 -> ZERO!
+  6 CODE      family.toml line 52 [f2.code]: ZERO! -> MARGINAL
+```
+
+The membership door (step 1) is `RUN-FLAG-U`: the pair ran, and carries the flag U (membership unchecked)
+because the needle was not measured. Steps 2 and 3 are the statistic: the difference of the two points at each
+size, then the logarithm of its size, then A over the size chain and B accumulated along it, divided by the log
+of the size span. The interval is `[-0.2479, +0.005]` against the margin `-0.25`: the lower end is **0.002
+inside** the margin, so the cell is `ZERO!` (step 5) and the code `MARGINAL` (step 6). Had the lower end fallen
+below `-0.25`, the cell would be `UNRES`, f2 would be `UNRES`, and the family would read
+`REFUSE-UNCLASSIFIED-v0` instead of LINE. The family verdict is therefore real and resolved, and also close: that is exactly what the pair trace
+is for.
