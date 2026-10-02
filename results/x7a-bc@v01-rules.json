@@ -5,7 +5,7 @@
  "input": "x7a-bc",
  "tables": "v01-rules",
  "derived_from": null,
- "code_commit": "be9a4f70f8150b9ded8ec11869c446c69a79dd9b",
+ "code_commit": "3b4e90f77ebe3e0fa2ae915aa71a2338262796c1",
  "interval": {
   "method": "block",
   "b": 400,
