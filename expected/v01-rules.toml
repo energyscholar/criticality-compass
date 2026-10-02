@@ -99,6 +99,11 @@ tables = "v01-rules"
 "k2-0.0" = "REFUSE-TWO-START-UNMEASURED"
 "k2-0.1" = "REFUSE-TWO-START-UNMEASURED"
 
+[verdicts.x5-bilayer]
+"0.0" = "REFUSE-SLOW"
+"0.1" = "NOT"
+"0.3" = "REFUSE-SLOW"
+
 [[change]]
 date = "2026-10-01"
 points = ["*"]
@@ -192,3 +197,12 @@ bracket NOT-MEASURED (no needle declared), f1 VARIES (0.0->0.21 and 0.07->0.21 P
 (the boundary pair 0.14->0.21 reads ZERO!), so LINE on flags T,U. x8-ising-compass bracket BRACKET (DIS x4, MID, ORD x4). \
 x7a-bc-lambda bracket NON-MONOTONE, all five pairs REFUSE-OFF-MANIFOLD. x7a-nnn-manifold bracket BRACKET, its one pair \
 NOT-EVALUATED. No v0 or P3 point verdict moved"""
+
+[[change]]
+date = "2026-10-02"
+points = ["x5-bilayer:*"]
+why = """DECLARED BEFORE THE FIRST RUN of x5-bilayer (plan 0864 P5, the E70 pre-check). Under v01-rules the needle at NEG or POS \
+inside the margin reads MID and the flow reads SLOW (Q1 c'), so g 0 and g 0.3 move from NOT to REFUSE-SLOW (across \
+RELEVANT, so Q2 does not make them LINE) and g 0.1 stays NOT (its needle reads SIG+ and its stability reads OFF). X5 goes \
+from three confident false negatives to two honest refusals and one NOT; it does NOT reach POINT in v0.1. Any other \
+outcome is a finding, never an edit of this lock"""

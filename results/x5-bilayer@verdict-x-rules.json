@@ -1,0 +1,712 @@
+{
+ "schema": 1,
+ "kind": "result",
+ "run_id": "x5-bilayer@verdict-x-rules",
+ "input": "x5-bilayer",
+ "tables": "verdict-x-rules",
+ "derived_from": null,
+ "code_commit": "799415009f0a05cc8bbba88bd1b00dd853704205",
+ "interval": {
+  "method": "block",
+  "b": 400,
+  "resamples": 400,
+  "level": 0.95,
+  "seed": 65
+ },
+ "read": {
+  "inputs/x5-bilayer/m.toml": "034d37302382f55d6a786e8bcfba845add2d393c0d45a33607dd8572e9d2ab1a",
+  "instruments/needle.toml": "03c8e390df85cdcef367ecba33043ebf9e0445c30f27fa626242a87387fb3ef0",
+  "instruments/across.toml": "8f6803e8af6cd80d4f7bb69b1be8148cf5eb8742892caf5f3f8392f38b3c0944",
+  "instruments/stability.toml": "2fc7bb21b58a2d6eceab15ca62424aadedd309eb1f9dd6125bdee57d52588170",
+  "instruments/two_start.toml": "30503b8a483a80faa442f419d04edc10a9498b56fb24c68554fa643c8679fa38",
+  "tables/verdict-x-rules/codes.toml": "d43f06815275e379c54fda75e619e158741b313697c9f870c10efb2812d8ee19",
+  "tables/verdict-x-rules/verdict.toml": "64a671e0046e2853e8dafebe23d05fa138ceb2d0810b09d79c24989e977b05a9",
+  "fixtures/data/x5-bilayer.toml": "7dd58952cf24840ca51f0e51605a755451cae1c971e640fdaccd0895c5f7c1aa",
+  "~/software/scratch/compass-toolset/data/x5/g0.0-L27-random.npz": "dbcba4f99b63cd41f8007b5d89d8ffeffe4bd1647f4e5bcfbf29ab82fe4ed41d",
+  "~/software/scratch/compass-toolset/data/x5/g0.0-L27-ordered.npz": "8ee5bdb9c5b109301d5da3a92a03d5069d0cf1d9355798ce89e80372fb4980f1",
+  "~/software/scratch/compass-toolset/data/x5/g0.0-L81-random.npz": "f5ea55f37440ef2c019b8993380847e8a810f9c0ec499e2e2e606dd985b9a7c1",
+  "~/software/scratch/compass-toolset/data/x5/g0.0-L81-ordered.npz": "8a2d37de6e67ac552073c012b5667d3b5638c55b480e19b29f416cb6470f490f",
+  "~/software/scratch/compass-toolset/data/x5/g0.0-L243-random.npz": "c17fb2c7e5a698bc09e47acf741dbd4a0819db34c6f7eb01871c8e593f19156c",
+  "~/software/scratch/compass-toolset/data/x5/g0.0-L243-ordered.npz": "0040759623f88fa9a9c52a07e86d6951be498a4a64b900d963fee7104d417fa3",
+  "~/software/scratch/compass-toolset/data/x5/g0.1-L27-random.npz": "4c5c70a6a32781c2f190f5526dc4fbe5e047ea8e5a01f5c8d8e88f310c5ee17e",
+  "~/software/scratch/compass-toolset/data/x5/g0.1-L27-ordered.npz": "34fcb7d1139a7bc7502c965b5ae2c44f45d869ff5f0a8c85c90e73d9caa414dd",
+  "~/software/scratch/compass-toolset/data/x5/g0.1-L81-random.npz": "88bb084c2514a4180f12d9c7556426bc6f52fd4fb3b68aff9a7e35d8820138bd",
+  "~/software/scratch/compass-toolset/data/x5/g0.1-L81-ordered.npz": "b6253143848ac7130869d69f554e22ebcd1ada9d526d0ba0437e173c47b9e0b5",
+  "~/software/scratch/compass-toolset/data/x5/g0.1-L243-random.npz": "5c30228d55d8ec7a766816d4f5e963a9eae11bd67c58a400bc289c0bf6f6a3c0",
+  "~/software/scratch/compass-toolset/data/x5/g0.1-L243-ordered.npz": "8c769646c1c44c07ff1957560039830a126938eb3e0376db5f2139b955a9ce08",
+  "~/software/scratch/compass-toolset/data/x5/g0.3-L27-random.npz": "07d33eaafa68858617fb97c1d9af653dd3ecd1bda76118d076f051aa2306a758",
+  "~/software/scratch/compass-toolset/data/x5/g0.3-L27-ordered.npz": "67d7e7b5a70a5712c2c5f1a01fd72343c4afc2b3e6da728bcef9d9ede9400b25",
+  "~/software/scratch/compass-toolset/data/x5/g0.3-L81-random.npz": "568c894ef312ea271f2a615183676e8730c0f4491744060da0feafb1d7a39319",
+  "~/software/scratch/compass-toolset/data/x5/g0.3-L81-ordered.npz": "74fab4bbd97b9224be7b24e2adb89f5ab7abe90053d2ec737aa723ac8d2026bc",
+  "~/software/scratch/compass-toolset/data/x5/g0.3-L243-random.npz": "ec2ce9ce061c49f3e9a758d5b31576b72b728dace37c8b9446df6c84357abf09",
+  "~/software/scratch/compass-toolset/data/x5/g0.3-L243-ordered.npz": "9582fd1bed9e4f8e0f77e8334740d7e9425e736a537486d591760c07b99fc3d3"
+ },
+ "vectors": "results/x5-bilayer@verdict-x-rules.npz",
+ "readings": [
+  {
+   "instrument": "across",
+   "column": "y_last",
+   "unit": {
+    "point": "0.0"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": 1.0437313737675935,
+   "lo": 0.9336025597327792,
+   "hi": 1.1605501190528793,
+   "cell": "SIG+",
+   "code": "RELEVANT",
+   "per_size": null,
+   "flags": [
+    "H",
+    "N"
+   ],
+   "reason": null,
+   "vector_key": "across/y_last/point=0.0"
+  },
+  {
+   "instrument": "needle",
+   "column": "velocity",
+   "unit": {
+    "point": "0.0"
+   },
+   "eps_key": "step",
+   "eps": 0.01,
+   "estimate": -0.011796874999999485,
+   "lo": -0.022634071180551076,
+   "hi": -0.00336141493055485,
+   "cell": "NEG",
+   "code": "FLOWING",
+   "per_size": null,
+   "flags": [
+    "N"
+   ],
+   "reason": null,
+   "vector_key": "needle/velocity/point=0.0"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_ord",
+   "unit": {
+    "point": "0.0"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.24647916666667058,
+   "lo": 0.2398199652777798,
+   "hi": 0.2537319444444452,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "N"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_ord/point=0.0"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_dis",
+   "unit": {
+    "point": "0.0"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.7535208333333294,
+   "lo": 0.7462680555555548,
+   "hi": 0.7601800347222202,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "N"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_dis/point=0.0"
+  },
+  {
+   "instrument": "stability",
+   "column": "d",
+   "unit": {
+    "point": "0.0"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -0.012522781873077538,
+   "lo": -0.15273283658861705,
+   "hi": 0.1607407441268678,
+   "cell": "ZERO!",
+   "code": "STABLE",
+   "per_size": null,
+   "flags": [
+    "H",
+    "N"
+   ],
+   "reason": null,
+   "vector_key": "stability/d/point=0.0"
+  },
+  {
+   "instrument": "two_start",
+   "column": "D",
+   "unit": {
+    "point": "0.0"
+   },
+   "eps_key": "two_start",
+   "eps": 0.01,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": null,
+   "code": "INDEP",
+   "per_size": [
+    {
+     "size": 27,
+     "estimate": 0.001490740740740848,
+     "lo": -0.0008638974622770797,
+     "hi": 0.003924185528120689,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    },
+    {
+     "size": 81,
+     "estimate": 7.737006553876213e-05,
+     "lo": -0.0010278149291266967,
+     "hi": 0.001296928821825935,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    },
+    {
+     "size": 243,
+     "estimate": 3.555309996783329e-05,
+     "lo": -0.0003398288391844445,
+     "hi": 0.0005246037718673989,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    }
+   ],
+   "flags": [
+    "N"
+   ],
+   "reason": null,
+   "vector_key": null
+  },
+  {
+   "instrument": "across",
+   "column": "y_last",
+   "unit": {
+    "point": "0.1"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": 0.9295072841220791,
+   "lo": 0.8496944488793113,
+   "hi": 1.0016693416829012,
+   "cell": "SIG+",
+   "code": "RELEVANT",
+   "per_size": null,
+   "flags": [
+    "H",
+    "N"
+   ],
+   "reason": null,
+   "vector_key": "across/y_last/point=0.1"
+  },
+  {
+   "instrument": "needle",
+   "column": "velocity",
+   "unit": {
+    "point": "0.1"
+   },
+   "eps_key": "step",
+   "eps": 0.01,
+   "estimate": 0.025673611111106776,
+   "lo": 0.01530373263888657,
+   "hi": 0.036992100694439874,
+   "cell": "SIG+",
+   "code": "FLOWING",
+   "per_size": null,
+   "flags": [
+    "N"
+   ],
+   "reason": null,
+   "vector_key": "needle/velocity/point=0.1"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_ord",
+   "unit": {
+    "point": "0.1"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.2599322916666714,
+   "lo": 0.2524102864583403,
+   "hi": 0.2675284288194494,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "N"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_ord/point=0.1"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_dis",
+   "unit": {
+    "point": "0.1"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.7400677083333286,
+   "lo": 0.7324715711805506,
+   "hi": 0.7475897135416597,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "N"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_dis/point=0.1"
+  },
+  {
+   "instrument": "stability",
+   "column": "d",
+   "unit": {
+    "point": "0.1"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -0.1833494141688239,
+   "lo": -0.3164955121785224,
+   "hi": -0.0813522200593322,
+   "cell": "NEG",
+   "code": "OFF",
+   "per_size": null,
+   "flags": [
+    "H",
+    "N"
+   ],
+   "reason": null,
+   "vector_key": "stability/d/point=0.1"
+  },
+  {
+   "instrument": "two_start",
+   "column": "D",
+   "unit": {
+    "point": "0.1"
+   },
+   "eps_key": "two_start",
+   "eps": 0.01,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": null,
+   "code": "INDEP",
+   "per_size": [
+    {
+     "size": 27,
+     "estimate": 0.00173062414266123,
+     "lo": -0.0014526105967077522,
+     "hi": 0.0049292909807956056,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    },
+    {
+     "size": 81,
+     "estimate": 0.0010213572626124323,
+     "lo": -0.0003636521681145615,
+     "hi": 0.0023763255410760927,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    },
+    {
+     "size": 243,
+     "estimate": -0.0006429003878134498,
+     "lo": -0.0011980884519635358,
+     "hi": 2.2205922200038503e-05,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    }
+   ],
+   "flags": [
+    "N"
+   ],
+   "reason": null,
+   "vector_key": null
+  },
+  {
+   "instrument": "across",
+   "column": "y_last",
+   "unit": {
+    "point": "0.3"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": 0.9830245678086149,
+   "lo": 0.9049918883611744,
+   "hi": 1.0852673223773954,
+   "cell": "SIG+",
+   "code": "RELEVANT",
+   "per_size": null,
+   "flags": [
+    "H",
+    "N"
+   ],
+   "reason": null,
+   "vector_key": "across/y_last/point=0.3"
+  },
+  {
+   "instrument": "needle",
+   "column": "velocity",
+   "unit": {
+    "point": "0.3"
+   },
+   "eps_key": "step",
+   "eps": 0.01,
+   "estimate": 0.008972222222217718,
+   "lo": 0.001692447916661613,
+   "hi": 0.01787105034722136,
+   "cell": "POS",
+   "code": "FLOWING",
+   "per_size": null,
+   "flags": [
+    "N"
+   ],
+   "reason": null,
+   "vector_key": "needle/velocity/point=0.3"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_ord",
+   "unit": {
+    "point": "0.3"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.23856944444445394,
+   "lo": 0.23252877604167232,
+   "hi": 0.24371488715278722,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "N"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_ord/point=0.3"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_dis",
+   "unit": {
+    "point": "0.3"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.7614305555555461,
+   "lo": 0.7562851128472128,
+   "hi": 0.7674712239583277,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "N"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_dis/point=0.3"
+  },
+  {
+   "instrument": "stability",
+   "column": "d",
+   "unit": {
+    "point": "0.3"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -0.03553974252426406,
+   "lo": -0.1477806866231407,
+   "hi": 0.13852349432585753,
+   "cell": "ZERO!",
+   "code": "STABLE",
+   "per_size": null,
+   "flags": [
+    "H",
+    "N"
+   ],
+   "reason": null,
+   "vector_key": "stability/d/point=0.3"
+  },
+  {
+   "instrument": "two_start",
+   "column": "D",
+   "unit": {
+    "point": "0.3"
+   },
+   "eps_key": "two_start",
+   "eps": 0.01,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": null,
+   "code": "INDEP",
+   "per_size": [
+    {
+     "size": 27,
+     "estimate": -0.0003377914951989691,
+     "lo": -0.0033444230109739835,
+     "hi": 0.0022360425240054546,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    },
+    {
+     "size": 81,
+     "estimate": 0.0005635764365188312,
+     "lo": -0.0008225322930955482,
+     "hi": 0.002261471669715008,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    },
+    {
+     "size": 243,
+     "estimate": 0.00022670366983357226,
+     "lo": -0.0002548039551897974,
+     "hi": 0.0007365583561955933,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    }
+   ],
+   "flags": [
+    "N"
+   ],
+   "reason": null,
+   "vector_key": null
+  }
+ ],
+ "pair_readings": [],
+ "reports": [
+  {
+   "instrument": "across",
+   "name": "y_steps",
+   "unit": {
+    "point": "0.0"
+   },
+   "estimate": [
+    1.056254155640671,
+    1.0437313737675935
+   ],
+   "vector_key": "across/y_steps/point=0.0"
+  },
+  {
+   "instrument": "needle",
+   "name": "v_all",
+   "unit": {
+    "point": "0.0"
+   },
+   "estimate": [
+    0.015484780092595019,
+    -0.0024980413105377686,
+    -0.011796874999999485
+   ],
+   "vector_key": "needle/v_all/point=0.0"
+  },
+  {
+   "instrument": "needle",
+   "name": "g_final",
+   "unit": {
+    "point": "0.0"
+   },
+   "estimate": 0.7535208333333294,
+   "vector_key": "needle/g_final/point=0.0"
+  },
+  {
+   "instrument": "across",
+   "name": "y_steps",
+   "unit": {
+    "point": "0.1"
+   },
+   "estimate": [
+    1.112856698290903,
+    0.9295072841220791
+   ],
+   "vector_key": "across/y_steps/point=0.1"
+  },
+  {
+   "instrument": "needle",
+   "name": "v_all",
+   "unit": {
+    "point": "0.1"
+   },
+   "estimate": [
+    0.02967687114197526,
+    0.0724560185185198,
+    0.025673611111106776
+   ],
+   "vector_key": "needle/v_all/point=0.1"
+  },
+  {
+   "instrument": "needle",
+   "name": "g_final",
+   "unit": {
+    "point": "0.1"
+   },
+   "estimate": 0.7400677083333286,
+   "vector_key": "needle/g_final/point=0.1"
+  },
+  {
+   "instrument": "across",
+   "name": "y_steps",
+   "unit": {
+    "point": "0.3"
+   },
+   "estimate": [
+    1.018564310332879,
+    0.9830245678086149
+   ],
+   "vector_key": "across/y_steps/point=0.3"
+  },
+  {
+   "instrument": "needle",
+   "name": "v_all",
+   "unit": {
+    "point": "0.3"
+   },
+   "estimate": [
+    0.08362112268518052,
+    0.04435381054130749,
+    0.008972222222217718
+   ],
+   "vector_key": "needle/v_all/point=0.3"
+  },
+  {
+   "instrument": "needle",
+   "name": "g_final",
+   "unit": {
+    "point": "0.3"
+   },
+   "estimate": 0.7614305555555461,
+   "vector_key": "needle/g_final/point=0.3"
+  }
+ ],
+ "signature_columns": [
+  "sink",
+  "needle",
+  "flow",
+  "across",
+  "stability",
+  "two_start"
+ ],
+ "signature": [
+  {
+   "point": "0.0",
+   "obtained": "navigated",
+   "sink": "NEITHER",
+   "needle": "DIS",
+   "flow": "FLOWING",
+   "across": "RELEVANT",
+   "stability": "STABLE",
+   "two_start": "INDEP",
+   "flags": {
+    "sink": [
+     "N"
+    ],
+    "needle": [
+     "N"
+    ],
+    "flow": [
+     "N"
+    ],
+    "across": [
+     "H",
+     "N"
+    ],
+    "stability": [
+     "H",
+     "N"
+    ],
+    "two_start": [
+     "N"
+    ]
+   },
+   "verdict": "NOT",
+   "verdict_class": "NOT",
+   "row_line": 25,
+   "why": "verdict_x STAGE1: off the window"
+  },
+  {
+   "point": "0.1",
+   "obtained": "navigated",
+   "sink": "NEITHER",
+   "needle": "ORD",
+   "flow": "FLOWING",
+   "across": "RELEVANT",
+   "stability": "OFF",
+   "two_start": "INDEP",
+   "flags": {
+    "sink": [
+     "N"
+    ],
+    "needle": [
+     "N"
+    ],
+    "flow": [
+     "N"
+    ],
+    "across": [
+     "H",
+     "N"
+    ],
+    "stability": [
+     "H",
+     "N"
+    ],
+    "two_start": [
+     "N"
+    ]
+   },
+   "verdict": "NOT",
+   "verdict_class": "NOT",
+   "row_line": 25,
+   "why": "verdict_x STAGE1: off the window"
+  },
+  {
+   "point": "0.3",
+   "obtained": "navigated",
+   "sink": "NEITHER",
+   "needle": "ORD",
+   "flow": "FLOWING",
+   "across": "RELEVANT",
+   "stability": "STABLE",
+   "two_start": "INDEP",
+   "flags": {
+    "sink": [
+     "N"
+    ],
+    "needle": [
+     "N"
+    ],
+    "flow": [
+     "N"
+    ],
+    "across": [
+     "H",
+     "N"
+    ],
+    "stability": [
+     "H",
+     "N"
+    ],
+    "two_start": [
+     "N"
+    ]
+   },
+   "verdict": "NOT",
+   "verdict_class": "NOT",
+   "row_line": 25,
+   "why": "verdict_x STAGE1: off the window"
+  }
+ ],
+ "pairs": []
+}

@@ -477,6 +477,36 @@ point 0.55   case ising-field-decoy
   => verdict NOT
      why: verdict_x STAGE1: off the window
 x4-ising-field: ran
+run x5-bilayer@scratch -> results/x5-bilayer@scratch.json
+x5-bilayer   rules: scratch   result: results/x5-bilayer@scratch.json (not frozen)
+point 0.0   case coupled-ising-bilinear
+  sink       d_ord 0.2465 [0.2398, 0.2537] SIG+ d_dis 0.7535 [0.7463, 0.7602] SIG+ -> NEITHER
+  needle     velocity -0.0118 [-0.02263, -0.003361] NEG d_ord 0.2465 [0.2398, 0.2537] SIG+ d_dis 0.7535 [0.7463, 0.7602] SIG+ -> DIS
+  flow       -0.0118 [-0.02263, -0.003361] NEG -> FLOWING
+  across     1.044 [0.9336, 1.161] SIG+ -> RELEVANT
+  stability  -0.01252 [-0.1527, 0.1607] ZERO! -> STABLE
+  two_start  INDEP
+  => verdict NOT
+     why: verdict_x STAGE1: off the window
+point 0.1   case coupled-ising-bilinear
+  sink       d_ord 0.2599 [0.2524, 0.2675] SIG+ d_dis 0.7401 [0.7325, 0.7476] SIG+ -> NEITHER
+  needle     velocity 0.02567 [0.0153, 0.03699] SIG+ d_ord 0.2599 [0.2524, 0.2675] SIG+ d_dis 0.7401 [0.7325, 0.7476] SIG+ -> ORD
+  flow       0.02567 [0.0153, 0.03699] SIG+ -> FLOWING
+  across     0.9295 [0.8497, 1.002] SIG+ -> RELEVANT
+  stability  -0.1833 [-0.3165, -0.08135] NEG -> OFF
+  two_start  INDEP
+  => verdict NOT
+     why: verdict_x STAGE1: off the window
+point 0.3   case coupled-ising-bilinear
+  sink       d_ord 0.2386 [0.2325, 0.2437] SIG+ d_dis 0.7614 [0.7563, 0.7675] SIG+ -> NEITHER
+  needle     velocity 0.008972 [0.001692, 0.01787] POS d_ord 0.2386 [0.2325, 0.2437] SIG+ d_dis 0.7614 [0.7563, 0.7675] SIG+ -> ORD
+  flow       0.008972 [0.001692, 0.01787] POS -> FLOWING
+  across     0.983 [0.905, 1.085] SIG+ -> RELEVANT
+  stability  -0.03554 [-0.1478, 0.1385] ZERO! -> STABLE
+  two_start  INDEP
+  => verdict NOT
+     why: verdict_x STAGE1: off the window
+x5-bilayer: ran
 x7a-bc: REFUSED: tables/scratch/membership.toml:along: along runs door:off_manifold on x7a-bc but this set has no rule for it
 x7a-nnn: REFUSED: tables/scratch/membership.toml:along: along runs door:off_manifold on x7a-nnn but this set has no rule for it
 run x8-ising-needle@scratch -> results/x8-ising-needle@scratch.json

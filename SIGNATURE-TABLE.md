@@ -62,6 +62,9 @@ Written by `bin/cc tabulate`. Truth is joined here only (cc/score.py); no result
 | x4-ising-field@v01-rules | 0.46 | `ising-field-decoy` | FIRST-ORDER | 27 81 243 | ORD (T) | ORD (T) | FLOWING (T) | NOT-EVALUATED (HT) | NOT-EVALUATED (HT) | UNRES (T) | NOT | NOT |
 | x4-ising-field@v01-rules | 0.5 | `ising-field-decoy` | FIRST-ORDER | 27 81 243 | ORD (T) | ORD (T) | SLOW (T) | NOT-EVALUATED (HT) | NOT-EVALUATED (HT) | INDEP (T) | NOT | NOT |
 | x4-ising-field@v01-rules | 0.55 | `ising-field-decoy` | FIRST-ORDER | 27 81 243 | ORD (T) | ORD (T) | STOPPED (T) | NOT-EVALUATED (HT) | NOT-EVALUATED (HT) | INDEP (T) | NOT | NOT |
+| x5-bilayer@v01-rules | 0.0 | `coupled-ising-bilinear` | POINT | 27 81 243 | NEITHER (N) | MID (N) | SLOW (N) | RELEVANT (HN) | STABLE (HN) | INDEP (N) | REFUSE-SLOW | REFUSE |
+| x5-bilayer@v01-rules | 0.1 | `coupled-ising-bilinear` | POINT | 27 81 243 | NEITHER (N) | ORD (N) | FLOWING (N) | RELEVANT (HN) | OFF (HN) | INDEP (N) | NOT | NOT |
+| x5-bilayer@v01-rules | 0.3 | `coupled-ising-bilinear` | POINT | 27 81 243 | NEITHER (N) | MID (N) | SLOW (N) | RELEVANT (HN) | STABLE (HN) | INDEP (N) | REFUSE-SLOW | REFUSE |
 | x7a-bc@v01-rules | 0.0 | `bc-lambda-line` | POINT | 27 81 243 | NEITHER (N) | ORD (N) | FLOWING (N) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT |
 | x7a-bc@v01-rules | 1.0 | `bc-lambda-line` | POINT | 27 81 243 | NEITHER (N) | DIS (N) | FLOWING (N) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT |
 | x7a-bc@v01-rules | 1.5 | `bc-lambda-line` | POINT | 27 81 243 | NEITHER (N) | DIS (N) | FLOWING (N) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT |
@@ -80,7 +83,7 @@ Written by `bin/cc tabulate`. Truth is joined here only (cc/score.py); no result
 | x8-ising-needle@v01-rules | 1.05 | `ising-off-critical` | NOT | 81 243 | ORD (T) | ORD (T) | FLOWING (T) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT |
 | x8-ising-needle@v01-rules | 1.10 | `ising-off-critical` | NOT | 81 243 | ORD (T) | ORD (T) | SLOW (T) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT |
 
-Verdict class against truth: 8 agree, 54 refused, 7 disagree, 4 no truth
+Verdict class against truth: 8 agree, 56 refused, 8 disagree, 4 no truth
 
 ## Collisions (v01-rules)
 
@@ -145,6 +148,9 @@ Verdict class against truth: 8 agree, 54 refused, 7 disagree, 4 no truth
 | x4-ising-field@verdict-x-rules | 0.46 | `ising-field-decoy` | FIRST-ORDER | 27 81 243 | ORD (T) | ORD (T) | FLOWING (T) | NOT-EVALUATED (HT) | NOT-EVALUATED (HT) | UNRES (T) | NOT | NOT |
 | x4-ising-field@verdict-x-rules | 0.5 | `ising-field-decoy` | FIRST-ORDER | 27 81 243 | ORD (T) | ORD (T) | SLOW (T) | NOT-EVALUATED (HT) | NOT-EVALUATED (HT) | INDEP (T) | NOT | NOT |
 | x4-ising-field@verdict-x-rules | 0.55 | `ising-field-decoy` | FIRST-ORDER | 27 81 243 | ORD (T) | ORD (T) | STOPPED (T) | NOT-EVALUATED (HT) | NOT-EVALUATED (HT) | INDEP (T) | NOT | NOT |
+| x5-bilayer@verdict-x-rules | 0.0 | `coupled-ising-bilinear` | POINT | 27 81 243 | NEITHER (N) | DIS (N) | FLOWING (N) | RELEVANT (HN) | STABLE (HN) | INDEP (N) | NOT | NOT |
+| x5-bilayer@verdict-x-rules | 0.1 | `coupled-ising-bilinear` | POINT | 27 81 243 | NEITHER (N) | ORD (N) | FLOWING (N) | RELEVANT (HN) | OFF (HN) | INDEP (N) | NOT | NOT |
+| x5-bilayer@verdict-x-rules | 0.3 | `coupled-ising-bilinear` | POINT | 27 81 243 | NEITHER (N) | ORD (N) | FLOWING (N) | RELEVANT (HN) | STABLE (HN) | INDEP (N) | NOT | NOT |
 | x8-ising-needle@verdict-x-rules | 0.90 | `ising-off-critical` | NOT | 81 243 | NEITHER (T) | DIS (T) | FLOWING (T) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT |
 | x8-ising-needle@verdict-x-rules | 0.95 | `ising-off-critical` | NOT | 81 243 | NEITHER (T) | DIS (T) | FLOWING (T) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT |
 | x8-ising-needle@verdict-x-rules | 0.98 | `ising-off-critical` | NOT | 81 243 | NEITHER (T) | DIS (T) | FLOWING (T) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT |
@@ -155,7 +161,7 @@ Verdict class against truth: 8 agree, 54 refused, 7 disagree, 4 no truth
 | x8-ising-needle@verdict-x-rules | 1.05 | `ising-off-critical` | NOT | 81 243 | ORD (T) | ORD (T) | FLOWING (T) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT |
 | x8-ising-needle@verdict-x-rules | 1.10 | `ising-off-critical` | NOT | 81 243 | ORD (T) | ORD (T) | SLOW (T) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT |
 
-Verdict class against truth: 8 agree, 45 refused, 3 disagree, 4 no truth
+Verdict class against truth: 8 agree, 45 refused, 6 disagree, 4 no truth
 
 ## Collisions (verdict-x-rules)
 

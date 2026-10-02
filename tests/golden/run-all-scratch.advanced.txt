@@ -537,6 +537,47 @@ point 0.55   case ising-field-decoy   obtained: truth
   => verdict NOT  class NOT, verdict.toml line 25
      why: verdict_x STAGE1: off the window
 x4-ising-field: ran
+run x5-bilayer@scratch -> results/x5-bilayer@scratch.json
+x5-bilayer   rules: scratch   result: results/x5-bilayer@scratch.json (not frozen)
+  interval: block resamples 400, level 0.95, seed 65
+  code_commit: none
+  read inputs/x5-bilayer/m.toml 034d37302382
+  read instruments/needle.toml 03c8e390df85
+  read instruments/across.toml 8f6803e8af6c
+  read instruments/stability.toml 2fc7bb21b58a
+  read instruments/two_start.toml 30503b8a483a
+  read tables/scratch/codes.toml d43f06815275
+  read tables/scratch/verdict.toml 05b42a6663bc
+  read fixtures/data/x5-bilayer.toml 7dd58952cf24
+  read 18 data files, sha256 match the pinned manifest
+point 0.0   case coupled-ising-bilinear   obtained: navigated
+  sink       d_ord 0.2465 [0.2398, 0.2537] SIG+ eps sink=0.02 d_dis 0.7535 [0.7463, 0.7602] SIG+ eps sink=0.02 -> NEITHER flags: navigated point
+  needle     velocity -0.0118 [-0.02263, -0.003361] NEG eps step=0.01 d_ord 0.2465 [0.2398, 0.2537] SIG+ eps sink=0.02 d_dis 0.7535 [0.7463, 0.7602] SIG+ eps sink=0.02 -> DIS flags: navigated point
+  flow       -0.0118 [-0.02263, -0.003361] NEG eps step=0.01 -> FLOWING flags: navigated point vector needle/velocity/point=0.0
+  across     1.044 [0.9336, 1.161] SIG+ eps y=0.25 -> RELEVANT flags: uses Hamiltonian knowledge, navigated point vector across/y_last/point=0.0
+  stability  -0.01252 [-0.1527, 0.1607] ZERO! eps y=0.25 -> STABLE flags: uses Hamiltonian knowledge, navigated point vector stability/d/point=0.0
+  two_start  INDEP eps two_start=0.01 per size: 27 ZERO! INDEP; 81 ZERO! INDEP; 243 ZERO! INDEP flags: navigated point
+  => verdict NOT  class NOT, verdict.toml line 25
+     why: verdict_x STAGE1: off the window
+point 0.1   case coupled-ising-bilinear   obtained: navigated
+  sink       d_ord 0.2599 [0.2524, 0.2675] SIG+ eps sink=0.02 d_dis 0.7401 [0.7325, 0.7476] SIG+ eps sink=0.02 -> NEITHER flags: navigated point
+  needle     velocity 0.02567 [0.0153, 0.03699] SIG+ eps step=0.01 d_ord 0.2599 [0.2524, 0.2675] SIG+ eps sink=0.02 d_dis 0.7401 [0.7325, 0.7476] SIG+ eps sink=0.02 -> ORD flags: navigated point
+  flow       0.02567 [0.0153, 0.03699] SIG+ eps step=0.01 -> FLOWING flags: navigated point vector needle/velocity/point=0.1
+  across     0.9295 [0.8497, 1.002] SIG+ eps y=0.25 -> RELEVANT flags: uses Hamiltonian knowledge, navigated point vector across/y_last/point=0.1
+  stability  -0.1833 [-0.3165, -0.08135] NEG eps y=0.25 -> OFF flags: uses Hamiltonian knowledge, navigated point vector stability/d/point=0.1
+  two_start  INDEP eps two_start=0.01 per size: 27 ZERO! INDEP; 81 ZERO! INDEP; 243 ZERO! INDEP flags: navigated point
+  => verdict NOT  class NOT, verdict.toml line 25
+     why: verdict_x STAGE1: off the window
+point 0.3   case coupled-ising-bilinear   obtained: navigated
+  sink       d_ord 0.2386 [0.2325, 0.2437] SIG+ eps sink=0.02 d_dis 0.7614 [0.7563, 0.7675] SIG+ eps sink=0.02 -> NEITHER flags: navigated point
+  needle     velocity 0.008972 [0.001692, 0.01787] POS eps step=0.01 d_ord 0.2386 [0.2325, 0.2437] SIG+ eps sink=0.02 d_dis 0.7614 [0.7563, 0.7675] SIG+ eps sink=0.02 -> ORD flags: navigated point
+  flow       0.008972 [0.001692, 0.01787] POS eps step=0.01 -> FLOWING flags: navigated point vector needle/velocity/point=0.3
+  across     0.983 [0.905, 1.085] SIG+ eps y=0.25 -> RELEVANT flags: uses Hamiltonian knowledge, navigated point vector across/y_last/point=0.3
+  stability  -0.03554 [-0.1478, 0.1385] ZERO! eps y=0.25 -> STABLE flags: uses Hamiltonian knowledge, navigated point vector stability/d/point=0.3
+  two_start  INDEP eps two_start=0.01 per size: 27 ZERO! INDEP; 81 ZERO! INDEP; 243 ZERO! INDEP flags: navigated point
+  => verdict NOT  class NOT, verdict.toml line 25
+     why: verdict_x STAGE1: off the window
+x5-bilayer: ran
 x7a-bc: REFUSED: tables/scratch/membership.toml:along: along runs door:off_manifold on x7a-bc but this set has no rule for it
 x7a-nnn: REFUSED: tables/scratch/membership.toml:along: along runs door:off_manifold on x7a-nnn but this set has no rule for it
 run x8-ising-needle@scratch -> results/x8-ising-needle@scratch.json

@@ -80,6 +80,11 @@ tables = "verdict-x-rules"
 "0.5" = "NOT"
 "0.55" = "NOT"
 
+[verdicts.x5-bilayer]
+"0.0" = "NOT"
+"0.1" = "NOT"
+"0.3" = "NOT"
+
 [[change]]
 date = "2026-10-01"
 points = ["*"]
@@ -107,3 +112,12 @@ points = ["x4-ising-field:*"]
 why = """NOT at a FIRST-ORDER-LINE decoy: the pipeline needle sits at the ORDERED sink, so STAGE1 \
 says NOT. The toolset's X4_CELL turns (NOT, COEXIST) into FIRST-ORDER-LINE from an h-crossing \
 statistic that v0 has no instrument for; verdict-x-rules cannot reach FIRST-ORDER on this data"""
+
+[[change]]
+date = "2026-10-02"
+points = ["x5-bilayer:*"]
+why = """DECLARED BEFORE THE FIRST RUN of x5-bilayer (plan 0864 P5). NOT at all three points, and CC must equal the toolset's \
+results/X5c.txt (3 of 3). Each is a KNOWN FALSE NEGATIVE (X5-score; toolset LOG E59–E62): the truth is POINT at every g \
+(two decoupled Ising points at g = 0, the Ising class at g 0.1 and 0.3). A navigated critical point re-read at the same K \
+and N reads the needle at NEG or POS inside the margin, which this set maps to FLOWING, so the verdict is NOT. Locked as \
+today's behaviour, not as the right answer; the repair is the v01-rules set (Q1 c')"""

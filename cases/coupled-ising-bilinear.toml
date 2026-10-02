@@ -1,0 +1,36 @@
+# cases/coupled-ising-bilinear.toml - the HELD-OUT, BLIND X5 bilayer (toolset [X5]-[X5c]); never frozen.
+# class_truth is the truth unsealed in toolset results/X5-score.txt; the seal's sha256 is fixtures/X5-truth-2026-10-01.sha256 (MVT clause 4).
+schema = 1
+kind = "case"
+id = "coupled-ising-bilinear"
+family = "two 2D Ising layers with a bilinear inter-layer coupling g s t, at K_c(g)"
+mechanism = """Z2 x Z2 symmetry breaking at an isolated fixed point of the Ising class: the inter-layer coupling g is \\
+relevant (it drives K_c(g) down), so the critical points do not lie on a line of fixed points; g = 0 is two decoupled \\
+Ising points"""
+class_truth = "POINT"
+sampler = "bilayer"
+traps = [
+  """a navigated K sits at the needle's MID by construction (A2), but an independent re-reading at the same K and N \\
+can read NEG or POS inside the margin: a pipeline that maps that to FLOWING says NOT at a true critical point \\
+(the X5 false negatives, toolset LOG E59-E62)""",
+  """K_c(g) is not known to the analyst: the point is the navigated K, so it is on the manifold only to the \\
+resolution of the navigation""",
+]
+decoy_of = "none"
+pairs_with = ["ising-2d", "ising-off-critical"]
+breaker_verdict = ""
+blind_seal = "fixtures/X5-truth-2026-10-01.sha256"
+sources = ["~/software/scratch/compass-toolset/results/X5-score.txt"]
+status = "run"
+studies = ["X5", "X5b", "X5c"]
+
+[controls]
+names = ["g (inter-layer coupling)", "K (intra-layer coupling, navigated)"]
+range = "g 0, 0.1, 0.3 at the navigated K_c(g); L 27-243 (X5c)"
+
+[observables]
+list = [
+  "g1 of the s layer per block level",
+  "E = sum over bonds of s s + t t",
+]
+conjugate_observable = true

@@ -1,5 +1,5 @@
 $ bin/cc validate --advanced
 
-checked: 17 case, 1 cc, 3 codes, 10 data-manifest, 1 family, 4 family-decl, 10 input, 5 instrument, 1 membership, 10 points, 3 verdict
+checked: 18 case, 1 cc, 3 codes, 11 data-manifest, 1 family, 4 family-decl, 11 input, 5 instrument, 1 membership, 11 points, 3 verdict
 validate: clean
 exit 0

@@ -9,7 +9,7 @@ validate: clean
   PASS  2 decoy: a FIRST-ORDER case imitating LINE :: ['bc-beyond-tricritical', 'ising-field-decoy']
   PASS  2 decoy: a FIRST-ORDER case imitating WALKING :: ['potts-q7']
   PASS  3 BKT breaker run, pre-registered verdict scored :: ['clock6-kt-ends', 'xy-tkt']
-  FAIL  4 >= 1 held-out case declared blind and run :: []
+  PASS  4 >= 1 held-out case declared blind and run :: ['coupled-ising-bilinear']
   FAIL  5 signature table enumerated over every in-table case, collisions listed :: 17 in-table case(s); collisions section present; missing ['ar1-null', 'bc-tricritical', 'potts-q6', 'potts-q7']
 -- MVT FAIL
 exit 0

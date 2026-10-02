@@ -32,7 +32,7 @@ X, V = detect.load_tables("verdict-x-rules"), detect.load_tables("v01-rules")
 same = [score.reverdict_result(r, X) for r in olds]
 n = sum(len(a["signature"]) * (json.dumps(a["signature"]) == json.dumps(b["signature"])
                                and json.dumps(a["readings"]) == json.dumps(b["readings"])) for a, b in zip(same, olds))
-check("reverdict under verdict-x-rules reproduces every frozen verdict, byte for byte (60 of 60)", n == 60, str(n))
+check("reverdict under verdict-x-rules reproduces every frozen verdict, byte for byte (63 of 63)", n == 63, str(n))
 check("a derived result names its parent and the parent's vectors",
       all(a["derived_from"] == b["run_id"] and a["vectors"] == b["vectors"] for a, b in zip(same, olds)))
 real = {r["input"]: json.loads((ROOT / "results" / f"{r['input']}@v01-rules.json").read_text()) for r in olds}
