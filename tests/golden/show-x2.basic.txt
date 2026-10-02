@@ -1,0 +1,48 @@
+$ bin/cc show x2-xy-line
+x2-xy-line   rules: verdict-x-rules   result: results/x2-xy-line@verdict-x-rules.json (frozen)
+point 0.5   case xy-low-phase
+  sink       d_ord 0.07124 [0.07094, 0.07154] SIG+ d_dis 0.9288 [0.9285, 0.9291] SIG+ -> NEITHER
+  needle     velocity 0.0008027 [0.0003857, 0.001277] SLOW+ d_ord 0.07124 [0.07094, 0.07154] SIG+ d_dis 0.9288 [0.9285, 0.9291] SIG+ -> MID
+  flow       0.0008027 [0.0003857, 0.001277] SLOW+ -> SLOW
+  across     0.01172 [-0.6621, 0.3645] BLANK (UNRES: interval straddles 0 and a margin edge)
+  stability  0.1041 [-0.6771, 0.5513] BLANK (UNRES: interval straddles 0 and a margin edge)
+  two_start  INDEP
+  => verdict BLANK (REFUSE-SLOW)
+     why: verdict_x STAGE3: slow flow
+point 0.6   case xy-low-phase
+  sink       d_ord 0.08854 [0.08815, 0.08889] SIG+ d_dis 0.9115 [0.9111, 0.9119] SIG+ -> NEITHER
+  needle     velocity 0.001239 [0.0007177, 0.001869] SLOW+ d_ord 0.08854 [0.08815, 0.08889] SIG+ d_dis 0.9115 [0.9111, 0.9119] SIG+ -> MID
+  flow       0.001239 [0.0007177, 0.001869] SLOW+ -> SLOW
+  across     0.6956 [0.3908, 0.9802] SIG+ -> RELEVANT
+  stability  0.9112 [0.4498, 1.363] SIG+ -> CROSSING
+  two_start  INDEP
+  => verdict BLANK (REFUSE-SLOW)
+     why: verdict_x STAGE3: slow flow
+point 0.7   case xy-low-phase
+  sink       d_ord 0.108 [0.1077, 0.1084] SIG+ d_dis 0.892 [0.8916, 0.8923] SIG+ -> NEITHER
+  needle     velocity 0.001721 [0.001106, 0.00223] SLOW+ d_ord 0.108 [0.1077, 0.1084] SIG+ d_dis 0.892 [0.8916, 0.8923] SIG+ -> MID
+  flow       0.001721 [0.001106, 0.00223] SLOW+ -> SLOW
+  across     -0.03746 [-0.6481, 0.3925] BLANK (UNRES: interval straddles 0 and a margin edge)
+  stability  0.1437 [-0.479, 0.7047] BLANK (UNRES: interval straddles 0 and a margin edge)
+  two_start  INDEP
+  => verdict BLANK (REFUSE-SLOW)
+     why: verdict_x STAGE3: slow flow
+point 0.89294   case xy-tkt
+  sink       d_ord 0.1707 [0.17, 0.1714] SIG+ d_dis 0.8293 [0.8286, 0.83] SIG+ -> NEITHER
+  needle     velocity 0.0001317 [-0.0008727, 0.00099] ZERO! d_ord 0.1707 [0.17, 0.1714] SIG+ d_dis 0.8293 [0.8286, 0.83] SIG+ -> MID
+  flow       0.0001317 [-0.0008727, 0.00099] ZERO! -> STOPPED
+  across     0.1827 [-0.0534, 0.3652] BLANK (UNRES: interval straddles 0 and a margin edge)
+  stability  0.01203 [-0.26, 0.2277] BLANK (UNRES: interval straddles 0 and a margin edge)
+  two_start  INDEP
+  => verdict BLANK (REFUSE-UNRES)
+     why: verdict_x CAND_GS: across unresolved, whatever stability reads
+point 1.1   case none
+  sink       d_ord 0.8497 [0.8488, 0.8504] SIG+ d_dis 0.1503 [0.1496, 0.1512] SIG+ -> NEITHER
+  needle     velocity -0.223 [-0.2246, -0.2215] SIG- d_ord 0.8497 [0.8488, 0.8504] SIG+ d_dis 0.1503 [0.1496, 0.1512] SIG+ -> DIS
+  flow       -0.223 [-0.2246, -0.2215] SIG- -> FLOWING
+  across     -0.2223 [-0.3324, -0.1081] NEG -> IRRELEVANT
+  stability  -0.4377 [-0.5758, -0.3067] SIG- -> OFF
+  two_start  INDEP
+  => verdict NOT
+     why: verdict_x STAGE1: off the window
+exit 0

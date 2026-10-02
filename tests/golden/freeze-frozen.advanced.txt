@@ -1,0 +1,3 @@
+$ bin/cc freeze w2-potts@verdict-x-rules --advanced
+froze 0 files, 0 dir for w2-potts@verdict-x-rules
+exit 0

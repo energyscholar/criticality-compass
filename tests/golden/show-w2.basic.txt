@@ -1,5 +1,5 @@
 $ bin/cc show w2-potts
-w2-potts   rules: verdict-x-rules   result: results/w2-potts@verdict-x-rules.json (not frozen)
+w2-potts   rules: verdict-x-rules   result: results/w2-potts@verdict-x-rules.json (frozen)
 point 2   case ising-2d
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
   needle     BLANK (NOT-MEASURED: needle is not declared on this input)

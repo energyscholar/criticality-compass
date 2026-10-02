@@ -1,0 +1,3 @@
+$ bin/cc tables drop my-rules
+dropped tables/my-rules
+exit 0

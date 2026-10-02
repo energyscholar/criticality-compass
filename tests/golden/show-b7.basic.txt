@@ -1,5 +1,5 @@
 $ bin/cc show b7-at-line
-b7-at-line   rules: verdict-x-rules   result: results/b7-at-line@verdict-x-rules.json (not frozen)
+b7-at-line   rules: verdict-x-rules   result: results/b7-at-line@verdict-x-rules.json (frozen)
 point 0.0   case at-self-dual-line
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
   needle     BLANK (NOT-MEASURED: needle is not declared on this input)

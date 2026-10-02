@@ -1,0 +1,4 @@
+$ bin/cc tables fork verdict-x-rules my-rules
+forked tables/verdict-x-rules to tables/my-rules
+  Next: edit tables/my-rules/verdict.toml, then bin/cc validate, then bin/cc run --all --tables my-rules
+exit 0

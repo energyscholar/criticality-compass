@@ -1,0 +1,4 @@
+$ bin/cc validate
+
+validate: clean
+exit 0

@@ -4,7 +4,7 @@
  "run_id": "x3-clock6@verdict-x-rules",
  "input": "x3-clock6",
  "tables": "verdict-x-rules",
- "code_commit": "c673ee56ac30546a2ebf99cb5f0872eb69ffd001",
+ "code_commit": "27b36c242b12fc905afab15c605ea9477f638cf5",
  "interval": {
   "method": "block",
   "b": 400,

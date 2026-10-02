@@ -1,0 +1,4 @@
+$ bin/cc data add w2-potts
+fixtures/data/w2-potts.toml already exists.
+  Next: delete it first if it is unfrozen and you mean to re-pin
+exit 1

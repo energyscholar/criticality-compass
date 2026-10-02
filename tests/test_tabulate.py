@@ -55,6 +55,8 @@ cells = [int(n) for n in re.findall(r'data-cells="(\d+)"', page)]
 check("the page's cell counts sum to 45 360 and some rows were never hit", sum(cells) == 45360 and 'class=never' in page, str(sum(cells)))
 with tempfile.TemporaryDirectory() as t:
     shutil.copytree(ROOT / "tables" / "verdict-x-rules", Path(t) / "d13")
+    for q in [Path(t) / "d13", *(Path(t) / "d13").rglob("*")]:   # the copy only; the live set is frozen
+        q.chmod(q.stat().st_mode | 0o200)
     f = Path(t) / "d13" / "verdict.toml"
     text = f.read_text()
     flip = text.replace('when.two_start = ["INDEP"]', 'when.two_start = ["INDEP", "UNRES"]').replace('["FLUCT", "UNRES"]', '["FLUCT"]')

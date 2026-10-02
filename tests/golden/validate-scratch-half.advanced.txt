@@ -1,0 +1,9 @@
+$ bin/cc validate --advanced
+tables/scratch/verdict.toml: 1512 uncovered cells in 1 patterns
+  [[row]]
+  when.needle = ["MID"]
+  when.two_start = ["UNRES"]
+  Next: add a [[row]] with one of these when-lines, or widen a neighbouring row
+checked: 17 case, 1 cc, 2 codes, 7 data-manifest, 7 input, 4 instrument, 7 points, 2 verdict
+validate: 1 findings
+exit 1

@@ -1,0 +1,5 @@
+$ bin/cc validate --advanced
+
+checked: 17 case, 1 cc, 2 codes, 7 data-manifest, 7 input, 4 instrument, 7 points, 2 verdict
+validate: clean
+exit 0

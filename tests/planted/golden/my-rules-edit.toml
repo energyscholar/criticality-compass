@@ -1,0 +1,166 @@
+# tables/verdict-x-rules/verdict.toml - a declared PARTITION of the signature domain (data).
+# Order-free: the validator expands every row to its cells and refuses unless the rows are
+# pairwise disjoint and cover the whole domain. A column a row's `when` omits matches every
+# value of that column (nulls included). A row's `why` is printed by `bin/cc explain`.
+schema = 1
+kind = "verdict"
+columns = ["needle", "sink", "flow", "across", "stability", "two_start"]   # = codes.toml signature
+ignores = ["sink"]                             # read by no row: declared, with the reason
+ignores_reason = """v0 transcribes verdict_x, which has no sink column; the sink already acts \
+through the derived needle code (codes.toml columns.signature.needle)."""
+verdicts = [
+  "POINT", "LINE", "WALKING", "FIRST-ORDER", "NOT", "REFUSE-EQUIL", "REFUSE-SLOW", "REFUSE-FLOW",
+  "REFUSE-WEAK", "REFUSE-OFF", "REFUSE-IRRELEVANT", "REFUSE-UNRES", "REFUSE-NEEDLE-UNMEASURED",
+  "REFUSE-TWO-START-UNMEASURED", "REFUSE-FLOW-UNMEASURED", "REFUSE-ACROSS-UNMEASURED",
+  "REFUSE-STABILITY-UNMEASURED",
+]
+# verdict class: a verdict in `refuse` scores as REFUSE; any other verdict scores as itself
+# (it must be a class_truth name) unless [class_of] names its class.
+refuse = [
+  "REFUSE-EQUIL", "REFUSE-SLOW", "REFUSE-FLOW", "REFUSE-WEAK", "REFUSE-OFF", "REFUSE-IRRELEVANT",
+  "REFUSE-UNRES", "REFUSE-NEEDLE-UNMEASURED", "REFUSE-TWO-START-UNMEASURED",
+  "REFUSE-FLOW-UNMEASURED", "REFUSE-ACROSS-UNMEASURED", "REFUSE-STABILITY-UNMEASURED",
+]
+
+[[row]]
+when.needle = ["DIS", "ORD"]
+verdict = "NOT"
+why = "verdict_x STAGE1: off the window"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["COEXIST"]
+verdict = "FIRST-ORDER"
+why = "verdict_x STAGE2: the two starts coexist at the window"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["FLUCT", "UNRES"]
+verdict = "REFUSE-EQUIL"
+why = """verdict_x STAGE2: an unresolved or fluctuating two-start difference cannot certify \
+equilibrium (open choice: UNRES could instead pass with INDEP)"""
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["SLOW"]
+verdict = "REFUSE-SLOW"
+why = "verdict_x STAGE3: slow flow"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["FLOWING"]
+verdict = "NOT"
+why = "verdict_x STAGE3: the needle still flows"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["UNRES"]
+verdict = "REFUSE-FLOW"
+why = "verdict_x STAGE3: flow unresolved"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["STOPPED"]
+when.across = ["RELEVANT"]
+when.stability = ["STABLE"]
+verdict = "POINT"
+why = "verdict_x CAND_GS: relevant and stable"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["STOPPED"]
+when.across = ["MARGINAL"]
+when.stability = ["STABLE"]
+verdict = "LINE"
+why = "verdict_x CAND_GS: marginal and stable"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["STOPPED"]
+when.across = ["RELEVANT", "MARGINAL"]
+when.stability = ["CROSSING"]
+verdict = "WALKING"
+why = "verdict_x CAND_GS: the exponent crosses with size"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["STOPPED"]
+when.across = ["RELEVANT", "MARGINAL"]
+when.stability = ["OFF"]
+verdict = "REFUSE-OFF"
+why = "verdict_x CAND_GS: stability reads off"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["STOPPED"]
+when.across = ["RELEVANT", "MARGINAL"]
+when.stability = ["UNRES"]
+verdict = "REFUSE-UNRES"
+why = "verdict_x CAND_GS: stability unresolved"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["STOPPED"]
+when.across = ["WEAK"]
+verdict = "REFUSE-WEAK"
+why = "verdict_x CAND_GS: WEAK refuses whatever stability reads (nulls included)"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["STOPPED"]
+when.across = ["IRRELEVANT"]
+verdict = "REFUSE-IRRELEVANT"
+why = "verdict_x CAND_GS: IRRELEVANT refuses whatever stability reads"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["STOPPED"]
+when.across = ["UNRES"]
+verdict = "REFUSE-UNRES"
+why = "verdict_x CAND_GS: across unresolved, whatever stability reads"
+
+[[row]]
+when.needle = ["NOT-MEASURED", "NOT-EVALUATED"]
+verdict = "NOT"
+why = "honest null (not in verdict_x): the needle was not measured or not evaluated"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["NOT-MEASURED", "NOT-EVALUATED"]
+verdict = "REFUSE-TWO-START-UNMEASURED"
+why = "honest null: the two-start difference was not measured or not evaluated"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["NOT-MEASURED", "NOT-EVALUATED"]
+verdict = "REFUSE-FLOW-UNMEASURED"
+why = "honest null: flow was not measured or not evaluated"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["STOPPED"]
+when.across = ["NOT-MEASURED", "NOT-EVALUATED"]
+verdict = "REFUSE-ACROSS-UNMEASURED"
+why = "honest null: across was not measured or not evaluated"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["STOPPED"]
+when.across = ["RELEVANT", "MARGINAL"]
+when.stability = ["NOT-MEASURED", "NOT-EVALUATED"]
+verdict = "REFUSE-STABILITY-UNMEASURED"
+why = "honest null: stability was not measured or not evaluated"

@@ -1,7 +1,7 @@
 $ bin/cc show b7-at-line --advanced
-b7-at-line   rules: verdict-x-rules   result: results/b7-at-line@verdict-x-rules.json (not frozen)
+b7-at-line   rules: verdict-x-rules   result: results/b7-at-line@verdict-x-rules.json (frozen)
   interval: block resamples 400, level 0.95, seed 22
-  code_commit: 20ab7bdb0a4634b0faec15e1d4548afefe423c36
+  code_commit: 27b36c242b12fc905afab15c605ea9477f638cf5
   read inputs/b7-at-line/m.toml d0d267e3857c
   read instruments/across.toml 8f6803e8af6c
   read instruments/stability.toml 2fc7bb21b58a

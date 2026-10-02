@@ -19,6 +19,8 @@ def check(name, ok, why=""):
 with tempfile.TemporaryDirectory() as t:
     repo = Path(t) / "repo"
     shutil.copytree(ROOT, repo, ignore=shutil.ignore_patterns(".git", "__pycache__"))
+    for q in [repo, *repo.rglob("*")]:               # the live tree is frozen; only this copy is made writable
+        q.chmod(q.stat().st_mode | 0o200)
 
     def cc(*args):
         r = subprocess.run([sys.executable, str(repo / "bin" / "cc"), *args], capture_output=True, text=True, cwd=repo)
@@ -76,21 +78,22 @@ with tempfile.TemporaryDirectory() as t:
     check("run names the inputs when the name is wrong",
           rc == 1 and "no input 'w2'. Inputs:" in out and "Next:" in out, out)
 
-    rid = "c2-bc-two-start@verdict-x-rules"
-    rc, out = cc("run", "c2-bc-two-start")
+    cc("tables", "fork", "verdict-x-rules", "t2")    # the live verdict-x-rules is already frozen
+    rid = "c2-bc-two-start@t2"
+    rc, out = cc("run", "c2-bc-two-start", "--tables", "t2")
     check("run writes the result JSON and NPZ",
           rc == 0 and (repo / f"results/{rid}.json").is_file() and (repo / f"results/{rid}.npz").is_file(), out)
     rc, out = cc("freeze", rid)
     check("freeze freezes the result, what it read, and the table set",
           rc == 0 and out.startswith("froze ") and "1 dir for" in out, out)
-    rc, out = cc("run", "c2-bc-two-start")
+    rc, out = cc("run", "c2-bc-two-start", "--tables", "t2")
     refused = f"REFUSED: results/{rid}.json is frozen (a frozen result never changes)."
-    nxt = ("Next: bin/cc tables fork verdict-x-rules <new-name>, edit tables/<new-name>/verdict.toml, "
+    nxt = ("Next: bin/cc tables fork t2 <new-name>, edit tables/<new-name>/verdict.toml, "
            "then bin/cc run c2-bc-two-start --tables <new-name>")
     check("a frozen result id is refused with its Next line", rc == 1 and refused in out and nxt in out, out)
-    rc, out = cc("run", "c2-bc-two-start", "--dry")
+    rc, out = cc("run", "c2-bc-two-start", "--tables", "t2", "--dry")
     check("a dry run of a frozen id writes nothing and is allowed", rc == 0 and "dry: nothing written" in out, out)
-    rc, out = cc("tables", "drop", "verdict-x-rules")
+    rc, out = cc("tables", "drop", "t2")
     check("a frozen set is never dropped", rc == 1 and "Next:" in out, out)
     v = repo / "tables/verdict-x-rules/verdict.toml"
     v.chmod(0o644)

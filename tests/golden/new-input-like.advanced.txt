@@ -1,0 +1,4 @@
+$ bin/cc new input w2b --like w2-potts --points 6,7 --advanced
+wrote inputs/w2b/m.toml and points.toml (like w2-potts)
+  Next: fix every TODO, then bin/cc data add w2b and bin/cc validate
+exit 0

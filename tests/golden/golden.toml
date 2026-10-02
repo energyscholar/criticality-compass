@@ -67,3 +67,134 @@ phase = 4
 "join-unknown-case.toml" = "inputs/w2-potts/points.toml"
 "uncovered-verdict.toml" = "tables/golden-bad/verdict.toml"
 "todo-case.toml" = "cases/golden-todo.toml"
+
+# ---- phase 5: every command a doc shows ---------------------------------------------------
+# A `before` command runs BEFORE the plants, so a case that must run after an edit plants the
+# edited file and runs the command itself.
+
+[[case]]
+id = "new-case"
+argv = ["new", "case", "potts-q4"]
+phase = 5
+
+[[case]]
+id = "tables-fork-my-rules"
+argv = ["tables", "fork", "verdict-x-rules", "my-rules"]
+phase = 5
+
+[[case]]
+id = "validate-my-rules"
+before = [["tables", "fork", "verdict-x-rules", "my-rules"]]
+argv = ["validate"]
+phase = 5
+
+[case.plant]
+"my-rules-edit.toml" = "tables/my-rules/verdict.toml"
+
+[[case]]
+id = "run-dry-my-rules"
+before = [["tables", "fork", "verdict-x-rules", "my-rules"]]
+argv = ["run", "w2-potts", "--tables", "my-rules", "--dry"]
+phase = 5
+
+[case.plant]
+"my-rules-edit.toml" = "tables/my-rules/verdict.toml"
+
+[[case]]
+id = "tables-drop-my-rules"
+before = [["tables", "fork", "verdict-x-rules", "my-rules"]]
+argv = ["tables", "drop", "my-rules"]
+phase = 5
+
+[[case]]
+id = "tables-fork-scratch"
+argv = ["tables", "fork", "verdict-x-rules", "scratch"]
+phase = 5
+
+[[case]]
+id = "validate-scratch-half"
+before = [["tables", "fork", "verdict-x-rules", "scratch"]]
+argv = ["validate"]
+phase = 5
+
+[case.plant]
+"scratch-half.toml" = "tables/scratch/verdict.toml"
+
+[[case]]
+id = "validate-scratch"
+before = [["tables", "fork", "verdict-x-rules", "scratch"]]
+argv = ["validate"]
+phase = 5
+
+[case.plant]
+"scratch-d13.toml" = "tables/scratch/verdict.toml"
+
+[[case]]
+id = "run-all-scratch"
+before = [["tables", "fork", "verdict-x-rules", "scratch"]]
+argv = ["run", "--all", "--tables", "scratch"]
+phase = 5
+
+[case.plant]
+"scratch-d13.toml" = "tables/scratch/verdict.toml"
+
+[[case]]
+id = "tabulate-diff-scratch"      # no scratch results here: a run before the plant would be stale
+before = [["tables", "fork", "verdict-x-rules", "scratch"]]
+argv = ["tabulate", "--diff", "verdict-x-rules", "scratch"]
+phase = 5
+
+[case.plant]
+"scratch-d13.toml" = "tables/scratch/verdict.toml"
+
+[[case]]
+id = "tables-drop-scratch"
+before = [["tables", "fork", "verdict-x-rules", "scratch"], ["run", "--all", "--tables", "scratch"]]
+argv = ["tables", "drop", "scratch", "--with-results"]
+phase = 5
+
+[[case]]
+id = "tables-split"
+before = [["tables", "fork", "verdict-x-rules", "mine"]]
+argv = ["tables", "split", "mine", "--column", "two_start", "--value", "UNRES", "--verdict", "REFUSE-EQUIL"]
+phase = 5
+
+[[case]]
+id = "new-input-like"
+argv = ["new", "input", "w2b", "--like", "w2-potts", "--points", "6,7"]
+phase = 5
+
+[[case]]
+id = "data-add-pinned"
+argv = ["data", "add", "w2-potts"]
+phase = 5
+
+[[case]]
+id = "freeze-frozen"
+argv = ["freeze", "w2-potts@verdict-x-rules"]
+phase = 5
+
+[[case]]
+id = "run-frozen"
+argv = ["run", "w2-potts"]
+phase = 5
+
+[[case]]
+id = "tabulate"
+argv = ["tabulate"]
+phase = 5
+
+[[case]]
+id = "validate-mvt"
+argv = ["validate", "--mvt"]
+phase = 5
+
+[[case]]
+id = "explain-x4"
+argv = ["explain", "x4-ising-field", "0.5"]
+phase = 5
+
+[[case]]
+id = "show-x2"
+argv = ["show", "x2-xy-line"]
+phase = 5

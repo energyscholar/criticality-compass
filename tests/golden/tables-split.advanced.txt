@@ -1,0 +1,4 @@
+$ bin/cc tables split mine --column two_start --value UNRES --verdict REFUSE-EQUIL --advanced
+split touched 3 rows (20 rows now)
+tables/mine/verdict.toml: clean
+exit 0

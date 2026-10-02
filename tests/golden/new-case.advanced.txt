@@ -1,0 +1,4 @@
+$ bin/cc new case potts-q4 --advanced
+wrote cases/potts-q4.toml
+  Next: fill every TODO in cases/potts-q4.toml, map points to it in inputs/<input>/points.toml, then bin/cc validate
+exit 0
