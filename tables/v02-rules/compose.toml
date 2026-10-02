@@ -34,6 +34,6 @@ verdict = "REFUSE-TWO-START-UNMEASURED"
 why = "honest null: the two-start difference was not measured or not evaluated"
 
 [[row]]
-when.order = ["EQUILIBRATED"]
+when.order = ["EQUILIBRATED", "CONTINUOUS", "FIRST-ORDER-TUNNELLING", "EQUILIBRATED-UNRES"]
 verdict = "@geometry"
-why = "the starts agree at the window: the geometry decides"
+why = "the starts agree at the window: the geometry decides (the fluct split names the order but moves no verdict, plan 0866 P-B)"

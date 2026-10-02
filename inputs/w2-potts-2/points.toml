@@ -1,0 +1,11 @@
+# inputs/w2-potts-2/points.toml - the point -> case JOIN (taxonomy; NEVER frozen;
+# read only by tabulate and the full validate)
+schema = 1
+kind = "points"
+input = "w2-potts-2"
+
+[points]
+"2" = "ising-2d"                         # Potts q = 2 is the Ising model
+"3" = "potts-q3"
+"4" = "none"                             # no potts-q4 case yet: declared, not omitted
+"5" = "potts-q5"

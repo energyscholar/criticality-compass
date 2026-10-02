@@ -368,6 +368,9 @@ def chk_input(p, d, c, stem=None):
         out += when(not want and name in d, p, name, "table present but no declared instrument uses it",
                     f"delete [{name}], or declare the instrument")
         out += shape(p, d[name], SIDECAR_SHAPE[name], pre=f"{name}.") if name in d else []
+    out += when("two_start" in d and isinstance(d["two_start"].get("unit_scale"), dict)
+                and sorted(d["two_start"]["unit_scale"]) != sorted(map(str, sz)), p, "two_start.unit_scale",
+                f"must declare a unit scale for every size {list(map(str, sz))}", "add the missing sizes, or remove the extra ones")
     out += when(need("relations") and "relations" not in d, p, "relations",
                 "missing required table (a declared instrument needs it)", "add [relations.<name>]")
     out += when(not need("relations") and "relations" in d, p, "relations",

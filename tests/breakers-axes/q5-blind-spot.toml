@@ -1,0 +1,29 @@
+# tests/breakers-axes/q5-blind-spot.toml - an AXIS BREAKER (data; read by tests/test_axes.py)
+schema = 1
+kind = "axis-breaker"
+id = "q5-blind-spot"
+rule = "at L << xi a weakly first-order point reads CONTINUOUS (a resolution limit), never FIRST-ORDER-TUNNELLING and never FIRST-ORDER"
+why = """Potts q = 5 has xi ~ 2500 >> every L reached: the starts agree, the variance per bond falls with size (fluct \
+VANISHES), the needle sits on the window with a slow flow. The honest reading is order CONTINUOUS and the geometry's own \
+refusal; calling it FIRST-ORDER-TUNNELLING would be the bad failure (plan 0866 Q3: CONTINUOUS at q = 5 is the resolution \
+limit, FIRST-ORDER at q = 5 is the failure). The blind spot is structural and pre-registered, not a bug."""
+tables = "v02-rules"
+
+[cells]
+"needle.velocity" = "SLOW+"
+"needle.d_ord" = "SIG+"
+"needle.d_dis" = "SIG+"
+"across.y_last" = "SIG+"
+"stability.d" = "UNRES"
+"two_start.D" = ["ZERO!"]
+"fluct.y_last" = "SIG-"
+
+[expect]
+geometry = "REFUSE-SLOW"
+order = "CONTINUOUS"
+verdict = "REFUSE-SLOW"
+
+[mutation]
+file = "tables/v02-rules/order.toml"
+intent = "a vanishing variance at agreeing starts reads FIRST-ORDER-TUNNELLING"
+py = '''s.replace('when.fluct = ["VANISHES"]\nverdict = "CONTINUOUS"', 'when.fluct = ["VANISHES"]\nverdict = "FIRST-ORDER-TUNNELLING"')'''

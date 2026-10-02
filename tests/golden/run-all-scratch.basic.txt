@@ -48,6 +48,7 @@ point 0.2747   case at-self-dual-line
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
 b7-at-line: ran
 b7-at-line-2: REFUSED: tables/scratch/membership.toml:along: along runs door:off_manifold on b7-at-line-2 but this set has no rule for it
+b7-at-line-3: REFUSED: tables/scratch/membership.toml:along: along runs door:off_manifold on b7-at-line-3 but this set has no rule for it
 run c2-bc-two-start@scratch -> results/c2-bc-two-start@scratch.json
 c2-bc-two-start   rules: scratch   result: results/c2-bc-two-start@scratch.json (not frozen)
 point d2.0-K1.0   case bc-beyond-tricritical
@@ -333,6 +334,45 @@ point 5   case potts-q5
   => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
 w2-potts: ran
+run w2-potts-2@scratch -> results/w2-potts-2@scratch.json
+w2-potts-2   rules: scratch   result: results/w2-potts-2@scratch.json (not frozen)
+point 2   case ising-2d
+  sink       BLANK (NOT-MEASURED: needle is not declared on this input)
+  needle     BLANK (NOT-MEASURED: needle is not declared on this input)
+  flow       BLANK (NOT-MEASURED: needle is not declared on this input)
+  across     0.9974 [0.9666, 1.027] SIG+ -> RELEVANT
+  stability  0.01804 [-0.02606, 0.06558] ZERO! -> STABLE
+  two_start  INDEP
+  => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
+     why: honest null (not in verdict_x): the needle was not measured or not evaluated
+point 3   case potts-q3
+  sink       BLANK (NOT-MEASURED: needle is not declared on this input)
+  needle     BLANK (NOT-MEASURED: needle is not declared on this input)
+  flow       BLANK (NOT-MEASURED: needle is not declared on this input)
+  across     1.182 [1.125, 1.241] SIG+ -> RELEVANT
+  stability  -0.006195 [-0.1008, 0.07911] ZERO! -> STABLE
+  two_start  INDEP
+  => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
+     why: honest null (not in verdict_x): the needle was not measured or not evaluated
+point 4   case none
+  sink       BLANK (NOT-MEASURED: needle is not declared on this input)
+  needle     BLANK (NOT-MEASURED: needle is not declared on this input)
+  flow       BLANK (NOT-MEASURED: needle is not declared on this input)
+  across     1.442 [1.306, 1.561] SIG+ -> RELEVANT
+  stability  -0.00606 [-0.1688, 0.1701] ZERO! -> STABLE
+  two_start  INDEP
+  => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
+     why: honest null (not in verdict_x): the needle was not measured or not evaluated
+point 5   case potts-q5
+  sink       BLANK (NOT-MEASURED: needle is not declared on this input)
+  needle     BLANK (NOT-MEASURED: needle is not declared on this input)
+  flow       BLANK (NOT-MEASURED: needle is not declared on this input)
+  across     1.679 [1.417, 1.932] SIG+ -> RELEVANT
+  stability  0.08076 [-0.3098, 0.5382] BLANK (UNRES: interval straddles 0 and a margin edge)
+  two_start  BLANK (UNRES: interval straddles 0 and a margin edge)
+  => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
+     why: honest null (not in verdict_x): the needle was not measured or not evaluated
+w2-potts-2: ran
 run x2-xy-line@scratch -> results/x2-xy-line@scratch.json
 x2-xy-line   rules: scratch   result: results/x2-xy-line@scratch.json (not frozen)
 point 0.5   case xy-low-phase
@@ -381,6 +421,54 @@ point 1.1   case none
   => verdict NOT
      why: verdict_x STAGE1: off the window
 x2-xy-line: ran
+run x2-xy-line-2@scratch -> results/x2-xy-line-2@scratch.json
+x2-xy-line-2   rules: scratch   result: results/x2-xy-line-2@scratch.json (not frozen)
+point 0.5   case xy-low-phase
+  sink       d_ord 0.07124 [0.07094, 0.07154] SIG+ d_dis 0.9288 [0.9285, 0.9291] SIG+ -> NEITHER
+  needle     velocity 0.0008027 [0.0003857, 0.001277] SLOW+ d_ord 0.07124 [0.07094, 0.07154] SIG+ d_dis 0.9288 [0.9285, 0.9291] SIG+ -> MID
+  flow       0.0008027 [0.0003857, 0.001277] SLOW+ -> SLOW
+  across     0.01172 [-0.6621, 0.3645] BLANK (UNRES: interval straddles 0 and a margin edge)
+  stability  0.1041 [-0.6771, 0.5513] BLANK (UNRES: interval straddles 0 and a margin edge)
+  two_start  INDEP
+  => verdict BLANK (REFUSE-SLOW)
+     why: verdict_x STAGE3: slow flow
+point 0.6   case xy-low-phase
+  sink       d_ord 0.08854 [0.08815, 0.08889] SIG+ d_dis 0.9115 [0.9111, 0.9119] SIG+ -> NEITHER
+  needle     velocity 0.001239 [0.0007177, 0.001869] SLOW+ d_ord 0.08854 [0.08815, 0.08889] SIG+ d_dis 0.9115 [0.9111, 0.9119] SIG+ -> MID
+  flow       0.001239 [0.0007177, 0.001869] SLOW+ -> SLOW
+  across     0.6956 [0.3908, 0.9802] SIG+ -> RELEVANT
+  stability  0.9112 [0.4498, 1.363] SIG+ -> CROSSING
+  two_start  INDEP
+  => verdict BLANK (REFUSE-SLOW)
+     why: verdict_x STAGE3: slow flow
+point 0.7   case xy-low-phase
+  sink       d_ord 0.108 [0.1077, 0.1084] SIG+ d_dis 0.892 [0.8916, 0.8923] SIG+ -> NEITHER
+  needle     velocity 0.001721 [0.001106, 0.00223] SLOW+ d_ord 0.108 [0.1077, 0.1084] SIG+ d_dis 0.892 [0.8916, 0.8923] SIG+ -> MID
+  flow       0.001721 [0.001106, 0.00223] SLOW+ -> SLOW
+  across     -0.03746 [-0.6481, 0.3925] BLANK (UNRES: interval straddles 0 and a margin edge)
+  stability  0.1437 [-0.479, 0.7047] BLANK (UNRES: interval straddles 0 and a margin edge)
+  two_start  INDEP
+  => verdict BLANK (REFUSE-SLOW)
+     why: verdict_x STAGE3: slow flow
+point 0.89294   case xy-tkt
+  sink       d_ord 0.1707 [0.17, 0.1714] SIG+ d_dis 0.8293 [0.8286, 0.83] SIG+ -> NEITHER
+  needle     velocity 0.0001317 [-0.0008727, 0.00099] ZERO! d_ord 0.1707 [0.17, 0.1714] SIG+ d_dis 0.8293 [0.8286, 0.83] SIG+ -> MID
+  flow       0.0001317 [-0.0008727, 0.00099] ZERO! -> STOPPED
+  across     0.1827 [-0.0534, 0.3652] BLANK (UNRES: interval straddles 0 and a margin edge)
+  stability  0.01203 [-0.26, 0.2277] BLANK (UNRES: interval straddles 0 and a margin edge)
+  two_start  INDEP
+  => verdict BLANK (REFUSE-UNRES)
+     why: verdict_x CAND_GS: across unresolved, whatever stability reads
+point 1.1   case none
+  sink       d_ord 0.8497 [0.8488, 0.8504] SIG+ d_dis 0.1503 [0.1496, 0.1512] SIG+ -> NEITHER
+  needle     velocity -0.223 [-0.2246, -0.2215] SIG- d_ord 0.8497 [0.8488, 0.8504] SIG+ d_dis 0.1503 [0.1496, 0.1512] SIG+ -> DIS
+  flow       -0.223 [-0.2246, -0.2215] SIG- -> FLOWING
+  across     -0.2223 [-0.3324, -0.1081] NEG -> IRRELEVANT
+  stability  -0.4377 [-0.5758, -0.3067] SIG- -> OFF
+  two_start  INDEP
+  => verdict NOT
+     why: verdict_x STAGE1: off the window
+x2-xy-line-2: ran
 run x3-clock6@scratch -> results/x3-clock6@scratch.json
 x3-clock6   rules: scratch   result: results/x3-clock6@scratch.json (not frozen)
 point 0.5   case none
@@ -447,6 +535,72 @@ point 1.1   case none
   => verdict NOT
      why: verdict_x STAGE1: off the window
 x3-clock6: ran
+run x3-clock6-2@scratch -> results/x3-clock6-2@scratch.json
+x3-clock6-2   rules: scratch   result: results/x3-clock6-2@scratch.json (not frozen)
+point 0.5   case none
+  sink       d_ord 0 [0, 0] ZERO! d_dis 1 [1, 1] SIG+ -> ORD
+  needle     velocity 7.834e-05 [4.87e-05, 0.0001097] SLOW+ d_ord 0 [0, 0] ZERO! d_dis 1 [1, 1] SIG+ -> ORD
+  flow       7.834e-05 [4.87e-05, 0.0001097] SLOW+ -> SLOW
+  across     BLANK (NOT-EVALUATED: R = 0)
+  stability  BLANK (NOT-EVALUATED: R = 0)
+  two_start  INDEP
+  => verdict NOT
+     why: verdict_x STAGE1: off the window
+point 0.7014   case clock6-kt-ends
+  sink       d_ord 0.1717 [0.1706, 0.1728] SIG+ d_dis 0.8283 [0.8272, 0.8294] SIG+ -> NEITHER
+  needle     velocity -0.002581 [-0.004046, -0.001051] SLOW- d_ord 0.1717 [0.1706, 0.1728] SIG+ d_dis 0.8283 [0.8272, 0.8294] SIG+ -> MID
+  flow       -0.002581 [-0.004046, -0.001051] SLOW- -> SLOW
+  across     -0.009701 [-0.3, 0.2096] BLANK (UNRES: interval straddles 0 and a margin edge)
+  stability  -0.2794 [-0.5931, 0.001367] BLANK (UNRES: interval straddles 0 and a margin edge)
+  two_start  INDEP
+  => verdict BLANK (REFUSE-SLOW)
+     why: verdict_x STAGE3: slow flow
+point 0.75   case clock6-critical-phase
+  sink       d_ord 0.2086 [0.2079, 0.2095] SIG+ d_dis 0.7914 [0.7905, 0.7921] SIG+ -> NEITHER
+  needle     velocity -0.005042 [-0.006277, -0.003735] SLOW- d_ord 0.2086 [0.2079, 0.2095] SIG+ d_dis 0.7914 [0.7905, 0.7921] SIG+ -> MID
+  flow       -0.005042 [-0.006277, -0.003735] SLOW- -> SLOW
+  across     0.04595 [-0.3271, 0.3047] BLANK (UNRES: interval straddles 0 and a margin edge)
+  stability  -0.0268 [-0.4463, 0.2757] BLANK (UNRES: interval straddles 0 and a margin edge)
+  two_start  INDEP
+  => verdict BLANK (REFUSE-SLOW)
+     why: verdict_x STAGE3: slow flow
+point 0.8   case clock6-critical-phase
+  sink       d_ord 0.2371 [0.2363, 0.238] SIG+ d_dis 0.7629 [0.762, 0.7637] SIG+ -> NEITHER
+  needle     velocity -0.004555 [-0.005818, -0.003324] SLOW- d_ord 0.2371 [0.2363, 0.238] SIG+ d_dis 0.7629 [0.762, 0.7637] SIG+ -> MID
+  flow       -0.004555 [-0.005818, -0.003324] SLOW- -> SLOW
+  across     -0.2256 [-0.6028, 0.1104] BLANK (UNRES: interval straddles 0 and a margin edge)
+  stability  -0.2421 [-0.6326, 0.1363] BLANK (UNRES: interval straddles 0 and a margin edge)
+  two_start  INDEP
+  => verdict BLANK (REFUSE-SLOW)
+     why: verdict_x STAGE3: slow flow
+point 0.85   case clock6-critical-phase
+  sink       d_ord 0.2652 [0.2643, 0.266] SIG+ d_dis 0.7348 [0.734, 0.7357] SIG+ -> NEITHER
+  needle     velocity -0.004355 [-0.005522, -0.00327] SLOW- d_ord 0.2652 [0.2643, 0.266] SIG+ d_dis 0.7348 [0.734, 0.7357] SIG+ -> MID
+  flow       -0.004355 [-0.005522, -0.00327] SLOW- -> SLOW
+  across     -0.001768 [-0.3171, 0.2478] BLANK (UNRES: interval straddles 0 and a margin edge)
+  stability  -0.09413 [-0.4459, 0.1892] BLANK (UNRES: interval straddles 0 and a margin edge)
+  two_start  INDEP
+  => verdict BLANK (REFUSE-SLOW)
+     why: verdict_x STAGE3: slow flow
+point 0.9008   case clock6-kt-ends
+  sink       d_ord 0.3053 [0.3045, 0.3062] SIG+ d_dis 0.6947 [0.6938, 0.6955] SIG+ -> NEITHER
+  needle     velocity -0.007924 [-0.009185, -0.0066] SLOW- d_ord 0.3053 [0.3045, 0.3062] SIG+ d_dis 0.6947 [0.6938, 0.6955] SIG+ -> MID
+  flow       -0.007924 [-0.009185, -0.0066] SLOW- -> SLOW
+  across     0.1794 [-0.01575, 0.3359] BLANK (UNRES: interval straddles 0 and a margin edge)
+  stability  -0.08367 [-0.3308, 0.115] BLANK (UNRES: interval straddles 0 and a margin edge)
+  two_start  INDEP
+  => verdict BLANK (REFUSE-SLOW)
+     why: verdict_x STAGE3: slow flow
+point 1.1   case none
+  sink       d_ord 0.9049 [0.9042, 0.9057] SIG+ d_dis 0.09511 [0.09426, 0.09585] SIG+ -> NEITHER
+  needle     velocity -0.1854 [-0.1868, -0.184] SIG- d_ord 0.9049 [0.9042, 0.9057] SIG+ d_dis 0.09511 [0.09426, 0.09585] SIG+ -> DIS
+  flow       -0.1854 [-0.1868, -0.184] SIG- -> FLOWING
+  across     -0.4807 [-0.6541, -0.3169] SIG- -> IRRELEVANT
+  stability  -0.6444 [-0.8358, -0.4389] SIG- -> OFF
+  two_start  INDEP
+  => verdict NOT
+     why: verdict_x STAGE1: off the window
+x3-clock6-2: ran
 run x4-ising-field@scratch -> results/x4-ising-field@scratch.json
 x4-ising-field   rules: scratch   result: results/x4-ising-field@scratch.json (not frozen)
 point 0.46   case ising-field-decoy
@@ -477,6 +631,36 @@ point 0.55   case ising-field-decoy
   => verdict NOT
      why: verdict_x STAGE1: off the window
 x4-ising-field: ran
+run x4-ising-field-2@scratch -> results/x4-ising-field-2@scratch.json
+x4-ising-field-2   rules: scratch   result: results/x4-ising-field-2@scratch.json (not frozen)
+point 0.46   case ising-field-decoy
+  sink       d_ord 0.00109 [0.000279, 0.002351] SLOW+ d_dis 0.9989 [0.9976, 0.9997] SIG+ -> ORD
+  needle     velocity 0.03071 [0.02553, 0.038] SIG+ d_ord 0.00109 [0.000279, 0.002351] SLOW+ d_dis 0.9989 [0.9976, 0.9997] SIG+ -> ORD
+  flow       0.03071 [0.02553, 0.038] SIG+ -> FLOWING
+  across     BLANK (NOT-EVALUATED: sign of R not constant across the point estimate and every resample)
+  stability  BLANK (NOT-EVALUATED: sign of R not constant across the point estimate and every resample)
+  two_start  BLANK (UNRES: interval straddles 0 and a margin edge)
+  => verdict NOT
+     why: verdict_x STAGE1: off the window
+point 0.5   case ising-field-decoy
+  sink       d_ord 0 [0, 0] ZERO! d_dis 1 [1, 1] SIG+ -> ORD
+  needle     velocity 0.0005781 [0.0002674, 0.000896] SLOW+ d_ord 0 [0, 0] ZERO! d_dis 1 [1, 1] SIG+ -> ORD
+  flow       0.0005781 [0.0002674, 0.000896] SLOW+ -> SLOW
+  across     BLANK (NOT-EVALUATED: R = 0)
+  stability  BLANK (NOT-EVALUATED: R = 0)
+  two_start  INDEP
+  => verdict NOT
+     why: verdict_x STAGE1: off the window
+point 0.55   case ising-field-decoy
+  sink       d_ord 0 [0, 0] ZERO! d_dis 1 [1, 1] SIG+ -> ORD
+  needle     velocity 0 [0, 0] ZERO! d_ord 0 [0, 0] ZERO! d_dis 1 [1, 1] SIG+ -> ORD
+  flow       0 [0, 0] ZERO! -> STOPPED
+  across     BLANK (NOT-EVALUATED: R = 0)
+  stability  BLANK (NOT-EVALUATED: R = 0)
+  two_start  INDEP
+  => verdict NOT
+     why: verdict_x STAGE1: off the window
+x4-ising-field-2: ran
 run x5-bilayer@scratch -> results/x5-bilayer@scratch.json
 x5-bilayer   rules: scratch   result: results/x5-bilayer@scratch.json (not frozen)
 point 0.0   case coupled-ising-bilinear
@@ -507,6 +691,36 @@ point 0.3   case coupled-ising-bilinear
   => verdict NOT
      why: verdict_x STAGE1: off the window
 x5-bilayer: ran
+run x5-bilayer-2@scratch -> results/x5-bilayer-2@scratch.json
+x5-bilayer-2   rules: scratch   result: results/x5-bilayer-2@scratch.json (not frozen)
+point 0.0   case coupled-ising-bilinear
+  sink       d_ord 0.2465 [0.2398, 0.2537] SIG+ d_dis 0.7535 [0.7463, 0.7602] SIG+ -> NEITHER
+  needle     velocity -0.0118 [-0.02263, -0.003361] NEG d_ord 0.2465 [0.2398, 0.2537] SIG+ d_dis 0.7535 [0.7463, 0.7602] SIG+ -> DIS
+  flow       -0.0118 [-0.02263, -0.003361] NEG -> FLOWING
+  across     1.044 [0.9336, 1.161] SIG+ -> RELEVANT
+  stability  -0.01252 [-0.1527, 0.1607] ZERO! -> STABLE
+  two_start  INDEP
+  => verdict NOT
+     why: verdict_x STAGE1: off the window
+point 0.1   case coupled-ising-bilinear
+  sink       d_ord 0.2599 [0.2524, 0.2675] SIG+ d_dis 0.7401 [0.7325, 0.7476] SIG+ -> NEITHER
+  needle     velocity 0.02567 [0.0153, 0.03699] SIG+ d_ord 0.2599 [0.2524, 0.2675] SIG+ d_dis 0.7401 [0.7325, 0.7476] SIG+ -> ORD
+  flow       0.02567 [0.0153, 0.03699] SIG+ -> FLOWING
+  across     0.9295 [0.8497, 1.002] SIG+ -> RELEVANT
+  stability  -0.1833 [-0.3165, -0.08135] NEG -> OFF
+  two_start  INDEP
+  => verdict NOT
+     why: verdict_x STAGE1: off the window
+point 0.3   case coupled-ising-bilinear
+  sink       d_ord 0.2386 [0.2325, 0.2437] SIG+ d_dis 0.7614 [0.7563, 0.7675] SIG+ -> NEITHER
+  needle     velocity 0.008972 [0.001692, 0.01787] POS d_ord 0.2386 [0.2325, 0.2437] SIG+ d_dis 0.7614 [0.7563, 0.7675] SIG+ -> ORD
+  flow       0.008972 [0.001692, 0.01787] POS -> FLOWING
+  across     0.983 [0.905, 1.085] SIG+ -> RELEVANT
+  stability  -0.03554 [-0.1478, 0.1385] ZERO! -> STABLE
+  two_start  INDEP
+  => verdict NOT
+     why: verdict_x STAGE1: off the window
+x5-bilayer-2: ran
 x7a-bc: REFUSED: tables/scratch/membership.toml:along: along runs door:off_manifold on x7a-bc but this set has no rule for it
 x7a-nnn: REFUSED: tables/scratch/membership.toml:along: along runs door:off_manifold on x7a-nnn but this set has no rule for it
 run x8-ising-needle@scratch -> results/x8-ising-needle@scratch.json

@@ -1,0 +1,440 @@
+# THIS IS CC's m.toml (Kernel V8's M for ONE input: what was measured and how).
+# It is NOT the toolset's m.toml (scratch/compass-toolset/m.toml, the study log).
+# inputs/x3-clock6-2/m.toml - like x3-clock6
+schema = 1
+kind = "input"
+id = "x3-clock6-2"
+instruments = ["needle", "across", "stability", "two_start", "fluct"]
+
+[obtained]
+"0.5" = "truth"
+"0.7014" = "truth"
+"0.75" = "truth"
+"0.8" = "truth"
+"0.85" = "truth"
+"0.9008" = "truth"
+"1.1" = "truth"
+
+[axes]
+point = ["0.5", "0.7014", "0.75", "0.8", "0.85", "0.9008", "1.1"]
+size = [27, 81, 243]
+starts = ["random", "ordered"]
+main_start = "random"
+
+[observable]
+name = "g1_xy of the plurality3 block states (unit vectors)"
+definition = """open-pair nearest-neighbour correlation of the unit vectors (cos, sin of 2 \
+pi k / 6) of the block states, every level down to final size 9"""
+levels = [2, 3, 4]
+final_size = 9
+
+[block_map]
+name = "plurality3-stochastic"
+factor = 3
+keeps = "the most frequent clock state of each 3x3 block (ties broken uniformly)"
+discards = "the within-block spread of states"
+
+[relations.size]
+template = "chain"
+axis = "size"
+provenance = "Coupling"
+direction_from = "the declared blocking map: one more blocking step relates L to L/3"
+
+[relations.matched]
+template = "matched"
+axis = "size"
+big = 243
+small = 81
+provenance = "Coupling"
+direction_from = "one extra declared blocking step at equal block-lattice size ([P2] relations)"
+
+[relations.start]
+template = "pair"
+axis = "starts"
+pairs = [["random", "ordered"]]
+provenance = "Coupling"
+direction_from = "two runs at the same point differing only in the declared initial state"
+
+[sinks]
+ordered = 1.0
+disordered = 0.0
+
+[interval]
+method = "block"
+b = 400
+resamples = 400
+level = 0.95
+seed = 62
+
+[eps]
+step = 0.01
+sink = 0.02
+y = 0.25
+two_start = 0.01
+
+[conjugate]
+observable = "E"
+conjugate_to = "beta (inverse temperature)"
+hamiltonian_knowledge = true
+
+[two_start]
+observable = "Q"
+definition = """E = sum of nn bond energies per snapshot (O column 0) / the declared bond \
+count 2 L^2"""
+unit_scale = { "27" = 1458, "81" = 13122, "243" = 118098 }
+
+[kernel]
+uses = ["A"]
+
+[data]
+format = "npz-v1"
+
+[[data.files]]
+point = "0.5"
+size = 27
+start = "random"
+path = "x3/T0.50000-L27-random.npz"
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.5"
+size = 27
+start = "ordered"
+path = "x3/T0.50000-L27-ordered.npz"
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.7014"
+size = 27
+start = "random"
+path = "x3/T0.70140-L27-random.npz"
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.7014"
+size = 27
+start = "ordered"
+path = "x3/T0.70140-L27-ordered.npz"
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.75"
+size = 27
+start = "random"
+path = "x3/T0.75000-L27-random.npz"
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.75"
+size = 27
+start = "ordered"
+path = "x3/T0.75000-L27-ordered.npz"
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.8"
+size = 27
+start = "random"
+path = "x3/T0.80000-L27-random.npz"
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.8"
+size = 27
+start = "ordered"
+path = "x3/T0.80000-L27-ordered.npz"
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.85"
+size = 27
+start = "random"
+path = "x3/T0.85000-L27-random.npz"
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.85"
+size = 27
+start = "ordered"
+path = "x3/T0.85000-L27-ordered.npz"
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.9008"
+size = 27
+start = "random"
+path = "x3/T0.90080-L27-random.npz"
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.9008"
+size = 27
+start = "ordered"
+path = "x3/T0.90080-L27-ordered.npz"
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.1"
+size = 27
+start = "random"
+path = "x3/T1.10000-L27-random.npz"
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.1"
+size = 27
+start = "ordered"
+path = "x3/T1.10000-L27-ordered.npz"
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.5"
+size = 81
+start = "random"
+path = "x3/T0.50000-L81-random.npz"
+arrays.GL = { key = "G" }
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.5"
+size = 81
+start = "ordered"
+path = "x3/T0.50000-L81-ordered.npz"
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.7014"
+size = 81
+start = "random"
+path = "x3/T0.70140-L81-random.npz"
+arrays.GL = { key = "G" }
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.7014"
+size = 81
+start = "ordered"
+path = "x3/T0.70140-L81-ordered.npz"
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.75"
+size = 81
+start = "random"
+path = "x3/T0.75000-L81-random.npz"
+arrays.GL = { key = "G" }
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.75"
+size = 81
+start = "ordered"
+path = "x3/T0.75000-L81-ordered.npz"
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.8"
+size = 81
+start = "random"
+path = "x3/T0.80000-L81-random.npz"
+arrays.GL = { key = "G" }
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.8"
+size = 81
+start = "ordered"
+path = "x3/T0.80000-L81-ordered.npz"
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.85"
+size = 81
+start = "random"
+path = "x3/T0.85000-L81-random.npz"
+arrays.GL = { key = "G" }
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.85"
+size = 81
+start = "ordered"
+path = "x3/T0.85000-L81-ordered.npz"
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.9008"
+size = 81
+start = "random"
+path = "x3/T0.90080-L81-random.npz"
+arrays.GL = { key = "G" }
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.9008"
+size = 81
+start = "ordered"
+path = "x3/T0.90080-L81-ordered.npz"
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.1"
+size = 81
+start = "random"
+path = "x3/T1.10000-L81-random.npz"
+arrays.GL = { key = "G" }
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.1"
+size = 81
+start = "ordered"
+path = "x3/T1.10000-L81-ordered.npz"
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.5"
+size = 243
+start = "random"
+path = "x3/T0.50000-L243-random.npz"
+arrays.GL = { key = "G" }
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.5"
+size = 243
+start = "ordered"
+path = "x3/T0.50000-L243-ordered.npz"
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.7014"
+size = 243
+start = "random"
+path = "x3/T0.70140-L243-random.npz"
+arrays.GL = { key = "G" }
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.7014"
+size = 243
+start = "ordered"
+path = "x3/T0.70140-L243-ordered.npz"
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.75"
+size = 243
+start = "random"
+path = "x3/T0.75000-L243-random.npz"
+arrays.GL = { key = "G" }
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.75"
+size = 243
+start = "ordered"
+path = "x3/T0.75000-L243-ordered.npz"
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.8"
+size = 243
+start = "random"
+path = "x3/T0.80000-L243-random.npz"
+arrays.GL = { key = "G" }
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.8"
+size = 243
+start = "ordered"
+path = "x3/T0.80000-L243-ordered.npz"
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.85"
+size = 243
+start = "random"
+path = "x3/T0.85000-L243-random.npz"
+arrays.GL = { key = "G" }
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.85"
+size = 243
+start = "ordered"
+path = "x3/T0.85000-L243-ordered.npz"
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.9008"
+size = 243
+start = "random"
+path = "x3/T0.90080-L243-random.npz"
+arrays.GL = { key = "G" }
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.9008"
+size = 243
+start = "ordered"
+path = "x3/T0.90080-L243-ordered.npz"
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.1"
+size = 243
+start = "random"
+path = "x3/T1.10000-L243-random.npz"
+arrays.GL = { key = "G" }
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.1"
+size = 243
+start = "ordered"
+path = "x3/T1.10000-L243-ordered.npz"
+arrays.Q = { key = "O", level = 0 }

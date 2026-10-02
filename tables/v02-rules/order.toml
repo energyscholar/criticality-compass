@@ -1,12 +1,15 @@
-# tables/v02-rules/order.toml - the ORDER axis: do the two starts agree at the window? Read from the needle (is
-# the point on the window at all) and two_start ONLY. A declared PARTITION of (needle, two_start); `validate`
-# proves it. Its values carry the honest nulls (ORDER-UNMEASURED, NEEDLE-UNMEASURED) and the position rule
+# tables/v02-rules/order.toml - the ORDER axis: do the two starts agree at the window, and what does the energy
+# density's variance say? Read from the needle (is the point on the window at all), two_start and the fluct witness
+# ONLY, and fluct only when the starts agree (INDEP): under COEXIST a run that does not tunnel has a within-phase
+# variance that vanishes (the q7 trap), so there fluct is a partition cell, not evidence. A declared PARTITION of
+# (needle, two_start, fluct); `validate` proves it. Its values carry the honest nulls (ORDER-UNMEASURED, NEEDLE-UNMEASURED) and the position rule
 # (OFF-WINDOW) as VALUES, so no later table has to guess them.
 schema = 1
 kind = "order"
-columns = ["needle", "two_start"]
+columns = ["needle", "two_start", "fluct"]
 values = [
-  "COEXIST-AT-WINDOW", "NOT-EQUILIBRATED", "EQUILIBRATED", "OFF-WINDOW", "ORDER-UNMEASURED", "NEEDLE-UNMEASURED",
+  "COEXIST-AT-WINDOW", "NOT-EQUILIBRATED", "EQUILIBRATED", "CONTINUOUS", "FIRST-ORDER-TUNNELLING", "EQUILIBRATED-UNRES",
+  "OFF-WINDOW", "ORDER-UNMEASURED", "NEEDLE-UNMEASURED",
 ]
 # score: the class each order value stands for, against a case's order_truth (cc/score.py reports the agreement)
 [score]
@@ -14,6 +17,9 @@ values = [
 "OFF-WINDOW" = "NONE"
 "NOT-EQUILIBRATED" = "REFUSE"
 "EQUILIBRATED" = "REFUSE"
+"CONTINUOUS" = "CONTINUOUS"
+"FIRST-ORDER-TUNNELLING" = "FIRST-ORDER"
+"EQUILIBRATED-UNRES" = "REFUSE"
 "ORDER-UNMEASURED" = "REFUSE"
 "NEEDLE-UNMEASURED" = "REFUSE"
 
@@ -42,8 +48,30 @@ why = "D below the margin (a fluctuation, not coexistence) or unresolved: the st
 [[row]]
 when.needle = ["MID"]
 when.two_start = ["INDEP"]
+when.fluct = ["NOT-MEASURED"]
 verdict = "EQUILIBRATED"
-why = "the two starts agree within the margin at the window"
+why = "the two starts agree within the margin at the window and the fluct witness was not measured (no split)"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.fluct = ["VANISHES"]
+verdict = "CONTINUOUS"
+why = "the starts agree and the variance of the energy density vanishes with size: a continuous transition"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.fluct = ["PERSISTS"]
+verdict = "FIRST-ORDER-TUNNELLING"
+why = "the starts agree (the sampler tunnelled) and the variance of the energy density persists with size: a discontinuity"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.fluct = ["GROWS", "UNRES", "NOT-EVALUATED"]
+verdict = "EQUILIBRATED-UNRES"
+why = "the starts agree but the fluct witness cannot say which side of zero (it grows, straddles, or was not evaluable): the split is unresolved"
 
 [[row]]
 when.needle = ["MID"]

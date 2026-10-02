@@ -50,6 +50,20 @@ alphabet = ["DIS", "MID", "ORD"]
 "SIG+" = "ORD"
 "UNRES" = "MID"
 
+[columns.helper.fluct]                         # v02-rules (plan 0866 P-B): the fluctuation witness on A over ln var(e)
+from = "fluct.y_last"                          # read by order.toml ONLY, and only with the starts INDEP; never by verdict.toml
+alphabet = ["PERSISTS", "VANISHES", "GROWS", "UNRES"]
+
+[columns.helper.fluct.map]
+"SIG-" = "VANISHES"
+"NEG" = "VANISHES"
+"SLOW-" = "PERSISTS"                           # inside the margin: the variance per bond does not change with size
+"ZERO!" = "PERSISTS"
+"SLOW+" = "PERSISTS"
+"POS" = "GROWS"
+"SIG+" = "GROWS"
+"UNRES" = "UNRES"
+
 # ---- signature columns: exactly the per-point signature row; verdict.toml `columns` = this set
 [columns.signature.sink]                       # position relative to the two sinks
 from = ["at_ord", "at_dis"]

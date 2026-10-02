@@ -1,0 +1,18 @@
+# instruments/fluct.toml - the fluctuation witness: A over ln var(e) along the size chain, e = E / unit_scale.
+# M keeps the second cumulant of the density e (its variance); it discards the higher cumulants and the time order.
+# A discontinuity has var(e) that persists with size (C ~ L^d); a continuous transition's var(e) vanishes.
+schema = 1
+kind = "instrument"
+module = "fluct"
+operators = ["A"]
+unit = "point"
+reports = ["y_steps"]
+arrays = ["E"]
+axes = ["point", "size"]
+relations = ["size"]
+sidecar = ["two_start"]
+flags = ["H"]
+pipeline = ["stage:reduce", "door:logcoord", "stage:growth"]
+
+[columns]
+y_last = "y"

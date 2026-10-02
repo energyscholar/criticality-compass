@@ -5,7 +5,7 @@
  "input": "x7a-bc",
  "tables": "v02-rules",
  "derived_from": null,
- "code_commit": "68e534291b3d906dd180700f50367af3343e98a0",
+ "code_commit": "016655370047475a41c6a9c8fa66380a479ca89a",
  "interval": {
   "method": "block",
   "b": 400,
@@ -17,11 +17,11 @@
   "inputs/x7a-bc/m.toml": "6c942b5a380a1ddecd8cd933caa00bf8eb580402e5e080f198f6b1f102b0c775",
   "instruments/needle.toml": "03c8e390df85cdcef367ecba33043ebf9e0445c30f27fa626242a87387fb3ef0",
   "instruments/along.toml": "f3fd87ddb9aa9a2786e3a0110340106e673670e305642a1e4bf30b1a8b2b4ef6",
-  "tables/v02-rules/codes.toml": "1fd20de97e25357ab46f6240266593534d6877c04dd9e178795263a84ab26f9e",
+  "tables/v02-rules/codes.toml": "001f281f95428bdb40a008b5f20030fe3311472d541decc7a193662f5d220258",
   "tables/v02-rules/verdict.toml": "c4f8c8288cda3de174006e313c89aea870c22b4c82d49f1fcb84449471ddc4b2",
   "tables/v02-rules/geometry.toml": "05c3737d287a1ef321fe66d01de27ed9d5661519a2df279e4eb2e3ec78f42805",
-  "tables/v02-rules/order.toml": "e5e8775df3e8cf6c182c9b6c2fd7a045852cdd253947aba5dcb73147c981df51",
-  "tables/v02-rules/compose.toml": "c33a1fad94da6a6c6e45a79701eb84149e6ce30a4cfd4c6dde5eb270c1eaa24c",
+  "tables/v02-rules/order.toml": "34f00b1dc89c1178f8f752ef3c29486d38651df4a720e92403aa075a1e3f759c",
+  "tables/v02-rules/compose.toml": "3c1b72137520285fe5bc96a76db9fc695d7ac3d552a619d7b9bccb8640a59957",
   "tables/v02-rules/membership.toml": "f9e012a4126b22d06abcd2f2a178324e991c36cd798bfbe5f34a728fe1a075f0",
   "fixtures/data/x7a-bc.toml": "4e79ececd3c9db6ca9fa218aee40343308d88debbb821fc8b52d8cb0be112d79",
   "~/software/scratch/compass-toolset/data/c1/d0.0-L27.npz": "9aa26e92e1901c1d18d1605e8b6d6c671ee8b1fd867f6ee7c0eb96ed5f6cb5a3",
@@ -61,6 +61,24 @@
    "per_size": null,
    "flags": [],
    "reason": "across is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "fluct",
+   "column": "y_last",
+   "unit": {
+    "point": "0.0"
+   },
+   "eps_key": "y",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "fluct is not declared on this input",
    "vector_key": null
   },
   {
@@ -178,6 +196,24 @@
    "vector_key": null
   },
   {
+   "instrument": "fluct",
+   "column": "y_last",
+   "unit": {
+    "point": "1.0"
+   },
+   "eps_key": "y",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "fluct is not declared on this input",
+   "vector_key": null
+  },
+  {
    "instrument": "needle",
    "column": "velocity",
    "unit": {
@@ -289,6 +325,24 @@
    "per_size": null,
    "flags": [],
    "reason": "across is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "fluct",
+   "column": "y_last",
+   "unit": {
+    "point": "1.5"
+   },
+   "eps_key": "y",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "fluct is not declared on this input",
    "vector_key": null
   },
   {
@@ -406,6 +460,24 @@
    "vector_key": null
   },
   {
+   "instrument": "fluct",
+   "column": "y_last",
+   "unit": {
+    "point": "1.8"
+   },
+   "eps_key": "y",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "fluct is not declared on this input",
+   "vector_key": null
+  },
+  {
    "instrument": "needle",
    "column": "velocity",
    "unit": {
@@ -520,6 +592,24 @@
    "vector_key": null
   },
   {
+   "instrument": "fluct",
+   "column": "y_last",
+   "unit": {
+    "point": "1.9"
+   },
+   "eps_key": "y",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "fluct is not declared on this input",
+   "vector_key": null
+  },
+  {
    "instrument": "needle",
    "column": "velocity",
    "unit": {
@@ -631,6 +721,24 @@
    "per_size": null,
    "flags": [],
    "reason": "across is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "fluct",
+   "column": "y_last",
+   "unit": {
+    "point": "1.95"
+   },
+   "eps_key": "y",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "fluct is not declared on this input",
    "vector_key": null
   },
   {
@@ -1018,7 +1126,7 @@
    "order": "OFF-WINDOW",
    "axis_lines": {
     "geometry": 16,
-    "order": 20,
+    "order": 26,
     "compose": 11
    }
   },
@@ -1050,7 +1158,7 @@
    "order": "OFF-WINDOW",
    "axis_lines": {
     "geometry": 16,
-    "order": 20,
+    "order": 26,
     "compose": 11
    }
   },
@@ -1082,7 +1190,7 @@
    "order": "OFF-WINDOW",
    "axis_lines": {
     "geometry": 16,
-    "order": 20,
+    "order": 26,
     "compose": 11
    }
   },
@@ -1114,7 +1222,7 @@
    "order": "ORDER-UNMEASURED",
    "axis_lines": {
     "geometry": 50,
-    "order": 48,
+    "order": 76,
     "compose": 31
    }
   },
@@ -1146,7 +1254,7 @@
    "order": "OFF-WINDOW",
    "axis_lines": {
     "geometry": 16,
-    "order": 20,
+    "order": 26,
     "compose": 11
    }
   },
@@ -1178,7 +1286,7 @@
    "order": "ORDER-UNMEASURED",
    "axis_lines": {
     "geometry": 50,
-    "order": 48,
+    "order": 76,
     "compose": 31
    }
   }

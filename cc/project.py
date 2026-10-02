@@ -26,3 +26,10 @@ def p_delta(v, shape):
     """Delta per (resample row, size): the signed pair differences re-declared with sizes along the last axis
     (keeps the signed difference per size and row; discards which two runs it came from)."""
     return np.reshape(v, shape)
+
+
+def density_var(e, scale):
+    """var of e / scale over one resample: the second cumulant of the density (keeps it; discards the higher cumulants
+    and the time order of the snapshots)."""
+    d = e / scale - np.mean(e / scale)
+    return np.mean(d * d)

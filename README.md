@@ -14,7 +14,7 @@ explains what the instruments compute.
 
 1. **input**: a directory `inputs/<id>/` holding `m.toml` (what was measured and how: Kernel V8's M) and `points.toml`.
 2. **point**: one labelled place in parameter space, e.g. `"0.07"` or `"d2.0-K1.0"`, with a list of sizes.
-3. **instrument**: one measurement (needle, across, stability, two_start). It applies a kernel operator over a declared relation.
+3. **instrument**: one measurement (needle, across, stability, two_start, along, fluct). It applies a kernel operator over a declared relation.
 4. **relation**: declared nodes and directed edges (a size chain, a start pair, matched levels). The operator A takes differences along its edges.
 5. **reading**: an estimate plus its resampled interval, and its **sign cell**: where the interval sits among the cuts -eps, 0, +eps (SIG+, POS, SLOW+, ZERO!, SLOW-, NEG, SIG-, UNRES).
 6. **code**: a sign cell translated by `codes.toml` into words, e.g. SIG+ becomes RELEVANT.
@@ -25,7 +25,7 @@ explains what the instruments compute.
 11. **case**: taxonomy (`cases/<id>.toml`, holding the true class). `points.toml` maps points to cases and is never frozen.
 12. **frozen**: a result, and every file it read, made read-only and hash-checked. To change a frozen thing you fork it.
 13. **geometry**: what the flow says (point, line, walking, ...), read from needle, flow, across and stability only. A rulebook with `geometry.toml` (`v02-rules`) prints it beside the verdict.
-14. **order**: whether the two starts agree at the window (coexist, equilibrated, off the window, ...), read from needle and two_start only (`order.toml`). `compose.toml` turns (geometry, order) into the verdict, and `validate` proves it gives `verdict.toml`'s verdict on every row.
+14. **order**: whether the two starts agree at the window, and what the fluct witness says when they do (coexist, continuous, first-order tunnelling, off the window, ...), read from needle, two_start and fluct only (`order.toml`). `compose.toml` turns (geometry, order) into the verdict, and `validate` proves it gives `verdict.toml`'s verdict on every row.
 
 ## The first hour
 
@@ -48,7 +48,7 @@ cc - Criticality Compass   (BASIC; `bin/cc help --advanced` lists every command)
   bin/cc validate                       check every file; each problem says what to do next
   bin/cc check                          validate + tests + scoreboard; run it before a commit
 
-inputs: b7-at-line b7-at-line-2 c2-bc-two-start w2-potts x2-xy-line x3-clock6 x4-ising-field x5-bilayer x7a-bc x7a-nnn x8-ising-needle
+inputs: b7-at-line b7-at-line-2 b7-at-line-3 c2-bc-two-start w2-potts w2-potts-2 x2-xy-line x2-xy-line-2 x3-clock6 x3-clock6-2 x4-ising-field x4-ising-field-2 x5-bilayer x5-bilayer-2 x7a-bc x7a-nnn x8-ising-needle
 rules in use: v01-rules   (cc.toml [defaults] tables)
 BLANK (...) means "CC does not know"; the word in brackets says why.
 

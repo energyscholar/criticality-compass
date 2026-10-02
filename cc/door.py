@@ -31,6 +31,7 @@ class Ctx:
     sink_ordered: float = None
     sink_disordered: float = None
     unit_scale: float = None
+    unit_scales: tuple = None        # a point unit over sizes: the declared unit scale at every size (axes.size order)
     unit_rel: object = None          # a pair unit: the 2-node restriction of the control relation (edge 1 -> 0)
     component_shape: tuple = None    # a pair unit: (R+1, n_size), the layout of Delta per resample row and size
     pair_shape: tuple = None         # a pair unit: (n_size, 2), one reduce output
@@ -88,7 +89,8 @@ def context(m, inst, size=None):
         log_span=float(np.log(sizes[-1] / sizes[0])), top=k - 1, top_steps=k - 2,
         coarsest=nb - 2, big_final=nb - 1,
         sink_ordered=m.get("sinks", {}).get("ordered"), sink_disordered=m.get("sinks", {}).get("disordered"),
-        unit_scale=m.get("two_start", {}).get("unit_scale", {}).get(str(size)))
+        unit_scale=m.get("two_start", {}).get("unit_scale", {}).get(str(size)),
+        unit_scales=tuple(m.get("two_start", {}).get("unit_scale", {}).get(str(s)) for s in sizes))
 
 
 def unit_keys(m, inst, point, size=None):

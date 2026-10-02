@@ -104,6 +104,45 @@ tables = "v02-rules"
 "0.1" = "NOT"
 "0.3" = "REFUSE-SLOW"
 
+[verdicts.w2-potts-2]
+"2" = "REFUSE-NEEDLE-UNMEASURED"
+"3" = "REFUSE-NEEDLE-UNMEASURED"
+"4" = "REFUSE-NEEDLE-UNMEASURED"
+"5" = "REFUSE-NEEDLE-UNMEASURED"
+
+[verdicts.x2-xy-line-2]
+"0.5" = "REFUSE-SLOW"
+"0.6" = "REFUSE-SLOW"
+"0.7" = "REFUSE-SLOW"
+"0.89294" = "REFUSE-UNRES"
+"1.1" = "NOT"
+
+[verdicts.x3-clock6-2]
+"0.5" = "NOT"
+"0.7014" = "REFUSE-SLOW"
+"0.75" = "REFUSE-SLOW"
+"0.8" = "REFUSE-SLOW"
+"0.85" = "REFUSE-SLOW"
+"0.9008" = "REFUSE-SLOW"
+"1.1" = "NOT"
+
+[verdicts.x4-ising-field-2]
+"0.46" = "NOT"
+"0.5" = "NOT"
+"0.55" = "NOT"
+
+[verdicts.x5-bilayer-2]
+"0.0" = "REFUSE-SLOW"
+"0.1" = "NOT"
+"0.3" = "REFUSE-SLOW"
+
+[verdicts.b7-at-line-3]
+"0.0" = "REFUSE-NEEDLE-UNMEASURED"
+"0.07" = "REFUSE-NEEDLE-UNMEASURED"
+"0.14" = "REFUSE-NEEDLE-UNMEASURED"
+"0.21" = "REFUSE-NEEDLE-UNMEASURED"
+"0.2747" = "REFUSE-NEEDLE-UNMEASURED"
+
 [order.b7-at-line-2]
 "0.0" = "NEEDLE-UNMEASURED"
 "0.07" = "NEEDLE-UNMEASURED"
@@ -202,6 +241,79 @@ tables = "v02-rules"
 "1.05" = "OFF-WINDOW"
 "1.10" = "OFF-WINDOW"
 
+[order.w2-potts-2]
+"2" = "NEEDLE-UNMEASURED"
+"3" = "NEEDLE-UNMEASURED"
+"4" = "NEEDLE-UNMEASURED"
+"5" = "NEEDLE-UNMEASURED"
+
+[order.x2-xy-line-2]
+"0.5" = ["CONTINUOUS", "EQUILIBRATED-UNRES"]
+"0.6" = ["CONTINUOUS", "EQUILIBRATED-UNRES"]
+"0.7" = ["CONTINUOUS", "EQUILIBRATED-UNRES"]
+"0.89294" = ["CONTINUOUS", "EQUILIBRATED-UNRES"]
+"1.1" = "OFF-WINDOW"
+
+[order.x3-clock6-2]
+"0.5" = "OFF-WINDOW"
+"0.7014" = ["CONTINUOUS", "EQUILIBRATED-UNRES"]
+"0.75" = ["CONTINUOUS", "EQUILIBRATED-UNRES"]
+"0.8" = ["CONTINUOUS", "EQUILIBRATED-UNRES"]
+"0.85" = ["CONTINUOUS", "EQUILIBRATED-UNRES"]
+"0.9008" = ["CONTINUOUS", "EQUILIBRATED-UNRES"]
+"1.1" = "OFF-WINDOW"
+
+[order.x4-ising-field-2]
+"0.46" = "OFF-WINDOW"
+"0.5" = "OFF-WINDOW"
+"0.55" = "OFF-WINDOW"
+
+[order.x5-bilayer-2]
+"0.0" = ["CONTINUOUS", "EQUILIBRATED-UNRES"]
+"0.1" = "OFF-WINDOW"
+"0.3" = ["CONTINUOUS", "EQUILIBRATED-UNRES"]
+
+[order.b7-at-line-3]
+"0.0" = "NEEDLE-UNMEASURED"
+"0.07" = "NEEDLE-UNMEASURED"
+"0.14" = "NEEDLE-UNMEASURED"
+"0.21" = "NEEDLE-UNMEASURED"
+"0.2747" = "NEEDLE-UNMEASURED"
+
+[fluct.w2-potts-2]
+"2" = ["VANISHES"]
+"3" = ["VANISHES"]
+"4" = ["VANISHES"]
+"5" = ["VANISHES", "UNRES"]
+
+[fluct.x2-xy-line-2]
+"0.5" = ["VANISHES", "UNRES"]
+"0.6" = ["VANISHES", "UNRES"]
+"0.7" = ["VANISHES", "UNRES"]
+"0.89294" = ["VANISHES", "UNRES"]
+"1.1" = ["VANISHES", "UNRES"]
+
+[fluct.x3-clock6-2]
+"0.5" = ["VANISHES", "UNRES"]
+"0.7014" = ["VANISHES", "UNRES"]
+"0.75" = ["VANISHES", "UNRES"]
+"0.8" = ["VANISHES", "UNRES"]
+"0.85" = ["VANISHES", "UNRES"]
+"0.9008" = ["VANISHES", "UNRES"]
+"1.1" = ["VANISHES", "UNRES"]
+
+[fluct.x5-bilayer-2]
+"0.0" = ["VANISHES", "UNRES"]
+"0.1" = ["VANISHES", "UNRES"]
+"0.3" = ["VANISHES", "UNRES"]
+
+[fluct.b7-at-line-3]
+"0.0" = ["VANISHES", "UNRES"]
+"0.07" = ["VANISHES", "UNRES"]
+"0.14" = ["VANISHES", "UNRES"]
+"0.21" = ["VANISHES", "UNRES"]
+"0.2747" = ["VANISHES", "UNRES"]
+
 [[family]]
 id = "b7-at-line-2"
 verdict = "LINE"
@@ -240,3 +352,15 @@ predicted from the stored v01-rules sign codes (needle, two_start) by hand, not 
 OFF-WINDOW, an unmeasured needle NEEDLE-UNMEASURED, MID with COEXIST COEXIST-AT-WINDOW, MID with FLUCT/UNRES \
 NOT-EQUILIBRATED, MID with INDEP EQUILIBRATED, MID with an unmeasured two_start ORDER-UNMEASURED. A moved verdict is a \
 finding, never an edit of this file"""
+
+[[change]]
+date = "2026-10-02"
+points = ["w2-potts-2:*", "x2-xy-line-2:*", "x3-clock6-2:*", "x4-ising-field-2:*", "x5-bilayer-2:*", "b7-at-line-3:*"]
+why = """DECLARED BEFORE THE FIRST RUN of the fluct inputs (plan 0866 P-B). w2-potts-2, x2-xy-line-2, x3-clock6-2, \
+x4-ising-field-2, x5-bilayer-2 and b7-at-line-3 are copies of the inputs that have E, with the fluct instrument added \
+(the frozen inputs cannot change); same blocks, seed and resample draws, so every combined verdict is the one the original \
+gets and every [verdicts.*] line above is that original's. [fluct.*] is the FLUCT REPLAY LOCK on the code of fluct.y_last (A over \
+ln var(e), 81 -> 243): w2 q = 2, 3, 4 VANISHES (a continuous transition: the variance per bond falls with size), q = 5 \
+VANISHES or UNRES and NEVER PERSISTS (the pre-registered blind spot: xi >> L); the other inputs never PERSISTS (their \
+points are continuous or off-critical; x4, a first-order line, is not locked). [order.*] of a point the starts leave \
+EQUILIBRATED is CONTINUOUS or EQUILIBRATED-UNRES, never FIRST-ORDER-TUNNELLING. No combined point verdict moves"""

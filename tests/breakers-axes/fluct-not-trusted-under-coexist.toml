@@ -1,0 +1,29 @@
+# tests/breakers-axes/fluct-not-trusted-under-coexist.toml - an AXIS BREAKER (data; read by tests/test_axes.py)
+schema = 1
+kind = "axis-breaker"
+id = "fluct-not-trusted-under-coexist"
+rule = "the fluct witness is read ONLY with the starts INDEP: under COEXIST a VANISHES variance is within-phase, never CONTINUOUS"
+why = """The q7 trap (plan 0866): a Swendsen-Wang run at q >= 7, L >= 81 does not tunnel, so each start stays inside its own \
+phase and the variance of the energy density there VANISHES exactly as at a continuous transition. If order read fluct under \
+COEXIST the point would be called CONTINUOUS. It must stay COEXIST-AT-WINDOW; the fluct code is a partition cell only \
+when the two starts agree."""
+tables = "v02-rules"
+
+[cells]
+"needle.velocity" = "ZERO!"
+"needle.d_ord" = "SIG+"
+"needle.d_dis" = "SIG+"
+"across.y_last" = "ZERO!"
+"stability.d" = "ZERO!"
+"two_start.D" = ["SIG+"]
+"fluct.y_last" = "SIG-"
+
+[expect]
+geometry = "LINE"
+order = "COEXIST-AT-WINDOW"
+verdict = "FIRST-ORDER"
+
+[mutation]
+file = "tables/v02-rules/order.toml"
+intent = "fluct is read under COEXIST: a VANISHES variance at coexisting starts reads CONTINUOUS"
+py = '''s.replace('when.two_start = ["COEXIST"]\nverdict = "COEXIST-AT-WINDOW"', 'when.two_start = ["COEXIST"]\nwhen.fluct = ["PERSISTS", "GROWS", "UNRES", "NOT-MEASURED", "NOT-EVALUATED"]\nverdict = "COEXIST-AT-WINDOW"').replace('when.two_start = ["INDEP"]\nwhen.fluct = ["VANISHES"]', 'when.two_start = ["INDEP", "COEXIST"]\nwhen.fluct = ["VANISHES"]')'''

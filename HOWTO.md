@@ -124,6 +124,7 @@ a missing one is refused and so is an unused one.
 | stability | `size` (a chain) | `conjugate`, `observable`, `block_map` | as across |
 | two_start | `start` (a pair) | `two_start` | one order parameter for each of the two starts, per size |
 | along | `size` (a chain) and `control` (a declared relation over the points) | `observable`, `block_map` | the observable of both points of a pair, at every size |
+| fluct | `size` (a chain) | `two_start` (its `unit_scale`) | the energy `E` at every size, from the main start |
 
 To change a frozen input, do not edit it. Make `<id>-2` with `--like <id>`, run `data add`, and run it as a new
 input; the old results stay readable.

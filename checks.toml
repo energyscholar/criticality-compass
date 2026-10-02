@@ -4,7 +4,7 @@
 maths = [
   "cc/kernel.py", "cc/sign.py", "cc/resample.py", "cc/project.py", "cc/readout.py",
   "cc/instruments/needle.py", "cc/instruments/across.py", "cc/instruments/stability.py",
-  "cc/instruments/two_start.py", "cc/instruments/along.py", "cc/fingerprint.py",
+  "cc/instruments/two_start.py", "cc/instruments/along.py", "cc/instruments/fluct.py", "cc/fingerprint.py",
 ]
 plumbing = ["bin/cc", "cc/admit.py", "cc/declare.py", "cc/author.py", "cc/door.py", "cc/detect.py", "cc/view.py", "cc/score.py", "cc/family.py", "tests/reference/verdict_x.py",
   ".githooks/pre-commit"]

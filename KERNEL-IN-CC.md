@@ -1,6 +1,6 @@
 # The kernel in CC
 
-What the five instruments compute, and the family fingerprints, in the kernel's terms, and where the code is built so that a wrong state
+What the six instruments compute, and the family fingerprints, in the kernel's terms, and where the code is built so that a wrong state
 cannot be reached instead of being checked for afterwards. You do not need this to use CC (`README.md` is
 enough). Read it when you want to know what a number means, or before you touch an instrument.
 
@@ -50,7 +50,7 @@ all-pairs over points        0.0, 0.07, 0.14, 0.21              edges: every (j 
 
 An `along` unit is one edge of the control relation, restricted to its two points (edge `b -> a`).
 
-## The five instruments
+## The six instruments
 
 ### needle: does one more blocking step move the observable, and where does it sit?
 
@@ -103,6 +103,21 @@ An `along` unit is one edge of the control relation, restricted to its two point
 - **A number:** w2-potts at q = 5, size 27: the starts give `0.7659` (random) and `0.7629` (ordered), so
   `D = 0.7629 - 0.7659 = -0.00301`, interval `[-0.008733, 0.001665]`, inside the margin of 0.01: `ZERO!`, which
   the table codes INDEP.
+
+### fluct: does the variance of the energy density persist with size?
+
+- **Relation:** the `size` chain. **Nodes:** `ln var(e)` at each size, `e = E / unit_scale`, the energy per bond (the
+  `unit_scale` is declared in the input's `[two_start]` table). **Operator:** A over the size edges, divided by the log of
+  the size ratio, like `across`; the door gives `ln` a positive argument by construction (variance is positive).
+- **M keeps** the second cumulant of the density and **discards** its higher cumulants and the time order of the snapshots.
+  Nothing but a declared unit scale acts before A.
+- **Reads:** `y_last`, the exponent of `var(e)` with size. A continuous transition has `var(e) ~ L^(-d + alpha/nu)`, so `y`
+  is negative (`VANISHES`); at a discontinuity `C ~ L^d` makes `var(e)` stay (`y` inside the margin: `PERSISTS`); above the
+  margin is `GROWS`. Margin `eps.y = 0.25`, cut at zero: no new constant.
+- **Means / trap:** a witness, read by `order.toml` only and only when the two starts agree (INDEP). Under COEXIST a run that
+  does not tunnel has a within-phase variance that vanishes, so there it is never evidence (the q = 7 trap). At q = 5,
+  L << xi, the variance falls as at a continuous point: the blind spot is structural, a resolution limit.
+- **A number:** w2-potts-2 at q = 3: `y_last = -1.564`, interval `[-1.615, -1.513]`, `SIG-`, so `VANISHES`.
 
 ### along: how fast does the difference between two neighbouring points grow with size?
 
