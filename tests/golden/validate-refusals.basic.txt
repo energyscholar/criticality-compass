@@ -1,0 +1,31 @@
+$ bin/cc validate
+cases/golden-todo.toml:family: still TODO
+  Next: replace it with a short description of the model
+cases/golden-todo.toml:mechanism: still TODO
+  Next: replace it with one sentence on what drives the transition
+cases/golden-todo.toml:class_truth: still TODO
+  Next: replace it with the real value
+cases/golden-todo.toml:controls.names[0]: still TODO
+  Next: replace it with the real value
+cases/golden-todo.toml:controls.range: still TODO
+  Next: replace it with the real value
+cases/golden-todo.toml:observables.list[0]: still TODO
+  Next: replace it with the real value
+cases/golden-todo.toml:sampler: still TODO
+  Next: replace it with the real value
+cases/golden-todo.toml:traps[0]: still TODO
+  Next: replace it with the real value
+cases/golden-todo.toml:decoy_of: still TODO
+  Next: replace it with the real value
+cases/golden-todo.toml:sources[0]: still TODO
+  Next: replace it with the real value
+inputs/w2-potts/points.toml:points."4": unknown case 'potts-4'
+  Next: create it with bin/cc new case potts-4, or map the point to an existing case or "none"
+tables/golden-bad/verdict.toml: 252 uncovered cells in 1 patterns
+  [[row]]
+  when.needle = ["MID"]
+  when.flow = ["SLOW"]
+  when.two_start = ["INDEP"]
+  Next: add a [[row]] with one of these when-lines, or widen a neighbouring row
+validate: 12 findings
+exit 1

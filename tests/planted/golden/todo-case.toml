@@ -1,0 +1,17 @@
+# cases/TEMPLATE.toml.in - read by `bin/cc new case <id>`, which substitutes golden-todo.
+# Replace every "TODO"; `bin/cc validate` refuses any TODO left in.
+schema = 1
+kind = "case"
+id = "golden-todo"
+family = "TODO"
+mechanism = "TODO"
+class_truth = "TODO"           # one of cc.toml alphabets.class_truth
+controls = { names = ["TODO"], range = "TODO" }
+observables = { list = ["TODO"], conjugate_observable = false }
+sampler = "TODO"               # free text, informational
+traps = ["TODO"]
+decoy_of = "TODO"              # "none", or a class other than class_truth
+pairs_with = []
+sources = ["TODO"]             # existing files (after ~ expansion)
+status = "declared"
+studies = []

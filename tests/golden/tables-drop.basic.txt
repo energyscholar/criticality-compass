@@ -1,0 +1,3 @@
+$ bin/cc tables drop g1
+dropped tables/g1
+exit 0

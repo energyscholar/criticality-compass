@@ -1,0 +1,42 @@
+$ bin/cc explain x8-ising-needle 1.10 --advanced
+explain x8-ising-needle 1.10   rules: verdict-x-rules
+sink
+  1 DATA      p1/g1-1.10.npy [GL key npy] ... 2 blocks; sha256 matches fixtures/data/x8-ising-needle.toml
+  2 REDUCE    row 0: 0 0.848, 1 0.9522, 2 0.9969, 3 1, 4 0.8483, 5 0.9526, 6 0.9974
+  3 RELATION  matched: matched, Coupling   big 243: L0..L3   small 81: L0..L2   edges: (243,L1)->(81,L0) (243,L2)->(81,L1) (243,L3)->(81,L2)
+  4 KERNEL    operator A over matched; row 0: velocity [0.002561]; d_ord [3.472e-05]; d_dis [1]; v_all [0.104, 0.04434, 0.002561]; g_final [1]
+  5 READING   d_ord 3.472e-05  interval [0, 0.0001042]  (95 %, 400 iid resamples)
+  6 SIGN      cuts -0.02 0 +0.02 (eps sink): bL 1, bU 2 -> ZERO!
+  7 CODE      at_ord: codes.toml line 19: ZERO! -> AT
+  1-4 SAME      as under sink
+  5 READING   d_dis 1  interval [0.9999, 1]  (95 %, 400 iid resamples)
+  6 SIGN      cuts -0.02 0 +0.02 (eps sink): bL 3, bU 3 -> SIG+
+  7 CODE      at_dis: codes.toml line 36: SIG+ -> NOT-AT
+  7 CODE      sink = ORD from at_ord AT and at_dis NOT-AT  (codes.toml line 59)
+needle
+  1-4 SAME      as under sink
+  5 READING   velocity 0.002561  interval [0.001996, 0.003151]  (95 %, 400 iid resamples)
+  6 SIGN      cuts -0.01 0 +0.01 (eps step): bL 2, bU 2 -> SLOW+
+  7 CODE      flow: codes.toml line 91: SLOW+ -> SLOW
+  1-4 SAME      as under sink
+  5 READING   d_ord 3.472e-05  interval [0, 0.0001042]  (95 %, 400 iid resamples)
+  6 SIGN      cuts -0.02 0 +0.02 (eps sink): bL 1, bU 2 -> ZERO!
+  7 CODE      at_ord: codes.toml line 19: ZERO! -> AT
+  1-4 SAME      as under sink
+  5 READING   d_dis 1  interval [0.9999, 1]  (95 %, 400 iid resamples)
+  6 SIGN      cuts -0.02 0 +0.02 (eps sink): bL 3, bU 3 -> SIG+
+  7 CODE      at_dis: codes.toml line 36: SIG+ -> NOT-AT
+  7 CODE      sink = ORD from at_ord AT and at_dis NOT-AT  (codes.toml line 59)
+  7 CODE      needle = ORD from sink ORD and vside MID  (codes.toml line 70)
+flow
+  1-4 SAME      as under sink
+  5 READING   velocity 0.002561  interval [0.001996, 0.003151]  (95 %, 400 iid resamples)
+  6 SIGN      cuts -0.01 0 +0.01 (eps step): bL 2, bU 2 -> SLOW+
+  7 CODE      flow: codes.toml line 91: SLOW+ -> SLOW
+across     NOT-MEASURED (across is not declared on this input)
+stability  NOT-MEASURED (stability is not declared on this input)
+two_start  NOT-MEASURED (two_start is not declared on this input)
+8 VERDICT   verdict.toml line 25: when.needle = [DIS, ORD]
+            => verdict NOT  class NOT, verdict.toml line 25
+               why: verdict_x STAGE1: off the window
+exit 0

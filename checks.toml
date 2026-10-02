@@ -6,7 +6,8 @@ maths = [
   "cc/instruments/needle.py", "cc/instruments/across.py", "cc/instruments/stability.py",
   "cc/instruments/two_start.py",
 ]
-plumbing = ["bin/cc", "cc/admit.py", "cc/declare.py", "cc/author.py", "cc/door.py", "cc/detect.py", ".githooks/pre-commit"]
+plumbing = ["bin/cc", "cc/admit.py", "cc/declare.py", "cc/author.py", "cc/door.py", "cc/detect.py", "cc/view.py", "cc/score.py", "tests/reference/verdict_x.py",
+  ".githooks/pre-commit"]
 benchmark = []
 methods = ["cc/detect.py"]
 tests = [
@@ -15,6 +16,8 @@ tests = [
   "tests/test_declare.py", "tests/test_tables_cli.py",
   "tests/test_needle_x8.py", "tests/test_b7.py", "tests/test_w2.py", "tests/test_two_start_c2.py",
   "tests/test_detect_verdicts.py", "tests/test_breakers.py", "tests/test_breakers_red.py",
+  "tests/test_golden.py", "tests/test_verdict_equivalence.py",
+  "tests/test_scoreboard.py", "tests/test_view.py", "tests/test_tabulate.py",
 ]
 
 [allow]

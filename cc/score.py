@@ -1,0 +1,156 @@
+"""score.py - the ONLY reader of class_truth: tabulate, the collisions, --diff, the verdict-table page. Plumbing."""
+import html
+import tomllib
+from pathlib import Path
+import numpy as np
+import declare
+import detect
+import view
+
+ROOT = Path(__file__).resolve().parent.parent
+
+
+def join(input_id, root=ROOT):
+    """point -> case id from inputs/<id>/points.toml (None when the input has no join file)."""
+    p = Path(root) / "inputs" / input_id / "points.toml"
+    return tomllib.loads(p.read_text())["points"] if p.is_file() else None
+
+
+def truths(root=ROOT):
+    return {f.stem: declare.load_truth(f) for f in sorted((Path(root) / "cases").glob("*.toml"))}
+
+
+def sizes_of(input_id, root):
+    p = Path(root) / "inputs" / input_id / "m.toml"
+    return tomllib.loads(p.read_text())["axes"]["size"] if p.is_file() else []
+
+
+def table_rows(res, tr, jn, root, findings):
+    """One row per point: the case from the join, the truth from the case file (UNJOINED + a finding if unknown)."""
+    rows = []
+    for sig in res["signature"]:
+        case = (jn or {}).get(sig["point"], "none")
+        if case != "none" and case not in tr:
+            findings.append(declare.fmt(declare.F(
+                f"inputs/{res['input']}/points.toml:points.\"{sig['point']}\"", f"unknown case '{case}'",
+                f'create it with bin/cc new case {case}, or map the point to an existing case or "none"')))
+        rows.append((sig, case, tr.get(case, "none" if case == "none" else "UNJOINED")))
+    return rows
+
+
+def tabulate(results, root=ROOT, joins=None):
+    """(SIGNATURE-TABLE.md text, findings): rows grouped by table set, then that set's collisions."""
+    tr, findings, by = truths(root), [], {}
+    for res in results:
+        bad = view.stale(res, root)
+        if bad:
+            findings.append(bad)
+        else:
+            by.setdefault(res["tables"], []).append(res)
+    out = ["# Signature table", "", "Written by `bin/cc tabulate`. Truth is joined here only (cc/score.py); "
+           "no result file holds it.", ""]
+    for tset, rs in sorted(by.items()):
+        cols, groups, tally = rs[0]["signature_columns"], {}, {"agree": 0, "refused": 0, "disagree": 0, "no truth": 0}
+        out += [f"## Rules: {tset}", "", "| run | point | case | truth | sizes | " + " | ".join(cols) + " | verdict | class |",
+                "|" + "---|" * (len(cols) + 7)]
+        for res in sorted(rs, key=lambda r: r["run_id"]):
+            jn = (joins or {}).get(res["input"]) or join(res["input"], root)
+            for sig, case, truth in table_rows(res, tr, jn, root, findings):
+                codes = [sig[c] + (f" ({''.join(sig['flags'][c])})" if sig["flags"].get(c) else "") for c in cols]
+                out.append(f"| {res['run_id']} | {sig['point']} | `{case}` | {truth} | "
+                           f"{' '.join(map(str, sizes_of(res['input'], root)))} | {' | '.join(codes)} | "
+                           f"{sig['verdict']} | {sig['verdict_class']} |")
+                groups.setdefault(tuple(sig[c] for c in cols), {}).setdefault(truth, []).append(f"{res['input']}:{sig['point']}")
+                kind = ("no truth" if truth in ("none", "UNJOINED") else "refused" if sig["verdict_class"] == "REFUSE"
+                        else "agree" if sig["verdict_class"] == truth else "disagree")
+                tally[kind] += 1
+        out += ["", f"Verdict class against truth: " + ", ".join(f"{n} {k}" for k, n in tally.items()), "",
+                f"## Collisions ({tset})", ""]
+        clash = [(k, g) for k, g in groups.items() if len({t for t in g if t not in ("none", "UNJOINED")}) > 1]
+        out += [f"- `{', '.join(f'{c}={v}' for c, v in zip(cols, k))}`: "
+                + " vs ".join(f"{t} ({', '.join(p)})" for t, p in sorted(g.items()) if t not in ("none", "UNJOINED"))
+                for k, g in clash] or ["none"]
+        out.append("")
+    return "\n".join(out) + "\n", findings
+
+
+# ------------------------------------------------------------------ the partition as an array
+def owners(T):
+    """(columns, domains, owner): the index of the verdict row that holds every cell of the signature domain."""
+    cols = T.verdict["columns"]
+    dom = [declare.doms(T.codes, T.codes["null_rank"])[c] for c in cols]
+    owner = np.full([len(d) for d in dom], -1)
+    for k, row in enumerate(T.verdict["row"]):
+        owner[np.ix_(*[[dom[i].index(v) for v in row["when"].get(c, dom[i])] for i, c in enumerate(cols)])] = k
+    return cols, dom, owner
+
+
+def verdict_cells(T, owner):
+    return np.array([r["verdict"] for r in T.verdict["row"]])[owner]
+
+
+def reverdict(res, pt, T):
+    """The verdict one stored point would get under table set T (its stored sign cells, no data read)."""
+    return detect.verdict_of(detect.signature_from_cells(view.cells_of(res, pt), T), T)[0]
+
+
+def diff(ta, tb, ra=(), rb=()):
+    """(lines, changed cells, changed fixture points): every cell whose verdict differs, as compressed patterns."""
+    (cols, dom, oa), (cols_b, dom_b, ob) = owners(ta), owners(tb)
+    if (cols, dom) != (cols_b, dom_b):
+        return [f"{ta.name} and {tb.name} have different signature columns or alphabets: no cell diff"], 0, []
+    va, vb = verdict_cells(ta, oa), verdict_cells(tb, ob)
+    lines, total = [], int((va != vb).sum())
+    for a, b in sorted({(x, y) for x, y in zip(va[va != vb], vb[va != vb])}):
+        free = (va == a) & (vb == b)
+        boxes = declare.patterns(free, cols, dom)
+        lines.append(f"{a} -> {b}: {int(free.sum())} cells in {len(boxes)} patterns")
+        lines += ["  " + "; ".join(f"when.{c} = {v}".replace("'", '"') for c, v in box) for box in boxes[:20]]
+    other = {r["run_id"].split("@")[0]: r for r in rb}
+    moved = []
+    for res in ra:
+        new = other.get(res["input"])
+        for sig in res["signature"]:
+            nv = {s["point"]: s["verdict"] for s in new["signature"]}[sig["point"]] if new else reverdict(res, sig["point"], tb)
+            moved += [(res["input"], sig["point"], sig["verdict"], nv)] * (nv != sig["verdict"])
+    return ([f"{total} cells change verdict between {ta.name} and {tb.name}"] + lines
+            + [f"{len(moved)} fixture points change verdict"] + [f"  {i}:{p}  {a} -> {b}" for i, p, a, b in moved], total, moved)
+
+
+# ------------------------------------------------------------------ docs/verdict-table.html
+CSS = ("body{font:15px/1.45 system-ui,sans-serif;margin:0 auto;max-width:70rem;padding:1rem 16px;background:#fff;color:#1a1a1a}"
+       "table{border-collapse:collapse;width:100%}td,th{border-bottom:1px solid #8884;padding:.25rem .5rem;text-align:left;"
+       "vertical-align:top}code{font-size:13px}.never{opacity:.7}"
+       "@media(prefers-color-scheme:dark){body{background:#16181c;color:#e6e6e6}}")
+
+
+def page(results, tables_dir=None, diffs=()):
+    """One static page: per table set, the verdict rows grouped by class with their cell counts and the points that hit them."""
+    by, order = {}, declare.Ctx(ROOT).alpha["class_truth"] + ["REFUSE"]
+    for res in results:
+        by.setdefault(res["tables"], []).append(res)
+    out = [f"<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'>"
+           f"<title>Verdict table</title><style>{CSS}</style><h1>Verdict table</h1>"]
+    for tset, rs in sorted(by.items()):
+        T = detect.load_tables(tset, tables_dir)
+        _, _, owner = owners(T)
+        hits = {}
+        for res in rs:
+            for sig in res["signature"]:
+                hits.setdefault(sig["row_line"], []).append(f"{res['input']}:{sig['point']}")
+        rows = [(r, T.lines[k], int((owner == k).sum())) for k, r in enumerate(T.verdict["row"])]
+        assert sum(n for _, _, n in rows) == owner.size, "the rows of a table must cover its domain exactly once"
+        cls = lambda v: "REFUSE" if v in T.verdict["refuse"] else T.verdict.get("class_of", {}).get(v, v)  # noqa: E731
+        out.append(f"<h2>Rules: {html.escape(tset)} ({owner.size} cells)</h2>")
+        for c in sorted({cls(r["verdict"]) for r, _, _ in rows}, key=lambda c: order.index(c) if c in order else 99):
+            out += [f"<h3>{html.escape(c)}</h3><table><tr><th>when<th>verdict<th>why<th>line<th>cells<th>hit by"]
+            for r, line, n in (x for x in rows if cls(x[0]["verdict"]) == c):
+                when = "; ".join(f"{k} = {', '.join(v)}" for k, v in r["when"].items())
+                out.append(f"<tr data-cells=\"{n}\"><td><code>{html.escape(when)}</code><td>{html.escape(r['verdict'])}"
+                           f"<td>{html.escape(r['why'])}<td>{line}<td>{n}<td>{html.escape(' '.join(hits.get(line, [])))}")
+            out.append("</table>")
+        out += ["<h3>Rows never hit by any result</h3><ul>"] + [
+            f"<li class=never>line {line}: {html.escape(r['verdict'])}" for r, line, _ in rows if line not in hits] + ["</ul>"]
+    for d in diffs:
+        out += ["<h2>Diff</h2><pre>" + html.escape("\n".join(d)) + "</pre>"]
+    return "\n".join(out) + "\n"

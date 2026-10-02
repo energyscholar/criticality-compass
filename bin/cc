@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """cc - Criticality Compass CLI (plumbing). Root = parent of the directory holding this script."""
 import json
+import os
 import shutil
 import stat
 import subprocess
@@ -12,8 +13,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "cc" / "instruments")]
-PHASE = {"show": 4, "explain": 4, "tabulate": 4}
 VERBOSE = False
+MODE = "basic"
 TOOLS = Path.home() / "software/scratch/structure-checks"
 ADVANCED = [
     ("show <input>", "every reading of an input, and each point's verdict"),
@@ -93,15 +94,20 @@ def run_tests(names, skip=()):
 
 def cmd_test(names):
     global VERBOSE
-    VERBOSE = "-v" in names
-    res, missing, allt = run_tests([n for n in names if n != "-v"])
+    regold = "--regolden" in names
+    os.environ["CC_REGOLDEN"] = "1" if regold else ""
+    VERBOSE = "-v" in names or regold
+    res, missing, allt = run_tests([n for n in names if n not in ("-v", "--regolden")])
     for n in missing:
         print(f"no test '{n}' in checks.toml [roles].tests\n  Next: bin/cc test <one of: "
               f"{' '.join(t.stem for t in allt)}>")
     for stem, ok, tail, _ in res:
         print(f"{'ok  ' if ok else 'FAIL'} {stem}")
-        if not ok or VERBOSE:
+        if not ok or (VERBOSE and not regold):
             print("\n".join("    " + ln for ln in tail))
+    if regold:
+        lines = [ln.strip() for _, _, tail, _ in res for ln in tail if ln.strip().startswith("REGOLDENED")]
+        print("\n".join(lines) + f"\nregoldened {len(lines)} files: review them with git diff tests/golden/")
     return 1 if missing or not all(ok for _, ok, _, _ in res) else 0
 
 
@@ -135,6 +141,7 @@ def cmd_check(args):
     bad = [r for r in res if not r[1]]
     skipped = f" (fast: {len(slow)} slow tests skipped; bin/cc check runs them)" if fast else ""
     print(f"check: {len(res) - len(bad)} tests passed, {len(bad)} failed{skipped}")
+    print("\n".join("check: " + ln.strip() for _, _, tail, _ in res for ln in tail if ln.strip().startswith("scoreboard ")))
     for stem, _, tail, _ in bad:
         print(f"check: FAILED: {stem}\n" + "\n".join("    " + ln for ln in tail) + f"\n  Next: bin/cc test {stem}")
     took, budget = time.time() - t0, config()["check"]["fast_budget_s"]
@@ -209,16 +216,14 @@ def run_one(name, tables, dry):
         return str(e), None
 
 
-def print_result(res, dry):
-    """The plain listing of a result (phase 3; the show view replaces it in phase 4)."""
-    print(f"run {res['run_id']}" + (" (dry: nothing written)" if dry else f" -> results/{res['run_id']}.json"))
-    for r in res["readings"]:
-        if r["cell"] != "NOT-MEASURED" or r["per_size"]:
-            est = "" if r["estimate"] is None else f"{r['estimate']:.4f} [{r['lo']:.4f}, {r['hi']:.4f}]"
-            per = "".join(f" L{q['size']} {q['estimate']:+.4f} {q['cell']}" for q in r["per_size"] or [])
-            print(f"  {r['unit']['point']:>10} {r['instrument']}.{r['column']} {est}{per} {r['cell'] or ''} "
-                  f"-> {r['code']}")
-    print("\n".join(f"  {s['point']:>10} => {s['verdict']} ({s['verdict_class']})" for s in res["signature"]))
+def frozen_note(rid, dry=False):
+    frozen = json.loads((ROOT / "FROZEN.json").read_text())["files"]
+    return "(dry: nothing written)" if dry else "(frozen)" if f"results/{rid}.json" in frozen else "(not frozen)"
+
+
+def emit(lines):
+    print("\n".join(lines))
+    return 1 if lines[0].startswith("REFUSED") else 0
 
 
 def cmd_run(args):
@@ -235,10 +240,68 @@ def cmd_run(args):
             bad += 1
             print(msg if len(names) == 1 else f"{name}: REFUSED: {msg.splitlines()[0]}")
             continue
-        print_result(res, "--dry" in args)
+        import score
+        import view
+        view_lines = view.show(res, score.join(name), MODE, frozen_note(res["run_id"], "--dry" in args))
+        print(f"run {res['run_id']}" + ("" if "--dry" in args else f" -> results/{res['run_id']}.json"))
+        bad += emit(view_lines)
         if len(names) > 1:
             print(f"{name}: ran")
     return 1 if bad else 0
+
+
+def load_result(name, tables, cmd):
+    """(refusal text, None) or (None, result): a result must exist before it can be shown."""
+    if name not in inputs():
+        return f"no input '{name}'. Inputs: {' '.join(inputs())}\n  Next: bin/cc {cmd} <one of these>", None
+    p = ROOT / "results" / f"{name}@{tables}.json"
+    if not p.is_file():
+        return (f"no result for {name} under {tables} yet.\n"
+                f"  Next: bin/cc run {name}   (or --dry to look without writing)"), None
+    return None, json.loads(p.read_text())
+
+
+def cmd_show(args, explain):
+    import score
+    import view
+    tables = opt(args, "--tables") or config()["defaults"]["tables"]
+    pos = [a for a in args if not a.startswith("--") and a != opt(args, "--tables")]
+    cmd = "explain" if explain else "show"
+    if len(pos) != 1 + explain:
+        print(f"usage: bin/cc {cmd} <input>{' <point>' * explain}\n  Next: bin/cc help")
+        return 1
+    msg, res = load_result(pos[0], tables, cmd)
+    if res is None:
+        print(msg)
+        return 1
+    points = [s["point"] for s in res["signature"]]
+    if explain and pos[1] not in points:
+        print(f"{pos[0]} has no point '{pos[1]}'. Points: {' '.join(points)}\n  Next: bin/cc explain {pos[0]} <one of these>")
+        return 1
+    jn = score.join(pos[0])
+    if explain:
+        return emit(view.explain(res, pos[1], jn, MODE))
+    return emit(view.show(res, jn, MODE, frozen_note(res["run_id"])))
+
+
+def cmd_tabulate(args):
+    import detect
+    import score
+    results = [json.loads(p.read_text()) for p in sorted((ROOT / "results").glob("*.json"))]
+    md, found = score.tabulate(results)
+    (ROOT / "SIGNATURE-TABLE.md").write_text(md)
+    diffs = []
+    if "--diff" in args:
+        a, b = args[args.index("--diff") + 1:][:2]
+        ra, rb = ([r for r in results if r["tables"] == t] for t in (a, b))
+        lines, _, _ = score.diff(detect.load_tables(a), detect.load_tables(b), ra, rb)
+        print("\n".join(lines))
+        diffs.append(lines)
+    (ROOT / "docs").mkdir(exist_ok=True)
+    (ROOT / "docs" / "verdict-table.html").write_text(score.page(results, None, diffs))
+    print("\n".join(found) + ("\n" if found else "") + f"tabulate: {len(results)} results -> SIGNATURE-TABLE.md, "
+          "docs/verdict-table.html")
+    return 1 if found else 0
 
 
 def freeze_files(rid, read):
@@ -249,7 +312,7 @@ def freeze_files(rid, read):
 
 
 def cmd_freeze(args):
-    import declare
+    import view
     tables = opt(args, "--tables") or config()["defaults"]["tables"]
     pos = [a for a in args if not a.startswith("--") and a != opt(args, "--tables")]
     done = (ROOT / "results").is_dir() and "--all" in args
@@ -262,12 +325,11 @@ def cmd_freeze(args):
         if not p.is_file():
             print(f"no result '{rid}'.\n  Next: bin/cc run {name}")
             return 1
-        read = json.loads(p.read_text())["read"]
-        for k, h in read.items():
-            if declare.sha(Path(k).expanduser() if k.startswith("~") else ROOT / k) != h:
-                print(f"REFUSED: {k} changed since {rid} was run.\n"
-                      f"  Next: bin/cc run {name} --tables {tset} (or restore the file)")
-                return 1
+        res = json.loads(p.read_text())
+        read, bad = res["read"], view.stale(res)
+        if bad:
+            print(bad)
+            return 1
         frozen = json.loads((ROOT / "FROZEN.json").read_text())
         tdir, want = freeze_files(rid, read)
         new = [w for w in want if w not in frozen["files"]]
@@ -320,21 +382,21 @@ def cmd_mutate(args):
 
 
 def main(argv):
+    global MODE
     advanced = "--advanced" in argv
+    MODE = "advanced" if advanced else config()["defaults"]["mode"]
     argv = [a for a in argv if a != "--advanced"]
     cmd, rest = (argv[0] if argv else "help"), argv[1:]
     if cmd == "help":
         print(help_text(advanced), end="")
         return 0
-    table = {"test": cmd_test, "run": cmd_run, "freeze": cmd_freeze, "check": cmd_check, "mutate": cmd_mutate,
+    table = {"show": lambda a: cmd_show(a, False), "explain": lambda a: cmd_show(a, True), "tabulate": cmd_tabulate,
+             "test": cmd_test, "run": cmd_run, "freeze": cmd_freeze, "check": cmd_check, "mutate": cmd_mutate,
              "validate": lambda a: cmd_validate(a + (["--advanced"] if advanced else []))}
     if cmd in table:
         return table[cmd](rest)
     if cmd in ("new", "data", "tables"):
         return cmd_author(cmd, rest)
-    if cmd in PHASE:
-        print(f"not built until phase {PHASE[cmd]}")
-        return 1
     print(f"unknown command '{cmd}'.\n  Next: bin/cc help")
     return 1
 

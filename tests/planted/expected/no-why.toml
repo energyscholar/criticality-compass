@@ -1,0 +1,66 @@
+# tests/planted/expected/no-why.toml - PLANTED: the last [[change]] has an empty why; test_scoreboard must refuse it
+# (copy of expected/verdict-x-rules.toml) - the SCOREBOARD LOCK for one table set (data; read by
+# tests/test_scoreboard.py only). It holds the VERDICT CC is expected to give each (input, point)
+# under this set. It is NOT truth: agreement with class_truth is reported by bin/cc tabulate
+# (cc/score.py), never here. Changing a verdict here is a reviewed edit: append a [[change]].
+schema = 1
+kind = "expected"
+tables = "no-why"
+
+[verdicts.x8-ising-needle]
+"0.90" = "NOT"
+"0.95" = "NOT"
+"0.98" = "NOT"
+"0.99" = "NOT"
+"1.00" = "REFUSE-TWO-START-UNMEASURED"
+"1.01" = "NOT"
+"1.02" = "NOT"
+"1.05" = "NOT"
+"1.10" = "NOT"
+
+[verdicts.b7-at-line]
+"0.0" = "REFUSE-NEEDLE-UNMEASURED"
+"0.07" = "REFUSE-NEEDLE-UNMEASURED"
+"0.14" = "REFUSE-NEEDLE-UNMEASURED"
+"0.21" = "REFUSE-NEEDLE-UNMEASURED"
+"0.2747" = "REFUSE-NEEDLE-UNMEASURED"
+
+[verdicts.w2-potts]
+"2" = "REFUSE-NEEDLE-UNMEASURED"
+"3" = "REFUSE-NEEDLE-UNMEASURED"
+"4" = "REFUSE-NEEDLE-UNMEASURED"
+"5" = "REFUSE-NEEDLE-UNMEASURED"
+
+[verdicts.c2-bc-two-start]           # no needle on this input: every point refuses
+"d2.0-K1.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K1.2" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K1.4" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K1.6" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K1.8" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K2.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K2.3" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K2.6" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K3.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K1.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K1.2" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K1.4" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K1.6" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K1.8" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K2.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K2.3" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K2.6" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K3.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K1.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K1.2" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K1.4" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K1.6" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K1.8" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K2.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K2.3" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K2.6" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K3.0" = "REFUSE-NEEDLE-UNMEASURED"
+
+[[change]]
+date = "2026-10-01"
+points = ["*"]
+why = ""

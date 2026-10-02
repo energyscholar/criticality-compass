@@ -1,0 +1,57 @@
+$ bin/cc show b7-at-line --advanced
+b7-at-line   rules: verdict-x-rules   result: results/b7-at-line@verdict-x-rules.json (not frozen)
+  interval: block resamples 400, level 0.95, seed 22
+  code_commit: 20ab7bdb0a4634b0faec15e1d4548afefe423c36
+  read inputs/b7-at-line/m.toml d0d267e3857c
+  read instruments/across.toml 8f6803e8af6c
+  read instruments/stability.toml 2fc7bb21b58a
+  read tables/verdict-x-rules/codes.toml d43f06815275
+  read tables/verdict-x-rules/verdict.toml 64a671e0046e
+  read fixtures/data/b7-at-line.toml bd62cf008da6
+  read 15 data files, sha256 match the pinned manifest
+point 0.0   case at-self-dual-line   obtained: truth
+  sink       NOT-MEASURED (needle is not declared on this input)
+  needle     NOT-MEASURED (needle is not declared on this input)
+  flow       NOT-MEASURED (needle is not declared on this input)
+  across     1.009 [0.9764, 1.045] SIG+ eps y=0.25 -> RELEVANT flags: uses Hamiltonian knowledge, truth point vector across/y_last/point=0.0
+  stability  0.01661 [-0.03909, 0.07487] ZERO! eps y=0.25 -> STABLE flags: uses Hamiltonian knowledge, truth point vector stability/d/point=0.0
+  two_start  NOT-MEASURED (two_start is not declared on this input)
+  => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 133
+     why: honest null (not in verdict_x): the needle was not measured or not evaluated
+point 0.07   case at-self-dual-line   obtained: truth
+  sink       NOT-MEASURED (needle is not declared on this input)
+  needle     NOT-MEASURED (needle is not declared on this input)
+  flow       NOT-MEASURED (needle is not declared on this input)
+  across     1.073 [1.04, 1.106] SIG+ eps y=0.25 -> RELEVANT flags: uses Hamiltonian knowledge, truth point vector across/y_last/point=0.07
+  stability  -0.02596 [-0.07265, 0.02263] ZERO! eps y=0.25 -> STABLE flags: uses Hamiltonian knowledge, truth point vector stability/d/point=0.07
+  two_start  NOT-MEASURED (two_start is not declared on this input)
+  => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 133
+     why: honest null (not in verdict_x): the needle was not measured or not evaluated
+point 0.14   case at-self-dual-line   obtained: truth
+  sink       NOT-MEASURED (needle is not declared on this input)
+  needle     NOT-MEASURED (needle is not declared on this input)
+  flow       NOT-MEASURED (needle is not declared on this input)
+  across     1.175 [1.137, 1.223] SIG+ eps y=0.25 -> RELEVANT flags: uses Hamiltonian knowledge, truth point vector across/y_last/point=0.14
+  stability  -0.06267 [-0.1145, 0.01062] ZERO! eps y=0.25 -> STABLE flags: uses Hamiltonian knowledge, truth point vector stability/d/point=0.14
+  two_start  NOT-MEASURED (two_start is not declared on this input)
+  => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 133
+     why: honest null (not in verdict_x): the needle was not measured or not evaluated
+point 0.21   case at-self-dual-line   obtained: truth
+  sink       NOT-MEASURED (needle is not declared on this input)
+  needle     NOT-MEASURED (needle is not declared on this input)
+  flow       NOT-MEASURED (needle is not declared on this input)
+  across     1.331 [1.265, 1.391] SIG+ eps y=0.25 -> RELEVANT flags: uses Hamiltonian knowledge, truth point vector across/y_last/point=0.21
+  stability  -0.007897 [-0.102, 0.07876] ZERO! eps y=0.25 -> STABLE flags: uses Hamiltonian knowledge, truth point vector stability/d/point=0.21
+  two_start  NOT-MEASURED (two_start is not declared on this input)
+  => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 133
+     why: honest null (not in verdict_x): the needle was not measured or not evaluated
+point 0.2747   case at-self-dual-line   obtained: truth
+  sink       NOT-MEASURED (needle is not declared on this input)
+  needle     NOT-MEASURED (needle is not declared on this input)
+  flow       NOT-MEASURED (needle is not declared on this input)
+  across     1.321 [1.202, 1.423] SIG+ eps y=0.25 -> RELEVANT flags: uses Hamiltonian knowledge, truth point vector across/y_last/point=0.2747
+  stability  -0.09087 [-0.2528, 0.04768] UNRES eps y=0.25 flags: uses Hamiltonian knowledge, truth point vector stability/d/point=0.2747
+  two_start  NOT-MEASURED (two_start is not declared on this input)
+  => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 133
+     why: honest null (not in verdict_x): the needle was not measured or not evaluated
+exit 0

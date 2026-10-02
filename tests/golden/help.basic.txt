@@ -1,0 +1,18 @@
+$ bin/cc help
+cc - Criticality Compass   (BASIC; `bin/cc help --advanced` lists every command)
+
+  bin/cc show <input>                   every reading of an input, and each point's verdict
+  bin/cc explain <input> <point>        the whole chain for one point: data -> verdict
+  bin/cc run <input> | --all [--dry]    measure under the working rules (--dry writes nothing)
+  bin/cc new case <id>                  start a case file (taxonomy) from the template
+  bin/cc tables fork <from> <to>        copy a rulebook so you can edit it
+  bin/cc tables drop <set>              delete a rulebook you no longer want
+  bin/cc validate                       check every file; each problem says what to do next
+  bin/cc check                          validate + tests + scoreboard; run it before a commit
+
+inputs: b7-at-line c2-bc-two-start w2-potts x8-ising-needle
+rules in use: verdict-x-rules   (cc.toml [defaults] tables)
+BLANK (...) means "CC does not know"; the word in brackets says why.
+
+start: bin/cc show b7-at-line
+exit 0

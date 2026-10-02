@@ -1,0 +1,69 @@
+# tests/golden/golden.toml - the GOLDEN TRANSCRIPTS (data; read by tests/test_golden.py).
+# Each [[case]] runs `bin/cc <argv>` in a fresh temp copy of the repo (data read in place), once
+# per mode (basic: argv as written; advanced: argv + ["--advanced"]), after its `before` commands
+# (not recorded) and its `plant` copies (src -> dst inside the copy). The transcript is
+# tests/golden/<id>.<mode>.txt: "$ bin/cc <argv>", then stdout and stderr, then "exit <code>".
+schema = 1
+kind = "golden"
+
+[[case]]
+id = "help"
+argv = ["help"]
+phase = 4
+
+[[case]]
+id = "show-b7"
+argv = ["show", "b7-at-line"]
+phase = 4
+
+[[case]]
+id = "show-w2"
+argv = ["show", "w2-potts"]
+phase = 4
+
+[[case]]
+id = "explain-w2-5"
+argv = ["explain", "w2-potts", "5"]
+phase = 4
+
+[[case]]
+id = "explain-b7-0.07"
+argv = ["explain", "b7-at-line", "0.07"]
+phase = 4
+
+[[case]]
+id = "explain-x8-1.10"
+argv = ["explain", "x8-ising-needle", "1.10"]
+phase = 4
+
+[[case]]
+id = "run-dry-x8"
+argv = ["run", "x8-ising-needle", "--dry"]
+phase = 4
+
+[[case]]
+id = "tables-fork"
+argv = ["tables", "fork", "verdict-x-rules", "g1"]
+phase = 4
+
+[[case]]
+id = "tables-drop"
+before = [["tables", "fork", "verdict-x-rules", "g1"]]
+argv = ["tables", "drop", "g1"]
+phase = 4
+
+[[case]]
+id = "tables-drop-default"           # the default check runs before the frozen check, so this
+argv = ["tables", "drop", "verdict-x-rules"]   # transcript is the same before and after phase 5
+phase = 4
+
+[[case]]
+id = "validate-refusals"
+before = [["tables", "fork", "verdict-x-rules", "golden-bad"]]
+argv = ["validate"]
+phase = 4
+
+[case.plant]                          # src (under tests/planted/golden/) -> dst in the copy
+"join-unknown-case.toml" = "inputs/w2-potts/points.toml"
+"uncovered-verdict.toml" = "tables/golden-bad/verdict.toml"
+"todo-case.toml" = "cases/golden-todo.toml"

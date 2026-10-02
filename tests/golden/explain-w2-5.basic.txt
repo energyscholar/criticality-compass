@@ -1,0 +1,48 @@
+$ bin/cc explain w2-potts 5
+explain w2-potts 5   rules: verdict-x-rules
+sink       BLANK (NOT-MEASURED: needle is not declared on this input)
+needle     BLANK (NOT-MEASURED: needle is not declared on this input)
+flow       BLANK (NOT-MEASURED: needle is not declared on this input)
+across
+  1 DATA      w2/q5-L27-random.npz [G key G, E key E] ... 3 blocks; sha256 matches fixtures/data/w2-potts.toml
+  2 REDUCE    row 0: 27 14.42, 81 83.45, 243 527.7
+  3 RELATION  size: chain, Coupling   27 <- 81 <- 243
+  4 KERNEL    operator A over size; row 0: y_steps [1.598, 1.679]; y_last [1.679]
+  5 READING   y_last 1.679  interval [1.417, 1.932]  (95 %, 400 block resamples, b 400)
+  6 SIGN      cuts -0.25 0 +0.25 (eps y): bL 3, bU 3 -> SIG+
+  7 CODE      across: codes.toml line 107: SIG+ -> RELEVANT
+stability
+  1 DATA      w2/q5-L27-random.npz [G key G, E key E] ... 3 blocks; sha256 matches fixtures/data/w2-potts.toml
+  2 REDUCE    row 0: 27 14.42, 81 83.45, 243 527.7
+  3 RELATION  size: chain, Coupling   27 <- 81 <- 243
+  4 KERNEL    operator A over size; row 0: d [0.08076]
+  5 READING   d 0.08076  interval [-0.3098, 0.5382]  (95 %, 400 block resamples, b 400)
+  6 SIGN      cuts -0.25 0 +0.25 (eps y): bL 0, bU 3 -> BLANK (UNRES: interval straddles 0 and a margin edge)
+  7 CODE      stability: codes.toml line 122: UNRES -> BLANK (UNRES: interval straddles 0 and a margin edge)
+two_start
+  1 DATA      L27 w2/q5-L27-random.npz [Q key E] ... 2 blocks; sha256 matches fixtures/data/w2-potts.toml
+  2 REDUCE    L27 row 0: 0 0.7659, 1 0.7629
+  3 RELATION  L27 start: pair, Coupling   random <- ordered
+  4 KERNEL    L27 operator A over start; row 0: D [-0.00301]
+  5 READING   L27 D -0.00301  interval [-0.008733, 0.001665]  (95 %, 400 block resamples, b 400)
+  6 SIGN      L27 cuts -0.01 0 +0.01 (eps two_start): bL 1, bU 2 -> ZERO!
+  7 CODE      L27 two_start: codes.toml line 136: ZERO! -> INDEP
+  1 DATA      L81 w2/q5-L81-random.npz [Q key E] ... 2 blocks; sha256 matches fixtures/data/w2-potts.toml
+  2 REDUCE    L81 row 0: 0 0.7515, 1 0.7467
+  3 RELATION  L81 start: pair, Coupling   random <- ordered
+  4 KERNEL    L81 operator A over start; row 0: D [-0.004793]
+  5 READING   L81 D -0.004793  interval [-0.01177, 0.001494]  (95 %, 400 block resamples, b 400)
+  6 SIGN      L81 cuts -0.01 0 +0.01 (eps two_start): bL 0, bU 2 -> BLANK (UNRES: interval straddles 0 and a margin edge)
+  7 CODE      L81 two_start: codes.toml line 140: UNRES -> BLANK (UNRES: interval straddles 0 and a margin edge)
+  1 DATA      L243 w2/q5-L243-random.npz [Q key E] ... 2 blocks; sha256 matches fixtures/data/w2-potts.toml
+  2 REDUCE    L243 row 0: 0 0.7373, 1 0.7411
+  3 RELATION  L243 start: pair, Coupling   random <- ordered
+  4 KERNEL    L243 operator A over start; row 0: D [0.003852]
+  5 READING   L243 D 0.003852  interval [-0.002115, 0.00997]  (95 %, 400 block resamples, b 400)
+  6 SIGN      L243 cuts -0.01 0 +0.01 (eps two_start): bL 1, bU 2 -> ZERO!
+  7 CODE      L243 two_start: codes.toml line 136: ZERO! -> INDEP
+  7 CODE      combine.rank NOT-MEASURED > NOT-EVALUATED > COEXIST > FLUCT > UNRES > INDEP (first wins) -> BLANK (UNRES: interval straddles 0 and a margin edge)
+8 VERDICT   verdict.toml line 133: when.needle = [NOT-MEASURED, NOT-EVALUATED]
+            => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
+               why: honest null (not in verdict_x): the needle was not measured or not evaluated
+exit 0

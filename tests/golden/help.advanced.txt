@@ -1,0 +1,21 @@
+$ bin/cc help --advanced
+cc - Criticality Compass   (ADVANCED)
+
+  bin/cc show <input>                                         every reading of an input, and each point's verdict
+  bin/cc explain <input> <point>                              the whole chain for one point: data -> verdict
+  bin/cc run <input> | --all [--tables SET] [--dry]           measure; --dry writes nothing
+  bin/cc freeze <run-id> | --all [--tables SET]               make a result and what it read read-only
+  bin/cc tabulate [--diff A B]                                SIGNATURE-TABLE.md and docs/verdict-table.html
+  bin/cc new case <id>                                        start a case file from the template
+  bin/cc new input <id> [--like X ...]                        start an input from the template
+  bin/cc data add <input>                                     pin the sha256 of an input's data files
+  bin/cc tables fork <from> <to>                              copy a rulebook so you can edit it
+  bin/cc tables drop <set> [--with-results]                   delete an unfrozen rulebook
+  bin/cc tables split <set> --column C --value V --verdict X  override one cell family
+  bin/cc validate [--input ID --tables SET | --mvt]           check every file; each problem has a Next line
+  bin/cc check [--fast]                                       validate + tests; run it before a commit
+  bin/cc test [-v] [<name> ...]                               run the named tests (default all)
+  bin/cc mutate <relpath> (--sed E | --py E) -- <test> ...    run tests against a temporary mutation
+  bin/cc help [--advanced]                                    this text
+  bin/cc (v0.1) family                                        not in v0
+exit 0
