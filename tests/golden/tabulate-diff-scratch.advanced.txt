@@ -28,5 +28,5 @@ REFUSE-EQUIL -> REFUSE-WEAK: 36 cells in 1 patterns
 REFUSE-EQUIL -> WALKING: 12 cells in 1 patterns
   when.needle = ["MID"]; when.flow = ["STOPPED"]; when.across = ["RELEVANT", "MARGINAL"]; when.stability = ["CROSSING"]; when.two_start = ["UNRES"]
 0 fixture points change verdict
-tabulate: 7 results -> SIGNATURE-TABLE.md, docs/verdict-table.html
+tabulate --diff: wrote nothing (bin/cc tabulate writes SIGNATURE-TABLE.md and docs/verdict-table.html)
 exit 0

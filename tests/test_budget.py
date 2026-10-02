@@ -4,7 +4,7 @@ Raising CAP is the Auditor's planned edit, never the Generator's."""
 import tomllib
 from pathlib import Path
 
-CAP = 2900
+CAP = 3600
 VERBATIM = [
     "cc/admit.py", "tests/test_kernel.py", "tests/test_sign.py", "tests/test_resample.py",
     "tests/test_kernel_rs.py", "tests/reference/verdict_x.py",

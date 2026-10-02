@@ -1,9 +1,11 @@
 """test_tabulate - SIGNATURE-TABLE.md and docs/verdict-table.html from the stored results: rows, collisions, the
 truth firewall, a seventh signature column, the page's cell counts and the D13 diff (appendix 9.3)."""
 import copy
+import hashlib
 import json
 import re
 import shutil
+import subprocess
 import sys
 import tempfile
 from pathlib import Path
@@ -64,5 +66,15 @@ with tempfile.TemporaryDirectory() as t:
     f.write_text(flip)
     lines, total, moved = score.diff(detect.load_tables("verdict-x-rules"), detect.load_tables("d13", t), results, [])
     check("--diff of the D13 flip: 1 512 cells, no fixture point", total == 1512 and moved == [], "\n".join(lines[:6]))
+with tempfile.TemporaryDirectory() as t:       # O2/R14: --diff prints and writes nothing (a copy of the repo, never the live tree)
+    repo = Path(t) / "repo"
+    shutil.copytree(ROOT, repo, ignore=shutil.ignore_patterns(".git", "__pycache__"))
+    pages = [repo / "SIGNATURE-TABLE.md", repo / "docs" / "verdict-table.html"]
+    digest = lambda: [hashlib.sha256(q.read_bytes()).hexdigest() if q.is_file() else "absent" for q in pages]  # noqa: E731
+    before = digest()
+    r = subprocess.run([sys.executable, str(repo / "bin" / "cc"), "tabulate", "--diff", "verdict-x-rules", "v01-rules"],
+                       capture_output=True, text=True, cwd=repo)
+    check("tabulate --diff writes neither SIGNATURE-TABLE.md nor docs/verdict-table.html",
+          r.returncode == 0 and digest() == before and "wrote nothing" in r.stdout, r.stdout + r.stderr)
 print("test_tabulate: " + ("FAILED" if bad else "all passed"))
 sys.exit(1 if bad else 0)

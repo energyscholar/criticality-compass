@@ -21,7 +21,7 @@ ADVANCED = [
     ("explain <input> <point>", "the whole chain for one point: data -> verdict"),
     ("run <input> | --all [--tables SET] [--dry]", "measure; --dry writes nothing"),
     ("freeze <run-id> | --all [--tables SET]", "make a result and what it read read-only"),
-    ("tabulate [--diff A B]", "SIGNATURE-TABLE.md and docs/verdict-table.html"),
+    ("tabulate [--diff A B]", "write SIGNATURE-TABLE.md + docs/verdict-table.html; --diff prints only"),
     ("new case <id>", "start a case file from the template"),
     ("new input <id> [--like X ...]", "start an input from the template"),
     ("data add <input>", "pin the sha256 of an input's data files"),
@@ -287,21 +287,27 @@ def cmd_show(args, explain):
     return emit(view.show(res, jn, MODE, frozen_note(res["run_id"])))
 
 
-def cmd_tabulate(args):
+def cmd_diff(args):
+    """tabulate --diff A B: print the diff and write NOTHING (plan 0864 O2/R14)."""
     import detect
     import score
     results = [json.loads(p.read_text()) for p in sorted((ROOT / "results").glob("*.json"))]
+    a, b = args[args.index("--diff") + 1:][:2]
+    ra, rb = ([r for r in results if r["tables"] == t] for t in (a, b))
+    lines, _, _ = score.diff(detect.load_tables(a), detect.load_tables(b), ra, rb)
+    print("\n".join(lines) + "\ntabulate --diff: wrote nothing (bin/cc tabulate writes SIGNATURE-TABLE.md and docs/verdict-table.html)")
+    return 0
+
+
+def cmd_tabulate(args):
+    import score
+    if "--diff" in args:
+        return cmd_diff(args)
+    results = [json.loads(p.read_text()) for p in sorted((ROOT / "results").glob("*.json"))]
     md, found = score.tabulate(results)
     (ROOT / "SIGNATURE-TABLE.md").write_text(md)
-    diffs = []
-    if "--diff" in args:
-        a, b = args[args.index("--diff") + 1:][:2]
-        ra, rb = ([r for r in results if r["tables"] == t] for t in (a, b))
-        lines, _, _ = score.diff(detect.load_tables(a), detect.load_tables(b), ra, rb)
-        print("\n".join(lines))
-        diffs.append(lines)
     (ROOT / "docs").mkdir(exist_ok=True)
-    (ROOT / "docs" / "verdict-table.html").write_text(score.page(results, None, diffs))
+    (ROOT / "docs" / "verdict-table.html").write_text(score.page(results, None, []))
     print("\n".join(found) + ("\n" if found else "") + f"tabulate: {len(results)} results -> SIGNATURE-TABLE.md, "
           "docs/verdict-table.html")
     return 1 if found else 0
