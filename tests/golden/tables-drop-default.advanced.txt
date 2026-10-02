@@ -1,4 +1,4 @@
-$ bin/cc tables drop verdict-x-rules --advanced
-REFUSED: tables/verdict-x-rules is the default rulebook (cc.toml [defaults] tables).
+$ bin/cc tables drop v01-rules --advanced
+REFUSED: tables/v01-rules is the default rulebook (cc.toml [defaults] tables).
   Next: change [defaults] tables in cc.toml first, or drop another set
 exit 1

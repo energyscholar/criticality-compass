@@ -1,5 +1,5 @@
 $ bin/cc explain w2-potts 5 --advanced
-explain w2-potts 5   rules: verdict-x-rules
+explain w2-potts 5   rules: v01-rules
 sink       NOT-MEASURED (needle is not declared on this input)
 needle     NOT-MEASURED (needle is not declared on this input)
 flow       NOT-MEASURED (needle is not declared on this input)
@@ -42,7 +42,7 @@ two_start
   6 SIGN      L243 cuts -0.01 0 +0.01 (eps two_start): bL 1, bU 2 -> ZERO!
   7 CODE      L243 two_start: codes.toml line 136: ZERO! -> INDEP
   7 CODE      combine.rank NOT-MEASURED > NOT-EVALUATED > COEXIST > FLUCT > UNRES > INDEP (first wins) -> UNRES
-8 VERDICT   verdict.toml line 133: when.needle = [NOT-MEASURED, NOT-EVALUATED]
-            => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 133
+8 VERDICT   verdict.toml line 153: when.needle = [NOT-MEASURED, NOT-EVALUATED]
+            => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 153
                why: honest null (not in verdict_x): the needle was not measured or not evaluated
 exit 0

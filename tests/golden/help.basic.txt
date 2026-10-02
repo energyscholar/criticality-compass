@@ -11,7 +11,7 @@ cc - Criticality Compass   (BASIC; `bin/cc help --advanced` lists every command)
   bin/cc check                          validate + tests + scoreboard; run it before a commit
 
 inputs: b7-at-line c2-bc-two-start w2-potts x2-xy-line x3-clock6 x4-ising-field x8-ising-needle
-rules in use: verdict-x-rules   (cc.toml [defaults] tables)
+rules in use: v01-rules   (cc.toml [defaults] tables)
 BLANK (...) means "CC does not know"; the word in brackets says why.
 
 start: bin/cc show b7-at-line

@@ -4,6 +4,7 @@ cc - Criticality Compass   (ADVANCED)
   bin/cc show <input>                                         every reading of an input, and each point's verdict
   bin/cc explain <input> <point>                              the whole chain for one point: data -> verdict
   bin/cc run <input> | --all [--tables SET] [--dry]           measure; --dry writes nothing
+  bin/cc reverdict <input> --tables SET [--from SET]          re-verdict a stored result under another rulebook; measures nothing
   bin/cc freeze <run-id> | --all [--tables SET]               make a result and what it read read-only
   bin/cc tabulate [--diff A B]                                write SIGNATURE-TABLE.md + docs/verdict-table.html; --diff prints only
   bin/cc new case <id>                                        start a case file from the template

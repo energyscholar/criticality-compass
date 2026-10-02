@@ -54,7 +54,7 @@ phase = 4
 
 [[case]]
 id = "tables-drop-default"           # the default check runs before the frozen check, so this
-argv = ["tables", "drop", "verdict-x-rules"]   # transcript is the same before and after phase 5
+argv = ["tables", "drop", "v01-rules"]   # the default set (plan 0864 R10b: was verdict-x-rules)
 phase = 4
 
 [[case]]
@@ -176,7 +176,7 @@ phase = 5
 
 [[case]]
 id = "run-frozen"
-argv = ["run", "w2-potts"]
+argv = ["run", "w2-potts", "--tables", "verdict-x-rules"]
 phase = 5
 
 [[case]]

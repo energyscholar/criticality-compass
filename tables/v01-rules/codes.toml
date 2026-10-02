@@ -1,4 +1,4 @@
-# tables/verdict-x-rules/codes.toml - sign cell -> code, one map per column (data; total).
+# tables/v01-rules/codes.toml - sign cell -> code, one map per column (data; total).
 # RULE (applied by the loader, stated here): the nulls NOT-MEASURED and NOT-EVALUATED
 # (cc.toml alphabets.nulls) are never keys; they pass through every map unchanged. A derived
 # column whose sources include a null takes the first null of `null_rank` among its sources.
@@ -42,11 +42,11 @@ alphabet = ["DIS", "MID", "ORD"]
 
 [columns.helper.vside.map]
 "SIG-" = "DIS"
-"NEG" = "DIS"
+"NEG" = "MID"                                  # v01-rules (plan 0864 Q1 c'): a resolved sub-eps side is MID
 "SLOW-" = "MID"
 "ZERO!" = "MID"
 "SLOW+" = "MID"
-"POS" = "ORD"
+"POS" = "MID"                                  # v01-rules (plan 0864 Q1 c')
 "SIG+" = "ORD"
 "UNRES" = "MID"
 
@@ -85,11 +85,11 @@ alphabet = ["STOPPED", "SLOW", "FLOWING", "UNRES"]
 
 [columns.signature.flow.map]
 "SIG-" = "FLOWING"
-"NEG" = "FLOWING"
+"NEG" = "SLOW"                                 # v01-rules (plan 0864 Q1 c'): inside eps is SLOW, never FLOWING
 "SLOW-" = "SLOW"
 "ZERO!" = "STOPPED"
 "SLOW+" = "SLOW"
-"POS" = "FLOWING"
+"POS" = "SLOW"                                 # v01-rules (plan 0864 Q1 c')
 "SIG+" = "FLOWING"
 "UNRES" = "UNRES"
 

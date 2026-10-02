@@ -1,5 +1,5 @@
 $ bin/cc explain x8-ising-needle 1.10 --advanced
-explain x8-ising-needle 1.10   rules: verdict-x-rules
+explain x8-ising-needle 1.10   rules: v01-rules
 sink
   1 DATA      p1/g1-1.10.npy [GL key npy] ... 2 blocks; sha256 matches fixtures/data/x8-ising-needle.toml
   2 REDUCE    row 0: 0 0.848, 1 0.9522, 2 0.9969, 3 1, 4 0.8483, 5 0.9526, 6 0.9974

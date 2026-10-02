@@ -3,7 +3,7 @@ schema = 1
 kind = "cc"
 
 [defaults]
-tables = "verdict-x-rules"      # the working table set (a directory under tables/)
+tables = "v01-rules"          # the working table set (a directory under tables/)
 mode = "basic"                  # basic | advanced; the flag --advanced overrides per command
 
 [data]
@@ -37,7 +37,7 @@ Q = 1                           # the two-start order parameter per snapshot
 keeps = ["point", "column", "estimate", "lo", "hi", "cell", "code", "reason", "verdict", "why"]
 discards = [
   "instrument", "unit", "eps_key", "eps", "flags", "obtained", "vector_key",
-  "verdict_class", "row_line", "per_size", "read", "code_commit", "interval", "reports",
+  "verdict_class", "row_line", "per_size", "read", "code_commit", "interval", "reports", "derived_from",
 ]
 blank = ["NOT-MEASURED", "NOT-EVALUATED", "UNRES"]  # shown as BLANK (<value>: <reason>)
 blank_refuse = true             # a verdict in the set's `refuse` list shows as BLANK (<verdict>)

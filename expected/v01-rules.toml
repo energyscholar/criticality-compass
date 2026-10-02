@@ -1,0 +1,119 @@
+# expected/v01-rules.toml - the SCOREBOARD LOCK for one table set (data; read by
+# tests/test_scoreboard.py only). It holds the VERDICT CC is expected to give each (input, point)
+# under this set. It is NOT truth: agreement with class_truth is reported by bin/cc tabulate
+# (cc/score.py), never here. Changing a verdict here is a reviewed edit: append a [[change]].
+schema = 1
+kind = "expected"
+tables = "v01-rules"
+
+[verdicts.x8-ising-needle]
+"0.90" = "NOT"
+"0.95" = "NOT"
+"0.98" = "NOT"
+"0.99" = "NOT"
+"1.00" = "REFUSE-TWO-START-UNMEASURED"
+"1.01" = "NOT"
+"1.02" = "NOT"
+"1.05" = "NOT"
+"1.10" = "NOT"
+
+[verdicts.b7-at-line]
+"0.0" = "REFUSE-NEEDLE-UNMEASURED"
+"0.07" = "REFUSE-NEEDLE-UNMEASURED"
+"0.14" = "REFUSE-NEEDLE-UNMEASURED"
+"0.21" = "REFUSE-NEEDLE-UNMEASURED"
+"0.2747" = "REFUSE-NEEDLE-UNMEASURED"
+
+[verdicts.w2-potts]
+"2" = "REFUSE-NEEDLE-UNMEASURED"
+"3" = "REFUSE-NEEDLE-UNMEASURED"
+"4" = "REFUSE-NEEDLE-UNMEASURED"
+"5" = "REFUSE-NEEDLE-UNMEASURED"
+
+[verdicts.c2-bc-two-start]           # no needle on this input: every point refuses
+"d2.0-K1.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K1.2" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K1.4" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K1.6" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K1.8" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K2.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K2.3" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K2.6" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K3.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K1.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K1.2" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K1.4" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K1.6" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K1.8" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K2.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K2.3" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K2.6" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K3.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K1.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K1.2" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K1.4" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K1.6" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K1.8" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K2.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K2.3" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K2.6" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K3.0" = "REFUSE-NEEDLE-UNMEASURED"
+
+[verdicts.x2-xy-line]                # frozen X2.txt: LINE points 0.5-0.7 read REFUSE-SLOW (the STAGE3 flaw)
+"0.5" = "REFUSE-SLOW"
+"0.6" = "REFUSE-SLOW"
+"0.7" = "REFUSE-SLOW"
+"0.89294" = "REFUSE-UNRES"           # the BKT breaker: a refusal is the good outcome (X2 Pb)
+"1.1" = "NOT"
+
+[verdicts.x3-clock6]                 # frozen X3.txt: the critical phase and both KT ends read REFUSE-SLOW
+"0.5" = "NOT"
+"0.7014" = "REFUSE-SLOW"
+"0.75" = "REFUSE-SLOW"
+"0.8" = "REFUSE-SLOW"
+"0.85" = "REFUSE-SLOW"
+"0.9008" = "REFUSE-SLOW"
+"1.1" = "NOT"
+
+[verdicts.x4-ising-field]            # frozen X4.txt: the pipeline verdict is NOT at all three; X4_CELL (the
+"0.46" = "NOT"                       # h-crossing, not an instrument of v0) is what calls FIRST-ORDER-LINE
+"0.5" = "NOT"
+"0.55" = "NOT"
+
+[[change]]
+date = "2026-10-01"
+points = ["*"]
+why = """first lock: the verdicts of the four v0 fixtures under verdict-x-rules, as the phase-3 \
+replays and A 9.2's worked rows give them (plan 0863 phase 4)"""
+
+[[change]]
+date = "2026-10-01"
+points = ["x2-xy-line:*", "x3-clock6:*", "x4-ising-field:*"]
+why = """first lock of the three full-signature inputs (plan 0863 phase 5a, amendment A4): each verdict \
+is the verdict the toolset's FROZEN results/X2.txt, X3.txt and X4.txt print for the same point"""
+
+[[change]]
+date = "2026-10-01"
+points = ["x2-xy-line:0.5", "x2-xy-line:0.6", "x2-xy-line:0.7", "x3-clock6:0.75", "x3-clock6:0.8",
+  "x3-clock6:0.85"]
+why = """REFUSE-SLOW at points whose true class is LINE is a KNOWN RULE FLAW (the toolset's STAGE3: \
+the verdict table maps a resolved below-margin flow, SLOW+ or SLOW-, to REFUSE-SLOW, so a critical \
+line whose block flow is small but resolved is refused, never called LINE). Locked as today's \
+behaviour, not as the right answer; a repaired rule is a new table set, not an edit of this lock"""
+
+[[change]]
+date = "2026-10-01"
+points = ["x4-ising-field:*"]
+why = """NOT at a FIRST-ORDER-LINE decoy: the pipeline needle sits at the ORDERED sink, so STAGE1 \
+says NOT. The toolset's X4_CELL turns (NOT, COEXIST) into FIRST-ORDER-LINE from an h-crossing \
+statistic that v0 has no instrument for; verdict-x-rules cannot reach FIRST-ORDER on this data"""
+
+[[change]]
+date = "2026-10-02"
+points = ["*"]
+why = """DECLARED DIFF written BEFORE the first run under v01-rules (plan 0864 P1, G6). This lock is the v0 lock \
+carried over unchanged: v01-rules = verdict-x-rules + Q1 c' (codes.toml: vside NEG and POS read MID, flow NEG \
+and POS read SLOW) + Q2 (verdict.toml: SLOW with across MARGINAL and stability STABLE reads LINE; every other \
+SLOW cell stays REFUSE-SLOW). The expected effect on the seven v0 inputs is NONE: x2, x3, x4, x8, b7, w2 and \
+c2 points are all UNCHANGED (60 of 60 as under verdict-x-rules). The only movers are on X5 once it is an input \
+(plan 0864 P4/P5: g 0 and g 0.3 NOT to REFUSE-SLOW). A moved v0 point is a finding, never an edit of this file"""

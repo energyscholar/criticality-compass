@@ -1,4 +1,4 @@
-$ bin/cc run w2-potts
+$ bin/cc run w2-potts --tables verdict-x-rules
 REFUSED: results/w2-potts@verdict-x-rules.json is frozen (a frozen result never changes).
   Next: bin/cc tables fork verdict-x-rules <new-name>, edit tables/<new-name>/verdict.toml, then bin/cc run w2-potts --tables <new-name>
 exit 1

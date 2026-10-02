@@ -33,7 +33,7 @@ files = sorted((ROOT / "results").glob("*.json"))
 results = [json.loads(f.read_text()) for f in files]
 md, found = score.tabulate(results)
 rows = [ln for ln in md.splitlines() if ln.startswith("| ") and not ln.startswith(("| run", "|---"))]
-check("one row per (run, point)", len(rows) == sum(len(r["signature"]) for r in results) == 60 and not found, str(found))
+check("one row per (run, point)", len(rows) == sum(len(r["signature"]) for r in results) == 60 * len({r["tables"] for r in results}) and not found, str(found))
 clash = [ln for ln in md.split("## Collisions")[1].splitlines() if ln.startswith("- ")]
 check("x8 1.00 and 1.10 are not a collision", not [c for c in clash if "x8-ising-needle:1.00" in c and "x8-ising-needle:1.10" in c])
 check("the collision list holds the C2 pair", any("FIRST-ORDER (" in c and "c2-bc-two-start:d2.0-K1.0" in c and "POINT (" in c
@@ -54,7 +54,7 @@ head = next(ln for ln in md7.split("## Rules: planted7")[1].splitlines() if ln.s
 check("a seventh column tabulates in its own section", len(head.strip("|").split("|")) == 5 + 7 + 2 and "extra" in head, head)
 page = score.page(results)
 cells = [int(n) for n in re.findall(r'data-cells="(\d+)"', page)]
-check("the page's cell counts sum to 45 360 and some rows were never hit", sum(cells) == 45360 and 'class=never' in page, str(sum(cells)))
+check("the page's cell counts sum to 45 360 per table set and some rows were never hit", sum(cells) == 45360 * len({r["tables"] for r in results}) and 'class=never' in page, str(sum(cells)))
 with tempfile.TemporaryDirectory() as t:
     shutil.copytree(ROOT / "tables" / "verdict-x-rules", Path(t) / "d13")
     for q in [Path(t) / "d13", *(Path(t) / "d13").rglob("*")]:   # the copy only; the live set is frozen

@@ -17,7 +17,7 @@ tests = [
   "tests/test_needle_x8.py", "tests/test_b7.py", "tests/test_w2.py", "tests/test_two_start_c2.py",
   "tests/test_detect_verdicts.py", "tests/test_breakers.py", "tests/test_breakers_red.py",
   "tests/test_golden.py", "tests/test_verdict_equivalence.py",
-  "tests/test_scoreboard.py", "tests/test_view.py", "tests/test_tabulate.py",
+  "tests/test_scoreboard.py", "tests/test_view.py", "tests/test_tabulate.py", "tests/test_reverdict.py",
 ]
 
 [allow]

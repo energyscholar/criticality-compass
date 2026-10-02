@@ -124,6 +124,56 @@ def reverdict(res, pt, T):
     return detect.verdict_of(detect.signature_from_cells(view.cells_of(res, pt), T), T)[0]
 
 
+def membership_text(root, name):
+    """The text of a set's membership.toml (empty when it has none): what a door may read from a table set."""
+    f = Path(root) / "tables" / name / "membership.toml"
+    return f.read_text() if f.is_file() else ""
+
+
+def reverdict_refusal(res, new, root=ROOT):
+    """A refusal is a VALUE: the text saying why `res` cannot be re-verdicted under set `new`, else None.
+    A set that changes what a door or membership read decided which units ran; those readings are not
+    the ones the new set would have measured, so only a re-measure is honest."""
+    old = res["tables"]
+    changed = membership_text(root, old) != membership_text(root, new)
+    return None if not changed else (
+        f"REFUSED: tables/{new} changes membership.toml, which decided which units of {res['input']} ran.\n"
+        f"  Next: re-measure with bin/cc run {res['input']} --tables {new}")
+
+
+def recode(rd, codes, direct, cols):
+    """One stored reading with its codes re-read under a new set; its numbers and cells are never touched."""
+    src = f"{rd['instrument']}.{rd['column']}"
+    first = rd["cell"] if rd["per_size"] is None else rd["per_size"][0]["cell"]
+    per = None if rd["per_size"] is None else [
+        {**q, "code": cols[direct[src]]["map"].get(q["cell"], q["cell"])} for q in rd["per_size"]]
+    return {**rd, "code": codes.get(direct.get(src), first), "per_size": per}
+
+
+def reverdict_result(res, T, commit="none"):
+    """The result `res` would have under table set T, from its stored sign cells alone (no data, no instrument)."""
+    cols = declare.code_cols(T.codes)
+    direct = {s["from"]: n for n, s in cols.items() if isinstance(s["from"], str)}
+    readings, signature = [], []
+    for old in res["signature"]:
+        pt = old["point"]
+        codes = detect.codes_of(view.cells_of(res, pt), T)
+        sig = {n: codes[n] for n in T.codes["columns"]["signature"]}
+        verdict, cls, line, why = detect.verdict_of(sig, T)
+        mine = [recode(rd, codes, direct, cols) for rd in res["readings"] if rd["unit"]["point"] == pt]
+        flags = {s: sorted({f for rd in mine if f"{rd['instrument']}.{rd['column']}" in detect.sources(s, cols)
+                            for f in rd["flags"]}) for s in sig}
+        readings += mine
+        signature.append({"point": pt, "obtained": old["obtained"], **sig, "flags": {s: f for s, f in flags.items() if f},
+                          "verdict": verdict, "verdict_class": cls, "row_line": line, "why": why})
+    old_id = res["run_id"]
+    read = {f"results/{old_id}.json": declare.sha(ROOT / "results" / f"{old_id}.json"),
+            **{k: h for k, h in res["read"].items() if not k.startswith("tables/")},
+            **{f"tables/{T.name}/{q.name}": declare.sha(q) for q in T.paths}}
+    return {**res, "run_id": f"{res['input']}@{T.name}", "tables": T.name, "derived_from": old_id,
+            "code_commit": commit, "read": read, "readings": readings, "signature": signature}
+
+
 def diff(ta, tb, ra=(), rb=()):
     """(lines, changed cells, changed fixture points): every cell whose verdict differs, as compressed patterns."""
     (cols, dom, oa), (cols_b, dom_b, ob) = owners(ta), owners(tb)

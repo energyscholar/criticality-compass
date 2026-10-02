@@ -1,4 +1,4 @@
-# tables/verdict-x-rules/verdict.toml - a declared PARTITION of the signature domain (data).
+# tables/v01-rules/verdict.toml - a declared PARTITION of the signature domain (data).
 # Order-free: the validator expands every row to its cells and refuses unless the rows are
 # pairwise disjoint and cover the whole domain. A column a row's `when` omits matches every
 # value of that column (nulls included). A row's `why` is printed by `bin/cc explain`.
@@ -44,8 +44,28 @@ equilibrium (open choice: UNRES could instead pass with INDEP)"""
 when.needle = ["MID"]
 when.two_start = ["INDEP"]
 when.flow = ["SLOW"]
+when.across = ["MARGINAL"]
+when.stability = ["STABLE"]
+verdict = "LINE"
+why = """Q2, 2026-10-02: slow flow with a marginal, stable exponent is a line (STAGE3 line = BKT-end \
+flaw split by across; every other slow cell still refuses)"""
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["SLOW"]
+when.across = ["RELEVANT", "WEAK", "IRRELEVANT", "UNRES", "NOT-MEASURED", "NOT-EVALUATED"]
 verdict = "REFUSE-SLOW"
-why = "verdict_x STAGE3: slow flow"
+why = "verdict_x STAGE3: slow flow (Q2, 2026-10-02: only across MARGINAL with stable stability leaves this row)"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["SLOW"]
+when.across = ["MARGINAL"]
+when.stability = ["CROSSING", "OFF", "UNRES", "NOT-MEASURED", "NOT-EVALUATED"]
+verdict = "REFUSE-SLOW"
+why = "verdict_x STAGE3: slow flow (Q2, 2026-10-02: a marginal across that is not stable still refuses)"
 
 [[row]]
 when.needle = ["MID"]

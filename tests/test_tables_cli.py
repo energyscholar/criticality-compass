@@ -42,9 +42,9 @@ with tempfile.TemporaryDirectory() as t:
     check("the split copy validates clean", rc == 0 and "validate: clean" in out, out)
     rc, out = cc("tables", "drop", "t1")
     check("drop removes an unfrozen set", rc == 0 and not (repo / "tables/t1").exists(), out)
-    rc, out = cc("tables", "drop", "verdict-x-rules")
+    rc, out = cc("tables", "drop", "v01-rules")      # the default set (plan 0864 R10b: was verdict-x-rules)
     check("drop refuses the default set",
-          rc == 1 and "is the default rulebook" in out and "Next:" in out and (repo / "tables/verdict-x-rules").is_dir(), out)
+          rc == 1 and "is the default rulebook" in out and "Next:" in out and (repo / "tables/v01-rules").is_dir(), out)
 
     rc, out = cc("new", "case", "potts-q4")
     rc2, out2 = cc("validate")

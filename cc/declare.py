@@ -14,7 +14,7 @@ SIGNS = ("SIG-", "NEG", "SLOW-", "ZERO!", "SLOW+", "POS", "SIG+", "UNRES")
 RESULT_FIELDS = (  # the result field set that cc.toml [basic] must partition (view.py reads it from here)
     "instrument", "unit", "column", "eps_key", "eps", "estimate", "lo", "hi", "cell", "code", "per_size",
     "flags", "reason", "vector_key", "point", "obtained", "verdict", "verdict_class", "row_line", "why",
-    "read", "code_commit", "interval", "reports")
+    "read", "code_commit", "interval", "reports", "derived_from")
 RESERVED = {"door", "declare", "author", "detect", "view", "score", "admit"}
 SIDECARS = ("observable", "block_map", "conjugate", "sinks", "two_start")
 TEMPLATES = {"chain": {"axis": str}, "pair": {"axis": str, "pairs": list},

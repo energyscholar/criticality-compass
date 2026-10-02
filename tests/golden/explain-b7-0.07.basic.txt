@@ -1,5 +1,5 @@
 $ bin/cc explain b7-at-line 0.07
-explain b7-at-line 0.07   rules: verdict-x-rules
+explain b7-at-line 0.07   rules: v01-rules
 sink       BLANK (NOT-MEASURED: needle is not declared on this input)
 needle     BLANK (NOT-MEASURED: needle is not declared on this input)
 flow       BLANK (NOT-MEASURED: needle is not declared on this input)
@@ -20,7 +20,7 @@ stability
   6 SIGN      cuts -0.25 0 +0.25 (eps y): bL 1, bU 2 -> ZERO!
   7 CODE      stability: codes.toml line 118: ZERO! -> STABLE
 two_start  BLANK (NOT-MEASURED: two_start is not declared on this input)
-8 VERDICT   verdict.toml line 133: when.needle = [NOT-MEASURED, NOT-EVALUATED]
+8 VERDICT   verdict.toml line 153: when.needle = [NOT-MEASURED, NOT-EVALUATED]
             => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
                why: honest null (not in verdict_x): the needle was not measured or not evaluated
 exit 0

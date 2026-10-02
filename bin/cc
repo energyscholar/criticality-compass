@@ -20,6 +20,7 @@ ADVANCED = [
     ("show <input>", "every reading of an input, and each point's verdict"),
     ("explain <input> <point>", "the whole chain for one point: data -> verdict"),
     ("run <input> | --all [--tables SET] [--dry]", "measure; --dry writes nothing"),
+    ("reverdict <input> --tables SET [--from SET]", "re-verdict a stored result under another rulebook; measures nothing"),
     ("freeze <run-id> | --all [--tables SET]", "make a result and what it read read-only"),
     ("tabulate [--diff A B]", "write SIGNATURE-TABLE.md + docs/verdict-table.html; --diff prints only"),
     ("new case <id>", "start a case file from the template"),
@@ -219,6 +220,49 @@ def run_one(name, tables, dry):
         return str(e), None
 
 
+def reverdict_one(name, new, old):
+    """(refusal text, None) or (None, result): re-verdict the stored result of `name` under set `new`."""
+    import declare
+    import score
+    import view
+    sets = sorted(t.name for t in (ROOT / "tables").glob("*") if t.is_dir())
+    msg, res = load_result(name, old, "reverdict")
+    if res is None:
+        return msg, None
+    if new not in sets:
+        return f"no table set '{new}'. Sets: {' '.join(sets)}\n  Next: bin/cc reverdict {name} --tables <one of these>", None
+    gate = structure_gate()
+    found, _ = declare.validate(ROOT, name, new)
+    if f"results/{name}@{new}.json" in json.loads((ROOT / "FROZEN.json").read_text())["files"]:
+        return f"REFUSED: results/{name}@{new}.json is frozen (a frozen result never changes).\n  Next: pick another table set", None
+    gone = view.stale(res)
+    refusal = score.reverdict_refusal(res, new)
+    first = gate or "\n".join(declare.fmt(f) for f in found) or gone or refusal
+    if first:
+        return first, None
+    import detect
+    commit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip() or "none"
+    out = score.reverdict_result(res, detect.load_tables(new), commit)
+    (ROOT / "results" / f"{out['run_id']}.json").write_text(json.dumps(out, indent=1) + "\n")
+    return None, out
+
+
+def cmd_reverdict(args):
+    new, old = opt(args, "--tables"), opt(args, "--from") or config()["defaults"]["tables"]
+    pos = [a for a in args if not a.startswith("--") and a not in (new, old)]
+    if len(pos) != 1 or not new:
+        print("usage: bin/cc reverdict <input> --tables SET [--from SET]\n  Next: bin/cc help --advanced")
+        return 1
+    msg, res = reverdict_one(pos[0], new, old)
+    if res is None:
+        print(msg)
+        return 1
+    import score
+    import view
+    print(f"reverdict {res['derived_from']} -> results/{res['run_id']}.json (no instrument was run)")
+    return emit(view.show(res, score.join(pos[0]), MODE, frozen_note(res["run_id"])))
+
+
 def frozen_note(rid, dry=False):
     frozen = json.loads((ROOT / "FROZEN.json").read_text())["files"]
     return "(dry: nothing written)" if dry else "(frozen)" if f"results/{rid}.json" in frozen else "(not frozen)"
@@ -313,10 +357,10 @@ def cmd_tabulate(args):
     return 1 if found else 0
 
 
-def freeze_files(rid, read):
-    """The repo files to freeze for one result: itself, what it read, and every file of its table set."""
+def freeze_files(rid, read, vectors):
+    """The repo files to freeze for one result: itself, the vectors it names, what it read, and its table set."""
     tdir = f"tables/{rid.split('@')[1]}"
-    want = [f"results/{rid}.json", f"results/{rid}.npz"] + [k for k in read if not k.startswith(("~", "tables/"))]
+    want = [f"results/{rid}.json", vectors] + [k for k in read if not k.startswith(("~", "tables/"))]
     return tdir, want + [f"{tdir}/{q.name}" for q in sorted((ROOT / tdir).iterdir())]
 
 
@@ -340,7 +384,7 @@ def cmd_freeze(args):
             print(bad)
             return 1
         frozen = json.loads((ROOT / "FROZEN.json").read_text())
-        tdir, want = freeze_files(rid, read)
+        tdir, want = freeze_files(rid, read, res["vectors"])
         new = [w for w in want if w not in frozen["files"]]
         freeze = [sys.executable, str(TOOLS / "freeze.py"), str(ROOT)]
         subprocess.run(freeze + ["files", *new], check=True, capture_output=True)
@@ -400,7 +444,7 @@ def main(argv):
         print(help_text(advanced), end="")
         return 0
     table = {"show": lambda a: cmd_show(a, False), "explain": lambda a: cmd_show(a, True), "tabulate": cmd_tabulate,
-             "test": cmd_test, "run": cmd_run, "freeze": cmd_freeze, "check": cmd_check, "mutate": cmd_mutate,
+             "test": cmd_test, "run": cmd_run, "reverdict": cmd_reverdict, "freeze": cmd_freeze, "check": cmd_check, "mutate": cmd_mutate,
              "validate": lambda a: cmd_validate(a + (["--advanced"] if advanced else []))}
     if cmd in table:
         return table[cmd](rest)
