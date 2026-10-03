@@ -5,7 +5,7 @@
  "input": "x5n-bilayer",
  "tables": "v02-rules",
  "derived_from": null,
- "code_commit": "545bb259052c9d244f7e4d6ffe831e2a20676de1",
+ "code_commit": "a47efd84c6a85171222850eb8bb4203ea7b5a8bb",
  "interval": {
   "method": "block",
   "b": 1600,
