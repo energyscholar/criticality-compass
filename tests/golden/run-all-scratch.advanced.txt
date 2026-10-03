@@ -68,7 +68,7 @@ c2-bc-two-start   rules: scratch   result: results/c2-bc-two-start@scratch.json 
   read tables/scratch/verdict.toml 05b42a6663bc
   read fixtures/data/c2-bc-two-start.toml 196279317616
   read 27 data files, sha256 match the pinned manifest
-point d2.0-K1.0   case bc-beyond-tricritical   obtained: observed
+point d2.0-K1.0   case none   obtained: observed
   sink       NOT-MEASURED (needle is not declared on this input)
   needle     NOT-MEASURED (needle is not declared on this input)
   flow       NOT-MEASURED (needle is not declared on this input)
@@ -77,7 +77,7 @@ point d2.0-K1.0   case bc-beyond-tricritical   obtained: observed
   two_start  INDEP eps two_start=0.02 per size: 81 ZERO! INDEP flags: observed point
   => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 133
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d2.0-K1.2   case bc-beyond-tricritical   obtained: observed
+point d2.0-K1.2   case none   obtained: observed
   sink       NOT-MEASURED (needle is not declared on this input)
   needle     NOT-MEASURED (needle is not declared on this input)
   flow       NOT-MEASURED (needle is not declared on this input)
@@ -86,7 +86,7 @@ point d2.0-K1.2   case bc-beyond-tricritical   obtained: observed
   two_start  INDEP eps two_start=0.02 per size: 81 SLOW+ INDEP flags: observed point
   => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 133
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d2.0-K1.4   case bc-beyond-tricritical   obtained: observed
+point d2.0-K1.4   case none   obtained: observed
   sink       NOT-MEASURED (needle is not declared on this input)
   needle     NOT-MEASURED (needle is not declared on this input)
   flow       NOT-MEASURED (needle is not declared on this input)
@@ -95,7 +95,7 @@ point d2.0-K1.4   case bc-beyond-tricritical   obtained: observed
   two_start  INDEP eps two_start=0.02 per size: 81 ZERO! INDEP flags: observed point
   => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 133
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d2.0-K1.6   case bc-beyond-tricritical   obtained: observed
+point d2.0-K1.6   case none   obtained: observed
   sink       NOT-MEASURED (needle is not declared on this input)
   needle     NOT-MEASURED (needle is not declared on this input)
   flow       NOT-MEASURED (needle is not declared on this input)
@@ -104,7 +104,7 @@ point d2.0-K1.6   case bc-beyond-tricritical   obtained: observed
   two_start  INDEP eps two_start=0.02 per size: 81 ZERO! INDEP flags: observed point
   => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 133
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d2.0-K1.8   case bc-beyond-tricritical   obtained: observed
+point d2.0-K1.8   case none   obtained: observed
   sink       NOT-MEASURED (needle is not declared on this input)
   needle     NOT-MEASURED (needle is not declared on this input)
   flow       NOT-MEASURED (needle is not declared on this input)
@@ -113,7 +113,7 @@ point d2.0-K1.8   case bc-beyond-tricritical   obtained: observed
   two_start  INDEP eps two_start=0.02 per size: 81 ZERO! INDEP flags: observed point
   => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 133
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d2.0-K2.0   case bc-beyond-tricritical   obtained: observed
+point d2.0-K2.0   case none   obtained: observed
   sink       NOT-MEASURED (needle is not declared on this input)
   needle     NOT-MEASURED (needle is not declared on this input)
   flow       NOT-MEASURED (needle is not declared on this input)
@@ -122,7 +122,7 @@ point d2.0-K2.0   case bc-beyond-tricritical   obtained: observed
   two_start  COEXIST eps two_start=0.02 per size: 81 SIG+ COEXIST flags: observed point
   => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 133
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d2.0-K2.3   case bc-beyond-tricritical   obtained: observed
+point d2.0-K2.3   case none   obtained: observed
   sink       NOT-MEASURED (needle is not declared on this input)
   needle     NOT-MEASURED (needle is not declared on this input)
   flow       NOT-MEASURED (needle is not declared on this input)
@@ -131,7 +131,7 @@ point d2.0-K2.3   case bc-beyond-tricritical   obtained: observed
   two_start  COEXIST eps two_start=0.02 per size: 81 SIG+ COEXIST flags: observed point
   => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 133
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d2.0-K2.6   case bc-beyond-tricritical   obtained: observed
+point d2.0-K2.6   case none   obtained: observed
   sink       NOT-MEASURED (needle is not declared on this input)
   needle     NOT-MEASURED (needle is not declared on this input)
   flow       NOT-MEASURED (needle is not declared on this input)
@@ -140,7 +140,7 @@ point d2.0-K2.6   case bc-beyond-tricritical   obtained: observed
   two_start  COEXIST eps two_start=0.02 per size: 81 SIG+ COEXIST flags: observed point
   => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 133
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d2.0-K3.0   case bc-beyond-tricritical   obtained: observed
+point d2.0-K3.0   case none   obtained: observed
   sink       NOT-MEASURED (needle is not declared on this input)
   needle     NOT-MEASURED (needle is not declared on this input)
   flow       NOT-MEASURED (needle is not declared on this input)
@@ -149,7 +149,7 @@ point d2.0-K3.0   case bc-beyond-tricritical   obtained: observed
   two_start  COEXIST eps two_start=0.02 per size: 81 SIG+ COEXIST flags: observed point
   => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 133
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d1.95-K1.0   case bc-lambda-line   obtained: observed
+point d1.95-K1.0   case bc-off-critical   obtained: observed
   sink       NOT-MEASURED (needle is not declared on this input)
   needle     NOT-MEASURED (needle is not declared on this input)
   flow       NOT-MEASURED (needle is not declared on this input)
@@ -158,7 +158,7 @@ point d1.95-K1.0   case bc-lambda-line   obtained: observed
   two_start  INDEP eps two_start=0.02 per size: 81 ZERO! INDEP flags: observed point
   => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 133
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d1.95-K1.2   case bc-lambda-line   obtained: observed
+point d1.95-K1.2   case bc-off-critical   obtained: observed
   sink       NOT-MEASURED (needle is not declared on this input)
   needle     NOT-MEASURED (needle is not declared on this input)
   flow       NOT-MEASURED (needle is not declared on this input)
@@ -167,7 +167,7 @@ point d1.95-K1.2   case bc-lambda-line   obtained: observed
   two_start  INDEP eps two_start=0.02 per size: 81 ZERO! INDEP flags: observed point
   => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 133
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d1.95-K1.4   case bc-lambda-line   obtained: observed
+point d1.95-K1.4   case bc-off-critical   obtained: observed
   sink       NOT-MEASURED (needle is not declared on this input)
   needle     NOT-MEASURED (needle is not declared on this input)
   flow       NOT-MEASURED (needle is not declared on this input)
@@ -176,7 +176,7 @@ point d1.95-K1.4   case bc-lambda-line   obtained: observed
   two_start  INDEP eps two_start=0.02 per size: 81 ZERO! INDEP flags: observed point
   => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 133
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d1.95-K1.6   case bc-lambda-line   obtained: observed
+point d1.95-K1.6   case bc-off-critical   obtained: observed
   sink       NOT-MEASURED (needle is not declared on this input)
   needle     NOT-MEASURED (needle is not declared on this input)
   flow       NOT-MEASURED (needle is not declared on this input)
@@ -185,7 +185,7 @@ point d1.95-K1.6   case bc-lambda-line   obtained: observed
   two_start  INDEP eps two_start=0.02 per size: 81 ZERO! INDEP flags: observed point
   => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 133
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d1.95-K1.8   case bc-lambda-line   obtained: observed
+point d1.95-K1.8   case bc-off-critical   obtained: observed
   sink       NOT-MEASURED (needle is not declared on this input)
   needle     NOT-MEASURED (needle is not declared on this input)
   flow       NOT-MEASURED (needle is not declared on this input)
@@ -194,7 +194,7 @@ point d1.95-K1.8   case bc-lambda-line   obtained: observed
   two_start  INDEP eps two_start=0.02 per size: 81 ZERO! INDEP flags: observed point
   => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 133
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d1.95-K2.0   case bc-lambda-line   obtained: observed
+point d1.95-K2.0   case bc-off-critical   obtained: observed
   sink       NOT-MEASURED (needle is not declared on this input)
   needle     NOT-MEASURED (needle is not declared on this input)
   flow       NOT-MEASURED (needle is not declared on this input)
@@ -203,7 +203,7 @@ point d1.95-K2.0   case bc-lambda-line   obtained: observed
   two_start  INDEP eps two_start=0.02 per size: 81 ZERO! INDEP flags: observed point
   => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 133
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d1.95-K2.3   case bc-lambda-line   obtained: observed
+point d1.95-K2.3   case bc-off-critical   obtained: observed
   sink       NOT-MEASURED (needle is not declared on this input)
   needle     NOT-MEASURED (needle is not declared on this input)
   flow       NOT-MEASURED (needle is not declared on this input)
@@ -212,7 +212,7 @@ point d1.95-K2.3   case bc-lambda-line   obtained: observed
   two_start  COEXIST eps two_start=0.02 per size: 81 SIG+ COEXIST flags: observed point
   => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 133
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d1.95-K2.6   case bc-lambda-line   obtained: observed
+point d1.95-K2.6   case bc-off-critical   obtained: observed
   sink       NOT-MEASURED (needle is not declared on this input)
   needle     NOT-MEASURED (needle is not declared on this input)
   flow       NOT-MEASURED (needle is not declared on this input)
@@ -221,7 +221,7 @@ point d1.95-K2.6   case bc-lambda-line   obtained: observed
   two_start  COEXIST eps two_start=0.02 per size: 81 SIG+ COEXIST flags: observed point
   => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 133
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d1.95-K3.0   case bc-lambda-line   obtained: observed
+point d1.95-K3.0   case bc-off-critical   obtained: observed
   sink       NOT-MEASURED (needle is not declared on this input)
   needle     NOT-MEASURED (needle is not declared on this input)
   flow       NOT-MEASURED (needle is not declared on this input)
@@ -230,7 +230,7 @@ point d1.95-K3.0   case bc-lambda-line   obtained: observed
   two_start  COEXIST eps two_start=0.02 per size: 81 SIG+ COEXIST flags: observed point
   => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 133
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d1.9-K1.0   case bc-lambda-line   obtained: observed
+point d1.9-K1.0   case bc-off-critical   obtained: observed
   sink       NOT-MEASURED (needle is not declared on this input)
   needle     NOT-MEASURED (needle is not declared on this input)
   flow       NOT-MEASURED (needle is not declared on this input)
@@ -239,7 +239,7 @@ point d1.9-K1.0   case bc-lambda-line   obtained: observed
   two_start  INDEP eps two_start=0.02 per size: 81 ZERO! INDEP flags: observed point
   => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 133
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d1.9-K1.2   case bc-lambda-line   obtained: observed
+point d1.9-K1.2   case bc-off-critical   obtained: observed
   sink       NOT-MEASURED (needle is not declared on this input)
   needle     NOT-MEASURED (needle is not declared on this input)
   flow       NOT-MEASURED (needle is not declared on this input)
@@ -248,7 +248,7 @@ point d1.9-K1.2   case bc-lambda-line   obtained: observed
   two_start  INDEP eps two_start=0.02 per size: 81 ZERO! INDEP flags: observed point
   => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 133
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d1.9-K1.4   case bc-lambda-line   obtained: observed
+point d1.9-K1.4   case bc-off-critical   obtained: observed
   sink       NOT-MEASURED (needle is not declared on this input)
   needle     NOT-MEASURED (needle is not declared on this input)
   flow       NOT-MEASURED (needle is not declared on this input)
@@ -257,7 +257,7 @@ point d1.9-K1.4   case bc-lambda-line   obtained: observed
   two_start  INDEP eps two_start=0.02 per size: 81 ZERO! INDEP flags: observed point
   => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 133
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d1.9-K1.6   case bc-lambda-line   obtained: observed
+point d1.9-K1.6   case bc-off-critical   obtained: observed
   sink       NOT-MEASURED (needle is not declared on this input)
   needle     NOT-MEASURED (needle is not declared on this input)
   flow       NOT-MEASURED (needle is not declared on this input)
@@ -266,7 +266,7 @@ point d1.9-K1.6   case bc-lambda-line   obtained: observed
   two_start  INDEP eps two_start=0.02 per size: 81 ZERO! INDEP flags: observed point
   => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 133
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d1.9-K1.8   case bc-lambda-line   obtained: observed
+point d1.9-K1.8   case bc-off-critical   obtained: observed
   sink       NOT-MEASURED (needle is not declared on this input)
   needle     NOT-MEASURED (needle is not declared on this input)
   flow       NOT-MEASURED (needle is not declared on this input)
@@ -275,7 +275,7 @@ point d1.9-K1.8   case bc-lambda-line   obtained: observed
   two_start  INDEP eps two_start=0.02 per size: 81 ZERO! INDEP flags: observed point
   => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 133
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d1.9-K2.0   case bc-lambda-line   obtained: observed
+point d1.9-K2.0   case bc-off-critical   obtained: observed
   sink       NOT-MEASURED (needle is not declared on this input)
   needle     NOT-MEASURED (needle is not declared on this input)
   flow       NOT-MEASURED (needle is not declared on this input)
@@ -284,7 +284,7 @@ point d1.9-K2.0   case bc-lambda-line   obtained: observed
   two_start  INDEP eps two_start=0.02 per size: 81 ZERO! INDEP flags: observed point
   => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 133
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d1.9-K2.3   case bc-lambda-line   obtained: observed
+point d1.9-K2.3   case bc-off-critical   obtained: observed
   sink       NOT-MEASURED (needle is not declared on this input)
   needle     NOT-MEASURED (needle is not declared on this input)
   flow       NOT-MEASURED (needle is not declared on this input)
@@ -293,7 +293,7 @@ point d1.9-K2.3   case bc-lambda-line   obtained: observed
   two_start  INDEP eps two_start=0.02 per size: 81 ZERO! INDEP flags: observed point
   => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 133
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d1.9-K2.6   case bc-lambda-line   obtained: observed
+point d1.9-K2.6   case bc-off-critical   obtained: observed
   sink       NOT-MEASURED (needle is not declared on this input)
   needle     NOT-MEASURED (needle is not declared on this input)
   flow       NOT-MEASURED (needle is not declared on this input)
@@ -302,7 +302,7 @@ point d1.9-K2.6   case bc-lambda-line   obtained: observed
   two_start  INDEP eps two_start=0.02 per size: 81 ZERO! INDEP flags: observed point
   => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 133
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d1.9-K3.0   case bc-lambda-line   obtained: observed
+point d1.9-K3.0   case bc-off-critical   obtained: observed
   sink       NOT-MEASURED (needle is not declared on this input)
   needle     NOT-MEASURED (needle is not declared on this input)
   flow       NOT-MEASURED (needle is not declared on this input)
@@ -1171,4 +1171,74 @@ point 1.10   case ising-off-critical   obtained: truth
   => verdict NOT  class NOT, verdict.toml line 25
      why: verdict_x STAGE1: off the window
 x8-ising-needle: ran
+run x9c-potts@scratch -> results/x9c-potts@scratch.json
+x9c-potts   rules: scratch   result: results/x9c-potts@scratch.json (not frozen)
+  interval: block resamples 400, level 0.95, seed 66
+  code_commit: none
+  read inputs/x9c-potts/m.toml edd48abf6c95
+  read instruments/needle.toml 03c8e390df85
+  read instruments/across.toml 8f6803e8af6c
+  read instruments/stability.toml 2fc7bb21b58a
+  read instruments/two_start.toml 30503b8a483a
+  read instruments/fluct.toml b9eee16fe05f
+  read instruments/needle_o.toml 5191ed5def20
+  read tables/scratch/codes.toml d43f06815275
+  read tables/scratch/verdict.toml 05b42a6663bc
+  read fixtures/data/x9c-potts.toml b5322f7b94f5
+  read 36 data files, sha256 match the pinned manifest
+point 3   case potts-q3   obtained: truth
+  sink       d_ord 0.2493 [0.2411, 0.254] SIG+ eps sink=0.02 d_dis 0.7507 [0.746, 0.7589] SIG+ eps sink=0.02 -> NEITHER flags: truth point
+  needle     velocity -0.0003678 [-0.005825, 0.01097] UNRES eps step=0.01 d_ord 0.2493 [0.2411, 0.254] SIG+ eps sink=0.02 d_dis 0.7507 [0.746, 0.7589] SIG+ eps sink=0.02 -> MID flags: truth point
+  flow       -0.0003678 [-0.005825, 0.01097] UNRES eps step=0.01 flags: truth point vector needle/velocity/point=3
+  across     1.188 [1.121, 1.225] SIG+ eps y=0.25 -> RELEVANT flags: uses Hamiltonian knowledge, truth point vector across/y_last/point=3
+  stability  -0.05274 [-0.1577, 0.006975] ZERO! eps y=0.25 -> STABLE flags: uses Hamiltonian knowledge, truth point vector stability/d/point=3
+  two_start  INDEP eps two_start=0.01 per size: 27 ZERO! INDEP; 81 ZERO! INDEP; 243 ZERO! INDEP flags: truth point
+  => verdict REFUSE-FLOW  class REFUSE, verdict.toml line 57
+     why: verdict_x STAGE3: flow unresolved
+point 4   case none   obtained: truth
+  sink       d_ord 0.2373 [0.2227, 0.2535] SIG+ eps sink=0.02 d_dis 0.7627 [0.7465, 0.7773] SIG+ eps sink=0.02 -> NEITHER flags: truth point
+  needle     velocity 0.005807 [-0.01136, 0.02228] UNRES eps step=0.01 d_ord 0.2373 [0.2227, 0.2535] SIG+ eps sink=0.02 d_dis 0.7627 [0.7465, 0.7773] SIG+ eps sink=0.02 -> MID flags: truth point
+  flow       0.005807 [-0.01136, 0.02228] UNRES eps step=0.01 flags: truth point vector needle/velocity/point=4
+  across     1.384 [1.247, 1.506] SIG+ eps y=0.25 -> RELEVANT flags: uses Hamiltonian knowledge, truth point vector across/y_last/point=4
+  stability  -0.002786 [-0.1764, 0.1447] ZERO! eps y=0.25 -> STABLE flags: uses Hamiltonian knowledge, truth point vector stability/d/point=4
+  two_start  INDEP eps two_start=0.01 per size: 27 ZERO! INDEP; 81 ZERO! INDEP; 243 ZERO! INDEP flags: truth point
+  => verdict REFUSE-FLOW  class REFUSE, verdict.toml line 57
+     why: verdict_x STAGE3: flow unresolved
+point 5   case potts-q5   obtained: truth
+  sink       d_ord 0.1637 [0.1393, 0.1912] SIG+ eps sink=0.02 d_dis 0.8363 [0.8088, 0.8607] SIG+ eps sink=0.02 -> NEITHER flags: truth point
+  needle     velocity 0.07492 [0.039, 0.1045] SIG+ eps step=0.01 d_ord 0.1637 [0.1393, 0.1912] SIG+ eps sink=0.02 d_dis 0.8363 [0.8088, 0.8607] SIG+ eps sink=0.02 -> ORD flags: truth point
+  flow       0.07492 [0.039, 0.1045] SIG+ eps step=0.01 -> FLOWING flags: truth point vector needle/velocity/point=5
+  across     0.9841 [0.5531, 1.375] SIG+ eps y=0.25 -> RELEVANT flags: uses Hamiltonian knowledge, truth point vector across/y_last/point=5
+  stability  -0.6691 [-1.132, -0.1533] NEG eps y=0.25 -> OFF flags: uses Hamiltonian knowledge, truth point vector stability/d/point=5
+  two_start  UNRES eps two_start=0.01 per size: 27 ZERO! INDEP; 81 UNRES UNRES; 243 UNRES UNRES flags: truth point
+  => verdict NOT  class NOT, verdict.toml line 25
+     why: verdict_x STAGE1: off the window
+point 6   case potts-q6   obtained: truth
+  sink       d_ord 0.3012 [0.1636, 0.3995] SIG+ eps sink=0.02 d_dis 0.6988 [0.6005, 0.8364] SIG+ eps sink=0.02 -> NEITHER flags: truth point
+  needle     velocity -0.136 [-0.2384, 0.007489] UNRES eps step=0.01 d_ord 0.3012 [0.1636, 0.3995] SIG+ eps sink=0.02 d_dis 0.6988 [0.6005, 0.8364] SIG+ eps sink=0.02 -> MID flags: truth point
+  flow       -0.136 [-0.2384, 0.007489] UNRES eps step=0.01 flags: truth point vector needle/velocity/point=6
+  across     2.681 [2.07, 3.011] SIG+ eps y=0.25 -> RELEVANT flags: uses Hamiltonian knowledge, truth point vector across/y_last/point=6
+  stability  1.209 [0.4228, 1.828] SIG+ eps y=0.25 -> CROSSING flags: uses Hamiltonian knowledge, truth point vector stability/d/point=6
+  two_start  COEXIST eps two_start=0.01 per size: 27 UNRES UNRES; 81 UNRES UNRES; 243 SIG+ COEXIST flags: truth point
+  => verdict FIRST-ORDER  class FIRST-ORDER, verdict.toml line 30
+     why: verdict_x STAGE2: the two starts coexist at the window
+point 8   case potts-q8   obtained: truth
+  sink       d_ord 0.9028 [0.9002, 0.9071] SIG+ eps sink=0.02 d_dis 0.09725 [0.09293, 0.09984] SIG+ eps sink=0.02 -> NEITHER flags: truth point
+  needle     velocity -0.6382 [-0.7877, -0.4872] SIG- eps step=0.01 d_ord 0.9028 [0.9002, 0.9071] SIG+ eps sink=0.02 d_dis 0.09725 [0.09293, 0.09984] SIG+ eps sink=0.02 -> DIS flags: truth point
+  flow       -0.6382 [-0.7877, -0.4872] SIG- eps step=0.01 -> FLOWING flags: truth point vector needle/velocity/point=8
+  across     -2.67 [-3.03, -2.068] SIG- eps y=0.25 -> IRRELEVANT flags: uses Hamiltonian knowledge, truth point vector across/y_last/point=8
+  stability  -5.65 [-6.288, -4.242] SIG- eps y=0.25 -> OFF flags: uses Hamiltonian knowledge, truth point vector stability/d/point=8
+  two_start  COEXIST eps two_start=0.01 per size: 27 UNRES UNRES; 81 UNRES UNRES; 243 SIG+ COEXIST flags: truth point
+  => verdict NOT  class NOT, verdict.toml line 25
+     why: verdict_x STAGE1: off the window
+point 10   case potts-q10   obtained: truth
+  sink       d_ord 0.9599 [0.9575, 0.9618] SIG+ eps sink=0.02 d_dis 0.04012 [0.03816, 0.04248] SIG+ eps sink=0.02 -> NEITHER flags: truth point
+  needle     velocity -0.09014 [-0.09411, -0.08663] SIG- eps step=0.01 d_ord 0.9599 [0.9575, 0.9618] SIG+ eps sink=0.02 d_dis 0.04012 [0.03816, 0.04248] SIG+ eps sink=0.02 -> DIS flags: truth point
+  flow       -0.09014 [-0.09411, -0.08663] SIG- eps step=0.01 -> FLOWING flags: truth point vector needle/velocity/point=10
+  across     0.007967 [-0.4345, 0.3603] UNRES eps y=0.25 flags: uses Hamiltonian knowledge, truth point vector across/y_last/point=10
+  stability  1.175 [-0.656, 1.87] UNRES eps y=0.25 flags: uses Hamiltonian knowledge, truth point vector stability/d/point=10
+  two_start  COEXIST eps two_start=0.01 per size: 27 UNRES UNRES; 81 SIG+ COEXIST; 243 SIG+ COEXIST flags: truth point
+  => verdict NOT  class NOT, verdict.toml line 25
+     why: verdict_x STAGE1: off the window
+x9c-potts: ran
 exit 1

@@ -7,9 +7,9 @@ validate: clean
   FAIL  1 WALKING: >= 2 in-table cases with different mechanisms :: 2 case(s) ['potts-q5', 'potts-q6'], 1 distinct mechanism(s)
   PASS  2 decoy: a POINT case imitating LINE :: ['bc-lambda-line', 'nnn-ising-manifold']
   PASS  2 decoy: a FIRST-ORDER case imitating LINE :: ['bc-beyond-tricritical', 'ising-field-decoy']
-  PASS  2 decoy: a FIRST-ORDER case imitating WALKING :: ['potts-q7']
+  PASS  2 decoy: a FIRST-ORDER case imitating WALKING :: ['potts-q10', 'potts-q7', 'potts-q8']
   PASS  3 BKT breaker run, pre-registered verdict scored :: ['clock6-kt-ends', 'xy-tkt']
   PASS  4 >= 1 held-out case declared blind and run :: ['coupled-ising-bilinear']
-  FAIL  5 signature table enumerated over every in-table case, collisions listed :: 17 in-table case(s); collisions section present; missing ['ar1-null', 'bc-tricritical']
+  FAIL  5 signature table enumerated over every in-table case, collisions listed :: 20 in-table case(s); collisions section present; missing ['ar1-null', 'bc-beyond-tricritical', 'bc-tricritical']
 -- MVT FAIL
 exit 0

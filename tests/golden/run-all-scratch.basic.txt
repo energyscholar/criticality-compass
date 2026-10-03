@@ -51,7 +51,7 @@ b7-at-line-2: REFUSED: tables/scratch/membership.toml:along: along runs door:off
 b7-at-line-3: REFUSED: tables/scratch/membership.toml:along: along runs door:off_manifold on b7-at-line-3 but this set has no rule for it
 run c2-bc-two-start@scratch -> results/c2-bc-two-start@scratch.json
 c2-bc-two-start   rules: scratch   result: results/c2-bc-two-start@scratch.json (not frozen)
-point d2.0-K1.0   case bc-beyond-tricritical
+point d2.0-K1.0   case none
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
   needle     BLANK (NOT-MEASURED: needle is not declared on this input)
   flow       BLANK (NOT-MEASURED: needle is not declared on this input)
@@ -60,7 +60,7 @@ point d2.0-K1.0   case bc-beyond-tricritical
   two_start  INDEP
   => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d2.0-K1.2   case bc-beyond-tricritical
+point d2.0-K1.2   case none
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
   needle     BLANK (NOT-MEASURED: needle is not declared on this input)
   flow       BLANK (NOT-MEASURED: needle is not declared on this input)
@@ -69,7 +69,7 @@ point d2.0-K1.2   case bc-beyond-tricritical
   two_start  INDEP
   => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d2.0-K1.4   case bc-beyond-tricritical
+point d2.0-K1.4   case none
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
   needle     BLANK (NOT-MEASURED: needle is not declared on this input)
   flow       BLANK (NOT-MEASURED: needle is not declared on this input)
@@ -78,7 +78,7 @@ point d2.0-K1.4   case bc-beyond-tricritical
   two_start  INDEP
   => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d2.0-K1.6   case bc-beyond-tricritical
+point d2.0-K1.6   case none
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
   needle     BLANK (NOT-MEASURED: needle is not declared on this input)
   flow       BLANK (NOT-MEASURED: needle is not declared on this input)
@@ -87,7 +87,7 @@ point d2.0-K1.6   case bc-beyond-tricritical
   two_start  INDEP
   => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d2.0-K1.8   case bc-beyond-tricritical
+point d2.0-K1.8   case none
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
   needle     BLANK (NOT-MEASURED: needle is not declared on this input)
   flow       BLANK (NOT-MEASURED: needle is not declared on this input)
@@ -96,7 +96,7 @@ point d2.0-K1.8   case bc-beyond-tricritical
   two_start  INDEP
   => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d2.0-K2.0   case bc-beyond-tricritical
+point d2.0-K2.0   case none
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
   needle     BLANK (NOT-MEASURED: needle is not declared on this input)
   flow       BLANK (NOT-MEASURED: needle is not declared on this input)
@@ -105,7 +105,7 @@ point d2.0-K2.0   case bc-beyond-tricritical
   two_start  COEXIST
   => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d2.0-K2.3   case bc-beyond-tricritical
+point d2.0-K2.3   case none
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
   needle     BLANK (NOT-MEASURED: needle is not declared on this input)
   flow       BLANK (NOT-MEASURED: needle is not declared on this input)
@@ -114,7 +114,7 @@ point d2.0-K2.3   case bc-beyond-tricritical
   two_start  COEXIST
   => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d2.0-K2.6   case bc-beyond-tricritical
+point d2.0-K2.6   case none
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
   needle     BLANK (NOT-MEASURED: needle is not declared on this input)
   flow       BLANK (NOT-MEASURED: needle is not declared on this input)
@@ -123,7 +123,7 @@ point d2.0-K2.6   case bc-beyond-tricritical
   two_start  COEXIST
   => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d2.0-K3.0   case bc-beyond-tricritical
+point d2.0-K3.0   case none
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
   needle     BLANK (NOT-MEASURED: needle is not declared on this input)
   flow       BLANK (NOT-MEASURED: needle is not declared on this input)
@@ -132,7 +132,7 @@ point d2.0-K3.0   case bc-beyond-tricritical
   two_start  COEXIST
   => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d1.95-K1.0   case bc-lambda-line
+point d1.95-K1.0   case bc-off-critical
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
   needle     BLANK (NOT-MEASURED: needle is not declared on this input)
   flow       BLANK (NOT-MEASURED: needle is not declared on this input)
@@ -141,7 +141,7 @@ point d1.95-K1.0   case bc-lambda-line
   two_start  INDEP
   => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d1.95-K1.2   case bc-lambda-line
+point d1.95-K1.2   case bc-off-critical
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
   needle     BLANK (NOT-MEASURED: needle is not declared on this input)
   flow       BLANK (NOT-MEASURED: needle is not declared on this input)
@@ -150,7 +150,7 @@ point d1.95-K1.2   case bc-lambda-line
   two_start  INDEP
   => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d1.95-K1.4   case bc-lambda-line
+point d1.95-K1.4   case bc-off-critical
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
   needle     BLANK (NOT-MEASURED: needle is not declared on this input)
   flow       BLANK (NOT-MEASURED: needle is not declared on this input)
@@ -159,7 +159,7 @@ point d1.95-K1.4   case bc-lambda-line
   two_start  INDEP
   => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d1.95-K1.6   case bc-lambda-line
+point d1.95-K1.6   case bc-off-critical
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
   needle     BLANK (NOT-MEASURED: needle is not declared on this input)
   flow       BLANK (NOT-MEASURED: needle is not declared on this input)
@@ -168,7 +168,7 @@ point d1.95-K1.6   case bc-lambda-line
   two_start  INDEP
   => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d1.95-K1.8   case bc-lambda-line
+point d1.95-K1.8   case bc-off-critical
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
   needle     BLANK (NOT-MEASURED: needle is not declared on this input)
   flow       BLANK (NOT-MEASURED: needle is not declared on this input)
@@ -177,7 +177,7 @@ point d1.95-K1.8   case bc-lambda-line
   two_start  INDEP
   => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d1.95-K2.0   case bc-lambda-line
+point d1.95-K2.0   case bc-off-critical
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
   needle     BLANK (NOT-MEASURED: needle is not declared on this input)
   flow       BLANK (NOT-MEASURED: needle is not declared on this input)
@@ -186,7 +186,7 @@ point d1.95-K2.0   case bc-lambda-line
   two_start  INDEP
   => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d1.95-K2.3   case bc-lambda-line
+point d1.95-K2.3   case bc-off-critical
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
   needle     BLANK (NOT-MEASURED: needle is not declared on this input)
   flow       BLANK (NOT-MEASURED: needle is not declared on this input)
@@ -195,7 +195,7 @@ point d1.95-K2.3   case bc-lambda-line
   two_start  COEXIST
   => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d1.95-K2.6   case bc-lambda-line
+point d1.95-K2.6   case bc-off-critical
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
   needle     BLANK (NOT-MEASURED: needle is not declared on this input)
   flow       BLANK (NOT-MEASURED: needle is not declared on this input)
@@ -204,7 +204,7 @@ point d1.95-K2.6   case bc-lambda-line
   two_start  COEXIST
   => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d1.95-K3.0   case bc-lambda-line
+point d1.95-K3.0   case bc-off-critical
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
   needle     BLANK (NOT-MEASURED: needle is not declared on this input)
   flow       BLANK (NOT-MEASURED: needle is not declared on this input)
@@ -213,7 +213,7 @@ point d1.95-K3.0   case bc-lambda-line
   two_start  COEXIST
   => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d1.9-K1.0   case bc-lambda-line
+point d1.9-K1.0   case bc-off-critical
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
   needle     BLANK (NOT-MEASURED: needle is not declared on this input)
   flow       BLANK (NOT-MEASURED: needle is not declared on this input)
@@ -222,7 +222,7 @@ point d1.9-K1.0   case bc-lambda-line
   two_start  INDEP
   => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d1.9-K1.2   case bc-lambda-line
+point d1.9-K1.2   case bc-off-critical
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
   needle     BLANK (NOT-MEASURED: needle is not declared on this input)
   flow       BLANK (NOT-MEASURED: needle is not declared on this input)
@@ -231,7 +231,7 @@ point d1.9-K1.2   case bc-lambda-line
   two_start  INDEP
   => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d1.9-K1.4   case bc-lambda-line
+point d1.9-K1.4   case bc-off-critical
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
   needle     BLANK (NOT-MEASURED: needle is not declared on this input)
   flow       BLANK (NOT-MEASURED: needle is not declared on this input)
@@ -240,7 +240,7 @@ point d1.9-K1.4   case bc-lambda-line
   two_start  INDEP
   => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d1.9-K1.6   case bc-lambda-line
+point d1.9-K1.6   case bc-off-critical
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
   needle     BLANK (NOT-MEASURED: needle is not declared on this input)
   flow       BLANK (NOT-MEASURED: needle is not declared on this input)
@@ -249,7 +249,7 @@ point d1.9-K1.6   case bc-lambda-line
   two_start  INDEP
   => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d1.9-K1.8   case bc-lambda-line
+point d1.9-K1.8   case bc-off-critical
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
   needle     BLANK (NOT-MEASURED: needle is not declared on this input)
   flow       BLANK (NOT-MEASURED: needle is not declared on this input)
@@ -258,7 +258,7 @@ point d1.9-K1.8   case bc-lambda-line
   two_start  INDEP
   => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d1.9-K2.0   case bc-lambda-line
+point d1.9-K2.0   case bc-off-critical
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
   needle     BLANK (NOT-MEASURED: needle is not declared on this input)
   flow       BLANK (NOT-MEASURED: needle is not declared on this input)
@@ -267,7 +267,7 @@ point d1.9-K2.0   case bc-lambda-line
   two_start  INDEP
   => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d1.9-K2.3   case bc-lambda-line
+point d1.9-K2.3   case bc-off-critical
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
   needle     BLANK (NOT-MEASURED: needle is not declared on this input)
   flow       BLANK (NOT-MEASURED: needle is not declared on this input)
@@ -276,7 +276,7 @@ point d1.9-K2.3   case bc-lambda-line
   two_start  INDEP
   => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d1.9-K2.6   case bc-lambda-line
+point d1.9-K2.6   case bc-off-critical
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
   needle     BLANK (NOT-MEASURED: needle is not declared on this input)
   flow       BLANK (NOT-MEASURED: needle is not declared on this input)
@@ -285,7 +285,7 @@ point d1.9-K2.6   case bc-lambda-line
   two_start  INDEP
   => verdict BLANK (REFUSE-NEEDLE-UNMEASURED)
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
-point d1.9-K3.0   case bc-lambda-line
+point d1.9-K3.0   case bc-off-critical
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
   needle     BLANK (NOT-MEASURED: needle is not declared on this input)
   flow       BLANK (NOT-MEASURED: needle is not declared on this input)
@@ -975,4 +975,61 @@ point 1.10   case ising-off-critical
   => verdict NOT
      why: verdict_x STAGE1: off the window
 x8-ising-needle: ran
+run x9c-potts@scratch -> results/x9c-potts@scratch.json
+x9c-potts   rules: scratch   result: results/x9c-potts@scratch.json (not frozen)
+point 3   case potts-q3
+  sink       d_ord 0.2493 [0.2411, 0.254] SIG+ d_dis 0.7507 [0.746, 0.7589] SIG+ -> NEITHER
+  needle     velocity -0.0003678 [-0.005825, 0.01097] BLANK (UNRES: interval straddles 0 and a margin edge) d_ord 0.2493 [0.2411, 0.254] SIG+ d_dis 0.7507 [0.746, 0.7589] SIG+ -> MID
+  flow       -0.0003678 [-0.005825, 0.01097] BLANK (UNRES: interval straddles 0 and a margin edge)
+  across     1.188 [1.121, 1.225] SIG+ -> RELEVANT
+  stability  -0.05274 [-0.1577, 0.006975] ZERO! -> STABLE
+  two_start  INDEP
+  => verdict BLANK (REFUSE-FLOW)
+     why: verdict_x STAGE3: flow unresolved
+point 4   case none
+  sink       d_ord 0.2373 [0.2227, 0.2535] SIG+ d_dis 0.7627 [0.7465, 0.7773] SIG+ -> NEITHER
+  needle     velocity 0.005807 [-0.01136, 0.02228] BLANK (UNRES: interval straddles 0 and a margin edge) d_ord 0.2373 [0.2227, 0.2535] SIG+ d_dis 0.7627 [0.7465, 0.7773] SIG+ -> MID
+  flow       0.005807 [-0.01136, 0.02228] BLANK (UNRES: interval straddles 0 and a margin edge)
+  across     1.384 [1.247, 1.506] SIG+ -> RELEVANT
+  stability  -0.002786 [-0.1764, 0.1447] ZERO! -> STABLE
+  two_start  INDEP
+  => verdict BLANK (REFUSE-FLOW)
+     why: verdict_x STAGE3: flow unresolved
+point 5   case potts-q5
+  sink       d_ord 0.1637 [0.1393, 0.1912] SIG+ d_dis 0.8363 [0.8088, 0.8607] SIG+ -> NEITHER
+  needle     velocity 0.07492 [0.039, 0.1045] SIG+ d_ord 0.1637 [0.1393, 0.1912] SIG+ d_dis 0.8363 [0.8088, 0.8607] SIG+ -> ORD
+  flow       0.07492 [0.039, 0.1045] SIG+ -> FLOWING
+  across     0.9841 [0.5531, 1.375] SIG+ -> RELEVANT
+  stability  -0.6691 [-1.132, -0.1533] NEG -> OFF
+  two_start  BLANK (UNRES: interval straddles 0 and a margin edge)
+  => verdict NOT
+     why: verdict_x STAGE1: off the window
+point 6   case potts-q6
+  sink       d_ord 0.3012 [0.1636, 0.3995] SIG+ d_dis 0.6988 [0.6005, 0.8364] SIG+ -> NEITHER
+  needle     velocity -0.136 [-0.2384, 0.007489] BLANK (UNRES: interval straddles 0 and a margin edge) d_ord 0.3012 [0.1636, 0.3995] SIG+ d_dis 0.6988 [0.6005, 0.8364] SIG+ -> MID
+  flow       -0.136 [-0.2384, 0.007489] BLANK (UNRES: interval straddles 0 and a margin edge)
+  across     2.681 [2.07, 3.011] SIG+ -> RELEVANT
+  stability  1.209 [0.4228, 1.828] SIG+ -> CROSSING
+  two_start  COEXIST
+  => verdict FIRST-ORDER
+     why: verdict_x STAGE2: the two starts coexist at the window
+point 8   case potts-q8
+  sink       d_ord 0.9028 [0.9002, 0.9071] SIG+ d_dis 0.09725 [0.09293, 0.09984] SIG+ -> NEITHER
+  needle     velocity -0.6382 [-0.7877, -0.4872] SIG- d_ord 0.9028 [0.9002, 0.9071] SIG+ d_dis 0.09725 [0.09293, 0.09984] SIG+ -> DIS
+  flow       -0.6382 [-0.7877, -0.4872] SIG- -> FLOWING
+  across     -2.67 [-3.03, -2.068] SIG- -> IRRELEVANT
+  stability  -5.65 [-6.288, -4.242] SIG- -> OFF
+  two_start  COEXIST
+  => verdict NOT
+     why: verdict_x STAGE1: off the window
+point 10   case potts-q10
+  sink       d_ord 0.9599 [0.9575, 0.9618] SIG+ d_dis 0.04012 [0.03816, 0.04248] SIG+ -> NEITHER
+  needle     velocity -0.09014 [-0.09411, -0.08663] SIG- d_ord 0.9599 [0.9575, 0.9618] SIG+ d_dis 0.04012 [0.03816, 0.04248] SIG+ -> DIS
+  flow       -0.09014 [-0.09411, -0.08663] SIG- -> FLOWING
+  across     0.007967 [-0.4345, 0.3603] BLANK (UNRES: interval straddles 0 and a margin edge)
+  stability  1.175 [-0.656, 1.87] BLANK (UNRES: interval straddles 0 and a margin edge)
+  two_start  COEXIST
+  => verdict NOT
+     why: verdict_x STAGE1: off the window
+x9c-potts: ran
 exit 1
