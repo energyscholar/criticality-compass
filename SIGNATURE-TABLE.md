@@ -240,6 +240,11 @@ Geometry against class_truth (order_truth not FIRST-ORDER): 11 agree, 66 refused
 | b7-at-line-3@v03-rules | 0.14 | `at-self-dual-line` | LINE | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | STABLE (HT) | NOT-MEASURED | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
 | b7-at-line-3@v03-rules | 0.21 | `at-self-dual-line` | LINE | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | STABLE (HT) | NOT-MEASURED | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
 | b7-at-line-3@v03-rules | 0.2747 | `at-self-dual-line` | LINE | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | UNRES (HT) | NOT-MEASURED | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
+| b7-at-line-4@v03-rules | 0.0 | `at-self-dual-line` | LINE | 27 81 243 | NEITHER (T) | MID (T) | NOT-MEASURED (T) | STOPPED (T) | RELEVANT (HT) | STABLE (HT) | NOT-MEASURED | REFUSE-TWO-START-UNMEASURED | REFUSE | POINT | ORDER-UNMEASURED |
+| b7-at-line-4@v03-rules | 0.07 | `at-self-dual-line` | LINE | 27 81 243 | NEITHER (T) | MID (T) | NOT-MEASURED (T) | STOPPED (T) | RELEVANT (HT) | STABLE (HT) | NOT-MEASURED | REFUSE-TWO-START-UNMEASURED | REFUSE | POINT | ORDER-UNMEASURED |
+| b7-at-line-4@v03-rules | 0.14 | `at-self-dual-line` | LINE | 27 81 243 | NEITHER (T) | MID (T) | NOT-MEASURED (T) | UNRES (T) | RELEVANT (HT) | STABLE (HT) | NOT-MEASURED | REFUSE-TWO-START-UNMEASURED | REFUSE | REFUSE-FLOW | ORDER-UNMEASURED |
+| b7-at-line-4@v03-rules | 0.21 | `at-self-dual-line` | LINE | 27 81 243 | NEITHER (T) | MID (T) | NOT-MEASURED (T) | UNRES (T) | RELEVANT (HT) | STABLE (HT) | NOT-MEASURED | REFUSE-TWO-START-UNMEASURED | REFUSE | REFUSE-FLOW | ORDER-UNMEASURED |
+| b7-at-line-4@v03-rules | 0.2747 | `at-self-dual-line` | LINE | 27 81 243 | NEITHER (T) | MID (T) | NOT-MEASURED (T) | UNRES (T) | RELEVANT (HT) | UNRES (HT) | NOT-MEASURED | REFUSE-TWO-START-UNMEASURED | REFUSE | REFUSE-FLOW | ORDER-UNMEASURED |
 | b7-at-line@v03-rules | 0.0 | `at-self-dual-line` | LINE | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | STABLE (HT) | NOT-MEASURED | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
 | b7-at-line@v03-rules | 0.07 | `at-self-dual-line` | LINE | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | STABLE (HT) | NOT-MEASURED | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
 | b7-at-line@v03-rules | 0.14 | `at-self-dual-line` | LINE | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | STABLE (HT) | NOT-MEASURED | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
@@ -357,9 +362,9 @@ Geometry against class_truth (order_truth not FIRST-ORDER): 11 agree, 66 refused
 | x9c-potts@v03-rules | 8 | `potts-q8` | FIRST-ORDER | 27 81 243 | NEITHER (T) | DIS (T) | PINNED-BETWEEN-PHASES (T) | FLOWING (T) | IRRELEVANT (HT) | OFF (HT) | COEXIST (T) | FIRST-ORDER | FIRST-ORDER | NOT | COEXIST-AT-WINDOW |
 | x9c-potts@v03-rules | 10 | `potts-q10` | FIRST-ORDER | 27 81 243 | NEITHER (T) | DIS (T) | PINNED-BETWEEN-PHASES (T) | FLOWING (T) | UNRES (HT) | UNRES (HT) | COEXIST (T) | FIRST-ORDER | FIRST-ORDER | NOT | COEXIST-AT-WINDOW |
 
-Verdict class against truth: 16 agree, 73 refused, 17 disagree, 20 no truth
-Order against order_truth: 29 agree, 61 refused, 16 disagree
-Geometry against class_truth (order_truth not FIRST-ORDER): 14 agree, 67 refused, 6 disagree
+Verdict class against truth: 16 agree, 78 refused, 17 disagree, 20 no truth
+Order against order_truth: 29 agree, 66 refused, 16 disagree
+Geometry against class_truth (order_truth not FIRST-ORDER): 14 agree, 70 refused, 8 disagree
 
 ## Collisions (v03-rules)
 

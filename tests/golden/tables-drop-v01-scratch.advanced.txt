@@ -1,3 +1,3 @@
 $ bin/cc tables drop scratch --with-results --advanced
-dropped tables/scratch and 46 result files
+dropped tables/scratch and 48 result files
 exit 0

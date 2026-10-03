@@ -185,6 +185,72 @@ pairs (each edge of the declared control relation)
   pair 0.14->0.21 y_along -0.1111 [-0.2479, 0.005093] ZERO! eps y=0.25 flags: truth point, membership unchecked (the upstream needle was not measured) vector along/y_along/pair=0.14->0.21
   pair 0.21->0.2747 y_along 0.1306 [0.03738, 0.2158] SLOW+ eps y=0.25 flags: truth point, membership unchecked (the upstream needle was not measured) vector along/y_along/pair=0.21->0.2747
 b7-at-line-3: ran
+run b7-at-line-4@scratch -> results/b7-at-line-4@scratch.json
+b7-at-line-4   rules: scratch   result: results/b7-at-line-4@scratch.json (not frozen)
+  interval: block resamples 400, level 0.95, seed 22
+  code_commit: none
+  read inputs/b7-at-line-4/m.toml 84d9ea7ad444
+  read instruments/across.toml 8f6803e8af6c
+  read instruments/stability.toml 2fc7bb21b58a
+  read instruments/along.toml f3fd87ddb9aa
+  read instruments/fluct.toml b9eee16fe05f
+  read instruments/needle.toml 03c8e390df85
+  read tables/scratch/codes.toml 1fd20de97e25
+  read tables/scratch/verdict.toml 6e1989a49f0b
+  read tables/scratch/membership.toml f9e012a4126b
+  read fixtures/data/b7-at-line-4.toml 89ed404cc5c7
+  read 15 data files, sha256 match the pinned manifest
+point 0.0   case at-self-dual-line   obtained: truth
+  sink       d_ord 0.4395 [0.4361, 0.4429] SIG+ eps sink=0.02 d_dis 0.5605 [0.5571, 0.5639] SIG+ eps sink=0.02 -> NEITHER flags: truth point
+  needle     velocity 0.00104 [-0.003281, 0.004936] ZERO! eps step=0.01 d_ord 0.4395 [0.4361, 0.4429] SIG+ eps sink=0.02 d_dis 0.5605 [0.5571, 0.5639] SIG+ eps sink=0.02 -> MID flags: truth point
+  flow       0.00104 [-0.003281, 0.004936] ZERO! eps step=0.01 -> STOPPED flags: truth point vector needle/velocity/point=0.0
+  across     1.009 [0.9764, 1.045] SIG+ eps y=0.25 -> RELEVANT flags: uses Hamiltonian knowledge, truth point vector across/y_last/point=0.0
+  stability  0.01661 [-0.03909, 0.07487] ZERO! eps y=0.25 -> STABLE flags: uses Hamiltonian knowledge, truth point vector stability/d/point=0.0
+  two_start  NOT-MEASURED (two_start is not declared on this input)
+  => verdict REFUSE-TWO-START-UNMEASURED  class REFUSE, verdict.toml line 158
+     why: honest null: the two-start difference was not measured or not evaluated
+point 0.07   case at-self-dual-line   obtained: truth
+  sink       d_ord 0.4048 [0.4013, 0.408] SIG+ eps sink=0.02 d_dis 0.5952 [0.592, 0.5987] SIG+ eps sink=0.02 -> NEITHER flags: truth point
+  needle     velocity -0.0001888 [-0.004439, 0.005388] ZERO! eps step=0.01 d_ord 0.4048 [0.4013, 0.408] SIG+ eps sink=0.02 d_dis 0.5952 [0.592, 0.5987] SIG+ eps sink=0.02 -> MID flags: truth point
+  flow       -0.0001888 [-0.004439, 0.005388] ZERO! eps step=0.01 -> STOPPED flags: truth point vector needle/velocity/point=0.07
+  across     1.073 [1.04, 1.106] SIG+ eps y=0.25 -> RELEVANT flags: uses Hamiltonian knowledge, truth point vector across/y_last/point=0.07
+  stability  -0.02596 [-0.07265, 0.02263] ZERO! eps y=0.25 -> STABLE flags: uses Hamiltonian knowledge, truth point vector stability/d/point=0.07
+  two_start  NOT-MEASURED (two_start is not declared on this input)
+  => verdict REFUSE-TWO-START-UNMEASURED  class REFUSE, verdict.toml line 158
+     why: honest null: the two-start difference was not measured or not evaluated
+point 0.14   case at-self-dual-line   obtained: truth
+  sink       d_ord 0.3623 [0.3572, 0.3674] SIG+ eps sink=0.02 d_dis 0.6377 [0.6326, 0.6428] SIG+ eps sink=0.02 -> NEITHER flags: truth point
+  needle     velocity 0.004377 [-0.003096, 0.01119] UNRES eps step=0.01 d_ord 0.3623 [0.3572, 0.3674] SIG+ eps sink=0.02 d_dis 0.6377 [0.6326, 0.6428] SIG+ eps sink=0.02 -> MID flags: truth point
+  flow       0.004377 [-0.003096, 0.01119] UNRES eps step=0.01 flags: truth point vector needle/velocity/point=0.14
+  across     1.175 [1.137, 1.223] SIG+ eps y=0.25 -> RELEVANT flags: uses Hamiltonian knowledge, truth point vector across/y_last/point=0.14
+  stability  -0.06267 [-0.1145, 0.01062] ZERO! eps y=0.25 -> STABLE flags: uses Hamiltonian knowledge, truth point vector stability/d/point=0.14
+  two_start  NOT-MEASURED (two_start is not declared on this input)
+  => verdict REFUSE-TWO-START-UNMEASURED  class REFUSE, verdict.toml line 158
+     why: honest null: the two-start difference was not measured or not evaluated
+point 0.21   case at-self-dual-line   obtained: truth
+  sink       d_ord 0.32 [0.3103, 0.3292] SIG+ eps sink=0.02 d_dis 0.68 [0.6708, 0.6897] SIG+ eps sink=0.02 -> NEITHER flags: truth point
+  needle     velocity -0.007615 [-0.01783, 0.005056] UNRES eps step=0.01 d_ord 0.32 [0.3103, 0.3292] SIG+ eps sink=0.02 d_dis 0.68 [0.6708, 0.6897] SIG+ eps sink=0.02 -> MID flags: truth point
+  flow       -0.007615 [-0.01783, 0.005056] UNRES eps step=0.01 flags: truth point vector needle/velocity/point=0.21
+  across     1.331 [1.265, 1.391] SIG+ eps y=0.25 -> RELEVANT flags: uses Hamiltonian knowledge, truth point vector across/y_last/point=0.21
+  stability  -0.007897 [-0.102, 0.07876] ZERO! eps y=0.25 -> STABLE flags: uses Hamiltonian knowledge, truth point vector stability/d/point=0.21
+  two_start  NOT-MEASURED (two_start is not declared on this input)
+  => verdict REFUSE-TWO-START-UNMEASURED  class REFUSE, verdict.toml line 158
+     why: honest null: the two-start difference was not measured or not evaluated
+point 0.2747   case at-self-dual-line   obtained: truth
+  sink       d_ord 0.2292 [0.2174, 0.2419] SIG+ eps sink=0.02 d_dis 0.7708 [0.7581, 0.7826] SIG+ eps sink=0.02 -> NEITHER flags: truth point
+  needle     velocity 0.01043 [-0.003658, 0.02503] UNRES eps step=0.01 d_ord 0.2292 [0.2174, 0.2419] SIG+ eps sink=0.02 d_dis 0.7708 [0.7581, 0.7826] SIG+ eps sink=0.02 -> MID flags: truth point
+  flow       0.01043 [-0.003658, 0.02503] UNRES eps step=0.01 flags: truth point vector needle/velocity/point=0.2747
+  across     1.321 [1.202, 1.423] SIG+ eps y=0.25 -> RELEVANT flags: uses Hamiltonian knowledge, truth point vector across/y_last/point=0.2747
+  stability  -0.09087 [-0.2528, 0.04768] UNRES eps y=0.25 flags: uses Hamiltonian knowledge, truth point vector stability/d/point=0.2747
+  two_start  NOT-MEASURED (two_start is not declared on this input)
+  => verdict REFUSE-TWO-START-UNMEASURED  class REFUSE, verdict.toml line 158
+     why: honest null: the two-start difference was not measured or not evaluated
+pairs (each edge of the declared control relation)
+  pair 0.0->0.07 y_along -0.006976 [-0.07966, 0.06922] ZERO! eps y=0.25 flags: truth point vector along/y_along/pair=0.0->0.07
+  pair 0.07->0.14 y_along -0.01927 [-0.1059, 0.05561] ZERO! eps y=0.25 flags: truth point vector along/y_along/pair=0.07->0.14
+  pair 0.14->0.21 y_along -0.1111 [-0.2479, 0.005093] ZERO! eps y=0.25 flags: truth point vector along/y_along/pair=0.14->0.21
+  pair 0.21->0.2747 y_along 0.1306 [0.03738, 0.2158] SLOW+ eps y=0.25 flags: truth point vector along/y_along/pair=0.21->0.2747
+b7-at-line-4: ran
 run c2-bc-two-start@scratch -> results/c2-bc-two-start@scratch.json
 c2-bc-two-start   rules: scratch   result: results/c2-bc-two-start@scratch.json (not frozen)
   interval: block resamples 400, level 0.95, seed 1500

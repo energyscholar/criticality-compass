@@ -153,6 +153,59 @@ pairs (each edge of the declared control relation)
   pair 0.14->0.21 y_along -0.1111 [-0.2479, 0.005093] ZERO!
   pair 0.21->0.2747 y_along 0.1306 [0.03738, 0.2158] SLOW+
 b7-at-line-3: ran
+run b7-at-line-4@scratch -> results/b7-at-line-4@scratch.json
+b7-at-line-4   rules: scratch   result: results/b7-at-line-4@scratch.json (not frozen)
+point 0.0   case at-self-dual-line
+  sink       d_ord 0.4395 [0.4361, 0.4429] SIG+ d_dis 0.5605 [0.5571, 0.5639] SIG+ -> NEITHER
+  needle     velocity 0.00104 [-0.003281, 0.004936] ZERO! d_ord 0.4395 [0.4361, 0.4429] SIG+ d_dis 0.5605 [0.5571, 0.5639] SIG+ -> MID
+  flow       0.00104 [-0.003281, 0.004936] ZERO! -> STOPPED
+  across     1.009 [0.9764, 1.045] SIG+ -> RELEVANT
+  stability  0.01661 [-0.03909, 0.07487] ZERO! -> STABLE
+  two_start  BLANK (NOT-MEASURED: two_start is not declared on this input)
+  => verdict BLANK (REFUSE-TWO-START-UNMEASURED)
+     why: honest null: the two-start difference was not measured or not evaluated
+point 0.07   case at-self-dual-line
+  sink       d_ord 0.4048 [0.4013, 0.408] SIG+ d_dis 0.5952 [0.592, 0.5987] SIG+ -> NEITHER
+  needle     velocity -0.0001888 [-0.004439, 0.005388] ZERO! d_ord 0.4048 [0.4013, 0.408] SIG+ d_dis 0.5952 [0.592, 0.5987] SIG+ -> MID
+  flow       -0.0001888 [-0.004439, 0.005388] ZERO! -> STOPPED
+  across     1.073 [1.04, 1.106] SIG+ -> RELEVANT
+  stability  -0.02596 [-0.07265, 0.02263] ZERO! -> STABLE
+  two_start  BLANK (NOT-MEASURED: two_start is not declared on this input)
+  => verdict BLANK (REFUSE-TWO-START-UNMEASURED)
+     why: honest null: the two-start difference was not measured or not evaluated
+point 0.14   case at-self-dual-line
+  sink       d_ord 0.3623 [0.3572, 0.3674] SIG+ d_dis 0.6377 [0.6326, 0.6428] SIG+ -> NEITHER
+  needle     velocity 0.004377 [-0.003096, 0.01119] BLANK (UNRES: interval straddles 0 and a margin edge) d_ord 0.3623 [0.3572, 0.3674] SIG+ d_dis 0.6377 [0.6326, 0.6428] SIG+ -> MID
+  flow       0.004377 [-0.003096, 0.01119] BLANK (UNRES: interval straddles 0 and a margin edge)
+  across     1.175 [1.137, 1.223] SIG+ -> RELEVANT
+  stability  -0.06267 [-0.1145, 0.01062] ZERO! -> STABLE
+  two_start  BLANK (NOT-MEASURED: two_start is not declared on this input)
+  => verdict BLANK (REFUSE-TWO-START-UNMEASURED)
+     why: honest null: the two-start difference was not measured or not evaluated
+point 0.21   case at-self-dual-line
+  sink       d_ord 0.32 [0.3103, 0.3292] SIG+ d_dis 0.68 [0.6708, 0.6897] SIG+ -> NEITHER
+  needle     velocity -0.007615 [-0.01783, 0.005056] BLANK (UNRES: interval straddles 0 and a margin edge) d_ord 0.32 [0.3103, 0.3292] SIG+ d_dis 0.68 [0.6708, 0.6897] SIG+ -> MID
+  flow       -0.007615 [-0.01783, 0.005056] BLANK (UNRES: interval straddles 0 and a margin edge)
+  across     1.331 [1.265, 1.391] SIG+ -> RELEVANT
+  stability  -0.007897 [-0.102, 0.07876] ZERO! -> STABLE
+  two_start  BLANK (NOT-MEASURED: two_start is not declared on this input)
+  => verdict BLANK (REFUSE-TWO-START-UNMEASURED)
+     why: honest null: the two-start difference was not measured or not evaluated
+point 0.2747   case at-self-dual-line
+  sink       d_ord 0.2292 [0.2174, 0.2419] SIG+ d_dis 0.7708 [0.7581, 0.7826] SIG+ -> NEITHER
+  needle     velocity 0.01043 [-0.003658, 0.02503] BLANK (UNRES: interval straddles 0 and a margin edge) d_ord 0.2292 [0.2174, 0.2419] SIG+ d_dis 0.7708 [0.7581, 0.7826] SIG+ -> MID
+  flow       0.01043 [-0.003658, 0.02503] BLANK (UNRES: interval straddles 0 and a margin edge)
+  across     1.321 [1.202, 1.423] SIG+ -> RELEVANT
+  stability  -0.09087 [-0.2528, 0.04768] BLANK (UNRES: interval straddles 0 and a margin edge)
+  two_start  BLANK (NOT-MEASURED: two_start is not declared on this input)
+  => verdict BLANK (REFUSE-TWO-START-UNMEASURED)
+     why: honest null: the two-start difference was not measured or not evaluated
+pairs (each edge of the declared control relation)
+  pair 0.0->0.07 y_along -0.006976 [-0.07966, 0.06922] ZERO!
+  pair 0.07->0.14 y_along -0.01927 [-0.1059, 0.05561] ZERO!
+  pair 0.14->0.21 y_along -0.1111 [-0.2479, 0.005093] ZERO!
+  pair 0.21->0.2747 y_along 0.1306 [0.03738, 0.2158] SLOW+
+b7-at-line-4: ran
 run c2-bc-two-start@scratch -> results/c2-bc-two-start@scratch.json
 c2-bc-two-start   rules: scratch   result: results/c2-bc-two-start@scratch.json (not frozen)
 point d2.0-K1.0   case none

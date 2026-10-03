@@ -49,6 +49,7 @@ point 0.2747   case at-self-dual-line
 b7-at-line: ran
 b7-at-line-2: REFUSED: tables/scratch/membership.toml:along: along runs door:off_manifold on b7-at-line-2 but this set has no rule for it
 b7-at-line-3: REFUSED: tables/scratch/membership.toml:along: along runs door:off_manifold on b7-at-line-3 but this set has no rule for it
+b7-at-line-4: REFUSED: tables/scratch/membership.toml:along: along runs door:off_manifold on b7-at-line-4 but this set has no rule for it
 run c2-bc-two-start@scratch -> results/c2-bc-two-start@scratch.json
 c2-bc-two-start   rules: scratch   result: results/c2-bc-two-start@scratch.json (not frozen)
 point d2.0-K1.0   case none
