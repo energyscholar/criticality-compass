@@ -229,7 +229,7 @@ def unit_blocks(m, inst):
     rels, ax = m.get("relations", {}), m["axes"]
     sizes = [rels["matched"]["big"], rels["matched"]["small"]] if "matched" in inst["relations"] else list(ax["size"])
     pair = rels.get("start", {}).get("pairs", [[ax["main_start"]]])[0]
-    return sizes, (list(pair) if "starts" in inst["axes"] else [ax["main_start"]])
+    return sizes, (list(pair) if "starts" in inst["axes"] else [inst.get("start", ax["main_start"])])   # `start`: read this start, not main_start (plan 0867)
 
 
 def stored(c, path, key):
@@ -427,7 +427,7 @@ def chk_instrument(p, d, c, stem=None):
         return list(todos(p, d))   # a template still full of TODOs: report them, nothing else
     req = {"module": str, "operators": list, "unit": str, "reports": list, "arrays": list, "axes": list,
            "relations": list, "sidecar": list, "flags": list, "pipeline": list, "columns": dict}
-    out = header(p, d, "instrument") + shape(p, d, req, {"requires": list, "door_values": list, "quantity": str})
+    out = header(p, d, "instrument") + shape(p, d, req, {"requires": list, "door_values": list, "quantity": str, "start": str})
     if out:
         return out
     out += inalpha(p, "unit", d["unit"], ("point", "pair", "point-size"))

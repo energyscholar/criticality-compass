@@ -1,0 +1,30 @@
+# tests/breakers-axes/slow-kinetics-off-transition-pair.toml - an AXIS BREAKER (data; read by tests/test_axes.py)
+schema = 1
+kind = "axis-breaker"
+id = "slow-kinetics-off-transition-pair"
+rule = "both starts at the ORDERED sink (SAME-SINK) is slow kinetics, not coexistence: OFF-WINDOW, verdict NOT, even when D reads COEXIST"
+why = """C2 at delta 1.9 / 1.95, deep ordered: the vacant start stays vacant, so D reads SIG+ exactly as at a first-order point. \
+Both starts' needles sit at the ordered sink, so needle_pair reads SAME-SINK (not PINNED-BETWEEN-PHASES: the starts do not \
+part to opposite sinks) and the order axis is OFF-WINDOW. The pair does not rescue slow kinetics (the v02-rules breaker of the \
+same stem, read on v03-rules with needle_o)."""
+tables = "v03-rules"
+
+[cells]
+"needle.velocity" = "SLOW+"
+"needle.d_ord" = "ZERO!"
+"needle.d_dis" = "SIG+"
+"needle_o.velocity" = "SLOW+"
+"needle_o.d_ord" = "ZERO!"
+"needle_o.d_dis" = "SIG+"
+"across.y_last" = "SIG+"
+"stability.d" = "ZERO!"
+"two_start.D" = ["SIG+"]
+
+[expect]
+order = "OFF-WINDOW"
+verdict = "NOT"
+
+[mutation]
+file = "tables/v03-rules/codes.toml"
+intent = "two starts at the same ordered sink are read as pinned between the phases"
+py = '''s.replace('"ORD,ORD" = "SAME-SINK"', '"ORD,ORD" = "PINNED-BETWEEN-PHASES"')'''

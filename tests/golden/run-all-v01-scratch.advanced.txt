@@ -1161,6 +1161,49 @@ point 0.3   case coupled-ising-bilinear   obtained: navigated
   => verdict POINT  class POINT, verdict.toml line 84
      why: verdict_x CAND_GS: relevant and stable
 x5n-bilayer: ran
+run x5n-bilayer-2@scratch -> results/x5n-bilayer-2@scratch.json
+x5n-bilayer-2   rules: scratch   result: results/x5n-bilayer-2@scratch.json (not frozen)
+  interval: block resamples 400, level 0.95, seed 65
+  code_commit: none
+  read inputs/x5n-bilayer-2/m.toml cf28be7b6b54
+  read instruments/needle.toml 03c8e390df85
+  read instruments/across.toml 8f6803e8af6c
+  read instruments/stability.toml 2fc7bb21b58a
+  read instruments/two_start.toml 30503b8a483a
+  read instruments/fluct.toml b9eee16fe05f
+  read instruments/needle_o.toml 5191ed5def20
+  read tables/scratch/codes.toml 1fd20de97e25
+  read tables/scratch/verdict.toml 6e1989a49f0b
+  read fixtures/data/x5n-bilayer-2.toml f2eb2cf4faad
+  read 18 data files, sha256 match the pinned manifest
+point 0.0   case coupled-ising-bilinear   obtained: navigated
+  sink       d_ord 0.2411 [0.2383, 0.2449] SIG+ eps sink=0.02 d_dis 0.7589 [0.7551, 0.7617] SIG+ eps sink=0.02 -> NEITHER flags: navigated point
+  needle     velocity -0.00244 [-0.007564, 0.001852] ZERO! eps step=0.01 d_ord 0.2411 [0.2383, 0.2449] SIG+ eps sink=0.02 d_dis 0.7589 [0.7551, 0.7617] SIG+ eps sink=0.02 -> MID flags: navigated point
+  flow       -0.00244 [-0.007564, 0.001852] ZERO! eps step=0.01 -> STOPPED flags: navigated point vector needle/velocity/point=0.0
+  across     0.9846 [0.9309, 1.051] SIG+ eps y=0.25 -> RELEVANT flags: uses Hamiltonian knowledge, navigated point vector across/y_last/point=0.0
+  stability  -0.04351 [-0.1291, 0.06495] ZERO! eps y=0.25 -> STABLE flags: uses Hamiltonian knowledge, navigated point vector stability/d/point=0.0
+  two_start  INDEP eps two_start=0.01 per size: 27 ZERO! INDEP; 81 ZERO! INDEP; 243 ZERO! INDEP flags: navigated point
+  => verdict POINT  class POINT, verdict.toml line 84
+     why: verdict_x CAND_GS: relevant and stable
+point 0.1   case coupled-ising-bilinear   obtained: navigated
+  sink       d_ord 0.2801 [0.2769, 0.2838] SIG+ eps sink=0.02 d_dis 0.7199 [0.7162, 0.7231] SIG+ eps sink=0.02 -> NEITHER flags: navigated point
+  needle     velocity -0.001112 [-0.007265, 0.003518] ZERO! eps step=0.01 d_ord 0.2801 [0.2769, 0.2838] SIG+ eps sink=0.02 d_dis 0.7199 [0.7162, 0.7231] SIG+ eps sink=0.02 -> MID flags: navigated point
+  flow       -0.001112 [-0.007265, 0.003518] ZERO! eps step=0.01 -> STOPPED flags: navigated point vector needle/velocity/point=0.1
+  across     1.015 [0.9707, 1.051] SIG+ eps y=0.25 -> RELEVANT flags: uses Hamiltonian knowledge, navigated point vector across/y_last/point=0.1
+  stability  -0.0578 [-0.1254, -0.0001782] SLOW- eps y=0.25 -> STABLE flags: uses Hamiltonian knowledge, navigated point vector stability/d/point=0.1
+  two_start  INDEP eps two_start=0.01 per size: 27 ZERO! INDEP; 81 SLOW- INDEP; 243 SLOW- INDEP flags: navigated point
+  => verdict POINT  class POINT, verdict.toml line 84
+     why: verdict_x CAND_GS: relevant and stable
+point 0.3   case coupled-ising-bilinear   obtained: navigated
+  sink       d_ord 0.247 [0.2432, 0.2505] SIG+ eps sink=0.02 d_dis 0.753 [0.7495, 0.7568] SIG+ eps sink=0.02 -> NEITHER flags: navigated point
+  needle     velocity 0.0003724 [-0.004144, 0.00439] ZERO! eps step=0.01 d_ord 0.247 [0.2432, 0.2505] SIG+ eps sink=0.02 d_dis 0.753 [0.7495, 0.7568] SIG+ eps sink=0.02 -> MID flags: navigated point
+  flow       0.0003724 [-0.004144, 0.00439] ZERO! eps step=0.01 -> STOPPED flags: navigated point vector needle/velocity/point=0.3
+  across     1.006 [0.9642, 1.055] SIG+ eps y=0.25 -> RELEVANT flags: uses Hamiltonian knowledge, navigated point vector across/y_last/point=0.3
+  stability  0.01882 [-0.05753, 0.1016] ZERO! eps y=0.25 -> STABLE flags: uses Hamiltonian knowledge, navigated point vector stability/d/point=0.3
+  two_start  INDEP eps two_start=0.01 per size: 27 ZERO! INDEP; 81 ZERO! INDEP; 243 ZERO! INDEP flags: navigated point
+  => verdict POINT  class POINT, verdict.toml line 84
+     why: verdict_x CAND_GS: relevant and stable
+x5n-bilayer-2: ran
 run x7a-bc@scratch -> results/x7a-bc@scratch.json
 x7a-bc   rules: scratch   result: results/x7a-bc@scratch.json (not frozen)
   interval: block resamples 400, level 0.95, seed 77

@@ -209,9 +209,11 @@ def reverdict_result(res, T, commit="none"):
 def diff(ta, tb, ra=(), rb=()):
     """(lines, changed cells, changed fixture points): every cell whose verdict differs, as compressed patterns."""
     (cols, dom, oa), (cols_b, dom_b, ob) = owners(ta), owners(tb)
-    if (cols, dom) != (cols_b, dom_b):
-        return [f"{ta.name} and {tb.name} have different signature columns or alphabets: no cell diff"], 0, []
-    va, vb = verdict_cells(ta, oa), verdict_cells(tb, ob)
+    da, db = dict(zip(cols, dom)), dict(zip(cols_b, dom_b))
+    if any(da[c] != db[c] for c in da.keys() & db.keys()):
+        return [f"{ta.name} and {tb.name} have different alphabets for a shared signature column: no cell diff"], 0, []
+    cols, dom = list(dict.fromkeys(cols_b + cols)), [{**da, **db}[c] for c in dict.fromkeys(cols_b + cols)]   # a column one set lacks: its verdicts hold along it
+    va, vb = np.broadcast_arrays(*(declare.lifted(verdict_cells(t, o), c, cols, dict(zip(cols, dom))) for t, o, c in ((ta, oa, list(da)), (tb, ob, list(db)))))
     lines, total = [], int((va != vb).sum())
     for a, b in sorted({(x, y) for x, y in zip(va[va != vb], vb[va != vb])}):
         free = (va == a) & (vb == b)

@@ -1,0 +1,31 @@
+# tests/breakers-axes/q3-same-window.toml - an AXIS BREAKER (data; read by tests/test_axes.py)
+schema = 1
+kind = "axis-breaker"
+id = "q3-same-window"
+rule = "both starts on the same window (SAME-WINDOW) leave the order to the existing rows: agreeing starts and a vanishing variance read CONTINUOUS, never coexistence"
+why = """Potts q 3 (a continuous transition): the random and the ordered start both read the needle on the window (MID, MID), the \
+two starts agree (two_start INDEP) and the energy variance per bond falls with size (fluct VANISHES). The pair adds nothing here: \
+needle_pair SAME-WINDOW is read by no order row, the geometry decides the verdict (POINT), and no coexistence is ever reported."""
+tables = "v03-rules"
+
+[cells]
+"needle.velocity" = "ZERO!"
+"needle.d_ord" = "SIG+"
+"needle.d_dis" = "SIG+"
+"needle_o.velocity" = "ZERO!"
+"needle_o.d_ord" = "SIG+"
+"needle_o.d_dis" = "SIG+"
+"across.y_last" = "SIG+"
+"stability.d" = "SLOW-"
+"two_start.D" = ["ZERO!"]
+"fluct.y_last" = "SIG-"
+
+[expect]
+geometry = "POINT"
+order = "CONTINUOUS"
+verdict = "POINT"
+
+[mutation]
+file = "tables/v03-rules/order.toml"
+intent = "a vanishing variance at agreeing starts on the same window reads coexistence"
+py = '''s.replace('when.fluct = ["VANISHES"]\nverdict = "CONTINUOUS"', 'when.fluct = ["VANISHES"]\nverdict = "COEXIST-AT-WINDOW"')'''

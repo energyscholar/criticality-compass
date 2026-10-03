@@ -1,0 +1,31 @@
+# tests/breakers-axes/crossed-is-reported.toml - an AXIS BREAKER (data; read by tests/test_axes.py)
+schema = 1
+kind = "axis-breaker"
+id = "crossed-is-reported"
+rule = "a CROSSED pair (random start ordered, ordered start disordered) is reported as a value and is never FIRST-ORDER"
+why = """The random start at the ORDERED sink while the ordered start sits at the DISORDERED one is unphysical at equilibrium; the \
+pair table gives it its own code (CROSSED) so that it is reported, and only PINNED-BETWEEN-PHASES is read as coexistence. Even with \
+two_start COEXIST the order stays OFF-WINDOW and the verdict NOT. (The pair code itself is the cell the mutation moves: \
+(ORD, DIS) -> PINNED-BETWEEN-PHASES.)"""
+tables = "v03-rules"
+
+[cells]
+"needle.velocity" = "ZERO!"
+"needle.d_ord" = "ZERO!"
+"needle.d_dis" = "SIG+"
+"needle_o.velocity" = "ZERO!"
+"needle_o.d_ord" = "SIG+"
+"needle_o.d_dis" = "ZERO!"
+"across.y_last" = "SIG+"
+"stability.d" = "UNRES"
+"two_start.D" = ["SIG+"]
+
+[expect]
+geometry = "NOT"
+order = "OFF-WINDOW"
+verdict = "NOT"
+
+[mutation]
+file = "tables/v03-rules/codes.toml"
+intent = "the crossed pair is read as pinned between the phases"
+py = '''s.replace('"ORD,DIS" = "CROSSED"', '"ORD,DIS" = "PINNED-BETWEEN-PHASES"')'''

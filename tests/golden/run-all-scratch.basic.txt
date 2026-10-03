@@ -859,6 +859,36 @@ point 0.3   case coupled-ising-bilinear
   => verdict POINT
      why: verdict_x CAND_GS: relevant and stable
 x5n-bilayer: ran
+run x5n-bilayer-2@scratch -> results/x5n-bilayer-2@scratch.json
+x5n-bilayer-2   rules: scratch   result: results/x5n-bilayer-2@scratch.json (not frozen)
+point 0.0   case coupled-ising-bilinear
+  sink       d_ord 0.2411 [0.2383, 0.2449] SIG+ d_dis 0.7589 [0.7551, 0.7617] SIG+ -> NEITHER
+  needle     velocity -0.00244 [-0.007564, 0.001852] ZERO! d_ord 0.2411 [0.2383, 0.2449] SIG+ d_dis 0.7589 [0.7551, 0.7617] SIG+ -> MID
+  flow       -0.00244 [-0.007564, 0.001852] ZERO! -> STOPPED
+  across     0.9846 [0.9309, 1.051] SIG+ -> RELEVANT
+  stability  -0.04351 [-0.1291, 0.06495] ZERO! -> STABLE
+  two_start  INDEP
+  => verdict POINT
+     why: verdict_x CAND_GS: relevant and stable
+point 0.1   case coupled-ising-bilinear
+  sink       d_ord 0.2801 [0.2769, 0.2838] SIG+ d_dis 0.7199 [0.7162, 0.7231] SIG+ -> NEITHER
+  needle     velocity -0.001112 [-0.007265, 0.003518] ZERO! d_ord 0.2801 [0.2769, 0.2838] SIG+ d_dis 0.7199 [0.7162, 0.7231] SIG+ -> MID
+  flow       -0.001112 [-0.007265, 0.003518] ZERO! -> STOPPED
+  across     1.015 [0.9707, 1.051] SIG+ -> RELEVANT
+  stability  -0.0578 [-0.1254, -0.0001782] SLOW- -> STABLE
+  two_start  INDEP
+  => verdict POINT
+     why: verdict_x CAND_GS: relevant and stable
+point 0.3   case coupled-ising-bilinear
+  sink       d_ord 0.247 [0.2432, 0.2505] SIG+ d_dis 0.753 [0.7495, 0.7568] SIG+ -> NEITHER
+  needle     velocity 0.0003724 [-0.004144, 0.00439] ZERO! d_ord 0.247 [0.2432, 0.2505] SIG+ d_dis 0.753 [0.7495, 0.7568] SIG+ -> MID
+  flow       0.0003724 [-0.004144, 0.00439] ZERO! -> STOPPED
+  across     1.006 [0.9642, 1.055] SIG+ -> RELEVANT
+  stability  0.01882 [-0.05753, 0.1016] ZERO! -> STABLE
+  two_start  INDEP
+  => verdict POINT
+     why: verdict_x CAND_GS: relevant and stable
+x5n-bilayer-2: ran
 x7a-bc: REFUSED: tables/scratch/membership.toml:along: along runs door:off_manifold on x7a-bc but this set has no rule for it
 x7a-nnn: REFUSED: tables/scratch/membership.toml:along: along runs door:off_manifold on x7a-nnn but this set has no rule for it
 run x8-ising-needle@scratch -> results/x8-ising-needle@scratch.json

@@ -1,3 +1,3 @@
 $ bin/cc tabulate --advanced
-tabulate: 42 results -> SIGNATURE-TABLE.md, docs/verdict-table.html
+tabulate: 64 results -> SIGNATURE-TABLE.md, docs/verdict-table.html
 exit 0

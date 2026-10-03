@@ -1,0 +1,31 @@
+# tests/breakers-axes/q8-pinned.toml - an AXIS BREAKER (data; read by tests/test_axes.py)
+schema = 1
+kind = "axis-breaker"
+id = "q8-pinned"
+rule = "a strong first-order point (starts pinned at opposite sinks, still apart) reads COEXIST-AT-WINDOW and FIRST-ORDER"
+why = """Potts q 8 at exact K_c, L 81 > xi ~ 24 (toolset LOG E120-E121): the random start falls into the DISORDERED phase (needle \
+DIS) and the ordered start stays ORDERED (needle ORD), so needle_pair reads PINNED-BETWEEN-PHASES, and the two starts stay \
+apart (two_start COEXIST). Under v02-rules the random start's needle alone reads OFF-WINDOW and the verdict is NOT: FIRST-ORDER \
+is unreachable. v03-rules reads the pair: the window is where the two phases' flows part."""
+tables = "v03-rules"
+
+[cells]
+"needle.velocity" = "ZERO!"
+"needle.d_ord" = "SIG+"
+"needle.d_dis" = "ZERO!"
+"needle_o.velocity" = "ZERO!"
+"needle_o.d_ord" = "ZERO!"
+"needle_o.d_dis" = "SIG+"
+"across.y_last" = "SIG+"
+"stability.d" = "UNRES"
+"two_start.D" = ["SIG+"]
+
+[expect]
+geometry = "NOT"
+order = "COEXIST-AT-WINDOW"
+verdict = "FIRST-ORDER"
+
+[mutation]
+file = "tables/v03-rules/order.toml"
+intent = "the pinned-between-phases cell reads OFF-WINDOW again (the v02-rules reading)"
+py = '''s.replace('when.two_start = ["COEXIST"]\nverdict = "COEXIST-AT-WINDOW"\nwhy = "plan 0867', 'when.two_start = ["COEXIST"]\nverdict = "OFF-WINDOW"\nwhy = "plan 0867')'''

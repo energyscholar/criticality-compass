@@ -1,0 +1,20 @@
+# instruments/needle_o.toml - the needle of the ORDERED start (plan 0867 P1): the same maths as needle.toml
+# (cc/instruments/needle.py), read on the ordered start's own level stacks. needle_pair pairs its code with needle's.
+schema = 1
+kind = "instrument"
+module = "needle"                              # cc/instruments/needle.py (shared with needle.toml)
+start = "ordered"                              # the start this instrument reads (the others read axes.main_start)
+operators = ["A"]
+unit = "point"
+reports = ["v_all", "g_final"]                 # reported, never coded
+arrays = ["GL"]                                # 2-D level stacks at matched big and small, of the ordered start
+axes = ["point", "size"]
+relations = ["matched"]
+sidecar = ["sinks", "observable", "block_map"]
+flags = []
+pipeline = ["stage:reduce", "door:nodefield", "stage:matched"]
+
+[columns]                                      # column -> the eps key its interval is read against
+velocity = "step"
+d_ord = "sink"
+d_dis = "sink"
