@@ -100,6 +100,7 @@ def cmd_test(names):
     regold = "--regolden" in names
     os.environ["CC_REGOLDEN"] = "1" if regold else ""
     VERBOSE = "-v" in names or regold
+    os.environ["CC_VERBOSE"] = "1" if "-v" in names else ""
     res, missing, allt = run_tests([n for n in names if n not in ("-v", "--regolden")])
     for n in missing:
         print(f"no test '{n}' in checks.toml [roles].tests\n  Next: bin/cc test <one of: "
@@ -148,6 +149,7 @@ def cmd_check(args):
     skipped = f" (fast: {len(slow)} slow tests skipped; bin/cc check runs them)" if fast else ""
     print(f"check: {len(res) - len(bad)} tests passed, {len(bad)} failed{skipped}")
     print("\n".join("check: " + ln.strip() for _, _, tail, _ in res for ln in tail if ln.strip().startswith("scoreboard ")))
+    print("check: seconds per test\n" + "\n".join(f"  {sec:7.1f} s  {stem}" for stem, _, _, sec in res))
     for stem, _, tail, _ in bad:
         print(f"check: FAILED: {stem}\n" + "\n".join("    " + ln for ln in tail) + f"\n  Next: bin/cc test {stem}")
     took, budget = time.time() - t0, config()["check"]["fast_budget_s"]

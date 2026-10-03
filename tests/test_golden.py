@@ -7,12 +7,14 @@ import stat
 import subprocess
 import sys
 import tempfile
+import time
 import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 GOLD = ROOT / "tests" / "golden"
 REGOLDEN = os.environ.get("CC_REGOLDEN") == "1"
+VERBOSE = os.environ.get("CC_VERBOSE") == "1"
 
 
 def transcript(case, mode):
@@ -37,7 +39,10 @@ def transcript(case, mode):
 bad, written = [], []
 for case in tomllib.loads((GOLD / "golden.toml").read_text())["case"]:
     for mode in ("basic", "advanced"):
+        t0 = time.time()
         f, got = GOLD / f"{case['id']}.{mode}.txt", transcript(case, mode)
+        if VERBOSE:
+            print(f"seconds {time.time() - t0:7.1f}  {f.name}")
         want = f.read_text() if f.is_file() else None
         if got == want:
             print(f"ok   {f.name}")
