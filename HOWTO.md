@@ -565,10 +565,11 @@ For this edit it prints `RED   test_breakers`, with the two breakers it breaks n
 
 Read these before you trust a verdict.
 
-- **No real input has reached a positive class for a single point.** The eleven inputs hold 76 points under
-  `v01-rules`: NOT (19 points), REFUSE-NEEDLE-UNMEASURED (41), REFUSE-SLOW (10), REFUSE-TWO-START-UNMEASURED (5)
-  and REFUSE-UNRES (1). POINT, LINE, WALKING and FIRST-ORDER appear in no real per-point result; only the
-  synthetic rule breakers exercise those rows. One positive **family** verdict exists, LINE for `b7-at-line-2`,
+- **One real input reaches a positive class for a point: `x5n-bilayer`, POINT at all three points.** The twelve
+  inputs hold 79 points under `v01-rules`: NOT (19 points), REFUSE-NEEDLE-UNMEASURED (41), REFUSE-SLOW (10),
+  REFUSE-TWO-START-UNMEASURED (5), REFUSE-UNRES (1) and POINT (3, all `x5n-bilayer`; `bin/cc run --all` prints
+  them). LINE, WALKING and FIRST-ORDER appear in no real per-point result; only the synthetic rule breakers
+  exercise those rows. One positive **family** verdict exists, LINE for `b7-at-line-2`,
   and it rests on a boundary cell (the pair `0.14->0.21` reads inside the margin by 0.002; see Tutorial part 3).
   The other three families refuse (`x8-ising-compass` and `x7a-nnn-manifold` read `REFUSE-UNCLASSIFIED-v0`,
   `x7a-bc-lambda` reads `REFUSE-OFF-MANIFOLD`). Do not read "no positive" as "nothing is critical".

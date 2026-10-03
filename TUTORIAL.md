@@ -194,8 +194,8 @@ tabulate --diff: wrote nothing (bin/cc tabulate writes SIGNATURE-TABLE.md and do
 1 512 cells of the rulebook (signature rows) change verdict, sorted by the old and new verdict: some become
 LINE, POINT or WALKING, most become other refusals, because the rest of the rulebook still has its say. And
 no fixture point changes verdict. Why: a point is only affected if it reads the needle at the window (MID)
-and the two-start comparison UNRES together. Of the 76 points CC holds, the x2, x3 and x5 points read MID, but
-their two-start comparison is INDEP; the one point whose two-start comparison is UNRES with the needle
+and the two-start comparison UNRES together. Of the 79 points CC holds under v01-rules, the x2, x3, x5 and x5n points read MID, but
+their two-start comparison is INDEP (x5n then reads POINT, which no such rule touches); the one point whose two-start comparison is UNRES with the needle
 measured (x4, K = 0.46) has the needle ORD, which is NOT either way; Potts q = 5 has an UNRES two-start but no
 needle at all; and the inputs that never measured the two starts (x7a, x8) read NOT-MEASURED, which is not
 UNRES. A rule can matter a lot to the rulebook and not at all to today's data. (`tabulate --diff` writes

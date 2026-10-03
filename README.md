@@ -170,11 +170,26 @@ dropped tables/my-rules
 
 ## What v0.1 can and cannot say
 
-Eleven inputs are loaded and 76 points are scored. No real input yet reaches a positive verdict for a single
-point (POINT, LINE, WALKING, FIRST-ORDER): the readings give NOT, or a refusal. Only synthetic test cases
-reach those rows. One positive verdict does exist on real data, and it belongs to a **family**, not a point:
-the points of `b7-at-line-2` taken together read LINE (`bin/cc family b7-at-line-2`, `TUTORIAL.md` part 3).
-This is a finding, not a bug in the docs; `HOWTO.md` ("Known limits of v0.1") says what it means.
+Twelve inputs are scored under the default rulebook (`v01-rules`), 79 points. Positive verdicts do exist on real
+data now. `x5n-bilayer`, the coupled Ising bilayer at its confirmed-stop critical point, reads **POINT** at all
+three of its points (needle MID, flow STOPPED, across RELEVANT, stability STABLE, two starts INDEP):
+
+```
+point 0.0   case coupled-ising-bilinear
+  needle     velocity -0.00244 [-0.007564, 0.001852] ZERO! d_ord 0.2411 [0.2383, 0.2449] SIG+ d_dis 0.7589 [0.7551, 0.7617] SIG+ -> MID
+  flow       -0.00244 [-0.007564, 0.001852] ZERO! -> STOPPED
+  across     0.9846 [0.9309, 1.051] SIG+ -> RELEVANT
+  stability  -0.04351 [-0.1291, 0.06495] ZERO! -> STABLE
+  two_start  INDEP
+  => verdict POINT
+     why: verdict_x CAND_GS: relevant and stable
+```
+
+(Transcript of `bin/cc run --all`, point 0.0 of `x5n-bilayer`; 0.1 and 0.3 read POINT the same way.) A second
+kind of positive verdict belongs to a **family**, not a point: the points of `b7-at-line-2` taken together read LINE
+(`bin/cc family b7-at-line-2`, `TUTORIAL.md` part 3). LINE, WALKING and FIRST-ORDER still appear in no real
+per-point result: the other 76 points give NOT or a refusal, and only synthetic test cases reach those rows.
+`HOWTO.md` ("Known limits of v0.1") says what the family verdict means.
 
 ## Before you commit
 
