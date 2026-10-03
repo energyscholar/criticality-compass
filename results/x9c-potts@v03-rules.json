@@ -5,7 +5,7 @@
  "input": "x9c-potts",
  "tables": "v03-rules",
  "derived_from": null,
- "code_commit": "137c6bfc760fd04dac4840bcc59362399a784942",
+ "code_commit": "03ccce72948d80e950639891333ca913d22eb4e1",
  "interval": {
   "method": "block",
   "b": 1600,
