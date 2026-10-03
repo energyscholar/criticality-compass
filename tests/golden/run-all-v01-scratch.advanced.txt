@@ -128,7 +128,7 @@ b7-at-line-3   rules: scratch   result: results/b7-at-line-3@scratch.json (not f
   read instruments/across.toml 8f6803e8af6c
   read instruments/stability.toml 2fc7bb21b58a
   read instruments/along.toml f3fd87ddb9aa
-  read instruments/fluct.toml d60421427a90
+  read instruments/fluct.toml b9eee16fe05f
   read tables/scratch/codes.toml 1fd20de97e25
   read tables/scratch/verdict.toml 6e1989a49f0b
   read tables/scratch/membership.toml f9e012a4126b
@@ -439,6 +439,65 @@ point d1.9-K3.0   case bc-lambda-line   obtained: observed
   => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 153
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
 c2-bc-two-start: ran
+run w1-potts@scratch -> results/w1-potts@scratch.json
+w1-potts   rules: scratch   result: results/w1-potts@scratch.json (not frozen)
+  interval: block resamples 400, level 0.95, seed 31
+  code_commit: none
+  read inputs/w1-potts/m.toml 6cd2c3237e0a
+  read instruments/across.toml 8f6803e8af6c
+  read instruments/stability.toml 2fc7bb21b58a
+  read instruments/two_start.toml 30503b8a483a
+  read instruments/fluct.toml b9eee16fe05f
+  read tables/scratch/codes.toml 1fd20de97e25
+  read tables/scratch/verdict.toml 6e1989a49f0b
+  read fixtures/data/w1-potts.toml 428b39028e9e
+  read 30 data files, sha256 match the pinned manifest
+point 2   case ising-2d   obtained: truth
+  sink       NOT-MEASURED (needle is not declared on this input)
+  needle     NOT-MEASURED (needle is not declared on this input)
+  flow       NOT-MEASURED (needle is not declared on this input)
+  across     0.8124 [0.724, 0.8921] SIG+ eps y=0.25 -> RELEVANT flags: uses Hamiltonian knowledge, truth point vector across/y_last/point=2
+  stability  0.01441 [-0.1076, 0.1355] ZERO! eps y=0.25 -> STABLE flags: uses Hamiltonian knowledge, truth point vector stability/d/point=2
+  two_start  INDEP eps two_start=0.01 per size: 27 ZERO! INDEP; 81 ZERO! INDEP; 243 ZERO! INDEP flags: truth point
+  => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 153
+     why: honest null (not in verdict_x): the needle was not measured or not evaluated
+point 3   case potts-q3   obtained: truth
+  sink       NOT-MEASURED (needle is not declared on this input)
+  needle     NOT-MEASURED (needle is not declared on this input)
+  flow       NOT-MEASURED (needle is not declared on this input)
+  across     0.9345 [0.78, 1.088] SIG+ eps y=0.25 -> RELEVANT flags: uses Hamiltonian knowledge, truth point vector across/y_last/point=3
+  stability  -0.06742 [-0.333, 0.1545] UNRES eps y=0.25 flags: uses Hamiltonian knowledge, truth point vector stability/d/point=3
+  two_start  INDEP eps two_start=0.01 per size: 27 ZERO! INDEP; 81 ZERO! INDEP; 243 ZERO! INDEP flags: truth point
+  => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 153
+     why: honest null (not in verdict_x): the needle was not measured or not evaluated
+point 4   case none   obtained: truth
+  sink       NOT-MEASURED (needle is not declared on this input)
+  needle     NOT-MEASURED (needle is not declared on this input)
+  flow       NOT-MEASURED (needle is not declared on this input)
+  across     1.062 [0.7431, 1.318] SIG+ eps y=0.25 -> RELEVANT flags: uses Hamiltonian knowledge, truth point vector across/y_last/point=4
+  stability  -0.01225 [-0.4642, 0.3572] UNRES eps y=0.25 flags: uses Hamiltonian knowledge, truth point vector stability/d/point=4
+  two_start  UNRES eps two_start=0.01 per size: 27 UNRES UNRES; 81 ZERO! INDEP; 243 ZERO! INDEP flags: truth point
+  => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 153
+     why: honest null (not in verdict_x): the needle was not measured or not evaluated
+point 5   case potts-q5   obtained: truth
+  sink       NOT-MEASURED (needle is not declared on this input)
+  needle     NOT-MEASURED (needle is not declared on this input)
+  flow       NOT-MEASURED (needle is not declared on this input)
+  across     1.554 [0.8661, 2.003] SIG+ eps y=0.25 -> RELEVANT flags: uses Hamiltonian knowledge, truth point vector across/y_last/point=5
+  stability  0.3251 [-0.6818, 1.109] UNRES eps y=0.25 flags: uses Hamiltonian knowledge, truth point vector stability/d/point=5
+  two_start  UNRES eps two_start=0.01 per size: 27 UNRES UNRES; 81 UNRES UNRES; 243 UNRES UNRES flags: truth point
+  => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 153
+     why: honest null (not in verdict_x): the needle was not measured or not evaluated
+point 7   case potts-q7   obtained: truth
+  sink       NOT-MEASURED (needle is not declared on this input)
+  needle     NOT-MEASURED (needle is not declared on this input)
+  flow       NOT-MEASURED (needle is not declared on this input)
+  across     -2.476 [-2.869, -1.946] SIG- eps y=0.25 -> IRRELEVANT flags: uses Hamiltonian knowledge, truth point vector across/y_last/point=7
+  stability  -4.645 [-5.323, -3.675] SIG- eps y=0.25 -> OFF flags: uses Hamiltonian knowledge, truth point vector stability/d/point=7
+  two_start  COEXIST eps two_start=0.01 per size: 27 POS COEXIST; 81 SIG+ COEXIST; 243 SIG+ COEXIST flags: truth point
+  => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 153
+     why: honest null (not in verdict_x): the needle was not measured or not evaluated
+w1-potts: ran
 run w2-potts@scratch -> results/w2-potts@scratch.json
 w2-potts   rules: scratch   result: results/w2-potts@scratch.json (not frozen)
   interval: block resamples 400, level 0.95, seed 31
@@ -496,7 +555,7 @@ w2-potts-2   rules: scratch   result: results/w2-potts-2@scratch.json (not froze
   read instruments/across.toml 8f6803e8af6c
   read instruments/stability.toml 2fc7bb21b58a
   read instruments/two_start.toml 30503b8a483a
-  read instruments/fluct.toml d60421427a90
+  read instruments/fluct.toml b9eee16fe05f
   read tables/scratch/codes.toml 1fd20de97e25
   read tables/scratch/verdict.toml 6e1989a49f0b
   read fixtures/data/w2-potts-2.toml eb42bb6aa7b8
@@ -538,6 +597,47 @@ point 5   case potts-q5   obtained: truth
   => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 153
      why: honest null (not in verdict_x): the needle was not measured or not evaluated
 w2-potts-2: ran
+run w3-potts@scratch -> results/w3-potts@scratch.json
+w3-potts   rules: scratch   result: results/w3-potts@scratch.json (not frozen)
+  interval: block resamples 400, level 0.95, seed 31
+  code_commit: none
+  read inputs/w3-potts/m.toml 112829864b97
+  read instruments/across.toml 8f6803e8af6c
+  read instruments/stability.toml 2fc7bb21b58a
+  read instruments/two_start.toml 30503b8a483a
+  read instruments/fluct.toml b9eee16fe05f
+  read tables/scratch/codes.toml 1fd20de97e25
+  read tables/scratch/verdict.toml 6e1989a49f0b
+  read fixtures/data/w3-potts.toml fce42920faaa
+  read 18 data files, sha256 match the pinned manifest
+point 4   case none   obtained: truth
+  sink       NOT-MEASURED (needle is not declared on this input)
+  needle     NOT-MEASURED (needle is not declared on this input)
+  flow       NOT-MEASURED (needle is not declared on this input)
+  across     1.195 [0.8917, 1.448] SIG+ eps y=0.25 -> RELEVANT flags: uses Hamiltonian knowledge, truth point vector across/y_last/point=4
+  stability  -0.1349 [-0.5609, 0.2338] UNRES eps y=0.25 flags: uses Hamiltonian knowledge, truth point vector stability/d/point=4
+  two_start  INDEP eps two_start=0.01 per size: 81 ZERO! INDEP; 243 ZERO! INDEP; 729 ZERO! INDEP flags: truth point
+  => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 153
+     why: honest null (not in verdict_x): the needle was not measured or not evaluated
+point 5   case potts-q5   obtained: truth
+  sink       NOT-MEASURED (needle is not declared on this input)
+  needle     NOT-MEASURED (needle is not declared on this input)
+  flow       NOT-MEASURED (needle is not declared on this input)
+  across     1.894 [1.321, 2.399] SIG+ eps y=0.25 -> RELEVANT flags: uses Hamiltonian knowledge, truth point vector across/y_last/point=5
+  stability  0.6499 [-0.05549, 1.596] UNRES eps y=0.25 flags: uses Hamiltonian knowledge, truth point vector stability/d/point=5
+  two_start  FLUCT eps two_start=0.01 per size: 81 UNRES UNRES; 243 NEG FLUCT; 729 NEG FLUCT flags: truth point
+  => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 153
+     why: honest null (not in verdict_x): the needle was not measured or not evaluated
+point 6   case potts-q6   obtained: truth
+  sink       NOT-MEASURED (needle is not declared on this input)
+  needle     NOT-MEASURED (needle is not declared on this input)
+  flow       NOT-MEASURED (needle is not declared on this input)
+  across     -0.6528 [-1.11, 0.4518] UNRES eps y=0.25 flags: uses Hamiltonian knowledge, truth point vector across/y_last/point=6
+  stability  -2.108 [-3.033, -0.05688] NEG eps y=0.25 -> OFF flags: uses Hamiltonian knowledge, truth point vector stability/d/point=6
+  two_start  COEXIST eps two_start=0.01 per size: 81 UNRES UNRES; 243 UNRES UNRES; 729 SIG+ COEXIST flags: truth point
+  => verdict REFUSE-NEEDLE-UNMEASURED  class REFUSE, verdict.toml line 153
+     why: honest null (not in verdict_x): the needle was not measured or not evaluated
+w3-potts: ran
 run x2-xy-line@scratch -> results/x2-xy-line@scratch.json
 x2-xy-line   rules: scratch   result: results/x2-xy-line@scratch.json (not frozen)
   interval: block resamples 400, level 0.95, seed 62
@@ -606,7 +706,7 @@ x2-xy-line-2   rules: scratch   result: results/x2-xy-line-2@scratch.json (not f
   read instruments/across.toml 8f6803e8af6c
   read instruments/stability.toml 2fc7bb21b58a
   read instruments/two_start.toml 30503b8a483a
-  read instruments/fluct.toml d60421427a90
+  read instruments/fluct.toml b9eee16fe05f
   read tables/scratch/codes.toml 1fd20de97e25
   read tables/scratch/verdict.toml 6e1989a49f0b
   read fixtures/data/x2-xy-line-2.toml d227e33756d6
@@ -743,7 +843,7 @@ x3-clock6-2   rules: scratch   result: results/x3-clock6-2@scratch.json (not fro
   read instruments/across.toml 8f6803e8af6c
   read instruments/stability.toml 2fc7bb21b58a
   read instruments/two_start.toml 30503b8a483a
-  read instruments/fluct.toml d60421427a90
+  read instruments/fluct.toml b9eee16fe05f
   read tables/scratch/codes.toml 1fd20de97e25
   read tables/scratch/verdict.toml 6e1989a49f0b
   read fixtures/data/x3-clock6-2.toml 5afcfa70cf30
@@ -862,7 +962,7 @@ x4-ising-field-2   rules: scratch   result: results/x4-ising-field-2@scratch.jso
   read instruments/across.toml 8f6803e8af6c
   read instruments/stability.toml 2fc7bb21b58a
   read instruments/two_start.toml 30503b8a483a
-  read instruments/fluct.toml d60421427a90
+  read instruments/fluct.toml b9eee16fe05f
   read tables/scratch/codes.toml 1fd20de97e25
   read tables/scratch/verdict.toml 6e1989a49f0b
   read fixtures/data/x4-ising-field-2.toml 2acaa28fe7a0
@@ -895,6 +995,47 @@ point 0.55   case ising-field-decoy   obtained: truth
   => verdict NOT  class NOT, verdict.toml line 25
      why: verdict_x STAGE1: off the window
 x4-ising-field-2: ran
+run x4-ising-field-3@scratch -> results/x4-ising-field-3@scratch.json
+x4-ising-field-3   rules: scratch   result: results/x4-ising-field-3@scratch.json (not frozen)
+  interval: block resamples 400, level 0.95, seed 64
+  code_commit: none
+  read inputs/x4-ising-field-3/m.toml e96ddffc01ee
+  read instruments/needle.toml 03c8e390df85
+  read instruments/across.toml 8f6803e8af6c
+  read instruments/stability.toml 2fc7bb21b58a
+  read instruments/two_start.toml 30503b8a483a
+  read tables/scratch/codes.toml 1fd20de97e25
+  read tables/scratch/verdict.toml 6e1989a49f0b
+  read fixtures/data/x4-ising-field-3.toml b2446b6bbd1d
+  read 18 data files, sha256 match the pinned manifest
+point 0.46   case ising-field-decoy   obtained: truth
+  sink       d_ord 0.00109 [0.000279, 0.002351] SLOW+ eps sink=0.02 d_dis 0.9989 [0.9976, 0.9997] SIG+ eps sink=0.02 -> ORD flags: truth point
+  needle     velocity 0.03071 [0.02553, 0.038] SIG+ eps step=0.01 d_ord 0.00109 [0.000279, 0.002351] SLOW+ eps sink=0.02 d_dis 0.9989 [0.9976, 0.9997] SIG+ eps sink=0.02 -> ORD flags: truth point
+  flow       0.03071 [0.02553, 0.038] SIG+ eps step=0.01 -> FLOWING flags: truth point vector needle/velocity/point=0.46
+  across     NOT-EVALUATED (sign of R not constant across the point estimate and every resample) flags: uses Hamiltonian knowledge, truth point
+  stability  NOT-EVALUATED (sign of R not constant across the point estimate and every resample) flags: uses Hamiltonian knowledge, truth point
+  two_start  FLUCT eps two_start=0.01 per size: 27 SIG- FLUCT; 81 SIG- FLUCT; 243 SIG- FLUCT flags: truth point
+  => verdict NOT  class NOT, verdict.toml line 25
+     why: verdict_x STAGE1: off the window
+point 0.5   case ising-field-decoy   obtained: truth
+  sink       d_ord 0 [0, 0] ZERO! eps sink=0.02 d_dis 1 [1, 1] SIG+ eps sink=0.02 -> ORD flags: truth point
+  needle     velocity 0.0005781 [0.0002674, 0.000896] SLOW+ eps step=0.01 d_ord 0 [0, 0] ZERO! eps sink=0.02 d_dis 1 [1, 1] SIG+ eps sink=0.02 -> ORD flags: truth point
+  flow       0.0005781 [0.0002674, 0.000896] SLOW+ eps step=0.01 -> SLOW flags: truth point vector needle/velocity/point=0.5
+  across     NOT-EVALUATED (R = 0) flags: uses Hamiltonian knowledge, truth point
+  stability  NOT-EVALUATED (R = 0) flags: uses Hamiltonian knowledge, truth point
+  two_start  FLUCT eps two_start=0.01 per size: 27 SIG- FLUCT; 81 SIG- FLUCT; 243 SIG- FLUCT flags: truth point
+  => verdict NOT  class NOT, verdict.toml line 25
+     why: verdict_x STAGE1: off the window
+point 0.55   case ising-field-decoy   obtained: truth
+  sink       d_ord 0 [0, 0] ZERO! eps sink=0.02 d_dis 1 [1, 1] SIG+ eps sink=0.02 -> ORD flags: truth point
+  needle     velocity 0 [0, 0] ZERO! eps step=0.01 d_ord 0 [0, 0] ZERO! eps sink=0.02 d_dis 1 [1, 1] SIG+ eps sink=0.02 -> ORD flags: truth point
+  flow       0 [0, 0] ZERO! eps step=0.01 -> STOPPED flags: truth point vector needle/velocity/point=0.55
+  across     NOT-EVALUATED (R = 0) flags: uses Hamiltonian knowledge, truth point
+  stability  NOT-EVALUATED (R = 0) flags: uses Hamiltonian knowledge, truth point
+  two_start  FLUCT eps two_start=0.01 per size: 27 SIG- FLUCT; 81 SIG- FLUCT; 243 SIG- FLUCT flags: truth point
+  => verdict NOT  class NOT, verdict.toml line 25
+     why: verdict_x STAGE1: off the window
+x4-ising-field-3: ran
 run x5-bilayer@scratch -> results/x5-bilayer@scratch.json
 x5-bilayer   rules: scratch   result: results/x5-bilayer@scratch.json (not frozen)
   interval: block resamples 400, level 0.95, seed 65
@@ -945,7 +1086,7 @@ x5-bilayer-2   rules: scratch   result: results/x5-bilayer-2@scratch.json (not f
   read instruments/across.toml 8f6803e8af6c
   read instruments/stability.toml 2fc7bb21b58a
   read instruments/two_start.toml 30503b8a483a
-  read instruments/fluct.toml d60421427a90
+  read instruments/fluct.toml b9eee16fe05f
   read tables/scratch/codes.toml 1fd20de97e25
   read tables/scratch/verdict.toml 6e1989a49f0b
   read fixtures/data/x5-bilayer-2.toml 443cdea35749

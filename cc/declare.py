@@ -427,7 +427,7 @@ def chk_instrument(p, d, c, stem=None):
         return list(todos(p, d))   # a template still full of TODOs: report them, nothing else
     req = {"module": str, "operators": list, "unit": str, "reports": list, "arrays": list, "axes": list,
            "relations": list, "sidecar": list, "flags": list, "pipeline": list, "columns": dict}
-    out = header(p, d, "instrument") + shape(p, d, req, {"requires": list, "door_values": list})
+    out = header(p, d, "instrument") + shape(p, d, req, {"requires": list, "door_values": list, "quantity": str})
     if out:
         return out
     out += inalpha(p, "unit", d["unit"], ("point", "pair", "point-size"))

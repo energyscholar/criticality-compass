@@ -162,6 +162,11 @@ tables = "v02-rules"
 "5" = "REFUSE-NEEDLE-UNMEASURED"
 "6" = "REFUSE-NEEDLE-UNMEASURED"
 
+[verdicts.x4-ising-field-3]
+"0.46" = "NOT"
+"0.5" = "NOT"
+"0.55" = "NOT"
+
 [order.b7-at-line]
 "0.0" = "NEEDLE-UNMEASURED"
 "0.07" = "NEEDLE-UNMEASURED"
@@ -362,6 +367,16 @@ tables = "v02-rules"
 "5" = ["FLUCT"]
 "6" = ["COEXIST"]
 
+[order.x4-ising-field-3]
+"0.46" = "OFF-WINDOW"
+"0.5" = "OFF-WINDOW"
+"0.55" = "OFF-WINDOW"
+
+[two_start.x4-ising-field-3]
+"0.46" = ["FLUCT"]
+"0.5" = ["FLUCT"]
+"0.55" = ["FLUCT"]
+
 [[family]]
 id = "b7-at-line-2"
 verdict = "LINE"
@@ -417,3 +432,8 @@ EQUILIBRATED is CONTINUOUS or EQUILIBRATED-UNRES, never FIRST-ORDER-TUNNELLING. 
 date = "2026-10-02"
 points = ["w1-potts:*", "w3-potts:*"]
 why = """X9 rung A (0866; LOG E111-E112). DECLARED BEFORE THE REAL RUN, after a DRY run was seen (LOG E111): the frozen Potts data hold no GL, so the needle cannot be declared and order is NEEDLE-UNMEASURED and geometry/combined REFUSE-NEEDLE-UNMEASURED at every point. [two_start.*] and [fluct.*] are the CODES the dry run measured, scored against the ORIGINAL [X9] cell predictions (not re-predicted): X9-1 q <= 4 two_start INDEP + fluct VANISHES; X9-2 q5 never COEXIST; X9-3 q6 COEXIST at 729; X9-4 q7 COEXIST + fluct VANISHES (the trap). X9-1 MISS: w1 q4 two_start reads UNRES, predicted INDEP (recorded, not repaired). All other cells meet their predictions"""
+
+[[change]]
+date = "2026-10-02"
+points = ["x4-ising-field-3:*"]
+why = """magnetisation two-start demo (0866 Q5). DECLARED BEFORE THE RUN. x4-ising-field-3 = x4-ising-field with two_start reading Q = O column 1 (the magnetisation per site) instead of the energy. The needle still reads ORD at all three points, so geometry is NOT and order OFF-WINDOW (the needle's position rule, not a side table): the combined verdict stays NOT, the class x4-ising-field already had. [two_start.*] is the code as observed in the dry run (seen before this lock): FLUCT at every point. FINDING, not repaired: D = M(random start) - M(ordered start) is negative because the frozen PLUS (random role) and MINUS (ordered role) files sit in opposite phases (+0.81 and -0.81); the sign of D for a signed order parameter is set by which start is called ordered, and two_start's sign cut reads it as an energy-like quantity. The starts DO stay apart (|D| = 1.6) - a COEXIST in physics that the sign convention reads as FLUCT. order never reads it here (OFF-WINDOW gate first)"""

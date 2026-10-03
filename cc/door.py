@@ -83,7 +83,7 @@ def context(m, inst, size=None):
     unit_rel = admit.declare(2, [(1, 0)], [Provenance(m["relations"]["control"]["provenance"])]) if pair else None
     return Ctx(
         unit_rel=unit_rel, component_shape=(m["interval"]["resamples"] + 1, len(sizes)) if pair else None,
-        pair_shape=(len(sizes), 2) if pair else None, quantity="Delta" if pair else "R",
+        pair_shape=(len(sizes), 2) if pair else None, quantity=inst.get("quantity", "Delta" if pair else "R"),
         level=m["interval"]["level"], eps={c: m["eps"][e] for c, e in inst["columns"].items()}, rel=rel,
         log_ratio=np.log(np.array(sizes[1:], float) / np.array(sizes[:-1], float)),
         log_span=float(np.log(sizes[-1] / sizes[0])), top=k - 1, top_steps=k - 2,

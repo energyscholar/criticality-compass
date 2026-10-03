@@ -1,3 +1,19 @@
 $ bin/cc tabulate
-tabulate: 36 results -> SIGNATURE-TABLE.md, docs/verdict-table.html
-exit 0
+REFUSED: instruments/fluct.toml changed since b7-at-line-3@v02-rules was run.
+  Next: bin/cc run b7-at-line-3 --tables v02-rules (or restore the file)
+REFUSED: instruments/fluct.toml changed since w1-potts@v02-rules was run.
+  Next: bin/cc run w1-potts --tables v02-rules (or restore the file)
+REFUSED: instruments/fluct.toml changed since w2-potts-2@v02-rules was run.
+  Next: bin/cc run w2-potts-2 --tables v02-rules (or restore the file)
+REFUSED: instruments/fluct.toml changed since w3-potts@v02-rules was run.
+  Next: bin/cc run w3-potts --tables v02-rules (or restore the file)
+REFUSED: instruments/fluct.toml changed since x2-xy-line-2@v02-rules was run.
+  Next: bin/cc run x2-xy-line-2 --tables v02-rules (or restore the file)
+REFUSED: instruments/fluct.toml changed since x3-clock6-2@v02-rules was run.
+  Next: bin/cc run x3-clock6-2 --tables v02-rules (or restore the file)
+REFUSED: instruments/fluct.toml changed since x4-ising-field-2@v02-rules was run.
+  Next: bin/cc run x4-ising-field-2 --tables v02-rules (or restore the file)
+REFUSED: instruments/fluct.toml changed since x5-bilayer-2@v02-rules was run.
+  Next: bin/cc run x5-bilayer-2 --tables v02-rules (or restore the file)
+tabulate: 39 results -> SIGNATURE-TABLE.md, docs/verdict-table.html
+exit 1

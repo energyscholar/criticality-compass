@@ -13,6 +13,7 @@ relations = ["size"]
 sidecar = ["two_start"]
 flags = ["H"]
 pipeline = ["stage:reduce", "door:logcoord", "stage:growth"]
+quantity = "var(e)"                            # the name a sign refusal of the logcoord door gives (optional; default R, or Delta for a pair)
 
 [columns]
 y_last = "y"

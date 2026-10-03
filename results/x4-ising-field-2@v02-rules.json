@@ -5,7 +5,7 @@
  "input": "x4-ising-field-2",
  "tables": "v02-rules",
  "derived_from": null,
- "code_commit": "47ba5d5022e7ab67aafa7f5d720757a1231b48f3",
+ "code_commit": "d6e0372c256c22556c94a8771d380eb7526d8327",
  "interval": {
   "method": "block",
   "b": 400,
@@ -19,7 +19,7 @@
   "instruments/across.toml": "8f6803e8af6cd80d4f7bb69b1be8148cf5eb8742892caf5f3f8392f38b3c0944",
   "instruments/stability.toml": "2fc7bb21b58a2d6eceab15ca62424aadedd309eb1f9dd6125bdee57d52588170",
   "instruments/two_start.toml": "30503b8a483a80faa442f419d04edc10a9498b56fb24c68554fa643c8679fa38",
-  "instruments/fluct.toml": "d60421427a90490b190073f0ab1b7c9f57ad908cea8d6f57293e4c589db1abd3",
+  "instruments/fluct.toml": "b9eee16fe05f430f982509db3d583201aa396e4d0470c0180a67439748cee423",
   "tables/v02-rules/codes.toml": "001f281f95428bdb40a008b5f20030fe3311472d541decc7a193662f5d220258",
   "tables/v02-rules/verdict.toml": "c4f8c8288cda3de174006e313c89aea870c22b4c82d49f1fcb84449471ddc4b2",
   "tables/v02-rules/geometry.toml": "05c3737d287a1ef321fe66d01de27ed9d5661519a2df279e4eb2e3ec78f42805",
