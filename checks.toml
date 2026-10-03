@@ -19,7 +19,7 @@ tests = [
   "tests/test_golden.py", "tests/test_verdict_equivalence.py",
   "tests/test_scoreboard.py", "tests/test_view.py", "tests/test_tabulate.py", "tests/test_reverdict.py",
   "tests/test_along.py", "tests/test_family.py", "tests/test_x5.py", "tests/test_axes.py", "tests/test_needle_o_start.py",
-  "tests/test_run_all.py",
+  "tests/test_run_all.py", "tests/test_code_hash.py",
 ]
 
 [allow]

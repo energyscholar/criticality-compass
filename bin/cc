@@ -32,7 +32,7 @@ ADVANCED = [
     ("tables drop <set> [--with-results]", "delete an unfrozen rulebook"),
     ("tables split <set> --column C --value V --verdict X", "override one cell family"),
     ("validate [--input ID --tables SET | --mvt]", "check every file; each problem has a Next line"),
-    ("check [--fast]", "validate + tests; run it before a commit"),
+    ("check [--fast | --baseline]", "validate + tests; run it before a commit; --baseline reads the recorded green run of this tree"),
     ("test [-v] [<name> ...]", "run the named tests (default all)"),
     ("mutate <relpath> (--sed E | --py E) -- <test> ...", "run tests against a temporary mutation"),
     ("help [--advanced]", "this text"),
@@ -135,11 +135,51 @@ def cmd_validate(args):
     return 1 if found else 0
 
 
+def tree_hash():
+    """The git tree of the working files WITHOUT tests/BASELINE.txt (the file cannot name itself), or 'none'."""
+    if not (ROOT / ".git").exists():
+        return "none"
+    env = {**os.environ, "GIT_INDEX_FILE": tempfile.mktemp(prefix="cc-index-")}
+    git = lambda *a: subprocess.run(["git", *a], cwd=ROOT, env=env, capture_output=True, text=True, check=True).stdout.strip()  # noqa: E731
+    try:
+        git("read-tree", "HEAD")
+        git("add", "-A", "--", ".")
+        git("rm", "--cached", "-q", "--ignore-unmatch", "tests/BASELINE.txt")
+        return git("write-tree")
+    finally:
+        Path(env["GIT_INDEX_FILE"]).unlink(missing_ok=True)
+
+
+def head_hash():
+    r = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True)
+    return r.stdout.strip() or "none"
+
+
+def write_baseline(res, took):
+    """A green full check records what it ran on: tree, HEAD, and every test's NAME, status and seconds."""
+    rows = [f"test {stem} {'ok' if ok else 'FAIL'} {sec:.1f}" for stem, ok, _, sec in res]
+    (ROOT / "tests" / "BASELINE.txt").write_text(f"tree {tree_hash()}\nhead {head_hash()}\nseconds {took:.0f}\n" + "\n".join(rows) + "\n")
+
+
+def cmd_baseline():
+    """check --baseline: print the recorded baseline if its tree is this tree (exit 0), else say run the check."""
+    f = ROOT / "tests" / "BASELINE.txt"
+    have = dict(ln.split(" ", 1) for ln in f.read_text().splitlines() if ln.startswith("tree ")) if f.is_file() else {}
+    if have.get("tree") == tree_hash() != "none":
+        print(f.read_text(), end="")
+        print("baseline: this tree was checked green (read it instead of running bin/cc check)")
+        return 0
+    print("baseline: no recorded baseline for this tree.\n  Next: bin/cc check")
+    return 1
+
+
 def cmd_check(args):
     import declare
     if "--regolden" in args:
         print("check never regoldens.\n  Next: bin/cc test --regolden test_golden")
         return 1
+    if "--baseline" in args:
+        return cmd_baseline()
     t0, fast = time.time(), "--fast" in args
     found, _ = declare.validate(ROOT)
     if found:
@@ -159,6 +199,9 @@ def cmd_check(args):
     took, budget = time.time() - t0, config()["check"]["fast_budget_s"]
     if not bad:
         print(f"check: clean in {took:.0f} s (fast budget {budget} s)")
+        if not fast:
+            write_baseline(res, took)
+            print("check: wrote tests/BASELINE.txt")
         if fast and took > budget:
             worst = max(res, key=lambda r: r[3])
             print(f"  Next: move the slowest fast test ({worst[0]}, {worst[3]:.0f} s) to cc.toml [check].slow")
@@ -396,6 +439,7 @@ def freeze_files(rid, read, vectors):
 
 
 def cmd_freeze(args):
+    import declare
     import view
     tables = opt(args, "--tables") or config()["defaults"]["tables"]
     pos = [a for a in args if not a.startswith("--") and a != opt(args, "--tables")]
@@ -415,6 +459,11 @@ def cmd_freeze(args):
             print(bad)
             return 1
         frozen = json.loads((ROOT / "FROZEN.json").read_text())
+        if f"results/{rid}.json" not in frozen["files"] and res.get("code_hash") != declare.code_hash(ROOT, committed=True):   # a frozen result was judged when it was frozen
+            print(f"REFUSED: {rid} was not made by the committed code (its code_hash differs from the HEAD tree's, "
+                  "or it records none).\n"
+                  f"  Next: commit the code, then bin/cc run {name} --tables {tset}, then bin/cc freeze {rid}")
+            return 1
         tdir, want = freeze_files(rid, read, res["vectors"])
         new = [w for w in want if w not in frozen["files"]]
         freeze = [sys.executable, str(TOOLS / "freeze.py"), str(ROOT)]

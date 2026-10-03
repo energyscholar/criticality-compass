@@ -1,0 +1,30 @@
+tree cb9a519065bef5430cda8d366345744f5689af5b
+head 52c00afce74017255d6643cb2bbb3008090c1d10
+seconds 149
+test test_budget ok 0.1
+test test_kernel ok 0.3
+test test_sign ok 0.3
+test test_resample ok 1.3
+test test_kernel_rs ok 0.7
+test test_declare ok 9.6
+test test_tables_cli ok 94.5
+test test_needle_x8 ok 1.6
+test test_b7 ok 5.4
+test test_w2 ok 6.0
+test test_two_start_c2 ok 2.2
+test test_detect_verdicts ok 53.9
+test test_breakers ok 0.6
+test test_breakers_red ok 12.7
+test test_golden ok 130.2
+test test_verdict_equivalence ok 1.5
+test test_scoreboard ok 1.6
+test test_view ok 23.1
+test test_tabulate ok 24.6
+test test_reverdict ok 7.2
+test test_along ok 20.4
+test test_family ok 4.4
+test test_x5 ok 12.9
+test test_axes ok 94.6
+test test_needle_o_start ok 101.4
+test test_run_all ok 100.2
+test test_code_hash ok 44.6

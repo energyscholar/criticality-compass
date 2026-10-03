@@ -357,7 +357,7 @@ def run(input_id, tables, write, tables_dir=None):
         commit = r.stdout.strip() or "none"
     rid = f"{input_id}@{tables}"
     res = {"schema": 1, "kind": "result", "run_id": rid, "input": input_id, "tables": tables,
-           "derived_from": None, "code_commit": commit, "interval": dict(m["interval"]), "read": read,
+           "derived_from": None, "code_commit": commit, "code_hash": declare.code_hash(ROOT), "interval": dict(m["interval"]), "read": read,
            "vectors": f"results/{rid}.npz",
            "readings": readings, "pair_readings": pair_readings, "reports": reports + pair_reports,
            "signature_columns": list(T.codes["columns"]["signature"]), "signature": signature, "pairs": pairs}

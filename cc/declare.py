@@ -2,6 +2,7 @@
 import hashlib
 import itertools
 import os
+import subprocess
 import tomllib
 from collections import namedtuple
 from dataclasses import dataclass, fields as dc_fields
@@ -14,7 +15,7 @@ SIGNS = ("SIG-", "NEG", "SLOW-", "ZERO!", "SLOW+", "POS", "SIG+", "UNRES")
 RESULT_FIELDS = (  # the result field set that cc.toml [basic] must partition (view.py reads it from here)
     "instrument", "unit", "column", "eps_key", "eps", "estimate", "lo", "hi", "cell", "code", "per_size",
     "flags", "reason", "vector_key", "point", "obtained", "verdict", "verdict_class", "row_line", "why",
-    "read", "code_commit", "interval", "reports", "derived_from", "pair_readings", "pairs", "geometry", "order", "axis_lines")
+    "read", "code_commit", "code_hash", "interval", "reports", "derived_from", "pair_readings", "pairs", "geometry", "order", "axis_lines")
 RESERVED = {"door", "declare", "author", "detect", "view", "score", "admit"}
 SIDECARS = ("observable", "block_map", "conjugate", "sinks", "two_start")
 TEMPLATES = {"chain": {"axis": str}, "pair": {"axis": str, "pairs": list}, "all-pairs": {"axis": str},
@@ -401,6 +402,25 @@ def chk_input(p, d, c, stem=None):
 # ---------------------------------------------------------------- manifest, instrument, codes
 def sha(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def code_hash(root, committed=False):
+    """sha256 over (path, content sha) of every file of cc/ and bin/cc: as read from disk, or from the HEAD tree
+    when `committed` and the repo has one. A result records the first; freeze demands it equals the second."""
+    root, git = Path(root), ["git", "-C", str(root)]
+    use_git = committed and (root / ".git").exists()
+    if use_git:
+        rels = subprocess.run(git + ["ls-tree", "-r", "--name-only", "HEAD", "--", "cc", "bin/cc"],
+                              capture_output=True, text=True, check=True).stdout.split()
+    else:
+        rels = [str(q.relative_to(root)) for q in (root / "cc").rglob("*") if q.is_file() and "__pycache__" not in q.parts]
+        rels.append("bin/cc")
+    h = hashlib.sha256()
+    for rel in sorted(rels):
+        data = (subprocess.run(git + ["show", f"HEAD:{rel}"], capture_output=True, check=True).stdout
+                if use_git else (root / rel).read_bytes())
+        h.update(f"{rel}\0{hashlib.sha256(data).hexdigest()}\n".encode())
+    return h.hexdigest()
 
 
 def chk_manifest(p, d, c, stem=None):
