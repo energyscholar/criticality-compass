@@ -33,7 +33,7 @@ ADVANCED = [
     ("tables split <set> --column C --value V --verdict X", "override one cell family"),
     ("validate [--input ID --tables SET | --mvt]", "check every file; each problem has a Next line"),
     ("check [--fast | --baseline]", "validate + tests; run it before a commit; --baseline reads the recorded green run of this tree"),
-    ("test [-v] [<name> ...]", "run the named tests (default all)"),
+    ("test [-v] [--regolden [--classify]] [<name> ...]", "run the named tests (default all); --classify tags a regolden's changed lines a-e and undoes it on any (e)"),
     ("mutate <relpath> (--sed E | --py E) -- <test> ...", "run tests against a temporary mutation"),
     ("help [--advanced]", "this text"),
     ("family <id> [--tables SET]", "the family verdict (bracket, f1, f2) of a stored result; measures nothing"),
@@ -87,7 +87,7 @@ def run_tests(names, skip=()):
     key = lambda t: (t.stem, t.name, str(t.relative_to(ROOT)))  # noqa: E731
     picked = [t for t in allt if (not names or set(names) & set(key(t))) and t.stem not in skip]
     missing = [n for n in names if not any(n in key(t) for t in allt)]
-    keep = 99 if VERBOSE else 8
+    keep = 10**6 if os.environ.get("CC_REGOLDEN") == "1" else 99 if VERBOSE else 8   # a regolden must list every file
 
     def one(t):
         t0 = time.time()
@@ -105,7 +105,13 @@ def cmd_test(names):
     os.environ["CC_REGOLDEN"] = "1" if regold else ""
     VERBOSE = "-v" in names or regold
     os.environ["CC_VERBOSE"] = "1" if "-v" in names else ""
-    res, missing, allt = run_tests([n for n in names if n not in ("-v", "--regolden")])
+    classify = "--classify" in names
+    if classify and not regold:
+        print("--classify reads a regolden.\n  Next: bin/cc test --regolden --classify test_golden")
+        return 1
+    gold = ROOT / "tests" / "golden"
+    before = {f.name: f.read_text() for f in gold.glob("*.txt")} if classify else {}
+    res, missing, allt = run_tests([n for n in names if n not in ("-v", "--regolden", "--classify")])
     for n in missing:
         print(f"no test '{n}' in checks.toml [roles].tests\n  Next: bin/cc test <one of: "
               f"{' '.join(t.stem for t in allt)}>")
@@ -116,7 +122,34 @@ def cmd_test(names):
     if regold:
         lines = [ln.strip() for _, _, tail, _ in res for ln in tail if ln.strip().startswith("REGOLDENED")]
         print("\n".join(lines) + f"\nregoldened {len(lines)} files: review them with git diff tests/golden/")
+    if classify and not missing and all(ok for _, ok, _, _ in res):
+        return report_classes(gold, before)
     return 1 if missing or not all(ok for _, ok, _, _ in res) else 0
+
+
+def report_classes(gold, before):
+    """Tag every changed line of a regolden by cc.toml [golden.classes]; any (e) line undoes the regolden (a STOP)."""
+    import declare
+    classes, found = config()["golden"]["classes"], []
+    after = {f.name: f.read_text() for f in gold.glob("*.txt")}
+    for name in sorted(after):
+        if after[name] != before.get(name):
+            found += [(name, k, ln) for k, ln in declare.classify_changes(classes, name, before.get(name), after[name])]
+    tally = ", ".join(f"{k} {sum(1 for _, c, _ in found if c == k)}" for k in sorted({*classes, "e"}))
+    print(f"classify: {len(found)} changed lines: {tally}")
+    other = [(n, ln) for n, k, ln in found if k == "e"]
+    if not other:
+        print("classify: every changed line is class a-d: the regolden may be committed")
+        return 0
+    print("\n".join(f"  (e) {n}: {ln}" for n, ln in other[:40]))
+    for name in after:   # undo: a regolden with an (e) line is not committed
+        if name in before:
+            (gold / name).write_text(before[name])
+        else:
+            (gold / name).unlink()
+    print(f"classify: STOP: {len(other)} changed lines are class (e) OTHER; the regolden was undone.\n"
+          "  Next: report them to the Auditor; do not commit")
+    return 1
 
 
 def cmd_validate(args):

@@ -1,7 +1,10 @@
 """declare.py - plugin loaders, schemas, cross-references, the partition checker, validate (plumbing)."""
+import difflib
+import fnmatch
 import hashlib
 import itertools
 import os
+import re
 import subprocess
 import tomllib
 from collections import namedtuple
@@ -155,8 +158,16 @@ def id_check(p, field, got, want, what):
 
 
 # ---------------------------------------------------------------- cc.toml
+def _regex_ok(x):
+    try:
+        re.compile(x)
+        return True
+    except re.error:
+        return False
+
+
 def chk_cc(p, d, c, stem=None):
-    top = {k: dict for k in ("defaults", "data", "alphabets", "flags", "obtained_flag", "arrays", "basic", "check")}
+    top = {k: dict for k in ("defaults", "data", "alphabets", "flags", "obtained_flag", "arrays", "basic", "check", "golden")}
     out = header(p, d, "cc") + shape(p, d, top)
     if out:
         return out
@@ -170,6 +181,12 @@ def chk_cc(p, d, c, stem=None):
     out += [at(p, "basic", f"field '{x}' is in both keeps and discards", "keep it in one list")
             for x in sorted(keeps & discards)]
     out += shape(p, d["check"], {"fast_budget_s": int, "slow": list}, pre="check.")
+    classes = d["golden"].get("classes", {})
+    out += [at(p, f"golden.classes.{k}", "must have files and match, each a list of strings", "write files = [...] and match = [...]")
+            for k, v in sorted(classes.items())
+            if not all(isinstance(v.get(f), list) and v[f] and all(isinstance(x, str) for x in v[f]) for f in ("files", "match"))]
+    out += [at(p, f"golden.classes.{k}", f"'{x}' is not a regex", "fix the pattern")
+            for k, v in sorted(classes.items()) for x in v.get("match", []) if isinstance(x, str) and not _regex_ok(x)]
     stems = {Path(t).stem for t in c.checks["roles"]["tests"]}
     return out + [at(p, "check.slow", f"'{x}' is not a test in checks.toml", "name a test stem listed there")
                   for x in d["check"].get("slow", []) if x not in stems]
@@ -402,6 +419,18 @@ def chk_input(p, d, c, stem=None):
 # ---------------------------------------------------------------- manifest, instrument, codes
 def sha(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def classify_changes(classes, name, old, new):
+    """[(class, line)] for every line a regolden of transcript `name` changes. `classes` is cc.toml [golden.classes]:
+    the first class whose files globs match `name` and whose regexes match the line claims it; the rest is 'e'."""
+    out = []
+    for ln in difflib.unified_diff((old or "").splitlines(), new.splitlines(), lineterm="", n=0):
+        if ln[:1] in "+-" and not ln.startswith(("+++", "---")):
+            hit = [k for k, c in sorted(classes.items())
+                   if any(fnmatch.fnmatch(name, g) for g in c["files"]) and any(re.search(r, ln) for r in c["match"])]
+            out.append((hit[0] if hit else "e", ln))
+    return out
 
 
 def code_hash(root, committed=False):
