@@ -104,6 +104,11 @@ tables = "v02-rules"
 "0.1" = "NOT"
 "0.3" = "REFUSE-SLOW"
 
+[verdicts.x5n-bilayer]
+"0.0" = "POINT"
+"0.1" = "POINT"
+"0.3" = "POINT"
+
 [verdicts.w2-potts-2]
 "2" = "REFUSE-NEEDLE-UNMEASURED"
 "3" = "REFUSE-NEEDLE-UNMEASURED"
@@ -290,6 +295,11 @@ tables = "v02-rules"
 "0.1" = "OFF-WINDOW"
 "0.3" = ["CONTINUOUS", "EQUILIBRATED-UNRES"]
 
+[order.x5n-bilayer]
+"0.0" = "CONTINUOUS"
+"0.1" = "CONTINUOUS"
+"0.3" = "CONTINUOUS"
+
 [order.b7-at-line-3]
 "0.0" = "NEEDLE-UNMEASURED"
 "0.07" = "NEEDLE-UNMEASURED"
@@ -323,6 +333,11 @@ tables = "v02-rules"
 "0.0" = ["VANISHES", "UNRES"]
 "0.1" = ["VANISHES", "UNRES"]
 "0.3" = ["VANISHES", "UNRES"]
+
+[fluct.x5n-bilayer]
+"0.0" = "VANISHES"
+"0.1" = "VANISHES"
+"0.3" = "VANISHES"
 
 [fluct.b7-at-line-3]
 "0.0" = ["VANISHES", "UNRES"]
@@ -437,3 +452,8 @@ why = """X9 rung A (0866; LOG E111-E112). DECLARED BEFORE THE REAL RUN, after a 
 date = "2026-10-02"
 points = ["x4-ising-field-3:*"]
 why = """magnetisation two-start demo (0866 Q5). DECLARED BEFORE THE RUN. x4-ising-field-3 = x4-ising-field with two_start reading Q = O column 1 (the magnetisation per site) instead of the energy. The needle still reads ORD at all three points, so geometry is NOT and order OFF-WINDOW (the needle's position rule, not a side table): the combined verdict stays NOT, the class x4-ising-field already had. [two_start.*] is the code as observed in the dry run (seen before this lock): FLUCT at every point. FINDING, not repaired: D = M(random start) - M(ordered start) is negative because the frozen PLUS (random role) and MINUS (ordered role) files sit in opposite phases (+0.81 and -0.81); the sign of D for a signed order parameter is set by which start is called ordered, and two_start's sign cut reads it as an energy-like quantity. The starts DO stay apart (|D| = 1.6) - a COEXIST in physics that the sign convention reads as FLUCT. order never reads it here (OFF-WINDOW gate first)"""
+
+[[change]]
+date = "2026-10-02"
+points = ["x5n-bilayer:*"]
+why = """DECLARED BEFORE THE REAL RUN of x5n-bilayer (plan 0865 S3). 0865 confirmed stop: X5 3/3 (toolset results/X5n.txt, LOG E114): POINT at all three g (needle MID, flow STOPPED, across RELEVANT, stability STABLE, two_start INDEP), the verdict read on the very data the stop was confirmed on (N 32000, block 1600). The truth is POINT (coupled-ising-bilinear, class POINT); the lock is CC's expected verdict, not truth. Order is CONTINUOUS and fluct VANISHES (the Ising class: the energy variance per bond falls with size), predicted from the toolset cells (needle MID, STOPPED, two_start INDEP). A different verdict is a finding, never an edit of this file. (A --dry run was seen before this file was written: it reads POINT at every g under all three sets, as the toolset does.)"""

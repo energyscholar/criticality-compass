@@ -104,6 +104,11 @@ tables = "v01-rules"
 "0.1" = "NOT"
 "0.3" = "REFUSE-SLOW"
 
+[verdicts.x5n-bilayer]
+"0.0" = "POINT"
+"0.1" = "POINT"
+"0.3" = "POINT"
+
 [[change]]
 date = "2026-10-01"
 points = ["*"]
@@ -206,3 +211,8 @@ inside the margin reads MID and the flow reads SLOW (Q1 c'), so g 0 and g 0.3 mo
 RELEVANT, so Q2 does not make them LINE) and g 0.1 stays NOT (its needle reads SIG+ and its stability reads OFF). X5 goes \
 from three confident false negatives to two honest refusals and one NOT; it does NOT reach POINT in v0.1. Any other \
 outcome is a finding, never an edit of this lock"""
+
+[[change]]
+date = "2026-10-02"
+points = ["x5n-bilayer:*"]
+why = """DECLARED BEFORE THE REAL RUN of x5n-bilayer (plan 0865 S3). 0865 confirmed stop: X5 3/3 (toolset results/X5n.txt, LOG E114): POINT at all three g (needle MID, flow STOPPED, across RELEVANT, stability STABLE, two_start INDEP), the verdict read on the very data the stop was confirmed on (N 32000, block 1600). The truth is POINT (coupled-ising-bilinear, class POINT); the lock is CC's expected verdict, not truth. A different verdict is a finding, never an edit of this file. (A --dry run was seen before this file was written: it reads POINT at every g under all three sets, as the toolset does.)"""

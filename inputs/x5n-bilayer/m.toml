@@ -1,0 +1,240 @@
+# THIS IS CC's m.toml (Kernel V8's M for ONE input: what was measured and how).
+# It is NOT the toolset's m.toml (scratch/compass-toolset/m.toml, the study log).
+# inputs/x5n-bilayer/m.toml - the bilinear coupled Ising bilayer at the CONFIRMED-STOP K_c(g) (plan 0865 S2; toolset
+# results/X5n.txt): g = 0, 0.1, 0.3 at K = 0.440625, 0.368653, 0.314014 (navigated, flag N). Frozen data data/x5n/g<g>/;
+# O = (E, Ms, Mt) per snapshot. Like x5-bilayer-2, but N = 32000 per run and block b = 1600 (20 blocks; x5-bilayer used block
+# 400 at N 8000). The verdict data IS the confirmation run the stop was confirmed on. Seed 65 as x5-bilayer.
+schema = 1
+kind = "input"
+id = "x5n-bilayer"
+instruments = ["needle", "across", "stability", "two_start", "fluct"]
+
+[obtained]
+"0.0" = "navigated"
+"0.1" = "navigated"
+"0.3" = "navigated"
+
+[axes]
+point = ["0.0", "0.1", "0.3"]
+size = [27, 81, 243]
+starts = ["random", "ordered"]
+main_start = "random"
+
+[observable]
+name = "g1 of the s layer's majority block lattice"
+definition = """open-pair nearest-neighbour correlation of each block lattice of the s layer \
+(toolset tools/flow.py), every level down to final size 9; the random start \
+is the RANDOM role, the ordered start (s = t = +1) the ORDERED role"""
+levels = [2, 3, 4]
+final_size = 9
+
+[block_map]
+name = "majority3"
+factor = 3
+keeps = "the sign of the local majority; tie-free"
+discards = "the magnitude of the local magnetisation"
+
+[relations.size]
+template = "chain"
+axis = "size"
+provenance = "Coupling"
+direction_from = "the declared blocking map: one more blocking step relates L to L/3"
+
+[relations.matched]
+template = "matched"
+axis = "size"
+big = 243
+small = 81
+provenance = "Coupling"
+direction_from = "one extra declared blocking step at equal block-lattice size ([P2] relations)"
+
+[relations.start]
+template = "pair"
+axis = "starts"
+pairs = [["random", "ordered"]]
+provenance = "Coupling"
+direction_from = "two runs at the same point differing only in the declared initial state"
+
+[sinks]
+ordered = 1.0
+disordered = 0.0
+
+[interval]
+method = "block"
+b = 1600
+resamples = 400
+level = 0.95
+seed = 65
+
+[eps]
+step = 0.01
+sink = 0.02
+y = 0.25
+two_start = 0.01
+
+[conjugate]
+observable = "E"
+conjugate_to = "K (intra-layer coupling; E = sum over bonds of s s + t t)"
+hamiltonian_knowledge = true
+
+[two_start]
+observable = "Q"
+definition = """E = sum over bonds of s s + t t per snapshot (O column 0) / the declared \
+bond count of the bilayer, 4 L^2 (two layers of 2 L^2)"""
+unit_scale = { "27" = 2916, "81" = 26244, "243" = 236196 }
+
+[kernel]
+uses = ["A"]
+
+[data]
+format = "npz-v1"
+
+[[data.files]]
+point = "0.0"
+size = 27
+start = "random"
+path = "x5n/g0.0/g0.0-L27-random.npz"
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.0"
+size = 27
+start = "ordered"
+path = "x5n/g0.0/g0.0-L27-ordered.npz"
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.0"
+size = 81
+start = "random"
+path = "x5n/g0.0/g0.0-L81-random.npz"
+arrays.GL = { key = "G" }
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.0"
+size = 81
+start = "ordered"
+path = "x5n/g0.0/g0.0-L81-ordered.npz"
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.0"
+size = 243
+start = "random"
+path = "x5n/g0.0/g0.0-L243-random.npz"
+arrays.GL = { key = "G" }
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.0"
+size = 243
+start = "ordered"
+path = "x5n/g0.0/g0.0-L243-ordered.npz"
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.1"
+size = 27
+start = "random"
+path = "x5n/g0.1/g0.1-L27-random.npz"
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.1"
+size = 27
+start = "ordered"
+path = "x5n/g0.1/g0.1-L27-ordered.npz"
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.1"
+size = 81
+start = "random"
+path = "x5n/g0.1/g0.1-L81-random.npz"
+arrays.GL = { key = "G" }
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.1"
+size = 81
+start = "ordered"
+path = "x5n/g0.1/g0.1-L81-ordered.npz"
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.1"
+size = 243
+start = "random"
+path = "x5n/g0.1/g0.1-L243-random.npz"
+arrays.GL = { key = "G" }
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.1"
+size = 243
+start = "ordered"
+path = "x5n/g0.1/g0.1-L243-ordered.npz"
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.3"
+size = 27
+start = "random"
+path = "x5n/g0.3/g0.3-L27-random.npz"
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.3"
+size = 27
+start = "ordered"
+path = "x5n/g0.3/g0.3-L27-ordered.npz"
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.3"
+size = 81
+start = "random"
+path = "x5n/g0.3/g0.3-L81-random.npz"
+arrays.GL = { key = "G" }
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.3"
+size = 81
+start = "ordered"
+path = "x5n/g0.3/g0.3-L81-ordered.npz"
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.3"
+size = 243
+start = "random"
+path = "x5n/g0.3/g0.3-L243-random.npz"
+arrays.GL = { key = "G" }
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.3"
+size = 243
+start = "ordered"
+path = "x5n/g0.3/g0.3-L243-ordered.npz"
+arrays.Q = { key = "O", level = 0 }

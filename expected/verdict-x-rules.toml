@@ -85,6 +85,11 @@ tables = "verdict-x-rules"
 "0.1" = "NOT"
 "0.3" = "NOT"
 
+[verdicts.x5n-bilayer]
+"0.0" = "POINT"
+"0.1" = "POINT"
+"0.3" = "POINT"
+
 [[change]]
 date = "2026-10-01"
 points = ["*"]
@@ -121,3 +126,8 @@ results/X5c.txt (3 of 3). Each is a KNOWN FALSE NEGATIVE (X5-score; toolset LOG 
 (two decoupled Ising points at g = 0, the Ising class at g 0.1 and 0.3). A navigated critical point re-read at the same K \
 and N reads the needle at NEG or POS inside the margin, which this set maps to FLOWING, so the verdict is NOT. Locked as \
 today's behaviour, not as the right answer; the repair is the v01-rules set (Q1 c')"""
+
+[[change]]
+date = "2026-10-02"
+points = ["x5n-bilayer:*"]
+why = """DECLARED BEFORE THE REAL RUN of x5n-bilayer (plan 0865 S3). 0865 confirmed stop: X5 3/3 (toolset results/X5n.txt, LOG E114): POINT at all three g (needle MID, flow STOPPED, across RELEVANT, stability STABLE, two_start INDEP), the verdict read on the very data the stop was confirmed on (N 32000, block 1600). The truth is POINT (coupled-ising-bilinear, class POINT); the lock is CC's expected verdict, not truth. A different verdict is a finding, never an edit of this file. (A --dry run was seen before this file was written: it reads POINT at every g under all three sets, as the toolset does.)"""

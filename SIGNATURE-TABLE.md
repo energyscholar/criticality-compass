@@ -65,6 +65,9 @@ Written by `bin/cc tabulate`. Truth is joined here only (cc/score.py); no result
 | x5-bilayer@v01-rules | 0.0 | `coupled-ising-bilinear` | POINT | 27 81 243 | NEITHER (N) | MID (N) | SLOW (N) | RELEVANT (HN) | STABLE (HN) | INDEP (N) | REFUSE-SLOW | REFUSE |
 | x5-bilayer@v01-rules | 0.1 | `coupled-ising-bilinear` | POINT | 27 81 243 | NEITHER (N) | ORD (N) | FLOWING (N) | RELEVANT (HN) | OFF (HN) | INDEP (N) | NOT | NOT |
 | x5-bilayer@v01-rules | 0.3 | `coupled-ising-bilinear` | POINT | 27 81 243 | NEITHER (N) | MID (N) | SLOW (N) | RELEVANT (HN) | STABLE (HN) | INDEP (N) | REFUSE-SLOW | REFUSE |
+| x5n-bilayer@v01-rules | 0.0 | `coupled-ising-bilinear` | POINT | 27 81 243 | NEITHER (N) | MID (N) | STOPPED (N) | RELEVANT (HN) | STABLE (HN) | INDEP (N) | POINT | POINT |
+| x5n-bilayer@v01-rules | 0.1 | `coupled-ising-bilinear` | POINT | 27 81 243 | NEITHER (N) | MID (N) | STOPPED (N) | RELEVANT (HN) | STABLE (HN) | INDEP (N) | POINT | POINT |
+| x5n-bilayer@v01-rules | 0.3 | `coupled-ising-bilinear` | POINT | 27 81 243 | NEITHER (N) | MID (N) | STOPPED (N) | RELEVANT (HN) | STABLE (HN) | INDEP (N) | POINT | POINT |
 | x7a-bc@v01-rules | 0.0 | `bc-lambda-line` | POINT | 27 81 243 | NEITHER (N) | ORD (N) | FLOWING (N) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT |
 | x7a-bc@v01-rules | 1.0 | `bc-lambda-line` | POINT | 27 81 243 | NEITHER (N) | DIS (N) | FLOWING (N) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT |
 | x7a-bc@v01-rules | 1.5 | `bc-lambda-line` | POINT | 27 81 243 | NEITHER (N) | DIS (N) | FLOWING (N) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT |
@@ -83,7 +86,7 @@ Written by `bin/cc tabulate`. Truth is joined here only (cc/score.py); no result
 | x8-ising-needle@v01-rules | 1.05 | `ising-off-critical` | NOT | 81 243 | ORD (T) | ORD (T) | FLOWING (T) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT |
 | x8-ising-needle@v01-rules | 1.10 | `ising-off-critical` | NOT | 81 243 | ORD (T) | ORD (T) | SLOW (T) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT |
 
-Verdict class against truth: 8 agree, 56 refused, 8 disagree, 4 no truth
+Verdict class against truth: 11 agree, 56 refused, 8 disagree, 4 no truth
 
 ## Collisions (v01-rules)
 
@@ -139,6 +142,11 @@ Verdict class against truth: 8 agree, 56 refused, 8 disagree, 4 no truth
 | c2-bc-two-start@v02-rules | d1.9-K2.3 | `bc-lambda-line` | POINT | 81 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | INDEP (C) | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
 | c2-bc-two-start@v02-rules | d1.9-K2.6 | `bc-lambda-line` | POINT | 81 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | INDEP (C) | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
 | c2-bc-two-start@v02-rules | d1.9-K3.0 | `bc-lambda-line` | POINT | 81 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | COEXIST (C) | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
+| w1-potts@v02-rules | 2 | `ising-2d` | POINT | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | STABLE (HT) | INDEP (T) | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
+| w1-potts@v02-rules | 3 | `potts-q3` | POINT | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | UNRES (HT) | INDEP (T) | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
+| w1-potts@v02-rules | 4 | `none` | none | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | UNRES (HT) | UNRES (T) | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
+| w1-potts@v02-rules | 5 | `potts-q5` | WALKING | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | UNRES (HT) | UNRES (T) | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
+| w1-potts@v02-rules | 7 | `potts-q7` | FIRST-ORDER | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | IRRELEVANT (HT) | OFF (HT) | COEXIST (T) | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
 | w2-potts-2@v02-rules | 2 | `ising-2d` | POINT | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | STABLE (HT) | INDEP (T) | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
 | w2-potts-2@v02-rules | 3 | `potts-q3` | POINT | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | STABLE (HT) | INDEP (T) | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
 | w2-potts-2@v02-rules | 4 | `none` | none | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | STABLE (HT) | INDEP (T) | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
@@ -147,6 +155,9 @@ Verdict class against truth: 8 agree, 56 refused, 8 disagree, 4 no truth
 | w2-potts@v02-rules | 3 | `potts-q3` | POINT | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | STABLE (HT) | INDEP (T) | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
 | w2-potts@v02-rules | 4 | `none` | none | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | STABLE (HT) | INDEP (T) | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
 | w2-potts@v02-rules | 5 | `potts-q5` | WALKING | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | UNRES (HT) | UNRES (T) | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
+| w3-potts@v02-rules | 4 | `none` | none | 81 243 729 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | UNRES (HT) | INDEP (T) | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
+| w3-potts@v02-rules | 5 | `potts-q5` | WALKING | 81 243 729 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | UNRES (HT) | FLUCT (T) | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
+| w3-potts@v02-rules | 6 | `potts-q6` | WALKING | 81 243 729 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | UNRES (HT) | OFF (HT) | COEXIST (T) | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
 | x2-xy-line-2@v02-rules | 0.5 | `xy-low-phase` | LINE | 27 81 243 | NEITHER (T) | MID (T) | SLOW (T) | UNRES (HT) | UNRES (HT) | INDEP (T) | REFUSE-SLOW | REFUSE | REFUSE-SLOW | CONTINUOUS |
 | x2-xy-line-2@v02-rules | 0.6 | `xy-low-phase` | LINE | 27 81 243 | NEITHER (T) | MID (T) | SLOW (T) | RELEVANT (HT) | CROSSING (HT) | INDEP (T) | REFUSE-SLOW | REFUSE | REFUSE-SLOW | CONTINUOUS |
 | x2-xy-line-2@v02-rules | 0.7 | `xy-low-phase` | LINE | 27 81 243 | NEITHER (T) | MID (T) | SLOW (T) | UNRES (HT) | UNRES (HT) | INDEP (T) | REFUSE-SLOW | REFUSE | REFUSE-SLOW | CONTINUOUS |
@@ -174,6 +185,9 @@ Verdict class against truth: 8 agree, 56 refused, 8 disagree, 4 no truth
 | x4-ising-field-2@v02-rules | 0.46 | `ising-field-decoy` | FIRST-ORDER | 27 81 243 | ORD (T) | ORD (T) | FLOWING (T) | NOT-EVALUATED (HT) | NOT-EVALUATED (HT) | UNRES (T) | NOT | NOT | NOT | OFF-WINDOW |
 | x4-ising-field-2@v02-rules | 0.5 | `ising-field-decoy` | FIRST-ORDER | 27 81 243 | ORD (T) | ORD (T) | SLOW (T) | NOT-EVALUATED (HT) | NOT-EVALUATED (HT) | INDEP (T) | NOT | NOT | NOT | OFF-WINDOW |
 | x4-ising-field-2@v02-rules | 0.55 | `ising-field-decoy` | FIRST-ORDER | 27 81 243 | ORD (T) | ORD (T) | STOPPED (T) | NOT-EVALUATED (HT) | NOT-EVALUATED (HT) | INDEP (T) | NOT | NOT | NOT | OFF-WINDOW |
+| x4-ising-field-3@v02-rules | 0.46 | `ising-field-decoy` | FIRST-ORDER | 27 81 243 | ORD (T) | ORD (T) | FLOWING (T) | NOT-EVALUATED (HT) | NOT-EVALUATED (HT) | FLUCT (T) | NOT | NOT | NOT | OFF-WINDOW |
+| x4-ising-field-3@v02-rules | 0.5 | `ising-field-decoy` | FIRST-ORDER | 27 81 243 | ORD (T) | ORD (T) | SLOW (T) | NOT-EVALUATED (HT) | NOT-EVALUATED (HT) | FLUCT (T) | NOT | NOT | NOT | OFF-WINDOW |
+| x4-ising-field-3@v02-rules | 0.55 | `ising-field-decoy` | FIRST-ORDER | 27 81 243 | ORD (T) | ORD (T) | STOPPED (T) | NOT-EVALUATED (HT) | NOT-EVALUATED (HT) | FLUCT (T) | NOT | NOT | NOT | OFF-WINDOW |
 | x4-ising-field@v02-rules | 0.46 | `ising-field-decoy` | FIRST-ORDER | 27 81 243 | ORD (T) | ORD (T) | FLOWING (T) | NOT-EVALUATED (HT) | NOT-EVALUATED (HT) | UNRES (T) | NOT | NOT | NOT | OFF-WINDOW |
 | x4-ising-field@v02-rules | 0.5 | `ising-field-decoy` | FIRST-ORDER | 27 81 243 | ORD (T) | ORD (T) | SLOW (T) | NOT-EVALUATED (HT) | NOT-EVALUATED (HT) | INDEP (T) | NOT | NOT | NOT | OFF-WINDOW |
 | x4-ising-field@v02-rules | 0.55 | `ising-field-decoy` | FIRST-ORDER | 27 81 243 | ORD (T) | ORD (T) | STOPPED (T) | NOT-EVALUATED (HT) | NOT-EVALUATED (HT) | INDEP (T) | NOT | NOT | NOT | OFF-WINDOW |
@@ -183,6 +197,9 @@ Verdict class against truth: 8 agree, 56 refused, 8 disagree, 4 no truth
 | x5-bilayer@v02-rules | 0.0 | `coupled-ising-bilinear` | POINT | 27 81 243 | NEITHER (N) | MID (N) | SLOW (N) | RELEVANT (HN) | STABLE (HN) | INDEP (N) | REFUSE-SLOW | REFUSE | REFUSE-SLOW | EQUILIBRATED |
 | x5-bilayer@v02-rules | 0.1 | `coupled-ising-bilinear` | POINT | 27 81 243 | NEITHER (N) | ORD (N) | FLOWING (N) | RELEVANT (HN) | OFF (HN) | INDEP (N) | NOT | NOT | NOT | OFF-WINDOW |
 | x5-bilayer@v02-rules | 0.3 | `coupled-ising-bilinear` | POINT | 27 81 243 | NEITHER (N) | MID (N) | SLOW (N) | RELEVANT (HN) | STABLE (HN) | INDEP (N) | REFUSE-SLOW | REFUSE | REFUSE-SLOW | EQUILIBRATED |
+| x5n-bilayer@v02-rules | 0.0 | `coupled-ising-bilinear` | POINT | 27 81 243 | NEITHER (N) | MID (N) | STOPPED (N) | RELEVANT (HN) | STABLE (HN) | INDEP (N) | POINT | POINT | POINT | CONTINUOUS |
+| x5n-bilayer@v02-rules | 0.1 | `coupled-ising-bilinear` | POINT | 27 81 243 | NEITHER (N) | MID (N) | STOPPED (N) | RELEVANT (HN) | STABLE (HN) | INDEP (N) | POINT | POINT | POINT | CONTINUOUS |
+| x5n-bilayer@v02-rules | 0.3 | `coupled-ising-bilinear` | POINT | 27 81 243 | NEITHER (N) | MID (N) | STOPPED (N) | RELEVANT (HN) | STABLE (HN) | INDEP (N) | POINT | POINT | POINT | CONTINUOUS |
 | x7a-bc@v02-rules | 0.0 | `bc-lambda-line` | POINT | 27 81 243 | NEITHER (N) | ORD (N) | FLOWING (N) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT | NOT | OFF-WINDOW |
 | x7a-bc@v02-rules | 1.0 | `bc-lambda-line` | POINT | 27 81 243 | NEITHER (N) | DIS (N) | FLOWING (N) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT | NOT | OFF-WINDOW |
 | x7a-bc@v02-rules | 1.5 | `bc-lambda-line` | POINT | 27 81 243 | NEITHER (N) | DIS (N) | FLOWING (N) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT | NOT | OFF-WINDOW |
@@ -201,9 +218,9 @@ Verdict class against truth: 8 agree, 56 refused, 8 disagree, 4 no truth
 | x8-ising-needle@v02-rules | 1.05 | `ising-off-critical` | NOT | 81 243 | ORD (T) | ORD (T) | FLOWING (T) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT | NOT | OFF-WINDOW |
 | x8-ising-needle@v02-rules | 1.10 | `ising-off-critical` | NOT | 81 243 | ORD (T) | ORD (T) | SLOW (T) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT | NOT | OFF-WINDOW |
 
-Verdict class against truth: 8 agree, 75 refused, 12 disagree, 8 no truth
-Order against order_truth: 19 agree, 64 refused, 12 disagree
-Geometry against class_truth (order_truth not FIRST-ORDER): 8 agree, 64 refused, 6 disagree
+Verdict class against truth: 11 agree, 81 refused, 15 disagree, 10 no truth
+Order against order_truth: 22 agree, 70 refused, 15 disagree
+Geometry against class_truth (order_truth not FIRST-ORDER): 11 agree, 66 refused, 6 disagree
 
 ## Collisions (v02-rules)
 
@@ -271,6 +288,9 @@ Geometry against class_truth (order_truth not FIRST-ORDER): 8 agree, 64 refused,
 | x5-bilayer@verdict-x-rules | 0.0 | `coupled-ising-bilinear` | POINT | 27 81 243 | NEITHER (N) | DIS (N) | FLOWING (N) | RELEVANT (HN) | STABLE (HN) | INDEP (N) | NOT | NOT |
 | x5-bilayer@verdict-x-rules | 0.1 | `coupled-ising-bilinear` | POINT | 27 81 243 | NEITHER (N) | ORD (N) | FLOWING (N) | RELEVANT (HN) | OFF (HN) | INDEP (N) | NOT | NOT |
 | x5-bilayer@verdict-x-rules | 0.3 | `coupled-ising-bilinear` | POINT | 27 81 243 | NEITHER (N) | ORD (N) | FLOWING (N) | RELEVANT (HN) | STABLE (HN) | INDEP (N) | NOT | NOT |
+| x5n-bilayer@verdict-x-rules | 0.0 | `coupled-ising-bilinear` | POINT | 27 81 243 | NEITHER (N) | MID (N) | STOPPED (N) | RELEVANT (HN) | STABLE (HN) | INDEP (N) | POINT | POINT |
+| x5n-bilayer@verdict-x-rules | 0.1 | `coupled-ising-bilinear` | POINT | 27 81 243 | NEITHER (N) | MID (N) | STOPPED (N) | RELEVANT (HN) | STABLE (HN) | INDEP (N) | POINT | POINT |
+| x5n-bilayer@verdict-x-rules | 0.3 | `coupled-ising-bilinear` | POINT | 27 81 243 | NEITHER (N) | MID (N) | STOPPED (N) | RELEVANT (HN) | STABLE (HN) | INDEP (N) | POINT | POINT |
 | x8-ising-needle@verdict-x-rules | 0.90 | `ising-off-critical` | NOT | 81 243 | NEITHER (T) | DIS (T) | FLOWING (T) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT |
 | x8-ising-needle@verdict-x-rules | 0.95 | `ising-off-critical` | NOT | 81 243 | NEITHER (T) | DIS (T) | FLOWING (T) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT |
 | x8-ising-needle@verdict-x-rules | 0.98 | `ising-off-critical` | NOT | 81 243 | NEITHER (T) | DIS (T) | FLOWING (T) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT |
@@ -281,7 +301,7 @@ Geometry against class_truth (order_truth not FIRST-ORDER): 8 agree, 64 refused,
 | x8-ising-needle@verdict-x-rules | 1.05 | `ising-off-critical` | NOT | 81 243 | ORD (T) | ORD (T) | FLOWING (T) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT |
 | x8-ising-needle@verdict-x-rules | 1.10 | `ising-off-critical` | NOT | 81 243 | ORD (T) | ORD (T) | SLOW (T) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT |
 
-Verdict class against truth: 8 agree, 45 refused, 6 disagree, 4 no truth
+Verdict class against truth: 11 agree, 45 refused, 6 disagree, 4 no truth
 
 ## Collisions (verdict-x-rules)
 

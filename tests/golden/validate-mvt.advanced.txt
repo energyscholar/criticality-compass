@@ -1,6 +1,6 @@
 $ bin/cc validate --mvt --advanced
 
-checked: 18 case, 1 cc, 3 codes, 1 compose, 20 data-manifest, 2 family, 4 family-decl, 1 geometry, 20 input, 6 instrument, 2 membership, 1 order, 20 points, 3 verdict
+checked: 18 case, 1 cc, 3 codes, 1 compose, 21 data-manifest, 2 family, 4 family-decl, 1 geometry, 21 input, 6 instrument, 2 membership, 1 order, 21 points, 3 verdict
 validate: clean
 -- MVT gate (report only; no status is changed)
   PASS  1 POINT: >= 2 in-table cases with different mechanisms :: 4 case(s) ['bc-lambda-line', 'ising-2d', 'nnn-ising-manifold', 'potts-q3'], 4 distinct mechanism(s)
@@ -11,6 +11,6 @@ validate: clean
   PASS  2 decoy: a FIRST-ORDER case imitating WALKING :: ['potts-q7']
   PASS  3 BKT breaker run, pre-registered verdict scored :: ['clock6-kt-ends', 'xy-tkt']
   PASS  4 >= 1 held-out case declared blind and run :: ['coupled-ising-bilinear']
-  FAIL  5 signature table enumerated over every in-table case, collisions listed :: 17 in-table case(s); collisions section present; missing ['ar1-null', 'bc-tricritical', 'potts-q6', 'potts-q7']
+  FAIL  5 signature table enumerated over every in-table case, collisions listed :: 17 in-table case(s); collisions section present; missing ['ar1-null', 'bc-tricritical']
 -- MVT FAIL
 exit 0

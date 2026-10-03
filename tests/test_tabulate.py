@@ -33,7 +33,7 @@ files = sorted((ROOT / "results").glob("*.json"))
 results = [json.loads(f.read_text()) for f in files]
 md, found = score.tabulate(results)
 rows = [ln for ln in md.splitlines() if ln.startswith("| ") and not ln.startswith(("| run", "|---"))]
-want = {"verdict-x-rules": 63, "v01-rules": 76, "v02-rules": 114}   # points per set (v02-rules: the same 76, plan 0866 P-A, + the 27 points of the six fluct inputs, P-B, + the 8 points of w1-potts and w3-potts, 0866 X9, + the 3 of x4-ising-field-3): the seven v0 inputs (60), + x5-bilayer (3); v01-rules also the three along inputs (13)
+want = {"verdict-x-rules": 66, "v01-rules": 79, "v02-rules": 117}   # points per set (v02-rules: the same 76, plan 0866 P-A, + the 27 points of the six fluct inputs, P-B, + the 8 points of w1-potts and w3-potts, 0866 X9, + the 3 of x4-ising-field-3; every set + the 3 of x5n-bilayer, plan 0865 S3): the seven v0 inputs (60), + x5-bilayer (3); v01-rules also the three along inputs (13)
 have = {t: sum(len(r["signature"]) for r in results if r["tables"] == t) for t in want}
 check("one row per (run, point)", len(rows) == sum(len(r["signature"]) for r in results) == sum(want.values()) and have == want
       and not found, str(found) + str(have))
