@@ -39,8 +39,8 @@ check("one row per (run, point)", len(rows) == sum(len(r["signature"]) for r in 
       and not found, str(found) + str(have))
 clash = [ln for ln in md.split("## Collisions")[1].splitlines() if ln.startswith("- ")]
 check("x8 1.00 and 1.10 are not a collision", not [c for c in clash if "x8-ising-needle:1.00" in c and "x8-ising-needle:1.10" in c])
-check("the collision list holds the C2 pair", any("FIRST-ORDER (" in c and "c2-bc-two-start:d2.0-K1.0" in c and "POINT (" in c
-                                                  and "c2-bc-two-start:d1.9-K1.0" in c for c in clash), str(clash[:2]))
+check("the C2 pair is no longer a collision (plan 0868 step 1: its points re-joined to their own truth) and the x8 / x7a-bc one is",
+      not [c for c in clash if "c2-bc-two-start" in c] and any("NOT (x8-ising-needle:1.01)" in c and "POINT (x7a-bc:0.0" in c for c in clash), str(clash[:2]))
 check("truth is in SIGNATURE-TABLE.md", "| LINE |" in md and "| FIRST-ORDER |" in md)
 live = detect.run("x8-ising-needle", "verdict-x-rules", write=False)
 forbidden = {"case", "class_truth", "truth"}

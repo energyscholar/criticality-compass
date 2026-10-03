@@ -1,0 +1,31 @@
+# cases/bc-off-critical.toml - plan 0868 step 1 (the per-point re-join); never frozen
+schema = 1
+kind = "case"
+id = "bc-off-critical"
+family = "2D Blume-Capel, a point of a sweep that crosses no transition"
+mechanism = """a point of the K sweep (D = delta K) whose K lies outside the declared crossing bracket of its \
+delta: no critical structure, a finite correlation length; the two starts agree or differ only by slow kinetics"""
+class_truth = "NOT"
+order_truth = "NONE"
+sampler = "blume_capel"
+traps = [
+  """deep ordered the two starts can differ from slow kinetics: SIG+ two_start sign away from the transition is \
+not coexistence (see bc-beyond-tricritical)""",
+  """a point joins this case only by the declared crossing bracket (plan 0868 step 1), taken from frozen \
+navigations; never from CC's own readings""",
+]
+decoy_of = "POINT"
+pairs_with = ["bc-lambda-line", "bc-beyond-tricritical"]
+sources = []
+status = "in-signature-table"
+studies = ["C1a2", "C2"]
+
+[controls]
+names = ["K = J/T", "delta"]
+range = "delta 1.9, 1.95; K 1.0-3.0 outside the crossing brackets [1.306641, 1.308594] and [1.517578, 1.519531]; L = 81, two starts (C2)"
+
+[observables]
+list = [
+  "q = mean s^2 (two starts: ordered, vacant)",
+]
+conjugate_observable = true
