@@ -5,7 +5,7 @@
  "input": "x3-clock6-2",
  "tables": "v02-rules",
  "derived_from": null,
- "code_commit": "d6e0372c256c22556c94a8771d380eb7526d8327",
+ "code_commit": "0e6e74c6efa10531cbd7b02eb83973d43a14888f",
  "interval": {
   "method": "block",
   "b": 400,
