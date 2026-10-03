@@ -354,10 +354,16 @@ Geometry against class_truth (order_truth not FIRST-ORDER): 11 agree, 66 refused
 | x8-ising-needle@v03-rules | 1.02 | `ising-off-critical` | NOT | 81 243 | ORD (T) | ORD (T) | NOT-MEASURED (T) | FLOWING (T) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT | NOT | OFF-WINDOW |
 | x8-ising-needle@v03-rules | 1.05 | `ising-off-critical` | NOT | 81 243 | ORD (T) | ORD (T) | NOT-MEASURED (T) | FLOWING (T) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT | NOT | OFF-WINDOW |
 | x8-ising-needle@v03-rules | 1.10 | `ising-off-critical` | NOT | 81 243 | ORD (T) | ORD (T) | NOT-MEASURED (T) | SLOW (T) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT | NOT | OFF-WINDOW |
+| x9c-potts@v03-rules | 3 | `potts-q3` | POINT | 27 81 243 | NEITHER (T) | MID (T) | SAME-WINDOW (T) | UNRES (T) | RELEVANT (HT) | STABLE (HT) | INDEP (T) | REFUSE-FLOW | REFUSE | REFUSE-FLOW | CONTINUOUS |
+| x9c-potts@v03-rules | 4 | `none` | none | 27 81 243 | NEITHER (T) | MID (T) | SAME-WINDOW (T) | UNRES (T) | RELEVANT (HT) | STABLE (HT) | INDEP (T) | REFUSE-FLOW | REFUSE | REFUSE-FLOW | CONTINUOUS |
+| x9c-potts@v03-rules | 5 | `potts-q5` | WALKING | 27 81 243 | NEITHER (T) | ORD (T) | HALF-PINNED (T) | FLOWING (T) | RELEVANT (HT) | OFF (HT) | UNRES (T) | NOT | NOT | NOT | OFF-WINDOW |
+| x9c-potts@v03-rules | 6 | `potts-q6` | WALKING | 27 81 243 | NEITHER (T) | MID (T) | HALF-PINNED (T) | UNRES (T) | RELEVANT (HT) | CROSSING (HT) | COEXIST (T) | FIRST-ORDER | FIRST-ORDER | REFUSE-FLOW | COEXIST-AT-WINDOW |
+| x9c-potts@v03-rules | 8 | `potts-q8` | FIRST-ORDER | 27 81 243 | NEITHER (T) | DIS (T) | PINNED-BETWEEN-PHASES (T) | FLOWING (T) | IRRELEVANT (HT) | OFF (HT) | COEXIST (T) | FIRST-ORDER | FIRST-ORDER | NOT | COEXIST-AT-WINDOW |
+| x9c-potts@v03-rules | 10 | `potts-q10` | FIRST-ORDER | 27 81 243 | NEITHER (T) | DIS (T) | PINNED-BETWEEN-PHASES (T) | FLOWING (T) | UNRES (HT) | UNRES (HT) | COEXIST (T) | FIRST-ORDER | FIRST-ORDER | NOT | COEXIST-AT-WINDOW |
 
-Verdict class against truth: 14 agree, 81 refused, 15 disagree, 10 no truth
-Order against order_truth: 25 agree, 70 refused, 15 disagree
-Geometry against class_truth (order_truth not FIRST-ORDER): 14 agree, 66 refused, 6 disagree
+Verdict class against truth: 16 agree, 82 refused, 17 disagree, 11 no truth
+Order against order_truth: 29 agree, 70 refused, 16 disagree
+Geometry against class_truth (order_truth not FIRST-ORDER): 14 agree, 67 refused, 6 disagree
 
 ## Collisions (v03-rules)
 

@@ -3,7 +3,7 @@
 # pair table of the toolset's m.toml [X9c] 0867 P0, and one order/verdict cell (needle at a sink, needle_pair PINNED-
 # BETWEEN-PHASES, two_start COEXIST) that reads COEXIST-AT-WINDOW / FIRST-ORDER instead of OFF-WINDOW / NOT. Every
 # [verdicts.*], [order.*], [fluct.*], [two_start.*] and [[family]] below is the v02-rules lock carried over UNCHANGED.
-# [needle_pair.*] is new and is read by no test: it is the declared prediction, checked by hand against the run.
+# [needle_pair.*] is new; tests/test_axes.py reads it (plan 0867 P3 gap) against the stored needle_pair column of every result.
 # It is NOT truth: agreement with class_truth / order_truth is reported by bin/cc tabulate (cc/score.py), never here.
 schema = 1
 kind = "expected"
@@ -438,6 +438,30 @@ f2 = "NOT-EVALUATED"
 "0.1" = "VANISHES"
 "0.3" = "VANISHES"
 
+[verdicts.x9c-potts]                 # q5, q6, q8, q10 transcribed from X9c.txt before the run; q3, q4 (X9c.txt: "refusal or POINT-family") SEEN after it
+"3" = "REFUSE-FLOW"                  # seen, not predicted
+"4" = "REFUSE-FLOW"                  # seen, not predicted
+"5" = "NOT"
+"6" = "FIRST-ORDER"
+"8" = "FIRST-ORDER"
+"10" = "FIRST-ORDER"
+
+[two_start.x9c-potts]               # transcribed from the frozen toolset results/X9c.txt BEFORE the CC run (plan 0867 P3); q5 L81 POS is marginal
+"3" = ["INDEP"]
+"4" = ["INDEP"]
+"5" = ["COEXIST", "UNRES", "INDEP"]       # X9c.txt reads COEXIST on one marginal cell (L81 POS +0.0066); CC reads UNRES (the allowed difference, brief 0867 P3)
+"6" = ["COEXIST"]
+"8" = ["COEXIST"]
+"10" = ["COEXIST"]
+
+[needle_pair.x9c-potts]              # transcribed from results/X9c.txt BEFORE the CC run
+"3" = ["SAME-WINDOW"]
+"4" = ["SAME-WINDOW"]
+"5" = ["HALF-PINNED"]
+"6" = ["HALF-PINNED"]
+"8" = ["PINNED-BETWEEN-PHASES"]
+"10" = ["PINNED-BETWEEN-PHASES"]
+
 [needle_pair.x5n-bilayer-2]          # predicted from the physics, not seen: at the confirmed stop both starts sit on the window
 "0.0" = ["SAME-WINDOW", "HALF-PINNED"]   # NEVER PINNED-BETWEEN-PHASES (a continuous point) and NEVER CROSSED
 "0.1" = ["SAME-WINDOW", "HALF-PINNED"]
@@ -464,3 +488,20 @@ the needle_o instrument reading the ordered start's own GL at L 243 / 81, so nee
 x5n-bilayer, so every verdict, order and fluct line is that input's. needle_pair is predicted SAME-WINDOW or HALF-PINNED (a continuous \
 critical point: both starts flow to the one fixed point), never PINNED-BETWEEN-PHASES, never CROSSED. A PINNED or CROSSED reading would be \
 a finding about the data, not a thing to repair"""
+
+[[change]]
+date = "2026-10-03"
+points = ["x9c-potts:*"]
+why = """DECLARED BEFORE THE RUN of x9c-potts (plan 0867 P3), transcribing the toolset's frozen results/X9c.txt (scored by the Auditor from the \
+same 36 npz): needle_pair q3/q4 SAME-WINDOW, q5/q6 HALF-PINNED, q8/q10 PINNED-BETWEEN-PHASES; two_start q3/q4 INDEP, q5/q6/q8/q10 COEXIST; \
+v03-rules verdict q8, q10, q6 FIRST-ORDER and q5 NOT (q3, q4: a refusal or a POINT-family cell, never FIRST-ORDER; their verdict lock is \
+written after the run and says so). q5's two_start rests on one marginal size cell (L81 POS +0.0066); CC's own resample stream may move it, \
+which would be a reported difference, not an edit of this file. A q8 or q10 verdict other than FIRST-ORDER, or any CROSSED pair, is a stop"""
+
+[[change]]
+date = "2026-10-03"
+points = ["x9c-potts:3", "x9c-potts:4", "x9c-potts:5"]
+why = """AFTER THE RUN (plan 0867 P3). q3 and q4 verdict REFUSE-FLOW (needle MID, flow unresolved; order CONTINUOUS) is SEEN, not predicted: X9c.txt \
+said only 'refusal or POINT-family'. q5 two_start read UNRES (L81 +0.00662 [-0.00033, 0.01170] straddles zero under CC's own block \
+resample; L243 UNRES as in X9c.txt), not COEXIST: the allowed marginal-cell difference, so the q5 lock admits UNRES and INDEP; the verdict \
+is NOT either way. Nothing else moved: q6, q8, q10 FIRST-ORDER, every needle_pair as declared"""

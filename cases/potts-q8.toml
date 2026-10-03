@@ -1,0 +1,33 @@
+# cases/potts-q8.toml - plan 0867 P3 (the X9c production); never frozen
+schema = 1
+kind = "case"
+id = "potts-q8"
+family = "2D 8-state Potts, square lattice"
+mechanism = """strong first order: two coexisting phases at K_c, xi ~ 24 inside the simulated sizes (L 81, 243)"""
+class_truth = "FIRST-ORDER"
+order_truth = "FIRST-ORDER"
+sampler = "potts"
+traps = [
+  """a random start falls into the DISORDERED phase and the ordered start stays ORDERED: under the position rule \
+alone the needle reads off-window; the coexistence shows only as the two starts' needles flowing to opposite sinks (needle_pair)""",
+  "the energy per bond of the two starts differs by the latent heat, so two_start reads COEXIST",
+]
+decoy_of = "WALKING"
+pairs_with = ["potts-q7", "potts-q6", "bc-beyond-tricritical"]
+sources = [
+  """~/software/has-anyone-looked/library/papers/walking/\
+iino2019-detecting-weakly-first-order-potts.md""",
+]
+status = "in-signature-table"
+studies = ["X9c"]
+
+[controls]
+names = ["K (nn coupling)"]
+range = "exact K_c = ln(1 + sqrt 8) only; L 27, 81, 243 (X9c, N 32000, both starts)"
+
+[observables]
+list = [
+  "g1_potts per block level (plurality, both starts)",
+  "E = sum_nn delta",
+]
+conjugate_observable = true

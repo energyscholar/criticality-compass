@@ -1,0 +1,402 @@
+# THIS IS CC's m.toml (Kernel V8's M for ONE input: what was measured and how).
+# It is NOT the toolset's m.toml (scratch/compass-toolset/m.toml, the study log).
+# inputs/x9c-potts/m.toml - the X9c production (plan 0867 P3): Potts at the exact K_c for q = 3, 4, 5, 6, 8, 10, sizes 27/81/243,
+# N 32 000, both starts, with the g1 level stack (GL) of the plurality block lattice stored for BOTH starts. Instruments as
+# w2-potts-2 plus needle (random start) and needle_o (ordered start), so needle_pair (tables/v03-rules) is measured.
+schema = 1
+kind = "input"
+id = "x9c-potts"
+instruments = ["needle", "across", "stability", "two_start", "fluct", "needle_o"]
+
+[obtained]
+"3" = "truth"
+"4" = "truth"
+"5" = "truth"
+"6" = "truth"
+"8" = "truth"
+"10" = "truth"
+
+[axes]
+point = ["3", "4", "5", "6", "8", "10"]
+size = [27, 81, 243]
+starts = ["random", "ordered"]
+main_start = "random"
+
+[observable]
+name = "g1 of the plurality block lattice"
+definition = """open-pair nearest-neighbour correlation of each plurality block lattice, every level down to final \
+size 9 (the level stack GL; the final level is G); the random start is the RANDOM role, the ordered start the ORDERED role"""
+levels = [2, 3, 4]
+final_size = 9
+
+[block_map]
+name = "plurality3-stochastic"
+factor = 3
+keeps = "the most frequent colour of each 3x3 block (a declared probabilistic map)"
+discards = "the within-block colour spread; ties broken uniformly at random"
+
+[relations.size]
+template = "chain"
+axis = "size"
+provenance = "Coupling"
+direction_from = "the declared blocking map: one more blocking step relates L to L/3"
+
+[relations.matched]
+template = "matched"
+axis = "size"
+big = 243
+small = 81
+provenance = "Coupling"
+direction_from = "one extra declared blocking step at equal block-lattice size ([P2] relations)"
+
+[relations.start]
+template = "pair"
+axis = "starts"
+pairs = [["random", "ordered"]]
+provenance = "Coupling"
+direction_from = "two runs at the same point differing only in the declared initial state"
+
+[sinks]
+ordered = 1.0
+disordered = 0.0
+
+[interval]
+method = "block"
+b = 1600
+resamples = 400
+level = 0.95
+seed = 66
+
+[eps]
+step = 0.01
+sink = 0.02
+y = 0.25
+two_start = 0.01
+
+[conjugate]
+observable = "E"
+conjugate_to = "K (nn coupling)"
+hamiltonian_knowledge = true
+
+[two_start]
+observable = "Q"
+definition = "E = sum of nn bond indicators per snapshot / the declared bond count 2 L^2"
+unit_scale = { "27" = 1458, "81" = 13122, "243" = 118098 }
+
+[kernel]
+uses = ["A"]
+
+[data]
+format = "npz-v1"
+
+[[data.files]]
+point = "3"
+size = 27
+start = "random"
+path = "x9c/q3-L27-random.npz"
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "E" }
+arrays.Q = { key = "E" }
+
+[[data.files]]
+point = "3"
+size = 27
+start = "ordered"
+path = "x9c/q3-L27-ordered.npz"
+arrays.Q = { key = "E" }
+
+[[data.files]]
+point = "3"
+size = 81
+start = "random"
+path = "x9c/q3-L81-random.npz"
+arrays.GL = { key = "G" }
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "E" }
+arrays.Q = { key = "E" }
+
+[[data.files]]
+point = "3"
+size = 81
+start = "ordered"
+path = "x9c/q3-L81-ordered.npz"
+arrays.GL = { key = "G" }
+arrays.Q = { key = "E" }
+
+[[data.files]]
+point = "3"
+size = 243
+start = "random"
+path = "x9c/q3-L243-random.npz"
+arrays.GL = { key = "G" }
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "E" }
+arrays.Q = { key = "E" }
+
+[[data.files]]
+point = "3"
+size = 243
+start = "ordered"
+path = "x9c/q3-L243-ordered.npz"
+arrays.GL = { key = "G" }
+arrays.Q = { key = "E" }
+
+[[data.files]]
+point = "4"
+size = 27
+start = "random"
+path = "x9c/q4-L27-random.npz"
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "E" }
+arrays.Q = { key = "E" }
+
+[[data.files]]
+point = "4"
+size = 27
+start = "ordered"
+path = "x9c/q4-L27-ordered.npz"
+arrays.Q = { key = "E" }
+
+[[data.files]]
+point = "4"
+size = 81
+start = "random"
+path = "x9c/q4-L81-random.npz"
+arrays.GL = { key = "G" }
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "E" }
+arrays.Q = { key = "E" }
+
+[[data.files]]
+point = "4"
+size = 81
+start = "ordered"
+path = "x9c/q4-L81-ordered.npz"
+arrays.GL = { key = "G" }
+arrays.Q = { key = "E" }
+
+[[data.files]]
+point = "4"
+size = 243
+start = "random"
+path = "x9c/q4-L243-random.npz"
+arrays.GL = { key = "G" }
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "E" }
+arrays.Q = { key = "E" }
+
+[[data.files]]
+point = "4"
+size = 243
+start = "ordered"
+path = "x9c/q4-L243-ordered.npz"
+arrays.GL = { key = "G" }
+arrays.Q = { key = "E" }
+
+[[data.files]]
+point = "5"
+size = 27
+start = "random"
+path = "x9c/q5-L27-random.npz"
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "E" }
+arrays.Q = { key = "E" }
+
+[[data.files]]
+point = "5"
+size = 27
+start = "ordered"
+path = "x9c/q5-L27-ordered.npz"
+arrays.Q = { key = "E" }
+
+[[data.files]]
+point = "5"
+size = 81
+start = "random"
+path = "x9c/q5-L81-random.npz"
+arrays.GL = { key = "G" }
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "E" }
+arrays.Q = { key = "E" }
+
+[[data.files]]
+point = "5"
+size = 81
+start = "ordered"
+path = "x9c/q5-L81-ordered.npz"
+arrays.GL = { key = "G" }
+arrays.Q = { key = "E" }
+
+[[data.files]]
+point = "5"
+size = 243
+start = "random"
+path = "x9c/q5-L243-random.npz"
+arrays.GL = { key = "G" }
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "E" }
+arrays.Q = { key = "E" }
+
+[[data.files]]
+point = "5"
+size = 243
+start = "ordered"
+path = "x9c/q5-L243-ordered.npz"
+arrays.GL = { key = "G" }
+arrays.Q = { key = "E" }
+
+[[data.files]]
+point = "6"
+size = 27
+start = "random"
+path = "x9c/q6-L27-random.npz"
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "E" }
+arrays.Q = { key = "E" }
+
+[[data.files]]
+point = "6"
+size = 27
+start = "ordered"
+path = "x9c/q6-L27-ordered.npz"
+arrays.Q = { key = "E" }
+
+[[data.files]]
+point = "6"
+size = 81
+start = "random"
+path = "x9c/q6-L81-random.npz"
+arrays.GL = { key = "G" }
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "E" }
+arrays.Q = { key = "E" }
+
+[[data.files]]
+point = "6"
+size = 81
+start = "ordered"
+path = "x9c/q6-L81-ordered.npz"
+arrays.GL = { key = "G" }
+arrays.Q = { key = "E" }
+
+[[data.files]]
+point = "6"
+size = 243
+start = "random"
+path = "x9c/q6-L243-random.npz"
+arrays.GL = { key = "G" }
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "E" }
+arrays.Q = { key = "E" }
+
+[[data.files]]
+point = "6"
+size = 243
+start = "ordered"
+path = "x9c/q6-L243-ordered.npz"
+arrays.GL = { key = "G" }
+arrays.Q = { key = "E" }
+
+[[data.files]]
+point = "8"
+size = 27
+start = "random"
+path = "x9c/q8-L27-random.npz"
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "E" }
+arrays.Q = { key = "E" }
+
+[[data.files]]
+point = "8"
+size = 27
+start = "ordered"
+path = "x9c/q8-L27-ordered.npz"
+arrays.Q = { key = "E" }
+
+[[data.files]]
+point = "8"
+size = 81
+start = "random"
+path = "x9c/q8-L81-random.npz"
+arrays.GL = { key = "G" }
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "E" }
+arrays.Q = { key = "E" }
+
+[[data.files]]
+point = "8"
+size = 81
+start = "ordered"
+path = "x9c/q8-L81-ordered.npz"
+arrays.GL = { key = "G" }
+arrays.Q = { key = "E" }
+
+[[data.files]]
+point = "8"
+size = 243
+start = "random"
+path = "x9c/q8-L243-random.npz"
+arrays.GL = { key = "G" }
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "E" }
+arrays.Q = { key = "E" }
+
+[[data.files]]
+point = "8"
+size = 243
+start = "ordered"
+path = "x9c/q8-L243-ordered.npz"
+arrays.GL = { key = "G" }
+arrays.Q = { key = "E" }
+
+[[data.files]]
+point = "10"
+size = 27
+start = "random"
+path = "x9c/q10-L27-random.npz"
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "E" }
+arrays.Q = { key = "E" }
+
+[[data.files]]
+point = "10"
+size = 27
+start = "ordered"
+path = "x9c/q10-L27-ordered.npz"
+arrays.Q = { key = "E" }
+
+[[data.files]]
+point = "10"
+size = 81
+start = "random"
+path = "x9c/q10-L81-random.npz"
+arrays.GL = { key = "G" }
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "E" }
+arrays.Q = { key = "E" }
+
+[[data.files]]
+point = "10"
+size = 81
+start = "ordered"
+path = "x9c/q10-L81-ordered.npz"
+arrays.GL = { key = "G" }
+arrays.Q = { key = "E" }
+
+[[data.files]]
+point = "10"
+size = 243
+start = "random"
+path = "x9c/q10-L243-random.npz"
+arrays.GL = { key = "G" }
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "E" }
+arrays.Q = { key = "E" }
+
+[[data.files]]
+point = "10"
+size = 243
+start = "ordered"
+path = "x9c/q10-L243-ordered.npz"
+arrays.GL = { key = "G" }
+arrays.Q = { key = "E" }
