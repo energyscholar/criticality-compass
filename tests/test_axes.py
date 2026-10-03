@@ -72,6 +72,21 @@ for f in sorted((ROOT / "expected").glob("*.toml")):
         check(f"{inp} under {f.stem}: the two_start cell lock (declared before the run)", not miss and set(want) <= set(got), str(miss))
 
 
+for f in sorted((ROOT / "expected").glob("*.toml")):     # the needle_pair lock (plan 0867 P3 gap): declared before the run, read against the stored column
+    pairs = tomllib.loads(f.read_text()).get("needle_pair", {})
+    if not pairs:
+        continue
+    every = pairs.get("EVERY-OTHER-INPUT", {}).get("*")
+    for r in sorted((ROOT / "results").glob(f"*@{f.stem}.json")):
+        inp, got = r.name.split("@")[0], {s["point"]: s["needle_pair"] for s in json.loads(r.read_text())["signature"]}
+        want = pairs.get(inp) or ({p: every for p in got} if every else None)
+        if want is None:
+            check(f"{inp} under {f.stem}: has a needle_pair lock", False, "no [needle_pair.<input>] and no EVERY-OTHER-INPUT")
+            continue
+        miss = {p: (w, got.get(p)) for p, w in want.items() if got.get(p) not in ([w] if isinstance(w, str) else w)}
+        check(f"{inp} under {f.stem}: the needle_pair lock (declared before the run)", not miss and set(got) == set(want), str(miss))
+
+
 def fluct_code(es):
     """The fluct code of synthetic energy ensembles `es` (one per size of w2-potts-2), through the real stages and resample plan."""
     m, ctx = detect.load_input("w2-potts-2"), detect.context_for("w2-potts-2", "fluct", "2")
