@@ -48,4 +48,4 @@ commands = ["show", "explain", "run", "new case", "tables fork", "tables drop", 
 
 [check]                         # bin/cc check --fast (the pre-commit hook) skips the `slow` tests
 fast_budget_s = 30              # elapsed time is printed against it; over budget WARNS, never fails
-slow = ["test_w2", "test_detect_verdicts", "test_breakers_red", "test_view", "test_golden", "test_along", "test_axes", "test_tables_cli", "test_tabulate", "test_needle_o_start"]   # each phase appends its > 5 s tests
+slow = ["test_w2", "test_detect_verdicts", "test_breakers_red", "test_view", "test_golden", "test_along", "test_axes", "test_tables_cli", "test_tabulate", "test_needle_o_start", "test_run_all"]   # each phase appends its > 5 s tests

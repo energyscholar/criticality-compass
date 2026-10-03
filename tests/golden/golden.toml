@@ -132,7 +132,7 @@ phase = 5
 [[case]]
 id = "run-all-scratch"
 before = [["tables", "fork", "verdict-x-rules", "scratch"]]
-argv = ["run", "--all", "--tables", "scratch"]
+argv = ["run", "b7-at-line", "--tables", "scratch"]   # plan 0869 P1a: one small input; the id is kept (files are never deleted)
 phase = 5
 
 [case.plant]
@@ -149,7 +149,7 @@ phase = 5
 
 [[case]]
 id = "tables-drop-scratch"
-before = [["tables", "fork", "verdict-x-rules", "scratch"], ["run", "--all", "--tables", "scratch"]]
+before = [["tables", "fork", "verdict-x-rules", "scratch"], ["run", "b7-at-line", "--tables", "scratch"]]
 argv = ["tables", "drop", "scratch", "--with-results"]
 phase = 5
 
@@ -306,7 +306,7 @@ phase = 6
 [[case]]
 id = "run-all-v01-scratch"
 before = [["tables", "fork", "v01-rules", "scratch"]]
-argv = ["run", "--all", "--tables", "scratch"]
+argv = ["run", "b7-at-line", "--tables", "scratch"]   # plan 0869 P1a: one small input; the id is kept (files are never deleted)
 phase = 6
 
 [case.plant]
@@ -323,7 +323,7 @@ phase = 6
 
 [[case]]
 id = "tables-drop-v01-scratch"
-before = [["tables", "fork", "v01-rules", "scratch"], ["run", "--all", "--tables", "scratch"]]
+before = [["tables", "fork", "v01-rules", "scratch"], ["run", "b7-at-line", "--tables", "scratch"]]
 argv = ["tables", "drop", "scratch", "--with-results"]
 phase = 6
 

@@ -9,6 +9,7 @@ import sys
 import tempfile
 import time
 import tomllib
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -86,12 +87,15 @@ def run_tests(names, skip=()):
     key = lambda t: (t.stem, t.name, str(t.relative_to(ROOT)))  # noqa: E731
     picked = [t for t in allt if (not names or set(names) & set(key(t))) and t.stem not in skip]
     missing = [n for n in names if not any(n in key(t) for t in allt)]
-    res = []
-    for t in picked:
+    keep = 99 if VERBOSE else 8
+
+    def one(t):
         t0 = time.time()
         r = subprocess.run([sys.executable, str(t)], capture_output=True, text=True, cwd=ROOT)
         lines = (r.stdout + r.stderr).strip().splitlines()
-        res.append((t.stem, r.returncode == 0, lines[-(99 if VERBOSE else 8):], time.time() - t0))
+        return (t.stem, r.returncode == 0, lines[-keep:], time.time() - t0)
+    with ThreadPoolExecutor(max(1, (os.cpu_count() or 3) - 2)) as pool:   # each script is its own subprocess
+        res = list(pool.map(one, picked))   # map returns in submission order: the printed order is fixed
     return res, missing, allt
 
 
