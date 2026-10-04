@@ -1,3 +1,4 @@
+# tables/v06-rules (= v05-rules + plan 0872 F1): stability TRANSFORMED is accepted wherever a line accepted STABLE; a relevant exponent on a TRANSFORMED point refuses (REFUSE-UNRES, with its Next line).
 # tables/v02-rules/geometry.toml - the GEOMETRY axis: what the renormalisation flow says, read from the
 # needle (position and flow), across and stability ONLY. It is the verdict the rulebook would give were the two
 # starts known to agree (every row of verdict.toml with two_start INDEP, the order-driven rows removed).
@@ -22,7 +23,7 @@ why = "verdict_x STAGE1: off the window"
 when.needle = ["MID"]
 when.flow = ["SLOW"]
 when.across = ["MARGINAL"]
-when.stability = ["STABLE"]
+when.stability = ["STABLE", "TRANSFORMED"]
 verdict = "LINE"
 why = "Q2, 2026-10-02: slow flow with a marginal, stable exponent is a line (STAGE3 line = BKT-end flaw split by across; every other slow cell still refuses)"
 
@@ -64,8 +65,16 @@ why = "verdict_x CAND_GS: relevant and stable"
 [[row]]
 when.needle = ["MID"]
 when.flow = ["STOPPED"]
+when.across = ["RELEVANT"]
+when.stability = ["TRANSFORMED"]
+verdict = "REFUSE-UNRES"
+why = "plan 0872 F1: a relevant exponent measured on a pre-asymptotic pair (drift CONVERGING, stability TRANSFORMED) is not certified as a point: the declared transform's y_inf is reported (transform.y_inf) but no verdict row reads it. Next: read across through the difference estimator (declare across_delta on a T-ordered control chain over the probed coupling), or add a larger size"
+
+[[row]]
+when.needle = ["MID"]
+when.flow = ["STOPPED"]
 when.across = ["MARGINAL"]
-when.stability = ["STABLE"]
+when.stability = ["STABLE", "TRANSFORMED"]
 verdict = "LINE"
 why = "verdict_x CAND_GS: marginal and stable"
 

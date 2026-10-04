@@ -1,3 +1,4 @@
+# tables/v06-rules/codes.toml (= v05-rules + plan 0872: F2 across_cov / across_dlt behind the signature column across; F1 stability_raw + drift_code -> stability with TRANSFORMED; the y_inf helper)
 # tables/v04-rules/codes.toml (= v03-rules + the declared probe column, plan 0870 P1) - sign cell -> code, one map per column (data; total).
 # RULE (applied by the loader, stated here): the nulls NOT-MEASURED and NOT-EVALUATED
 # (cc.toml alphabets.nulls) are never keys; they pass through every map unchanged. A derived
@@ -319,11 +320,15 @@ alphabet = ["RELEVANT", "MARGINAL", "WEAK", "IRRELEVANT", "UNRES"]
 "UNRES,NOT-MEASURED" = "UNRES"
 "UNRES,NOT-EVALUATED" = "UNRES"
 
-[columns.signature.stability]                  # W2 stability (verdict_x STAB_CODE)
+# plan 0872 F1: the declared finite-size transform. stability_raw is v05-rules' stability (W2, verdict_x STAB_CODE). The signature column `stability` is the TOTAL table over
+# (stability_raw, drift_code): on a point whose needle drift is CONVERGING (a measured pre-asymptotic small pair) a resolved raw stability (STABLE, or CROSSING that the correction
+# explains) reads TRANSFORMED; OFF and UNRES stay (a significant fall or an unresolved d is not explained by a decaying correction); a point whose drift is PERSISTENT, MARGINAL-DRIFT,
+# UNRES or null keeps today's reading, so a real walking stays detectable (WALKING needs CROSSING, which only survives off a CONVERGING point).
+[columns.helper.stability_raw]                 # W2 stability (verdict_x STAB_CODE)
 from = "stability.d"
 alphabet = ["STABLE", "CROSSING", "OFF", "UNRES"]
 
-[columns.signature.stability.map]
+[columns.helper.stability_raw.map]
 "SIG-" = "OFF"
 "NEG" = "OFF"
 "SLOW-" = "STABLE"
@@ -332,6 +337,51 @@ alphabet = ["STABLE", "CROSSING", "OFF", "UNRES"]
 "POS" = "CROSSING"
 "SIG+" = "CROSSING"
 "UNRES" = "UNRES"
+
+[columns.helper.y_inf_code]                    # the transform's y_inf = (y2 - r y1)/(1 - r), r = the needle's own v2/v1 (instruments/transform.toml): reported, read by no verdict row
+from = "transform.y_inf"
+alphabet = ["RELEVANT", "MARGINAL", "WEAK", "IRRELEVANT", "UNRES"]
+
+[columns.helper.y_inf_code.map]
+"SIG-" = "IRRELEVANT"
+"NEG" = "IRRELEVANT"
+"SLOW-" = "WEAK"
+"ZERO!" = "MARGINAL"
+"SLOW+" = "WEAK"
+"POS" = "RELEVANT"
+"SIG+" = "RELEVANT"
+"UNRES" = "UNRES"
+
+[columns.signature.stability]
+from = ["stability_raw", "drift_code"]
+nullable = true                                # a null drift_code is a cell of the map, not a null stability
+alphabet = ["STABLE", "CROSSING", "OFF", "UNRES", "TRANSFORMED"]
+
+[columns.signature.stability.map]
+"STABLE,CONVERGING" = "TRANSFORMED"
+"STABLE,MARGINAL-DRIFT" = "STABLE"
+"STABLE,PERSISTENT" = "STABLE"
+"STABLE,UNRES" = "STABLE"
+"STABLE,NOT-MEASURED" = "STABLE"
+"STABLE,NOT-EVALUATED" = "STABLE"
+"CROSSING,CONVERGING" = "TRANSFORMED"
+"CROSSING,MARGINAL-DRIFT" = "CROSSING"
+"CROSSING,PERSISTENT" = "CROSSING"
+"CROSSING,UNRES" = "CROSSING"
+"CROSSING,NOT-MEASURED" = "CROSSING"
+"CROSSING,NOT-EVALUATED" = "CROSSING"
+"OFF,CONVERGING" = "OFF"
+"OFF,MARGINAL-DRIFT" = "OFF"
+"OFF,PERSISTENT" = "OFF"
+"OFF,UNRES" = "OFF"
+"OFF,NOT-MEASURED" = "OFF"
+"OFF,NOT-EVALUATED" = "OFF"
+"UNRES,CONVERGING" = "UNRES"
+"UNRES,MARGINAL-DRIFT" = "UNRES"
+"UNRES,PERSISTENT" = "UNRES"
+"UNRES,UNRES" = "UNRES"
+"UNRES,NOT-MEASURED" = "UNRES"
+"UNRES,NOT-EVALUATED" = "UNRES"
 
 [columns.signature.two_start]                  # C2 / verdict_x START_CODE, combined over sizes
 from = "two_start.D"

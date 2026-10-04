@@ -1,0 +1,18 @@
+# instruments/transform.toml (plan 0872 F1) - the declared finite-size transform of the growth exponent: y_inf = (y2 - r y1)/(1 - r), where y1, y2 are the exponents of
+# ln(s R) over the two size steps (R = cov(G, E), as stability) and r is the needle's own v2/v1 (as needle_chain). It is REPORTED (a helper column of v06-rules); no verdict
+# row reads it. Refused (NOT-EVALUATED) where the correction does not decay (r >= 1 at the estimate or a resample) or a sign is not constant.
+schema = 1
+kind = "instrument"
+module = "transform"
+operators = ["A"]
+unit = "point"
+reports = []
+arrays = ["G", "E", "GL"]
+axes = ["point", "size"]
+relations = ["size", "chain"]
+sidecar = ["conjugate", "observable", "block_map"]
+flags = ["H"]
+pipeline = ["stage:reduce", "door:nodefield", "stage:velocity", "door:logcoord", "stage:ratio", "door:decays", "stage:transform"]
+
+[columns]
+y_inf = "y"
