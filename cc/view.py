@@ -155,6 +155,8 @@ def ascii_relation(m, name):
         return " <- ".join(str(v) for v in ax[r["axis"]])
     if r["template"] == "pair":
         return " ; ".join(f"{a} <- {b}" for a, b in r["pairs"])
+    if r["template"] == "matched-chain":
+        return " ; ".join(f"big {b} vs small {sm}" for b, sm in r["pairs"]) + "   (each pair as a matched relation, laid end to end)"
     nb = m["observable"]["levels"][ax["size"].index(r["big"])]
     return (f"big {r['big']}: L0..L{nb - 1}   small {r['small']}: L0..L{nb - 2}   edges: "
             + " ".join(f"({r['big']},L{k})->({r['small']},L{k - 1})" for k in range(1, nb)))
@@ -234,6 +236,8 @@ def explain(res, pt, join, mode, tables_dir=None):
         live = [r for r in rs if r["cell"] != "NOT-MEASURED"]
         if not live:
             out.append(column_line(c, rs, sig, mode, cfg)[2:])
+            cp = tomllib.loads((ROOT / "inputs" / res["input"] / "couplings.toml").read_text()) if c in declare.declared_cols(T.codes) else None
+            out += [f"  declared in inputs/{res['input']}/couplings.toml: couplings {cp['names']}, probed by across {cp['probes']}"] if cp else []
             continue
         out.append(c)
         for r in live:
@@ -248,7 +252,9 @@ def explain(res, pt, join, mode, tables_dir=None):
                 steps = head + read_steps(q, r, lv, text, dcol, mode, cfg)
                 out += [f"  {n} {w:<9} {tag}{t}" for n, w, t in steps]
             if r["per_size"]:
-                out.append(f"  7 CODE      combine.rank {' > '.join(cols[dcol]['combine']['rank'])} (first wins) -> "
+                top = cols[dcol]["combine"].get("top_only")
+                out.append(f"  7 CODE      combine.rank {' > '.join(cols[dcol]['combine']['rank'])} (first wins)"
+                           + (f"; {', '.join(top)} counts only when the largest size reads it" if top else "") + " -> "
                            f"{shown(codes[c], None, mode, cfg)}")
         for d in chain(c):
             a, b = cols[d]["from"]

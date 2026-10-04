@@ -125,6 +125,10 @@ a missing one is refused and so is an unused one.
 | two_start | `start` (a pair) | `two_start` | one order parameter for each of the two starts, per size |
 | along | `size` (a chain) and `control` (a declared relation over the points) | `observable`, `block_map` | the observable of both points of a pair, at every size |
 | fluct | `size` (a chain) | `two_start` (its `unit_scale`) | the energy `E` at every size, from the main start |
+| needle_chain | `chain` (template `matched-chain`: the pairs `[[243, 81], [81, 27]]`) and `size` | `observable`, `block_map`, and `[eps] drift` | the level stacks at three sizes: the needle's velocity at two size pairs, and how it decays |
+
+Under `v04-rules` every input also needs `inputs/<id>/couplings.toml` (see "Probe completeness" below); `new input` does not
+write it, and `validate` names a missing one.
 
 To change a frozen input, do not edit it. Make `<id>-2` with `--like <id>`, run `data add`, and run it as a new
 input; the old results stay readable.
@@ -561,6 +565,101 @@ For this edit it prints `RED   test_breakers`, with the two breakers it breaks n
 | change a frozen input | `new input <id>-2 --like <id>`; `data add` | as for a new model | none | yes |
 | new instrument | `new instrument <id>`; its registry file and module; `checks.toml` | registry file; `checks.py` | yes | yes: a new module name |
 
+## Probe completeness, the size chain and POINT-MANIFOLD (v04-rules, plan 0870)
+
+`v04-rules` is `v03-rules` forked, with three declared changes. Each is a table or a declaration, never a threshold chain in code.
+
+**1. Probe completeness.** A per-point instrument probes one direction: `across` reads the response to the declared conjugate.
+If the system has a second coupling that nothing probes, "relevant and stopped" on the probed direction is consistent with a
+point and with a line alike (the AT line of E151 read POINT twice for this reason). `inputs/<id>/couplings.toml` declares the
+sampler's couplings from the Hamiltonian, and which of them `across` probes:
+
+```
+schema = 1
+kind = "couplings"
+id = "x5n-bilayer-2"
+names = ["K", "g"]
+probes = ["K"]
+```
+
+`validate` checks `names` against the scalars the data files store (minus the size key `L`): a declaration cannot choose its own
+verdict. The signature column `probe` reads COMPLETE (every coupling probed), INCOMPLETE (one is not), UNKNOWN (`names = "unknown"`,
+admissible only when the data store no scalars) or NOT-MEASURED (the input declares no `across`). `tables/v04-rules/probe.toml`
+projects the geometry through it: a positive geometry (POINT, LINE, WALKING) with probe INCOMPLETE reads REFUSE-PROBE-INCOMPLETE,
+with probe UNKNOWN REFUSE-PROBE-UNKNOWN, and every other cell passes. `compose.toml` reads the projected geometry, so the verdict
+moves only where the geometry did (b7-at-line-4 keeps its REFUSE-TWO-START-UNMEASURED; its GEOMETRY at 0.0 and 0.07 is the refusal).
+A refusal says why and what to do:
+
+```
+$ bin/cc explain x5n-bilayer-2 0.0 --tables v04-rules
+…
+probe      INCOMPLETE
+  declared in inputs/x5n-bilayer-2/couplings.toml: couplings ['K', 'g'], probed by across ['K']
+…
+8 VERDICT   verdict.toml line 131: when.needle = [MID]; when.two_start = [INDEP]; when.flow = [STOPPED]; when.across = [RELEVANT]; when.stability = [STABLE]; when.probe = [INCOMPLETE]
+            => verdict BLANK (REFUSE-PROBE-INCOMPLETE)
+               why: plan 0870: a second coupling exists and is not probed here (across probes one direction only): a positive per-point class is not certified; read the family over the unprobed coupling. Next: declare the second coupling's instrument, or read the family
+9  GEOMETRY  geometry.toml line 56: when.needle = [MID]; when.flow = [STOPPED]; when.across = [RELEVANT]; when.stability = [STABLE]  => POINT
+10 PROBE     probe.toml line 17: when.probe = [INCOMPLETE]; when.geometry = [POINT, LINE, WALKING]  => REFUSE-PROBE-INCOMPLETE
+11 ORDER     order.toml line 72: when.needle = [MID]; when.two_start = [INDEP]; when.fluct = [VANISHES]  => CONTINUOUS
+12 COMPOSE   compose.toml line 36: when.order = [EQUILIBRATED, CONTINUOUS, FIRST-ORDER-TUNNELLING, EQUILIBRATED-UNRES]  => REFUSE-PROBE-INCOMPLETE (the geometry)
+```
+
+**2. The size chain.** The flow was read from ONE size pair, so a finite-size correction that decays (the XY low phase) read SLOW and
+refused. An input with two matched pairs declares `relations.chain` (template `matched-chain`, `pairs = [[243, 81], [81, 27]]`) and the
+instrument `needle_chain`: it takes the needle's velocity at both pairs, `ln|v|` through `door:logcoord` (a velocity whose sign is not
+constant is NOT-EVALUATED by construction), and reports `drift = omega_eff - 1`, where `omega_eff = -A(ln|v|) / ln(size ratio)` is how fast
+the velocity decays down the chain. It is read against `[eps] drift = 0.5`, declared in the plan before any run. `drift_code` is
+CONVERGING (omega_eff above 1: the correction dies), MARGINAL-DRIFT (within eps of 1), PERSISTENT (below 1: a genuine slow flow, log
+corrections included) or UNRES. The derived `flow` is a total table over (flow of the top pair, drift_code): **a SLOW flow whose drift
+CONVERGES reads STOPPED, and every other cell is the top pair's flow.** `drift_code` stays in every result and in `ignores` of
+`verdict.toml`: it is the visible flag of Bruce's R2, read by no verdict row. An input with one size pair reads drift NOT-MEASURED, and
+its flow is the top pair's, as under v03-rules.
+
+```
+$ bin/cc show x2-xy-line-3 --tables v04-rules
+…
+point 0.6   case xy-low-phase
+…
+  drift_code 0.8204 [0.3995, 1.332] POS -> CONVERGING
+  flow       velocity 0.001239 [0.0007177, 0.001869] SLOW+ drift 0.8204 [0.3995, 1.332] POS -> STOPPED
+  across     0.6956 [0.3908, 0.9802] SIG+ -> RELEVANT
+  stability  0.9112 [0.4498, 1.363] SIG+ -> CROSSING
+…
+  => verdict WALKING
+```
+
+Read that block as a finding, not a success: T 0.6 of the XY low phase is a LINE point, the flow now reads STOPPED, and a 2.5 sigma
+fluctuation of `across` that the old REFUSE-SLOW was hiding reaches the WALKING row. The rule is recorded as it is.
+The same plan narrows `two_start`: COEXIST at the combined cell now requires the LARGEST size to read COEXIST
+(`combine.top_only` in `codes.toml`); no stored two_start code on any existing input moved.
+
+**3. POINT-MANIFOLD.** A family over a navigated chain of points can say what one point cannot. `family.toml` gains the row
+{f1 CONSTANT, f2 IRRELEVANT} = POINT-MANIFOLD (class POINT), and names its two siblings {VARIES, IRRELEVANT} and {CONSTANT, MARGINAL}
+as REFUSE-UNCLASSIFIED, each with a `why` that names a Next line. `families/x5n-g.toml` reads the coupled Ising layers over g
+(`x5n-bilayer-3`: `x5n-bilayer-2` plus `along`, a control chain over g, and two matched pairs):
+
+```
+$ bin/cc family x5n-g --tables v04-rules
+family x5n-g   rules: v04-rules   input: x5n-bilayer-3   interior: 0.0 0.1 0.3
+  bracket BRACKET
+    edge 0.0->0.1 NO-DESCENT
+    edge 0.1->0.3 NO-DESCENT
+  f1      CONSTANT
+    0.0->0.1 y_last +0.030 [-0.050, +0.086] ZERO!  -> CONSTANT
+    0.0->0.3 y_last +0.021 [-0.066, +0.091] ZERO!  -> CONSTANT
+    0.1->0.3 y_last -0.009 [-0.067, +0.059] ZERO!  -> CONSTANT
+  f2      IRRELEVANT
+    0.0->0.1 along SIG-  -> IRRELEVANT
+    0.1->0.3 along NEG  -> IRRELEVANT
+  => family verdict POINT-MANIFOLD   class POINT, family.toml line 75
+     why: plan 0870 P3: …
+```
+
+So the positive class of x5n is re-earned by the family over g: each per-point reading refuses (the K probe is incomplete), and the
+three points together read as one point class. This is the first reading ever of the POINT-MANIFOLD row; a MARGINAL f2 here would have
+been a finding that stopped the plan.
+
 ## Known limits of v0.1
 
 Read these before you trust a verdict.
@@ -597,3 +696,12 @@ Read these before you trust a verdict.
   is the honest reading of "a second direction may exist"; only a family over a navigated chain can say more. To lift it, declare the
   couplings from the Hamiltonian; if they are unknown this instrument reads the position only. An input with two couplings and one probed
   (b7: K and L4; x5n: K and g) reads REFUSE-PROBE-INCOMPLETE per point and is read through its family.
+- **v04-rules: x2-xy-line-3 T 0.6 reads WALKING, and x3-clock6-3 T 0.5 reads flow STOPPED.** The XY low phase is a LINE; its drift CONVERGES, so
+  its flow reads STOPPED, and a fluctuation of `across` (+0.696, a 2.5 sigma reading) with stability CROSSING reaches the WALKING row. The clock's
+  ordered end (needle ORD, verdict NOT either way) is STOPPED by a converging drift, which the declared predictions said no clock point would be.
+  Both are recorded in `expected/v04-rules.toml` as findings about the rule, not repaired.
+- **v04-rules: `needle_chain` needs the level stack at three sizes, and its drift is NOT-EVALUATED wherever the velocity changes sign** (b7, x5n,
+  x9c q3-q8, the clock's T1 and the XY T_KT). A drift that cannot be formed refuses nothing: the flow is the top pair's.
+- **v04-rules: `couplings.toml` sits beside `m.toml` rather than inside it,** because an `m.toml` that a stored result read cannot change
+  (its hash is in the result); `[conjugate].hamiltonian_knowledge` therefore stays in `m.toml`, and `conjugate_to` is free text ("beta" for the
+  one coupling `T`), so `probes` is checked against `names` and the stored scalars, not against `conjugate_to`.

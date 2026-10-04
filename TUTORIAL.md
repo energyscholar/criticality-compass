@@ -307,3 +307,14 @@ inside** the margin, so the cell is `ZERO!` (step 5) and the code `MARGINAL` (st
 below `-0.25`, the cell would be `UNRES`, f2 would be `UNRES`, and the family would read
 `REFUSE-UNCLASSIFIED-v0` instead of LINE. The family verdict is therefore real and resolved, and also close: that is exactly what the pair trace
 is for.
+
+## Part 4: a point that refuses and a family that does not (v04-rules)
+
+`bin/cc explain x5n-bilayer-2 0.0 --tables v04-rules` ends with the verdict `REFUSE-PROBE-INCOMPLETE`. Read it from the bottom:
+step 12 (COMPOSE) takes the geometry as the probe left it, step 10 (PROBE) is the row that replaced the geometry POINT of step 9,
+and the `probe INCOMPLETE` line says why: `inputs/x5n-bilayer-2/couplings.toml` declares the couplings K and g, and `across` probes only K.
+One probed direction cannot tell a point from a line, so the point refuses and the `why` sends you to the family.
+
+`bin/cc family x5n-g --tables v04-rules` reads the same system over its three g values: f1 CONSTANT (the exponent does not change),
+f2 IRRELEVANT (the difference between neighbouring g shrinks relative to the size), so the verdict is POINT-MANIFOLD, class POINT.
+The point class is earned by the family, never by one probed direction. HOWTO has the full transcripts and the rules.

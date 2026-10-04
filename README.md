@@ -223,9 +223,11 @@ changes, because no result names a case; `bin/cc show w2-potts` now prints the n
 | `inputs/<id>/points.toml` | which case each point belongs to | you | never |
 | `inputs/<id>/m.toml` | what was measured and how: files, sizes, relations, margins, resampling | you, when you add an input | once a result read it |
 | `fixtures/data/<id>.toml` | the sha256 of each data file an input reads | `bin/cc data add` | once a result read it |
+| `inputs/<id>/couplings.toml` | the sampler's couplings (from the Hamiltonian) and which of them `across` probes; read by `v04-rules` (HOWTO, "Probe completeness") | you, when you add an input | once a result read it |
 | `instruments/*.toml` | what each instrument measures and its pipeline | the maintainers | once a result read it |
 | `tables/<set>/codes.toml` | sign cell to code, per column | you, in a forked set | with its set |
 | `tables/<set>/verdict.toml` | the rows that map a signature row to a verdict | you, in a forked set | with its set |
+| `tables/<set>/probe.toml` | `v04-rules`: the projection of the geometry by the declared probe (a positive geometry with an unprobed coupling is a named refusal) | you, in a forked set | with its set |
 | `tables/<set>/membership.toml` | which needle codes count as "on the manifold" for a pair of points (the along instrument) | you, in a forked set | with its set |
 | `tables/<set>/family.toml` | how the readings along a family of points are coded and looked up (bracket, f1, f2) | you, in a forked set | with its set |
 | `families/<id>.toml` | one family: an input and the points that form it (a family names no rulebook) | you | never |
@@ -236,3 +238,11 @@ changes, because no result names a case; `bin/cc show w2-potts` now prints the n
 | `tests/` | the tests and the recorded command transcripts (`tests/golden/`) | the maintainers | the four core tests |
 | `SIGNATURE-TABLE.md`, `docs/verdict-table.html` | every result and the rulebook as tables (`bin/cc tabulate`) | written by `tabulate` | no |
 | `FROZEN.json` | the list of frozen files and their hashes | written by `bin/cc freeze` | n/a |
+
+## Since v04-rules (plan 0870)
+
+The working rulebook above is `v01-rules`. `v04-rules` (HOWTO, "Probe completeness, the size chain and POINT-MANIFOLD") adds three things:
+a per-point POINT, LINE or WALKING is refused (`REFUSE-PROBE-INCOMPLETE`) when the system has a second coupling that nothing probes, which
+turns `x5n-bilayer`'s three POINTs into refusals; a flow read from two size pairs can call a decaying finite-size correction STOPPED
+(`drift_code`); and a family can read POINT-MANIFOLD. Try `bin/cc explain x5n-bilayer-2 0.0 --tables v04-rules` and
+`bin/cc family x5n-g --tables v04-rules`: the points refuse, and the family over g reads one point class.

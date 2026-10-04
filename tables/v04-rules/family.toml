@@ -75,7 +75,7 @@ why = "0863: a bracket that could not be read"
 [[row]]
 when = { bracket = ["BRACKET", "NO-MID", "NOT-MEASURED"], f1 = ["CONSTANT"], f2 = ["IRRELEVANT"] }
 verdict = "POINT-MANIFOLD"
-why = "plan 0870 P3: the exponent is constant along the navigated chain (f1) and every neighbouring pair has a difference that GROWS SLOWER than the size (f2 IRRELEVANT): the members are one point class, a manifold of points. The first reading ever of this row (X7a's pairs were all off the manifold, E44/E46); x5n over g is its test"
+why = "plan 0870 P3: the exponent is constant along the navigated chain (f1) and every neighbouring pair has a difference that GROWS SLOWER than the size (f2 IRRELEVANT): the members are one point class, a manifold of points. The members' own per-point verdicts are not lifted (x5n: REFUSE-PROBE-INCOMPLETE); the family is the reading that carries the class. The first reading ever of this row (X7a's pairs were all off the manifold, E44/E46); x5n over g is its test"
 
 [[row]]
 when = { bracket = ["BRACKET", "NO-MID", "NOT-MEASURED"], f1 = ["VARIES"], f2 = ["IRRELEVANT"] }

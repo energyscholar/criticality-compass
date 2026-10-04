@@ -76,5 +76,8 @@ pick = lambda r: [(x["unit"]["point"], x["column"], x["estimate"], x["cell"]) fo
 check("x2-xy-line-3 re-measured: the drift readings equal the stored ones", pick(fresh) == pick(stored) and len(pick(stored)) == 5, str(pick(fresh)[:2]))
 check("x2-xy-line-3 re-measured: omega_eff - 1 at T 0.5 is 1.06 (omega_eff 2.06), CONVERGING, flow STOPPED",
       abs(pick(fresh)[0][2] - 1.063) < 0.01 and fresh["signature"][0]["drift_code"] == "CONVERGING" and fresh["signature"][0]["flow"] == "STOPPED", str(pick(fresh)[0]))
+import view  # noqa: E402
+text = "\n".join(view.explain(stored, "0.6", None, "basic"))
+check("explain reads the drift trace and the flow derivation of x2-xy-line-3 T 0.6", "flow = STOPPED from flow_top SLOW and drift_code CONVERGING" in text and "matched-chain" in text, text[-300:])
 print("".join(f"FAILED {x}\n" for x in bad) + "test_chain: " + ("FAILED" if bad else "all passed"))
 sys.exit(1 if bad else 0)
