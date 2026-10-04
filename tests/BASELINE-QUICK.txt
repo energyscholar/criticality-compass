@@ -1,40 +1,41 @@
-tree 9e77a55ea480b5fbceba56a9ab12e0d2d7af4056
-head 442e214761f439f11296ce1c99f50317e0ee2ed9
-seconds 189
+tree 0496802d34a627557cd3b5f72c98c50e40f9c04d
+head 06d0715e66d2324ce4f58786a2fe0863e09707e1
+seconds 205
 tier quick
 test test_budget ok 0.1
 test test_kernel ok 0.4
-test test_sign ok 0.5
+test test_sign ok 0.4
 test test_resample ok 1.3
 test test_kernel_rs ok 0.9
-test test_declare ok 57.8
-test test_tables_cli ok 175.9
-test test_needle_x8 ok 2.2
-test test_b7 ok 7.0
-test test_w2 ok 9.9
-test test_two_start_c2 ok 2.8
-test test_detect_verdicts ok 49.3
-test test_breakers ok 0.8
-test test_breakers_red ok 20.0
-test test_golden ok 119.0
-test test_verdict_equivalence ok 1.6
-test test_scoreboard ok 6.3
-test test_view ok 27.3
-test test_tabulate ok 86.0
-test test_reverdict ok 8.5
-test test_along ok 17.4
-test test_family ok 4.9
+test test_declare ok 81.0
+test test_tables_cli ok 191.8
+test test_needle_x8 ok 1.6
+test test_b7 ok 6.9
+test test_w2 ok 9.3
+test test_two_start_c2 ok 2.1
+test test_detect_verdicts ok 43.3
+test test_breakers ok 0.7
+test test_breakers_red ok 14.6
+test test_golden ok 109.9
+test test_verdict_equivalence ok 1.8
+test test_scoreboard ok 5.8
+test test_view ok 21.9
+test test_tabulate ok 123.8
+test test_reverdict ok 7.7
+test test_along ok 15.8
+test test_family ok 6.1
 test test_x5 ok 10.8
-test test_axes ok 75.1
+test test_axes ok 76.7
 test test_needle_o_start ok 0.5
-test test_run_all ok 18.2
-test test_code_hash ok 41.9
-test test_across_delta ok 18.6
-test test_transformed ok 4.0
-test test_end_note ok 68.6
-test test_classify ok 0.5
-test test_probe ok 6.1
-test test_chain ok 33.2
+test test_run_all ok 20.2
+test test_code_hash ok 37.2
+test test_across_delta ok 19.6
+test test_transformed ok 4.4
+test test_end_note ok 66.1
+test test_v06_locks ok 2.0
+test test_classify ok 0.6
+test test_probe ok 6.4
+test test_chain ok 27.9
 test test_ends ok 1.0
 quick: dropped test_golden case run-all-scratch: re-measure took 18 s, over the 8 s case budget
 quick: dropped test_golden case run-all-v01-scratch: re-measure took 18 s, over the 8 s case budget
@@ -61,6 +62,7 @@ quick: dropped test_run_all input w2-potts: re-measure took 12 s, over the 8 s c
 quick: dropped test_run_all input x2-xy-line-2: re-measure took 23 s, over the 8 s case budget
 quick: dropped test_run_all input x2-xy-line-3: re-measure took 32 s, over the 8 s case budget
 quick: dropped test_run_all input x2-xy-line: re-measure took 20 s, over the 8 s case budget
+quick: dropped test_run_all input x2b-xy-2: re-measure took 565 s, over the 8 s case budget
 quick: dropped test_run_all input x2b-xy: re-measure took 330 s, over the 8 s case budget
 quick: dropped test_run_all input x3-clock6-2: re-measure took 33 s, over the 8 s case budget
 quick: dropped test_run_all input x3-clock6-3: re-measure took 45 s, over the 8 s case budget

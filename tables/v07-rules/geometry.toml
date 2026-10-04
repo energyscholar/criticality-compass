@@ -1,0 +1,150 @@
+# tables/v06-rules (= v05-rules + plan 0872 F1): stability TRANSFORMED is accepted wherever a line accepted STABLE; a relevant exponent on a TRANSFORMED point refuses (REFUSE-UNRES, with its Next line).
+# tables/v02-rules/geometry.toml - the GEOMETRY axis: what the renormalisation flow says, read from the
+# needle (position and flow), across and stability ONLY. It is the verdict the rulebook would give were the two
+# starts known to agree (every row of verdict.toml with two_start INDEP, the order-driven rows removed).
+# A declared PARTITION of (needle, flow, across, stability); `validate` proves it, and proves that
+# compose.toml of (geometry, order) gives verdict.toml's verdict on every row.
+schema = 1
+kind = "geometry"
+columns = ["needle", "flow", "across", "stability"]
+verdicts = [
+  "POINT", "LINE", "WALKING", "NOT", "REFUSE-SLOW", "REFUSE-FLOW", "REFUSE-WEAK", "REFUSE-OFF", "REFUSE-IRRELEVANT", "REFUSE-UNRES", "REFUSE-NEEDLE-UNMEASURED", "REFUSE-FLOW-UNMEASURED", "REFUSE-ACROSS-UNMEASURED", "REFUSE-STABILITY-UNMEASURED",
+]
+refuse = [
+  "REFUSE-SLOW", "REFUSE-FLOW", "REFUSE-WEAK", "REFUSE-OFF", "REFUSE-IRRELEVANT", "REFUSE-UNRES", "REFUSE-NEEDLE-UNMEASURED", "REFUSE-FLOW-UNMEASURED", "REFUSE-ACROSS-UNMEASURED", "REFUSE-STABILITY-UNMEASURED",
+]
+
+[[row]]
+when.needle = ["DIS", "ORD"]
+verdict = "NOT"
+why = "verdict_x STAGE1: off the window"
+
+[[row]]
+when.needle = ["MID"]
+when.flow = ["SLOW"]
+when.across = ["MARGINAL"]
+when.stability = ["STABLE", "TRANSFORMED"]
+verdict = "LINE"
+why = "Q2, 2026-10-02: slow flow with a marginal, stable exponent is a line (STAGE3 line = BKT-end flaw split by across; every other slow cell still refuses)"
+
+[[row]]
+when.needle = ["MID"]
+when.flow = ["SLOW"]
+when.across = ["RELEVANT", "WEAK", "IRRELEVANT", "UNRES", "NOT-MEASURED", "NOT-EVALUATED"]
+verdict = "REFUSE-SLOW"
+why = "verdict_x STAGE3: slow flow (Q2, 2026-10-02: only across MARGINAL with stable stability leaves this row)"
+
+[[row]]
+when.needle = ["MID"]
+when.flow = ["SLOW"]
+when.across = ["MARGINAL"]
+when.stability = ["CROSSING", "OFF", "UNRES", "NOT-MEASURED", "NOT-EVALUATED"]
+verdict = "REFUSE-SLOW"
+why = "verdict_x STAGE3: slow flow (Q2, 2026-10-02: a marginal across that is not stable still refuses)"
+
+[[row]]
+when.needle = ["MID"]
+when.flow = ["FLOWING"]
+verdict = "NOT"
+why = "verdict_x STAGE3: the needle still flows"
+
+[[row]]
+when.needle = ["MID"]
+when.flow = ["UNRES"]
+verdict = "REFUSE-FLOW"
+why = "verdict_x STAGE3: flow unresolved"
+
+[[row]]
+when.needle = ["MID"]
+when.flow = ["STOPPED"]
+when.across = ["RELEVANT"]
+when.stability = ["STABLE"]
+verdict = "POINT"
+why = "verdict_x CAND_GS: relevant and stable"
+
+[[row]]
+when.needle = ["MID"]
+when.flow = ["STOPPED"]
+when.across = ["RELEVANT"]
+when.stability = ["TRANSFORMED"]
+verdict = "REFUSE-UNRES"
+why = "plan 0872 F1: a relevant exponent measured on a pre-asymptotic pair (drift CONVERGING, stability TRANSFORMED) is not certified as a point: the declared transform's y_inf is reported (transform.y_inf) but no verdict row reads it. Next: read across through the difference estimator (declare across_delta on a T-ordered control chain over the probed coupling), or add a larger size"
+
+[[row]]
+when.needle = ["MID"]
+when.flow = ["STOPPED"]
+when.across = ["MARGINAL"]
+when.stability = ["STABLE", "TRANSFORMED"]
+verdict = "LINE"
+why = "verdict_x CAND_GS: marginal and stable"
+
+[[row]]
+when.needle = ["MID"]
+when.flow = ["STOPPED"]
+when.across = ["RELEVANT", "MARGINAL"]
+when.stability = ["CROSSING"]
+verdict = "WALKING"
+why = "verdict_x CAND_GS: the exponent crosses with size"
+
+[[row]]
+when.needle = ["MID"]
+when.flow = ["STOPPED"]
+when.across = ["RELEVANT", "MARGINAL"]
+when.stability = ["OFF"]
+verdict = "REFUSE-OFF"
+why = "verdict_x CAND_GS: stability reads off"
+
+[[row]]
+when.needle = ["MID"]
+when.flow = ["STOPPED"]
+when.across = ["RELEVANT", "MARGINAL"]
+when.stability = ["UNRES"]
+verdict = "REFUSE-UNRES"
+why = "verdict_x CAND_GS: stability unresolved"
+
+[[row]]
+when.needle = ["MID"]
+when.flow = ["STOPPED"]
+when.across = ["WEAK"]
+verdict = "REFUSE-WEAK"
+why = "verdict_x CAND_GS: WEAK refuses whatever stability reads (nulls included)"
+
+[[row]]
+when.needle = ["MID"]
+when.flow = ["STOPPED"]
+when.across = ["IRRELEVANT"]
+verdict = "REFUSE-IRRELEVANT"
+why = "verdict_x CAND_GS: IRRELEVANT refuses whatever stability reads"
+
+[[row]]
+when.needle = ["MID"]
+when.flow = ["STOPPED"]
+when.across = ["UNRES"]
+verdict = "REFUSE-UNRES"
+why = "verdict_x CAND_GS: across unresolved, whatever stability reads"
+
+[[row]]
+when.needle = ["NOT-MEASURED", "NOT-EVALUATED"]
+verdict = "REFUSE-NEEDLE-UNMEASURED"
+why = "honest null (not in verdict_x): the needle was not measured or not evaluated"
+
+[[row]]
+when.needle = ["MID"]
+when.flow = ["NOT-MEASURED", "NOT-EVALUATED"]
+verdict = "REFUSE-FLOW-UNMEASURED"
+why = "honest null: flow was not measured or not evaluated"
+
+[[row]]
+when.needle = ["MID"]
+when.flow = ["STOPPED"]
+when.across = ["NOT-MEASURED", "NOT-EVALUATED"]
+verdict = "REFUSE-ACROSS-UNMEASURED"
+why = "honest null: across was not measured or not evaluated"
+
+[[row]]
+when.needle = ["MID"]
+when.flow = ["STOPPED"]
+when.across = ["RELEVANT", "MARGINAL"]
+when.stability = ["NOT-MEASURED", "NOT-EVALUATED"]
+verdict = "REFUSE-STABILITY-UNMEASURED"
+why = "honest null: stability was not measured or not evaluated"

@@ -1,0 +1,296 @@
+# tables/v06-rules (= v05-rules + plan 0872 F1): stability TRANSFORMED is accepted wherever a line accepted STABLE; a relevant exponent on a TRANSFORMED point refuses (REFUSE-UNRES, with its Next line).
+# tables/v04-rules/verdict.toml (= v03-rules + the probe column, plan 0870 P1: a POINT, LINE or WALKING row is split by probe) - a declared PARTITION of the signature domain (data).
+# Order-free: the validator expands every row to its cells and refuses unless the rows are
+# pairwise disjoint and cover the whole domain. A column a row's `when` omits matches every
+# value of that column (nulls included). A row's `why` is printed by `bin/cc explain`.
+schema = 1
+kind = "verdict"
+columns = ["needle", "needle_pair", "sink", "flow", "across", "stability", "two_start", "probe", "drift_code"]   # = codes.toml signature
+ignores = ["sink", "drift_code"]                             # read by no row: declared, with the reason
+ignores_reason = """v0 transcribes verdict_x, which has no sink column; the sink already acts \
+through the derived needle code (codes.toml columns.signature.needle). drift_code (plan 0870 P2, Bruce R2) is the visible flag \
+of a finite-size correction: it acts through the derived flow code and no row reads it; it stays in every result."""
+verdicts = [
+  "POINT", "LINE", "WALKING", "FIRST-ORDER", "NOT", "REFUSE-EQUIL", "REFUSE-SLOW", "REFUSE-FLOW",
+  "REFUSE-WEAK", "REFUSE-OFF", "REFUSE-IRRELEVANT", "REFUSE-UNRES", "REFUSE-NEEDLE-UNMEASURED",
+  "REFUSE-TWO-START-UNMEASURED", "REFUSE-FLOW-UNMEASURED", "REFUSE-ACROSS-UNMEASURED",
+  "REFUSE-STABILITY-UNMEASURED", "REFUSE-PROBE-INCOMPLETE", "REFUSE-PROBE-UNKNOWN",
+]
+# verdict class: a verdict in `refuse` scores as REFUSE; any other verdict scores as itself
+# (it must be a class_truth name) unless [class_of] names its class.
+refuse = [
+  "REFUSE-EQUIL", "REFUSE-SLOW", "REFUSE-FLOW", "REFUSE-WEAK", "REFUSE-OFF", "REFUSE-IRRELEVANT",
+  "REFUSE-UNRES", "REFUSE-NEEDLE-UNMEASURED", "REFUSE-TWO-START-UNMEASURED",
+  "REFUSE-FLOW-UNMEASURED", "REFUSE-ACROSS-UNMEASURED", "REFUSE-STABILITY-UNMEASURED", "REFUSE-PROBE-INCOMPLETE", "REFUSE-PROBE-UNKNOWN",
+]
+
+[[row]]
+when.needle = ["DIS", "ORD"]
+when.needle_pair = ["PINNED-BETWEEN-PHASES"]
+when.two_start = ["COEXIST"]
+verdict = "FIRST-ORDER"
+why = "plan 0867: the random start sits at one sink and the ordered start at the other, and the two starts stay apart: coexistence between the phases (the window is where the two phases' flows part)"
+
+[[row]]
+when.needle = ["DIS", "ORD"]
+when.needle_pair = ["SAME-WINDOW", "SAME-SINK", "HALF-PINNED", "CROSSED", "NOT-MEASURED", "NOT-EVALUATED"]
+verdict = "NOT"
+why = "verdict_x STAGE1: off the window"
+
+[[row]]
+when.needle = ["DIS", "ORD"]
+when.needle_pair = ["PINNED-BETWEEN-PHASES"]
+when.two_start = ["FLUCT", "UNRES", "INDEP", "NOT-MEASURED", "NOT-EVALUATED"]
+verdict = "NOT"
+why = "verdict_x STAGE1: off the window (pinned between the phases, but the starts do not stay apart)"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["COEXIST"]
+verdict = "FIRST-ORDER"
+why = "verdict_x STAGE2: the two starts coexist at the window"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["FLUCT", "UNRES"]
+verdict = "REFUSE-EQUIL"
+why = """verdict_x STAGE2: an unresolved or fluctuating two-start difference cannot certify \
+equilibrium (open choice: UNRES could instead pass with INDEP)"""
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["SLOW"]
+when.across = ["MARGINAL"]
+when.stability = ["STABLE", "TRANSFORMED"]
+when.probe = ["COMPLETE", "NOT-MEASURED", "NOT-EVALUATED"]
+verdict = "LINE"
+why = """Q2, 2026-10-02: slow flow with a marginal, stable exponent is a line (STAGE3 line = BKT-end \
+flaw split by across; every other slow cell still refuses)"""
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["SLOW"]
+when.across = ["MARGINAL"]
+when.stability = ["STABLE", "TRANSFORMED"]
+when.probe = ["INCOMPLETE"]
+verdict = "REFUSE-PROBE-INCOMPLETE"
+why = "plan 0870: a second coupling exists and is not probed here (across probes one direction only): a positive per-point class is not certified; read the family over the unprobed coupling. Next: declare the second coupling's instrument, or read the family"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["SLOW"]
+when.across = ["MARGINAL"]
+when.stability = ["STABLE", "TRANSFORMED"]
+when.probe = ["UNKNOWN"]
+verdict = "REFUSE-PROBE-UNKNOWN"
+why = "plan 0870: the couplings of this system are unknown, so no direction can be said to be probed: a positive per-point class is not certified. Next: declare the system's couplings from its Hamiltonian; if they are unknown this instrument reads the position only"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["SLOW"]
+when.across = ["RELEVANT", "WEAK", "IRRELEVANT", "UNRES", "NOT-MEASURED", "NOT-EVALUATED"]
+verdict = "REFUSE-SLOW"
+why = "verdict_x STAGE3: slow flow (Q2, 2026-10-02: only across MARGINAL with stable stability leaves this row)"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["SLOW"]
+when.across = ["MARGINAL"]
+when.stability = ["CROSSING", "OFF", "UNRES", "NOT-MEASURED", "NOT-EVALUATED"]
+verdict = "REFUSE-SLOW"
+why = "verdict_x STAGE3: slow flow (Q2, 2026-10-02: a marginal across that is not stable still refuses)"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["FLOWING"]
+verdict = "NOT"
+why = "verdict_x STAGE3: the needle still flows"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["UNRES"]
+verdict = "REFUSE-FLOW"
+why = "verdict_x STAGE3: flow unresolved"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["STOPPED"]
+when.across = ["RELEVANT"]
+when.stability = ["STABLE"]
+when.probe = ["COMPLETE", "NOT-MEASURED", "NOT-EVALUATED"]
+verdict = "POINT"
+why = "verdict_x CAND_GS: relevant and stable"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["STOPPED"]
+when.across = ["RELEVANT"]
+when.stability = ["STABLE"]
+when.probe = ["INCOMPLETE"]
+verdict = "REFUSE-PROBE-INCOMPLETE"
+why = "plan 0870: a second coupling exists and is not probed here (across probes one direction only): a positive per-point class is not certified; read the family over the unprobed coupling. Next: declare the second coupling's instrument, or read the family"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["STOPPED"]
+when.across = ["RELEVANT"]
+when.stability = ["STABLE"]
+when.probe = ["UNKNOWN"]
+verdict = "REFUSE-PROBE-UNKNOWN"
+why = "plan 0870: the couplings of this system are unknown, so no direction can be said to be probed: a positive per-point class is not certified. Next: declare the system's couplings from its Hamiltonian; if they are unknown this instrument reads the position only"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["STOPPED"]
+when.across = ["RELEVANT"]
+when.stability = ["TRANSFORMED"]
+verdict = "REFUSE-UNRES"
+why = "plan 0872 F1: a relevant exponent measured on a pre-asymptotic pair (drift CONVERGING, stability TRANSFORMED) is not certified as a point: the declared transform's y_inf is reported (transform.y_inf) but no verdict row reads it. Next: read across through the difference estimator (declare across_delta on a T-ordered control chain over the probed coupling), or add a larger size"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["STOPPED"]
+when.across = ["MARGINAL"]
+when.stability = ["STABLE", "TRANSFORMED"]
+when.probe = ["COMPLETE", "NOT-MEASURED", "NOT-EVALUATED"]
+verdict = "LINE"
+why = "verdict_x CAND_GS: marginal and stable"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["STOPPED"]
+when.across = ["MARGINAL"]
+when.stability = ["STABLE", "TRANSFORMED"]
+when.probe = ["INCOMPLETE"]
+verdict = "REFUSE-PROBE-INCOMPLETE"
+why = "plan 0870: a second coupling exists and is not probed here (across probes one direction only): a positive per-point class is not certified; read the family over the unprobed coupling. Next: declare the second coupling's instrument, or read the family"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["STOPPED"]
+when.across = ["MARGINAL"]
+when.stability = ["STABLE", "TRANSFORMED"]
+when.probe = ["UNKNOWN"]
+verdict = "REFUSE-PROBE-UNKNOWN"
+why = "plan 0870: the couplings of this system are unknown, so no direction can be said to be probed: a positive per-point class is not certified. Next: declare the system's couplings from its Hamiltonian; if they are unknown this instrument reads the position only"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["STOPPED"]
+when.across = ["RELEVANT", "MARGINAL"]
+when.stability = ["CROSSING"]
+when.probe = ["COMPLETE", "NOT-MEASURED", "NOT-EVALUATED"]
+verdict = "WALKING"
+why = "verdict_x CAND_GS: the exponent crosses with size"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["STOPPED"]
+when.across = ["RELEVANT", "MARGINAL"]
+when.stability = ["CROSSING"]
+when.probe = ["INCOMPLETE"]
+verdict = "REFUSE-PROBE-INCOMPLETE"
+why = "plan 0870: a second coupling exists and is not probed here (across probes one direction only): a positive per-point class is not certified; read the family over the unprobed coupling. Next: declare the second coupling's instrument, or read the family"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["STOPPED"]
+when.across = ["RELEVANT", "MARGINAL"]
+when.stability = ["CROSSING"]
+when.probe = ["UNKNOWN"]
+verdict = "REFUSE-PROBE-UNKNOWN"
+why = "plan 0870: the couplings of this system are unknown, so no direction can be said to be probed: a positive per-point class is not certified. Next: declare the system's couplings from its Hamiltonian; if they are unknown this instrument reads the position only"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["STOPPED"]
+when.across = ["RELEVANT", "MARGINAL"]
+when.stability = ["OFF"]
+verdict = "REFUSE-OFF"
+why = "verdict_x CAND_GS: stability reads off"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["STOPPED"]
+when.across = ["RELEVANT", "MARGINAL"]
+when.stability = ["UNRES"]
+verdict = "REFUSE-UNRES"
+why = "verdict_x CAND_GS: stability unresolved"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["STOPPED"]
+when.across = ["WEAK"]
+verdict = "REFUSE-WEAK"
+why = "verdict_x CAND_GS: WEAK refuses whatever stability reads (nulls included)"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["STOPPED"]
+when.across = ["IRRELEVANT"]
+verdict = "REFUSE-IRRELEVANT"
+why = "verdict_x CAND_GS: IRRELEVANT refuses whatever stability reads"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["STOPPED"]
+when.across = ["UNRES"]
+verdict = "REFUSE-UNRES"
+why = "verdict_x CAND_GS: across unresolved, whatever stability reads"
+
+[[row]]
+when.needle = ["NOT-MEASURED", "NOT-EVALUATED"]
+verdict = "REFUSE-NEEDLE-UNMEASURED"
+why = "honest null (not in verdict_x): the needle was not measured or not evaluated"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["NOT-MEASURED", "NOT-EVALUATED"]
+verdict = "REFUSE-TWO-START-UNMEASURED"
+why = "honest null: the two-start difference was not measured or not evaluated"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["NOT-MEASURED", "NOT-EVALUATED"]
+verdict = "REFUSE-FLOW-UNMEASURED"
+why = "honest null: flow was not measured or not evaluated"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["STOPPED"]
+when.across = ["NOT-MEASURED", "NOT-EVALUATED"]
+verdict = "REFUSE-ACROSS-UNMEASURED"
+why = "honest null: across was not measured or not evaluated"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.flow = ["STOPPED"]
+when.across = ["RELEVANT", "MARGINAL"]
+when.stability = ["NOT-MEASURED", "NOT-EVALUATED"]
+verdict = "REFUSE-STABILITY-UNMEASURED"
+why = "honest null: stability was not measured or not evaluated"
