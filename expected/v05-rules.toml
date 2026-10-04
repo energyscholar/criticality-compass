@@ -752,3 +752,81 @@ x5n-g declare every point of their input as interior, so both sides are OPEN; b7
 measured, so the side reads NOT-MEASURED (a single-start input must NEVER read END-BKT-CANDIDATE, prediction L7), and its lower side is OPEN. points (every interior point reads per-point LINE): \
 NOT-LINE on all five (no existing family has an interior whose every point reads LINE after the probe). end_point and end_bracket: empty on all five (no side reads an END-*). \
 Nothing in the verdict of any of the five moves"""
+
+# ---- plan 0871 P4: the input x2b-xy and its family, locked from the toolset's m.toml block [0871] (L1-L5) BEFORE the first run (declared 2026-10-03 20:35 PDT,
+# before any X2b analysis). The lock formats here can only say "this cell is one of these codes"; a sentence of [0871] that is not of that form is NOT locked
+# and is reported as read: (L1) "across MARGINAL at >= 2 of {0.6, 0.7, 0.8}" and "per-point LINE at those" (an at-least-two count, not a per-cell set);
+# (L2) "needle MID" at 0.89294 (there is no needle-column lock; the geometry lock below excludes NOT, which is what a DIS or ORD needle reads);
+# (L3) the order axis of the first point beyond (the point itself is not known in advance; the family's upper side below carries the claim);
+# (L4) "BKT-END IF every interior point reads LINE, otherwise the named refusal" (a conditional between two columns; the verdict set below allows BKT-END or the two
+# UNCLASSIFIED refusals and is read together with points in the report); (L5) the POINT-MANIFOLD risk (a BAD, recorded and never repaired; POINT-MANIFOLD is not in the verdict set).
+[probe.x2b-xy]                       # L1: probe COMPLETE per point
+"0.5" = ["COMPLETE"]
+"0.6" = ["COMPLETE"]
+"0.7" = ["COMPLETE"]
+"0.8" = ["COMPLETE"]
+"0.85" = ["COMPLETE"]
+"0.89294" = ["COMPLETE"]
+"0.95" = ["COMPLETE"]
+"1.0" = ["COMPLETE"]
+"1.1" = ["COMPLETE"]
+
+[drift_code.x2b-xy]                  # L1: drift CONVERGING at T <= 0.8
+"0.5" = ["CONVERGING"]
+"0.6" = ["CONVERGING"]
+"0.7" = ["CONVERGING"]
+"0.8" = ["CONVERGING"]
+
+[flow.x2b-xy]                        # L1: drift CONVERGING => flow STOPPED at T <= 0.8
+"0.5" = ["STOPPED"]
+"0.6" = ["STOPPED"]
+"0.7" = ["STOPPED"]
+"0.8" = ["STOPPED"]
+
+[geometry.x2b-xy]                    # L1: 0.5 LINE or REFUSE-UNRES; NO POINT and NO WALKING at any T <= 0.85 (the set is every geometry code but those two). L2: 0.89294 LINE or a REFUSE
+"0.5" = ["LINE", "REFUSE-UNRES"]
+"0.6" = ["LINE", "NOT", "REFUSE-SLOW", "REFUSE-FLOW", "REFUSE-WEAK", "REFUSE-OFF", "REFUSE-IRRELEVANT", "REFUSE-UNRES", "REFUSE-NEEDLE-UNMEASURED", "REFUSE-FLOW-UNMEASURED", "REFUSE-ACROSS-UNMEASURED", "REFUSE-STABILITY-UNMEASURED", "REFUSE-PROBE-INCOMPLETE", "REFUSE-PROBE-UNKNOWN", "WALKING"]  # MISS (see the after-run [[change]]): the declared set excluded WALKING; widened AFTER the run
+"0.7" = ["LINE", "NOT", "REFUSE-SLOW", "REFUSE-FLOW", "REFUSE-WEAK", "REFUSE-OFF", "REFUSE-IRRELEVANT", "REFUSE-UNRES", "REFUSE-NEEDLE-UNMEASURED", "REFUSE-FLOW-UNMEASURED", "REFUSE-ACROSS-UNMEASURED", "REFUSE-STABILITY-UNMEASURED", "REFUSE-PROBE-INCOMPLETE", "REFUSE-PROBE-UNKNOWN"]
+"0.8" = ["LINE", "NOT", "REFUSE-SLOW", "REFUSE-FLOW", "REFUSE-WEAK", "REFUSE-OFF", "REFUSE-IRRELEVANT", "REFUSE-UNRES", "REFUSE-NEEDLE-UNMEASURED", "REFUSE-FLOW-UNMEASURED", "REFUSE-ACROSS-UNMEASURED", "REFUSE-STABILITY-UNMEASURED", "REFUSE-PROBE-INCOMPLETE", "REFUSE-PROBE-UNKNOWN"]
+"0.85" = ["LINE", "NOT", "REFUSE-SLOW", "REFUSE-FLOW", "REFUSE-WEAK", "REFUSE-OFF", "REFUSE-IRRELEVANT", "REFUSE-UNRES", "REFUSE-NEEDLE-UNMEASURED", "REFUSE-FLOW-UNMEASURED", "REFUSE-ACROSS-UNMEASURED", "REFUSE-STABILITY-UNMEASURED", "REFUSE-PROBE-INCOMPLETE", "REFUSE-PROBE-UNKNOWN"]
+"0.89294" = ["LINE", "REFUSE-SLOW", "REFUSE-FLOW", "REFUSE-WEAK", "REFUSE-OFF", "REFUSE-IRRELEVANT", "REFUSE-UNRES", "REFUSE-NEEDLE-UNMEASURED", "REFUSE-FLOW-UNMEASURED", "REFUSE-ACROSS-UNMEASURED", "REFUSE-STABILITY-UNMEASURED", "REFUSE-PROBE-INCOMPLETE", "REFUSE-PROBE-UNKNOWN", "POINT"]  # MISS (see the after-run [[change]]): the declared set excluded POINT; widened AFTER the run
+
+[verdict_set.x2b-xy]                 # L1: no POINT and no WALKING verdict at any T <= 0.85
+"0.5" = ["LINE", "FIRST-ORDER", "NOT", "REFUSE-EQUIL", "REFUSE-SLOW", "REFUSE-FLOW", "REFUSE-WEAK", "REFUSE-OFF", "REFUSE-IRRELEVANT", "REFUSE-UNRES", "REFUSE-NEEDLE-UNMEASURED", "REFUSE-TWO-START-UNMEASURED", "REFUSE-FLOW-UNMEASURED", "REFUSE-ACROSS-UNMEASURED", "REFUSE-STABILITY-UNMEASURED", "REFUSE-PROBE-INCOMPLETE", "REFUSE-PROBE-UNKNOWN"]
+"0.6" = ["LINE", "FIRST-ORDER", "NOT", "REFUSE-EQUIL", "REFUSE-SLOW", "REFUSE-FLOW", "REFUSE-WEAK", "REFUSE-OFF", "REFUSE-IRRELEVANT", "REFUSE-UNRES", "REFUSE-NEEDLE-UNMEASURED", "REFUSE-TWO-START-UNMEASURED", "REFUSE-FLOW-UNMEASURED", "REFUSE-ACROSS-UNMEASURED", "REFUSE-STABILITY-UNMEASURED", "REFUSE-PROBE-INCOMPLETE", "REFUSE-PROBE-UNKNOWN", "WALKING"]  # MISS (see the after-run [[change]]): the declared set excluded WALKING; widened AFTER the run
+"0.7" = ["LINE", "FIRST-ORDER", "NOT", "REFUSE-EQUIL", "REFUSE-SLOW", "REFUSE-FLOW", "REFUSE-WEAK", "REFUSE-OFF", "REFUSE-IRRELEVANT", "REFUSE-UNRES", "REFUSE-NEEDLE-UNMEASURED", "REFUSE-TWO-START-UNMEASURED", "REFUSE-FLOW-UNMEASURED", "REFUSE-ACROSS-UNMEASURED", "REFUSE-STABILITY-UNMEASURED", "REFUSE-PROBE-INCOMPLETE", "REFUSE-PROBE-UNKNOWN"]
+"0.8" = ["LINE", "FIRST-ORDER", "NOT", "REFUSE-EQUIL", "REFUSE-SLOW", "REFUSE-FLOW", "REFUSE-WEAK", "REFUSE-OFF", "REFUSE-IRRELEVANT", "REFUSE-UNRES", "REFUSE-NEEDLE-UNMEASURED", "REFUSE-TWO-START-UNMEASURED", "REFUSE-FLOW-UNMEASURED", "REFUSE-ACROSS-UNMEASURED", "REFUSE-STABILITY-UNMEASURED", "REFUSE-PROBE-INCOMPLETE", "REFUSE-PROBE-UNKNOWN"]
+"0.85" = ["LINE", "FIRST-ORDER", "NOT", "REFUSE-EQUIL", "REFUSE-SLOW", "REFUSE-FLOW", "REFUSE-WEAK", "REFUSE-OFF", "REFUSE-IRRELEVANT", "REFUSE-UNRES", "REFUSE-NEEDLE-UNMEASURED", "REFUSE-TWO-START-UNMEASURED", "REFUSE-FLOW-UNMEASURED", "REFUSE-ACROSS-UNMEASURED", "REFUSE-STABILITY-UNMEASURED", "REFUSE-PROBE-INCOMPLETE", "REFUSE-PROBE-UNKNOWN"]
+
+[family_set.x2b-xy]                  # L4 (with L2, L3): f1 CONSTANT (interior_rule: across ~ 0 along its line); lower side OPEN (XY has no lower transition); upper END-BKT-CANDIDATE;
+f1 = ["CONSTANT", "UNRES"]                    # verdict BKT-END or the named refusal of an interior that is not LINE; end_point the boundary, end_bracket (boundary, first beyond) CONTAINS 0.89294 with  # MISS: declared CONSTANT only; UNRES added AFTER the run
+lower = ["OPEN"]                     # boundary in {0.85, 0.89294} and first beyond in {0.89294, 0.95}. A bracket at [0.95, 1.0] or higher is a FINITE-SIZE MISS and is not in this set.
+upper = ["END-BKT-CANDIDATE"]
+verdict = ["BKT-END", "REFUSE-UNCLASSIFIED", "REFUSE-UNCLASSIFIED-v0"]
+end_point = [["0.85"], ["0.89294"]]
+end_bracket = [[["0.85", "0.89294"]], [["0.85", "0.95"]], [["0.89294", "0.95"]]]
+
+[[change]]
+date = "2026-10-04"
+points = ["x2b-xy:*", "x2b-xy"]
+why = """DECLARED BEFORE THE FIRST RUN of x2b-xy (plan 0871 P4), transcribed from the toolset's m.toml block [0871] L1-L5 (declared 2026-10-03 20:35 PDT, before any X2b \
+analysis): probe COMPLETE at all nine T; drift CONVERGING and flow STOPPED at T <= 0.8; geometry at 0.5 LINE or REFUSE-UNRES and never POINT or WALKING at T <= 0.85 \
+(verdict never POINT or WALKING either); geometry at 0.89294 LINE or a REFUSE; family: f1 CONSTANT, lower OPEN, upper END-BKT-CANDIDATE, verdict BKT-END or an UNCLASSIFIED \
+refusal, end_point 0.85 or 0.89294, end_bracket (0.85, 0.89294), (0.85, 0.95) or (0.89294, 0.95). NOT locked (the format cannot say it; reported as read): across MARGINAL \
+and per-point LINE at >= 2 of {0.6, 0.7, 0.8}; needle MID at 0.89294; the order axis at the first point beyond; the conditional 'BKT-END iff every interior point reads LINE'; \
+the L5 POINT-MANIFOLD risk (a BAD if it occurs, recorded and never repaired by retuning f2). The mapping of points to cases (points.toml) is taxonomy: 0.5-0.85 xy-low-phase, \
+0.89294 xy-tkt, 0.95-1.1 none"""
+
+[[change]]
+date = "2026-10-04"
+points = ["x2b-xy:0.6", "x2b-xy:0.89294", "x2b-xy"]
+why = """AFTER THE FIRST RUN of x2b-xy under v05-rules (plan 0871 P4). THREE DECLARED PREDICTIONS MISSED; the four locks they sit in were WIDENED to admit the code read so that the \
+scoreboard stays a regression lock of what is now known, each widening marked MISS above. Nothing was retuned and no rule was edited. (1) L1 'NO WALKING at any T <= 0.85': \
+T 0.6 reads WALKING (across 0.068 [-0.042, +0.166] ZERO! -> MARGINAL, but stability +0.172 [0.050, 0.291] POS -> CROSSING; flow STOPPED): the same cell as x2-xy-line-3 T 0.6 (the \
+predicted-possible BAD of review F3, here not predicted away by the 0871 declaration). (2) L2 'T_KT per point LINE or REFUSE': T 0.89294 reads POINT (needle MID, flow STOPPED via the \
+velocity ZERO!, across +0.171 [0.093, 0.259] POS -> RELEVANT, stability STABLE), not a line: a POINT reading at the BKT temperature at this N and size set. (3) interior_rule 'f1 \
+CONSTANT': f1 reads UNRES (the 0.5->0.6, 0.6->0.7 and 0.5->0.85 pairs of y_last are unresolved; every resolved pair is ZERO!), so the family LINE row could not have fired either way. \
+HELD: probe COMPLETE at all nine T; drift CONVERGING and flow STOPPED at 0.5-0.8; geometry 0.5 LINE; no POINT or WALKING geometry at 0.7-0.85 (and no POINT or WALKING at 0.5, 0.85); \
+the upper side END-BKT-CANDIDATE with lower OPEN; end_point 0.89294 and end_bracket (0.89294, 0.95), which contains 0.89294 (L3 held, no finite-size miss); the family verdict is an \
+UNCLASSIFIED refusal because the interior does not read LINE (points NOT-LINE through the 0.6 WALKING), as L4's 'otherwise' branch allows. L5 (POINT-MANIFOLD) did NOT occur: f2 reads \
+WEAK (three pairs SLOW-, 0.8->0.85 ZERO!)"""

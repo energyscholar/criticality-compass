@@ -1,0 +1,6 @@
+# families/x2b-xy.toml - the 2D XY temperature sweep X2b (plan 0871 P4): interior = T <= 0.85 (the declared low phase); the points above are the upper side
+schema = 1
+kind = "family-decl"
+id = "x2b-xy"
+input = "x2b-xy"                             # nine T, both starts, two matched pairs, along on the T control chain; its axes.point order is the family order
+interior = ["0.5", "0.6", "0.7", "0.8", "0.85"]

@@ -632,6 +632,15 @@ Geometry against class_truth (order_truth not FIRST-ORDER): 8 agree, 95 refused,
 | x2-xy-line@v05-rules | 0.7 | `xy-low-phase` | LINE | 27 81 243 | NEITHER (T) | MID (T) | NOT-MEASURED (T) | NOT-MEASURED | SLOW (T) | UNRES (HT) | UNRES (HT) | INDEP (T) | COMPLETE | REFUSE-SLOW | REFUSE | REFUSE-SLOW | EQUILIBRATED |
 | x2-xy-line@v05-rules | 0.89294 | `xy-tkt` | BKT-END | 27 81 243 | NEITHER (T) | MID (T) | NOT-MEASURED (T) | NOT-MEASURED | STOPPED (T) | UNRES (HT) | UNRES (HT) | INDEP (T) | COMPLETE | REFUSE-UNRES | REFUSE | REFUSE-UNRES | EQUILIBRATED |
 | x2-xy-line@v05-rules | 1.1 | `none` | none | 27 81 243 | NEITHER (T) | DIS (T) | NOT-MEASURED (T) | NOT-MEASURED | FLOWING (T) | IRRELEVANT (HT) | OFF (HT) | INDEP (T) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
+| x2b-xy@v05-rules | 0.5 | `xy-low-phase` | LINE | 27 81 243 | NEITHER (T) | MID (T) | NOT-MEASURED (T) | CONVERGING (T) | STOPPED (T) | MARGINAL (HT) | STABLE (HT) | INDEP (T) | COMPLETE | LINE | LINE | LINE | CONTINUOUS |
+| x2b-xy@v05-rules | 0.6 | `xy-low-phase` | LINE | 27 81 243 | NEITHER (T) | MID (T) | NOT-MEASURED (T) | CONVERGING (T) | STOPPED (T) | MARGINAL (HT) | CROSSING (HT) | INDEP (T) | COMPLETE | WALKING | WALKING | WALKING | CONTINUOUS |
+| x2b-xy@v05-rules | 0.7 | `xy-low-phase` | LINE | 27 81 243 | NEITHER (T) | MID (T) | NOT-MEASURED (T) | CONVERGING (T) | STOPPED (T) | MARGINAL (HT) | STABLE (HT) | INDEP (T) | COMPLETE | LINE | LINE | LINE | CONTINUOUS |
+| x2b-xy@v05-rules | 0.8 | `xy-low-phase` | LINE | 27 81 243 | NEITHER (T) | MID (T) | NOT-MEASURED (T) | CONVERGING (T) | STOPPED (T) | MARGINAL (HT) | STABLE (HT) | INDEP (T) | COMPLETE | LINE | LINE | LINE | CONTINUOUS |
+| x2b-xy@v05-rules | 0.85 | `xy-low-phase` | LINE | 27 81 243 | NEITHER (T) | MID (T) | NOT-MEASURED (T) | CONVERGING (T) | STOPPED (T) | MARGINAL (HT) | STABLE (HT) | INDEP (T) | COMPLETE | LINE | LINE | LINE | CONTINUOUS |
+| x2b-xy@v05-rules | 0.89294 | `xy-tkt` | BKT-END | 27 81 243 | NEITHER (T) | MID (T) | NOT-MEASURED (T) | NOT-EVALUATED (T) | STOPPED (T) | RELEVANT (HT) | STABLE (HT) | INDEP (T) | COMPLETE | POINT | POINT | POINT | CONTINUOUS |
+| x2b-xy@v05-rules | 0.95 | `none` | none | 27 81 243 | NEITHER (T) | DIS (T) | NOT-MEASURED (T) | PERSISTENT (T) | FLOWING (T) | RELEVANT (HT) | CROSSING (HT) | INDEP (T) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
+| x2b-xy@v05-rules | 1.0 | `none` | none | 27 81 243 | NEITHER (T) | DIS (T) | NOT-MEASURED (T) | PERSISTENT (T) | FLOWING (T) | RELEVANT (HT) | OFF (HT) | INDEP (T) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
+| x2b-xy@v05-rules | 1.1 | `none` | none | 27 81 243 | NEITHER (T) | DIS (T) | NOT-MEASURED (T) | PERSISTENT (T) | FLOWING (T) | IRRELEVANT (HT) | OFF (HT) | INDEP (T) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
 | x3-clock6-2@v05-rules | 0.5 | `none` | none | 27 81 243 | ORD (T) | ORD (T) | NOT-MEASURED (T) | NOT-MEASURED | SLOW (T) | NOT-EVALUATED (HT) | NOT-EVALUATED (HT) | INDEP (T) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
 | x3-clock6-2@v05-rules | 0.7014 | `clock6-kt-ends` | BKT-END | 27 81 243 | NEITHER (T) | MID (T) | NOT-MEASURED (T) | NOT-MEASURED | SLOW (T) | UNRES (HT) | UNRES (HT) | INDEP (T) | COMPLETE | REFUSE-SLOW | REFUSE | REFUSE-SLOW | CONTINUOUS |
 | x3-clock6-2@v05-rules | 0.75 | `clock6-critical-phase` | LINE | 27 81 243 | NEITHER (T) | MID (T) | NOT-MEASURED (T) | NOT-MEASURED | SLOW (T) | UNRES (HT) | UNRES (HT) | INDEP (T) | COMPLETE | REFUSE-SLOW | REFUSE | REFUSE-SLOW | CONTINUOUS |
@@ -707,9 +716,9 @@ Geometry against class_truth (order_truth not FIRST-ORDER): 8 agree, 95 refused,
 | x9c-potts@v05-rules | 8 | `potts-q8` | FIRST-ORDER | 27 81 243 | NEITHER (T) | DIS (T) | PINNED-BETWEEN-PHASES (T) | NOT-MEASURED | FLOWING (T) | IRRELEVANT (HT) | OFF (HT) | COEXIST (T) | COMPLETE | FIRST-ORDER | FIRST-ORDER | NOT | COEXIST-AT-WINDOW |
 | x9c-potts@v05-rules | 10 | `potts-q10` | FIRST-ORDER | 27 81 243 | NEITHER (T) | DIS (T) | PINNED-BETWEEN-PHASES (T) | NOT-MEASURED | FLOWING (T) | UNRES (HT) | UNRES (HT) | COEXIST (T) | COMPLETE | FIRST-ORDER | FIRST-ORDER | NOT | COEXIST-AT-WINDOW |
 
-Verdict class against truth: 12 agree, 101 refused, 20 disagree, 24 no truth
-Order against order_truth: 45 agree, 71 refused, 17 disagree
-Geometry against class_truth (order_truth not FIRST-ORDER): 8 agree, 95 refused, 7 disagree
+Verdict class against truth: 16 agree, 101 refused, 22 disagree, 27 no truth
+Order against order_truth: 51 agree, 71 refused, 17 disagree
+Geometry against class_truth (order_truth not FIRST-ORDER): 12 agree, 95 refused, 9 disagree
 
 ## Collisions (v05-rules)
 
@@ -717,6 +726,13 @@ Geometry against class_truth (order_truth not FIRST-ORDER): 8 agree, 95 refused,
 - `sink=NEITHER, needle=MID, needle_pair=NOT-MEASURED, drift_code=PERSISTENT, flow=SLOW, across=UNRES, stability=UNRES, two_start=INDEP, probe=COMPLETE`: BKT-END (x3-clock6-3:0.9008) vs LINE (x3-clock6-3:0.75, x3-clock6-3:0.8, x3-clock6-3:0.85)
 - `sink=NEITHER, needle=ORD, needle_pair=NOT-MEASURED, drift_code=NOT-MEASURED, flow=FLOWING, across=NOT-MEASURED, stability=NOT-MEASURED, two_start=NOT-MEASURED, probe=NOT-MEASURED`: NOT (x8-ising-needle:1.01) vs POINT (x7a-bc:0.0, x7a-bc:1.9)
 - `sink=NEITHER, needle=DIS, needle_pair=NOT-MEASURED, drift_code=NOT-MEASURED, flow=FLOWING, across=NOT-MEASURED, stability=NOT-MEASURED, two_start=NOT-MEASURED, probe=NOT-MEASURED`: NOT (x8-ising-needle:0.90, x8-ising-needle:0.95, x8-ising-needle:0.98, x8-ising-needle:0.99) vs POINT (x7a-bc:1.0, x7a-bc:1.5)
+
+## Family ends (v05-rules)
+
+- `x2b-xy`: family REFUSE-UNCLASSIFIED-v0 (class REFUSE), end_point ['0.89294'], end_bracket [['0.89294', '0.95']]
+  - point 0.89294 (case `xy-tkt`, truth BKT-END): refused
+
+Family end against truth: 0 agree, 1 refused, 0 disagree
 
 ## Rules: verdict-x-rules
 

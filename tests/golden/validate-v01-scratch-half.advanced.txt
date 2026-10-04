@@ -4,6 +4,6 @@ tables/scratch/verdict.toml: 1512 uncovered cells in 1 patterns
   when.needle = ["MID"]
   when.two_start = ["UNRES"]
   Next: add a [[row]] with one of these when-lines, or widen a neighbouring row
-checked: 21 case, 1 cc, 7 codes, 4 compose, 29 couplings, 29 data-manifest, 6 family, 5 family-decl, 4 geometry, 29 input, 8 instrument, 6 membership, 4 order, 29 points, 2 probe, 7 verdict
+checked: 21 case, 1 cc, 7 codes, 4 compose, 30 couplings, 30 data-manifest, 6 family, 6 family-decl, 4 geometry, 30 input, 8 instrument, 6 membership, 4 order, 30 points, 2 probe, 7 verdict
 validate: 1 findings
 exit 1
