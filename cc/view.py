@@ -243,6 +243,10 @@ def explain(res, pt, join, mode, tables_dir=None):
         for r in live:
             dcol = direct[f"{r['instrument']}.{r['column']}"]
             for q in r["per_size"] or [r]:
+                if r["per_size"] and detect.instrument(r["instrument"])[0]["unit"] == "pair":   # plan 0872: a per_point pair reading is one cell per control pair
+                    steps = [("1-4", "SEE", f"bin/cc explain {res['input']} {q['size']}")] + read_steps(q, r, lv, text, dcol, mode, cfg)
+                    out += [f"  {n} {w:<9} pair {q['size']} {t_}" for n, w, t_ in steps]
+                    continue
                 tag = f"L{q['size']} " if r["per_size"] else ""
                 sz = q["size"] if r["per_size"] else None
                 key, head = (r["instrument"], sz), []
@@ -252,9 +256,10 @@ def explain(res, pt, join, mode, tables_dir=None):
                 steps = head + read_steps(q, r, lv, text, dcol, mode, cfg)
                 out += [f"  {n} {w:<9} {tag}{t}" for n, w, t in steps]
             if r["per_size"]:
-                top = cols[dcol]["combine"].get("top_only")
+                top, agree = cols[dcol]["combine"].get("top_only"), cols[dcol]["combine"].get("agree")
                 out.append(f"  7 CODE      combine.rank {' > '.join(cols[dcol]['combine']['rank'])} (first wins)"
-                           + (f"; {', '.join(top)} counts only when the largest size reads it" if top else "") + " -> "
+                           + (f"; {', '.join(top)} counts only when the largest size reads it" if top else "")
+                           + (f"; {', '.join(agree)} count only when every item reads them, else {cols[dcol]['combine']['disagree']}" if agree else "") + " -> "
                            f"{shown(codes[c], None, mode, cfg)}")
         for d in chain(c):
             a, b = cols[d]["from"]
@@ -294,13 +299,14 @@ def explain_pair(res, pair, mode, tables_dir=None):
     cfg, T, m = config(), detect.load_tables(res["tables"], tables_dir), detect.load_input(res["input"])
     a, b = pair.split("->")
     r = next(q for q in res["pair_readings"] if q["unit"]["pair"] == [a, b])
-    sig, rule = {s["point"]: s for s in res["signature"]}, T.membership[r["instrument"]]
-    got = [(pt, sig[pt][rule["reads"]], rule["map"][sig[pt][rule["reads"]]]) for pt in (a, b)]
-    mem = door.member(T.membership, r["instrument"], (a, b), sig)
-    out = [f"explain {res['input']} {pair}   rules: {res['tables']}", f"{r['instrument']}   (pair {pair})",
-           f"  1 MEMBER    membership.toml [{r['instrument']}] reads {rule['reads']}: "
-           + ", ".join(f"{p} {c} -> {x}" for p, c, x in got) + f"; lowest rank decides -> door {mem['door']}"
-           + (f"   flags: {words(r['flags'], cfg)}" if r["flags"] else "")]
+    sig, rule = {s["point"]: s for s in res["signature"]}, T.membership.get(r["instrument"])   # plan 0872: across_delta has no membership rule
+    out = [f"explain {res['input']} {pair}   rules: {res['tables']}", f"{r['instrument']}   (pair {pair})"]
+    if rule:
+        got = [(pt, sig[pt][rule["reads"]], rule["map"][sig[pt][rule["reads"]]]) for pt in (a, b)]
+        mem = door.member(T.membership, r["instrument"], (a, b), sig)
+        out.append(f"  1 MEMBER    membership.toml [{r['instrument']}] reads {rule['reads']}: "
+                   + ", ".join(f"{p} {c} -> {x}" for p, c, x in got) + f"; lowest rank decides -> door {mem['door']}"
+                   + (f"   flags: {words(r['flags'], cfg)}" if r["flags"] else ""))
     if r["estimate"] is None:
         return out + [f"  2 READING   {shown(r['cell'], r['reason'], mode, cfg)}"]
     delta = next(q for q in res["reports"] if q["vector_key"] == f"{r['instrument']}/delta/pair={pair}")["estimate"]

@@ -1,0 +1,19 @@
+# instruments/across_delta.toml (plan 0872 F2) - across through the DIFFERENCE estimator: for a declared control pair (a, b), Delta(L) = mean g1(b) - mean g1(a)
+# at final size 9, and y_last = log3 |Delta(L)/Delta(L/3)| at the top size step. A pair instrument; per_point: a point reads the cells of the control pairs that touch it,
+# combined by the set's codes.toml (all must agree to resolve). Admissible only when the control chain moves the probed coupling (couplings.toml; validate refuses otherwise).
+schema = 1
+kind = "instrument"
+module = "across_delta"
+operators = ["A"]
+unit = "pair"
+per_point = true
+reports = ["delta"]                            # reported, never coded: Delta per size (row 0 = the estimate)
+arrays = ["G"]
+axes = ["point", "size"]
+relations = ["size", "control"]
+sidecar = ["observable", "block_map"]
+flags = []
+pipeline = ["stage:reduce", "door:nodefield", "stage:delta", "door:logcoord", "stage:growth"]
+
+[columns]
+y_last = "y"

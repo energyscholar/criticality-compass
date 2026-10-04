@@ -240,11 +240,14 @@ alphabet = ["STOPPED", "SLOW", "FLOWING", "UNRES"]
 "UNRES,NOT-MEASURED" = "UNRES"
 "UNRES,NOT-EVALUATED" = "UNRES"
 
-[columns.signature.across]                     # B4 direction_table (verdict_x GROWTH_CODE)
+# plan 0872 F2: the signature column `across` reads ONE of two helpers, declared per input: across_cov (the covariance estimator, across.y_last) unless the input declares
+# across_delta (the difference estimator over the control chain), in which case across_dlt. The choice is the table below, never both: the second source's NOT-MEASURED
+# (the input does not declare across_delta) reads the covariance code, a declared-but-NOT-EVALUATED across_delta reads UNRES (never the covariance: a fallback would hide a dead primary).
+[columns.helper.across_cov]                    # B4 direction_table (verdict_x GROWTH_CODE) on the covariance estimator
 from = "across.y_last"
 alphabet = ["RELEVANT", "MARGINAL", "WEAK", "IRRELEVANT", "UNRES"]
 
-[columns.signature.across.map]
+[columns.helper.across_cov.map]
 "SIG-" = "IRRELEVANT"
 "NEG" = "IRRELEVANT"
 "SLOW-" = "WEAK"
@@ -253,6 +256,68 @@ alphabet = ["RELEVANT", "MARGINAL", "WEAK", "IRRELEVANT", "UNRES"]
 "POS" = "RELEVANT"
 "SIG+" = "RELEVANT"
 "UNRES" = "UNRES"
+
+[columns.helper.across_dlt]                    # the same direction table on the difference estimator, one cell per control pair touching the point
+from = "across_delta.y_last"
+alphabet = ["RELEVANT", "MARGINAL", "WEAK", "IRRELEVANT", "UNRES"]
+combine.over = "pair"
+combine.agree = ["RELEVANT", "MARGINAL", "WEAK", "IRRELEVANT"]   # a resolved code counts only when EVERY touching pair reads it
+combine.disagree = "UNRES"                     # pairs that disagree (or one unresolved) leave the point's across unresolved
+combine.rank = [
+  "NOT-MEASURED", "NOT-EVALUATED", "UNRES", "IRRELEVANT", "WEAK", "MARGINAL", "RELEVANT",
+]
+
+[columns.helper.across_dlt.map]
+"SIG-" = "IRRELEVANT"
+"NEG" = "IRRELEVANT"
+"SLOW-" = "WEAK"
+"ZERO!" = "MARGINAL"
+"SLOW+" = "WEAK"
+"POS" = "RELEVANT"
+"SIG+" = "RELEVANT"
+"UNRES" = "UNRES"
+
+[columns.signature.across]
+from = ["across_cov", "across_dlt"]
+nullable = true                                # NOT-MEASURED / NOT-EVALUATED across_dlt are cells of the map
+alphabet = ["RELEVANT", "MARGINAL", "WEAK", "IRRELEVANT", "UNRES"]
+
+[columns.signature.across.map]
+"RELEVANT,RELEVANT" = "RELEVANT"
+"RELEVANT,MARGINAL" = "MARGINAL"
+"RELEVANT,WEAK" = "WEAK"
+"RELEVANT,IRRELEVANT" = "IRRELEVANT"
+"RELEVANT,UNRES" = "UNRES"
+"RELEVANT,NOT-MEASURED" = "RELEVANT"
+"RELEVANT,NOT-EVALUATED" = "UNRES"
+"MARGINAL,RELEVANT" = "RELEVANT"
+"MARGINAL,MARGINAL" = "MARGINAL"
+"MARGINAL,WEAK" = "WEAK"
+"MARGINAL,IRRELEVANT" = "IRRELEVANT"
+"MARGINAL,UNRES" = "UNRES"
+"MARGINAL,NOT-MEASURED" = "MARGINAL"
+"MARGINAL,NOT-EVALUATED" = "UNRES"
+"WEAK,RELEVANT" = "RELEVANT"
+"WEAK,MARGINAL" = "MARGINAL"
+"WEAK,WEAK" = "WEAK"
+"WEAK,IRRELEVANT" = "IRRELEVANT"
+"WEAK,UNRES" = "UNRES"
+"WEAK,NOT-MEASURED" = "WEAK"
+"WEAK,NOT-EVALUATED" = "UNRES"
+"IRRELEVANT,RELEVANT" = "RELEVANT"
+"IRRELEVANT,MARGINAL" = "MARGINAL"
+"IRRELEVANT,WEAK" = "WEAK"
+"IRRELEVANT,IRRELEVANT" = "IRRELEVANT"
+"IRRELEVANT,UNRES" = "UNRES"
+"IRRELEVANT,NOT-MEASURED" = "IRRELEVANT"
+"IRRELEVANT,NOT-EVALUATED" = "UNRES"
+"UNRES,RELEVANT" = "RELEVANT"
+"UNRES,MARGINAL" = "MARGINAL"
+"UNRES,WEAK" = "WEAK"
+"UNRES,IRRELEVANT" = "IRRELEVANT"
+"UNRES,UNRES" = "UNRES"
+"UNRES,NOT-MEASURED" = "UNRES"
+"UNRES,NOT-EVALUATED" = "UNRES"
 
 [columns.signature.stability]                  # W2 stability (verdict_x STAB_CODE)
 from = "stability.d"

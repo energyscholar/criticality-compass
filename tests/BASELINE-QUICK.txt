@@ -1,38 +1,39 @@
-tree 3719801c63798bd1895a67a7eae878c800b46d75
-head 844ddacdfa3dff28d0e0faf4b250519bee99d1a1
+tree cc47c8cf6fc68f058b4fcb451142d8ba507edd17
+head db6145fdd95e66f7eff905b7f98833fd784317c1
 seconds 150
 tier quick
-test test_budget ok 0.2
-test test_kernel ok 0.4
-test test_sign ok 0.6
+test test_budget ok 0.1
+test test_kernel ok 0.3
+test test_sign ok 0.5
 test test_resample ok 1.6
-test test_kernel_rs ok 1.2
-test test_declare ok 50.6
-test test_tables_cli ok 135.2
-test test_needle_x8 ok 2.4
-test test_b7 ok 9.7
-test test_w2 ok 10.6
-test test_two_start_c2 ok 2.9
-test test_detect_verdicts ok 46.9
+test test_kernel_rs ok 0.7
+test test_declare ok 48.1
+test test_tables_cli ok 140.7
+test test_needle_x8 ok 2.1
+test test_b7 ok 7.7
+test test_w2 ok 7.9
+test test_two_start_c2 ok 2.4
+test test_detect_verdicts ok 48.2
 test test_breakers ok 0.7
-test test_breakers_red ok 18.8
-test test_golden ok 88.8
-test test_verdict_equivalence ok 1.9
-test test_scoreboard ok 4.1
-test test_view ok 23.5
-test test_tabulate ok 74.0
-test test_reverdict ok 6.6
-test test_along ok 14.5
-test test_family ok 5.5
-test test_x5 ok 10.0
-test test_axes ok 56.1
-test test_needle_o_start ok 0.7
-test test_run_all ok 16.4
-test test_code_hash ok 30.5
-test test_classify ok 0.6
-test test_probe ok 6.0
-test test_chain ok 27.5
-test test_ends ok 1.3
+test test_breakers_red ok 15.7
+test test_golden ok 98.3
+test test_verdict_equivalence ok 1.5
+test test_scoreboard ok 4.5
+test test_view ok 23.7
+test test_tabulate ok 82.3
+test test_reverdict ok 9.7
+test test_along ok 18.1
+test test_family ok 5.0
+test test_x5 ok 9.4
+test test_axes ok 63.7
+test test_needle_o_start ok 0.5
+test test_run_all ok 16.7
+test test_code_hash ok 35.6
+test test_across_delta ok 17.3
+test test_classify ok 0.7
+test test_probe ok 5.9
+test test_chain ok 24.0
+test test_ends ok 1.2
 quick: dropped test_golden case run-all-scratch: re-measure took 18 s, over the 8 s case budget
 quick: dropped test_golden case run-all-v01-scratch: re-measure took 18 s, over the 8 s case budget
 quick: dropped test_golden case run-dry-my-rules: re-measure took 24 s, over the 8 s case budget

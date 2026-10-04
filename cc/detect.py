@@ -129,8 +129,9 @@ def codes_of(cells, tables):
                 raw = cells.get(src, "NOT-MEASURED")
                 if isinstance(raw, list):
                     got = [one(name, x) for x in raw]    # sizes ascend: a code in top_only counts only when the LARGEST size reads it (plan 0870)
-                    memo[name] = min((v for i, v in enumerate(got) if v not in c["combine"].get("top_only", []) or i == len(got) - 1),
-                                     key=c["combine"]["rank"].index)
+                    best = min((v for i, v in enumerate(got) if v not in c["combine"].get("top_only", []) or i == len(got) - 1),
+                               key=c["combine"]["rank"].index)
+                    memo[name] = c["combine"]["disagree"] if best in c["combine"].get("agree", []) and set(got) != {best} else best   # plan 0872: an `agree` code counts only when EVERY item reads it
                 else:
                     memo[name] = one(name, raw)
             else:
@@ -282,19 +283,31 @@ def measure(m, c, reg, T):
     return first
 
 
+def labelled(m, inst, n, pt, on):
+    """[(label, unit key)] one instrument is read at for one point: a point-size instrument at every size, a per_point pair instrument at
+    every control pair that touches the point (label `a->b`), any other at the point alone (label None)."""
+    if not on:
+        return [(None, None)]
+    if inst["unit"] == "pair":
+        return [("->".join(p), (n, p, None)) for p in door.control_pairs(m) if pt in p]
+    return [(sz, (n, pt, sz)) for sz in (m["axes"]["size"] if inst["unit"] == "point-size" else [None])]
+
+
 def point_rows(m, c, reg, out, pt, use):
     """Every registry column at one point that the table set reads (`use`) as (instrument, column, eps key, flags,
-    [(size, Reading)], source); an instrument this input does not declare reads NOT-MEASURED."""
+    [(label, Reading)], source); an instrument this input does not declare reads NOT-MEASURED; a pair instrument is
+    read per point only when it declares per_point (plan 0872), one Reading per control pair that touches the point."""
     rows, flagmap = [], c.cfg["obtained_flag"]
     for n, (inst, _) in reg.items():
-        if inst["unit"] == "pair":
+        if inst["unit"] == "pair" and not inst.get("per_point"):
             continue   # a pair instrument has no point row: its readings are pair_readings
         on = n in m["instruments"]
         flags = sorted(set(inst["flags"]) | {flagmap[m["obtained"][pt]]}) if on else []
-        sizes = m["axes"]["size"] if on and inst["unit"] == "point-size" else [None]
+        labs = labelled(m, inst, n, pt, on)
         for col, ek in ((k, e) for k, e in inst["columns"].items() if f"{n}.{k}" in use):
             none = Reading(None, None, None, "NOT-MEASURED", ek, None, f"{n} is not declared on this input")
-            per = [(sz, out[(n, pt, sz)][0][col] if on else none) for sz in sizes]
+            lone = Reading(None, None, None, "NOT-EVALUATED", ek, None, f"no control pair touches point {pt}")   # a per_point instrument on a point no pair touches
+            per = [(lab, out[key][0][col] if on else none) for lab, key in labs] or [(None, lone)]
             rows.append((n, col, ek, flags, per, f"{n}.{col}"))
     return rows
 

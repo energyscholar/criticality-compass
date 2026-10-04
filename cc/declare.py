@@ -346,7 +346,7 @@ def chk_relations(p, d, c, use, sz):
             out.append(at(p, f"relations.{rn}.template", f"unknown template '{r.get('template')}'",
                           f"use one of: {' '.join(TEMPLATES)}"))
             continue
-        out += shape(p, r, {"template": str, "provenance": str, "direction_from": str, **t}, pre=f"relations.{rn}.")
+        out += shape(p, r, {"template": str, "provenance": str, "direction_from": str, **t}, {"coupling": str} if rn == "control" else None, pre=f"relations.{rn}.")
         out += inalpha(p, f"relations.{rn}.provenance", r.get("provenance"), ("Coupling", "Continuation"))
         prs = r["pairs"] if r["template"] == "matched-chain" else [[r.get("big"), r.get("small")]]
         for big, small in (x for x in prs if r["template"] in ("matched", "matched-chain") and "observable" in d and len(x) == 2 and set(x) <= set(sz)):
@@ -484,9 +484,11 @@ def chk_instrument(p, d, c, stem=None):
         return list(todos(p, d))   # a template still full of TODOs: report them, nothing else
     req = {"module": str, "operators": list, "unit": str, "reports": list, "arrays": list, "axes": list,
            "relations": list, "sidecar": list, "flags": list, "pipeline": list, "columns": dict}
-    out = header(p, d, "instrument") + shape(p, d, req, {"requires": list, "door_values": list, "quantity": str, "start": str})
+    out = header(p, d, "instrument") + shape(p, d, req, {"requires": list, "door_values": list, "quantity": str, "start": str, "per_point": bool})
     if out:
         return out
+    out += when(d.get("per_point") and d["unit"] != "pair", p, "per_point", "only a pair instrument is read per point (over the control pairs that touch it)",
+                'remove per_point, or set unit = "pair"')
     out += inalpha(p, "unit", d["unit"], ("point", "pair", "point-size"))
     out += [at(p, "requires", f"'{r}' must be a registry instrument with no requires of its own",
                "name an instrument that is read first (one level in v0.1)")
@@ -547,7 +549,11 @@ def chk_column(p, loc, col, c, allc):
             return [at(p, loc + ".from", f"'{src}' is not a column of a registry instrument",
                        "name <instrument>.<column>")]
         else:
-            want, needs = list(SIGNS), c.reg[inst]["unit"] == "point-size"
+            unit = c.reg[inst]["unit"]
+            if unit == "pair" and not c.reg[inst].get("per_point"):
+                return [at(p, loc + ".from", f"'{src}' is a pair instrument's column and has no per-point cell",
+                           f"declare per_point = true in instruments/{inst}.toml (its cells are combined over the control pairs that touch a point), or read a point instrument")]
+            want, needs = list(SIGNS), unit == "point-size" or unit == "pair"
     else:
         if len(src) != 2 or [x for x in src if x not in allc]:
             return [at(p, loc + ".from", f"derived columns name two helper/signature columns, not {src}",
@@ -564,9 +570,12 @@ def chk_column(p, loc, col, c, allc):
     out += when(needs != (cb is not None), p, loc + ".combine",
                 "required for a point-size source" if needs else "only a point-size source combines", "fix")
     if cb is not None:
-        out += shape(p, cb, {"over": str, "rank": list}, {"top_only": list}, pre=loc + ".combine.")
-        out += [at(p, loc + ".combine.top_only", f"'{x}' is not in the alphabet {alpha}", "list codes of this column")
-                for x in cb.get("top_only", []) if x not in alpha]
+        out += shape(p, cb, {"over": str, "rank": list}, {"top_only": list, "agree": list, "disagree": str}, pre=loc + ".combine.")
+        out += [at(p, loc + f".combine.{k}", f"'{x}' is not in the alphabet {alpha}", "list codes of this column")
+                for k in ("top_only", "agree") for x in cb.get(k, []) if x not in alpha]
+        out += when(("agree" in cb) != ("disagree" in cb), p, loc + ".combine.agree", "agree and disagree come together",
+                    "write both: the codes that count only when every item reads them, and the code a disagreement reads")
+        out += when(cb.get("disagree", alpha[0] if alpha else "") not in alpha, p, loc + ".combine.disagree", f"'{cb.get('disagree')}' is not in the alphabet {alpha}", "use a code of this column")
         out += when(sorted(cb.get("rank", [])) != sorted(alpha + nulls), p, loc + ".combine.rank",
                     f"must list {sorted(alpha + nulls)} exactly once each", "fix the list")
     return out
@@ -914,6 +923,14 @@ def chk_couplings(p, d, c, stem=None):
     out += [at(p, "probes", f"'{x}' is not a declared coupling", "probes must be a subset of names") for x in probes
             if isinstance(names, list) and x not in names]
     across = "across" in m["instruments"]
+    ctl = m.get("relations", {}).get("control", {}).get("coupling")
+    if "across_delta" in m["instruments"]:   # plan 0872 F2: a Delta over the control chain is across only when the chain moves the coupling across probes
+        out += when(not across, p, "probes", "the input declares across_delta but not across (across_delta replaces across's reading, it does not replace the instrument)",
+                    "add across to instruments in m.toml, or remove across_delta")
+        out += when(ctl is None, p, "probes", "the input declares across_delta, a Delta over the control chain, but relations.control.coupling is not declared",
+                    'write coupling = "<name>" in [relations.control] of m.toml: the coupling the control chain moves')
+        out += when(ctl is not None and ctl not in probes, p, "probes", f"across_delta reads a chain over {ctl}, but across probes {probes}: the chain's coupling is not the probed coupling",
+                    f"declare a control chain over a probed coupling ({', '.join(probes) or 'none declared'}), or remove across_delta from instruments in m.toml")
     out += when(across and names != "unknown" and not probes, p, "probes", "the input declares across, which probes a coupling", "name it in probes")
     out += when(not across and probes, p, "probes", "the input declares no across, so nothing is probed", "write probes = []")
     return out
