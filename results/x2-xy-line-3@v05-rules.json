@@ -1,0 +1,1837 @@
+{
+ "schema": 1,
+ "kind": "result",
+ "run_id": "x2-xy-line-3@v05-rules",
+ "input": "x2-xy-line-3",
+ "tables": "v05-rules",
+ "derived_from": null,
+ "code_commit": "7c77590cef05187dfdb01c8ead8a2ee16fdef82e",
+ "code_hash": "464bceddfb25d54ea7377a011763e605762a1d99ad0520585b5a8efb271a2845",
+ "interval": {
+  "method": "block",
+  "b": 400,
+  "resamples": 400,
+  "level": 0.95,
+  "seed": 62
+ },
+ "read": {
+  "inputs/x2-xy-line-3/m.toml": "18b7159324cac11f686942d41f094e649aa8c9cfd46fc6e411057ae5f8f51919",
+  "instruments/needle.toml": "03c8e390df85cdcef367ecba33043ebf9e0445c30f27fa626242a87387fb3ef0",
+  "instruments/across.toml": "8f6803e8af6cd80d4f7bb69b1be8148cf5eb8742892caf5f3f8392f38b3c0944",
+  "instruments/stability.toml": "2fc7bb21b58a2d6eceab15ca62424aadedd309eb1f9dd6125bdee57d52588170",
+  "instruments/two_start.toml": "30503b8a483a80faa442f419d04edc10a9498b56fb24c68554fa643c8679fa38",
+  "instruments/fluct.toml": "b9eee16fe05f430f982509db3d583201aa396e4d0470c0180a67439748cee423",
+  "instruments/needle_chain.toml": "9afa93faecb17bb5f69b0c129004b318541fbd360e9009225fa5f8dc066c5acf",
+  "tables/v05-rules/codes.toml": "65bec6f9821ca6cda151d4a189470b1c5be0456d802323eb0584088f506b6567",
+  "tables/v05-rules/verdict.toml": "b5f2e27b8ab3cf6bb4dc28ee40bc25a427e6d120b9973928b4b4e8141bf9a799",
+  "tables/v05-rules/geometry.toml": "05c3737d287a1ef321fe66d01de27ed9d5661519a2df279e4eb2e3ec78f42805",
+  "tables/v05-rules/probe.toml": "38a288f312a29c0a4abe3b0f93a9294d5a0e4e96cabe6b6e930bc1a1e1f6b076",
+  "tables/v05-rules/order.toml": "ab789dc52e449c1e46ce382630894247d40d0b199ddd7724a872519f1eaf5978",
+  "tables/v05-rules/compose.toml": "3c1b72137520285fe5bc96a76db9fc695d7ac3d552a619d7b9bccb8640a59957",
+  "fixtures/data/x2-xy-line-3.toml": "019ce96afcfd192147b582d81e435acb5280d24607589df6b1f8190e67fbd868",
+  "~/software/scratch/compass-toolset/data/x2/T0.50000-L27-random.npz": "1e0f7c0062f1616e3fe52c7873a6532ffd406b20efc1d49bd12098e9f9025585",
+  "~/software/scratch/compass-toolset/data/x2/T0.50000-L27-ordered.npz": "1618208b0aad23991e6871e3f645d0f06dd783d04c3137da55190f56a75396af",
+  "~/software/scratch/compass-toolset/data/x2/T0.60000-L27-random.npz": "1990661eaddf8fcc85891a76c24dcc9654f6e131775cc930e1aa3ccb59e9d380",
+  "~/software/scratch/compass-toolset/data/x2/T0.60000-L27-ordered.npz": "6bcdcc91ad771e6f4db3c5be7983bd0dd67b9612edc9fc5367ef08b1f3cb3af1",
+  "~/software/scratch/compass-toolset/data/x2/T0.70000-L27-random.npz": "8c33444031caada5902becac4ba7e48fe07929ae2798badb67c6291b41a3e605",
+  "~/software/scratch/compass-toolset/data/x2/T0.70000-L27-ordered.npz": "4a3615b4152373bd6699a3e05a8d919e6c92d0dde595dc780beeba3caff08770",
+  "~/software/scratch/compass-toolset/data/x2/T0.89294-L27-random.npz": "ced3bd6dfedb2d2af8fb0ac291206267e3eefff83d09c9b83fa9db590f116866",
+  "~/software/scratch/compass-toolset/data/x2/T0.89294-L27-ordered.npz": "ad118cc988ed52285bb46a51c400d35a8b96f0d490c5408b119dcbcaaf58aa2c",
+  "~/software/scratch/compass-toolset/data/x2/T1.10000-L27-random.npz": "b733c0d690a2e4e15d84520cace4f6e1e6a1c87e2b805eea69b9e2bf82cfcd63",
+  "~/software/scratch/compass-toolset/data/x2/T1.10000-L27-ordered.npz": "7cfe0fb35d1f6b6503ae88da3cd1a2911fab31d71557ccc7d43ffc631b1bd738",
+  "~/software/scratch/compass-toolset/data/x2/T0.50000-L81-random.npz": "760563152758aed48e224bd22ead01e360678f1e3551cdbc18b016d4c680bc19",
+  "~/software/scratch/compass-toolset/data/x2/T0.50000-L81-ordered.npz": "6fbce3119385bd3322581754b5042bdf3877640db5fd696359b06f01aa9150ae",
+  "~/software/scratch/compass-toolset/data/x2/T0.60000-L81-random.npz": "8ed29d4d8ee7dd79ce9025e0e21b3c4be5aaabc3dc7538413ab4783999cdb1b7",
+  "~/software/scratch/compass-toolset/data/x2/T0.60000-L81-ordered.npz": "558c42b3621eb7b6e4cbdf7315ca806b94e26235fb8326460b1c1007849e29dd",
+  "~/software/scratch/compass-toolset/data/x2/T0.70000-L81-random.npz": "c9b88331fbd7d62210f0c1ff929f1a5d2e5070f3310a287b1bc8e637f7b07d23",
+  "~/software/scratch/compass-toolset/data/x2/T0.70000-L81-ordered.npz": "a2de2717b420d13bc59caa8bf239faf95430a52681b45ac7cdfbaba9ed3d04b9",
+  "~/software/scratch/compass-toolset/data/x2/T0.89294-L81-random.npz": "d46b4c75a2bbaeabcfe88ea55696d1764358b7e53d801b1b21b382b86e3ec170",
+  "~/software/scratch/compass-toolset/data/x2/T0.89294-L81-ordered.npz": "f7a591bb3008f20dd0650b3fc3bf37ea2097379966f940335e6ad72e2e1194cd",
+  "~/software/scratch/compass-toolset/data/x2/T1.10000-L81-random.npz": "b50a147d99b9ae3f6ef01b301fd69d9891e36ce571dd0f37171c411f013d31fc",
+  "~/software/scratch/compass-toolset/data/x2/T1.10000-L81-ordered.npz": "092db131a98f3a714673c22833412023937c9e6f0598bb8baa6f414694927c2c",
+  "~/software/scratch/compass-toolset/data/x2/T0.50000-L243-random.npz": "dfb5088d12d733c29084882af620e98cb70df218418299b5e92b5b7e20c1be69",
+  "~/software/scratch/compass-toolset/data/x2/T0.50000-L243-ordered.npz": "2572105f6b92ac75b20152c0cecf58e6620b5499e16ed2abeaa41573464c8bc9",
+  "~/software/scratch/compass-toolset/data/x2/T0.60000-L243-random.npz": "e0118fd4a3d10194b3134c59a8a8dddb8eaf99452e51b31661bad482d53c5aec",
+  "~/software/scratch/compass-toolset/data/x2/T0.60000-L243-ordered.npz": "1716f196ac4a1769d777d49dd98c44d853a43449f3b7cec7d87ba0706a484797",
+  "~/software/scratch/compass-toolset/data/x2/T0.70000-L243-random.npz": "93aa5b57d391735b6634d9b0afd6da2ff9641ec73090676cdcf13bf5e880698a",
+  "~/software/scratch/compass-toolset/data/x2/T0.70000-L243-ordered.npz": "96a8b9337a3eb4362a0d74b89dd5deed29bb8be9a490f379d356202781065d88",
+  "~/software/scratch/compass-toolset/data/x2/T0.89294-L243-random.npz": "3e2076d86ca045424fb95ca8b8cdd76c7a9e20b79d44dfdb1c224de937d27f16",
+  "~/software/scratch/compass-toolset/data/x2/T0.89294-L243-ordered.npz": "8e9710b992b149072389a4b361f26dddd8123910e85ccf53081cd7b64c3fd579",
+  "~/software/scratch/compass-toolset/data/x2/T1.10000-L243-random.npz": "29edc8575cce9ebdc79d46f107d85d3531fc974ff8597b91a50e1f1c4cc70063",
+  "~/software/scratch/compass-toolset/data/x2/T1.10000-L243-ordered.npz": "2192baff56e6bde98ca43e3251ae5ebcc4f34b45f8dbe0df6ae9a181dd3e081a",
+  "inputs/x2-xy-line-3/couplings.toml": "999862553b39e6928f980b2b052b3d5385bd055004faebefd8de5d498f1f9361"
+ },
+ "vectors": "results/x2-xy-line-3@v05-rules.npz",
+ "readings": [
+  {
+   "instrument": "across",
+   "column": "y_last",
+   "unit": {
+    "point": "0.5"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": 0.011723535838744952,
+   "lo": -0.6621410480724694,
+   "hi": 0.36454458538706824,
+   "cell": "UNRES",
+   "code": "UNRES",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "across/y_last/point=0.5"
+  },
+  {
+   "instrument": "fluct",
+   "column": "y_last",
+   "unit": {
+    "point": "0.5"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -1.9961803258293953,
+   "lo": -2.036405888587936,
+   "hi": -1.9606283812565017,
+   "cell": "SIG-",
+   "code": "VANISHES",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "fluct/y_last/point=0.5"
+  },
+  {
+   "instrument": "needle",
+   "column": "velocity",
+   "unit": {
+    "point": "0.5"
+   },
+   "eps_key": "step",
+   "eps": 0.01,
+   "estimate": 0.0008026867580642749,
+   "lo": 0.00038574606283915685,
+   "hi": 0.001277104098450041,
+   "cell": "SLOW+",
+   "code": "SLOW",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/velocity/point=0.5"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_ord",
+   "unit": {
+    "point": "0.5"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.0712441965433408,
+   "lo": 0.070936372056384,
+   "hi": 0.071535223800713,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_ord/point=0.5"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_dis",
+   "unit": {
+    "point": "0.5"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.9287558034566592,
+   "lo": 0.928464776199287,
+   "hi": 0.929063627943616,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_dis/point=0.5"
+  },
+  {
+   "instrument": "needle_chain",
+   "column": "drift",
+   "unit": {
+    "point": "0.5"
+   },
+   "eps_key": "drift",
+   "eps": 0.5,
+   "estimate": 1.062542745618983,
+   "lo": 0.6154451611069414,
+   "hi": 1.753259965687702,
+   "cell": "SIG+",
+   "code": "CONVERGING",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle_chain/drift/point=0.5"
+  },
+  {
+   "instrument": "needle_o",
+   "column": "velocity",
+   "unit": {
+    "point": "0.5"
+   },
+   "eps_key": "step",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "needle_o",
+   "column": "d_ord",
+   "unit": {
+    "point": "0.5"
+   },
+   "eps_key": "sink",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "needle_o",
+   "column": "d_dis",
+   "unit": {
+    "point": "0.5"
+   },
+   "eps_key": "sink",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "stability",
+   "column": "d",
+   "unit": {
+    "point": "0.5"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": 0.10413018395918522,
+   "lo": -0.6771239923730241,
+   "hi": 0.551304075520796,
+   "cell": "UNRES",
+   "code": "UNRES",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "stability/d/point=0.5"
+  },
+  {
+   "instrument": "two_start",
+   "column": "D",
+   "unit": {
+    "point": "0.5"
+   },
+   "eps_key": "two_start",
+   "eps": 0.01,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": null,
+   "code": "INDEP",
+   "per_size": [
+    {
+     "size": 27,
+     "estimate": 0.00010627341780389266,
+     "lo": -0.0004479388104299847,
+     "hi": 0.0006547071284720558,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    },
+    {
+     "size": 81,
+     "estimate": 7.608308457007773e-05,
+     "lo": -7.222060603305768e-05,
+     "hi": 0.00023227560864235434,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    },
+    {
+     "size": 243,
+     "estimate": 1.9203021708658063e-05,
+     "lo": -2.8014158804218185e-05,
+     "hi": 6.467609471166034e-05,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    }
+   ],
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": null
+  },
+  {
+   "instrument": "across",
+   "column": "y_last",
+   "unit": {
+    "point": "0.6"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": 0.6955555906552533,
+   "lo": 0.3907660187819547,
+   "hi": 0.980194914169933,
+   "cell": "SIG+",
+   "code": "RELEVANT",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "across/y_last/point=0.6"
+  },
+  {
+   "instrument": "fluct",
+   "column": "y_last",
+   "unit": {
+    "point": "0.6"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -1.9837170752794073,
+   "lo": -2.0239696668306473,
+   "hi": -1.942614504903966,
+   "cell": "SIG-",
+   "code": "VANISHES",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "fluct/y_last/point=0.6"
+  },
+  {
+   "instrument": "needle",
+   "column": "velocity",
+   "unit": {
+    "point": "0.6"
+   },
+   "eps_key": "step",
+   "eps": 0.01,
+   "estimate": 0.0012390800113564193,
+   "lo": 0.0007176705393324713,
+   "hi": 0.0018691464585521226,
+   "cell": "SLOW+",
+   "code": "SLOW",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/velocity/point=0.6"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_ord",
+   "unit": {
+    "point": "0.6"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.08854192531995753,
+   "lo": 0.08814979799657066,
+   "hi": 0.08889343694550877,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_ord/point=0.6"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_dis",
+   "unit": {
+    "point": "0.6"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.9114580746800425,
+   "lo": 0.9111065630544912,
+   "hi": 0.9118502020034294,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_dis/point=0.6"
+  },
+  {
+   "instrument": "needle_chain",
+   "column": "drift",
+   "unit": {
+    "point": "0.6"
+   },
+   "eps_key": "drift",
+   "eps": 0.5,
+   "estimate": 0.8203957607491714,
+   "lo": 0.3994673022008221,
+   "hi": 1.3316160071483516,
+   "cell": "POS",
+   "code": "CONVERGING",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle_chain/drift/point=0.6"
+  },
+  {
+   "instrument": "needle_o",
+   "column": "velocity",
+   "unit": {
+    "point": "0.6"
+   },
+   "eps_key": "step",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "needle_o",
+   "column": "d_ord",
+   "unit": {
+    "point": "0.6"
+   },
+   "eps_key": "sink",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "needle_o",
+   "column": "d_dis",
+   "unit": {
+    "point": "0.6"
+   },
+   "eps_key": "sink",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "stability",
+   "column": "d",
+   "unit": {
+    "point": "0.6"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": 0.9112480083360812,
+   "lo": 0.44980749545153165,
+   "hi": 1.3631422213032995,
+   "cell": "SIG+",
+   "code": "CROSSING",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "stability/d/point=0.6"
+  },
+  {
+   "instrument": "two_start",
+   "column": "D",
+   "unit": {
+    "point": "0.6"
+   },
+   "eps_key": "two_start",
+   "eps": 0.01,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": null,
+   "code": "INDEP",
+   "per_size": [
+    {
+     "size": 27,
+     "estimate": -0.0001992618079180719,
+     "lo": -0.0007491374087864737,
+     "hi": 0.0002813765397995848,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    },
+    {
+     "size": 81,
+     "estimate": 8.894699048533905e-05,
+     "lo": -6.946820582156287e-05,
+     "hi": 0.0002502144231030455,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    },
+    {
+     "size": 243,
+     "estimate": 5.935609250107277e-06,
+     "lo": -4.2062024487660155e-05,
+     "hi": 6.906456042350682e-05,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    }
+   ],
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": null
+  },
+  {
+   "instrument": "across",
+   "column": "y_last",
+   "unit": {
+    "point": "0.7"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -0.037458220522783255,
+   "lo": -0.6480606829087728,
+   "hi": 0.3924826159693947,
+   "cell": "UNRES",
+   "code": "UNRES",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "across/y_last/point=0.7"
+  },
+  {
+   "instrument": "fluct",
+   "column": "y_last",
+   "unit": {
+    "point": "0.7"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -1.995409732220585,
+   "lo": -2.027279620841183,
+   "hi": -1.959280232424709,
+   "cell": "SIG-",
+   "code": "VANISHES",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "fluct/y_last/point=0.7"
+  },
+  {
+   "instrument": "needle",
+   "column": "velocity",
+   "unit": {
+    "point": "0.7"
+   },
+   "eps_key": "step",
+   "eps": 0.01,
+   "estimate": 0.0017210848740228935,
+   "lo": 0.0011061066199576173,
+   "hi": 0.0022299727145294896,
+   "cell": "SLOW+",
+   "code": "SLOW",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/velocity/point=0.7"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_ord",
+   "unit": {
+    "point": "0.7"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.10803589876301678,
+   "lo": 0.10771460720809944,
+   "hi": 0.10843242710658438,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_ord/point=0.7"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_dis",
+   "unit": {
+    "point": "0.7"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.8919641012369832,
+   "lo": 0.8915675728934156,
+   "hi": 0.8922853927919006,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_dis/point=0.7"
+  },
+  {
+   "instrument": "needle_chain",
+   "column": "drift",
+   "unit": {
+    "point": "0.7"
+   },
+   "eps_key": "drift",
+   "eps": 0.5,
+   "estimate": 0.653937484709761,
+   "lo": 0.38796159666964686,
+   "hi": 1.0848051302822783,
+   "cell": "POS",
+   "code": "CONVERGING",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle_chain/drift/point=0.7"
+  },
+  {
+   "instrument": "needle_o",
+   "column": "velocity",
+   "unit": {
+    "point": "0.7"
+   },
+   "eps_key": "step",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "needle_o",
+   "column": "d_ord",
+   "unit": {
+    "point": "0.7"
+   },
+   "eps_key": "sink",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "needle_o",
+   "column": "d_dis",
+   "unit": {
+    "point": "0.7"
+   },
+   "eps_key": "sink",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "stability",
+   "column": "d",
+   "unit": {
+    "point": "0.7"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": 0.1437245546338462,
+   "lo": -0.47897473142315855,
+   "hi": 0.7047496835981281,
+   "cell": "UNRES",
+   "code": "UNRES",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "stability/d/point=0.7"
+  },
+  {
+   "instrument": "two_start",
+   "column": "D",
+   "unit": {
+    "point": "0.7"
+   },
+   "eps_key": "two_start",
+   "eps": 0.01,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": null,
+   "code": "INDEP",
+   "per_size": [
+    {
+     "size": 27,
+     "estimate": 0.00020418314567161033,
+     "lo": -0.0005073538842944868,
+     "hi": 0.0009639519310877501,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    },
+    {
+     "size": 81,
+     "estimate": 9.739573469502716e-05,
+     "lo": -9.009766757738229e-05,
+     "hi": 0.00032784897285214606,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    },
+    {
+     "size": 243,
+     "estimate": -2.3019491510289924e-05,
+     "lo": -9.2675520416402e-05,
+     "hi": 4.7164258858503607e-05,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    }
+   ],
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": null
+  },
+  {
+   "instrument": "across",
+   "column": "y_last",
+   "unit": {
+    "point": "0.89294"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": 0.18273351245629377,
+   "lo": -0.05339894777983171,
+   "hi": 0.3651635274005077,
+   "cell": "UNRES",
+   "code": "UNRES",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "across/y_last/point=0.89294"
+  },
+  {
+   "instrument": "fluct",
+   "column": "y_last",
+   "unit": {
+    "point": "0.89294"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -1.9996116465110483,
+   "lo": -2.0419953866693654,
+   "hi": -1.962015675354349,
+   "cell": "SIG-",
+   "code": "VANISHES",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "fluct/y_last/point=0.89294"
+  },
+  {
+   "instrument": "needle",
+   "column": "velocity",
+   "unit": {
+    "point": "0.89294"
+   },
+   "eps_key": "step",
+   "eps": 0.01,
+   "estimate": 0.00013167587260942692,
+   "lo": -0.0008726976457842815,
+   "hi": 0.000990035522460128,
+   "cell": "ZERO!",
+   "code": "STOPPED",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/velocity/point=0.89294"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_ord",
+   "unit": {
+    "point": "0.89294"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.1706868490751865,
+   "lo": 0.16999508580440975,
+   "hi": 0.17137444149275516,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_ord/point=0.89294"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_dis",
+   "unit": {
+    "point": "0.89294"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.8293131509248135,
+   "lo": 0.8286255585072448,
+   "hi": 0.8300049141955903,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_dis/point=0.89294"
+  },
+  {
+   "instrument": "needle_chain",
+   "column": "drift",
+   "unit": {
+    "point": "0.89294"
+   },
+   "eps_key": "drift",
+   "eps": 0.5,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-EVALUATED",
+   "code": "NOT-EVALUATED",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": "sign of velocity not constant across the point estimate and every resample",
+   "vector_key": null
+  },
+  {
+   "instrument": "needle_o",
+   "column": "velocity",
+   "unit": {
+    "point": "0.89294"
+   },
+   "eps_key": "step",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "needle_o",
+   "column": "d_ord",
+   "unit": {
+    "point": "0.89294"
+   },
+   "eps_key": "sink",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "needle_o",
+   "column": "d_dis",
+   "unit": {
+    "point": "0.89294"
+   },
+   "eps_key": "sink",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "stability",
+   "column": "d",
+   "unit": {
+    "point": "0.89294"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": 0.0120258970378318,
+   "lo": -0.259959518113034,
+   "hi": 0.22770268981096253,
+   "cell": "UNRES",
+   "code": "UNRES",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "stability/d/point=0.89294"
+  },
+  {
+   "instrument": "two_start",
+   "column": "D",
+   "unit": {
+    "point": "0.89294"
+   },
+   "eps_key": "two_start",
+   "eps": 0.01,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": null,
+   "code": "INDEP",
+   "per_size": [
+    {
+     "size": 27,
+     "estimate": 3.1901837358461194e-06,
+     "lo": -0.0007946814651427211,
+     "hi": 0.0009916607543122202,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    },
+    {
+     "size": 81,
+     "estimate": 2.6786101701148368e-05,
+     "lo": -0.0003807653702500968,
+     "hi": 0.00031099960955657813,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    },
+    {
+     "size": 243,
+     "estimate": -3.7512233617698065e-05,
+     "lo": -0.00015357027160713686,
+     "hi": 8.177882608564889e-05,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    }
+   ],
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": null
+  },
+  {
+   "instrument": "across",
+   "column": "y_last",
+   "unit": {
+    "point": "1.1"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -0.22231962662416438,
+   "lo": -0.33236596424233544,
+   "hi": -0.10811374259137865,
+   "cell": "NEG",
+   "code": "IRRELEVANT",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "across/y_last/point=1.1"
+  },
+  {
+   "instrument": "fluct",
+   "column": "y_last",
+   "unit": {
+    "point": "1.1"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -2.002244933408849,
+   "lo": -2.034598651708488,
+   "hi": -1.9691185640512139,
+   "cell": "SIG-",
+   "code": "VANISHES",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "fluct/y_last/point=1.1"
+  },
+  {
+   "instrument": "needle",
+   "column": "velocity",
+   "unit": {
+    "point": "1.1"
+   },
+   "eps_key": "step",
+   "eps": 0.01,
+   "estimate": -0.22300510850555094,
+   "lo": -0.22457904321568828,
+   "hi": -0.22150313549950368,
+   "cell": "SIG-",
+   "code": "FLOWING",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/velocity/point=1.1"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_ord",
+   "unit": {
+    "point": "1.1"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.8496875637269454,
+   "lo": 0.8488361391095399,
+   "hi": 0.850400510153718,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_ord/point=1.1"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_dis",
+   "unit": {
+    "point": "1.1"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.15031243627305457,
+   "lo": 0.14959948984628207,
+   "hi": 0.1511638608904601,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_dis/point=1.1"
+  },
+  {
+   "instrument": "needle_chain",
+   "column": "drift",
+   "unit": {
+    "point": "1.1"
+   },
+   "eps_key": "drift",
+   "eps": 0.5,
+   "estimate": -1.0625923995742412,
+   "lo": -1.0767283990667909,
+   "hi": -1.0475243324801708,
+   "cell": "SIG-",
+   "code": "PERSISTENT",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle_chain/drift/point=1.1"
+  },
+  {
+   "instrument": "needle_o",
+   "column": "velocity",
+   "unit": {
+    "point": "1.1"
+   },
+   "eps_key": "step",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "needle_o",
+   "column": "d_ord",
+   "unit": {
+    "point": "1.1"
+   },
+   "eps_key": "sink",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "needle_o",
+   "column": "d_dis",
+   "unit": {
+    "point": "1.1"
+   },
+   "eps_key": "sink",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "stability",
+   "column": "d",
+   "unit": {
+    "point": "1.1"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -0.43772032470511246,
+   "lo": -0.5758131112387777,
+   "hi": -0.3066585911533517,
+   "cell": "SIG-",
+   "code": "OFF",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "stability/d/point=1.1"
+  },
+  {
+   "instrument": "two_start",
+   "column": "D",
+   "unit": {
+    "point": "1.1"
+   },
+   "eps_key": "two_start",
+   "eps": 0.01,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": null,
+   "code": "INDEP",
+   "per_size": [
+    {
+     "size": 27,
+     "estimate": 0.0020944892916233693,
+     "lo": 0.0007453365670096277,
+     "hi": 0.003577828086422852,
+     "cell": "SLOW+",
+     "code": "INDEP"
+    },
+    {
+     "size": 81,
+     "estimate": -5.341547415183001e-05,
+     "lo": -0.0005161238127442484,
+     "hi": 0.00034710512264154715,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    },
+    {
+     "size": 243,
+     "estimate": -8.752173334580782e-05,
+     "lo": -0.00027913222559741436,
+     "hi": 0.00010237030551648029,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    }
+   ],
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": null
+  }
+ ],
+ "pair_readings": [],
+ "reports": [
+  {
+   "instrument": "across",
+   "name": "y_steps",
+   "unit": {
+    "point": "0.5"
+   },
+   "estimate": [
+    -0.09240664812044026,
+    0.011723535838744952
+   ],
+   "vector_key": "across/y_steps/point=0.5"
+  },
+  {
+   "instrument": "fluct",
+   "name": "y_steps",
+   "unit": {
+    "point": "0.5"
+   },
+   "estimate": [
+    -2.032165850027136,
+    -1.9961803258293953
+   ],
+   "vector_key": "fluct/y_steps/point=0.5"
+  },
+  {
+   "instrument": "needle",
+   "name": "v_all",
+   "unit": {
+    "point": "0.5"
+   },
+   "estimate": [
+    0.054049429875879795,
+    0.007378438132876086,
+    0.0008026867580642749
+   ],
+   "vector_key": "needle/v_all/point=0.5"
+  },
+  {
+   "instrument": "needle",
+   "name": "g_final",
+   "unit": {
+    "point": "0.5"
+   },
+   "estimate": 0.9287558034566592,
+   "vector_key": "needle/g_final/point=0.5"
+  },
+  {
+   "instrument": "needle_chain",
+   "name": "velocity_prev",
+   "unit": {
+    "point": "0.5"
+   },
+   "estimate": 0.007738006339267245,
+   "vector_key": "needle_chain/velocity_prev/point=0.5"
+  },
+  {
+   "instrument": "across",
+   "name": "y_steps",
+   "unit": {
+    "point": "0.6"
+   },
+   "estimate": [
+    -0.21569241768082797,
+    0.6955555906552533
+   ],
+   "vector_key": "across/y_steps/point=0.6"
+  },
+  {
+   "instrument": "fluct",
+   "name": "y_steps",
+   "unit": {
+    "point": "0.6"
+   },
+   "estimate": [
+    -2.008029944139646,
+    -1.9837170752794073
+   ],
+   "vector_key": "fluct/y_steps/point=0.6"
+  },
+  {
+   "instrument": "needle",
+   "name": "v_all",
+   "unit": {
+    "point": "0.6"
+   },
+   "estimate": [
+    0.06511032695227736,
+    0.009071877851773436,
+    0.0012390800113564193
+   ],
+   "vector_key": "needle/v_all/point=0.6"
+  },
+  {
+   "instrument": "needle",
+   "name": "g_final",
+   "unit": {
+    "point": "0.6"
+   },
+   "estimate": 0.9114580746800425,
+   "vector_key": "needle/g_final/point=0.6"
+  },
+  {
+   "instrument": "needle_chain",
+   "name": "velocity_prev",
+   "unit": {
+    "point": "0.6"
+   },
+   "estimate": 0.009154799991067275,
+   "vector_key": "needle_chain/velocity_prev/point=0.6"
+  },
+  {
+   "instrument": "across",
+   "name": "y_steps",
+   "unit": {
+    "point": "0.7"
+   },
+   "estimate": [
+    -0.18118277515662945,
+    -0.037458220522783255
+   ],
+   "vector_key": "across/y_steps/point=0.7"
+  },
+  {
+   "instrument": "fluct",
+   "name": "y_steps",
+   "unit": {
+    "point": "0.7"
+   },
+   "estimate": [
+    -2.0016203165443174,
+    -1.995409732220585
+   ],
+   "vector_key": "fluct/y_steps/point=0.7"
+  },
+  {
+   "instrument": "needle",
+   "name": "v_all",
+   "unit": {
+    "point": "0.7"
+   },
+   "estimate": [
+    0.07626079274847641,
+    0.011185210884263608,
+    0.0017210848740228935
+   ],
+   "vector_key": "needle/v_all/point=0.7"
+  },
+  {
+   "instrument": "needle",
+   "name": "g_final",
+   "unit": {
+    "point": "0.7"
+   },
+   "estimate": 0.8919641012369832,
+   "vector_key": "needle/g_final/point=0.7"
+  },
+  {
+   "instrument": "needle_chain",
+   "name": "velocity_prev",
+   "unit": {
+    "point": "0.7"
+   },
+   "estimate": 0.010590854843210762,
+   "vector_key": "needle_chain/velocity_prev/point=0.7"
+  },
+  {
+   "instrument": "across",
+   "name": "y_steps",
+   "unit": {
+    "point": "0.89294"
+   },
+   "estimate": [
+    0.17070761541846197,
+    0.18273351245629377
+   ],
+   "vector_key": "across/y_steps/point=0.89294"
+  },
+  {
+   "instrument": "fluct",
+   "name": "y_steps",
+   "unit": {
+    "point": "0.89294"
+   },
+   "estimate": [
+    -1.9886925224515535,
+    -1.9996116465110483
+   ],
+   "vector_key": "fluct/y_steps/point=0.89294"
+  },
+  {
+   "instrument": "needle",
+   "name": "v_all",
+   "unit": {
+    "point": "0.89294"
+   },
+   "estimate": [
+    0.08900728447707762,
+    0.01285637037962406,
+    0.00013167587260942692
+   ],
+   "vector_key": "needle/v_all/point=0.89294"
+  },
+  {
+   "instrument": "needle",
+   "name": "g_final",
+   "unit": {
+    "point": "0.89294"
+   },
+   "estimate": 0.8293131509248135,
+   "vector_key": "needle/g_final/point=0.89294"
+  },
+  {
+   "instrument": "needle_chain",
+   "name": "velocity_prev",
+   "unit": {
+    "point": "0.89294"
+   },
+   "estimate": 0.012214980812190523,
+   "vector_key": "needle_chain/velocity_prev/point=0.89294"
+  },
+  {
+   "instrument": "across",
+   "name": "y_steps",
+   "unit": {
+    "point": "1.1"
+   },
+   "estimate": [
+    0.2154006980809481,
+    -0.22231962662416438
+   ],
+   "vector_key": "across/y_steps/point=1.1"
+  },
+  {
+   "instrument": "fluct",
+   "name": "y_steps",
+   "unit": {
+    "point": "1.1"
+   },
+   "estimate": [
+    -2.0783229907265173,
+    -2.002244933408849
+   ],
+   "vector_key": "fluct/y_steps/point=1.1"
+  },
+  {
+   "instrument": "needle",
+   "name": "v_all",
+   "unit": {
+    "point": "1.1"
+   },
+   "estimate": [
+    -0.023363922770124,
+    -0.19062950771177045,
+    -0.22300510850555094
+   ],
+   "vector_key": "needle/v_all/point=1.1"
+  },
+  {
+   "instrument": "needle",
+   "name": "g_final",
+   "unit": {
+    "point": "1.1"
+   },
+   "estimate": 0.15031243627305457,
+   "vector_key": "needle/g_final/point=1.1"
+  },
+  {
+   "instrument": "needle_chain",
+   "name": "velocity_prev",
+   "unit": {
+    "point": "1.1"
+   },
+   "estimate": -0.20818558135096515,
+   "vector_key": "needle_chain/velocity_prev/point=1.1"
+  }
+ ],
+ "signature_columns": [
+  "sink",
+  "needle",
+  "needle_pair",
+  "drift_code",
+  "flow",
+  "across",
+  "stability",
+  "two_start",
+  "probe"
+ ],
+ "signature": [
+  {
+   "point": "0.5",
+   "obtained": "truth",
+   "sink": "NEITHER",
+   "needle": "MID",
+   "needle_pair": "NOT-MEASURED",
+   "drift_code": "CONVERGING",
+   "flow": "STOPPED",
+   "across": "UNRES",
+   "stability": "UNRES",
+   "two_start": "INDEP",
+   "probe": "COMPLETE",
+   "flags": {
+    "sink": [
+     "T"
+    ],
+    "needle": [
+     "T"
+    ],
+    "needle_pair": [
+     "T"
+    ],
+    "drift_code": [
+     "T"
+    ],
+    "flow": [
+     "T"
+    ],
+    "across": [
+     "H",
+     "T"
+    ],
+    "stability": [
+     "H",
+     "T"
+    ],
+    "two_start": [
+     "T"
+    ]
+   },
+   "verdict": "REFUSE-UNRES",
+   "verdict_class": "REFUSE",
+   "row_line": 245,
+   "why": "verdict_x CAND_GS: across unresolved, whatever stability reads",
+   "geometry": "REFUSE-UNRES",
+   "order": "CONTINUOUS",
+   "axis_lines": {
+    "geometry": 110,
+    "probe": 12,
+    "order": 72,
+    "compose": 36
+   }
+  },
+  {
+   "point": "0.6",
+   "obtained": "truth",
+   "sink": "NEITHER",
+   "needle": "MID",
+   "needle_pair": "NOT-MEASURED",
+   "drift_code": "CONVERGING",
+   "flow": "STOPPED",
+   "across": "RELEVANT",
+   "stability": "CROSSING",
+   "two_start": "INDEP",
+   "probe": "COMPLETE",
+   "flags": {
+    "sink": [
+     "T"
+    ],
+    "needle": [
+     "T"
+    ],
+    "needle_pair": [
+     "T"
+    ],
+    "drift_code": [
+     "T"
+    ],
+    "flow": [
+     "T"
+    ],
+    "across": [
+     "H",
+     "T"
+    ],
+    "stability": [
+     "H",
+     "T"
+    ],
+    "two_start": [
+     "T"
+    ]
+   },
+   "verdict": "WALKING",
+   "verdict_class": "WALKING",
+   "row_line": 181,
+   "why": "verdict_x CAND_GS: the exponent crosses with size",
+   "geometry": "WALKING",
+   "order": "CONTINUOUS",
+   "axis_lines": {
+    "geometry": 72,
+    "probe": 12,
+    "order": 72,
+    "compose": 36
+   }
+  },
+  {
+   "point": "0.7",
+   "obtained": "truth",
+   "sink": "NEITHER",
+   "needle": "MID",
+   "needle_pair": "NOT-MEASURED",
+   "drift_code": "CONVERGING",
+   "flow": "STOPPED",
+   "across": "UNRES",
+   "stability": "UNRES",
+   "two_start": "INDEP",
+   "probe": "COMPLETE",
+   "flags": {
+    "sink": [
+     "T"
+    ],
+    "needle": [
+     "T"
+    ],
+    "needle_pair": [
+     "T"
+    ],
+    "drift_code": [
+     "T"
+    ],
+    "flow": [
+     "T"
+    ],
+    "across": [
+     "H",
+     "T"
+    ],
+    "stability": [
+     "H",
+     "T"
+    ],
+    "two_start": [
+     "T"
+    ]
+   },
+   "verdict": "REFUSE-UNRES",
+   "verdict_class": "REFUSE",
+   "row_line": 245,
+   "why": "verdict_x CAND_GS: across unresolved, whatever stability reads",
+   "geometry": "REFUSE-UNRES",
+   "order": "CONTINUOUS",
+   "axis_lines": {
+    "geometry": 110,
+    "probe": 12,
+    "order": 72,
+    "compose": 36
+   }
+  },
+  {
+   "point": "0.89294",
+   "obtained": "truth",
+   "sink": "NEITHER",
+   "needle": "MID",
+   "needle_pair": "NOT-MEASURED",
+   "drift_code": "NOT-EVALUATED",
+   "flow": "STOPPED",
+   "across": "UNRES",
+   "stability": "UNRES",
+   "two_start": "INDEP",
+   "probe": "COMPLETE",
+   "flags": {
+    "sink": [
+     "T"
+    ],
+    "needle": [
+     "T"
+    ],
+    "needle_pair": [
+     "T"
+    ],
+    "drift_code": [
+     "T"
+    ],
+    "flow": [
+     "T"
+    ],
+    "across": [
+     "H",
+     "T"
+    ],
+    "stability": [
+     "H",
+     "T"
+    ],
+    "two_start": [
+     "T"
+    ]
+   },
+   "verdict": "REFUSE-UNRES",
+   "verdict_class": "REFUSE",
+   "row_line": 245,
+   "why": "verdict_x CAND_GS: across unresolved, whatever stability reads",
+   "geometry": "REFUSE-UNRES",
+   "order": "CONTINUOUS",
+   "axis_lines": {
+    "geometry": 110,
+    "probe": 12,
+    "order": 72,
+    "compose": 36
+   }
+  },
+  {
+   "point": "1.1",
+   "obtained": "truth",
+   "sink": "NEITHER",
+   "needle": "DIS",
+   "needle_pair": "NOT-MEASURED",
+   "drift_code": "PERSISTENT",
+   "flow": "FLOWING",
+   "across": "IRRELEVANT",
+   "stability": "OFF",
+   "two_start": "INDEP",
+   "probe": "COMPLETE",
+   "flags": {
+    "sink": [
+     "T"
+    ],
+    "needle": [
+     "T"
+    ],
+    "needle_pair": [
+     "T"
+    ],
+    "drift_code": [
+     "T"
+    ],
+    "flow": [
+     "T"
+    ],
+    "across": [
+     "H",
+     "T"
+    ],
+    "stability": [
+     "H",
+     "T"
+    ],
+    "two_start": [
+     "T"
+    ]
+   },
+   "verdict": "NOT",
+   "verdict_class": "NOT",
+   "row_line": 33,
+   "why": "verdict_x STAGE1: off the window",
+   "geometry": "NOT",
+   "order": "OFF-WINDOW",
+   "axis_lines": {
+    "geometry": 16,
+    "probe": 12,
+    "order": 35,
+    "compose": 11
+   }
+  }
+ ],
+ "pairs": [],
+ "declared": {
+  "probe": "COMPLETE"
+ }
+}

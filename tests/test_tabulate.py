@@ -3,15 +3,18 @@ truth firewall, a seventh signature column, the page's cell counts and the D13 d
 import copy
 import hashlib
 import json
+import math
 import re
 import shutil
 import subprocess
 import sys
 import tempfile
+import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "cc" / "instruments")]
+import declare  # noqa: E402
 import detect  # noqa: E402
 import score  # noqa: E402
 
@@ -33,10 +36,11 @@ files = sorted((ROOT / "results").glob("*.json"))
 results = [json.loads(f.read_text()) for f in files]
 md, found = score.tabulate(results)
 rows = [ln for ln in md.splitlines() if ln.startswith("| ") and not ln.startswith(("| run", "|---"))]
-want = {"verdict-x-rules": 66, "v01-rules": 79, "v02-rules": 117, "v03-rules": 131, "v04-rules": 157}   # points per set (v03-rules: the 117 of v02-rules + the 3 of x5n-bilayer-2, plan 0867 P1, + the 6 of x9c-potts, P3, + the 5 of b7-at-line-4, plan 0868 step 2; v02-rules: the same 76, plan 0866 P-A, + the 27 points of the six fluct inputs, P-B, + the 8 points of w1-potts and w3-potts, 0866 X9, + the 3 of x4-ising-field-3; every set + the 3 of x5n-bilayer, plan 0865 S3): the seven v0 inputs (60), + x5-bilayer (3); v01-rules also the three along inputs (13)
-have = {t: sum(len(r["signature"]) for r in results if r["tables"] == t) for t in want}
-check("one row per (run, point)", len(rows) == sum(len(r["signature"]) for r in results) == sum(want.values()) and have == want
-      and not found, str(found) + str(have))
+sets = sorted({r["tables"] for r in results})          # plan 0871 G5: every count below is derived from the result sets on disk, never a hand-listed set name
+have = {t: sum(len(r["signature"]) for r in results if r["tables"] == t) for t in sets}
+section = {t: [ln for ln in md.split(f"## Rules: {t}")[1].split("\n## ")[0].splitlines() if ln.startswith("| ") and not ln.startswith(("| run", "|---"))] for t in sets}
+check("one row per (run, point), in each table set's own section", len(rows) == sum(have.values()) == sum(len(v) for v in section.values())
+      and {t: len(v) for t, v in section.items()} == have and not found, str(found) + str(have))
 clash = [ln for ln in md.split("## Collisions")[1].splitlines() if ln.startswith("- ")]
 check("x8 1.00 and 1.10 are not a collision", not [c for c in clash if "x8-ising-needle:1.00" in c and "x8-ising-needle:1.10" in c])
 check("the C2 pair is no longer a collision (plan 0868 step 1: its points re-joined to their own truth) and the x8 / x7a-bc one is",
@@ -57,8 +61,11 @@ head = next(ln for ln in md7.split("## Rules: planted7")[1].splitlines() if ln.s
 check("a seventh column tabulates in its own section", len(head.strip("|").split("|")) == 5 + 7 + 2 and "extra" in head, head)
 page = score.page(results)
 cells = [int(n) for n in re.findall(r'data-cells="(\d+)"', page)]
-check("the page's cell counts sum to 45 360 per table set (317 520 for v03-rules: its needle_pair column has 7 values; 9 525 600 for v04-rules: its probe column has 5 values and its drift_code 6) and some rows were never hit",
-      sum(cells) == 45360 * (len({r["tables"] for r in results}) - 2) + 317520 + 9525600 and 'class=never' in page, str(sum(cells)))
+null_n = len(declare.Ctx(ROOT).alpha["nulls"])
+cells_of_set = lambda t: math.prod(len(tomllib.loads((ROOT / "tables" / t / "codes.toml").read_text())["columns"]["signature"][c]["alphabet"]) + null_n   # noqa: E731
+                                   for c in tomllib.loads((ROOT / "tables" / t / "verdict.toml").read_text())["columns"])
+check("the page's cell counts sum to the product of each table set's declared column alphabets (nulls included), over the sets on disk, and some rows were never hit",
+      sum(cells) == sum(cells_of_set(t) for t in sets) and 'class=never' in page, f"{sum(cells)} vs {sum(cells_of_set(t) for t in sets)}")
 with tempfile.TemporaryDirectory() as t:
     shutil.copytree(ROOT / "tables" / "verdict-x-rules", Path(t) / "d13")
     for q in [Path(t) / "d13", *(Path(t) / "d13").rglob("*")]:   # the copy only; the live set is frozen
@@ -69,7 +76,15 @@ with tempfile.TemporaryDirectory() as t:
     check("the D13 flip edits 15 rows", text.count('when.two_start = ["INDEP"]') == 14 and flip != text)
     f.write_text(flip)
     lines, total, moved = score.diff(detect.load_tables("verdict-x-rules"), detect.load_tables("d13", t), results, [])
-    x5 = [("x2-xy-line-3", "0.5", "REFUSE-UNRES", "REFUSE-SLOW"), ("x2-xy-line-3", "0.6", "WALKING", "REFUSE-SLOW"), ("x2-xy-line-3", "0.7", "REFUSE-UNRES", "REFUSE-SLOW")] + [("x5-bilayer-2", pt, "REFUSE-SLOW", "NOT") for pt in ("0.0", "0.3")] * 3 + [("x5-bilayer", pt, "REFUSE-SLOW", "NOT") for pt in ("0.0", "0.3")] * 4 + [(i, pt, "REFUSE-PROBE-INCOMPLETE", "POINT") for i in ("x5n-bilayer-2", "x5n-bilayer-3", "x5n-bilayer") for pt in ("0.0", "0.1", "0.3")] + [("x9c-potts-2", pt, "FIRST-ORDER", "NOT") for pt in ("8", "10")] + [("x9c-potts", pt, "FIRST-ORDER", "NOT") for pt in ("8", "10")] * 2   # + the @v04-rules results of plan 0870 (the same x5 and x9c points; x5n is REFUSE-PROBE-INCOMPLETE there, POINT under a verdict-x fork; P2: x2-xy-line-3 T 0.5/0.6/0.7, whose flow is STOPPED by its drift, and x9c-potts-2 q8, q10; P3: x5n-bilayer-3) + + x9c-potts@v03-rules q8, q10 (needle_pair is read by no verdict-x fork); x5-bilayer-2@v02-rules and @v03-rules, x5@v01-rules, @v02-rules and @v03-rules reverdicted under a fork of verdict-x-rules
+    flipped = [("x2-xy-line-3", "0.5", "REFUSE-UNRES", "REFUSE-SLOW"), ("x2-xy-line-3", "0.6", "WALKING", "REFUSE-SLOW"), ("x2-xy-line-3", "0.7", "REFUSE-UNRES", "REFUSE-SLOW")] \
+        + [(i, pt, "REFUSE-SLOW", "NOT") for i in ("x5-bilayer-2", "x5-bilayer") for pt in ("0.0", "0.3")] \
+        + [(i, pt, "REFUSE-PROBE-INCOMPLETE", "POINT") for i in ("x5n-bilayer-2", "x5n-bilayer-3", "x5n-bilayer") for pt in ("0.0", "0.1", "0.3")] \
+        + [(i, pt, "FIRST-ORDER", "NOT") for i in ("x9c-potts-2", "x9c-potts") for pt in ("8", "10")]
+    # plan 0871 G5: the DISTINCT (input, point, stored verdict, flipped verdict) the D13 flip moves is the finding (declared above); how many times each moves is
+    # derived from the results on disk - one per stored result of that input whose point holds that stored verdict - so a new table set needs no hand edit
+    verdict_at = {(r["input"], s["point"], r["run_id"]): s["verdict"] for r in results for s in r["signature"]}
+    x5 = sorted(k for k in flipped for r in results if verdict_at.get((r["input"], k[1], r["run_id"])) == k[2] and r["input"] == k[0])
+    moved = sorted(moved)
     check("--diff of the D13 flip: 1 512 cells, no fixture point but x5's two v01-rules refusals", total == 1512 and moved == x5,
           "\n".join(lines[:6]) + str(moved))
 with tempfile.TemporaryDirectory() as t:       # O2/R14: --diff prints and writes nothing (a copy of the repo, never the live tree)
