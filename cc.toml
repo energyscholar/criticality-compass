@@ -58,6 +58,7 @@ slow = ["test_w2", "test_detect_verdicts", "test_breakers_red", "test_view", "te
 case_budget_s = 8
 [check.quick.test_run_all.inputs]    # inputs: read the stored result (re-verdicted under the set when stored under another)
 x2b-xy = 330
+x2b-xy-2 = 565
 x3-clock6-3 = 45
 x9c-potts-2 = 39
 x9c-potts = 34

@@ -429,6 +429,27 @@ the test can still catch is an end that sits too early (boundary 0.85) or too la
 the refusal `REFUSE-UNCLASSIFIED-v0`, the family rulebook's default for a cell with no positive row (its printed `why`, "no positive row yet"):
 BKT-END needs an interior that reads LINE, and this one does not.
 
+## Across by the difference estimator, the finite-size transform and the end note (v06-rules, plan 0872)
+
+v06-rules = v05-rules + three things, each declared before it ran (`expected/v06-rules.toml`).
+
+**`across_delta` (F2).** A pair instrument: for a control pair (a, b) of the declared chain, Delta(L) = mean g1(b) - mean g1(a) at final size 9, and the
+exponent is `log3 |Delta(L)/Delta(L/3)|` at the top size step, with the same block bootstrap and the same eps (`y`) as `across`. It is `per_point`: a point reads the
+cell of every control pair that touches it (`bin/cc explain <input> a->b` shows one), and `codes.toml [columns.helper.across_dlt]` combines them: a resolved code counts only when
+EVERY touching pair reads it (`combine.agree`), else UNRES (`combine.disagree`). The signature column `across` is then ONE declared choice per input: the helper `across_dlt` when the
+input declares `across_delta`, else the covariance helper `across_cov`; a declared `across_delta` that is NOT-EVALUATED reads UNRES, never the covariance. Admissible only when
+`[relations.control] coupling = "<name>"` names a coupling that `couplings.toml` says `across` probes; `bin/cc validate` refuses anything else, each with a Next line. Declare it on a
+T-ordered input by adding `across_delta` to `instruments` and the coupling line (see `inputs/x2b-xy-2`). Read the tight intervals with care: the Delta estimator resolves the exponent to about
++-0.01, so an interval that excludes 0 by a hair reads SLOW-/SLOW+ (WEAK), not ZERO! (MARGINAL).
+
+**TRANSFORMED stability (F1).** `stability` is a total table over (`stability_raw`, `drift_code`): on a point whose needle drift is CONVERGING (a measured pre-asymptotic small pair), a raw STABLE
+or CROSSING reads TRANSFORMED; OFF and UNRES stay; every other drift keeps today's reading, so a real walking (CROSSING off a CONVERGING point) is still WALKING. `geometry.toml` accepts
+TRANSFORMED wherever a line accepted STABLE; a RELEVANT exponent on a TRANSFORMED point refuses (REFUSE-UNRES: not certified as a point, with its Next line). The declared transform
+`y_inf = (y2 - r y1)/(1 - r)` (r = the needle's own v2/v1) is the `transform` instrument; its helper column `y_inf_code` is visible in `show` and read by no verdict row, and it is NOT-EVALUATED where the correction does not decay.
+
+**The end note (F3).** A family names each end point (`ends`: point, side, END-kind). `bin/cc show` and `explain` of that point print `end of a LINE run (family <id>, END-<kind>)` beside its per-point
+reading (read from the stored family; nothing for a dry run, a set without family sides, or a point that ends nothing). No verdict changes.
+
 ## A new instrument
 
 `bin/cc new instrument <id>` writes `instruments/<id>.toml` and a stub module `cc/instruments/<id>.py`:
@@ -825,3 +846,7 @@ Read these before you trust a verdict.
 - **v04-rules: `couplings.toml` sits beside `m.toml` rather than inside it,** because an `m.toml` that a stored result read cannot change
   (its hash is in the result); `[conjugate].hamiltonian_knowledge` therefore stays in `m.toml`, and `conjugate_to` is free text ("beta" for the
   one coupling `T`), so `probes` is checked against `names` and the stored scalars, not against `conjugate_to`.
+- **v06-rules: the difference estimator does not read MARGINAL where it is tightest (plan 0872 P4, recorded and not repaired).** On x2b-xy-2 the stability reads TRANSFORMED at all
+  five low-phase points and no point reads WALKING, but `across_delta` is MARGINAL only at T 0.5; the pairs 0.6->0.7 and 0.7->0.8 read SLOW- (WEAK), and a point whose two touching pairs
+  disagree is UNRES, so geometry is LINE at 0.5 and REFUSE-UNRES / REFUSE-WEAK at 0.6-0.85. The family x2b-xy under v06-rules reads x2b-xy (covariance across plus F1) and is BKT-END with
+  end_bracket [0.89294, 0.95]. `expected/v06-rules.toml` keeps the declaration and the after-run `[[change]]`.

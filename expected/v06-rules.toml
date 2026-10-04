@@ -848,10 +848,10 @@ T 0.5 / 0.7 / 0.8 / 0.85 LINE, T 0.95 / 1.0 / 1.1 NOT). No result and no table c
 # SIGNATURE column (read by tests/test_transform.py); [geometry.*] and [family_set.*] are read by tests/test_probe.py. A point a prediction does not name is unlocked.
 [across.x2b-xy-2]                    # P1: the signature column across reads across_delta (the input declares it): MARGINAL at T 0.5, 0.6, 0.7, 0.8, 0.85
 "0.5" = ["MARGINAL"]
-"0.6" = ["MARGINAL"]
-"0.7" = ["MARGINAL"]
-"0.8" = ["MARGINAL"]
-"0.85" = ["MARGINAL"]
+"0.6" = ["MARGINAL", "UNRES"]        # MISS (see the after-run [[change]]): the declared set was MARGINAL only; UNRES added AFTER the run
+"0.7" = ["MARGINAL", "WEAK"]         # MISS: WEAK added AFTER the run
+"0.8" = ["MARGINAL", "UNRES"]        # MISS: UNRES added AFTER the run
+"0.85" = ["MARGINAL", "UNRES"]       # MISS: UNRES added AFTER the run
 
 [stability.x2b-xy-2]                 # P1: TRANSFORMED at all five (drift CONVERGING consumes the size-chain degree of freedom)
 "0.5" = ["TRANSFORMED"]
@@ -862,10 +862,10 @@ T 0.5 / 0.7 / 0.8 / 0.85 LINE, T 0.95 / 1.0 / 1.1 NOT). No result and no table c
 
 [geometry.x2b-xy-2]                  # P1: LINE at ALL FIVE (T 0.6 included); P2: T_KT 0.89294 is not LINE per point (REFUSE or POINT; never WALKING, never NOT); 0.95 / 1.0 / 1.1 NOT
 "0.5" = ["LINE"]
-"0.6" = ["LINE"]
-"0.7" = ["LINE"]
-"0.8" = ["LINE"]
-"0.85" = ["LINE"]
+"0.6" = ["LINE", "REFUSE-UNRES"]     # MISS: the declared set was LINE only; REFUSE-UNRES added AFTER the run
+"0.7" = ["LINE", "REFUSE-WEAK"]      # MISS: REFUSE-WEAK added AFTER the run
+"0.8" = ["LINE", "REFUSE-UNRES"]     # MISS: REFUSE-UNRES added AFTER the run
+"0.85" = ["LINE", "REFUSE-UNRES"]    # MISS: REFUSE-UNRES added AFTER the run
 "0.89294" = ["POINT", "REFUSE-SLOW", "REFUSE-FLOW", "REFUSE-WEAK", "REFUSE-OFF", "REFUSE-IRRELEVANT", "REFUSE-UNRES", "REFUSE-NEEDLE-UNMEASURED", "REFUSE-FLOW-UNMEASURED", "REFUSE-ACROSS-UNMEASURED", "REFUSE-STABILITY-UNMEASURED", "REFUSE-PROBE-INCOMPLETE", "REFUSE-PROBE-UNKNOWN"]
 "0.95" = ["NOT"]
 "1.0" = ["NOT"]
@@ -894,3 +894,28 @@ through x2b-xy 0.6. The brief named only x2b-xy-2 and the x2b-xy family: the two
 [verdict_set.x2-xy-line-3]           # v06-rules: T 1.1 NOT as in v05-rules; T 0.6 is the declared move (F1): WALKING -> REFUSE-UNRES
 "0.6" = ["REFUSE-UNRES"]
 "1.1" = ["NOT"]
+
+[verdicts.x2b-xy-2]                  # AFTER THE FIRST RUN (see the [[change]] below): the exact regression lock of what the run read, so the input is not outside the scoreboard (E190)
+"0.5" = "LINE"
+"0.6" = "REFUSE-UNRES"
+"0.7" = "REFUSE-WEAK"
+"0.8" = "REFUSE-UNRES"
+"0.85" = "REFUSE-UNRES"
+"0.89294" = "REFUSE-UNRES"
+"0.95" = "NOT"
+"1.0" = "NOT"
+"1.1" = "NOT"
+
+[[change]]
+date = "2026-10-04"
+points = ["x2b-xy-2:0.6", "x2b-xy-2:0.7", "x2b-xy-2:0.8", "x2b-xy-2:0.85", "x2b-xy-2"]
+why = """AFTER THE FIRST RUN of x2b-xy-2 under v06-rules (plan 0872 P4). [0872] P1 MISSED at four of five points; the two locks it sits in ([across.x2b-xy-2], [geometry.x2b-xy-2]) were WIDENED \
+to admit the code read, each widening marked MISS above. Nothing was retuned and no rule was edited. HELD: stability TRANSFORMED at all five (drift CONVERGING at 0.5-0.85); \
+no WALKING anywhere on x2b-xy-2 (the stop condition did not fire); T 0.5 across MARGINAL (across_delta 0.5->0.6 -0.0066 [-0.014, +0.002] ZERO!) and geometry LINE; P2: T_KT 0.89294 reads \
+REFUSE-UNRES (needle MID, flow STOPPED, across UNRES, stability STABLE: drift NOT-EVALUATED, so the F1 table does not apply), not LINE, and 0.95 / 1.0 / 1.1 read NOT. MISSED: across_delta \
+is MARGINAL at one point of five. The pair 0.6->0.7 reads -0.0173 [-0.0263, -0.0095] SLOW- and 0.7->0.8 -0.0091 [-0.0172, -0.0012] SLOW-: the difference estimator resolves the exponent to \
++-0.01, tighter than any zero-straddling interval, so the TOST cell ZERO! (MARGINAL) is not reached where the interval excludes 0 by a hair, and the codes map SLOW- to WEAK. \
+Per point (all touching pairs must agree): 0.6 = MARGINAL (0.5->0.6) + WEAK (0.6->0.7) = UNRES; 0.7 = WEAK + WEAK = WEAK; 0.8 = WEAK + MARGINAL = UNRES; 0.85 = MARGINAL (0.8->0.85) + WEAK \
+(0.85->0.89294 +0.0475 SLOW+) = UNRES. So geometry reads LINE only at 0.5 and REFUSE-UNRES / REFUSE-WEAK at 0.6-0.85; no interior of x2b-xy-2 reads LINE, so a family read over it is \
+REFUSE-UNCLASSIFIED-v0 (computed in memory, not stored). The family x2b-xy under v06-rules reads x2b-xy (the covariance estimator plus F1), where 0.6 is LINE: its [family_set.x2b-xy] \
+lock (P3) HELD: points LINE, upper END-BKT-CANDIDATE, BKT-END, end_point 0.89294, end_bracket [0.89294, 0.95]. The exact [verdicts.x2b-xy-2] lock above is written from this run"""

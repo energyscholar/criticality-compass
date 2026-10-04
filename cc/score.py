@@ -223,7 +223,8 @@ def reverdict_result(res, T, commit="none"):
         codes = detect.codes_of(view.cells_of(res, pt), T)
         sig = {n: codes[n] for n in T.codes["columns"]["signature"]}
         verdict, cls, line, why = detect.verdict_of(sig, T)
-        mine = [recode(rd, codes, direct, cols) for rd in res["readings"] if rd["unit"]["point"] == pt]
+        mine = [recode(rd, codes, direct, cols) for rd in res["readings"] if rd["unit"]["point"] == pt
+                and f"{rd['instrument']}.{rd['column']}" in direct]   # plan 0872: a reading the new set does not read (a v06 helper column) is not carried into it
         flags = {s: sorted({f for rd in mine if f"{rd['instrument']}.{rd['column']}" in detect.sources(s, cols)
                             for f in rd["flags"]}) for s in sig}
         readings += mine

@@ -63,7 +63,7 @@ def column_line(col, rs, sig, mode, cfg):
         if r["estimate"] is not None:
             items += [("estimate", f"{r['estimate']:.4g}"), ("lo", f"[{r['lo']:.4g},"), ("hi", f"{r['hi']:.4g}]")]
         celled = len(rs) > 1 or r["cell"] not in (None, code)
-        if celled:
+        if celled and r["cell"] is not None:   # a per-size / per-pair reading holds its cells in per_size
             items.append(("cell", shown(r["cell"], None, mode, cfg)))
         if r["eps"] is not None:
             (items if celled else late).append(("eps", f"eps {r['eps_key']}={r['eps']}"))
@@ -74,8 +74,9 @@ def column_line(col, rs, sig, mode, cfg):
     if reason and not (mode == "basic" and code in cfg["basic"]["blank"]):
         items.append(("reason", f"({reason})"))
     r0 = rs[0] if rs else {"eps": None, "per_size": None, "vector_key": None}
-    if r0["per_size"]:
-        items.append(("per_size", "per size: " + "; ".join(f"{q['size']} {q['cell']} {q['code']}" for q in r0["per_size"])))
+    for r in rs:
+        if r["per_size"]:
+            items.append(("per_size", ("per pair: " if "->" in str(r["per_size"][0]["size"]) else "per size: ") + "; ".join(f"{q['size']} {q['cell']} {q['code']}" for q in r["per_size"])))
     if sig["flags"].get(col):
         items.append(("flags", "flags: " + words(sig["flags"][col], cfg)))
     if r0["vector_key"] and len(rs) == 1:
