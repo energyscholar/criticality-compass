@@ -151,6 +151,13 @@ tables = "v03-rules"
 "0.21" = "REFUSE-NEEDLE-UNMEASURED"
 "0.2747" = "REFUSE-NEEDLE-UNMEASURED"
 
+[verdicts.b7-at-line-4]              # plan 0870 P-1: locked exactly as it reads under v03-rules (E155 "UNLOCKED first readings")
+"0.0" = "REFUSE-TWO-START-UNMEASURED"
+"0.07" = "REFUSE-TWO-START-UNMEASURED"
+"0.14" = "REFUSE-TWO-START-UNMEASURED"
+"0.21" = "REFUSE-TWO-START-UNMEASURED"
+"0.2747" = "REFUSE-TWO-START-UNMEASURED"
+
 [order.b7-at-line-2]
 "0.0" = "NEEDLE-UNMEASURED"
 "0.07" = "NEEDLE-UNMEASURED"
@@ -309,6 +316,20 @@ tables = "v03-rules"
 "0.14" = "NEEDLE-UNMEASURED"
 "0.21" = "NEEDLE-UNMEASURED"
 "0.2747" = "NEEDLE-UNMEASURED"
+
+[order.b7-at-line-4]
+"0.0" = "ORDER-UNMEASURED"
+"0.07" = "ORDER-UNMEASURED"
+"0.14" = "ORDER-UNMEASURED"
+"0.21" = "ORDER-UNMEASURED"
+"0.2747" = "ORDER-UNMEASURED"
+
+[geometry.b7-at-line-4]              # plan 0870 P-1: the geometry axis (read by tests/test_probe.py); 0.0 and 0.07 are the two confident-wrong POINTs of E151
+"0.0" = "POINT"
+"0.07" = "POINT"
+"0.14" = "REFUSE-FLOW"
+"0.21" = "REFUSE-FLOW"
+"0.2747" = "REFUSE-FLOW"
 
 [fluct.w2-potts-2]
 "2" = ["VANISHES"]
@@ -505,3 +526,10 @@ why = """AFTER THE RUN (plan 0867 P3). q3 and q4 verdict REFUSE-FLOW (needle MID
 said only 'refusal or POINT-family'. q5 two_start read UNRES (L81 +0.00662 [-0.00033, 0.01170] straddles zero under CC's own block \
 resample; L243 UNRES as in X9c.txt), not COEXIST: the allowed marginal-cell difference, so the q5 lock admits UNRES and INDEP; the verdict \
 is NOT either way. Nothing else moved: q6, q8, q10 FIRST-ORDER, every needle_pair as declared"""
+
+[[change]]
+date = "2026-10-03"
+points = ["b7-at-line-4:*"]
+why = """plan 0870 P-1, BEFORE any v04-rules run: b7-at-line-4 (needle declared, no ordered start) had no lock (E155). It is locked here exactly as \
+it reads under v03-rules today (verdict REFUSE-TWO-START-UNMEASURED x5, order ORDER-UNMEASURED x5, geometry POINT, POINT, REFUSE-FLOW x3), so \
+that the v04-rules re-verdict of its geometry at 0.0 and 0.07 is a declared change and not a silent one (review F5). No result moved"""

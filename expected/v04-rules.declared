@@ -1,0 +1,568 @@
+# expected/v04-rules.toml - the SCOREBOARD LOCK for v04-rules (plan 0870), DECLARED BEFORE ANY v04-rules RUN. It is committed in P-1 as
+# expected/v04-rules.declared (so the scoreboard test, which reads every expected/*.toml against stored results, has nothing to read yet)
+# and renamed to expected/v04-rules.toml in the phase that first runs the set. v04-rules = v03-rules forked: every lock below is the v03-rules
+# lock carried over UNCHANGED, except the cells the [[change]] at the end names. Nothing else may move on any existing input.
+# It is NOT truth: agreement with class_truth / order_truth is reported by bin/cc tabulate (cc/score.py), never here.
+schema = 1
+kind = "expected"
+tables = "v04-rules"
+
+[verdicts.x8-ising-needle]
+"0.90" = "NOT"
+"0.95" = "NOT"
+"0.98" = "NOT"
+"0.99" = "NOT"
+"1.00" = "REFUSE-TWO-START-UNMEASURED"
+"1.01" = "NOT"
+"1.02" = "NOT"
+"1.05" = "NOT"
+"1.10" = "NOT"
+
+[verdicts.b7-at-line]
+"0.0" = "REFUSE-NEEDLE-UNMEASURED"
+"0.07" = "REFUSE-NEEDLE-UNMEASURED"
+"0.14" = "REFUSE-NEEDLE-UNMEASURED"
+"0.21" = "REFUSE-NEEDLE-UNMEASURED"
+"0.2747" = "REFUSE-NEEDLE-UNMEASURED"
+
+[verdicts.w2-potts]
+"2" = "REFUSE-NEEDLE-UNMEASURED"
+"3" = "REFUSE-NEEDLE-UNMEASURED"
+"4" = "REFUSE-NEEDLE-UNMEASURED"
+"5" = "REFUSE-NEEDLE-UNMEASURED"
+
+[verdicts.c2-bc-two-start]           # no needle on this input: every point refuses
+"d2.0-K1.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K1.2" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K1.4" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K1.6" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K1.8" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K2.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K2.3" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K2.6" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K3.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K1.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K1.2" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K1.4" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K1.6" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K1.8" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K2.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K2.3" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K2.6" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K3.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K1.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K1.2" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K1.4" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K1.6" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K1.8" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K2.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K2.3" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K2.6" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K3.0" = "REFUSE-NEEDLE-UNMEASURED"
+
+[verdicts.x2-xy-line]                # frozen X2.txt: LINE points 0.5-0.7 read REFUSE-SLOW (the STAGE3 flaw)
+"0.5" = "REFUSE-SLOW"
+"0.6" = "REFUSE-SLOW"
+"0.7" = "REFUSE-SLOW"
+"0.89294" = "REFUSE-UNRES"           # the BKT breaker: a refusal is the good outcome (X2 Pb)
+"1.1" = "NOT"
+
+[verdicts.x3-clock6]                 # frozen X3.txt: the critical phase and both KT ends read REFUSE-SLOW
+"0.5" = "NOT"
+"0.7014" = "REFUSE-SLOW"
+"0.75" = "REFUSE-SLOW"
+"0.8" = "REFUSE-SLOW"
+"0.85" = "REFUSE-SLOW"
+"0.9008" = "REFUSE-SLOW"
+"1.1" = "NOT"
+
+[verdicts.x4-ising-field]            # frozen X4.txt: the pipeline verdict is NOT at all three; X4_CELL (the
+"0.46" = "NOT"                       # h-crossing, not an instrument of v0) is what calls FIRST-ORDER-LINE
+"0.5" = "NOT"
+"0.55" = "NOT"
+
+[verdicts.b7-at-line-2]              # b7 data + the along instrument: no needle, so every point refuses
+"0.0" = "REFUSE-NEEDLE-UNMEASURED"
+"0.07" = "REFUSE-NEEDLE-UNMEASURED"
+"0.14" = "REFUSE-NEEDLE-UNMEASURED"
+"0.21" = "REFUSE-NEEDLE-UNMEASURED"
+"0.2747" = "REFUSE-NEEDLE-UNMEASURED"
+
+[verdicts.x7a-bc]                    # needle only (no two_start): MID points refuse, off-window points are NOT
+"0.0" = "NOT"
+"1.0" = "NOT"
+"1.5" = "NOT"
+"1.8" = "REFUSE-TWO-START-UNMEASURED"
+"1.9" = "NOT"
+"1.95" = "REFUSE-TWO-START-UNMEASURED"
+
+[verdicts.x7a-nnn]
+"k2-0.0" = "REFUSE-TWO-START-UNMEASURED"
+"k2-0.1" = "REFUSE-TWO-START-UNMEASURED"
+
+[verdicts.x5-bilayer]
+"0.0" = "REFUSE-SLOW"
+"0.1" = "NOT"
+"0.3" = "REFUSE-SLOW"
+
+[verdicts.x5n-bilayer]
+"0.0" = "REFUSE-PROBE-INCOMPLETE"
+"0.1" = "REFUSE-PROBE-INCOMPLETE"
+"0.3" = "REFUSE-PROBE-INCOMPLETE"
+
+[verdicts.w2-potts-2]
+"2" = "REFUSE-NEEDLE-UNMEASURED"
+"3" = "REFUSE-NEEDLE-UNMEASURED"
+"4" = "REFUSE-NEEDLE-UNMEASURED"
+"5" = "REFUSE-NEEDLE-UNMEASURED"
+
+[verdicts.x2-xy-line-2]
+"0.5" = "REFUSE-SLOW"
+"0.6" = "REFUSE-SLOW"
+"0.7" = "REFUSE-SLOW"
+"0.89294" = "REFUSE-UNRES"
+"1.1" = "NOT"
+
+[verdicts.x3-clock6-2]
+"0.5" = "NOT"
+"0.7014" = "REFUSE-SLOW"
+"0.75" = "REFUSE-SLOW"
+"0.8" = "REFUSE-SLOW"
+"0.85" = "REFUSE-SLOW"
+"0.9008" = "REFUSE-SLOW"
+"1.1" = "NOT"
+
+[verdicts.x4-ising-field-2]
+"0.46" = "NOT"
+"0.5" = "NOT"
+"0.55" = "NOT"
+
+[verdicts.x5-bilayer-2]
+"0.0" = "REFUSE-SLOW"
+"0.1" = "NOT"
+"0.3" = "REFUSE-SLOW"
+
+[verdicts.b7-at-line-3]
+"0.0" = "REFUSE-NEEDLE-UNMEASURED"
+"0.07" = "REFUSE-NEEDLE-UNMEASURED"
+"0.14" = "REFUSE-NEEDLE-UNMEASURED"
+"0.21" = "REFUSE-NEEDLE-UNMEASURED"
+"0.2747" = "REFUSE-NEEDLE-UNMEASURED"
+
+[verdicts.b7-at-line-4]              # plan 0870 P-1: locked exactly as it reads under v03-rules (E155 "UNLOCKED first readings")
+"0.0" = "REFUSE-TWO-START-UNMEASURED"
+"0.07" = "REFUSE-TWO-START-UNMEASURED"
+"0.14" = "REFUSE-TWO-START-UNMEASURED"
+"0.21" = "REFUSE-TWO-START-UNMEASURED"
+"0.2747" = "REFUSE-TWO-START-UNMEASURED"
+
+[order.b7-at-line-2]
+"0.0" = "NEEDLE-UNMEASURED"
+"0.07" = "NEEDLE-UNMEASURED"
+"0.14" = "NEEDLE-UNMEASURED"
+"0.21" = "NEEDLE-UNMEASURED"
+"0.2747" = "NEEDLE-UNMEASURED"
+
+[verdicts.w1-potts]
+"2" = "REFUSE-NEEDLE-UNMEASURED"
+"3" = "REFUSE-NEEDLE-UNMEASURED"
+"4" = "REFUSE-NEEDLE-UNMEASURED"
+"5" = "REFUSE-NEEDLE-UNMEASURED"
+"7" = "REFUSE-NEEDLE-UNMEASURED"
+
+[verdicts.w3-potts]
+"4" = "REFUSE-NEEDLE-UNMEASURED"
+"5" = "REFUSE-NEEDLE-UNMEASURED"
+"6" = "REFUSE-NEEDLE-UNMEASURED"
+
+[verdicts.x4-ising-field-3]
+"0.46" = "NOT"
+"0.5" = "NOT"
+"0.55" = "NOT"
+
+[order.b7-at-line]
+"0.0" = "NEEDLE-UNMEASURED"
+"0.07" = "NEEDLE-UNMEASURED"
+"0.14" = "NEEDLE-UNMEASURED"
+"0.21" = "NEEDLE-UNMEASURED"
+"0.2747" = "NEEDLE-UNMEASURED"
+
+[order.c2-bc-two-start]
+"d2.0-K1.0" = "NEEDLE-UNMEASURED"
+"d2.0-K1.2" = "NEEDLE-UNMEASURED"
+"d2.0-K1.4" = "NEEDLE-UNMEASURED"
+"d2.0-K1.6" = "NEEDLE-UNMEASURED"
+"d2.0-K1.8" = "NEEDLE-UNMEASURED"
+"d2.0-K2.0" = "NEEDLE-UNMEASURED"
+"d2.0-K2.3" = "NEEDLE-UNMEASURED"
+"d2.0-K2.6" = "NEEDLE-UNMEASURED"
+"d2.0-K3.0" = "NEEDLE-UNMEASURED"
+"d1.95-K1.0" = "NEEDLE-UNMEASURED"
+"d1.95-K1.2" = "NEEDLE-UNMEASURED"
+"d1.95-K1.4" = "NEEDLE-UNMEASURED"
+"d1.95-K1.6" = "NEEDLE-UNMEASURED"
+"d1.95-K1.8" = "NEEDLE-UNMEASURED"
+"d1.95-K2.0" = "NEEDLE-UNMEASURED"
+"d1.95-K2.3" = "NEEDLE-UNMEASURED"
+"d1.95-K2.6" = "NEEDLE-UNMEASURED"
+"d1.95-K3.0" = "NEEDLE-UNMEASURED"
+"d1.9-K1.0" = "NEEDLE-UNMEASURED"
+"d1.9-K1.2" = "NEEDLE-UNMEASURED"
+"d1.9-K1.4" = "NEEDLE-UNMEASURED"
+"d1.9-K1.6" = "NEEDLE-UNMEASURED"
+"d1.9-K1.8" = "NEEDLE-UNMEASURED"
+"d1.9-K2.0" = "NEEDLE-UNMEASURED"
+"d1.9-K2.3" = "NEEDLE-UNMEASURED"
+"d1.9-K2.6" = "NEEDLE-UNMEASURED"
+"d1.9-K3.0" = "NEEDLE-UNMEASURED"
+
+[order.w2-potts]
+"2" = "NEEDLE-UNMEASURED"
+"3" = "NEEDLE-UNMEASURED"
+"4" = "NEEDLE-UNMEASURED"
+"5" = "NEEDLE-UNMEASURED"
+
+[order.x2-xy-line]
+"0.5" = "EQUILIBRATED"
+"0.6" = "EQUILIBRATED"
+"0.7" = "EQUILIBRATED"
+"0.89294" = "EQUILIBRATED"
+"1.1" = "OFF-WINDOW"
+
+[order.x3-clock6]
+"0.5" = "OFF-WINDOW"
+"0.7014" = "EQUILIBRATED"
+"0.75" = "EQUILIBRATED"
+"0.8" = "EQUILIBRATED"
+"0.85" = "EQUILIBRATED"
+"0.9008" = "EQUILIBRATED"
+"1.1" = "OFF-WINDOW"
+
+[order.x4-ising-field]
+"0.46" = "OFF-WINDOW"
+"0.5" = "OFF-WINDOW"
+"0.55" = "OFF-WINDOW"
+
+[order.x5-bilayer]
+"0.0" = "EQUILIBRATED"
+"0.1" = "OFF-WINDOW"
+"0.3" = "EQUILIBRATED"
+
+[order.x7a-bc]
+"0.0" = "OFF-WINDOW"
+"1.0" = "OFF-WINDOW"
+"1.5" = "OFF-WINDOW"
+"1.8" = "ORDER-UNMEASURED"
+"1.9" = "OFF-WINDOW"
+"1.95" = "ORDER-UNMEASURED"
+
+[order.x7a-nnn]
+"k2-0.0" = "ORDER-UNMEASURED"
+"k2-0.1" = "ORDER-UNMEASURED"
+
+[order.x8-ising-needle]
+"0.90" = "OFF-WINDOW"
+"0.95" = "OFF-WINDOW"
+"0.98" = "OFF-WINDOW"
+"0.99" = "OFF-WINDOW"
+"1.00" = "ORDER-UNMEASURED"
+"1.01" = "OFF-WINDOW"
+"1.02" = "OFF-WINDOW"
+"1.05" = "OFF-WINDOW"
+"1.10" = "OFF-WINDOW"
+
+[order.w2-potts-2]
+"2" = "NEEDLE-UNMEASURED"
+"3" = "NEEDLE-UNMEASURED"
+"4" = "NEEDLE-UNMEASURED"
+"5" = "NEEDLE-UNMEASURED"
+
+[order.x2-xy-line-2]
+"0.5" = ["CONTINUOUS", "EQUILIBRATED-UNRES"]
+"0.6" = ["CONTINUOUS", "EQUILIBRATED-UNRES"]
+"0.7" = ["CONTINUOUS", "EQUILIBRATED-UNRES"]
+"0.89294" = ["CONTINUOUS", "EQUILIBRATED-UNRES"]
+"1.1" = "OFF-WINDOW"
+
+[order.x3-clock6-2]
+"0.5" = "OFF-WINDOW"
+"0.7014" = ["CONTINUOUS", "EQUILIBRATED-UNRES"]
+"0.75" = ["CONTINUOUS", "EQUILIBRATED-UNRES"]
+"0.8" = ["CONTINUOUS", "EQUILIBRATED-UNRES"]
+"0.85" = ["CONTINUOUS", "EQUILIBRATED-UNRES"]
+"0.9008" = ["CONTINUOUS", "EQUILIBRATED-UNRES"]
+"1.1" = "OFF-WINDOW"
+
+[order.x4-ising-field-2]
+"0.46" = "OFF-WINDOW"
+"0.5" = "OFF-WINDOW"
+"0.55" = "OFF-WINDOW"
+
+[order.x5-bilayer-2]
+"0.0" = ["CONTINUOUS", "EQUILIBRATED-UNRES"]
+"0.1" = "OFF-WINDOW"
+"0.3" = ["CONTINUOUS", "EQUILIBRATED-UNRES"]
+
+[order.x5n-bilayer]
+"0.0" = "CONTINUOUS"
+"0.1" = "CONTINUOUS"
+"0.3" = "CONTINUOUS"
+
+[order.b7-at-line-3]
+"0.0" = "NEEDLE-UNMEASURED"
+"0.07" = "NEEDLE-UNMEASURED"
+"0.14" = "NEEDLE-UNMEASURED"
+"0.21" = "NEEDLE-UNMEASURED"
+"0.2747" = "NEEDLE-UNMEASURED"
+
+[order.b7-at-line-4]
+"0.0" = "ORDER-UNMEASURED"
+"0.07" = "ORDER-UNMEASURED"
+"0.14" = "ORDER-UNMEASURED"
+"0.21" = "ORDER-UNMEASURED"
+"0.2747" = "ORDER-UNMEASURED"
+
+[geometry.x5n-bilayer]
+"0.0" = "REFUSE-PROBE-INCOMPLETE"
+"0.1" = "REFUSE-PROBE-INCOMPLETE"
+"0.3" = "REFUSE-PROBE-INCOMPLETE"
+
+[geometry.x5n-bilayer-2]
+"0.0" = "REFUSE-PROBE-INCOMPLETE"
+"0.1" = "REFUSE-PROBE-INCOMPLETE"
+"0.3" = "REFUSE-PROBE-INCOMPLETE"
+
+[geometry.b7-at-line-4]              # plan 0870 P-1: the geometry axis (read by tests/test_probe.py); 0.0 and 0.07 were the two confident-wrong POINTs of E151 (v03-rules)
+"0.0" = "REFUSE-PROBE-INCOMPLETE"
+"0.07" = "REFUSE-PROBE-INCOMPLETE"
+"0.14" = "REFUSE-FLOW"
+"0.21" = "REFUSE-FLOW"
+"0.2747" = "REFUSE-FLOW"
+
+[fluct.w2-potts-2]
+"2" = ["VANISHES"]
+"3" = ["VANISHES"]
+"4" = ["VANISHES"]
+"5" = ["VANISHES", "UNRES"]
+
+[fluct.x2-xy-line-2]
+"0.5" = ["VANISHES", "UNRES"]
+"0.6" = ["VANISHES", "UNRES"]
+"0.7" = ["VANISHES", "UNRES"]
+"0.89294" = ["VANISHES", "UNRES"]
+"1.1" = ["VANISHES", "UNRES"]
+
+[fluct.x3-clock6-2]
+"0.5" = ["VANISHES", "UNRES"]
+"0.7014" = ["VANISHES", "UNRES"]
+"0.75" = ["VANISHES", "UNRES"]
+"0.8" = ["VANISHES", "UNRES"]
+"0.85" = ["VANISHES", "UNRES"]
+"0.9008" = ["VANISHES", "UNRES"]
+"1.1" = ["VANISHES", "UNRES"]
+
+[fluct.x5-bilayer-2]
+"0.0" = ["VANISHES", "UNRES"]
+"0.1" = ["VANISHES", "UNRES"]
+"0.3" = ["VANISHES", "UNRES"]
+
+[fluct.x5n-bilayer]
+"0.0" = "VANISHES"
+"0.1" = "VANISHES"
+"0.3" = "VANISHES"
+
+[fluct.b7-at-line-3]
+"0.0" = ["VANISHES", "UNRES"]
+"0.07" = ["VANISHES", "UNRES"]
+"0.14" = ["VANISHES", "UNRES"]
+"0.21" = ["VANISHES", "UNRES"]
+"0.2747" = ["VANISHES", "UNRES"]
+
+[order.w1-potts]
+"2" = "NEEDLE-UNMEASURED"
+"3" = "NEEDLE-UNMEASURED"
+"4" = "NEEDLE-UNMEASURED"
+"5" = "NEEDLE-UNMEASURED"
+"7" = "NEEDLE-UNMEASURED"
+
+[order.w3-potts]
+"4" = "NEEDLE-UNMEASURED"
+"5" = "NEEDLE-UNMEASURED"
+"6" = "NEEDLE-UNMEASURED"
+
+[fluct.w1-potts]
+"2" = ["VANISHES"]
+"3" = ["VANISHES"]
+"4" = ["VANISHES"]
+"5" = ["VANISHES"]
+"7" = ["VANISHES"]
+
+[fluct.w3-potts]
+"4" = ["VANISHES"]
+"5" = ["VANISHES"]
+"6" = ["VANISHES"]
+
+[two_start.w1-potts]
+"2" = ["INDEP"]
+"3" = ["INDEP"]
+"4" = ["UNRES"]
+"5" = ["UNRES"]
+"7" = ["COEXIST"]
+
+[two_start.w3-potts]
+"4" = ["INDEP"]
+"5" = ["FLUCT"]
+"6" = ["COEXIST"]
+
+[order.x4-ising-field-3]
+"0.46" = "OFF-WINDOW"
+"0.5" = "OFF-WINDOW"
+"0.55" = "OFF-WINDOW"
+
+[two_start.x4-ising-field-3]
+"0.46" = ["FLUCT"]
+"0.5" = ["FLUCT"]
+"0.55" = ["FLUCT"]
+
+[[family]]
+id = "b7-at-line-2"
+verdict = "LINE"
+bracket = "NOT-MEASURED"
+f1 = "VARIES"
+f2 = "MARGINAL"
+
+[[family]]
+id = "x8-ising-compass"
+verdict = "REFUSE-UNCLASSIFIED-v0"
+bracket = "BRACKET"
+f1 = "NOT-MEASURED"
+f2 = "NOT-MEASURED"
+
+[[family]]
+id = "x7a-bc-lambda"
+verdict = "REFUSE-OFF-MANIFOLD"
+bracket = "NON-MONOTONE"
+f1 = "NOT-MEASURED"
+f2 = "REFUSE-OFF-MANIFOLD"
+
+[[family]]
+id = "x7a-nnn-manifold"
+verdict = "REFUSE-UNCLASSIFIED-v0"
+bracket = "BRACKET"
+f1 = "NOT-MEASURED"
+f2 = "NOT-EVALUATED"
+
+[verdicts.x5n-bilayer-2]             # plan 0867 P1: x5n-bilayer with needle_o; the verdicts are x5n-bilayer's (POINT x 3)
+"0.0" = "REFUSE-PROBE-INCOMPLETE"
+"0.1" = "REFUSE-PROBE-INCOMPLETE"
+"0.3" = "REFUSE-PROBE-INCOMPLETE"
+
+[order.x5n-bilayer-2]
+"0.0" = "CONTINUOUS"
+"0.1" = "CONTINUOUS"
+"0.3" = "CONTINUOUS"
+
+[fluct.x5n-bilayer-2]
+"0.0" = "VANISHES"
+"0.1" = "VANISHES"
+"0.3" = "VANISHES"
+
+[verdicts.x9c-potts]                 # q5, q6, q8, q10 transcribed from X9c.txt before the run; q3, q4 (X9c.txt: "refusal or POINT-family") SEEN after it
+"3" = "REFUSE-FLOW"                  # seen, not predicted
+"4" = "REFUSE-FLOW"                  # seen, not predicted
+"5" = "NOT"
+"6" = "FIRST-ORDER"
+"8" = "FIRST-ORDER"
+"10" = "FIRST-ORDER"
+
+[two_start.x9c-potts]               # transcribed from the frozen toolset results/X9c.txt BEFORE the CC run (plan 0867 P3); q5 L81 POS is marginal
+"3" = ["INDEP"]
+"4" = ["INDEP"]
+"5" = ["COEXIST", "UNRES", "INDEP"]       # X9c.txt reads COEXIST on one marginal cell (L81 POS +0.0066); CC reads UNRES (the allowed difference, brief 0867 P3)
+"6" = ["COEXIST"]
+"8" = ["COEXIST"]
+"10" = ["COEXIST"]
+
+[needle_pair.x9c-potts]              # transcribed from results/X9c.txt BEFORE the CC run
+"3" = ["SAME-WINDOW"]
+"4" = ["SAME-WINDOW"]
+"5" = ["HALF-PINNED"]
+"6" = ["HALF-PINNED"]
+"8" = ["PINNED-BETWEEN-PHASES"]
+"10" = ["PINNED-BETWEEN-PHASES"]
+
+[needle_pair.x5n-bilayer-2]          # predicted from the physics, not seen: at the confirmed stop both starts sit on the window
+"0.0" = ["SAME-WINDOW", "HALF-PINNED"]   # NEVER PINNED-BETWEEN-PHASES (a continuous point) and NEVER CROSSED
+"0.1" = ["SAME-WINDOW", "HALF-PINNED"]
+"0.3" = ["SAME-WINDOW", "HALF-PINNED"]
+
+[needle_pair.EVERY-OTHER-INPUT]      # the existing inputs declare no ordered-start GL (needle_o): NOT-MEASURED at every point
+"*" = "NOT-MEASURED"
+
+[[change]]
+date = "2026-10-02"
+points = ["*"]
+why = """DECLARED BEFORE THE FIRST RUN under v03-rules (plan 0867 P1, G6). v03-rules = v02-rules + needle_pair. The ONLY cells of the \
+signature domain whose verdict differs from v02-rules are those with needle in {DIS, ORD}, needle_pair PINNED-BETWEEN-PHASES and \
+two_start COEXIST (NOT -> FIRST-ORDER; order OFF-WINDOW -> COEXIST-AT-WINDOW). An existing input declares no ordered-start level \
+stack (no needle_o), so its needle_pair reads NOT-MEASURED and none of its points can sit in that cell: the predicted effect on \
+fixture points is NONE (x4-ising-field-3 reads FLUCT, not COEXIST, so is not an exception). Every verdict above is the v02-rules lock \
+carried over. A moved point is a finding, never an edit of this file"""
+
+[[change]]
+date = "2026-10-02"
+points = ["x5n-bilayer-2:*"]
+why = """DECLARED BEFORE THE RUN of x5n-bilayer-2 (plan 0867 P1): x5n-bilayer (POINT at all three g, order CONTINUOUS, fluct VANISHES) with \
+the needle_o instrument reading the ordered start's own GL at L 243 / 81, so needle_pair is measured. Same blocks, seed and draws as \
+x5n-bilayer, so every verdict, order and fluct line is that input's. needle_pair is predicted SAME-WINDOW or HALF-PINNED (a continuous \
+critical point: both starts flow to the one fixed point), never PINNED-BETWEEN-PHASES, never CROSSED. A PINNED or CROSSED reading would be \
+a finding about the data, not a thing to repair"""
+
+[[change]]
+date = "2026-10-03"
+points = ["x9c-potts:*"]
+why = """DECLARED BEFORE THE RUN of x9c-potts (plan 0867 P3), transcribing the toolset's frozen results/X9c.txt (scored by the Auditor from the \
+same 36 npz): needle_pair q3/q4 SAME-WINDOW, q5/q6 HALF-PINNED, q8/q10 PINNED-BETWEEN-PHASES; two_start q3/q4 INDEP, q5/q6/q8/q10 COEXIST; \
+v03-rules verdict q8, q10, q6 FIRST-ORDER and q5 NOT (q3, q4: a refusal or a POINT-family cell, never FIRST-ORDER; their verdict lock is \
+written after the run and says so). q5's two_start rests on one marginal size cell (L81 POS +0.0066); CC's own resample stream may move it, \
+which would be a reported difference, not an edit of this file. A q8 or q10 verdict other than FIRST-ORDER, or any CROSSED pair, is a stop"""
+
+[[change]]
+date = "2026-10-03"
+points = ["x9c-potts:3", "x9c-potts:4", "x9c-potts:5"]
+why = """AFTER THE RUN (plan 0867 P3). q3 and q4 verdict REFUSE-FLOW (needle MID, flow unresolved; order CONTINUOUS) is SEEN, not predicted: X9c.txt \
+said only 'refusal or POINT-family'. q5 two_start read UNRES (L81 +0.00662 [-0.00033, 0.01170] straddles zero under CC's own block \
+resample; L243 UNRES as in X9c.txt), not COEXIST: the allowed marginal-cell difference, so the q5 lock admits UNRES and INDEP; the verdict \
+is NOT either way. Nothing else moved: q6, q8, q10 FIRST-ORDER, every needle_pair as declared"""
+
+[[change]]
+date = "2026-10-03"
+points = ["b7-at-line-4:*"]
+why = """plan 0870 P-1, BEFORE any v04-rules run: b7-at-line-4 (needle declared, no ordered start) had no lock (E155). It is locked here exactly as \
+it reads under v03-rules today (verdict REFUSE-TWO-START-UNMEASURED x5, order ORDER-UNMEASURED x5, geometry POINT, POINT, REFUSE-FLOW x3), so \
+that the v04-rules re-verdict of its geometry at 0.0 and 0.07 is a declared change and not a silent one (review F5). No result moved"""
+
+[[change]]
+date = "2026-10-03"
+points = ["x5n-bilayer:0.0", "x5n-bilayer:0.1", "x5n-bilayer:0.3", "x5n-bilayer-2:0.0", "x5n-bilayer-2:0.1", "x5n-bilayer-2:0.3"]
+why = """DECLARED BEFORE ANY v04-rules RUN (plan 0870 P-1, R1 adopted by Bruce 2026-10-03): the six x5n verdict cells move POINT -> \
+REFUSE-PROBE-INCOMPLETE and the geometry axis with them. x5n couples K and g; the per-point instruments probe K only (across.probes), so \
+'relevant and stopped' on one probed direction is consistent with a POINT and with a LINE alike (the AT misses of E151). Order CONTINUOUS, fluct \
+VANISHES and needle_pair are unchanged. The positive class is to be re-earned by the family over g (plan 0870 P3: x5n-bilayer-3, families/x5n-g.toml), \
+never by the per-point reading. This is a declared re-verdict, not a repair"""
+
+[[change]]
+date = "2026-10-03"
+points = ["b7-at-line-4:0.0", "b7-at-line-4:0.07"]
+why = """DECLARED BEFORE ANY v04-rules RUN (plan 0870 P-1): GEOMETRY POINT -> REFUSE-PROBE-INCOMPLETE at 0.0 and 0.07 (b7 couples K and L4; across \
+probes K only). The VERDICT is UNCHANGED, REFUSE-TWO-START-UNMEASURED, because order is ORDER-UNMEASURED and compose returns that refusal whatever \
+the geometry reads (review F5): a test on the verdict could not fail. The geometry lock above is the test. The b7-at-line-2 family stays LINE"""
+
+[[change]]
+date = "2026-10-03"
+points = ["*"]
+why = """DECLARED BEFORE ANY v04-rules RUN (plan 0870 P-1): the two_start NARROW rule (COEXIST at the combined cell requires the largest size to read \
+COEXIST; otherwise the lowest rank over the non-COEXIST cells) moves NO stored two_start code on any existing input (review section 2.3: q6/q8/q10 of \
+x9c-potts, q7 of w1-potts and q6 of w3-potts read COEXIST at the largest size; x9c-potts q5 stays UNRES). The drift column and the derived flow \
+exist only on inputs that declare needle_chain (new inputs with two matched pairs): every existing input has ONE matched pair, so its flow is the \
+v03-rules flow. Any other moved cell on an existing input is a stop"""
