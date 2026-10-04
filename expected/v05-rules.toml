@@ -830,3 +830,22 @@ HELD: probe COMPLETE at all nine T; drift CONVERGING and flow STOPPED at 0.5-0.8
 the upper side END-BKT-CANDIDATE with lower OPEN; end_point 0.89294 and end_bracket (0.89294, 0.95), which contains 0.89294 (L3 held, no finite-size miss); the family verdict is an \
 UNCLASSIFIED refusal because the interior does not read LINE (points NOT-LINE through the 0.6 WALKING), as L4's 'otherwise' branch allows. L5 (POINT-MANIFOLD) did NOT occur: f2 reads \
 WEAK (three pairs SLOW-, 0.8->0.85 ZERO!)"""
+
+# ---- plan 0872 P-1 (E190): the EXACT verdict lock of x2b-xy, absent from the scoreboard until now (the 0871 P4 locks are column sets, read by tests/test_probe.py,
+# and the scoreboard reads only [verdicts.*]). Written AFTER the 0871 P4 run, as results/x2b-xy@v05-rules.json reads now: it is a regression lock of what is known, not a prediction.
+[verdicts.x2b-xy]
+"0.5" = "LINE"
+"0.6" = "WALKING"
+"0.7" = "LINE"
+"0.8" = "LINE"
+"0.85" = "LINE"
+"0.89294" = "POINT"
+"0.95" = "NOT"
+"1.0" = "NOT"
+"1.1" = "NOT"
+
+[[change]]
+date = "2026-10-04"
+points = ["x2b-xy:*"]
+why = """PLAN 0872 P-1 (E190): [verdicts.x2b-xy] added to the scoreboard, exact, as the stored result reads after the 0871 P4 run (T 0.6 WALKING, T 0.89294 POINT, \
+T 0.5 / 0.7 / 0.8 / 0.85 LINE, T 0.95 / 1.0 / 1.1 NOT). No result and no table changed: the input was outside the scoreboard, so a later change to its cells could not have been seen"""

@@ -1,0 +1,896 @@
+# expected/v06-rules.toml - the SCOREBOARD LOCK for v06-rules (plan 0872), DECLARED BEFORE ANY v06-rules RUN. Committed in P-1 as
+# expected/v06-rules.declared (the scoreboard test reads every expected/*.toml against stored results, and none exist yet) and renamed
+# in the phase that first runs the set (P4); its contents are P-1's. v06-rules = v05-rules forked: every lock below is the v05-rules lock
+# carried over UNCHANGED (verdicts, geometry, order, needle_pair, two_start, fluct, flow, drift_code, probe, families), except the cells the
+# [[change]] at the end names. No existing per-point cell and no family VERDICT may move on any existing input, but the ones named there.
+# It is NOT truth: agreement with class_truth / order_truth is reported by bin/cc tabulate (cc/score.py), never here.
+schema = 1
+kind = "expected"
+tables = "v06-rules"
+
+[verdicts.x8-ising-needle]
+"0.90" = "NOT"
+"0.95" = "NOT"
+"0.98" = "NOT"
+"0.99" = "NOT"
+"1.00" = "REFUSE-TWO-START-UNMEASURED"
+"1.01" = "NOT"
+"1.02" = "NOT"
+"1.05" = "NOT"
+"1.10" = "NOT"
+
+[verdicts.b7-at-line]
+"0.0" = "REFUSE-NEEDLE-UNMEASURED"
+"0.07" = "REFUSE-NEEDLE-UNMEASURED"
+"0.14" = "REFUSE-NEEDLE-UNMEASURED"
+"0.21" = "REFUSE-NEEDLE-UNMEASURED"
+"0.2747" = "REFUSE-NEEDLE-UNMEASURED"
+
+[verdicts.w2-potts]
+"2" = "REFUSE-NEEDLE-UNMEASURED"
+"3" = "REFUSE-NEEDLE-UNMEASURED"
+"4" = "REFUSE-NEEDLE-UNMEASURED"
+"5" = "REFUSE-NEEDLE-UNMEASURED"
+
+[verdicts.c2-bc-two-start]           # no needle on this input: every point refuses
+"d2.0-K1.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K1.2" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K1.4" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K1.6" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K1.8" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K2.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K2.3" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K2.6" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K3.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K1.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K1.2" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K1.4" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K1.6" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K1.8" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K2.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K2.3" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K2.6" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K3.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K1.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K1.2" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K1.4" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K1.6" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K1.8" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K2.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K2.3" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K2.6" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K3.0" = "REFUSE-NEEDLE-UNMEASURED"
+
+[verdicts.x2-xy-line]                # frozen X2.txt: LINE points 0.5-0.7 read REFUSE-SLOW (the STAGE3 flaw)
+"0.5" = "REFUSE-SLOW"
+"0.6" = "REFUSE-SLOW"
+"0.7" = "REFUSE-SLOW"
+"0.89294" = "REFUSE-UNRES"           # the BKT breaker: a refusal is the good outcome (X2 Pb)
+"1.1" = "NOT"
+
+[verdicts.x3-clock6]                 # frozen X3.txt: the critical phase and both KT ends read REFUSE-SLOW
+"0.5" = "NOT"
+"0.7014" = "REFUSE-SLOW"
+"0.75" = "REFUSE-SLOW"
+"0.8" = "REFUSE-SLOW"
+"0.85" = "REFUSE-SLOW"
+"0.9008" = "REFUSE-SLOW"
+"1.1" = "NOT"
+
+[verdicts.x4-ising-field]            # frozen X4.txt: the pipeline verdict is NOT at all three; X4_CELL (the
+"0.46" = "NOT"                       # h-crossing, not an instrument of v0) is what calls FIRST-ORDER-LINE
+"0.5" = "NOT"
+"0.55" = "NOT"
+
+[verdicts.b7-at-line-2]              # b7 data + the along instrument: no needle, so every point refuses
+"0.0" = "REFUSE-NEEDLE-UNMEASURED"
+"0.07" = "REFUSE-NEEDLE-UNMEASURED"
+"0.14" = "REFUSE-NEEDLE-UNMEASURED"
+"0.21" = "REFUSE-NEEDLE-UNMEASURED"
+"0.2747" = "REFUSE-NEEDLE-UNMEASURED"
+
+[verdicts.x7a-bc]                    # needle only (no two_start): MID points refuse, off-window points are NOT
+"0.0" = "NOT"
+"1.0" = "NOT"
+"1.5" = "NOT"
+"1.8" = "REFUSE-TWO-START-UNMEASURED"
+"1.9" = "NOT"
+"1.95" = "REFUSE-TWO-START-UNMEASURED"
+
+[verdicts.x7a-nnn]
+"k2-0.0" = "REFUSE-TWO-START-UNMEASURED"
+"k2-0.1" = "REFUSE-TWO-START-UNMEASURED"
+
+[verdicts.x5-bilayer]
+"0.0" = "REFUSE-SLOW"
+"0.1" = "NOT"
+"0.3" = "REFUSE-SLOW"
+
+[verdicts.x5n-bilayer]
+"0.0" = "REFUSE-PROBE-INCOMPLETE"
+"0.1" = "REFUSE-PROBE-INCOMPLETE"
+"0.3" = "REFUSE-PROBE-INCOMPLETE"
+
+[verdicts.w2-potts-2]
+"2" = "REFUSE-NEEDLE-UNMEASURED"
+"3" = "REFUSE-NEEDLE-UNMEASURED"
+"4" = "REFUSE-NEEDLE-UNMEASURED"
+"5" = "REFUSE-NEEDLE-UNMEASURED"
+
+[verdicts.x2-xy-line-2]
+"0.5" = "REFUSE-SLOW"
+"0.6" = "REFUSE-SLOW"
+"0.7" = "REFUSE-SLOW"
+"0.89294" = "REFUSE-UNRES"
+"1.1" = "NOT"
+
+[verdicts.x3-clock6-2]
+"0.5" = "NOT"
+"0.7014" = "REFUSE-SLOW"
+"0.75" = "REFUSE-SLOW"
+"0.8" = "REFUSE-SLOW"
+"0.85" = "REFUSE-SLOW"
+"0.9008" = "REFUSE-SLOW"
+"1.1" = "NOT"
+
+[verdicts.x4-ising-field-2]
+"0.46" = "NOT"
+"0.5" = "NOT"
+"0.55" = "NOT"
+
+[verdicts.x5-bilayer-2]
+"0.0" = "REFUSE-SLOW"
+"0.1" = "NOT"
+"0.3" = "REFUSE-SLOW"
+
+[verdicts.b7-at-line-3]
+"0.0" = "REFUSE-NEEDLE-UNMEASURED"
+"0.07" = "REFUSE-NEEDLE-UNMEASURED"
+"0.14" = "REFUSE-NEEDLE-UNMEASURED"
+"0.21" = "REFUSE-NEEDLE-UNMEASURED"
+"0.2747" = "REFUSE-NEEDLE-UNMEASURED"
+
+[verdicts.b7-at-line-4]              # plan 0870 P-1: locked exactly as it reads under v03-rules (E155 "UNLOCKED first readings")
+"0.0" = "REFUSE-TWO-START-UNMEASURED"
+"0.07" = "REFUSE-TWO-START-UNMEASURED"
+"0.14" = "REFUSE-TWO-START-UNMEASURED"
+"0.21" = "REFUSE-TWO-START-UNMEASURED"
+"0.2747" = "REFUSE-TWO-START-UNMEASURED"
+
+[order.b7-at-line-2]
+"0.0" = "NEEDLE-UNMEASURED"
+"0.07" = "NEEDLE-UNMEASURED"
+"0.14" = "NEEDLE-UNMEASURED"
+"0.21" = "NEEDLE-UNMEASURED"
+"0.2747" = "NEEDLE-UNMEASURED"
+
+[verdicts.w1-potts]
+"2" = "REFUSE-NEEDLE-UNMEASURED"
+"3" = "REFUSE-NEEDLE-UNMEASURED"
+"4" = "REFUSE-NEEDLE-UNMEASURED"
+"5" = "REFUSE-NEEDLE-UNMEASURED"
+"7" = "REFUSE-NEEDLE-UNMEASURED"
+
+[verdicts.w3-potts]
+"4" = "REFUSE-NEEDLE-UNMEASURED"
+"5" = "REFUSE-NEEDLE-UNMEASURED"
+"6" = "REFUSE-NEEDLE-UNMEASURED"
+
+[verdicts.x4-ising-field-3]
+"0.46" = "NOT"
+"0.5" = "NOT"
+"0.55" = "NOT"
+
+[order.b7-at-line]
+"0.0" = "NEEDLE-UNMEASURED"
+"0.07" = "NEEDLE-UNMEASURED"
+"0.14" = "NEEDLE-UNMEASURED"
+"0.21" = "NEEDLE-UNMEASURED"
+"0.2747" = "NEEDLE-UNMEASURED"
+
+[order.c2-bc-two-start]
+"d2.0-K1.0" = "NEEDLE-UNMEASURED"
+"d2.0-K1.2" = "NEEDLE-UNMEASURED"
+"d2.0-K1.4" = "NEEDLE-UNMEASURED"
+"d2.0-K1.6" = "NEEDLE-UNMEASURED"
+"d2.0-K1.8" = "NEEDLE-UNMEASURED"
+"d2.0-K2.0" = "NEEDLE-UNMEASURED"
+"d2.0-K2.3" = "NEEDLE-UNMEASURED"
+"d2.0-K2.6" = "NEEDLE-UNMEASURED"
+"d2.0-K3.0" = "NEEDLE-UNMEASURED"
+"d1.95-K1.0" = "NEEDLE-UNMEASURED"
+"d1.95-K1.2" = "NEEDLE-UNMEASURED"
+"d1.95-K1.4" = "NEEDLE-UNMEASURED"
+"d1.95-K1.6" = "NEEDLE-UNMEASURED"
+"d1.95-K1.8" = "NEEDLE-UNMEASURED"
+"d1.95-K2.0" = "NEEDLE-UNMEASURED"
+"d1.95-K2.3" = "NEEDLE-UNMEASURED"
+"d1.95-K2.6" = "NEEDLE-UNMEASURED"
+"d1.95-K3.0" = "NEEDLE-UNMEASURED"
+"d1.9-K1.0" = "NEEDLE-UNMEASURED"
+"d1.9-K1.2" = "NEEDLE-UNMEASURED"
+"d1.9-K1.4" = "NEEDLE-UNMEASURED"
+"d1.9-K1.6" = "NEEDLE-UNMEASURED"
+"d1.9-K1.8" = "NEEDLE-UNMEASURED"
+"d1.9-K2.0" = "NEEDLE-UNMEASURED"
+"d1.9-K2.3" = "NEEDLE-UNMEASURED"
+"d1.9-K2.6" = "NEEDLE-UNMEASURED"
+"d1.9-K3.0" = "NEEDLE-UNMEASURED"
+
+[order.w2-potts]
+"2" = "NEEDLE-UNMEASURED"
+"3" = "NEEDLE-UNMEASURED"
+"4" = "NEEDLE-UNMEASURED"
+"5" = "NEEDLE-UNMEASURED"
+
+[order.x2-xy-line]
+"0.5" = "EQUILIBRATED"
+"0.6" = "EQUILIBRATED"
+"0.7" = "EQUILIBRATED"
+"0.89294" = "EQUILIBRATED"
+"1.1" = "OFF-WINDOW"
+
+[order.x3-clock6]
+"0.5" = "OFF-WINDOW"
+"0.7014" = "EQUILIBRATED"
+"0.75" = "EQUILIBRATED"
+"0.8" = "EQUILIBRATED"
+"0.85" = "EQUILIBRATED"
+"0.9008" = "EQUILIBRATED"
+"1.1" = "OFF-WINDOW"
+
+[order.x4-ising-field]
+"0.46" = "OFF-WINDOW"
+"0.5" = "OFF-WINDOW"
+"0.55" = "OFF-WINDOW"
+
+[order.x5-bilayer]
+"0.0" = "EQUILIBRATED"
+"0.1" = "OFF-WINDOW"
+"0.3" = "EQUILIBRATED"
+
+[order.x7a-bc]
+"0.0" = "OFF-WINDOW"
+"1.0" = "OFF-WINDOW"
+"1.5" = "OFF-WINDOW"
+"1.8" = "ORDER-UNMEASURED"
+"1.9" = "OFF-WINDOW"
+"1.95" = "ORDER-UNMEASURED"
+
+[order.x7a-nnn]
+"k2-0.0" = "ORDER-UNMEASURED"
+"k2-0.1" = "ORDER-UNMEASURED"
+
+[order.x8-ising-needle]
+"0.90" = "OFF-WINDOW"
+"0.95" = "OFF-WINDOW"
+"0.98" = "OFF-WINDOW"
+"0.99" = "OFF-WINDOW"
+"1.00" = "ORDER-UNMEASURED"
+"1.01" = "OFF-WINDOW"
+"1.02" = "OFF-WINDOW"
+"1.05" = "OFF-WINDOW"
+"1.10" = "OFF-WINDOW"
+
+[order.w2-potts-2]
+"2" = "NEEDLE-UNMEASURED"
+"3" = "NEEDLE-UNMEASURED"
+"4" = "NEEDLE-UNMEASURED"
+"5" = "NEEDLE-UNMEASURED"
+
+[order.x2-xy-line-2]
+"0.5" = ["CONTINUOUS", "EQUILIBRATED-UNRES"]
+"0.6" = ["CONTINUOUS", "EQUILIBRATED-UNRES"]
+"0.7" = ["CONTINUOUS", "EQUILIBRATED-UNRES"]
+"0.89294" = ["CONTINUOUS", "EQUILIBRATED-UNRES"]
+"1.1" = "OFF-WINDOW"
+
+[order.x3-clock6-2]
+"0.5" = "OFF-WINDOW"
+"0.7014" = ["CONTINUOUS", "EQUILIBRATED-UNRES"]
+"0.75" = ["CONTINUOUS", "EQUILIBRATED-UNRES"]
+"0.8" = ["CONTINUOUS", "EQUILIBRATED-UNRES"]
+"0.85" = ["CONTINUOUS", "EQUILIBRATED-UNRES"]
+"0.9008" = ["CONTINUOUS", "EQUILIBRATED-UNRES"]
+"1.1" = "OFF-WINDOW"
+
+[order.x4-ising-field-2]
+"0.46" = "OFF-WINDOW"
+"0.5" = "OFF-WINDOW"
+"0.55" = "OFF-WINDOW"
+
+[order.x5-bilayer-2]
+"0.0" = ["CONTINUOUS", "EQUILIBRATED-UNRES"]
+"0.1" = "OFF-WINDOW"
+"0.3" = ["CONTINUOUS", "EQUILIBRATED-UNRES"]
+
+[order.x5n-bilayer]
+"0.0" = "CONTINUOUS"
+"0.1" = "CONTINUOUS"
+"0.3" = "CONTINUOUS"
+
+[order.b7-at-line-3]
+"0.0" = "NEEDLE-UNMEASURED"
+"0.07" = "NEEDLE-UNMEASURED"
+"0.14" = "NEEDLE-UNMEASURED"
+"0.21" = "NEEDLE-UNMEASURED"
+"0.2747" = "NEEDLE-UNMEASURED"
+
+[order.b7-at-line-4]
+"0.0" = "ORDER-UNMEASURED"
+"0.07" = "ORDER-UNMEASURED"
+"0.14" = "ORDER-UNMEASURED"
+"0.21" = "ORDER-UNMEASURED"
+"0.2747" = "ORDER-UNMEASURED"
+
+[geometry.x5n-bilayer]
+"0.0" = "REFUSE-PROBE-INCOMPLETE"
+"0.1" = "REFUSE-PROBE-INCOMPLETE"
+"0.3" = "REFUSE-PROBE-INCOMPLETE"
+
+[geometry.x5n-bilayer-2]
+"0.0" = "REFUSE-PROBE-INCOMPLETE"
+"0.1" = "REFUSE-PROBE-INCOMPLETE"
+"0.3" = "REFUSE-PROBE-INCOMPLETE"
+
+[geometry.b7-at-line-4]              # plan 0870 P-1: the geometry axis (read by tests/test_probe.py); 0.0 and 0.07 were the two confident-wrong POINTs of E151 (v03-rules)
+"0.0" = "REFUSE-PROBE-INCOMPLETE"
+"0.07" = "REFUSE-PROBE-INCOMPLETE"
+"0.14" = "REFUSE-FLOW"
+"0.21" = "REFUSE-FLOW"
+"0.2747" = "REFUSE-FLOW"
+
+[fluct.w2-potts-2]
+"2" = ["VANISHES"]
+"3" = ["VANISHES"]
+"4" = ["VANISHES"]
+"5" = ["VANISHES", "UNRES"]
+
+[fluct.x2-xy-line-2]
+"0.5" = ["VANISHES", "UNRES"]
+"0.6" = ["VANISHES", "UNRES"]
+"0.7" = ["VANISHES", "UNRES"]
+"0.89294" = ["VANISHES", "UNRES"]
+"1.1" = ["VANISHES", "UNRES"]
+
+[fluct.x3-clock6-2]
+"0.5" = ["VANISHES", "UNRES"]
+"0.7014" = ["VANISHES", "UNRES"]
+"0.75" = ["VANISHES", "UNRES"]
+"0.8" = ["VANISHES", "UNRES"]
+"0.85" = ["VANISHES", "UNRES"]
+"0.9008" = ["VANISHES", "UNRES"]
+"1.1" = ["VANISHES", "UNRES"]
+
+[fluct.x5-bilayer-2]
+"0.0" = ["VANISHES", "UNRES"]
+"0.1" = ["VANISHES", "UNRES"]
+"0.3" = ["VANISHES", "UNRES"]
+
+[fluct.x5n-bilayer]
+"0.0" = "VANISHES"
+"0.1" = "VANISHES"
+"0.3" = "VANISHES"
+
+[fluct.b7-at-line-3]
+"0.0" = ["VANISHES", "UNRES"]
+"0.07" = ["VANISHES", "UNRES"]
+"0.14" = ["VANISHES", "UNRES"]
+"0.21" = ["VANISHES", "UNRES"]
+"0.2747" = ["VANISHES", "UNRES"]
+
+[order.w1-potts]
+"2" = "NEEDLE-UNMEASURED"
+"3" = "NEEDLE-UNMEASURED"
+"4" = "NEEDLE-UNMEASURED"
+"5" = "NEEDLE-UNMEASURED"
+"7" = "NEEDLE-UNMEASURED"
+
+[order.w3-potts]
+"4" = "NEEDLE-UNMEASURED"
+"5" = "NEEDLE-UNMEASURED"
+"6" = "NEEDLE-UNMEASURED"
+
+[fluct.w1-potts]
+"2" = ["VANISHES"]
+"3" = ["VANISHES"]
+"4" = ["VANISHES"]
+"5" = ["VANISHES"]
+"7" = ["VANISHES"]
+
+[fluct.w3-potts]
+"4" = ["VANISHES"]
+"5" = ["VANISHES"]
+"6" = ["VANISHES"]
+
+[two_start.w1-potts]
+"2" = ["INDEP"]
+"3" = ["INDEP"]
+"4" = ["UNRES"]
+"5" = ["UNRES"]
+"7" = ["COEXIST"]
+
+[two_start.w3-potts]
+"4" = ["INDEP"]
+"5" = ["FLUCT"]
+"6" = ["COEXIST"]
+
+[order.x4-ising-field-3]
+"0.46" = "OFF-WINDOW"
+"0.5" = "OFF-WINDOW"
+"0.55" = "OFF-WINDOW"
+
+[two_start.x4-ising-field-3]
+"0.46" = ["FLUCT"]
+"0.5" = ["FLUCT"]
+"0.55" = ["FLUCT"]
+
+[[family]]
+id = "b7-at-line-2"
+verdict = "LINE"
+bracket = "NOT-MEASURED"
+f1 = "VARIES"
+f2 = "MARGINAL"
+points = "NOT-LINE"
+lower = "OPEN"
+upper = "NOT-MEASURED"
+end_point = []
+end_bracket = []
+
+
+[[family]]
+id = "x8-ising-compass"
+verdict = "REFUSE-UNCLASSIFIED-v0"
+bracket = "BRACKET-UP"
+f1 = "NOT-MEASURED"
+f2 = "NOT-MEASURED"
+points = "NOT-LINE"
+lower = "OPEN"
+upper = "OPEN"
+end_point = []
+end_bracket = []
+
+
+[[family]]
+id = "x7a-bc-lambda"
+verdict = "REFUSE-OFF-MANIFOLD"
+bracket = "NON-MONOTONE"
+f1 = "NOT-MEASURED"
+f2 = "REFUSE-OFF-MANIFOLD"
+points = "NOT-LINE"
+lower = "OPEN"
+upper = "OPEN"
+end_point = []
+end_bracket = []
+
+
+[[family]]
+id = "x7a-nnn-manifold"
+verdict = "REFUSE-UNCLASSIFIED-v0"
+bracket = "BRACKET-FLAT"
+f1 = "NOT-MEASURED"
+f2 = "NOT-EVALUATED"
+points = "NOT-LINE"
+lower = "OPEN"
+upper = "OPEN"
+end_point = []
+end_bracket = []
+
+
+[verdicts.x5n-bilayer-2]             # plan 0867 P1: x5n-bilayer with needle_o; the verdicts are x5n-bilayer's (POINT x 3)
+"0.0" = "REFUSE-PROBE-INCOMPLETE"
+"0.1" = "REFUSE-PROBE-INCOMPLETE"
+"0.3" = "REFUSE-PROBE-INCOMPLETE"
+
+[order.x5n-bilayer-2]
+"0.0" = "CONTINUOUS"
+"0.1" = "CONTINUOUS"
+"0.3" = "CONTINUOUS"
+
+[fluct.x5n-bilayer-2]
+"0.0" = "VANISHES"
+"0.1" = "VANISHES"
+"0.3" = "VANISHES"
+
+[verdicts.x9c-potts]                 # q5, q6, q8, q10 transcribed from X9c.txt before the run; q3, q4 (X9c.txt: "refusal or POINT-family") SEEN after it
+"3" = "REFUSE-FLOW"                  # seen, not predicted
+"4" = "REFUSE-FLOW"                  # seen, not predicted
+"5" = "NOT"
+"6" = "FIRST-ORDER"
+"8" = "FIRST-ORDER"
+"10" = "FIRST-ORDER"
+
+[two_start.x9c-potts]               # transcribed from the frozen toolset results/X9c.txt BEFORE the CC run (plan 0867 P3); q5 L81 POS is marginal
+"3" = ["INDEP"]
+"4" = ["INDEP"]
+"5" = ["COEXIST", "UNRES", "INDEP"]       # X9c.txt reads COEXIST on one marginal cell (L81 POS +0.0066); CC reads UNRES (the allowed difference, brief 0867 P3)
+"6" = ["COEXIST"]
+"8" = ["COEXIST"]
+"10" = ["COEXIST"]
+
+[needle_pair.x9c-potts]              # transcribed from results/X9c.txt BEFORE the CC run
+"3" = ["SAME-WINDOW"]
+"4" = ["SAME-WINDOW"]
+"5" = ["HALF-PINNED"]
+"6" = ["HALF-PINNED"]
+"8" = ["PINNED-BETWEEN-PHASES"]
+"10" = ["PINNED-BETWEEN-PHASES"]
+
+[needle_pair.x5n-bilayer-2]          # predicted from the physics, not seen: at the confirmed stop both starts sit on the window
+"0.0" = ["SAME-WINDOW", "HALF-PINNED"]   # NEVER PINNED-BETWEEN-PHASES (a continuous point) and NEVER CROSSED
+"0.1" = ["SAME-WINDOW", "HALF-PINNED"]
+"0.3" = ["SAME-WINDOW", "HALF-PINNED"]
+
+[needle_pair.EVERY-OTHER-INPUT]      # the existing inputs declare no ordered-start GL (needle_o): NOT-MEASURED at every point
+"*" = "NOT-MEASURED"
+
+[[change]]
+date = "2026-10-02"
+points = ["*"]
+why = """DECLARED BEFORE THE FIRST RUN under v03-rules (plan 0867 P1, G6). v03-rules = v02-rules + needle_pair. The ONLY cells of the \
+signature domain whose verdict differs from v02-rules are those with needle in {DIS, ORD}, needle_pair PINNED-BETWEEN-PHASES and \
+two_start COEXIST (NOT -> FIRST-ORDER; order OFF-WINDOW -> COEXIST-AT-WINDOW). An existing input declares no ordered-start level \
+stack (no needle_o), so its needle_pair reads NOT-MEASURED and none of its points can sit in that cell: the predicted effect on \
+fixture points is NONE (x4-ising-field-3 reads FLUCT, not COEXIST, so is not an exception). Every verdict above is the v02-rules lock \
+carried over. A moved point is a finding, never an edit of this file"""
+
+[[change]]
+date = "2026-10-02"
+points = ["x5n-bilayer-2:*"]
+why = """DECLARED BEFORE THE RUN of x5n-bilayer-2 (plan 0867 P1): x5n-bilayer (POINT at all three g, order CONTINUOUS, fluct VANISHES) with \
+the needle_o instrument reading the ordered start's own GL at L 243 / 81, so needle_pair is measured. Same blocks, seed and draws as \
+x5n-bilayer, so every verdict, order and fluct line is that input's. needle_pair is predicted SAME-WINDOW or HALF-PINNED (a continuous \
+critical point: both starts flow to the one fixed point), never PINNED-BETWEEN-PHASES, never CROSSED. A PINNED or CROSSED reading would be \
+a finding about the data, not a thing to repair"""
+
+[[change]]
+date = "2026-10-03"
+points = ["x9c-potts:*"]
+why = """DECLARED BEFORE THE RUN of x9c-potts (plan 0867 P3), transcribing the toolset's frozen results/X9c.txt (scored by the Auditor from the \
+same 36 npz): needle_pair q3/q4 SAME-WINDOW, q5/q6 HALF-PINNED, q8/q10 PINNED-BETWEEN-PHASES; two_start q3/q4 INDEP, q5/q6/q8/q10 COEXIST; \
+v03-rules verdict q8, q10, q6 FIRST-ORDER and q5 NOT (q3, q4: a refusal or a POINT-family cell, never FIRST-ORDER; their verdict lock is \
+written after the run and says so). q5's two_start rests on one marginal size cell (L81 POS +0.0066); CC's own resample stream may move it, \
+which would be a reported difference, not an edit of this file. A q8 or q10 verdict other than FIRST-ORDER, or any CROSSED pair, is a stop"""
+
+[[change]]
+date = "2026-10-03"
+points = ["x9c-potts:3", "x9c-potts:4", "x9c-potts:5"]
+why = """AFTER THE RUN (plan 0867 P3). q3 and q4 verdict REFUSE-FLOW (needle MID, flow unresolved; order CONTINUOUS) is SEEN, not predicted: X9c.txt \
+said only 'refusal or POINT-family'. q5 two_start read UNRES (L81 +0.00662 [-0.00033, 0.01170] straddles zero under CC's own block \
+resample; L243 UNRES as in X9c.txt), not COEXIST: the allowed marginal-cell difference, so the q5 lock admits UNRES and INDEP; the verdict \
+is NOT either way. Nothing else moved: q6, q8, q10 FIRST-ORDER, every needle_pair as declared"""
+
+[[change]]
+date = "2026-10-03"
+points = ["b7-at-line-4:*"]
+why = """plan 0870 P-1, BEFORE any v04-rules run: b7-at-line-4 (needle declared, no ordered start) had no lock (E155). It is locked here exactly as \
+it reads under v03-rules today (verdict REFUSE-TWO-START-UNMEASURED x5, order ORDER-UNMEASURED x5, geometry POINT, POINT, REFUSE-FLOW x3), so \
+that the v04-rules re-verdict of its geometry at 0.0 and 0.07 is a declared change and not a silent one (review F5). No result moved"""
+
+[[change]]
+date = "2026-10-03"
+points = ["x5n-bilayer:0.0", "x5n-bilayer:0.1", "x5n-bilayer:0.3", "x5n-bilayer-2:0.0", "x5n-bilayer-2:0.1", "x5n-bilayer-2:0.3"]
+why = """DECLARED BEFORE ANY v04-rules RUN (plan 0870 P-1, R1 adopted by Bruce 2026-10-03): the six x5n verdict cells move POINT -> \
+REFUSE-PROBE-INCOMPLETE and the geometry axis with them. x5n couples K and g; the per-point instruments probe K only (across.probes), so \
+'relevant and stopped' on one probed direction is consistent with a POINT and with a LINE alike (the AT misses of E151). Order CONTINUOUS, fluct \
+VANISHES and needle_pair are unchanged. The positive class is to be re-earned by the family over g (plan 0870 P3: x5n-bilayer-3, families/x5n-g.toml), \
+never by the per-point reading. This is a declared re-verdict, not a repair"""
+
+[[change]]
+date = "2026-10-03"
+points = ["b7-at-line-4:0.0", "b7-at-line-4:0.07"]
+why = """DECLARED BEFORE ANY v04-rules RUN (plan 0870 P-1): GEOMETRY POINT -> REFUSE-PROBE-INCOMPLETE at 0.0 and 0.07 (b7 couples K and L4; across \
+probes K only). The VERDICT is UNCHANGED, REFUSE-TWO-START-UNMEASURED, because order is ORDER-UNMEASURED and compose returns that refusal whatever \
+the geometry reads (review F5): a test on the verdict could not fail. The geometry lock above is the test. The b7-at-line-2 family stays LINE"""
+
+[[change]]
+date = "2026-10-03"
+points = ["*"]
+why = """DECLARED BEFORE ANY v04-rules RUN (plan 0870 P-1): the two_start NARROW rule (COEXIST at the combined cell requires the largest size to read \
+COEXIST; otherwise the lowest rank over the non-COEXIST cells) moves NO stored two_start code on any existing input (review section 2.3: q6/q8/q10 of \
+x9c-potts, q7 of w1-potts and q6 of w3-potts read COEXIST at the largest size; x9c-potts q5 stays UNRES). The drift column and the derived flow \
+exist only on inputs that declare needle_chain (new inputs with two matched pairs): every existing input has ONE matched pair, so its flow is the \
+v03-rules flow. Any other moved cell on an existing input is a stop"""
+
+# ---- plan 0870 P2: the inputs with TWO matched pairs (needle_chain), locked from the toolset's m.toml block [V04] BEFORE their first run.
+# [drift_code.*], [flow.*], [probe.*], [verdict_set.*] hold a point -> allowed code or a LIST of allowed codes (read by tests/test_probe.py);
+# a point a prediction does not name is left out: those cells are unlocked on purpose, and are reported as read, never repaired.
+[drift_code.x2-xy-line-3]            # V04-1: omega_eff 2.1 / 1.8 / 1.6 at T 0.5 / 0.6 / 0.7 -> CONVERGING or UNRES, NEVER PERSISTENT
+"0.5" = ["CONVERGING", "UNRES"]
+"0.6" = ["CONVERGING", "UNRES"]
+"0.7" = ["CONVERGING", "UNRES"]
+
+[flow.x2-xy-line-3]                  # V04-1: STOPPED where CONVERGING, else SLOW; T 0.89294 STOPPED (v2 ZERO!); T 1.1 FLOWING
+"0.5" = ["STOPPED", "SLOW"]
+"0.6" = ["STOPPED", "SLOW"]
+"0.7" = ["STOPPED", "SLOW"]
+"0.89294" = ["STOPPED"]
+"1.1" = ["FLOWING"]
+
+# [verdict_set.x2-xy-line-3] of v05-rules is REPLACED below (T 0.6 is a declared move under v06-rules)
+
+[probe.x2-xy-line-3]                 # one coupling T, probed: COMPLETE (a positive per-point class here is certified by the probe, not by the family)
+"0.5" = ["COMPLETE"]
+"0.6" = ["COMPLETE"]
+"0.7" = ["COMPLETE"]
+"0.89294" = ["COMPLETE"]
+"1.1" = ["COMPLETE"]
+
+[drift_code.x3-clock6-3]             # V04-2: omega_eff 0.35-0.54 in the critical phase -> PERSISTENT or MARGINAL-DRIFT; T1 (0.7014) NOT-EVALUATED or PERSISTENT
+"0.7014" = ["NOT-EVALUATED", "PERSISTENT"]
+"0.75" = ["PERSISTENT", "MARGINAL-DRIFT"]
+"0.8" = ["PERSISTENT", "MARGINAL-DRIFT"]
+"0.85" = ["PERSISTENT", "MARGINAL-DRIFT"]
+"0.9008" = ["PERSISTENT", "MARGINAL-DRIFT"]
+
+[flow.x3-clock6-3]                   # V04-2: the four critical-phase points read SLOW; NO clock point becomes STOPPED via CONVERGING (checked over every point and reported)
+"0.75" = ["SLOW"]
+"0.8" = ["SLOW"]
+"0.85" = ["SLOW"]
+"0.9008" = ["SLOW"]
+
+[probe.x3-clock6-3]
+"0.7014" = ["COMPLETE"]
+"0.75" = ["COMPLETE"]
+"0.8" = ["COMPLETE"]
+"0.85" = ["COMPLETE"]
+"0.9008" = ["COMPLETE"]
+
+[drift_code.x9c-potts-2]             # V04-3: q3 drift NOT-EVALUATED (sign reversal)
+"3" = ["NOT-EVALUATED"]
+
+[verdicts.x9c-potts-2]               # V04-3: every q verdict as x9c-potts
+"3" = "REFUSE-FLOW"
+"4" = "REFUSE-FLOW"
+"5" = "NOT"
+"6" = "FIRST-ORDER"
+"8" = "FIRST-ORDER"
+"10" = "FIRST-ORDER"
+
+[drift_code.b7-at-line-5]            # V04-4: 0.07, 0.14, 0.2747 drift NOT-EVALUATED (sign reversal / v1 ~ 0)
+"0.07" = ["NOT-EVALUATED"]
+"0.14" = ["NOT-EVALUATED"]
+"0.2747" = ["NOT-EVALUATED"]
+
+[geometry.b7-at-line-5]              # V04-4: REFUSE-PROBE-INCOMPLETE wherever v03 geometry read POINT (b7-at-line-4: 0.0 and 0.07)
+"0.0" = ["REFUSE-PROBE-INCOMPLETE"]
+"0.07" = ["REFUSE-PROBE-INCOMPLETE"]
+
+[needle_pair.x9c-potts-2]            # the same data and the same needle_o as x9c-potts: its needle_pair lock carried over (read by tests/test_axes.py)
+"3" = ["SAME-WINDOW"]
+"4" = ["SAME-WINDOW"]
+"5" = ["HALF-PINNED"]
+"6" = ["HALF-PINNED"]
+"8" = ["PINNED-BETWEEN-PHASES"]
+"10" = ["PINNED-BETWEEN-PHASES"]
+
+[[change]]
+date = "2026-10-03"
+points = ["x2-xy-line-3:*", "x3-clock6-3:*", "x9c-potts-2:*", "b7-at-line-5:*"]
+why = """DECLARED BEFORE THE FIRST RUN of the four two-pair inputs (plan 0870 P2), transcribed from the toolset's m.toml block [V04] (declared \
+2026-10-03 19:02 PDT from the Fable review's point estimates), with [eps] drift = 0.5 declared in the plan and never tuned. x2-xy-line-3: \
+drift_code CONVERGING or UNRES (never PERSISTENT) at T 0.5/0.6/0.7, flow STOPPED where CONVERGING else SLOW, T 0.89294 STOPPED, T 1.1 FLOWING and \
+NOT; a T 0.6 WALKING is a predicted possible BAD (review F3), recorded and not repaired. x3-clock6-3: drift_code PERSISTENT or MARGINAL-DRIFT and flow \
+SLOW at T 0.75/0.8/0.85/0.9008, T 0.7014 NOT-EVALUATED or PERSISTENT, no point STOPPED via CONVERGING. x9c-potts-2: q3 drift NOT-EVALUATED, every \
+verdict as x9c-potts. b7-at-line-5: 0.07/0.14/0.2747 NOT-EVALUATED, geometry REFUSE-PROBE-INCOMPLETE at 0.0 and 0.07. A cell not named here is \
+unlocked and is reported as read"""
+
+[[change]]
+date = "2026-10-03"
+points = ["x2-xy-line-3:0.6", "x3-clock6-3:0.5"]
+why = """AFTER THE RUN of the four two-pair inputs (plan 0870 P2): every lock above held. Two readings the declarations flagged or did not cover are \
+RECORDED, never repaired. (1) x2-xy-line-3 T 0.6: drift_code CONVERGING (omega_eff - 1 = 0.820 [0.399, 1.332], POS), so flow is STOPPED, and across RELEVANT \
+(+0.696) with stability CROSSING (+0.911) reads WALKING: the predicted possible BAD of review F3 (a LINE point read WALKING; today's REFUSE-SLOW was masking a 2.5 \
+sigma fluctuation of across). (2) x3-clock6-3 T 0.5 (the ordered end, needle ORD): flow_top SLOW+ with drift CONVERGING (3.376 [3.035, 3.809]) reads \
+flow STOPPED, which is a clock point becoming STOPPED via CONVERGING, contrary to the V04-2 sentence 'no clock point becomes STOPPED via CONVERGING' \
+(its four critical-phase points and T 0.7014 held); the verdict is NOT either way, so nothing moved. Both are findings about the rule, not edits of this file"""
+
+# ---- plan 0870 P3: the x5n g-chain family, locked from [V04-5] BEFORE its first run. [family_set.*] holds a family key -> allowed value(s)
+# (read by tests/test_probe.py): [[family]] holds one exact value per key, and V04-5 allows two outcomes for f2 and for the verdict.
+[family_set.x5n-g]
+f1 = ["CONSTANT"]
+f2 = ["IRRELEVANT", "UNRES"]                  # f2 MARGINAL is a FINDING that stops the plan (stop condition), not an allowed value
+verdict = ["POINT-MANIFOLD", "REFUSE-UNCLASSIFIED-v0"]   # POINT-MANIFOLD, or the named refusal of the (CONSTANT, UNRES) cell
+
+[[change]]
+date = "2026-10-03"
+points = ["x5n-bilayer-3:*"]
+why = """DECLARED BEFORE THE FIRST RUN of x5n-bilayer-3 (plan 0870 P3, review F8): x5n-bilayer-2 plus the along instrument, a control chain over g \
+(0.0 -> 0.1 -> 0.3) and two matched pairs, with families/x5n-g.toml over the three points. [V04-5]: f1 CONSTANT; f2 IRRELEVANT or UNRES; the family \
+verdict POINT-MANIFOLD or the named refusal of its cell. The IRRELEVANT is expected to be carried by the g 0.1 L27 transient (review section 1.5). \
+An f2 MARGINAL would be a finding that stops the plan. The per-point verdicts are x5n-bilayer-2's under v04-rules: REFUSE-PROBE-INCOMPLETE x3"""
+
+[verdicts.x5n-bilayer-3]             # AFTER THE FIRST RUN (see the [[change]] below): x5n-bilayer-2's, the six moved cells of P-1
+"0.0" = "REFUSE-PROBE-INCOMPLETE"
+"0.1" = "REFUSE-PROBE-INCOMPLETE"
+"0.3" = "REFUSE-PROBE-INCOMPLETE"
+
+[needle_pair.x5n-bilayer-3]          # x5n-bilayer-2's needle_pair declaration carried over unchanged (the same data and the same needle_o); read by tests/test_axes.py
+"0.0" = ["SAME-WINDOW", "HALF-PINNED"]
+"0.1" = ["SAME-WINDOW", "HALF-PINNED"]
+"0.3" = ["SAME-WINDOW", "HALF-PINNED"]
+
+[[family]]
+id = "x5n-g"
+verdict = "POINT-MANIFOLD"
+bracket = "BRACKET-FLAT"
+f1 = "CONSTANT"
+f2 = "IRRELEVANT"
+points = "NOT-LINE"
+lower = "OPEN"
+upper = "OPEN"
+end_point = []
+end_bracket = []
+
+
+[[change]]
+date = "2026-10-03"
+points = ["x5n-bilayer-3:*", "x5n-g"]
+why = """AFTER THE RUN of x5n-bilayer-3 (plan 0870 P3). [V04-5] held: f1 CONSTANT (every pair ZERO!), f2 IRRELEVANT (y_along 0.0->0.1 -0.4575 \
+[-0.5236, -0.3991] SIG-, 0.1->0.3 -0.2307 [-0.301, -0.1534] NEG: both pairs diverge from each other more slowly than the size grows), \
+bracket BRACKET, family verdict POINT-MANIFOLD (class POINT): the positive class of x5n is re-earned by the family over g, not by the per-point \
+reading. The exact [[family]] lock, the [verdicts.x5n-bilayer-3] lock (REFUSE-PROBE-INCOMPLETE x3, x5n-bilayer-2's) and the [needle_pair.x5n-bilayer-3] \
+lock (x5n-bilayer-2's declaration carried over unchanged) are written AFTER this run, from its result; the [family_set.x5n-g] lock above was \
+declared before it and is the one that could have failed. f2 was not MARGINAL. drift_code is NOT-EVALUATED at all three g (the velocity changes \
+sign), so the three per-point flows are the top pair's, STOPPED"""
+
+[[change]]
+date = "2026-10-03"
+points = ["x8-ising-compass", "x7a-nnn-manifold", "x5n-g"]
+why = """DECLARED BEFORE ANY v05-rules RUN (plan 0871 P-1, E1): the family bracket is recoded from BRACKET to the direction-agnostic codes. x8-ising-compass \
+(DIS x4, MID, ORD x4: ascents only) reads BRACKET-UP. x7a-nnn-manifold and x5n-g are all-MID chains (no ascent and no descent, a MID present): the build spec's \
+four codes (BRACKET-UP, BRACKET-DOWN, NON-MONOTONE, NO-MID) have no cell for that, and calling it UP would assert a direction no step shows, so v05-rules adds a fifth code, \
+BRACKET-FLAT (recorded as a plan gap in the P1 commit). x7a-bc-lambda stays NON-MONOTONE (an ascent and a descent). b7-at-line-2 stays NOT-MEASURED (no needle). \
+Every family VERDICT is unchanged: the rows that accepted BRACKET accept the three BRACKET-* codes"""
+
+[[change]]
+date = "2026-10-03"
+points = ["b7-at-line-2", "x8-ising-compass", "x7a-bc-lambda", "x7a-nnn-manifold", "x5n-g"]
+why = """DECLARED BEFORE ANY v05-rules RUN (plan 0871 P-1, E2/E3): the family columns that did not exist in v04-rules. lower and upper: x8, x7a-bc-lambda, x7a-nnn-manifold and \
+x5n-g declare every point of their input as interior, so both sides are OPEN; b7-at-line-2 declares 0.0..0.21 as interior and leaves 0.2747 as its upper side: its needle was never \
+measured, so the side reads NOT-MEASURED (a single-start input must NEVER read END-BKT-CANDIDATE, prediction L7), and its lower side is OPEN. points (every interior point reads per-point LINE): \
+NOT-LINE on all five (no existing family has an interior whose every point reads LINE after the probe). end_point and end_bracket: empty on all five (no side reads an END-*). \
+Nothing in the verdict of any of the five moves"""
+
+# ---- plan 0871 P4: the input x2b-xy and its family, locked from the toolset's m.toml block [0871] (L1-L5) BEFORE the first run (declared 2026-10-03 20:35 PDT,
+# before any X2b analysis). The lock formats here can only say "this cell is one of these codes"; a sentence of [0871] that is not of that form is NOT locked
+# and is reported as read: (L1) "across MARGINAL at >= 2 of {0.6, 0.7, 0.8}" and "per-point LINE at those" (an at-least-two count, not a per-cell set);
+# (L2) "needle MID" at 0.89294 (there is no needle-column lock; the geometry lock below excludes NOT, which is what a DIS or ORD needle reads);
+# (L3) the order axis of the first point beyond (the point itself is not known in advance; the family's upper side below carries the claim);
+# (L4) "BKT-END IF every interior point reads LINE, otherwise the named refusal" (a conditional between two columns; the verdict set below allows BKT-END or the two
+# UNCLASSIFIED refusals and is read together with points in the report); (L5) the POINT-MANIFOLD risk (a BAD, recorded and never repaired; POINT-MANIFOLD is not in the verdict set).
+[probe.x2b-xy]                       # L1: probe COMPLETE per point
+"0.5" = ["COMPLETE"]
+"0.6" = ["COMPLETE"]
+"0.7" = ["COMPLETE"]
+"0.8" = ["COMPLETE"]
+"0.85" = ["COMPLETE"]
+"0.89294" = ["COMPLETE"]
+"0.95" = ["COMPLETE"]
+"1.0" = ["COMPLETE"]
+"1.1" = ["COMPLETE"]
+
+[drift_code.x2b-xy]                  # L1: drift CONVERGING at T <= 0.8
+"0.5" = ["CONVERGING"]
+"0.6" = ["CONVERGING"]
+"0.7" = ["CONVERGING"]
+"0.8" = ["CONVERGING"]
+
+[flow.x2b-xy]                        # L1: drift CONVERGING => flow STOPPED at T <= 0.8
+"0.5" = ["STOPPED"]
+"0.6" = ["STOPPED"]
+"0.7" = ["STOPPED"]
+"0.8" = ["STOPPED"]
+
+[geometry.x2b-xy]                    # L1: 0.5 LINE or REFUSE-UNRES; NO POINT and NO WALKING at any T <= 0.85 (the set is every geometry code but those two). L2: 0.89294 LINE or a REFUSE
+"0.5" = ["LINE", "REFUSE-UNRES"]
+"0.6" = ["LINE", "NOT", "REFUSE-SLOW", "REFUSE-FLOW", "REFUSE-WEAK", "REFUSE-OFF", "REFUSE-IRRELEVANT", "REFUSE-UNRES", "REFUSE-NEEDLE-UNMEASURED", "REFUSE-FLOW-UNMEASURED", "REFUSE-ACROSS-UNMEASURED", "REFUSE-STABILITY-UNMEASURED", "REFUSE-PROBE-INCOMPLETE", "REFUSE-PROBE-UNKNOWN", "WALKING"]  # MISS (see the after-run [[change]]): the declared set excluded WALKING; widened AFTER the run
+"0.7" = ["LINE", "NOT", "REFUSE-SLOW", "REFUSE-FLOW", "REFUSE-WEAK", "REFUSE-OFF", "REFUSE-IRRELEVANT", "REFUSE-UNRES", "REFUSE-NEEDLE-UNMEASURED", "REFUSE-FLOW-UNMEASURED", "REFUSE-ACROSS-UNMEASURED", "REFUSE-STABILITY-UNMEASURED", "REFUSE-PROBE-INCOMPLETE", "REFUSE-PROBE-UNKNOWN"]
+"0.8" = ["LINE", "NOT", "REFUSE-SLOW", "REFUSE-FLOW", "REFUSE-WEAK", "REFUSE-OFF", "REFUSE-IRRELEVANT", "REFUSE-UNRES", "REFUSE-NEEDLE-UNMEASURED", "REFUSE-FLOW-UNMEASURED", "REFUSE-ACROSS-UNMEASURED", "REFUSE-STABILITY-UNMEASURED", "REFUSE-PROBE-INCOMPLETE", "REFUSE-PROBE-UNKNOWN"]
+"0.85" = ["LINE", "NOT", "REFUSE-SLOW", "REFUSE-FLOW", "REFUSE-WEAK", "REFUSE-OFF", "REFUSE-IRRELEVANT", "REFUSE-UNRES", "REFUSE-NEEDLE-UNMEASURED", "REFUSE-FLOW-UNMEASURED", "REFUSE-ACROSS-UNMEASURED", "REFUSE-STABILITY-UNMEASURED", "REFUSE-PROBE-INCOMPLETE", "REFUSE-PROBE-UNKNOWN"]
+"0.89294" = ["LINE", "REFUSE-SLOW", "REFUSE-FLOW", "REFUSE-WEAK", "REFUSE-OFF", "REFUSE-IRRELEVANT", "REFUSE-UNRES", "REFUSE-NEEDLE-UNMEASURED", "REFUSE-FLOW-UNMEASURED", "REFUSE-ACROSS-UNMEASURED", "REFUSE-STABILITY-UNMEASURED", "REFUSE-PROBE-INCOMPLETE", "REFUSE-PROBE-UNKNOWN", "POINT"]  # MISS (see the after-run [[change]]): the declared set excluded POINT; widened AFTER the run
+
+[verdict_set.x2b-xy]                 # L1: no POINT and no WALKING verdict at any T <= 0.85
+"0.5" = ["LINE", "FIRST-ORDER", "NOT", "REFUSE-EQUIL", "REFUSE-SLOW", "REFUSE-FLOW", "REFUSE-WEAK", "REFUSE-OFF", "REFUSE-IRRELEVANT", "REFUSE-UNRES", "REFUSE-NEEDLE-UNMEASURED", "REFUSE-TWO-START-UNMEASURED", "REFUSE-FLOW-UNMEASURED", "REFUSE-ACROSS-UNMEASURED", "REFUSE-STABILITY-UNMEASURED", "REFUSE-PROBE-INCOMPLETE", "REFUSE-PROBE-UNKNOWN"]
+"0.6" = ["LINE", "FIRST-ORDER", "NOT", "REFUSE-EQUIL", "REFUSE-SLOW", "REFUSE-FLOW", "REFUSE-WEAK", "REFUSE-OFF", "REFUSE-IRRELEVANT", "REFUSE-UNRES", "REFUSE-NEEDLE-UNMEASURED", "REFUSE-TWO-START-UNMEASURED", "REFUSE-FLOW-UNMEASURED", "REFUSE-ACROSS-UNMEASURED", "REFUSE-STABILITY-UNMEASURED", "REFUSE-PROBE-INCOMPLETE", "REFUSE-PROBE-UNKNOWN", "WALKING"]  # MISS (see the after-run [[change]]): the declared set excluded WALKING; widened AFTER the run
+"0.7" = ["LINE", "FIRST-ORDER", "NOT", "REFUSE-EQUIL", "REFUSE-SLOW", "REFUSE-FLOW", "REFUSE-WEAK", "REFUSE-OFF", "REFUSE-IRRELEVANT", "REFUSE-UNRES", "REFUSE-NEEDLE-UNMEASURED", "REFUSE-TWO-START-UNMEASURED", "REFUSE-FLOW-UNMEASURED", "REFUSE-ACROSS-UNMEASURED", "REFUSE-STABILITY-UNMEASURED", "REFUSE-PROBE-INCOMPLETE", "REFUSE-PROBE-UNKNOWN"]
+"0.8" = ["LINE", "FIRST-ORDER", "NOT", "REFUSE-EQUIL", "REFUSE-SLOW", "REFUSE-FLOW", "REFUSE-WEAK", "REFUSE-OFF", "REFUSE-IRRELEVANT", "REFUSE-UNRES", "REFUSE-NEEDLE-UNMEASURED", "REFUSE-TWO-START-UNMEASURED", "REFUSE-FLOW-UNMEASURED", "REFUSE-ACROSS-UNMEASURED", "REFUSE-STABILITY-UNMEASURED", "REFUSE-PROBE-INCOMPLETE", "REFUSE-PROBE-UNKNOWN"]
+"0.85" = ["LINE", "FIRST-ORDER", "NOT", "REFUSE-EQUIL", "REFUSE-SLOW", "REFUSE-FLOW", "REFUSE-WEAK", "REFUSE-OFF", "REFUSE-IRRELEVANT", "REFUSE-UNRES", "REFUSE-NEEDLE-UNMEASURED", "REFUSE-TWO-START-UNMEASURED", "REFUSE-FLOW-UNMEASURED", "REFUSE-ACROSS-UNMEASURED", "REFUSE-STABILITY-UNMEASURED", "REFUSE-PROBE-INCOMPLETE", "REFUSE-PROBE-UNKNOWN"]
+
+# [family_set.x2b-xy] of v05-rules is REPLACED below by the [0872] P3 lock (stricter: BKT-END only)
+
+[[change]]
+date = "2026-10-04"
+points = ["x2b-xy:*", "x2b-xy"]
+why = """DECLARED BEFORE THE FIRST RUN of x2b-xy (plan 0871 P4), transcribed from the toolset's m.toml block [0871] L1-L5 (declared 2026-10-03 20:35 PDT, before any X2b \
+analysis): probe COMPLETE at all nine T; drift CONVERGING and flow STOPPED at T <= 0.8; geometry at 0.5 LINE or REFUSE-UNRES and never POINT or WALKING at T <= 0.85 \
+(verdict never POINT or WALKING either); geometry at 0.89294 LINE or a REFUSE; family: f1 CONSTANT, lower OPEN, upper END-BKT-CANDIDATE, verdict BKT-END or an UNCLASSIFIED \
+refusal, end_point 0.85 or 0.89294, end_bracket (0.85, 0.89294), (0.85, 0.95) or (0.89294, 0.95). NOT locked (the format cannot say it; reported as read): across MARGINAL \
+and per-point LINE at >= 2 of {0.6, 0.7, 0.8}; needle MID at 0.89294; the order axis at the first point beyond; the conditional 'BKT-END iff every interior point reads LINE'; \
+the L5 POINT-MANIFOLD risk (a BAD if it occurs, recorded and never repaired by retuning f2). The mapping of points to cases (points.toml) is taxonomy: 0.5-0.85 xy-low-phase, \
+0.89294 xy-tkt, 0.95-1.1 none"""
+
+[[change]]
+date = "2026-10-04"
+points = ["x2b-xy:0.6", "x2b-xy:0.89294", "x2b-xy"]
+why = """AFTER THE FIRST RUN of x2b-xy under v05-rules (plan 0871 P4). THREE DECLARED PREDICTIONS MISSED; the four locks they sit in were WIDENED to admit the code read so that the \
+scoreboard stays a regression lock of what is now known, each widening marked MISS above. Nothing was retuned and no rule was edited. (1) L1 'NO WALKING at any T <= 0.85': \
+T 0.6 reads WALKING (across 0.068 [-0.042, +0.166] ZERO! -> MARGINAL, but stability +0.172 [0.050, 0.291] POS -> CROSSING; flow STOPPED): the same cell as x2-xy-line-3 T 0.6 (the \
+predicted-possible BAD of review F3, here not predicted away by the 0871 declaration). (2) L2 'T_KT per point LINE or REFUSE': T 0.89294 reads POINT (needle MID, flow STOPPED via the \
+velocity ZERO!, across +0.171 [0.093, 0.259] POS -> RELEVANT, stability STABLE), not a line: a POINT reading at the BKT temperature at this N and size set. (3) interior_rule 'f1 \
+CONSTANT': f1 reads UNRES (the 0.5->0.6, 0.6->0.7 and 0.5->0.85 pairs of y_last are unresolved; every resolved pair is ZERO!), so the family LINE row could not have fired either way. \
+HELD: probe COMPLETE at all nine T; drift CONVERGING and flow STOPPED at 0.5-0.8; geometry 0.5 LINE; no POINT or WALKING geometry at 0.7-0.85 (and no POINT or WALKING at 0.5, 0.85); \
+the upper side END-BKT-CANDIDATE with lower OPEN; end_point 0.89294 and end_bracket (0.89294, 0.95), which contains 0.89294 (L3 held, no finite-size miss); the family verdict is an \
+UNCLASSIFIED refusal because the interior does not read LINE (points NOT-LINE through the 0.6 WALKING), as L4's 'otherwise' branch allows. L5 (POINT-MANIFOLD) did NOT occur: f2 reads \
+WEAK (three pairs SLOW-, 0.8->0.85 ZERO!)"""
+
+# ---- plan 0872 P-1 (E190): the EXACT verdict lock of x2b-xy, absent from the scoreboard until now (the 0871 P4 locks are column sets, read by tests/test_probe.py,
+# and the scoreboard reads only [verdicts.*]). Written AFTER the 0871 P4 run, as results/x2b-xy@v05-rules.json reads now: it is a regression lock of what is known, not a prediction.
+[verdicts.x2b-xy]
+"0.5" = "LINE"
+"0.6" = "LINE"                       # MOVES under v06-rules (F1: drift CONVERGING + stability CROSSING reads TRANSFORMED); declared in the [[change]] below
+"0.7" = "LINE"
+"0.8" = "LINE"
+"0.85" = "LINE"
+"0.89294" = "POINT"
+"0.95" = "NOT"
+"1.0" = "NOT"
+"1.1" = "NOT"
+
+[[change]]
+date = "2026-10-04"
+points = ["x2b-xy:*"]
+why = """PLAN 0872 P-1 (E190): [verdicts.x2b-xy] added to the scoreboard, exact, as the stored result reads after the 0871 P4 run (T 0.6 WALKING, T 0.89294 POINT, \
+T 0.5 / 0.7 / 0.8 / 0.85 LINE, T 0.95 / 1.0 / 1.1 NOT). No result and no table changed: the input was outside the scoreboard, so a later change to its cells could not have been seen"""
+
+# ---- plan 0872 P-1: the locks of the input x2b-xy-2 and of the family x2b-xy under v06-rules, transcribed from the toolset's m.toml block [0872] (P1-P4,
+# declared 2026-10-04 13:13 PDT) BEFORE the first v06-rules run. [across.*] and [stability.*] hold a point -> allowed code or LIST of allowed codes of that
+# SIGNATURE column (read by tests/test_transform.py); [geometry.*] and [family_set.*] are read by tests/test_probe.py. A point a prediction does not name is unlocked.
+[across.x2b-xy-2]                    # P1: the signature column across reads across_delta (the input declares it): MARGINAL at T 0.5, 0.6, 0.7, 0.8, 0.85
+"0.5" = ["MARGINAL"]
+"0.6" = ["MARGINAL"]
+"0.7" = ["MARGINAL"]
+"0.8" = ["MARGINAL"]
+"0.85" = ["MARGINAL"]
+
+[stability.x2b-xy-2]                 # P1: TRANSFORMED at all five (drift CONVERGING consumes the size-chain degree of freedom)
+"0.5" = ["TRANSFORMED"]
+"0.6" = ["TRANSFORMED"]
+"0.7" = ["TRANSFORMED"]
+"0.8" = ["TRANSFORMED"]
+"0.85" = ["TRANSFORMED"]
+
+[geometry.x2b-xy-2]                  # P1: LINE at ALL FIVE (T 0.6 included); P2: T_KT 0.89294 is not LINE per point (REFUSE or POINT; never WALKING, never NOT); 0.95 / 1.0 / 1.1 NOT
+"0.5" = ["LINE"]
+"0.6" = ["LINE"]
+"0.7" = ["LINE"]
+"0.8" = ["LINE"]
+"0.85" = ["LINE"]
+"0.89294" = ["POINT", "REFUSE-SLOW", "REFUSE-FLOW", "REFUSE-WEAK", "REFUSE-OFF", "REFUSE-IRRELEVANT", "REFUSE-UNRES", "REFUSE-NEEDLE-UNMEASURED", "REFUSE-FLOW-UNMEASURED", "REFUSE-ACROSS-UNMEASURED", "REFUSE-STABILITY-UNMEASURED", "REFUSE-PROBE-INCOMPLETE", "REFUSE-PROBE-UNKNOWN"]
+"0.95" = ["NOT"]
+"1.0" = ["NOT"]
+"1.1" = ["NOT"]
+
+[family_set.x2b-xy]                  # P3 (replaces v05-rules' wider lock): points LINE => interior LINE; upper END-BKT-CANDIDATE => BKT-END, end_point 0.89294, end_bracket [0.89294, 0.95]
+f1 = ["CONSTANT", "UNRES"]           # not named by [0872]: v05-rules' set carried over
+points = ["LINE"]
+lower = ["OPEN"]
+upper = ["END-BKT-CANDIDATE"]
+verdict = ["BKT-END"]
+end_point = [["0.89294"]]
+end_bracket = [[["0.89294", "0.95"]]]
+
+[[change]]
+date = "2026-10-04"
+points = ["x2b-xy-2:*", "x2b-xy-2", "x2b-xy:0.6", "x2b-xy", "x2-xy-line-3:0.6"]
+why = """DECLARED BEFORE ANY v06-rules RUN (plan 0872 P-1): v06-rules = v05-rules + F2 (the signature column across reads across_delta when the input declares it) + F1 \
+(stability TRANSFORMED on a drift_code CONVERGING point whose raw stability reads STABLE or CROSSING) + F3 (a family's end point is named; show / explain print the note). \
+The NEW input x2b-xy-2 (= x2b-xy + across_delta + transform, the frozen X2b data) is locked from [0872] P1/P2 above. The cells of an EXISTING input that may move are exactly the \
+ones the F1 table moves, computed from the stored v05-rules sign cells (a point with drift CONVERGING and raw stability STABLE or CROSSING): x2b-xy 0.5 / 0.7 / 0.8 / 0.85 (STABLE -> \
+TRANSFORMED, geometry LINE unchanged), x2b-xy 0.6 (CROSSING -> TRANSFORMED: WALKING -> LINE; locked LINE above) and x2-xy-line-3 0.6 (CROSSING -> TRANSFORMED with across RELEVANT: \
+WALKING -> REFUSE-UNRES, the relevant exponent measured on a pre-asymptotic pair is not certified; locked below). The family x2b-xy under v06-rules reads x2b-xy, so it moves \
+through x2b-xy 0.6. The brief named only x2b-xy-2 and the x2b-xy family: the two per-point cells of existing inputs are a consequence of the F1 table, listed here before the run"""
+
+[verdict_set.x2-xy-line-3]           # v06-rules: T 1.1 NOT as in v05-rules; T 0.6 is the declared move (F1): WALKING -> REFUSE-UNRES
+"0.6" = ["REFUSE-UNRES"]
+"1.1" = ["NOT"]
