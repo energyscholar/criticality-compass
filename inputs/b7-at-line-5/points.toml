@@ -1,4 +1,4 @@
-# inputs/b7-at-line-4/points.toml - the point -> case JOIN (taxonomy; never frozen)
+# inputs/b7-at-line-5/points.toml - the point -> case JOIN (taxonomy; never frozen)
 schema = 1
 kind = "points"
 input = "b7-at-line-5"

@@ -498,6 +498,9 @@ Geometry against class_truth (order_truth not FIRST-ORDER): 14 agree, 70 refused
 | x5n-bilayer-2@v04-rules | 0.0 | `coupled-ising-bilinear` | POINT | 27 81 243 | NEITHER (N) | MID (N) | SAME-WINDOW (N) | NOT-MEASURED | STOPPED (N) | RELEVANT (HN) | STABLE (HN) | INDEP (N) | INCOMPLETE | REFUSE-PROBE-INCOMPLETE | REFUSE | REFUSE-PROBE-INCOMPLETE | CONTINUOUS |
 | x5n-bilayer-2@v04-rules | 0.1 | `coupled-ising-bilinear` | POINT | 27 81 243 | NEITHER (N) | MID (N) | SAME-WINDOW (N) | NOT-MEASURED | STOPPED (N) | RELEVANT (HN) | STABLE (HN) | INDEP (N) | INCOMPLETE | REFUSE-PROBE-INCOMPLETE | REFUSE | REFUSE-PROBE-INCOMPLETE | CONTINUOUS |
 | x5n-bilayer-2@v04-rules | 0.3 | `coupled-ising-bilinear` | POINT | 27 81 243 | NEITHER (N) | MID (N) | SAME-WINDOW (N) | NOT-MEASURED | STOPPED (N) | RELEVANT (HN) | STABLE (HN) | INDEP (N) | INCOMPLETE | REFUSE-PROBE-INCOMPLETE | REFUSE | REFUSE-PROBE-INCOMPLETE | CONTINUOUS |
+| x5n-bilayer-3@v04-rules | 0.0 | `coupled-ising-bilinear` | POINT | 27 81 243 | NEITHER (N) | MID (N) | SAME-WINDOW (N) | NOT-EVALUATED (N) | STOPPED (N) | RELEVANT (HN) | STABLE (HN) | INDEP (N) | INCOMPLETE | REFUSE-PROBE-INCOMPLETE | REFUSE | REFUSE-PROBE-INCOMPLETE | CONTINUOUS |
+| x5n-bilayer-3@v04-rules | 0.1 | `coupled-ising-bilinear` | POINT | 27 81 243 | NEITHER (N) | MID (N) | SAME-WINDOW (N) | NOT-EVALUATED (N) | STOPPED (N) | RELEVANT (HN) | STABLE (HN) | INDEP (N) | INCOMPLETE | REFUSE-PROBE-INCOMPLETE | REFUSE | REFUSE-PROBE-INCOMPLETE | CONTINUOUS |
+| x5n-bilayer-3@v04-rules | 0.3 | `coupled-ising-bilinear` | POINT | 27 81 243 | NEITHER (N) | MID (N) | SAME-WINDOW (N) | NOT-EVALUATED (N) | STOPPED (N) | RELEVANT (HN) | STABLE (HN) | INDEP (N) | INCOMPLETE | REFUSE-PROBE-INCOMPLETE | REFUSE | REFUSE-PROBE-INCOMPLETE | CONTINUOUS |
 | x5n-bilayer@v04-rules | 0.0 | `coupled-ising-bilinear` | POINT | 27 81 243 | NEITHER (N) | MID (N) | NOT-MEASURED (N) | NOT-MEASURED | STOPPED (N) | RELEVANT (HN) | STABLE (HN) | INDEP (N) | INCOMPLETE | REFUSE-PROBE-INCOMPLETE | REFUSE | REFUSE-PROBE-INCOMPLETE | CONTINUOUS |
 | x5n-bilayer@v04-rules | 0.1 | `coupled-ising-bilinear` | POINT | 27 81 243 | NEITHER (N) | MID (N) | NOT-MEASURED (N) | NOT-MEASURED | STOPPED (N) | RELEVANT (HN) | STABLE (HN) | INDEP (N) | INCOMPLETE | REFUSE-PROBE-INCOMPLETE | REFUSE | REFUSE-PROBE-INCOMPLETE | CONTINUOUS |
 | x5n-bilayer@v04-rules | 0.3 | `coupled-ising-bilinear` | POINT | 27 81 243 | NEITHER (N) | MID (N) | NOT-MEASURED (N) | NOT-MEASURED | STOPPED (N) | RELEVANT (HN) | STABLE (HN) | INDEP (N) | INCOMPLETE | REFUSE-PROBE-INCOMPLETE | REFUSE | REFUSE-PROBE-INCOMPLETE | CONTINUOUS |
@@ -531,9 +534,9 @@ Geometry against class_truth (order_truth not FIRST-ORDER): 14 agree, 70 refused
 | x9c-potts@v04-rules | 8 | `potts-q8` | FIRST-ORDER | 27 81 243 | NEITHER (T) | DIS (T) | PINNED-BETWEEN-PHASES (T) | NOT-MEASURED | FLOWING (T) | IRRELEVANT (HT) | OFF (HT) | COEXIST (T) | COMPLETE | FIRST-ORDER | FIRST-ORDER | NOT | COEXIST-AT-WINDOW |
 | x9c-potts@v04-rules | 10 | `potts-q10` | FIRST-ORDER | 27 81 243 | NEITHER (T) | DIS (T) | PINNED-BETWEEN-PHASES (T) | NOT-MEASURED | FLOWING (T) | UNRES (HT) | UNRES (HT) | COEXIST (T) | COMPLETE | FIRST-ORDER | FIRST-ORDER | NOT | COEXIST-AT-WINDOW |
 
-Verdict class against truth: 12 agree, 98 refused, 20 disagree, 24 no truth
-Order against order_truth: 42 agree, 71 refused, 17 disagree
-Geometry against class_truth (order_truth not FIRST-ORDER): 8 agree, 92 refused, 7 disagree
+Verdict class against truth: 12 agree, 101 refused, 20 disagree, 24 no truth
+Order against order_truth: 45 agree, 71 refused, 17 disagree
+Geometry against class_truth (order_truth not FIRST-ORDER): 8 agree, 95 refused, 7 disagree
 
 ## Collisions (v04-rules)
 

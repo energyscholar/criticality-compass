@@ -1,0 +1,6 @@
+# families/x5n-g.toml - the coupled-Ising-layers family over the inter-layer coupling g (plan 0870 P3); a family names no table set
+schema = 1
+kind = "family-decl"
+id = "x5n-g"
+input = "x5n-bilayer-3"                      # x5n-bilayer-2 plus the along instrument and a control chain over g
+interior = ["0.0", "0.1", "0.3"]             # the three navigated points, all on the manifold (needle MID); g increasing

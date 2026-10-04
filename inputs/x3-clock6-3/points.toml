@@ -1,4 +1,4 @@
-# inputs/x3-clock6-2/points.toml - the point -> case JOIN (taxonomy; never frozen)
+# inputs/x3-clock6-3/points.toml - the point -> case JOIN (taxonomy; never frozen)
 schema = 1
 kind = "points"
 input = "x3-clock6-3"

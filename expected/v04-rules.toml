@@ -660,3 +660,46 @@ RECORDED, never repaired. (1) x2-xy-line-3 T 0.6: drift_code CONVERGING (omega_e
 sigma fluctuation of across). (2) x3-clock6-3 T 0.5 (the ordered end, needle ORD): flow_top SLOW+ with drift CONVERGING (3.376 [3.035, 3.809]) reads \
 flow STOPPED, which is a clock point becoming STOPPED via CONVERGING, contrary to the V04-2 sentence 'no clock point becomes STOPPED via CONVERGING' \
 (its four critical-phase points and T 0.7014 held); the verdict is NOT either way, so nothing moved. Both are findings about the rule, not edits of this file"""
+
+# ---- plan 0870 P3: the x5n g-chain family, locked from [V04-5] BEFORE its first run. [family_set.*] holds a family key -> allowed value(s)
+# (read by tests/test_probe.py): [[family]] holds one exact value per key, and V04-5 allows two outcomes for f2 and for the verdict.
+[family_set.x5n-g]
+f1 = ["CONSTANT"]
+f2 = ["IRRELEVANT", "UNRES"]                  # f2 MARGINAL is a FINDING that stops the plan (stop condition), not an allowed value
+verdict = ["POINT-MANIFOLD", "REFUSE-UNCLASSIFIED-v0"]   # POINT-MANIFOLD, or the named refusal of the (CONSTANT, UNRES) cell
+
+[[change]]
+date = "2026-10-03"
+points = ["x5n-bilayer-3:*"]
+why = """DECLARED BEFORE THE FIRST RUN of x5n-bilayer-3 (plan 0870 P3, review F8): x5n-bilayer-2 plus the along instrument, a control chain over g \
+(0.0 -> 0.1 -> 0.3) and two matched pairs, with families/x5n-g.toml over the three points. [V04-5]: f1 CONSTANT; f2 IRRELEVANT or UNRES; the family \
+verdict POINT-MANIFOLD or the named refusal of its cell. The IRRELEVANT is expected to be carried by the g 0.1 L27 transient (review section 1.5). \
+An f2 MARGINAL would be a finding that stops the plan. The per-point verdicts are x5n-bilayer-2's under v04-rules: REFUSE-PROBE-INCOMPLETE x3"""
+
+[verdicts.x5n-bilayer-3]             # AFTER THE FIRST RUN (see the [[change]] below): x5n-bilayer-2's, the six moved cells of P-1
+"0.0" = "REFUSE-PROBE-INCOMPLETE"
+"0.1" = "REFUSE-PROBE-INCOMPLETE"
+"0.3" = "REFUSE-PROBE-INCOMPLETE"
+
+[needle_pair.x5n-bilayer-3]          # x5n-bilayer-2's needle_pair declaration carried over unchanged (the same data and the same needle_o); read by tests/test_axes.py
+"0.0" = ["SAME-WINDOW", "HALF-PINNED"]
+"0.1" = ["SAME-WINDOW", "HALF-PINNED"]
+"0.3" = ["SAME-WINDOW", "HALF-PINNED"]
+
+[[family]]
+id = "x5n-g"
+verdict = "POINT-MANIFOLD"
+bracket = "BRACKET"
+f1 = "CONSTANT"
+f2 = "IRRELEVANT"
+
+[[change]]
+date = "2026-10-03"
+points = ["x5n-bilayer-3:*", "x5n-g"]
+why = """AFTER THE RUN of x5n-bilayer-3 (plan 0870 P3). [V04-5] held: f1 CONSTANT (every pair ZERO!), f2 IRRELEVANT (y_along 0.0->0.1 -0.4575 \
+[-0.5236, -0.3991] SIG-, 0.1->0.3 -0.2307 [-0.301, -0.1534] NEG: both pairs diverge from each other more slowly than the size grows), \
+bracket BRACKET, family verdict POINT-MANIFOLD (class POINT): the positive class of x5n is re-earned by the family over g, not by the per-point \
+reading. The exact [[family]] lock, the [verdicts.x5n-bilayer-3] lock (REFUSE-PROBE-INCOMPLETE x3, x5n-bilayer-2's) and the [needle_pair.x5n-bilayer-3] \
+lock (x5n-bilayer-2's declaration carried over unchanged) are written AFTER this run, from its result; the [family_set.x5n-g] lock above was \
+declared before it and is the one that could have failed. f2 was not MARGINAL. drift_code is NOT-EVALUATED at all three g (the velocity changes \
+sign), so the three per-point flows are the top pair's, STOPPED"""

@@ -1,4 +1,4 @@
-# inputs/x9c-potts/points.toml - the point -> case JOIN (taxonomy; NEVER frozen; read only by tabulate and the full validate)
+# inputs/x9c-potts-2/points.toml - the point -> case JOIN (taxonomy; NEVER frozen; read only by tabulate and the full validate)
 schema = 1
 kind = "points"
 input = "x9c-potts-2"
