@@ -429,6 +429,21 @@ the test can still catch is an end that sits too early (boundary 0.85) or too la
 the refusal `REFUSE-UNCLASSIFIED-v0`, the family rulebook's default for a cell with no positive row (its printed `why`, "no positive row yet"):
 BKT-END needs an interior that reads LINE, and this one does not.
 
+## across_delta on the TRANSFORMED basis (v07-rules, plan 0874)
+
+v07-rules = v06-rules + one thing, declared before it ran (`expected/v07-rules.toml`): `across_delta` reads the finite-size TRANSFORMED exponent on a pair whose two endpoints are both converging.
+
+**The pair basis.** `tables/v07-rules/membership.toml [across_delta]` reads the signature column `drift_code` at both endpoints of a control pair; the lowest-ranked membership decides the pair's door
+value. Both CONVERGING gives `delta_basis TRANSFORMED`: the pair reads `yD_inf = (yD2 - r yD1)/(1 - r)` (yD1, yD2 the Delta exponents of the two size steps, r the mean of the two endpoints' needle
+`|v2|/|v1|`, taken per resample from `needle_chain`'s drift as `3^-(drift + 1)`). Any other pair (a null `drift_code` included) reads `delta_basis RAW`: the raw yD2, r = 0. `door:basis` refuses a
+TRANSFORMED pair (NOT-EVALUATED, with a reason) where r >= 1 at the estimate or any resample. A set with no `[across_delta]` rule (v06-rules and earlier) reads every pair RAW: the instrument declares
+`member_default = "RAW"`. `delta_basis` is shown (`show`, `--advanced`: `per pair: 0.5->0.6 ZERO! MARGINAL [delta_basis TRANSFORMED]`; the pair rows of a result) and read by no verdict row; the pair's step
+exponents and r are reported (`y_steps`, `ratio`).
+
+**The per-point rule.** `codes.toml [columns.helper.across_dlt] combine.prefer_door = "TRANSFORMED"`: a point combines ONLY the touching pairs read on the TRANSFORMED basis when it has at least one, else all of
+its touching pairs (RAW), then the v06 rule applies (a resolved code counts only when every combined pair reads it). A converging point is thus read from its converging neighbours and never from a
+pair that crosses into a non-converging region. `bin/cc explain <input> <point>` prints the rule beside the combine rank.
+
 ## Across by the difference estimator, the finite-size transform and the end note (v06-rules, plan 0872)
 
 v06-rules = v05-rules + three things, each declared before it ran (`expected/v06-rules.toml`).
@@ -850,3 +865,6 @@ Read these before you trust a verdict.
   five low-phase points and no point reads WALKING, but `across_delta` is MARGINAL only at T 0.5; the pairs 0.6->0.7 and 0.7->0.8 read SLOW- (WEAK), and a point whose two touching pairs
   disagree is UNRES, so geometry is LINE at 0.5 and REFUSE-UNRES / REFUSE-WEAK at 0.6-0.85. The family x2b-xy under v06-rules reads x2b-xy (covariance across plus F1) and is BKT-END with
   end_bracket [0.89294, 0.95]. `expected/v06-rules.toml` keeps the declaration and the after-run `[[change]]`.
+- **v07-rules: the difference estimator reads MARGINAL on x2b-xy-2 once it is corrected (plan 0874).** The four converging pairs 0.5->0.6 ... 0.8->0.85 read yD_inf within +-0.02 of zero (all ZERO!), so across is MARGINAL
+  and geometry / verdict LINE at all five low-phase points, and the family x2b-xy-2 is BKT-END with end_bracket [0.89294, 0.95]. All [0874] predictions held; `expected/v07-rules.toml` keeps the declaration and the
+  after-run `[[change]]`. The instrument file `instruments/across_delta.toml` gained fields (requires, door_values, member_default, door_label), so `x2b-xy-2@v06-rules` was re-measured (every cell identical).

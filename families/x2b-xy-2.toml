@@ -1,0 +1,6 @@
+# families/x2b-xy-2.toml (plan 0874 P2) - the 2D XY temperature sweep X2b read through x2b-xy-2 (across_delta + transform + needle_chain): interior = T <= 0.85 (the declared low phase); the points above are the upper side
+schema = 1
+kind = "family-decl"
+id = "x2b-xy-2"
+input = "x2b-xy-2"                           # the same nine T as x2b-xy, the frozen X2b data; its axes.point order is the family order
+interior = ["0.5", "0.6", "0.7", "0.8", "0.85"]

@@ -942,3 +942,13 @@ The cells that may move are exactly x2b-xy-2's per-point across, geometry and ve
 predicted LINE at all five) and the NEW family x2b-xy-2 (families/x2b-xy-2.toml, interior T <= 0.85, added in P2; predicted BKT-END, end 0.89294, bracket [0.89294, 0.95]). \
 x2b-xy-2 T 0.89294 and 0.95 / 1.0 / 1.1 are predicted UNCHANGED from v06. Every other input, every v01-v06 cell and the x2b-xy family (the covariance input) must not move; \
 a moved cell outside this list is a stop. A prediction that misses is recorded here as a MISS-marked widening after the run and reported, never repaired"""
+
+[[change]]
+date = "2026-10-04"
+points = ["x2b-xy-2:0.5", "x2b-xy-2:0.6", "x2b-xy-2:0.7", "x2b-xy-2:0.8", "x2b-xy-2:0.85", "x2b-xy-2"]
+why = """AFTER THE FIRST RUN of x2b-xy-2 and the family x2b-xy-2 under v07-rules (plan 0874 P2). Every [0874] prediction HELD; no lock was widened and nothing was retuned. Q1: the four pairs whose BOTH \\
+endpoints read drift CONVERGING read delta_basis TRANSFORMED and yD_inf 0.5->0.6 +0.0040 [-0.0051, +0.0146], 0.6->0.7 -0.0069 [-0.0178, +0.0030], 0.7->0.8 +0.0014 [-0.0086, +0.0120], 0.8->0.85 +0.0202 \\
+[-0.0052, +0.0451], each ZERO! (MARGINAL); 0.85->0.89294 (drift NOT-EVALUATED at the T_KT end) is RAW, +0.0475 SLOW+ (WEAK). Q2: across MARGINAL, geometry LINE and verdict LINE at all five of 0.5-0.85. Q3: 0.89294 \\
+REFUSE-UNRES as in v06-rules, 0.95 / 1.0 / 1.1 NOT. Q4: family x2b-xy-2 BKT-END, end_point 0.89294, end_bracket [0.89294, 0.95], scored AGREE against xy-tkt (DEVELOPMENT data, not a blind score). \\
+Q5 (BAD): no WALKING; the only cells that moved between v06-rules and v07-rules on any of the 31 inputs are x2b-xy-2's across / geometry / verdict / verdict_class at 0.6, 0.7, 0.8, 0.85 (0.5 was already \\
+LINE); the x2b-xy family (the covariance input) is unchanged (BKT-END, end 0.89294, bracket [0.89294, 0.95])"""
