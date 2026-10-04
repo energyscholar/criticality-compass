@@ -21,7 +21,7 @@ cc - Criticality Compass   (ADVANCED)
   bin/cc tables drop <set> [--with-results]                   delete an unfrozen rulebook
   bin/cc tables split <set> --column C --value V --verdict X  override one cell family
   bin/cc validate [--input ID --tables SET | --mvt]           check every file; each problem has a Next line
-  bin/cc check [--fast]                                       validate + tests; run it before a commit
+  bin/cc check [--fast | --quick]                             validate + tests; run it before a commit (three tiers, see Tests)
   bin/cc test [-v] [<name> ...]                               run the named tests (default all)
   bin/cc mutate <relpath> (--sed E | --py E) -- <test> ...    run tests against a temporary mutation
   bin/cc help [--advanced]                                    this text
@@ -598,8 +598,26 @@ validate: clean
 
 ## Tests, mutations and the testing system
 
-`bin/cc check` runs `validate`, every test and the scoreboard (about seven minutes); `bin/cc check --fast`, which the
-pre-commit hook runs, skips the slow tests. `bin/cc test` runs every test, `bin/cc test <name> …` the named
+`bin/cc check` has three tiers; pick by what you are about to do:
+
+| tier | command | wall time | when |
+|---|---|---|---|
+| fast | `bin/cc check --fast` | about 25 s (budget 30 s) | the pre-commit hook runs it; it skips the tests listed in `cc.toml [check].slow` |
+| quick | `bin/cc check --quick` | about 2 min | routine: the end of every Generator phase |
+| full | `bin/cc check` | about 8-10 min | a full revision test: plan close, or the Auditor's gate at plan end |
+
+Quick runs `validate`, EVERY test script and the scoreboard, exactly as full does. What it drops are the HEAVY CASES named
+in `cc.toml [check.quick]`: a case (an input in `test_run_all` or `test_needle_o_start`, a golden case id in `test_golden`) whose
+re-measure took more than `case_budget_s` (8 s), each with the seconds it took. A dropped input is read from its stored,
+hash-pinned `results/` file (re-verdicted under the set when stored under another) instead of re-measured, so a changed
+stored verdict is still caught; a dropped golden case is not re-run, and its transcript stays on disk unread; `test_needle_o_start`
+does not run its mutation re-measure. `check --quick` prints every drop and why. `validate` refuses a name in the list
+that does not exist or whose figure is not over the budget. Re-measuring a heavy input is what only the full check does.
+Each tier writes its own record: `bin/cc check` writes `tests/BASELINE.txt`, `bin/cc check --quick` writes
+`tests/BASELINE-QUICK.txt` (a `tier quick` line, and the drops); a quick check never overwrites the full record, and
+`bin/cc check --baseline [--quick]` reads the record of the tier for this tree.
+
+`bin/cc test` runs every test, `bin/cc test <name> …` the named
 ones, `-v` prints each test's lines. Tests are plain scripts, and a test that cannot find its data fails with
 the path; none skips.
 
@@ -784,7 +802,7 @@ Read these before you trust a verdict.
   the family rulebook (and to nothing else).
 - **`new input --like` cannot change the size axis or mix data directories.** `--data-dir` moves every file to one
   folder; a different set of sizes, or points drawn from two folders, is written by hand.
-- **`bin/cc check --fast` takes about 34 s against its 30 s budget.** The hook runs it before every commit; it
+- **`bin/cc check --fast` takes about 25-34 s against its 30 s budget.** The hook runs it before every commit; it
   prints the slowest fast test and the line to move into `cc.toml [check].slow`, and that move is a maintainer's
   choice, so the budget is currently exceeded.
 - **REFUSE-PROBE-UNKNOWN: a real-data input can never read POINT, LINE or WALKING per point (v04-rules).** `inputs/<id>/couplings.toml`
