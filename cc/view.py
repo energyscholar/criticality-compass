@@ -137,6 +137,8 @@ def show(res, join, mode, note="", tables_dir=None):
                 f"  code_commit: {res['code_commit']}",
                 *[f"  read {k} {res['read'][k][:12]}" for k in files],
                 f"  read {len(res['read']) - len(files)} data files, sha256 match the pinned manifest"]
+    import family   # plan 0872 F3: lazy (family imports view)
+    notes = family.end_notes(ROOT, res)
     for sig in res["signature"]:
         pt, case = sig["point"], (join or {}).get(sig["point"])
         tag = "" if case is None else f"   case {'' if case == 'none' or (ROOT / 'cases' / (case + '.toml')).is_file() else '?'}{case}"
@@ -144,7 +146,7 @@ def show(res, join, mode, note="", tables_dir=None):
         out += [column_line(c, feeders(res, pt, c, cols), sig, mode, cfg) for c in res["signature_columns"]]
         wit = detect.codes_of(cells_of(res, pt), T)
         out += [column_line(c, feeders(res, pt, c, cols), {**sig, c: wit[c]}, mode, cfg) for c in witnesses(T, res)]
-        out += verdict_lines(sig, mode, cfg) + axes_lines(sig, mode, cfg)
+        out += verdict_lines(sig, mode, cfg) + axes_lines(sig, mode, cfg) + family.note_lines(notes, pt)
     return out + pair_lines(res, mode, cfg)
 
 
@@ -270,6 +272,8 @@ def explain(res, pt, join, mode, tables_dir=None):
     out.append(f"8 VERDICT   verdict.toml line {sig['row_line']}: "
                + "; ".join(f"when.{k} = [{', '.join(v)}]" for k, v in row["when"].items()))
     out += verdict_lines(sig, mode, cfg, pad="            ")
+    import family   # plan 0872 F3: lazy (family imports view)
+    note = family.note_lines(family.end_notes(ROOT, res), pt, "")
     names = ["GEOMETRY", *["PROBE"] * ("probe" in T.axes), "ORDER", "COMPOSE"]
     for num, name in ((str(9 + i), n) for i, n in enumerate(names)) if "geometry" in sig else ():
         tab, lines = T.axes[name.lower()]
@@ -277,7 +281,7 @@ def explain(res, pt, join, mode, tables_dir=None):
         got = row["verdict"].replace("@geometry", f"{sig['geometry']} (the geometry)") if name in ("COMPOSE", "PROBE") else row["verdict"]
         out.append(f"{num:<3}{name:<8}  {name.lower()}.toml line {sig['axis_lines'][name.lower()]}: "
                    + "; ".join(f"when.{k} = [{', '.join(v)}]" for k, v in row["when"].items()) + f"  => {got}")
-    return out
+    return out + note
 
 
 def f2_code_line(text):

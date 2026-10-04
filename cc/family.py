@@ -119,8 +119,10 @@ def compute(decl, res, z, fam, text, m, nulls):
         out |= {w: side_of(fam, decl, res, nulls, side_lines, w) for w in ("lower", "upper")}
     codes = {c: v[0] for c, v in out.items()}
     verdict, cls, line, why = detect.verdict_of(codes, SimpleNamespace(verdict=fam, lines=declare.row_lines(text)))
-    ends = [out[w][1] for w in ("lower", "upper") if w in out and out[w][0] in fam["side"]["ends"]]   # plan 0871 E3: the sides that END a line
-    named = {"end_point": [e["boundary"] for e in ends], "end_bracket": [[e["boundary"], e["beyond"][0]] for e in ends]} if "points" in out else {}
+    sides = [(w, out[w][0], out[w][1]) for w in ("lower", "upper") if w in out and out[w][0] in fam["side"]["ends"]]   # plan 0871 E3: the sides that END a line
+    ends = [e for _, _, e in sides]
+    named = {"end_point": [e["boundary"] for e in ends], "end_bracket": [[e["boundary"], e["beyond"][0]] for e in ends],
+             "ends": [{"point": e["boundary"], "side": w, "kind": k} for w, k, e in sides]} if "points" in out else {}   # plan 0872 F3: each end point, named with its side and kind
     return {**codes, **named, "cells": {c: v[1] for c, v in out.items()}, "verdict": verdict, "class": cls, "line": line, "why": why}
 
 
@@ -152,6 +154,32 @@ def run(root, fid, tables):
         return None, (decl, compute(decl, res, z, fam, ft.read_text(), m, nulls), tables)
 
 
+def end_notes(root, res):
+    """{point: [(family id, END-kind)]} for a STORED result: the end points of the families that read its input (plan 0872 F3). Empty when the set has
+    no family rule with sides, the input has no family, or the result's vectors are not stored (a dry run): the note is read from the stored family, never invented."""
+    root, notes = Path(root), {}
+    ft = root / "tables" / res["tables"] / "family.toml"
+    if not ft.is_file() or not (root / "families").is_dir() or not (root / res["vectors"]).is_file():
+        return notes
+    fam = tomllib.loads(ft.read_text())
+    if "points" not in fam["columns"]:
+        return notes
+    nulls = declare.Ctx(root).alpha["nulls"]
+    for f in sorted((root / "families").glob("*.toml")):
+        decl = load_decl(root, f.stem)
+        if decl["input"] == res["input"]:
+            with np.load(root / res["vectors"]) as z:
+                got = compute(decl, res, z, fam, ft.read_text(), detect.load_input(res["input"]), nulls)
+            for e in got["ends"]:
+                notes.setdefault(e["point"], []).append((decl["id"], e["kind"]))
+    return notes
+
+
+def note_lines(notes, pt, pad="  "):
+    """The F3 line(s) under one point: it ends a LINE run of a family."""
+    return [f"{pad}end of a LINE run (family {fid}, {kind})" for fid, kind in notes.get(pt, [])]
+
+
 def show(decl, out, tables):
     """The printed family: each fingerprint with its cells, then the verdict and the row's why."""
     c = out["cells"]
@@ -165,5 +193,6 @@ def show(decl, out, tables):
         f"    reads {', '.join(f'{k} {v}' for k, v in c[w]['key'].items())}  -> family.toml side_row line {c[w]['line']}",
         f"    why: {c[w]['why']}")]
     lines += [f"  end     {', '.join(f'{q} (bracket {a} .. {z})' for q, (a, z) in zip(out[k], out['end_bracket'])) or '(none)'}" for k in ("end_point",) if k in out]
+    lines += [f"    {e['point']}: end of a LINE run ({e['side']} side, {e['kind']})" for e in out.get("ends", [])]
     return lines + [f"  => family verdict {out['verdict']}   class {out['class']}, family.toml line {out['line']}",
                     f"     why: {out['why']}"]
