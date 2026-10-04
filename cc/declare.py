@@ -18,8 +18,10 @@ SIGNS = ("SIG-", "NEG", "SLOW-", "ZERO!", "SLOW+", "POS", "SIG+", "UNRES")
 RESULT_FIELDS = (  # the result field set that cc.toml [basic] must partition (view.py reads it from here)
     "instrument", "unit", "column", "eps_key", "eps", "estimate", "lo", "hi", "cell", "code", "per_size",
     "flags", "reason", "vector_key", "point", "obtained", "verdict", "verdict_class", "row_line", "why",
-    "read", "code_commit", "code_hash", "interval", "reports", "derived_from", "pair_readings", "pairs", "geometry", "order", "axis_lines")
+    "read", "code_commit", "code_hash", "interval", "reports", "derived_from", "pair_readings", "pairs", "geometry", "order", "axis_lines", "declared")
 RESERVED = {"door", "declare", "author", "detect", "view", "score", "admit"}
+DECLARED = {"probe": ("COMPLETE", "INCOMPLETE", "UNKNOWN")}   # code columns read from an input's declaration (couplings.toml), never from data
+SIZE_KEY = "L"                 # the one scalar a data file holds that is the lattice size, not a coupling
 SIDECARS = ("observable", "block_map", "conjugate", "sinks", "two_start")
 TEMPLATES = {"chain": {"axis": str}, "pair": {"axis": str, "pairs": list}, "all-pairs": {"axis": str},
              "matched": {"axis": str, "big": int, "small": int}}
@@ -513,6 +515,11 @@ def code_cols(d):
     return {**d["columns"].get("helper", {}), **d["columns"].get("signature", {})}
 
 
+def declared_cols(d):
+    """{column: 'declared.<kind>'} of the code columns a codes.toml reads from an input's declaration, not from data."""
+    return {k: v["from"] for k, v in code_cols(d).items() if isinstance(v.get("from"), str) and v["from"].startswith("declared.")}
+
+
 def doms(d, nulls):
     """column -> its alphabet followed by the nulls (the verdict domain)."""
     return {k: list(v["alphabet"]) + list(nulls) for k, v in d["columns"]["signature"].items()}
@@ -520,21 +527,27 @@ def doms(d, nulls):
 
 def chk_column(p, loc, col, c, allc):
     """One code column: where it comes from, its map (total, no foreign values) and its combine rule."""
-    e = shape(p, col, {"from": (str, list), "alphabet": list, "map": dict}, {"combine": dict}, pre=loc + ".")
+    e = shape(p, col, {"from": (str, list), "alphabet": list, "map": dict}, {"combine": dict, "nullable": bool}, pre=loc + ".")
     if e:
         return e
     src, alpha, nulls = col["from"], col["alphabet"], c.alpha["nulls"]
     if isinstance(src, str):
         inst, _, column = src.partition(".")
-        if column not in c.reg.get(inst, {}).get("columns", {}):
+        if inst == "declared":      # plan 0870: a column read from the input's declaration; its map keys are the declared alphabet
+            if column not in DECLARED:
+                return [at(p, loc + ".from", f"'{src}' is not a declared column", f"use one of: {' '.join('declared.' + k for k in DECLARED)}")]
+            want, needs = list(DECLARED[column]), False
+        elif column not in c.reg.get(inst, {}).get("columns", {}):
             return [at(p, loc + ".from", f"'{src}' is not a column of a registry instrument",
                        "name <instrument>.<column>")]
-        want, needs = list(SIGNS), c.reg[inst]["unit"] == "point-size"
+        else:
+            want, needs = list(SIGNS), c.reg[inst]["unit"] == "point-size"
     else:
         if len(src) != 2 or [x for x in src if x not in allc]:
             return [at(p, loc + ".from", f"derived columns name two helper/signature columns, not {src}",
                        "fix the list")]
-        want = [f"{a},{b}" for a, b in itertools.product(*(allc[x].get("alphabet", []) for x in src))]
+        second = list(allc[src[1]].get("alphabet", [])) + list(nulls) * bool(col.get("nullable"))   # nullable: a null of the 2nd source is a named cell
+        want = [f"{a},{b}" for a, b in itertools.product(allc[src[0]].get("alphabet", []), second)]
         needs = False
     mk, cb = col["map"], col.get("combine")
     out = [at(p, loc + ".map", f"missing key '{k}'", f'add "{k}" = <code>') for k in want if k not in mk]
@@ -545,7 +558,9 @@ def chk_column(p, loc, col, c, allc):
     out += when(needs != (cb is not None), p, loc + ".combine",
                 "required for a point-size source" if needs else "only a point-size source combines", "fix")
     if cb is not None:
-        out += shape(p, cb, {"over": str, "rank": list}, pre=loc + ".combine.")
+        out += shape(p, cb, {"over": str, "rank": list}, {"select": str}, pre=loc + ".combine.")
+        out += when(cb.get("select", "top") not in ("top", "rest"), p, loc + ".combine.select", f"'{cb.get('select')}' is not top or rest",
+                    "select the largest size (top) or the smaller ones (rest), or omit it for all sizes")
         out += when(sorted(cb.get("rank", [])) != sorted(alpha + nulls), p, loc + ".combine.rank",
                     f"must list {sorted(alpha + nulls)} exactly once each", "fix the list")
     return out
@@ -740,7 +755,7 @@ def chk_family_decl(p, d, c, stem=None):
 def feeding(allc, name):
     """The instruments a code column is derived from (through its helper columns)."""
     src = allc[name]["from"]
-    return {src.partition(".")[0]} if isinstance(src, str) else feeding(allc, src[0]) | feeding(allc, src[1])
+    return {src.partition(".")[0]} - {"declared"} if isinstance(src, str) else feeding(allc, src[0]) | feeding(allc, src[1])
 
 
 def chk_membership(p, d, c, stem=None):
@@ -801,6 +816,53 @@ def chk_geometry(p, d, c, stem=None):
     return chk_axis(p, d, c, "geometry", "verdicts", {"refuse": list}) + (chk_classes(p, d, c) if "refuse" in d and "verdicts" in d else [])
 
 
+def chk_probe(p, d, c, stem=None):
+    """probe.toml (plan 0870): a total projection over (probe, geometry) -> geometry'. A refusal named here replaces a positive
+    geometry that one probed direction cannot certify; every other cell is @geometry. A partition of the product of the two alphabets."""
+    out = header(p, d, "probe") + shape(p, d, {"columns": list, "verdicts": list, "refuse": list, "row": list}, {"class_of": dict})
+    codes, bad = load(c.over.get("codes") or Path(c.root, p).parent / "codes.toml", c.root)
+    geo, bad2 = load(Path(c.root, p).parent / "geometry.toml", c.root)
+    if out or bad or bad2 or "probe" not in (codes or {}).get("columns", {}).get("signature", {}):
+        return out + bad + bad2 + when(not (out or bad or bad2), p, "columns", "codes.toml has no signature column 'probe'", "declare it in codes.toml")
+    dom = {"probe": list(codes["columns"]["signature"]["probe"]["alphabet"]) + list(c.alpha["nulls"]), "geometry": list(geo["verdicts"])}
+    out += same(p, "columns", d["columns"], ["probe", "geometry"], "columns")
+    out += [at(p, "verdicts", f"geometry value '{x}' is not in verdicts", "list every geometry value (a pass-through is @geometry)") for x in geo["verdicts"] if x not in d["verdicts"]]
+    rows, _ = chk_rows(p, {**d, "verdicts": [*d["verdicts"], "@geometry"]}, dom)
+    out += rows + chk_classes(p, d, c)
+    return out if out else chk_partition(p, ["probe", "geometry"], [dom["probe"], dom["geometry"]], [r["when"] for r in d["row"]], Path(c.root, p).read_text())
+
+
+def scalar_keys(m, c):
+    """The 0-d arrays (the sampler's parameters) the data files of an input hold, minus the size key: [] when none are stored."""
+    keys = set()
+    for path in sorted({c.data_root / b["path"] for b in m["data"]["files"]}):
+        z = np.load(path) if path.is_file() else None
+        keys |= {k for k in (z.files if z is not None and not isinstance(z, np.ndarray) else []) if z[k].ndim == 0}
+    return sorted(keys - {SIZE_KEY})
+
+
+def chk_couplings(p, d, c, stem=None):
+    """inputs/<id>/couplings.toml (plan 0870): the sampler's free parameters, declared from the Hamiltonian, and the ones the per-point
+    instruments probe. Checked against the scalars the data files store, so a declaration cannot choose its own verdict."""
+    out = header(p, d, "couplings") + shape(p, d, {"id": str, "names": (list, str), "probes": list})
+    out += id_check(p, "id", d.get("id"), stem, "its directory")
+    m, bad = load(Path(c.root, p).parent / "m.toml", c.root)
+    if out or bad:
+        return out + bad
+    names, probes, have = d["names"], d["probes"], scalar_keys(m, c)
+    out += when(names != "unknown" and (not names or not all(isinstance(x, str) for x in names)), p, "names",
+                "must be a list of coupling names, or the string unknown", 'write names = ["K"] or names = "unknown"')
+    out += when(names == "unknown" and have, p, "names", f"unknown, but the data store the scalars {have}", f"declare names = {have}")
+    out += when(isinstance(names, list) and have and sorted(names) != have, p, "names",
+                f"must equal the scalars the data files store (minus {SIZE_KEY}): {have}", f"write names = {have}")
+    out += [at(p, "probes", f"'{x}' is not a declared coupling", "probes must be a subset of names") for x in probes
+            if isinstance(names, list) and x not in names]
+    across = "across" in m["instruments"]
+    out += when(across and names != "unknown" and not probes, p, "probes", "the input declares across, which probes a coupling", "name it in probes")
+    out += when(not across and probes, p, "probes", "the input declares no across, so nothing is probed", "write probes = []")
+    return out
+
+
 def chk_order(p, d, c, stem=None):
     out = chk_axis(p, d, c, "order", "values", {"score": dict})
     sc, vals = d.get("score", {}), d.get("values", [])
@@ -812,12 +874,13 @@ def chk_order(p, d, c, stem=None):
 def chk_compose(p, d, c, stem=None):
     """compose.toml: a partition of (geometry value x order value); a verdict of verdict.toml, or @geometry."""
     out = header(p, d, "compose") + shape(p, d, {"columns": list, "row": list})
-    tabs = {n: load(Path(c.root, p).parent / f"{n}.toml", c.root) for n in ("geometry", "order", "verdict")}
+    names = ("geometry", "order", "verdict") + ("probe",) * (Path(c.root, p).parent / "probe.toml").is_file()
+    tabs = {n: load(Path(c.root, p).parent / f"{n}.toml", c.root) for n in names}
     if out or any(b for _, b in tabs.values()):
         return out + [f for _, b in tabs.values() for f in b]
-    g, o, v = (tabs[n][0] for n in ("geometry", "order", "verdict"))
+    o, v = (tabs[n][0] for n in ("order", "verdict"))
     out += same(p, "columns", d["columns"], ["geometry", "order"], "columns")
-    dom = {"geometry": g.get("verdicts", []), "order": o.get("values", [])}
+    dom = {"geometry": tabs.get("probe", tabs["geometry"])[0].get("verdicts", []), "order": o.get("values", [])}   # with a probe projection, compose reads geometry'
     rows, read = chk_rows(p, {**d, "verdicts": [*v["verdicts"], "@geometry"]}, dom)
     out += rows + [at(p, "", f"geometry value '{x}' is not a verdict of verdict.toml", "fix geometry.toml") for x in dom["geometry"] if x not in v["verdicts"]]
     return out if out else chk_partition(p, ["geometry", "order"], [dom["geometry"], dom["order"]], [r["when"] for r in d["row"]], Path(c.root, p).read_text())
@@ -842,6 +905,7 @@ def factorisation(root, tset):
     signature columns and every column an axis reads (a set with none of the three files has nothing to prove)."""
     t, nulls = Path(root) / "tables" / tset, tomllib.loads((Path(root) / "cc.toml").read_text())["alphabets"]["nulls"]
     have = [n for n in ("geometry", "order", "compose") if (t / f"{n}.toml").is_file()]
+    pr = tomllib.loads((t / "probe.toml").read_text()) if (t / "probe.toml").is_file() else None
     at_ = f"tables/{tset}/compose.toml"
     if not have:
         return [], 0
@@ -853,7 +917,13 @@ def factorisation(root, tset):
     vv = lifted(table_values(v, dom, v["columns"]), v["columns"], full, dom)
     gv = lifted(table_values(g, dom, g["columns"]), g["columns"], full, dom)
     ov = lifted(table_values(o, dom, o["columns"]), o["columns"], full, dom)
-    cdom = {"geometry": g["verdicts"], "order": o["values"]}
+    if pr:   # the probe projection: geometry' = (probe, geometry) -> @geometry or a refusal
+        pdom = {"probe": dom["probe"], "geometry": g["verdicts"]}
+        pv = table_values(pr, pdom, ["probe", "geometry"])
+        pi, gj = np.broadcast_arrays(lifted(np.arange(len(pdom["probe"])), ["probe"], full, dom), np.vectorize(pdom["geometry"].index)(gv))
+        got_p = pv[pi, gj]
+        gv = np.where(got_p == "@geometry", gv, got_p)
+    cdom = {"geometry": pr["verdicts"] if pr else g["verdicts"], "order": o["values"]}
     comp = table_values(cm, cdom, ["geometry", "order"])
     gi, oi = (np.vectorize(cdom[k].index)(x) for k, x in (("geometry", gv), ("order", ov)))
     got = np.where(comp[gi, oi] == "@geometry", gv, comp[gi, oi])
@@ -870,7 +940,7 @@ def factorisation(root, tset):
 KIND = {"membership": chk_membership, "case": chk_case, "points": chk_points, "input": chk_input, "instrument": chk_instrument,
         "codes": chk_codes, "verdict": chk_verdict, "data-manifest": chk_manifest, "cc": chk_cc,
         "family": chk_family, "family-decl": chk_family_decl, "geometry": chk_geometry, "order": chk_order,
-        "compose": chk_compose}
+        "compose": chk_compose, "probe": chk_probe, "couplings": chk_couplings}
 
 
 def check_file(path, root=ROOT, **over):
@@ -878,7 +948,7 @@ def check_file(path, root=ROOT, **over):
     c, path = Ctx(Path(root).resolve(), **over), Path(path)
     p = rel(path.resolve() if path.is_absolute() else path, c.root)
     real = c.root in path.resolve().parents and "planted" not in path.parts
-    stem = (path.parent.name if path.name in ("m.toml", "points.toml") else path.stem) if real else None
+    stem = (path.parent.name if path.name in ("m.toml", "points.toml", "couplings.toml") else path.stem) if real else None
     d, bad = load(path, c.root)
     if bad:
         return bad
@@ -904,13 +974,19 @@ def validate(root=ROOT, input_id=None, tables=None):
         files += sorted((root / "inputs").glob("*/points.toml"))
     files += [root / "tables" / s / f for s in sets for f in ("codes.toml", "verdict.toml")]
     files += [f for s in sets if not input_id for n in ("membership", "family") if (f := root / "tables" / s / f"{n}.toml").is_file()]
-    files += [f for s in sets for n in ("geometry", "order", "compose") if (f := root / "tables" / s / f"{n}.toml").is_file()]
+    files += [f for s in sets for n in ("geometry", "order", "probe", "compose") if (f := root / "tables" / s / f"{n}.toml").is_file()]
+    files += [f for f in sorted((root / "inputs").glob("*/couplings.toml")) if not input_id or f.parent.name == input_id]
     files += sorted((root / "families").glob("*.toml")) if not input_id and (root / "families").is_dir() else []
     out, n = [], {}
     for f in files:
         kind = (load(f, root)[0] or {}).get("kind", "?")
         n[kind] = n.get(kind, 0) + 1
         out += check_file(f, root)
+    reads_decl = [s for s in sets if declared_cols((load(root / "tables" / s / "codes.toml", root)[0] or {"columns": {}}))]   # a set with a declared column needs every input's couplings.toml
+    out += [at(f"inputs/{i}/couplings.toml", "", f"missing, and tables/{reads_decl[0]} reads a declared column",
+               f"write it: kind = \"couplings\", id, names (from the Hamiltonian) and probes (which of them across probes)")
+            for i in ([input_id] if input_id else sorted(q.parent.name for q in (root / "inputs").glob("*/m.toml")))
+            if reads_decl and not (root / "inputs" / i / "couplings.toml").is_file()]
     if not out:
         out += [x for s in sets for x in factorisation(root, s)[0]]
     return out + (member_need(root, input_id, tables) if input_id and tables else []), n

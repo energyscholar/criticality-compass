@@ -1,0 +1,8 @@
+# inputs/x2-xy-line/couplings.toml (plan 0870 P1) - the sampler's free parameters, declared from the Hamiltonian (never from the answer),
+# and which of them the per-point instruments probe. one temperature T (across's conjugate is beta = 1/T, the same coupling).
+# validate checks `names` against the scalars the data files store (minus the size key L) and `probes` against names.
+schema = 1
+kind = "couplings"
+id = "x2-xy-line"
+names = ["T"]
+probes = ["T"]

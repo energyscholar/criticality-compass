@@ -28,8 +28,9 @@ def stale(res, root=ROOT):
 
 def cells_of(res, pt):
     """The sign cells of one point as `<instrument>.<column>` -> cell (a list per size for a point-size column)."""
-    return {f"{r['instrument']}.{r['column']}": [q["cell"] for q in r["per_size"]] if r["per_size"] else r["cell"]
-            for r in res["readings"] if r["unit"]["point"] == pt}
+    return {**{f"declared.{k}": v for k, v in res.get("declared", {}).items()},
+            **{f"{r['instrument']}.{r['column']}": [q["cell"] for q in r["per_size"]] if r["per_size"] else r["cell"]
+               for r in res["readings"] if r["unit"]["point"] == pt}}
 
 
 def feeders(res, pt, col, cols):
@@ -94,8 +95,9 @@ def axes_lines(sig, mode, cfg, pad="  "):
     if "geometry" not in sig:
         return []
     ln = sig["axis_lines"]
+    pl = f", probe.toml line {ln['probe']}" if "probe" in ln else ""
     items = [("geometry", f"geometry {sig['geometry']},"), ("order", f"order {sig['order']}"),
-             ("axis_lines", f"  (geometry.toml line {ln['geometry']}, order.toml line {ln['order']}, compose.toml line {ln['compose']})")]
+             ("axis_lines", f"  (geometry.toml line {ln['geometry']}{pl}, order.toml line {ln['order']}, compose.toml line {ln['compose']})")]
     return [f"{pad}   axes: " + join_line(items, mode, cfg)]
 
 
@@ -257,10 +259,11 @@ def explain(res, pt, join, mode, tables_dir=None):
     out.append(f"8 VERDICT   verdict.toml line {sig['row_line']}: "
                + "; ".join(f"when.{k} = [{', '.join(v)}]" for k, v in row["when"].items()))
     out += verdict_lines(sig, mode, cfg, pad="            ")
-    for num, name in (("9", "GEOMETRY"), ("10", "ORDER"), ("11", "COMPOSE")) if "geometry" in sig else ():
+    names = ["GEOMETRY", *["PROBE"] * ("probe" in T.axes), "ORDER", "COMPOSE"]
+    for num, name in ((str(9 + i), n) for i, n in enumerate(names)) if "geometry" in sig else ():
         tab, lines = T.axes[name.lower()]
         row = tab["row"][lines.index(sig["axis_lines"][name.lower()])]
-        got = row["verdict"].replace("@geometry", f"{sig['geometry']} (the geometry)") if name == "COMPOSE" else row["verdict"]
+        got = row["verdict"].replace("@geometry", f"{sig['geometry']} (the geometry)") if name in ("COMPOSE", "PROBE") else row["verdict"]
         out.append(f"{num:<3}{name:<8}  {name.lower()}.toml line {sig['axis_lines'][name.lower()]}: "
                    + "; ".join(f"when.{k} = [{', '.join(v)}]" for k, v in row["when"].items()) + f"  => {got}")
     return out

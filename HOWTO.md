@@ -591,3 +591,9 @@ Read these before you trust a verdict.
 - **`bin/cc check --fast` takes about 34 s against its 30 s budget.** The hook runs it before every commit; it
   prints the slowest fast test and the line to move into `cc.toml [check].slow`, and that move is a maintainer's
   choice, so the budget is currently exceeded.
+- **REFUSE-PROBE-UNKNOWN: a real-data input can never read POINT, LINE or WALKING per point (v04-rules).** `inputs/<id>/couplings.toml`
+  declares the system's couplings and which of them `across` probes. With `names = "unknown"` (admissible only when the data store no
+  scalar parameters) the probe column reads UNKNOWN, and `probe.toml` turns every positive geometry into REFUSE-PROBE-UNKNOWN. That
+  is the honest reading of "a second direction may exist"; only a family over a navigated chain can say more. To lift it, declare the
+  couplings from the Hamiltonian; if they are unknown this instrument reads the position only. An input with two couplings and one probed
+  (b7: K and L4; x5n: K and g) reads REFUSE-PROBE-INCOMPLETE per point and is read through its family.

@@ -40,7 +40,7 @@ keeps = ["point", "column", "estimate", "lo", "hi", "cell", "code", "reason", "v
 discards = [
   "instrument", "unit", "eps_key", "eps", "flags", "obtained", "vector_key",
   "verdict_class", "row_line", "per_size", "read", "code_commit", "code_hash", "interval", "reports", "derived_from",
-  "pair_readings", "axis_lines",
+  "pair_readings", "axis_lines", "declared",
 ]
 blank = ["NOT-MEASURED", "NOT-EVALUATED", "UNRES"]  # shown as BLANK (<value>: <reason>)
 blank_refuse = true             # a verdict in the set's `refuse` list shows as BLANK (<verdict>)

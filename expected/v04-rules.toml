@@ -1,6 +1,6 @@
-# expected/v04-rules.toml - the SCOREBOARD LOCK for v04-rules (plan 0870), DECLARED BEFORE ANY v04-rules RUN. It is committed in P-1 as
-# expected/v04-rules.declared (so the scoreboard test, which reads every expected/*.toml against stored results, has nothing to read yet)
-# and renamed to expected/v04-rules.toml in the phase that first runs the set. v04-rules = v03-rules forked: every lock below is the v03-rules
+# expected/v04-rules.toml - the SCOREBOARD LOCK for v04-rules (plan 0870), DECLARED BEFORE ANY v04-rules RUN. It was committed in P-1 as
+# expected/v04-rules.declared (the scoreboard test reads every expected/*.toml against stored results, and none existed yet) and renamed
+# here, in P1, with the first run of the set; its contents are P-1's, byte for byte. v04-rules = v03-rules forked: every lock below is the v03-rules
 # lock carried over UNCHANGED, except the cells the [[change]] at the end names. Nothing else may move on any existing input.
 # It is NOT truth: agreement with class_truth / order_truth is reported by bin/cc tabulate (cc/score.py), never here.
 schema = 1

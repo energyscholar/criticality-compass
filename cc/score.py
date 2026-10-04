@@ -34,7 +34,7 @@ def axis_tallies(rows, T, tr, otr):
     """The per-axis agreement lines of one table set whose results carry geometry and order. Order is read against
     order_truth through the set's [score] map; geometry against class_truth, over the points whose order_truth is not
     FIRST-ORDER (a first-order point has no geometry class to be right about). Points with no case are not scored."""
-    sc, g = T.axes["order"][0]["score"], T.axes["geometry"][0]
+    sc, g = T.axes["order"][0]["score"], T.axes.get("probe", T.axes["geometry"])[0]   # the geometry as the declared probe lets it stand
     cls = lambda v: "REFUSE" if v in g["refuse"] else g.get("class_of", {}).get(v, v)  # noqa: E731
     both = [(sig, case) for sig, case, _ in rows if case != "none" and case in tr]
     o = agreement([(sc[sig["order"]], otr[case]) for sig, case in both])
@@ -166,7 +166,8 @@ def reverdict_refusal(res, new, root=ROOT):
     m = Path(root) / "inputs" / res["input"] / "m.toml"
     declared = tomllib.loads(m.read_text()).get("instruments", []) if m.is_file() else []
     changed = membership_of(root, res["tables"], declared) != membership_of(root, new, declared)
-    return None if not changed else (
+    lacks = bool(declare.declared_cols(declare.load(Path(root) / "tables" / new / "codes.toml", root)[0] or {"columns": {}})) and "declared" not in res   # plan 0870: a declared column is read from couplings.toml at run time
+    return f"REFUSED: tables/{new} reads a declared column that {res['run_id']} was not run with.\n  Next: re-measure with bin/cc run {res['input']} --tables {new}" if lacks else None if not changed else (
         f"REFUSED: tables/{new} changes membership.toml, which decided which units of {res['input']} ran.\n"
         f"  Next: re-measure with bin/cc run {res['input']} --tables {new}")
 

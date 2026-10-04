@@ -16,6 +16,7 @@ import readout
 
 ROOT = Path(__file__).resolve().parent.parent
 AXES = ("geometry", "order", "compose")
+AXIS_FILES = ("geometry", "probe", "order", "compose")   # probe.toml (plan 0870) is optional: a projection of the geometry by the declared probe
 if str(ROOT / "cc" / "instruments") not in sys.path:
     sys.path.insert(0, str(ROOT / "cc" / "instruments"))
 
@@ -69,7 +70,7 @@ def load_tables(name, tables_dir=None):
         sets = " ".join(sorted(p.name for p in (ROOT / "tables").glob("*")))
         raise refused(f"no table set '{name}'. Sets: {sets}", "bin/cc tables fork verdict-x-rules <name>")
     mp = d / "membership.toml"
-    ax = [d / f"{n}.toml" for n in AXES if (d / f"{n}.toml").is_file()]
+    ax = [d / f"{n}.toml" for n in AXIS_FILES if (d / f"{n}.toml").is_file()]
     bad = [f for q in (d / "codes.toml", d / "verdict.toml", *[mp] * mp.is_file(), *ax) for f in declare.check_file(q, ROOT)]
     if bad:
         raise ValueError("\n".join(declare.fmt(f) for f in bad))
@@ -127,12 +128,13 @@ def codes_of(cells, tables):
             if isinstance(src, str):
                 raw = cells.get(src, "NOT-MEASURED")
                 if isinstance(raw, list):
-                    memo[name] = min((one(name, x) for x in raw), key=c["combine"]["rank"].index)
+                    pick = {None: raw, "top": raw[-1:], "rest": raw[:-1] or raw}[c["combine"].get("select")]   # sizes ascend: top = the largest
+                    memo[name] = min((one(name, x) for x in pick), key=c["combine"]["rank"].index)
                 else:
                     memo[name] = one(name, raw)
             else:
                 a, b = val(src[0]), val(src[1])
-                hit = [x for x in nulls if x in (a, b)]
+                hit = [x for x in nulls if x in ((a,) if c.get("nullable") else (a, b))]   # nullable: a null of the second source is a cell of the map
                 memo[name] = hit[0] if hit else c["map"][f"{a},{b}"]
         return memo[name]
     return {n: val(n) for n in cols}
@@ -173,7 +175,11 @@ def axes_of(codes, T):
     (g, gl), (o, ol), (_, cl) = (T.axes[n] for n in AXES)
     gk, ok = row_of(g, codes), row_of(o, codes)
     gv, ov = g["row"][gk]["verdict"], o["row"][ok]["verdict"]
-    return {"geometry": gv, "order": ov, "axis_lines": {"geometry": gl[gk], "order": ol[ok],
+    pl = {}
+    if "probe" in T.axes:   # plan 0870: the geometry as the declared probe lets it stand
+        (pt, pls), pk = T.axes["probe"], row_of(T.axes["probe"][0], {"probe": codes["probe"], "geometry": gv})
+        gv, pl = (gv if pt["row"][pk]["verdict"] == "@geometry" else pt["row"][pk]["verdict"]), {"probe": pls[pk]}
+    return {"geometry": gv, "order": ov, "axis_lines": {"geometry": gl[gk], **pl, "order": ol[ok],
                                                          "compose": cl[composed(gv, ov, T)[1]]}}
 
 
@@ -223,6 +229,24 @@ def read_hashes(m, input_id, tables, T, c):
                               f"if intended, make a new input: bin/cc new input {input_id}-2 --like {input_id}, "
                               f"then bin/cc data add {input_id}-2")
     return read
+
+
+def probe_of(m, cp):
+    """The probe code of an input from its declaration: UNKNOWN when its couplings are unknown, NOT-MEASURED when it declares no
+    across, else COMPLETE when every declared coupling is probed and INCOMPLETE when one is not."""
+    return "NOT-MEASURED" if "across" not in m["instruments"] else (
+        "UNKNOWN" if cp["names"] == "unknown" else ("COMPLETE", "INCOMPLETE")[not set(cp["names"]) <= set(cp["probes"])])
+
+
+def declared_of(input_id, m, T):
+    """{'declared.<kind>': cell} for the declared columns of the set (empty for a set with none); the file is read, never guessed."""
+    if not declare.declared_cols(T.codes):
+        return {}
+    p = ROOT / "inputs" / input_id / "couplings.toml"
+    if not p.is_file():
+        raise refused(f"inputs/{input_id}/couplings.toml does not exist, and tables/{T.name} reads a declared column",
+                      "write it: kind = \"couplings\", id, names (from the Hamiltonian) and probes (which of them across probes)")
+    return {"declared.probe": probe_of(m, tomllib.loads(p.read_text()))}
 
 
 def cells_of_rows(rows):
@@ -321,13 +345,14 @@ def pair_results(m, c, reg, out, vectors):
 def run(input_id, tables, write, tables_dir=None):
     m, c, T = load_input(input_id), declare.Ctx(ROOT), load_tables(tables, tables_dir)
     reg = {n: instrument(n) for n in sorted(c.reg)}
-    read, out = read_hashes(m, input_id, tables, T, c), measure(m, c, reg, T)
+    read, out, decl = read_hashes(m, input_id, tables, T, c), measure(m, c, reg, T), declared_of(input_id, m, T)
+    read.update({f"inputs/{input_id}/couplings.toml": declare.sha(ROOT / "inputs" / input_id / "couplings.toml")} if decl else {})
     cols = declare.code_cols(T.codes)
     direct = {s["from"]: n for n, s in cols.items() if isinstance(s["from"], str)}
     readings, reports, vectors, signature = [], [], {}, []
     for pt in m["axes"]["point"]:
         rows = point_rows(m, c, reg, out, pt, used(T))
-        cells = cells_of_rows(rows)
+        cells = {**cells_of_rows(rows), **decl}
         for n, col, ek, flags, per, src in rows:
             for sz, r in per:
                 if r.vector is not None:
@@ -360,7 +385,8 @@ def run(input_id, tables, write, tables_dir=None):
            "derived_from": None, "code_commit": commit, "code_hash": declare.code_hash(ROOT), "interval": dict(m["interval"]), "read": read,
            "vectors": f"results/{rid}.npz",
            "readings": readings, "pair_readings": pair_readings, "reports": reports + pair_reports,
-           "signature_columns": list(T.codes["columns"]["signature"]), "signature": signature, "pairs": pairs}
+           "signature_columns": list(T.codes["columns"]["signature"]), "signature": signature, "pairs": pairs,
+           **({"declared": {k.split(".", 1)[1]: v for k, v in decl.items()}} if decl else {})}
     if write:
         (ROOT / "results").mkdir(exist_ok=True)
         (ROOT / "results" / f"{rid}.json").write_text(json.dumps(res, indent=1) + "\n")

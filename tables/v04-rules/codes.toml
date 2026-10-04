@@ -1,4 +1,4 @@
-# tables/v03-rules/codes.toml (= v02-rules + the needle_pair column, plan 0867 P1) - sign cell -> code, one map per column (data; total).
+# tables/v04-rules/codes.toml (= v03-rules + the declared probe column, plan 0870 P1) - sign cell -> code, one map per column (data; total).
 # RULE (applied by the loader, stated here): the nulls NOT-MEASURED and NOT-EVALUATED
 # (cc.toml alphabets.nulls) are never keys; they pass through every map unchanged. A derived
 # column whose sources include a null takes the first null of `null_rank` among its sources.
@@ -240,3 +240,12 @@ combine.rank = [                               # lowest rank present wins
 "POS" = "COEXIST"
 "SIG+" = "COEXIST"
 "UNRES" = "UNRES"
+
+[columns.signature.probe]                      # plan 0870 P1: read from the input's couplings.toml, never from data (declare.DECLARED); the loader's rule applies
+from = "declared.probe"                        # COMPLETE: every declared coupling is probed by across; INCOMPLETE: one is not; UNKNOWN: the couplings are unknown; no across: NOT-MEASURED
+alphabet = ["COMPLETE", "INCOMPLETE", "UNKNOWN"]
+
+[columns.signature.probe.map]
+"COMPLETE" = "COMPLETE"
+"INCOMPLETE" = "INCOMPLETE"
+"UNKNOWN" = "UNKNOWN"
