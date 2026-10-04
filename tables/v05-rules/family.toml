@@ -1,0 +1,103 @@
+# tables/v04-rules/family.toml (= v03-rules + the POINT-MANIFOLD row and its two siblings, plan 0870 P3) - family columns (bracket, f1, f2) and a declared PARTITION over them (data).
+# A family names no table set: `bin/cc family <id> [--tables SET]` reads the set's rule. cc/family.py is plumbing;
+# the differences are maths (cc/fingerprint.py, by A). Nulls are plumbing: an edge or pair touching a null point reads that null.
+schema = 1
+kind = "family"
+columns = ["bracket", "f1", "f2"]
+verdicts = ["LINE", "POINT-MANIFOLD", "REFUSE-NON-MONOTONE", "REFUSE-OFF-MANIFOLD", "REFUSE-BRACKET", "REFUSE-UNCLASSIFIED", "REFUSE-UNCLASSIFIED-v0"]
+refuse = ["REFUSE-NON-MONOTONE", "REFUSE-OFF-MANIFOLD", "REFUSE-BRACKET", "REFUSE-UNCLASSIFIED", "REFUSE-UNCLASSIFIED-v0"]
+class_of = { LINE = "LINE", POINT-MANIFOLD = "POINT" }
+
+[alphabets]                                    # uniform rule: every alphabet includes UNRES, NOT-EVALUATED and NOT-MEASURED
+bracket = ["BRACKET", "NO-MID", "NON-MONOTONE", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"]
+f1 = ["VARIES", "CONSTANT", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"]
+f2 = ["MARGINAL", "RELEVANT", "WEAK", "IRRELEVANT", "UNRES", "REFUSE-OFF-MANIFOLD", "NOT-EVALUATED", "NOT-MEASURED"]
+
+[bracket]                                      # P1/P2 compass rule over ALL family points in declared order, on a signature column
+reads = "needle"
+rank = { DIS = 0, MID = 1, ORD = 2 }           # code -> integer; consecutive differences by A over the chain of points
+edge_code = { "SIG-" = "DESCENT", "UNRES" = "NO-DESCENT", "SIG+" = "NO-DESCENT" }   # sign(d, d, 0): eps = 0 reaches exactly these three cells
+descent_rank = ["NOT-MEASURED", "NOT-EVALUATED", "DESCENT", "NO-DESCENT"]          # combined over edges; an edge touching a null point is that null
+point_code = { DIS = "NO-MID", MID = "MID", ORD = "NO-MID" }
+mid_rank = ["NOT-MEASURED", "NOT-EVALUATED", "MID", "NO-MID"]                      # combined over points
+
+[bracket.table]                                # total over descent_rank x mid_rank
+"NOT-MEASURED,NOT-MEASURED" = "NOT-MEASURED"
+"NOT-MEASURED,NOT-EVALUATED" = "NOT-MEASURED"
+"NOT-MEASURED,MID" = "NOT-MEASURED"
+"NOT-MEASURED,NO-MID" = "NOT-MEASURED"
+"NOT-EVALUATED,NOT-MEASURED" = "NOT-MEASURED"
+"NOT-EVALUATED,NOT-EVALUATED" = "NOT-EVALUATED"
+"NOT-EVALUATED,MID" = "NOT-EVALUATED"
+"NOT-EVALUATED,NO-MID" = "NOT-EVALUATED"
+"DESCENT,NOT-MEASURED" = "NOT-MEASURED"
+"DESCENT,NOT-EVALUATED" = "NOT-EVALUATED"
+"DESCENT,MID" = "NON-MONOTONE"
+"DESCENT,NO-MID" = "NON-MONOTONE"
+"NO-DESCENT,NOT-MEASURED" = "NOT-MEASURED"
+"NO-DESCENT,NOT-EVALUATED" = "NOT-EVALUATED"
+"NO-DESCENT,MID" = "BRACKET"
+"NO-DESCENT,NO-MID" = "NO-MID"
+
+[f1]                                           # fingerprint 1: across y VARIES along the family
+reads = "across.y_last"                        # per-resample vectors of <instrument>.<column>, interior points only
+relation = "all-pairs"                         # every i < j over the interior points: y(j) - y(i) per resample (A, edge j -> i)
+eps = "y"                                      # the eps key of that column (instruments/across.toml); read from the input only when across is declared
+code = { "SIG-" = "VARIES", "NEG" = "VARIES", "SLOW-" = "CONSTANT", "ZERO!" = "CONSTANT", "SLOW+" = "CONSTANT", "POS" = "VARIES", "SIG+" = "VARIES", "UNRES" = "UNRES" }
+rank = ["VARIES", "NOT-MEASURED", "NOT-EVALUATED", "UNRES", "CONSTANT"]           # one resolved pair suffices; CONSTANT needs every pair CONSTANT
+
+[f2]                                           # fingerprint 2: along MARGINAL on every consecutive interior pair
+reads = "along"                                # a registry instrument of unit pair: its pair cell per consecutive pair of interior points
+relation = "chain"
+code = { "SIG-" = "IRRELEVANT", "NEG" = "IRRELEVANT", "SLOW-" = "WEAK", "ZERO!" = "MARGINAL", "SLOW+" = "WEAK", "POS" = "RELEVANT", "SIG+" = "RELEVANT", "UNRES" = "UNRES", "REFUSE-OFF-MANIFOLD" = "REFUSE-OFF-MANIFOLD" }
+rank = ["REFUSE-OFF-MANIFOLD", "NOT-EVALUATED", "NOT-MEASURED", "UNRES", "RELEVANT", "IRRELEVANT", "WEAK", "MARGINAL"]   # lowest rank present wins
+
+[[row]]
+when = { bracket = ["BRACKET", "NO-MID", "NOT-MEASURED"], f1 = ["VARIES"], f2 = ["MARGINAL"] }
+verdict = "LINE"
+why = "B7 (SYNTHESIS-3): fingerprints 1 and 2 both resolved; X7a: POINT manifolds do not reach f2 MARGINAL"
+
+[[row]]
+when = { f2 = ["REFUSE-OFF-MANIFOLD"] }
+verdict = "REFUSE-OFF-MANIFOLD"
+why = "X7a: a member point off the manifold at L 243 (it also explains a non-monotone bracket, so it is read first by partition)"
+
+[[row]]
+when = { bracket = ["NON-MONOTONE"], f2 = ["MARGINAL", "RELEVANT", "WEAK", "IRRELEVANT", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
+verdict = "REFUSE-NON-MONOTONE"
+why = "P1/P2 compass rule"
+
+[[row]]
+when = { bracket = ["UNRES", "NOT-EVALUATED"], f2 = ["MARGINAL", "RELEVANT", "WEAK", "IRRELEVANT", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
+verdict = "REFUSE-BRACKET"
+why = "0863: a bracket that could not be read"
+
+[[row]]
+when = { bracket = ["BRACKET", "NO-MID", "NOT-MEASURED"], f1 = ["CONSTANT"], f2 = ["IRRELEVANT"] }
+verdict = "POINT-MANIFOLD"
+why = "plan 0870 P3: the exponent is constant along the navigated chain (f1) and every neighbouring pair has a difference that GROWS SLOWER than the size (f2 IRRELEVANT): the members are one point class, a manifold of points. The members' own per-point verdicts are not lifted (x5n: REFUSE-PROBE-INCOMPLETE); the family is the reading that carries the class. The first reading ever of this row (X7a's pairs were all off the manifold, E44/E46); x5n over g is its test"
+
+[[row]]
+when = { bracket = ["BRACKET", "NO-MID", "NOT-MEASURED"], f1 = ["VARIES"], f2 = ["IRRELEVANT"] }
+verdict = "REFUSE-UNCLASSIFIED"
+why = "plan 0870 P3: a sibling of POINT-MANIFOLD, named and refused: the exponent varies along the chain while every pair converges. A varying exponent with a vanishing difference has no declared class. Next: read the per-point cells and the pair readings (bin/cc family) before adding a row"
+
+[[row]]
+when = { bracket = ["BRACKET", "NO-MID", "NOT-MEASURED"], f1 = ["CONSTANT"], f2 = ["MARGINAL"] }
+verdict = "REFUSE-UNCLASSIFIED"
+why = "plan 0870 P3: a sibling of POINT-MANIFOLD and of LINE, named and refused: a constant exponent with a marginal difference. Next: read the pair readings (bin/cc family); a constant exponent along a marginal manifold may be a line of one class, which this rule does not claim"
+
+[[row]]
+when = { bracket = ["BRACKET", "NO-MID", "NOT-MEASURED"], f1 = ["CONSTANT"], f2 = ["RELEVANT", "WEAK", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
+verdict = "REFUSE-UNCLASSIFIED-v0"
+why = "0863: no positive row yet (0862 X7b/X2-X4 decide)"
+
+[[row]]
+when = { bracket = ["BRACKET", "NO-MID", "NOT-MEASURED"], f1 = ["UNRES", "NOT-EVALUATED", "NOT-MEASURED"], f2 = ["MARGINAL", "RELEVANT", "WEAK", "IRRELEVANT", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
+verdict = "REFUSE-UNCLASSIFIED-v0"
+why = "0863: no positive row yet (0862 X7b/X2-X4 decide)"
+
+[[row]]
+when = { bracket = ["BRACKET", "NO-MID", "NOT-MEASURED"], f1 = ["VARIES"], f2 = ["RELEVANT", "WEAK", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
+verdict = "REFUSE-UNCLASSIFIED-v0"
+why = "0863: no positive row yet"

@@ -1,33 +1,33 @@
-tree b77f2208fadd0f580a51e8cfec504f568587ed9b
-head 9489253f1d5d73294070c8227098a301dbc925f1
-seconds 187
+tree 19bb0616bfb7fbdb94ca3e25f30cbdbe65c476bb
+head 4bdb6eacb1c455e813f2f9f3d84bf14caea1a488
+seconds 181
 test test_budget ok 0.1
 test test_kernel ok 0.3
-test test_sign ok 0.5
+test test_sign ok 0.4
 test test_resample ok 1.2
 test test_kernel_rs ok 0.7
-test test_declare ok 18.1
-test test_tables_cli ok 148.4
-test test_needle_x8 ok 1.4
-test test_b7 ok 4.9
-test test_w2 ok 5.8
-test test_two_start_c2 ok 1.9
-test test_detect_verdicts ok 40.1
-test test_breakers ok 0.5
-test test_breakers_red ok 10.8
-test test_golden ok 166.4
-test test_verdict_equivalence ok 1.1
-test test_scoreboard ok 2.4
-test test_view ok 19.1
-test test_tabulate ok 47.7
-test test_reverdict ok 5.6
-test test_along ok 19.4
-test test_family ok 5.0
-test test_x5 ok 10.3
-test test_axes ok 95.7
-test test_needle_o_start ok 121.1
-test test_run_all ok 138.8
-test test_code_hash ok 47.4
-test test_classify ok 0.6
-test test_probe ok 4.6
-test test_chain ok 55.9
+test test_declare ok 19.2
+test test_tables_cli ok 145.4
+test test_needle_x8 ok 1.6
+test test_b7 ok 5.5
+test test_w2 ok 6.5
+test test_two_start_c2 ok 2.0
+test test_detect_verdicts ok 39.4
+test test_breakers ok 0.6
+test test_breakers_red ok 11.8
+test test_golden ok 162.9
+test test_verdict_equivalence ok 1.2
+test test_scoreboard ok 2.2
+test test_view ok 16.7
+test test_tabulate ok 44.5
+test test_reverdict ok 5.7
+test test_along ok 17.1
+test test_family ok 3.4
+test test_x5 ok 10.1
+test test_axes ok 92.0
+test test_needle_o_start ok 118.9
+test test_run_all ok 135.2
+test test_code_hash ok 47.9
+test test_classify ok 0.9
+test test_probe ok 4.1
+test test_chain ok 52.2

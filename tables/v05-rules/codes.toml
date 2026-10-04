@@ -1,0 +1,297 @@
+# tables/v04-rules/codes.toml (= v03-rules + the declared probe column, plan 0870 P1) - sign cell -> code, one map per column (data; total).
+# RULE (applied by the loader, stated here): the nulls NOT-MEASURED and NOT-EVALUATED
+# (cc.toml alphabets.nulls) are never keys; they pass through every map unchanged. A derived
+# column whose sources include a null takes the first null of `null_rank` among its sources.
+schema = 1
+kind = "codes"
+signs = ["SIG-", "NEG", "SLOW-", "ZERO!", "SLOW+", "POS", "SIG+", "UNRES"]   # sign.py's 8 names
+null_rank = ["NOT-MEASURED", "NOT-EVALUATED"]
+
+# ---- helper columns: intermediate codes; never in the signature row, never read by verdict.toml
+[columns.helper.at_ord]                        # B3a2 at_sink rule on the needle's d_ord
+from = "needle.d_ord"
+alphabet = ["AT", "NOT-AT"]
+
+[columns.helper.at_ord.map]
+"SIG-" = "NOT-AT"
+"NEG" = "NOT-AT"
+"SLOW-" = "AT"
+"ZERO!" = "AT"
+"SLOW+" = "AT"
+"POS" = "NOT-AT"
+"SIG+" = "NOT-AT"
+"UNRES" = "NOT-AT"
+
+[columns.helper.at_dis]                        # the same rule on d_dis (written out in full)
+from = "needle.d_dis"
+alphabet = ["AT", "NOT-AT"]
+
+[columns.helper.at_dis.map]
+"SIG-" = "NOT-AT"
+"NEG" = "NOT-AT"
+"SLOW-" = "AT"
+"ZERO!" = "AT"
+"SLOW+" = "AT"
+"POS" = "NOT-AT"
+"SIG+" = "NOT-AT"
+"UNRES" = "NOT-AT"
+
+[columns.helper.vside]                         # P2 side_table on the matched velocity
+from = "needle.velocity"
+alphabet = ["DIS", "MID", "ORD"]
+
+[columns.helper.vside.map]
+"SIG-" = "DIS"
+"NEG" = "MID"                                  # v01-rules (plan 0864 Q1 c'): a resolved sub-eps side is MID
+"SLOW-" = "MID"
+"ZERO!" = "MID"
+"SLOW+" = "MID"
+"POS" = "MID"                                  # v01-rules (plan 0864 Q1 c')
+"SIG+" = "ORD"
+"UNRES" = "MID"
+
+[columns.helper.flow_top]                       # plan 0870 P2: the flow of the TOP size pair alone (verdict_x FLOW_CODE on the matched velocity; v03-rules' flow)
+from = "needle.velocity"
+alphabet = ["STOPPED", "SLOW", "FLOWING", "UNRES"]
+
+[columns.helper.flow_top.map]
+"SIG-" = "FLOWING"
+"NEG" = "SLOW"                                 # v01-rules (plan 0864 Q1 c'): inside eps is SLOW, never FLOWING
+"SLOW-" = "SLOW"
+"ZERO!" = "STOPPED"
+"SLOW+" = "SLOW"
+"POS" = "SLOW"                                 # v01-rules (plan 0864 Q1 c')
+"SIG+" = "FLOWING"
+"UNRES" = "UNRES"
+
+[columns.helper.fluct]                         # v02-rules (plan 0866 P-B): the fluctuation witness on A over ln var(e)
+from = "fluct.y_last"                          # read by order.toml ONLY, and only with the starts INDEP; never by verdict.toml
+alphabet = ["PERSISTS", "VANISHES", "GROWS", "UNRES"]
+
+[columns.helper.fluct.map]
+"SIG-" = "VANISHES"
+"NEG" = "VANISHES"
+"SLOW-" = "PERSISTS"                           # inside the margin: the variance per bond does not change with size
+"ZERO!" = "PERSISTS"
+"SLOW+" = "PERSISTS"
+"POS" = "GROWS"
+"SIG+" = "GROWS"
+"UNRES" = "UNRES"
+
+# ---- plan 0867 P1: the needle code of the ORDERED start (the same chain on needle_o's own GL), then the pair
+# The ordered start's needle: instruments/needle_o.toml reads the ordered start's level stack with the same maths as
+# needle; its sign cells go through the SAME maps as the random start's (written out in full, as at_dis is).
+[columns.helper.at_ord_o]                        # B3a2 at_sink rule on the needle's d_ord
+from = "needle_o.d_ord"
+alphabet = ["AT", "NOT-AT"]
+
+[columns.helper.at_ord_o.map]
+"SIG-" = "NOT-AT"
+"NEG" = "NOT-AT"
+"SLOW-" = "AT"
+"ZERO!" = "AT"
+"SLOW+" = "AT"
+"POS" = "NOT-AT"
+"SIG+" = "NOT-AT"
+"UNRES" = "NOT-AT"
+
+[columns.helper.at_dis_o]                        # the same rule on d_dis (written out in full)
+from = "needle_o.d_dis"
+alphabet = ["AT", "NOT-AT"]
+
+[columns.helper.at_dis_o.map]
+"SIG-" = "NOT-AT"
+"NEG" = "NOT-AT"
+"SLOW-" = "AT"
+"ZERO!" = "AT"
+"SLOW+" = "AT"
+"POS" = "NOT-AT"
+"SIG+" = "NOT-AT"
+"UNRES" = "NOT-AT"
+
+[columns.helper.vside_o]                         # P2 side_table on the matched velocity
+from = "needle_o.velocity"
+alphabet = ["DIS", "MID", "ORD"]
+
+[columns.helper.vside_o.map]
+"SIG-" = "DIS"
+"NEG" = "MID"                                  # v01-rules (plan 0864 Q1 c'): a resolved sub-eps side is MID
+"SLOW-" = "MID"
+"ZERO!" = "MID"
+"SLOW+" = "MID"
+"POS" = "MID"                                  # v01-rules (plan 0864 Q1 c')
+"SIG+" = "ORD"
+"UNRES" = "MID"
+
+[columns.helper.sink_o]                       # position relative to the two sinks
+from = ["at_ord_o", "at_dis_o"]
+alphabet = ["ORD", "DIS", "NEITHER", "BOTH"]
+
+[columns.helper.sink_o.map]
+"AT,NOT-AT" = "ORD"
+"NOT-AT,AT" = "DIS"
+"NOT-AT,NOT-AT" = "NEITHER"
+"AT,AT" = "BOTH"
+
+[columns.helper.needle_ordered]                     # B3a2 needle_table, total over (sink, vside)
+from = ["sink_o", "vside_o"]
+alphabet = ["DIS", "MID", "ORD"]
+
+[columns.helper.needle_ordered.map]
+"ORD,DIS" = "ORD"
+"ORD,MID" = "ORD"
+"ORD,ORD" = "ORD"
+"DIS,DIS" = "DIS"
+"DIS,MID" = "DIS"
+"DIS,ORD" = "DIS"
+"NEITHER,DIS" = "DIS"
+"NEITHER,MID" = "MID"
+"NEITHER,ORD" = "ORD"
+"BOTH,DIS" = "MID"
+"BOTH,MID" = "MID"
+"BOTH,ORD" = "MID"
+
+# ---- signature columns: exactly the per-point signature row; verdict.toml `columns` = this set
+[columns.signature.sink]                       # position relative to the two sinks
+from = ["at_ord", "at_dis"]
+alphabet = ["ORD", "DIS", "NEITHER", "BOTH"]
+
+[columns.signature.sink.map]
+"AT,NOT-AT" = "ORD"
+"NOT-AT,AT" = "DIS"
+"NOT-AT,NOT-AT" = "NEITHER"
+"AT,AT" = "BOTH"
+
+[columns.signature.needle]                     # B3a2 needle_table, total over (sink, vside)
+from = ["sink", "vside"]
+alphabet = ["DIS", "MID", "ORD"]
+
+[columns.signature.needle.map]
+"ORD,DIS" = "ORD"
+"ORD,MID" = "ORD"
+"ORD,ORD" = "ORD"
+"DIS,DIS" = "DIS"
+"DIS,MID" = "DIS"
+"DIS,ORD" = "DIS"
+"NEITHER,DIS" = "DIS"
+"NEITHER,MID" = "MID"
+"NEITHER,ORD" = "ORD"
+"BOTH,DIS" = "MID"
+"BOTH,MID" = "MID"
+"BOTH,ORD" = "MID"
+
+[columns.signature.needle_pair]                # plan 0867 P1: the needle code of EACH start, (random, ordered), a TOTAL table over the 3 x 3 pairs
+from = ["needle", "needle_ordered"]            # (a null in either start's needle is the first null of null_rank: the loader's rule)
+alphabet = ["SAME-WINDOW", "PINNED-BETWEEN-PHASES", "SAME-SINK", "HALF-PINNED", "CROSSED"]
+
+[columns.signature.needle_pair.map]            # the pair table declared in the toolset's m.toml [X9c] 0867 P0, verbatim
+"MID,MID" = "SAME-WINDOW"
+"DIS,ORD" = "PINNED-BETWEEN-PHASES"
+"DIS,DIS" = "SAME-SINK"
+"ORD,ORD" = "SAME-SINK"
+"MID,ORD" = "HALF-PINNED"
+"DIS,MID" = "HALF-PINNED"
+"ORD,MID" = "HALF-PINNED"
+"MID,DIS" = "HALF-PINNED"
+"ORD,DIS" = "CROSSED"
+
+[columns.signature.drift_code]                 # plan 0870 P2: how the needle's drift decays down the size chain (omega_eff - 1, needle_chain.drift, read against [eps] drift)
+from = "needle_chain.drift"                    # the VISIBLE FLAG of Bruce's R2: kept in every result, listed in verdict.toml `ignores`, read only by `flow`
+alphabet = ["CONVERGING", "MARGINAL-DRIFT", "PERSISTENT", "UNRES"]
+
+[columns.signature.drift_code.map]
+"SIG-" = "PERSISTENT"                          # omega_eff well below 1: a genuine slow flow (log corrections included)
+"NEG" = "PERSISTENT"
+"SLOW-" = "MARGINAL-DRIFT"                     # omega_eff within eps of 1: undecidable at this eps
+"ZERO!" = "MARGINAL-DRIFT"
+"SLOW+" = "MARGINAL-DRIFT"
+"POS" = "CONVERGING"                           # omega_eff above 1: a finite-size correction that decays
+"SIG+" = "CONVERGING"
+"UNRES" = "UNRES"
+
+[columns.signature.flow]                       # plan 0870 P2: (flow of the top pair, drift_code) -> flow; a SLOW top-pair flow whose drift CONVERGES reads STOPPED; every other cell is the top pair's
+from = ["flow_top", "drift_code"]
+nullable = true                                # a null drift_code (one size pair, or a sign that is not constant) is a cell of the map, not a null flow
+alphabet = ["STOPPED", "SLOW", "FLOWING", "UNRES"]
+
+[columns.signature.flow.map]
+"STOPPED,CONVERGING" = "STOPPED"
+"STOPPED,MARGINAL-DRIFT" = "STOPPED"
+"STOPPED,PERSISTENT" = "STOPPED"
+"STOPPED,UNRES" = "STOPPED"
+"STOPPED,NOT-MEASURED" = "STOPPED"
+"STOPPED,NOT-EVALUATED" = "STOPPED"
+"SLOW,CONVERGING" = "STOPPED"
+"SLOW,MARGINAL-DRIFT" = "SLOW"
+"SLOW,PERSISTENT" = "SLOW"
+"SLOW,UNRES" = "SLOW"
+"SLOW,NOT-MEASURED" = "SLOW"
+"SLOW,NOT-EVALUATED" = "SLOW"
+"FLOWING,CONVERGING" = "FLOWING"
+"FLOWING,MARGINAL-DRIFT" = "FLOWING"
+"FLOWING,PERSISTENT" = "FLOWING"
+"FLOWING,UNRES" = "FLOWING"
+"FLOWING,NOT-MEASURED" = "FLOWING"
+"FLOWING,NOT-EVALUATED" = "FLOWING"
+"UNRES,CONVERGING" = "UNRES"
+"UNRES,MARGINAL-DRIFT" = "UNRES"
+"UNRES,PERSISTENT" = "UNRES"
+"UNRES,UNRES" = "UNRES"
+"UNRES,NOT-MEASURED" = "UNRES"
+"UNRES,NOT-EVALUATED" = "UNRES"
+
+[columns.signature.across]                     # B4 direction_table (verdict_x GROWTH_CODE)
+from = "across.y_last"
+alphabet = ["RELEVANT", "MARGINAL", "WEAK", "IRRELEVANT", "UNRES"]
+
+[columns.signature.across.map]
+"SIG-" = "IRRELEVANT"
+"NEG" = "IRRELEVANT"
+"SLOW-" = "WEAK"
+"ZERO!" = "MARGINAL"
+"SLOW+" = "WEAK"
+"POS" = "RELEVANT"
+"SIG+" = "RELEVANT"
+"UNRES" = "UNRES"
+
+[columns.signature.stability]                  # W2 stability (verdict_x STAB_CODE)
+from = "stability.d"
+alphabet = ["STABLE", "CROSSING", "OFF", "UNRES"]
+
+[columns.signature.stability.map]
+"SIG-" = "OFF"
+"NEG" = "OFF"
+"SLOW-" = "STABLE"
+"ZERO!" = "STABLE"
+"SLOW+" = "STABLE"
+"POS" = "CROSSING"
+"SIG+" = "CROSSING"
+"UNRES" = "UNRES"
+
+[columns.signature.two_start]                  # C2 / verdict_x START_CODE, combined over sizes
+from = "two_start.D"
+alphabet = ["COEXIST", "FLUCT", "UNRES", "INDEP"]
+combine.over = "size"
+combine.top_only = ["COEXIST"]                 # plan 0870 P2 (the narrow rule): COEXIST counts only when the LARGEST size reads it
+combine.rank = [                               # lowest rank present wins
+  "NOT-MEASURED", "NOT-EVALUATED", "COEXIST", "FLUCT", "UNRES", "INDEP",
+]
+
+[columns.signature.two_start.map]
+"SIG-" = "FLUCT"
+"NEG" = "FLUCT"
+"SLOW-" = "INDEP"
+"ZERO!" = "INDEP"
+"SLOW+" = "INDEP"
+"POS" = "COEXIST"
+"SIG+" = "COEXIST"
+"UNRES" = "UNRES"
+
+[columns.signature.probe]                      # plan 0870 P1: read from the input's couplings.toml, never from data (declare.DECLARED); the loader's rule applies
+from = "declared.probe"                        # COMPLETE: every declared coupling is probed by across; INCOMPLETE: one is not; UNKNOWN: the couplings are unknown; no across: NOT-MEASURED
+alphabet = ["COMPLETE", "INCOMPLETE", "UNKNOWN"]
+
+[columns.signature.probe.map]
+"COMPLETE" = "COMPLETE"
+"INCOMPLETE" = "INCOMPLETE"
+"UNKNOWN" = "UNKNOWN"
