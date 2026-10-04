@@ -30,7 +30,9 @@ def cells_of(res, pt):
     """The sign cells of one point as `<instrument>.<column>` -> cell (a list per size for a point-size column)."""
     return {**{f"declared.{k}": v for k, v in res.get("declared", {}).items()},
             **{f"{r['instrument']}.{r['column']}": [q["cell"] for q in r["per_size"]] if r["per_size"] else r["cell"]
-               for r in res["readings"] if r["unit"]["point"] == pt}}
+               for r in res["readings"] if r["unit"]["point"] == pt},
+            **{f"{r['instrument']}.{r['column']}@door": [q["door"] for q in r["per_size"]]   # plan 0874: the door value each pair read on, beside its cell
+               for r in res["readings"] if r["unit"]["point"] == pt and r["per_size"] and "door" in r["per_size"][0]}}
 
 
 def feeders(res, pt, col, cols):
@@ -50,6 +52,11 @@ def words(flags, cfg):
 def join_line(items, mode, cfg):
     """The BASIC projection: only the fields cc.toml [basic].keeps; ADVANCED prints every item."""
     return " ".join(t for f, t in items if mode == "advanced" or f in cfg["basic"]["keeps"])
+
+
+def label_of(r):
+    """The name an instrument gives its pairs' door value (door_label), 'door' when it declares none."""
+    return detect.instrument(r["instrument"])[0].get("door_label", "door")
 
 
 def column_line(col, rs, sig, mode, cfg):
@@ -76,7 +83,8 @@ def column_line(col, rs, sig, mode, cfg):
     r0 = rs[0] if rs else {"eps": None, "per_size": None, "vector_key": None}
     for r in rs:
         if r["per_size"]:
-            items.append(("per_size", ("per pair: " if "->" in str(r["per_size"][0]["size"]) else "per size: ") + "; ".join(f"{q['size']} {q['cell']} {q['code']}" for q in r["per_size"])))
+            items.append(("per_size", ("per pair: " if "->" in str(r["per_size"][0]["size"]) else "per size: ")
+                          + "; ".join(f"{q['size']} {q['cell']} {q['code']}" + (f" [{label_of(r)} {q['door']}]" if "door" in q else "") for q in r["per_size"])))
     if sig["flags"].get(col):
         items.append(("flags", "flags: " + words(sig["flags"][col], cfg)))
     if r0["vector_key"] and len(rs) == 1:
@@ -117,6 +125,8 @@ def pair_lines(res, mode, cfg):
             items += [("estimate", f"{r['estimate']:.4g}"), ("lo", f"[{r['lo']:.4g},"), ("hi", f"{r['hi']:.4g}]")]
         blank = mode == "basic" and r["cell"] in cfg["basic"]["blank"]
         items += [("cell", shown(r["cell"], r["reason"], mode, cfg)), ("eps", f"eps {r['eps_key']}={r['eps']}")]
+        row = next((q for q in res["pairs"] if q["pair"] == [a, b]), {})
+        items += [("pairs", f"{label_of(r)} {row[label_of(r)]}")] if label_of(r) in row else []   # plan 0874: the pair's basis (TRANSFORMED / RAW), shown, read by no verdict row
         items += [("reason", f"({r['reason']})")] if r["reason"] and not blank else []
         items += [("flags", "flags: " + words(r["flags"], cfg))]
         items += [("vector_key", f"vector {r['vector_key']}")] if r["vector_key"] else []
@@ -259,9 +269,10 @@ def explain(res, pt, join, mode, tables_dir=None):
                 steps = head + read_steps(q, r, lv, text, dcol, mode, cfg)
                 out += [f"  {n} {w:<9} {tag}{t}" for n, w, t in steps]
             if r["per_size"]:
-                top, agree = cols[dcol]["combine"].get("top_only"), cols[dcol]["combine"].get("agree")
+                top, agree, pref = (cols[dcol]["combine"].get(k) for k in ("top_only", "agree", "prefer_door"))
                 out.append(f"  7 CODE      combine.rank {' > '.join(cols[dcol]['combine']['rank'])} (first wins)"
                            + (f"; {', '.join(top)} counts only when the largest size reads it" if top else "")
+                           + (f"; only the items read on door value {pref} combine when there is one" if pref else "")
                            + (f"; {', '.join(agree)} count only when every item reads them, else {cols[dcol]['combine']['disagree']}" if agree else "") + " -> "
                            f"{shown(codes[c], None, mode, cfg)}")
         for d in chain(c):

@@ -1,19 +1,26 @@
 # instruments/across_delta.toml (plan 0872 F2) - across through the DIFFERENCE estimator: for a declared control pair (a, b), Delta(L) = mean g1(b) - mean g1(a)
 # at final size 9, and y_last = log3 |Delta(L)/Delta(L/3)| at the top size step. A pair instrument; per_point: a point reads the cells of the control pairs that touch it,
 # combined by the set's codes.toml (all must agree to resolve). Admissible only when the control chain moves the probed coupling (couplings.toml; validate refuses otherwise).
+# plan 0874: the exponent has a TRANSFORMED reading per PAIR. A pair whose BOTH endpoints read drift_code CONVERGING (the set's membership.toml [across_delta]) reads
+# yD_inf = (yD2 - r yD1)/(1 - r), r = the mean of the endpoints' needle |v2|/|v1| (door value TRANSFORMED, shown as delta_basis); any other pair reads the raw yD2 (RAW, r = 0).
+# A table set that writes no membership rule for this instrument reads every pair RAW (member_default): the 0872 reading.
 schema = 1
 kind = "instrument"
 module = "across_delta"
 operators = ["A"]
 unit = "pair"
 per_point = true
-reports = ["delta"]                            # reported, never coded: Delta per size (row 0 = the estimate)
+reports = ["delta", "y_steps", "ratio"]        # reported, never coded: Delta per size (row 0 = the estimate), the step exponents (yD1, yD2) and the ratio r the pair's basis selected
 arrays = ["G"]
 axes = ["point", "size"]
 relations = ["size", "control"]
 sidecar = ["observable", "block_map"]
+requires = ["needle_chain"]                    # door order only: membership reads the endpoints' drift_code (fed by needle_chain), and r is read from needle_chain's resampled drift
+door_values = ["TRANSFORMED", "RAW"]
+member_default = "RAW"                         # a set without a membership rule for this instrument reads every pair RAW
+door_label = "delta_basis"                     # the name under which a pair's door value is shown (pair rows, per-pair cells; ignored by every verdict row)
 flags = []
-pipeline = ["stage:reduce", "door:nodefield", "stage:delta", "door:logcoord", "stage:growth"]
+pipeline = ["stage:reduce", "door:nodefield", "stage:delta", "door:logcoord", "door:basis", "stage:growth"]
 
 [columns]
 y_last = "y"

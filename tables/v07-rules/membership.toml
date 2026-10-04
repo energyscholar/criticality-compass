@@ -1,4 +1,4 @@
-# tables/v01-rules/membership.toml - membership rules for instruments with a door:off_manifold step (data).
+# tables/v07-rules/membership.toml - membership rules for instruments with a door:off_manifold step (data).
 # validate: `reads` names a [columns.signature] column of this set's codes.toml; the keys of `map` equal that
 # column's alphabet plus cc.toml alphabets.nulls EXACTLY (a gap fails validate, never a run); `rank` lists the
 # membership values; `door` keys = rank. A pair takes the LOWEST-ranked membership of its two points.
@@ -11,3 +11,12 @@ reads = "needle"                               # the signature column whose per-
 map = { DIS = "OFF", ORD = "OFF", MID = "ON", NOT-MEASURED = "UNCHECKED", NOT-EVALUATED = "NOT-EVALUATED" }
 rank = ["OFF", "NOT-EVALUATED", "UNCHECKED", "ON"]
 door = { OFF = "REFUSE-OFF-MANIFOLD", NOT-EVALUATED = "NOT-EVALUATED", UNCHECKED = "RUN-FLAG-U", ON = "RUN" }
+
+# plan 0874: across_delta reads this rule too (door:basis). A pair whose BOTH endpoints read drift_code CONVERGING reads the TRANSFORMED exponent yD_inf (a measured
+# pre-asymptotic small pair is corrected by the declared transform); any other pair, a null drift_code included, reads the RAW yD2. The lowest-ranked membership of the two
+# endpoints decides, so one non-CONVERGING endpoint makes the pair RAW. The door values are TRANSFORMED and RAW (instruments/across_delta.toml door_values).
+[across_delta]
+reads = "drift_code"
+map = { CONVERGING = "CONVERGING", MARGINAL-DRIFT = "OTHER", PERSISTENT = "OTHER", UNRES = "OTHER", NOT-MEASURED = "OTHER", NOT-EVALUATED = "OTHER" }
+rank = ["OTHER", "CONVERGING"]
+door = { OTHER = "RAW", CONVERGING = "TRANSFORMED" }

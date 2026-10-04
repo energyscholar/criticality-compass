@@ -39,6 +39,7 @@ class Ctx:
     n_size: int = None               # the number of declared sizes
     member: dict = None              # a pair unit: {"door": value, "reason": text} from the membership rule
     quantity: str = "R"              # the name a sign refusal gives the logged quantity
+    ratio: object = None             # a pair unit with door:basis: the correction ratio r per resample row (0 on a RAW pair; plan 0874)
 
 
 def relations_for(m, name):
@@ -162,6 +163,27 @@ def member(rules, name, pair, codes):
     what = r["door"][low].lower().removeprefix("refuse-")
     return {"door": r["door"][low], "reason": f"{what}: [{', '.join(pt for pt, _ in keep)}] read "
             f"[{', '.join(c for _, c in keep)}] (membership.toml [{name}] reads {r['reads']})"}
+
+
+def member_for(inst, rules, name, pair, codes):
+    """The membership of one pair: the set's rule when it has one; else the instrument's DECLARED default door value (member_default),
+    so a set that writes no rule for an instrument that declares one reads what the instrument declares. An instrument that
+    declares no default needs its rule (a missing one is a KeyError here, as before)."""
+    return member(rules, name, pair, codes) if name in rules or "member_default" not in inst else {
+        "door": inst["member_default"], "reason": f"{inst['member_default'].lower()}: tables have no membership rule for {name}; the instrument's declared default"}
+
+
+def ratio_of(door_value, drift, pair, log_ratio, rows):
+    """The correction ratio r per resample row that a pair's door value selects (a total table over the door values): TRANSFORMED is the
+    mean over the pair's two endpoints of the needle's own |v2|/|v1| = 3^-(drift + 1) read from needle_chain's resampled drift; RAW is 0
+    (no correction, so y_inf = y2). `drift` and `log_ratio` are read only by the row that needs them."""
+    return {"TRANSFORMED": lambda: np.mean([np.exp(-(drift(pt) + 1) * log_ratio()) for pt in pair], axis=0),
+            "RAW": lambda: np.zeros(rows)}[door_value]()
+
+
+def basis(x, ctx):
+    """A TRANSFORMED pair is read only where the endpoints' correction decays (r < 1 at the estimate and every resample); a RAW pair has r = 0 and passes."""
+    return x if (ctx.ratio < 1).all() else Null("NOT-EVALUATED", "the endpoints' needle correction does not decay (r >= 1) at the estimate or a resample: y_inf is undefined")
 
 
 def off_manifold(x, ctx):

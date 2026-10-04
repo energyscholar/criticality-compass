@@ -1,42 +1,43 @@
-tree 0496802d34a627557cd3b5f72c98c50e40f9c04d
-head 06d0715e66d2324ce4f58786a2fe0863e09707e1
-seconds 205
+tree 0647c77d0024ec50c58b78c99d374f0b087eb621
+head a7275b06846d57aebbdd5f5ec91d531f37b9b29b
+seconds 183
 tier quick
-test test_budget ok 0.1
+test test_budget ok 0.2
 test test_kernel ok 0.4
-test test_sign ok 0.4
+test test_sign ok 0.6
 test test_resample ok 1.3
-test test_kernel_rs ok 0.9
-test test_declare ok 81.0
-test test_tables_cli ok 191.8
-test test_needle_x8 ok 1.6
-test test_b7 ok 6.9
-test test_w2 ok 9.3
-test test_two_start_c2 ok 2.1
-test test_detect_verdicts ok 43.3
-test test_breakers ok 0.7
-test test_breakers_red ok 14.6
-test test_golden ok 109.9
-test test_verdict_equivalence ok 1.8
-test test_scoreboard ok 5.8
+test test_kernel_rs ok 0.7
+test test_declare ok 70.4
+test test_tables_cli ok 169.6
+test test_needle_x8 ok 1.8
+test test_b7 ok 6.6
+test test_w2 ok 7.6
+test test_two_start_c2 ok 2.2
+test test_detect_verdicts ok 42.7
+test test_breakers ok 0.8
+test test_breakers_red ok 14.9
+test test_golden ok 92.1
+test test_verdict_equivalence ok 1.4
+test test_scoreboard ok 5.6
 test test_view ok 21.9
-test test_tabulate ok 123.8
-test test_reverdict ok 7.7
-test test_along ok 15.8
-test test_family ok 6.1
-test test_x5 ok 10.8
-test test_axes ok 76.7
-test test_needle_o_start ok 0.5
-test test_run_all ok 20.2
-test test_code_hash ok 37.2
-test test_across_delta ok 19.6
-test test_transformed ok 4.4
-test test_end_note ok 66.1
-test test_v06_locks ok 2.0
-test test_classify ok 0.6
-test test_probe ok 6.4
-test test_chain ok 27.9
-test test_ends ok 1.0
+test test_tabulate ok 104.5
+test test_reverdict ok 7.5
+test test_along ok 14.3
+test test_family ok 5.4
+test test_x5 ok 8.7
+test test_axes ok 59.8
+test test_needle_o_start ok 0.8
+test test_run_all ok 17.4
+test test_code_hash ok 29.6
+test test_across_delta ok 16.0
+test test_delta_basis ok 9.0
+test test_transformed ok 3.1
+test test_end_note ok 56.9
+test test_v06_locks ok 1.8
+test test_classify ok 0.4
+test test_probe ok 5.7
+test test_chain ok 25.7
+test test_ends ok 0.8
 quick: dropped test_golden case run-all-scratch: re-measure took 18 s, over the 8 s case budget
 quick: dropped test_golden case run-all-v01-scratch: re-measure took 18 s, over the 8 s case budget
 quick: dropped test_golden case run-dry-my-rules: re-measure took 24 s, over the 8 s case budget

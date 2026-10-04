@@ -20,7 +20,7 @@ tests = [
   "tests/test_scoreboard.py", "tests/test_view.py", "tests/test_tabulate.py", "tests/test_reverdict.py",
   "tests/test_along.py", "tests/test_family.py", "tests/test_x5.py", "tests/test_axes.py", "tests/test_needle_o_start.py",
   "tests/test_run_all.py", "tests/test_code_hash.py",
-  "tests/test_across_delta.py", "tests/test_transformed.py", "tests/test_end_note.py", "tests/test_v06_locks.py", "tests/test_classify.py", "tests/test_probe.py", "tests/test_chain.py", "tests/test_ends.py",
+  "tests/test_across_delta.py", "tests/test_delta_basis.py", "tests/test_transformed.py", "tests/test_end_note.py", "tests/test_v06_locks.py", "tests/test_classify.py", "tests/test_probe.py", "tests/test_chain.py", "tests/test_ends.py",
 ]
 
 [allow]

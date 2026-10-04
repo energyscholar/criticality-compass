@@ -114,6 +114,11 @@ def after_reduce(name, x, ctx):
     return after(name, x, ctx)[0]
 
 
+def preferred(got, doors, prefer):
+    """The items read on the preferred door value when at least one is; else all of them (declared per column: combine.prefer_door; plan 0874)."""
+    return [g for g, d in zip(got, doors) if d == prefer] or got
+
+
 def codes_of(cells, tables):
     """Every helper and signature column for one point; nulls pass through; a point-size source is combined."""
     cols, nulls = declare.code_cols(tables.codes), tables.codes["null_rank"]
@@ -129,6 +134,7 @@ def codes_of(cells, tables):
                 raw = cells.get(src, "NOT-MEASURED")
                 if isinstance(raw, list):
                     got = [one(name, x) for x in raw]    # sizes ascend: a code in top_only counts only when the LARGEST size reads it (plan 0870)
+                    got = preferred(got, cells.get(src + "@door", [None] * len(got)), c["combine"].get("prefer_door"))   # plan 0874: only the pairs on the preferred door value, when there is one
                     best = min((v for i, v in enumerate(got) if v not in c["combine"].get("top_only", []) or i == len(got) - 1),
                                key=c["combine"]["rank"].index)
                     memo[name] = c["combine"]["disagree"] if best in c["combine"].get("agree", []) and set(got) != {best} else best   # plan 0872: an `agree` code counts only when EVERY item reads it
@@ -212,10 +218,10 @@ def read_hashes(m, input_id, tables, T, c):
         read[f"instruments/{n}.toml"] = declare.sha(ROOT / "instruments" / f"{n}.toml")
     for path in T.paths:
         read[f"tables/{tables}/{path.name}"] = declare.sha(path)
-    if any("door:off_manifold" in c.reg[n]["pipeline"] for n in m["instruments"]):
-        if T.membership_path is None:
-            raise refused(f"tables/{tables} has no membership.toml, and {input_id} declares an instrument whose "
-                          "door reads one", f"copy tables/v01-rules/membership.toml into tables/{tables}/")
+    if any("door:off_manifold" in c.reg[n]["pipeline"] for n in m["instruments"]) and T.membership_path is None:
+        raise refused(f"tables/{tables} has no membership.toml, and {input_id} declares an instrument whose "
+                      "door reads one", f"copy tables/v01-rules/membership.toml into tables/{tables}/")
+    if T.membership_path is not None and any({"door:off_manifold", "door:basis"} & set(c.reg[n]["pipeline"]) for n in m["instruments"]):   # plan 0874: door:basis reads a rule when the set has one
         read[f"tables/{tables}/membership.toml"] = declare.sha(T.membership_path)
     mf = ROOT / "fixtures" / "data" / f"{input_id}.toml"
     if not mf.is_file():
@@ -253,8 +259,9 @@ def declared_of(input_id, m, T):
 
 def cells_of_rows(rows):
     """The sign cells of one point as `<instrument>.<column>` -> cell (a list per size for a point-size column)."""
-    return {src: [r.cell for _, r in per] if len(per) > 1 or per[0][0] is not None else per[0][1].cell
-            for _, _, _, _, per, src in rows}
+    return {**{src: [r.cell for _, r in per] if len(per) > 1 or per[0][0] is not None else per[0][1].cell
+               for _, _, _, _, per, src in rows},
+            **{src + "@door": [r.door for _, r in per] for _, _, _, _, per, src in rows if per[0][1].door is not None}}   # plan 0874: the door value each pair read on, beside its cell
 
 
 def measure(m, c, reg, T):
@@ -275,11 +282,16 @@ def measure(m, c, reg, T):
             arrays = {a: [gather(cache, blocks, idx, pos[k], a) for k in keys] for a in inst["arrays"]}
             acc[(n, u, sz)].append(reg[n][1].reduce(arrays, ctxs[(n, sz)]))
     first = {u: after(u[0], np.stack(v), ctxs[(u[0], u[2])]) for u, v in acc.items() if not reg[u[0]][0].get("requires")}
-    codes = {pt: codes_of(cells_of_rows(point_rows(m, c, reg, first, pt, used(T))), T) for pt in m["axes"]["point"]}
+    wait = {n for n in m["instruments"] if reg[n][0].get("requires")}
+    codes = {pt: codes_of(cells_of_rows(point_rows(m, c, reg, first, pt, used(T), wait)), T) for pt in m["axes"]["point"]}
+    nc = ctxs.get(("needle_chain", None))   # plan 0874: the endpoints' resampled drift gives a TRANSFORMED pair its ratio r
     for u, v in acc.items():
         if reg[u[0]][0].get("requires"):
-            ctx = dataclasses.replace(ctxs[(u[0], u[2])], member=door.member(T.membership, u[0], u[1], codes))
-            first[u] = after(u[0], np.stack(v), ctx)
+            inst, ctx = reg[u[0]][0], ctxs[(u[0], u[2])]
+            mem = door.member_for(inst, T.membership, u[0], u[1], codes)
+            ratio = door.ratio_of(mem["door"], lambda pt: first[("needle_chain", pt, None)][0]["drift"].vector, u[1],
+                                  lambda: nc.log_ratio[nc.top], ctx.component_shape[0]) if "door:basis" in inst["pipeline"] else None
+            first[u] = after(u[0], np.stack(v), dataclasses.replace(ctx, member=mem, ratio=ratio))
     return first
 
 
@@ -293,14 +305,14 @@ def labelled(m, inst, n, pt, on):
     return [(sz, (n, pt, sz)) for sz in (m["axes"]["size"] if inst["unit"] == "point-size" else [None])]
 
 
-def point_rows(m, c, reg, out, pt, use):
+def point_rows(m, c, reg, out, pt, use, pending=()):
     """Every registry column at one point that the table set reads (`use`) as (instrument, column, eps key, flags,
     [(label, Reading)], source); an instrument this input does not declare reads NOT-MEASURED; a pair instrument is
     read per point only when it declares per_point (plan 0872), one Reading per control pair that touches the point."""
     rows, flagmap = [], c.cfg["obtained_flag"]
     for n, (inst, _) in reg.items():
-        if inst["unit"] == "pair" and not inst.get("per_point"):
-            continue   # a pair instrument has no point row: its readings are pair_readings
+        if (inst["unit"] == "pair" and not inst.get("per_point")) or n in pending:
+            continue   # a pair instrument has no point row: its readings are pair_readings; a `pending` instrument (its membership reads these codes) is not read yet
         on = n in m["instruments"]
         flags = sorted(set(inst["flags"]) | {flagmap[m["obtained"][pt]]}) if on else []
         labs = labelled(m, inst, n, pt, on)
@@ -322,7 +334,8 @@ def reading_dict(row, unit, codes, direct, cols):
     n, col, ek, flags, per, src = row
     r0, point_size = per[0][1], len(per) > 1 or per[0][0] is not None
     per_size = [{"size": sz, "estimate": r.estimate, "lo": r.lo, "hi": r.hi, "cell": r.cell,
-                 "code": cols[direct[src]]["map"].get(r.cell, r.cell)} for sz, r in per] if point_size else None
+                 "code": cols[direct[src]]["map"].get(r.cell, r.cell), **({"door": r.door} if r.door is not None else {})}
+                for sz, r in per] if point_size else None
     full = None if point_size or r0.vector is None else f"{n}/{col}/{ukey(unit)}"
     return {"instrument": n, "column": col, "unit": unit, "eps_key": ek, "eps": r0.eps,
             "estimate": None if point_size else r0.estimate, "lo": None if point_size else r0.lo,
@@ -347,7 +360,7 @@ def pair_results(m, c, reg, out, vectors):
                 readings.append(reading_dict((n, col, ek, flags, [(None, res[col])], f"{n}.{col}"), unit, {}, {}, {}))
                 if res[col].vector is not None:
                     vectors[f"{n}/{col}/{ukey(unit)}"] = res[col].vector
-            pairs.append({"pair": list(pair), n: first.cell, "flags": flags})
+            pairs.append({"pair": list(pair), n: first.cell, "flags": flags, **({inst["door_label"]: first.door} if "door_label" in inst else {})})
             for rn, v in reps.items():
                 key = f"{n}/{rn}/{ukey(unit)}"
                 reports.append({"instrument": n, "name": rn, "unit": unit, "estimate": np.asarray(v)[0].tolist(),

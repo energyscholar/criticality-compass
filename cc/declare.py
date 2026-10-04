@@ -484,12 +484,14 @@ def chk_instrument(p, d, c, stem=None):
         return list(todos(p, d))   # a template still full of TODOs: report them, nothing else
     req = {"module": str, "operators": list, "unit": str, "reports": list, "arrays": list, "axes": list,
            "relations": list, "sidecar": list, "flags": list, "pipeline": list, "columns": dict}
-    out = header(p, d, "instrument") + shape(p, d, req, {"requires": list, "door_values": list, "quantity": str, "start": str, "per_point": bool})
+    out = header(p, d, "instrument") + shape(p, d, req, {"requires": list, "door_values": list, "quantity": str, "start": str, "per_point": bool, "member_default": str, "door_label": str})
     if out:
         return out
     out += when(d.get("per_point") and d["unit"] != "pair", p, "per_point", "only a pair instrument is read per point (over the control pairs that touch it)",
                 'remove per_point, or set unit = "pair"')
     out += inalpha(p, "unit", d["unit"], ("point", "pair", "point-size"))
+    out += when(d.get("member_default", "") not in ["", *d.get("door_values", [])], p, "member_default", f"'{d.get('member_default')}' is not in door_values {d.get('door_values', [])}",
+                "name one of the instrument's door_values (the door value a set without a membership rule reads)")
     out += [at(p, "requires", f"'{r}' must be a registry instrument with no requires of its own",
                "name an instrument that is read first (one level in v0.1)")
             for r in d.get("requires", []) if r not in c.reg or c.reg[r].get("requires")]
@@ -570,7 +572,9 @@ def chk_column(p, loc, col, c, allc):
     out += when(needs != (cb is not None), p, loc + ".combine",
                 "required for a point-size source" if needs else "only a point-size source combines", "fix")
     if cb is not None:
-        out += shape(p, cb, {"over": str, "rank": list}, {"top_only": list, "agree": list, "disagree": str}, pre=loc + ".combine.")
+        out += shape(p, cb, {"over": str, "rank": list}, {"top_only": list, "agree": list, "disagree": str, "prefer_door": str}, pre=loc + ".combine.")
+        out += when(cb.get("prefer_door", "") not in ["", *c.reg.get(src.partition(".")[0] if isinstance(src, str) else "", {}).get("door_values", [])], p, loc + ".combine.prefer_door",
+                    f"'{cb.get('prefer_door')}' is not a door value of the instrument the column reads", "name one of its door_values: only the items read on that door value combine, when there is one")
         out += [at(p, loc + f".combine.{k}", f"'{x}' is not in the alphabet {alpha}", "list codes of this column")
                 for k in ("top_only", "agree") for x in cb.get(k, []) if x not in alpha]
         out += when(("agree" in cb) != ("disagree" in cb), p, loc + ".combine.agree", "agree and disagree come together",
@@ -833,8 +837,8 @@ def chk_membership(p, d, c, stem=None):
     sig, allc, nulls = codes["columns"]["signature"], code_cols(codes), c.alpha["nulls"]
     for name, r in ((k, v) for k, v in d.items() if k not in ("schema", "kind")):
         loc, inst = name, c.reg.get(name, {})
-        out += when("door:off_manifold" not in inst.get("pipeline", []), p, loc,
-                    f"'{name}' is not a registry instrument with a door:off_manifold step", "name such an instrument")
+        out += when(not {"door:off_manifold", "door:basis"} & set(inst.get("pipeline", [])), p, loc,
+                    f"'{name}' is not a registry instrument with a door:off_manifold or door:basis step", "name such an instrument")
         e = shape(p, r, {"reads": str, "map": dict, "rank": list, "door": dict}, pre=loc + ".")
         if e or r["reads"] not in sig:
             out += e + when(not e, p, loc + ".reads", f"'{r['reads']}' is not a signature column", f"use one of: {' '.join(sig)}")

@@ -1,3 +1,4 @@
+# tables/v07-rules/codes.toml (= v06-rules + plan 0874: across_dlt combines only the TRANSFORMED touching pairs when there are any)
 # tables/v06-rules/codes.toml (= v05-rules + plan 0872: F2 across_cov / across_dlt behind the signature column across; F1 stability_raw + drift_code -> stability with TRANSFORMED; the y_inf helper)
 # tables/v04-rules/codes.toml (= v03-rules + the declared probe column, plan 0870 P1) - sign cell -> code, one map per column (data; total).
 # RULE (applied by the loader, stated here): the nulls NOT-MEASURED and NOT-EVALUATED
@@ -262,7 +263,8 @@ alphabet = ["RELEVANT", "MARGINAL", "WEAK", "IRRELEVANT", "UNRES"]
 from = "across_delta.y_last"
 alphabet = ["RELEVANT", "MARGINAL", "WEAK", "IRRELEVANT", "UNRES"]
 combine.over = "pair"
-combine.agree = ["RELEVANT", "MARGINAL", "WEAK", "IRRELEVANT"]   # a resolved code counts only when EVERY touching pair reads it
+combine.prefer_door = "TRANSFORMED"            # plan 0874: a point combines ONLY its touching pairs read on the TRANSFORMED basis when at least one exists, else all of them (RAW)
+combine.agree = ["RELEVANT", "MARGINAL", "WEAK", "IRRELEVANT"]   # a resolved code counts only when EVERY (preferred) touching pair reads it
 combine.disagree = "UNRES"                     # pairs that disagree (or one unresolved) leave the point's across unresolved
 combine.rank = [
   "NOT-MEASURED", "NOT-EVALUATED", "UNRES", "IRRELEVANT", "WEAK", "MARGINAL", "RELEVANT",

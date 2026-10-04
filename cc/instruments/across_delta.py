@@ -15,6 +15,8 @@ def delta(x, ctx):
 
 
 def growth(x, ctx):
-    """x holds ln(s Delta) per size; A over the size chain divided by the declared ln of the size ratio; the last step is the exponent."""
+    """x holds ln(s Delta) per size; A over the size chain divided by the declared ln of the size ratio gives the step exponents yD1, yD2. The reading is
+    y_last = yD2 + r (yD2 - yD1)/(1 - r) = (yD2 - r yD1)/(1 - r), r = ctx.ratio (plan 0874: the pair's door value selects r; r = 0 on a RAW pair, so y_last = yD2)."""
     y = A(x, ctx.rel["size"]).spatial / ctx.log_ratio
-    return {"y_steps": y, "y_last": y[:, ctx.top]}
+    r = ctx.ratio
+    return {"y_steps": y, "ratio": r, "y_last": y[:, ctx.top] + r * (y[:, ctx.top] - y[:, ctx.top_steps]) / (1 - r)}

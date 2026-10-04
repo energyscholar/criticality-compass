@@ -5,8 +5,8 @@
  "input": "x2b-xy-2",
  "tables": "v06-rules",
  "derived_from": null,
- "code_commit": "5c061b8129467a8114043efcd2f135cdb54adac0",
- "code_hash": "2e5ca6876e8f5eb99d172385e0378c16886732bb7e3d9893f2a1cba87f74dc7e",
+ "code_commit": "a7275b06846d57aebbdd5f5ec91d531f37b9b29b",
+ "code_hash": "e2e8606104d772569000048d2419fb94e5f022b3c110a6de8f8e6875c4307776",
  "interval": {
   "method": "block",
   "b": 400,
@@ -23,7 +23,7 @@
   "instruments/fluct.toml": "b9eee16fe05f430f982509db3d583201aa396e4d0470c0180a67439748cee423",
   "instruments/along.toml": "f3fd87ddb9aa9a2786e3a0110340106e673670e305642a1e4bf30b1a8b2b4ef6",
   "instruments/needle_chain.toml": "9afa93faecb17bb5f69b0c129004b318541fbd360e9009225fa5f8dc066c5acf",
-  "instruments/across_delta.toml": "7973eb2fbdb7f3918b3e244a738c4ebfc041667b61583ee4659e49010382111a",
+  "instruments/across_delta.toml": "1690f69061d15ca6bca3b15008e2edbe373280bc00acb36f78107fcd8e3ace23",
   "instruments/transform.toml": "c797772a9afba3a680751094f7f40c4a9f6664e728f7fb542fd3caf7498802a3",
   "tables/v06-rules/codes.toml": "141ab2de7663057c675d54ff27e6597ad187d3774050849b3b155e181dee3c77",
   "tables/v06-rules/verdict.toml": "9e6911b9bcbd913d1597361f38c099562925cf91eadee4bed561f71bda43d2df",
@@ -132,7 +132,8 @@
      "lo": -0.014033126756511149,
      "hi": 0.001969183865893369,
      "cell": "ZERO!",
-     "code": "MARGINAL"
+     "code": "MARGINAL",
+     "door": "RAW"
     }
    ],
    "flags": [
@@ -424,7 +425,8 @@
      "lo": -0.014033126756511149,
      "hi": 0.001969183865893369,
      "cell": "ZERO!",
-     "code": "MARGINAL"
+     "code": "MARGINAL",
+     "door": "RAW"
     },
     {
      "size": "0.6->0.7",
@@ -432,7 +434,8 @@
      "lo": -0.026315151385895613,
      "hi": -0.0095436490390882,
      "cell": "SLOW-",
-     "code": "WEAK"
+     "code": "WEAK",
+     "door": "RAW"
     }
    ],
    "flags": [
@@ -724,7 +727,8 @@
      "lo": -0.026315151385895613,
      "hi": -0.0095436490390882,
      "cell": "SLOW-",
-     "code": "WEAK"
+     "code": "WEAK",
+     "door": "RAW"
     },
     {
      "size": "0.7->0.8",
@@ -732,7 +736,8 @@
      "lo": -0.01723682633597944,
      "hi": -0.0012401946392921383,
      "cell": "SLOW-",
-     "code": "WEAK"
+     "code": "WEAK",
+     "door": "RAW"
     }
    ],
    "flags": [
@@ -1024,7 +1029,8 @@
      "lo": -0.01723682633597944,
      "hi": -0.0012401946392921383,
      "cell": "SLOW-",
-     "code": "WEAK"
+     "code": "WEAK",
+     "door": "RAW"
     },
     {
      "size": "0.8->0.85",
@@ -1032,7 +1038,8 @@
      "lo": -0.00878700216275329,
      "hi": 0.0342315310669001,
      "cell": "ZERO!",
-     "code": "MARGINAL"
+     "code": "MARGINAL",
+     "door": "RAW"
     }
    ],
    "flags": [
@@ -1324,7 +1331,8 @@
      "lo": -0.00878700216275329,
      "hi": 0.0342315310669001,
      "cell": "ZERO!",
-     "code": "MARGINAL"
+     "code": "MARGINAL",
+     "door": "RAW"
     },
     {
      "size": "0.85->0.89294",
@@ -1332,7 +1340,8 @@
      "lo": 0.025789554755824246,
      "hi": 0.06893586827027569,
      "cell": "SLOW+",
-     "code": "WEAK"
+     "code": "WEAK",
+     "door": "RAW"
     }
    ],
    "flags": [
@@ -1624,7 +1633,8 @@
      "lo": 0.025789554755824246,
      "hi": 0.06893586827027569,
      "cell": "SLOW+",
-     "code": "WEAK"
+     "code": "WEAK",
+     "door": "RAW"
     },
     {
      "size": "0.89294->0.95",
@@ -1632,7 +1642,8 @@
      "lo": 0.5180956278460417,
      "hi": 0.5430162748948146,
      "cell": "SIG+",
-     "code": "RELEVANT"
+     "code": "RELEVANT",
+     "door": "RAW"
     }
    ],
    "flags": [
@@ -1924,7 +1935,8 @@
      "lo": 0.5180956278460417,
      "hi": 0.5430162748948146,
      "cell": "SIG+",
-     "code": "RELEVANT"
+     "code": "RELEVANT",
+     "door": "RAW"
     },
     {
      "size": "0.95->1.0",
@@ -1932,7 +1944,8 @@
      "lo": 0.7772710347776278,
      "hi": 0.7920963403772576,
      "cell": "SIG+",
-     "code": "RELEVANT"
+     "code": "RELEVANT",
+     "door": "RAW"
     }
    ],
    "flags": [
@@ -2224,7 +2237,8 @@
      "lo": 0.7772710347776278,
      "hi": 0.7920963403772576,
      "cell": "SIG+",
-     "code": "RELEVANT"
+     "code": "RELEVANT",
+     "door": "RAW"
     },
     {
      "size": "1.0->1.1",
@@ -2232,7 +2246,8 @@
      "lo": 0.056629964784623774,
      "hi": 0.06494032811981096,
      "cell": "SLOW+",
-     "code": "WEAK"
+     "code": "WEAK",
+     "door": "RAW"
     }
    ],
    "flags": [
@@ -2524,7 +2539,8 @@
      "lo": 0.056629964784623774,
      "hi": 0.06494032811981096,
      "cell": "SLOW+",
-     "code": "WEAK"
+     "code": "WEAK",
+     "door": "RAW"
     }
    ],
    "flags": [
@@ -3660,6 +3676,33 @@
   },
   {
    "instrument": "across_delta",
+   "name": "y_steps",
+   "unit": {
+    "pair": [
+     "0.5",
+     "0.6"
+    ]
+   },
+   "estimate": [
+    -0.08114562841051343,
+    -0.006583570866301398
+   ],
+   "vector_key": "across_delta/y_steps/pair=0.5->0.6"
+  },
+  {
+   "instrument": "across_delta",
+   "name": "ratio",
+   "unit": {
+    "pair": [
+     "0.5",
+     "0.6"
+    ]
+   },
+   "estimate": 0.0,
+   "vector_key": "across_delta/ratio/pair=0.5->0.6"
+  },
+  {
+   "instrument": "across_delta",
    "name": "delta",
    "unit": {
     "pair": [
@@ -3673,6 +3716,33 @@
     -0.01938866954191043
    ],
    "vector_key": "across_delta/delta/pair=0.6->0.7"
+  },
+  {
+   "instrument": "across_delta",
+   "name": "y_steps",
+   "unit": {
+    "pair": [
+     "0.6",
+     "0.7"
+    ]
+   },
+   "estimate": [
+    -0.09018252827733647,
+    -0.017349539483129894
+   ],
+   "vector_key": "across_delta/y_steps/pair=0.6->0.7"
+  },
+  {
+   "instrument": "across_delta",
+   "name": "ratio",
+   "unit": {
+    "pair": [
+     "0.6",
+     "0.7"
+    ]
+   },
+   "estimate": 0.0,
+   "vector_key": "across_delta/ratio/pair=0.6->0.7"
   },
   {
    "instrument": "across_delta",
@@ -3692,6 +3762,33 @@
   },
   {
    "instrument": "across_delta",
+   "name": "y_steps",
+   "unit": {
+    "pair": [
+     "0.7",
+     "0.8"
+    ]
+   },
+   "estimate": [
+    -0.0802168999396209,
+    -0.009129634117220876
+   ],
+   "vector_key": "across_delta/y_steps/pair=0.7->0.8"
+  },
+  {
+   "instrument": "across_delta",
+   "name": "ratio",
+   "unit": {
+    "pair": [
+     "0.7",
+     "0.8"
+    ]
+   },
+   "estimate": 0.0,
+   "vector_key": "across_delta/ratio/pair=0.7->0.8"
+  },
+  {
+   "instrument": "across_delta",
    "name": "delta",
    "unit": {
     "pair": [
@@ -3705,6 +3802,33 @@
     -0.016845884882322415
    ],
    "vector_key": "across_delta/delta/pair=0.8->0.85"
+  },
+  {
+   "instrument": "across_delta",
+   "name": "y_steps",
+   "unit": {
+    "pair": [
+     "0.8",
+     "0.85"
+    ]
+   },
+   "estimate": [
+    -0.03719372960751653,
+    0.013640345394031809
+   ],
+   "vector_key": "across_delta/y_steps/pair=0.8->0.85"
+  },
+  {
+   "instrument": "across_delta",
+   "name": "ratio",
+   "unit": {
+    "pair": [
+     "0.8",
+     "0.85"
+    ]
+   },
+   "estimate": 0.0,
+   "vector_key": "across_delta/ratio/pair=0.8->0.85"
   },
   {
    "instrument": "across_delta",
@@ -3724,6 +3848,33 @@
   },
   {
    "instrument": "across_delta",
+   "name": "y_steps",
+   "unit": {
+    "pair": [
+     "0.85",
+     "0.89294"
+    ]
+   },
+   "estimate": [
+    0.0918607629398851,
+    0.0474631697152565
+   ],
+   "vector_key": "across_delta/y_steps/pair=0.85->0.89294"
+  },
+  {
+   "instrument": "across_delta",
+   "name": "ratio",
+   "unit": {
+    "pair": [
+     "0.85",
+     "0.89294"
+    ]
+   },
+   "estimate": 0.0,
+   "vector_key": "across_delta/ratio/pair=0.85->0.89294"
+  },
+  {
+   "instrument": "across_delta",
    "name": "delta",
    "unit": {
     "pair": [
@@ -3737,6 +3888,33 @@
     -0.09365540460041488
    ],
    "vector_key": "across_delta/delta/pair=0.89294->0.95"
+  },
+  {
+   "instrument": "across_delta",
+   "name": "y_steps",
+   "unit": {
+    "pair": [
+     "0.89294",
+     "0.95"
+    ]
+   },
+   "estimate": [
+    0.3809398686242003,
+    0.531060773972462
+   ],
+   "vector_key": "across_delta/y_steps/pair=0.89294->0.95"
+  },
+  {
+   "instrument": "across_delta",
+   "name": "ratio",
+   "unit": {
+    "pair": [
+     "0.89294",
+     "0.95"
+    ]
+   },
+   "estimate": 0.0,
+   "vector_key": "across_delta/ratio/pair=0.89294->0.95"
   },
   {
    "instrument": "across_delta",
@@ -3756,6 +3934,33 @@
   },
   {
    "instrument": "across_delta",
+   "name": "y_steps",
+   "unit": {
+    "pair": [
+     "0.95",
+     "1.0"
+    ]
+   },
+   "estimate": [
+    0.8273526274361289,
+    0.7851375467860817
+   ],
+   "vector_key": "across_delta/y_steps/pair=0.95->1.0"
+  },
+  {
+   "instrument": "across_delta",
+   "name": "ratio",
+   "unit": {
+    "pair": [
+     "0.95",
+     "1.0"
+    ]
+   },
+   "estimate": 0.0,
+   "vector_key": "across_delta/ratio/pair=0.95->1.0"
+  },
+  {
+   "instrument": "across_delta",
    "name": "delta",
    "unit": {
     "pair": [
@@ -3769,6 +3974,33 @@
     -0.30426371997241675
    ],
    "vector_key": "across_delta/delta/pair=1.0->1.1"
+  },
+  {
+   "instrument": "across_delta",
+   "name": "y_steps",
+   "unit": {
+    "pair": [
+     "1.0",
+     "1.1"
+    ]
+   },
+   "estimate": [
+    0.5669125362808907,
+    0.06064515578730955
+   ],
+   "vector_key": "across_delta/y_steps/pair=1.0->1.1"
+  },
+  {
+   "instrument": "across_delta",
+   "name": "ratio",
+   "unit": {
+    "pair": [
+     "1.0",
+     "1.1"
+    ]
+   },
+   "estimate": 0.0,
+   "vector_key": "across_delta/ratio/pair=1.0->1.1"
   },
   {
    "instrument": "along",
@@ -4350,7 +4582,8 @@
    "across_delta": "ZERO!",
    "flags": [
     "T"
-   ]
+   ],
+   "delta_basis": "RAW"
   },
   {
    "pair": [
@@ -4360,7 +4593,8 @@
    "across_delta": "SLOW-",
    "flags": [
     "T"
-   ]
+   ],
+   "delta_basis": "RAW"
   },
   {
    "pair": [
@@ -4370,7 +4604,8 @@
    "across_delta": "SLOW-",
    "flags": [
     "T"
-   ]
+   ],
+   "delta_basis": "RAW"
   },
   {
    "pair": [
@@ -4380,7 +4615,8 @@
    "across_delta": "ZERO!",
    "flags": [
     "T"
-   ]
+   ],
+   "delta_basis": "RAW"
   },
   {
    "pair": [
@@ -4390,7 +4626,8 @@
    "across_delta": "SLOW+",
    "flags": [
     "T"
-   ]
+   ],
+   "delta_basis": "RAW"
   },
   {
    "pair": [
@@ -4400,7 +4637,8 @@
    "across_delta": "SIG+",
    "flags": [
     "T"
-   ]
+   ],
+   "delta_basis": "RAW"
   },
   {
    "pair": [
@@ -4410,7 +4648,8 @@
    "across_delta": "SIG+",
    "flags": [
     "T"
-   ]
+   ],
+   "delta_basis": "RAW"
   },
   {
    "pair": [
@@ -4420,7 +4659,8 @@
    "across_delta": "SLOW+",
    "flags": [
     "T"
-   ]
+   ],
+   "delta_basis": "RAW"
   },
   {
    "pair": [
