@@ -2,6 +2,7 @@
 widest set; every point the expected/<set>.toml lock names must read its locked verdict (plan 0869 P1)."""
 import os
 import sys
+import time
 import tomllib
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
@@ -14,14 +15,19 @@ SET = "v03-rules"
 
 
 def measure(name):
-    return name, {s["point"]: s["verdict"] for s in detect.run(name, SET, write=False)["signature"]}
+    t0 = time.time()
+    got = {s["point"]: s["verdict"] for s in detect.run(name, SET, write=False)["signature"]}
+    return name, got, time.time() - t0
 
 
 if __name__ == "__main__":
     names = sorted(p.name for p in (ROOT / "inputs").iterdir() if p.is_dir() and not p.name.startswith("TEMPLATE"))
     expected = tomllib.loads((ROOT / "expected" / f"{SET}.toml").read_text())["verdicts"]
     with ProcessPoolExecutor(max(1, (os.cpu_count() or 3) - 2)) as pool:
-        got = dict(pool.map(measure, names))
+        done = list(pool.map(measure, names))
+    got = {name: g for name, g, _ in done}
+    if os.environ.get("CC_VERBOSE") == "1":
+        print("".join(f"seconds {sec:7.1f}  {name}\n" for name, _, sec in sorted(done, key=lambda d: -d[2])), end="")
     bad, n = [], 0
     for name in names:
         for pt, want in expected.get(name, {}).items():
