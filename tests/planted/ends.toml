@@ -49,6 +49,12 @@ flow = "FLOWING"
 two_start = "NOT-MEASURED"
 order = "OFF-WINDOW"
 geometry = "NOT"
+[kind.ORDs]         # an ordered sink, ONE start only
+needle = "ORD"
+flow = "FLOWING"
+two_start = "NOT-MEASURED"
+order = "OFF-WINDOW"
+geometry = "NOT"
 [kind.DISc]         # a sink where the starts stay apart (the AT 4-Potts lookalike)
 needle = "DIS"
 flow = "FLOWING"
@@ -94,15 +100,15 @@ end_point = ["c"]
 end_bracket = [["c", "d"]]
 
 [[plant]]
-name = "the same chain with a SINGLE-START beyond point: the end kind cannot be read, so it is never BKT-END (prediction L7)"
+name = "the same chain with a SINGLE-START beyond point: the end kind cannot be read, so it is never BKT-END (prediction L7); the interior is still a LINE (plan 0871 G4)"
 points = ["a:L", "b:L", "c:L", "d:DISs"]
 interior = ["a", "b", "c"]
 bracket = "BRACKET-DOWN"
 points_code = "LINE"
 lower = "OPEN"
 upper = "END-ORDER-UNMEASURED"
-verdict = "REFUSE-UNCLASSIFIED-v0"
-class = "REFUSE"
+verdict = "LINE"
+class = "LINE"
 end_point = ["c"]
 end_bracket = [["c", "d"]]
 
@@ -160,17 +166,17 @@ end_point = ["c"]
 end_bracket = [["c", "d"]]
 
 [[plant]]
-name = "a MID point beyond the boundary (the interior declared short): NO-END, whatever follows it"
+name = "G3: a MID point just beyond the declared interior joins the MID run (before G3 it read NO-END): the boundary moves out to it"
 points = ["a:L", "b:L", "c:L", "d:DISi"]
 interior = ["a", "b"]
 bracket = "BRACKET-DOWN"
 points_code = "LINE"
 lower = "OPEN"
-upper = "NO-END"
-verdict = "REFUSE-UNCLASSIFIED-v0"
-class = "REFUSE"
-end_point = []
-end_bracket = []
+upper = "END-BKT-CANDIDATE"
+verdict = "BKT-END"
+class = "BKT-END"
+end_point = ["c"]
+end_bracket = [["c", "d"]]
 
 [[plant]]
 name = "a boundary that still flows is not an end"
@@ -258,8 +264,8 @@ bracket = "BRACKET-DOWN"
 points_code = "LINE"
 lower = "OPEN"
 upper = "END-ORDER-UNMEASURED"
-verdict = "REFUSE-UNCLASSIFIED-v0"
-class = "REFUSE"
+verdict = "LINE"
+class = "LINE"
 end_point = ["b"]
 end_bracket = [["b", "d"]]
 
@@ -271,6 +277,86 @@ bracket = "BRACKET-DOWN"
 points_code = "LINE"
 lower = "OPEN"
 upper = "END-MULTICRITICAL"
+verdict = "LINE"
+class = "LINE"
+end_point = ["b"]
+end_bracket = [["b", "d"]]
+
+# ---- plan 0871 G3 / G4 (Auditor decisions): the boundary is the end of the MID run that extends outward from the interior; a LINE with no readable end is a LINE
+
+[[plant]]
+name = "G3: [interior LINE | MID, MID | DIS]: the boundary is the SECOND MID (the end of the run), the beyond point the sink"
+points = ["a:L", "b:L", "c:L", "d:L", "e:DISi"]
+interior = ["a", "b"]
+bracket = "BRACKET-DOWN"
+points_code = "LINE"
+lower = "OPEN"
+upper = "END-BKT-CANDIDATE"
+verdict = "BKT-END"
+class = "BKT-END"
+end_point = ["d"]
+end_bracket = [["d", "e"]]
+
+[[plant]]
+name = "G3: the same on the LOWER side of an ORD-ended chain: [ORD | MID | interior]: the boundary is the MID outside the interior, the bracket runs outward"
+points = ["o:ORDi", "m:L", "a:L", "b:L"]
+interior = ["a", "b"]
+bracket = "BRACKET-DOWN"
+points_code = "LINE"
+lower = "END-BKT-CANDIDATE"
+upper = "OPEN"
+verdict = "BKT-END"
+class = "BKT-END"
+end_point = ["m"]
+end_bracket = [["m", "o"]]
+
+[[plant]]
+name = "G3: [interior LINE | MID | DIS | MID]: a MID that re-appears after a sink point on that side is NO-END (nothing is read as an end)"
+points = ["a:L", "b:L", "c:L", "d:DISi", "e:L"]
+interior = ["a", "b"]
+bracket = "NON-MONOTONE"
+points_code = "LINE"
+lower = "OPEN"
+upper = "NO-END"
+verdict = "REFUSE-NON-MONOTONE"
+class = "REFUSE"
+end_point = []
+end_bracket = []
+
+[[plant]]
+name = "G4: an interior that reads LINE with BOTH sides OPEN is a LINE (the end is not observed; a line is still a line)"
+points = ["a:L", "b:L", "c:L"]
+interior = ["a", "b", "c"]
+bracket = "BRACKET-FLAT"
+points_code = "LINE"
+lower = "OPEN"
+upper = "OPEN"
+verdict = "LINE"
+class = "LINE"
+end_point = []
+end_bracket = []
+
+[[plant]]
+name = "G4: an interior that reads LINE with END-ORDER-UNMEASURED on BOTH sides (single-start sinks) is a LINE, and both ends are reported"
+points = ["o:ORDs", "a:L", "b:L", "c:L", "d:DISs"]
+interior = ["a", "b", "c"]
+bracket = "BRACKET-DOWN"
+points_code = "LINE"
+lower = "END-ORDER-UNMEASURED"
+upper = "END-ORDER-UNMEASURED"
+verdict = "LINE"
+class = "LINE"
+end_point = ["a", "c"]
+end_bracket = [["a", "o"], ["c", "d"]]
+
+[[plant]]
+name = "G4: a side that is OPEN beside a side that is END-ORDER-UNMEASURED is still a LINE"
+points = ["a:L", "b:L", "d:DISs"]
+interior = ["a", "b"]
+bracket = "BRACKET-DOWN"
+points_code = "LINE"
+lower = "OPEN"
+upper = "END-ORDER-UNMEASURED"
 verdict = "LINE"
 class = "LINE"
 end_point = ["b"]

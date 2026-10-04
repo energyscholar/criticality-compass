@@ -216,9 +216,29 @@ verdict = "LINE"
 why = "plan 0871 E2: every interior point reads per-point LINE and a side ends at a multicritical point (END-MULTICRITICAL, the AT 4-Potts lookalike): the interior is a LINE; the end is reported beside it (lower, upper) and is never read as BKT-END"
 
 [[row]]
-when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT", "NO-MID", "NOT-MEASURED"], f1 = ["VARIES"], f2 = ["MARGINAL"], lower = ["END-MULTICRITICAL", "END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], upper = ["END-MULTICRITICAL", "END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
+when = { bracket = ["NO-MID", "NOT-MEASURED"], f1 = ["VARIES"], f2 = ["MARGINAL"], lower = ["END-MULTICRITICAL", "END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], upper = ["END-MULTICRITICAL", "END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
 verdict = "LINE"
 why = "B7 (SYNTHESIS-3): fingerprints 1 and 2 both resolved; X7a: POINT manifolds do not reach f2 MARGINAL"
+
+[[row]]
+when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT"], f1 = ["VARIES"], f2 = ["MARGINAL"], points = ["NOT-LINE", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], lower = ["END-MULTICRITICAL", "END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], upper = ["END-MULTICRITICAL", "END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
+verdict = "LINE"
+why = "B7 (SYNTHESIS-3): fingerprints 1 and 2 both resolved; X7a: POINT manifolds do not reach f2 MARGINAL"
+
+[[row]]
+when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT"], f1 = ["VARIES"], f2 = ["MARGINAL"], points = ["LINE"], lower = ["END-MULTICRITICAL", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], upper = ["END-MULTICRITICAL", "END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
+verdict = "LINE"
+why = "B7 (SYNTHESIS-3): fingerprints 1 and 2 both resolved; X7a: POINT manifolds do not reach f2 MARGINAL"
+
+[[row]]
+when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT"], f1 = ["VARIES"], f2 = ["MARGINAL"], points = ["LINE"], lower = ["END-ORDER-UNMEASURED", "OPEN"], upper = ["END-MULTICRITICAL", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
+verdict = "LINE"
+why = "B7 (SYNTHESIS-3): fingerprints 1 and 2 both resolved; X7a: POINT manifolds do not reach f2 MARGINAL"
+
+[[row]]
+when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT"], points = ["LINE"], lower = ["OPEN", "END-ORDER-UNMEASURED"], upper = ["OPEN", "END-ORDER-UNMEASURED"] }
+verdict = "LINE"
+why = "plan 0871 G4: every interior point reads per-point LINE and no side shows a readable end (both sides OPEN or END-ORDER-UNMEASURED): a line whose end is not observed is still a line; the sides are reported beside it (lower, upper) and are never read as BKT-END"
 
 [[row]]
 when = { bracket = ["NO-MID", "NOT-MEASURED"], f1 = ["VARIES"], f2 = ["MARGINAL"], upper = ["END-BKT-CANDIDATE"] }
@@ -231,7 +251,22 @@ verdict = "LINE"
 why = "B7 (SYNTHESIS-3): fingerprints 1 and 2 both resolved; X7a: POINT manifolds do not reach f2 MARGINAL"
 
 [[row]]
-when = { f2 = ["REFUSE-OFF-MANIFOLD"], lower = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], upper = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
+when = { bracket = ["NO-MID", "NON-MONOTONE", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], f2 = ["REFUSE-OFF-MANIFOLD"], lower = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], upper = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
+verdict = "REFUSE-OFF-MANIFOLD"
+why = "X7a: a member point off the manifold at L 243 (it also explains a non-monotone bracket, so it is read first by partition)"
+
+[[row]]
+when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT"], f2 = ["REFUSE-OFF-MANIFOLD"], points = ["NOT-LINE", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], lower = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], upper = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
+verdict = "REFUSE-OFF-MANIFOLD"
+why = "X7a: a member point off the manifold at L 243 (it also explains a non-monotone bracket, so it is read first by partition)"
+
+[[row]]
+when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT"], f2 = ["REFUSE-OFF-MANIFOLD"], points = ["LINE"], lower = ["NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], upper = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
+verdict = "REFUSE-OFF-MANIFOLD"
+why = "X7a: a member point off the manifold at L 243 (it also explains a non-monotone bracket, so it is read first by partition)"
+
+[[row]]
+when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT"], f2 = ["REFUSE-OFF-MANIFOLD"], points = ["LINE"], lower = ["END-ORDER-UNMEASURED", "OPEN"], upper = ["NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
 verdict = "REFUSE-OFF-MANIFOLD"
 why = "X7a: a member point off the manifold at L 243 (it also explains a non-monotone bracket, so it is read first by partition)"
 
@@ -266,7 +301,22 @@ verdict = "REFUSE-BRACKET"
 why = "0863: a bracket that could not be read"
 
 [[row]]
-when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT", "NO-MID", "NOT-MEASURED"], f1 = ["CONSTANT"], f2 = ["IRRELEVANT"], lower = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], upper = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
+when = { bracket = ["NO-MID", "NOT-MEASURED"], f1 = ["CONSTANT"], f2 = ["IRRELEVANT"], lower = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], upper = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
+verdict = "POINT-MANIFOLD"
+why = "plan 0870 P3: the exponent is constant along the navigated chain (f1) and every neighbouring pair has a difference that GROWS SLOWER than the size (f2 IRRELEVANT): the members are one point class, a manifold of points. The members' own per-point verdicts are not lifted (x5n: REFUSE-PROBE-INCOMPLETE); the family is the reading that carries the class. The first reading ever of this row (X7a's pairs were all off the manifold, E44/E46); x5n over g is its test"
+
+[[row]]
+when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT"], f1 = ["CONSTANT"], f2 = ["IRRELEVANT"], points = ["NOT-LINE", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], lower = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], upper = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
+verdict = "POINT-MANIFOLD"
+why = "plan 0870 P3: the exponent is constant along the navigated chain (f1) and every neighbouring pair has a difference that GROWS SLOWER than the size (f2 IRRELEVANT): the members are one point class, a manifold of points. The members' own per-point verdicts are not lifted (x5n: REFUSE-PROBE-INCOMPLETE); the family is the reading that carries the class. The first reading ever of this row (X7a's pairs were all off the manifold, E44/E46); x5n over g is its test"
+
+[[row]]
+when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT"], f1 = ["CONSTANT"], f2 = ["IRRELEVANT"], points = ["LINE"], lower = ["NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], upper = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
+verdict = "POINT-MANIFOLD"
+why = "plan 0870 P3: the exponent is constant along the navigated chain (f1) and every neighbouring pair has a difference that GROWS SLOWER than the size (f2 IRRELEVANT): the members are one point class, a manifold of points. The members' own per-point verdicts are not lifted (x5n: REFUSE-PROBE-INCOMPLETE); the family is the reading that carries the class. The first reading ever of this row (X7a's pairs were all off the manifold, E44/E46); x5n over g is its test"
+
+[[row]]
+when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT"], f1 = ["CONSTANT"], f2 = ["IRRELEVANT"], points = ["LINE"], lower = ["END-ORDER-UNMEASURED", "OPEN"], upper = ["NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
 verdict = "POINT-MANIFOLD"
 why = "plan 0870 P3: the exponent is constant along the navigated chain (f1) and every neighbouring pair has a difference that GROWS SLOWER than the size (f2 IRRELEVANT): the members are one point class, a manifold of points. The members' own per-point verdicts are not lifted (x5n: REFUSE-PROBE-INCOMPLETE); the family is the reading that carries the class. The first reading ever of this row (X7a's pairs were all off the manifold, E44/E46); x5n over g is its test"
 
@@ -291,7 +341,22 @@ verdict = "POINT-MANIFOLD"
 why = "plan 0870 P3: the exponent is constant along the navigated chain (f1) and every neighbouring pair has a difference that GROWS SLOWER than the size (f2 IRRELEVANT): the members are one point class, a manifold of points. The members' own per-point verdicts are not lifted (x5n: REFUSE-PROBE-INCOMPLETE); the family is the reading that carries the class. The first reading ever of this row (X7a's pairs were all off the manifold, E44/E46); x5n over g is its test"
 
 [[row]]
-when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT", "NO-MID", "NOT-MEASURED"], f1 = ["VARIES"], f2 = ["IRRELEVANT"], lower = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], upper = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
+when = { bracket = ["NO-MID", "NOT-MEASURED"], f1 = ["VARIES"], f2 = ["IRRELEVANT"], lower = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], upper = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
+verdict = "REFUSE-UNCLASSIFIED"
+why = "plan 0870 P3: a sibling of POINT-MANIFOLD, named and refused: the exponent varies along the chain while every pair converges. A varying exponent with a vanishing difference has no declared class. Next: read the per-point cells and the pair readings (bin/cc family) before adding a row"
+
+[[row]]
+when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT"], f1 = ["VARIES"], f2 = ["IRRELEVANT"], points = ["NOT-LINE", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], lower = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], upper = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
+verdict = "REFUSE-UNCLASSIFIED"
+why = "plan 0870 P3: a sibling of POINT-MANIFOLD, named and refused: the exponent varies along the chain while every pair converges. A varying exponent with a vanishing difference has no declared class. Next: read the per-point cells and the pair readings (bin/cc family) before adding a row"
+
+[[row]]
+when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT"], f1 = ["VARIES"], f2 = ["IRRELEVANT"], points = ["LINE"], lower = ["NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], upper = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
+verdict = "REFUSE-UNCLASSIFIED"
+why = "plan 0870 P3: a sibling of POINT-MANIFOLD, named and refused: the exponent varies along the chain while every pair converges. A varying exponent with a vanishing difference has no declared class. Next: read the per-point cells and the pair readings (bin/cc family) before adding a row"
+
+[[row]]
+when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT"], f1 = ["VARIES"], f2 = ["IRRELEVANT"], points = ["LINE"], lower = ["END-ORDER-UNMEASURED", "OPEN"], upper = ["NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
 verdict = "REFUSE-UNCLASSIFIED"
 why = "plan 0870 P3: a sibling of POINT-MANIFOLD, named and refused: the exponent varies along the chain while every pair converges. A varying exponent with a vanishing difference has no declared class. Next: read the per-point cells and the pair readings (bin/cc family) before adding a row"
 
@@ -316,7 +381,22 @@ verdict = "REFUSE-UNCLASSIFIED"
 why = "plan 0870 P3: a sibling of POINT-MANIFOLD, named and refused: the exponent varies along the chain while every pair converges. A varying exponent with a vanishing difference has no declared class. Next: read the per-point cells and the pair readings (bin/cc family) before adding a row"
 
 [[row]]
-when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT", "NO-MID", "NOT-MEASURED"], f1 = ["CONSTANT"], f2 = ["MARGINAL"], lower = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], upper = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
+when = { bracket = ["NO-MID", "NOT-MEASURED"], f1 = ["CONSTANT"], f2 = ["MARGINAL"], lower = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], upper = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
+verdict = "REFUSE-UNCLASSIFIED"
+why = "plan 0870 P3: a sibling of POINT-MANIFOLD and of LINE, named and refused: a constant exponent with a marginal difference. Next: read the pair readings (bin/cc family); a constant exponent along a marginal manifold may be a line of one class, which this rule does not claim"
+
+[[row]]
+when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT"], f1 = ["CONSTANT"], f2 = ["MARGINAL"], points = ["NOT-LINE", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], lower = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], upper = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
+verdict = "REFUSE-UNCLASSIFIED"
+why = "plan 0870 P3: a sibling of POINT-MANIFOLD and of LINE, named and refused: a constant exponent with a marginal difference. Next: read the pair readings (bin/cc family); a constant exponent along a marginal manifold may be a line of one class, which this rule does not claim"
+
+[[row]]
+when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT"], f1 = ["CONSTANT"], f2 = ["MARGINAL"], points = ["LINE"], lower = ["NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], upper = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
+verdict = "REFUSE-UNCLASSIFIED"
+why = "plan 0870 P3: a sibling of POINT-MANIFOLD and of LINE, named and refused: a constant exponent with a marginal difference. Next: read the pair readings (bin/cc family); a constant exponent along a marginal manifold may be a line of one class, which this rule does not claim"
+
+[[row]]
+when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT"], f1 = ["CONSTANT"], f2 = ["MARGINAL"], points = ["LINE"], lower = ["END-ORDER-UNMEASURED", "OPEN"], upper = ["NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
 verdict = "REFUSE-UNCLASSIFIED"
 why = "plan 0870 P3: a sibling of POINT-MANIFOLD and of LINE, named and refused: a constant exponent with a marginal difference. Next: read the pair readings (bin/cc family); a constant exponent along a marginal manifold may be a line of one class, which this rule does not claim"
 
@@ -341,7 +421,22 @@ verdict = "REFUSE-UNCLASSIFIED"
 why = "plan 0870 P3: a sibling of POINT-MANIFOLD and of LINE, named and refused: a constant exponent with a marginal difference. Next: read the pair readings (bin/cc family); a constant exponent along a marginal manifold may be a line of one class, which this rule does not claim"
 
 [[row]]
-when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT", "NO-MID", "NOT-MEASURED"], f1 = ["CONSTANT"], f2 = ["RELEVANT", "WEAK", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], lower = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], upper = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
+when = { bracket = ["NO-MID", "NOT-MEASURED"], f1 = ["CONSTANT"], f2 = ["RELEVANT", "WEAK", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], lower = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], upper = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
+verdict = "REFUSE-UNCLASSIFIED-v0"
+why = "0863: no positive row yet (0862 X7b/X2-X4 decide)"
+
+[[row]]
+when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT"], f1 = ["CONSTANT"], f2 = ["RELEVANT", "WEAK", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], points = ["NOT-LINE", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], lower = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], upper = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
+verdict = "REFUSE-UNCLASSIFIED-v0"
+why = "0863: no positive row yet (0862 X7b/X2-X4 decide)"
+
+[[row]]
+when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT"], f1 = ["CONSTANT"], f2 = ["RELEVANT", "WEAK", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], points = ["LINE"], lower = ["NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], upper = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
+verdict = "REFUSE-UNCLASSIFIED-v0"
+why = "0863: no positive row yet (0862 X7b/X2-X4 decide)"
+
+[[row]]
+when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT"], f1 = ["CONSTANT"], f2 = ["RELEVANT", "WEAK", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], points = ["LINE"], lower = ["END-ORDER-UNMEASURED", "OPEN"], upper = ["NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
 verdict = "REFUSE-UNCLASSIFIED-v0"
 why = "0863: no positive row yet (0862 X7b/X2-X4 decide)"
 
@@ -366,7 +461,22 @@ verdict = "REFUSE-UNCLASSIFIED-v0"
 why = "0863: no positive row yet (0862 X7b/X2-X4 decide)"
 
 [[row]]
-when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT", "NO-MID", "NOT-MEASURED"], f1 = ["UNRES", "NOT-EVALUATED", "NOT-MEASURED"], f2 = ["MARGINAL", "RELEVANT", "WEAK", "IRRELEVANT", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], lower = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], upper = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
+when = { bracket = ["NO-MID", "NOT-MEASURED"], f1 = ["UNRES", "NOT-EVALUATED", "NOT-MEASURED"], f2 = ["MARGINAL", "RELEVANT", "WEAK", "IRRELEVANT", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], lower = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], upper = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
+verdict = "REFUSE-UNCLASSIFIED-v0"
+why = "0863: no positive row yet (0862 X7b/X2-X4 decide)"
+
+[[row]]
+when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT"], f1 = ["UNRES", "NOT-EVALUATED", "NOT-MEASURED"], f2 = ["MARGINAL", "RELEVANT", "WEAK", "IRRELEVANT", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], points = ["NOT-LINE", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], lower = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], upper = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
+verdict = "REFUSE-UNCLASSIFIED-v0"
+why = "0863: no positive row yet (0862 X7b/X2-X4 decide)"
+
+[[row]]
+when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT"], f1 = ["UNRES", "NOT-EVALUATED", "NOT-MEASURED"], f2 = ["MARGINAL", "RELEVANT", "WEAK", "IRRELEVANT", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], points = ["LINE"], lower = ["NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], upper = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
+verdict = "REFUSE-UNCLASSIFIED-v0"
+why = "0863: no positive row yet (0862 X7b/X2-X4 decide)"
+
+[[row]]
+when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT"], f1 = ["UNRES", "NOT-EVALUATED", "NOT-MEASURED"], f2 = ["MARGINAL", "RELEVANT", "WEAK", "IRRELEVANT", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], points = ["LINE"], lower = ["END-ORDER-UNMEASURED", "OPEN"], upper = ["NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
 verdict = "REFUSE-UNCLASSIFIED-v0"
 why = "0863: no positive row yet (0862 X7b/X2-X4 decide)"
 
@@ -391,7 +501,22 @@ verdict = "REFUSE-UNCLASSIFIED-v0"
 why = "0863: no positive row yet (0862 X7b/X2-X4 decide)"
 
 [[row]]
-when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT", "NO-MID", "NOT-MEASURED"], f1 = ["VARIES"], f2 = ["RELEVANT", "WEAK", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], lower = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], upper = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
+when = { bracket = ["NO-MID", "NOT-MEASURED"], f1 = ["VARIES"], f2 = ["RELEVANT", "WEAK", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], lower = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], upper = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
+verdict = "REFUSE-UNCLASSIFIED-v0"
+why = "0863: no positive row yet"
+
+[[row]]
+when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT"], f1 = ["VARIES"], f2 = ["RELEVANT", "WEAK", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], points = ["NOT-LINE", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], lower = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], upper = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
+verdict = "REFUSE-UNCLASSIFIED-v0"
+why = "0863: no positive row yet"
+
+[[row]]
+when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT"], f1 = ["VARIES"], f2 = ["RELEVANT", "WEAK", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], points = ["LINE"], lower = ["NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], upper = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
+verdict = "REFUSE-UNCLASSIFIED-v0"
+why = "0863: no positive row yet"
+
+[[row]]
+when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT"], f1 = ["VARIES"], f2 = ["RELEVANT", "WEAK", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], points = ["LINE"], lower = ["END-ORDER-UNMEASURED", "OPEN"], upper = ["NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
 verdict = "REFUSE-UNCLASSIFIED-v0"
 why = "0863: no positive row yet"
 

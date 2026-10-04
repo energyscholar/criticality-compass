@@ -1,6 +1,7 @@
 """family.py - a family of points: bracket, f1 and f2 read from a STORED result, then one partition lookup (plumbing).
 Reads results/<input>@<set>.json and .npz only; it never re-runs an instrument. Nulls are plumbing: an edge or a pair
 that touches a null point reads that null, and only ranked codes go to the maths (cc/fingerprint.py)."""
+import itertools
 import json
 import tomllib
 from pathlib import Path
@@ -84,12 +85,16 @@ def points_of(fam, decl, res):
 
 
 def side_of(fam, decl, res, nulls, lines, which):
-    """(code, detail) of one side of the declared interior (plan 0871 E2). The boundary is the interior point nearest the side; the
-    beyond points are the points of axes.point on that side, nearest first. Beyond needles and beyond orders are each COMBINED by a declared
-    rank whose last member (NONE) is read only when the side is empty; one total table then codes the side."""
+    """(code, detail) of one side of the declared interior (plan 0871 E2, G3). Walking outward from the interior's edge point, the boundary is
+    the last point of the contiguous run that reads MID (the edge point itself when it does not); the beyond points are the points of
+    axes.point past it, nearest first. Beyond needles and beyond orders are each COMBINED by a declared rank whose last member (NONE) is read
+    only when the side is empty; one total table then codes the side. A MID that re-appears after a sink point stays in beyond: NO-END."""
     pts, e = [s["point"] for s in res["signature"]], fam["side"]
     sg, inner = {s["point"]: s for s in res["signature"]}, decl["interior"]
-    boundary = inner[0] if which == "lower" else inner[-1]
+    edge = pts.index(inner[0] if which == "lower" else inner[-1])
+    out = pts[:edge + 1][::-1] if which == "lower" else pts[edge:]          # the edge point, then outward
+    run = list(itertools.takewhile(lambda q: e["needle_code"].get(sg[q]["needle"]) == "MID", out))
+    boundary = (run or out[:1])[-1]
     k = pts.index(boundary)
     beyond = pts[:k][::-1] if which == "lower" else pts[k + 1:]
     yn = low([c if c in nulls else e["needle_code"][c] for c in (sg[q]["needle"] for q in beyond)] + ["NONE"], e["needle_rank"])

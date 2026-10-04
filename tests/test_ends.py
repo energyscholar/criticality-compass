@@ -125,10 +125,14 @@ ep = (at["lower"] == "END-BKT-CANDIDATE") | (at["upper"] == "END-BKT-CANDIDATE")
 em = (at["lower"] == "END-MULTICRITICAL") | (at["upper"] == "END-MULTICRITICAL")
 special = br3 & interior_line & ep
 prior = np.broadcast_to(old[tuple(slice(None) if i < 3 else None for i in range(6))], new.shape)
-carved = br3 & (at["points"] == "LINE") & em & ~ep
+unread = np.isin(at["lower"], ["OPEN", "END-ORDER-UNMEASURED"]) & np.isin(at["upper"], ["OPEN", "END-ORDER-UNMEASURED"])     # plan 0871 G4: no readable end
+g4 = br3 & (at["points"] == "LINE") & unread
+carved = (br3 & (at["points"] == "LINE") & em & ~ep) | g4
+check("G4: interior LINE with both sides OPEN or END-ORDER-UNMEASURED reads LINE (a line whose end is not observed is still a line)", bool((new[g4] == "LINE").all()))
+check("G4: the family route to an interior LINE (f1 VARIES, f2 MARGINAL) with no readable end reads LINE too", bool((new[br3 & interior_line & unread] == "LINE").all()))
 check("BKT-END exactly when the bracket is directional, the interior reads LINE and a side is END-BKT-CANDIDATE",
       bool((new[special] == "BKT-END").all() and not (new[~special] == "BKT-END").any()), f"{(new[special] != 'BKT-END').sum()} missing")
-check("interior LINE with only a multicritical end reads LINE (the end is reported, not read as BKT-END)", bool((new[carved] == "LINE").all()))
+check("interior LINE with only a multicritical end, or no readable end, reads LINE (the end is reported, not read as BKT-END)", bool((new[carved] == "LINE").all()))
 check(f"every other of the {int((~special & ~carved).sum())} cells reads what v04-rules read (no existing family verdict can move)",
       bool((new[~special & ~carved] == prior[~special & ~carved]).all()), f"{int((new[~special & ~carved] != prior[~special & ~carved]).sum())} cells differ")
 
