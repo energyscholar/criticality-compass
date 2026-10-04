@@ -1,0 +1,247 @@
+# tests/planted/ends.toml - PLANTED families for plan 0871 (read by tests/test_ends.py): stored-result signatures built by hand, so no
+# instrument runs. A point is "name:KIND"; a KIND is the signature row it stands for (needle, flow, two_start, the order axis, the geometry after the probe).
+# Every plant says what v05-rules must read for it; `v04_verdict` (when present) is what v04-rules' family rule gave the same signatures.
+[kind.L]            # a per-point LINE: on the window, flow stopped, the starts agree
+needle = "MID"
+flow = "STOPPED"
+two_start = "INDEP"
+order = "CONTINUOUS"
+geometry = "LINE"
+[kind.Lslow]        # the same at T_KT: the flow is marginal-slow
+needle = "MID"
+flow = "SLOW"
+two_start = "INDEP"
+order = "CONTINUOUS"
+geometry = "LINE"
+[kind.Lunres]       # the same with the flow unresolved
+needle = "MID"
+flow = "UNRES"
+two_start = "INDEP"
+order = "CONTINUOUS"
+geometry = "LINE"
+[kind.Lflowing]     # a MID point that still flows
+needle = "MID"
+flow = "FLOWING"
+two_start = "INDEP"
+order = "CONTINUOUS"
+geometry = "NOT"
+[kind.R]            # a MID point whose geometry is a refusal (the interior is not LINE)
+needle = "MID"
+flow = "STOPPED"
+two_start = "INDEP"
+order = "CONTINUOUS"
+geometry = "REFUSE-UNRES"
+[kind.DISi]         # a sink (disordered), both starts run and agree
+needle = "DIS"
+flow = "FLOWING"
+two_start = "INDEP"
+order = "OFF-WINDOW"
+geometry = "NOT"
+[kind.ORDi]         # a sink (ordered), both starts run and agree
+needle = "ORD"
+flow = "FLOWING"
+two_start = "INDEP"
+order = "OFF-WINDOW"
+geometry = "NOT"
+[kind.DISs]         # a sink, ONE start only: the order axis still reads OFF-WINDOW, two_start is NOT-MEASURED
+needle = "DIS"
+flow = "FLOWING"
+two_start = "NOT-MEASURED"
+order = "OFF-WINDOW"
+geometry = "NOT"
+[kind.DISc]         # a sink where the starts stay apart (the AT 4-Potts lookalike)
+needle = "DIS"
+flow = "FLOWING"
+two_start = "COEXIST"
+order = "COEXIST-AT-WINDOW"
+geometry = "FIRST-ORDER"
+[kind.NM]           # the needle was never measured
+needle = "NOT-MEASURED"
+flow = "NOT-MEASURED"
+two_start = "NOT-MEASURED"
+order = "NEEDLE-UNMEASURED"
+geometry = "REFUSE-NEEDLE-UNMEASURED"
+[kind.Kdis]         # the x8 K sweep: its points as v04-rules read them
+needle = "DIS"
+flow = "FLOWING"
+two_start = "NOT-MEASURED"
+order = "OFF-WINDOW"
+geometry = "NOT"
+[kind.Kmid]
+needle = "MID"
+flow = "UNRES"
+two_start = "NOT-MEASURED"
+order = "ORDER-UNMEASURED"
+geometry = "REFUSE-FLOW"
+[kind.Kord]
+needle = "ORD"
+flow = "FLOWING"
+two_start = "NOT-MEASURED"
+order = "OFF-WINDOW"
+geometry = "NOT"
+
+[[plant]]
+name = "a T-ordered XY chain, [MID x3, DIS], the beyond point INDEP, interior per-point LINE: a BKT candidate end, family BKT-END"
+points = ["a:L", "b:L", "c:L", "d:DISi"]
+interior = ["a", "b", "c"]
+bracket = "BRACKET-DOWN"
+points_code = "LINE"
+lower = "OPEN"
+upper = "END-BKT-CANDIDATE"
+verdict = "BKT-END"
+class = "BKT-END"
+
+[[plant]]
+name = "the same chain with a SINGLE-START beyond point: the end kind cannot be read, so it is never BKT-END (prediction L7)"
+points = ["a:L", "b:L", "c:L", "d:DISs"]
+interior = ["a", "b", "c"]
+bracket = "BRACKET-DOWN"
+points_code = "LINE"
+lower = "OPEN"
+upper = "END-ORDER-UNMEASURED"
+verdict = "REFUSE-UNCLASSIFIED-v0"
+class = "REFUSE"
+
+[[plant]]
+name = "the same chain with COEXISTING starts beyond (the AT 4-Potts lookalike): END-MULTICRITICAL, the family reads LINE with the end reported, never BKT-END"
+points = ["a:L", "b:L", "c:L", "d:DISc"]
+interior = ["a", "b", "c"]
+bracket = "BRACKET-DOWN"
+points_code = "LINE"
+lower = "OPEN"
+upper = "END-MULTICRITICAL"
+verdict = "LINE"
+class = "LINE"
+
+[[plant]]
+name = "a K-ordered chain, the x8 shape [DIS x4, MID, ORD x4], every point interior: BRACKET-UP, both sides OPEN, the verdict v04-rules gave"
+points = ["a:Kdis", "b:Kdis", "c:Kdis", "d:Kdis", "e:Kmid", "f:Kord", "g:Kord", "h:Kord", "i:Kord"]
+interior = ["a", "b", "c", "d", "e", "f", "g", "h", "i"]
+bracket = "BRACKET-UP"
+points_code = "NOT-LINE"
+lower = "OPEN"
+upper = "OPEN"
+verdict = "REFUSE-UNCLASSIFIED-v0"
+class = "REFUSE"
+v04_verdict = "REFUSE-UNCLASSIFIED-v0"
+
+[[plant]]
+name = "a clock-shaped chain, [ORD x2, MID x3, DIS x2]: both ends are sinks that agree, so both sides are BKT candidates (the lower end exits to ORD)"
+points = ["o1:ORDi", "o2:ORDi", "a:L", "b:L", "c:L", "d:DISi", "e:DISi"]
+interior = ["a", "b", "c"]
+bracket = "BRACKET-DOWN"
+points_code = "LINE"
+lower = "END-BKT-CANDIDATE"
+upper = "END-BKT-CANDIDATE"
+verdict = "BKT-END"
+class = "BKT-END"
+
+[[plant]]
+name = "the decoy shape with an interior that is NOT per-point LINE: the upper side still reads END-BKT-CANDIDATE, but the family is not BKT-END"
+points = ["a:R", "b:R", "c:R", "d:DISi"]
+interior = ["a", "b", "c"]
+bracket = "BRACKET-DOWN"
+points_code = "NOT-LINE"
+lower = "OPEN"
+upper = "END-BKT-CANDIDATE"
+verdict = "REFUSE-UNCLASSIFIED-v0"
+class = "REFUSE"
+
+[[plant]]
+name = "a MID point beyond the boundary (the interior declared short): NO-END, whatever follows it"
+points = ["a:L", "b:L", "c:L", "d:DISi"]
+interior = ["a", "b"]
+bracket = "BRACKET-DOWN"
+points_code = "LINE"
+lower = "OPEN"
+upper = "NO-END"
+verdict = "REFUSE-UNCLASSIFIED-v0"
+class = "REFUSE"
+
+[[plant]]
+name = "a boundary that still flows is not an end"
+points = ["a:L", "b:Lflowing", "d:DISi"]
+interior = ["a", "b"]
+bracket = "BRACKET-DOWN"
+points_code = "NOT-LINE"
+lower = "OPEN"
+upper = "UNRES"
+verdict = "REFUSE-UNCLASSIFIED-v0"
+class = "REFUSE"
+
+[[plant]]
+name = "a boundary at a sink: the interior reaches past its own end"
+points = ["a:L", "b:DISi", "d:DISi"]
+interior = ["a", "b"]
+bracket = "BRACKET-DOWN"
+points_code = "NOT-LINE"
+lower = "OPEN"
+upper = "UNRES"
+verdict = "REFUSE-UNCLASSIFIED-v0"
+class = "REFUSE"
+
+[[plant]]
+name = "a needle never measured beyond the boundary reads the null, not an end"
+points = ["a:L", "b:L", "d:NM"]
+interior = ["a", "b"]
+bracket = "NOT-MEASURED"
+points_code = "LINE"
+lower = "OPEN"
+upper = "NOT-MEASURED"
+verdict = "REFUSE-UNCLASSIFIED-v0"
+class = "REFUSE"
+
+[[plant]]
+name = "T_KT: the boundary's flow is SLOW (marginal-slow), not STOPPED, and the end still reads"
+points = ["a:L", "b:Lslow", "d:DISi"]
+interior = ["a", "b"]
+bracket = "BRACKET-DOWN"
+points_code = "LINE"
+lower = "OPEN"
+upper = "END-BKT-CANDIDATE"
+verdict = "BKT-END"
+class = "BKT-END"
+
+[[plant]]
+name = "the boundary's flow unresolved still reads the end (the spec admits STOPPED, SLOW and UNRES)"
+points = ["a:L", "b:Lunres", "d:DISi"]
+interior = ["a", "b"]
+bracket = "BRACKET-DOWN"
+points_code = "LINE"
+lower = "OPEN"
+upper = "END-BKT-CANDIDATE"
+verdict = "BKT-END"
+class = "BKT-END"
+
+[[plant]]
+name = "[DIS, MID, DIS]: an ascent and a descent is NON-MONOTONE and refused, even with both sides BKT candidates"
+points = ["o:DISi", "a:L", "b:L", "e:DISi"]
+interior = ["a", "b"]
+bracket = "NON-MONOTONE"
+points_code = "LINE"
+lower = "END-BKT-CANDIDATE"
+upper = "END-BKT-CANDIDATE"
+verdict = "REFUSE-NON-MONOTONE"
+class = "REFUSE"
+
+[[plant]]
+name = "two beyond points, INDEP then single-start: the combined end order is the lowest rank present, UNMEASURED"
+points = ["a:L", "b:L", "d:DISi", "e:DISs"]
+interior = ["a", "b"]
+bracket = "BRACKET-DOWN"
+points_code = "LINE"
+lower = "OPEN"
+upper = "END-ORDER-UNMEASURED"
+verdict = "REFUSE-UNCLASSIFIED-v0"
+class = "REFUSE"
+
+[[plant]]
+name = "two beyond points, INDEP then COEXIST: the combined end order is COEXIST, a multicritical end"
+points = ["a:L", "b:L", "d:DISi", "e:DISc"]
+interior = ["a", "b"]
+bracket = "BRACKET-DOWN"
+points_code = "LINE"
+lower = "OPEN"
+upper = "END-MULTICRITICAL"
+verdict = "LINE"
+class = "LINE"

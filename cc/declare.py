@@ -102,8 +102,8 @@ def todos(p, d, pre=""):
                     yield from todos(p, x, f"{pre}{k}[{i}].")
 
 
-def row_lines(text):
-    return [i + 1 for i, ln in enumerate(text.splitlines()) if ln.strip() == "[[row]]"]
+def row_lines(text, key="row"):
+    return [i + 1 for i, ln in enumerate(text.splitlines()) if ln.strip() == f"[[{key}]]"]
 
 
 @dataclass(frozen=True)
@@ -600,9 +600,9 @@ def patterns(free, cols, dom):
     return boxes
 
 
-def chk_partition(p, cols, dom, rows, text, limit=20):
+def chk_partition(p, cols, dom, rows, text, limit=20, key="row"):
     """Rows (list of dicts column -> allowed values) must be pairwise disjoint and cover the domain."""
-    shp, out, lines = [len(x) for x in dom], [], row_lines(text)
+    shp, out, lines = [len(x) for x in dom], [], row_lines(text, key)
     owner = np.full(shp, -1)
     for k, w in enumerate(rows):
         sub = np.ix_(*[[dom[ci].index(v) for v in w.get(col, dom[ci])] for ci, col in enumerate(cols)])
@@ -616,7 +616,7 @@ def chk_partition(p, cols, dom, rows, text, limit=20):
         owner[sub] = k
     if (owner < 0).any():
         boxes = patterns(owner < 0, cols, dom)
-        body = "".join("\n  [[row]]" + "".join(f"\n  when.{c} = {v}".replace("'", '"') for c, v in b)
+        body = "".join(f"\n  [[{key}]]" + "".join(f"\n  when.{c} = {v}".replace("'", '"') for c, v in b)
                        for b in boxes[:limit])
         more = f"\n  ... ({len(boxes) - limit} more patterns)" if len(boxes) > limit else ""
         out.append(at(p, "", f"{int((owner < 0).sum())} uncovered cells in {len(boxes)} patterns{body}{more}",
@@ -624,11 +624,11 @@ def chk_partition(p, cols, dom, rows, text, limit=20):
     return out
 
 
-def chk_rows(p, d, dom):
+def chk_rows(p, d, dom, key="row"):
     """Every row: known columns, values inside each column's domain, a listed verdict, a why."""
     out, read = [], set()
-    for i, r in enumerate(d["row"]):
-        loc, w = f"row[{i}]", r.get("when", {})
+    for i, r in enumerate(d[key]):
+        loc, w = f"{key}[{i}]", r.get("when", {})
         out += shape(p, r, {"when": dict, "verdict": str, "why": str}, pre=loc + ".")
         out += [at(p, loc + ".when", f"unknown column '{k}'", "use a signature column") for k in w if k not in dom]
         out += [at(p, f"{loc}.when.{k}", f"'{x}' is not in {dom[k]}", "use values of that column or the nulls")
@@ -691,12 +691,14 @@ def bracket_axes(b):
 
 def chk_family(p, d, c, stem=None):
     """A set's family rule: the three fingerprint sections against the codes, the registry and the alphabets, then the
-    partition over (bracket, f1, f2) (every cell of the product has exactly one row)."""
+    partition over (bracket, f1, f2) (every cell of the product has exactly one row). Plan 0871: a set that lists the column `points`
+    also reads the interior's per-point geometry and the two LINE-END sides (`points`, `lower`, `upper`; sections points, side, side_row)."""
+    ext = "points" in (d["columns"] if isinstance(d.get("columns"), list) else [])
     req = {"columns": list, "verdicts": list, "refuse": list, "alphabets": dict, "bracket": dict, "f1": dict, "f2": dict, "row": list}
-    out = header(p, d, "family") + shape(p, d, req, {"class_of": dict})
+    out = header(p, d, "family") + shape(p, d, {**req, **({"points": dict, "side": dict, "side_row": list} if ext else {})}, {"class_of": dict})
     if out:
         return out
-    cols, al, nulls, b = ["bracket", "f1", "f2"], d["alphabets"], c.alpha["nulls"], d["bracket"]
+    cols, al, nulls, b = ["bracket", "f1", "f2", *SIDE_COLS * ext], d["alphabets"], c.alpha["nulls"], d["bracket"]
     codes, bad = load(c.over.get("codes") or Path(c.root, p).parent / "codes.toml", c.root)
     if bad:
         return bad
@@ -739,7 +741,43 @@ def chk_family(p, d, c, stem=None):
     rows, read = chk_rows(p, d, al)
     out += rows
     out += [at(p, "columns", f"column '{x}' is not read by any row", "read it in a row") for x in cols if x not in read]
+    out += chk_sides(p, d, c, codes, al) if ext else []
     return out if out else chk_partition(p, cols, [al[x] for x in cols], [r["when"] for r in d["row"]], Path(c.root, p).read_text())
+
+
+SIDE_COLS = ("points", "lower", "upper")
+SIDE_KEYS = ("boundary_needle", "boundary_flow", "beyond_needles", "beyond_order")
+
+
+def chk_sides(p, d, c, codes, al):
+    """Plan 0871 E2: `points` reads the geometry' of the interior points; `side` codes the points beyond a boundary; `side_row` is a
+    total partition over (boundary needle, boundary flow, beyond needles, beyond order). Every key set is the declared alphabet it reads."""
+    here, sig, pt, sd = Path(c.root, p).parent, codes["columns"]["signature"], d["points"], d["side"]
+    out = shape(p, pt, {"reads": str, "code": dict, "rank": list}, pre="points.")
+    out += shape(p, sd, {"needle_code": dict, "needle_rank": list, "order_code": dict, "order_rank": list}, pre="side.")
+    out += when(al["lower"] != al["upper"], p, "alphabets.upper", "must equal alphabets.lower (one side alphabet)", "fix the list")
+    probe, order = (load(here / f"{n}.toml", c.root) for n in ("probe", "order"))
+    geom = (probe[0] or load(here / "geometry.toml", c.root)[0] or {}).get("verdicts", [])
+    out += when(not order[0], p, "side", "needs order.toml in this set", "copy order.toml into the set")
+    if out:
+        return out
+    needles = sig["needle"]["alphabet"]
+    flows = sig["flow"]["alphabet"]
+    ovals = [f"{o},{s}" for o in order[0]["values"] for s in [*sig["two_start"]["alphabet"], *c.alpha["nulls"]]]
+    out += when(pt["reads"] != "geometry", p, "points.reads", "must be geometry (the axis value after the probe)", "fix it")
+    out += same(p, "points.code", pt["code"], geom, "points.code keys = the geometry values of probe.toml")
+    out += same(p, "points.rank", pt["rank"], al["points"], "points.rank")
+    out += [at(p, f"points.code.{k}", f"'{v}' is not in alphabets.points", "use a value of that alphabet") for k, v in pt["code"].items() if v not in al["points"]]
+    out += same(p, "side.needle_code", sd["needle_code"], needles, "side.needle_code keys = the needle alphabet")
+    out += same(p, "side.needle_rank", sd["needle_rank"], [*c.alpha["nulls"], *set(sd["needle_code"].values()), "NONE"], "side.needle_rank (nulls, the codes, NONE for no point)")
+    out += same(p, "side.order_code", sd["order_code"], ovals, "side.order_code keys = order value x two_start (nulls included)")
+    out += same(p, "side.order_rank", sd["order_rank"], [*set(sd["order_code"].values()), "NONE"], "side.order_rank (the codes, NONE for no point)")
+    dom = {"boundary_needle": [*needles, *c.alpha["nulls"]], "boundary_flow": [*flows, *c.alpha["nulls"]],
+           "beyond_needles": sd["needle_rank"], "beyond_order": sd["order_rank"]}
+    rows, _ = chk_rows(p, {**d, "verdicts": al["lower"]}, dom, "side_row")
+    out += rows
+    return out if out else chk_partition(p, list(SIDE_KEYS), [dom[x] for x in SIDE_KEYS], [r["when"] for r in d["side_row"]],
+                                         Path(c.root, p).read_text(), key="side_row")
 
 
 def chk_family_decl(p, d, c, stem=None):
