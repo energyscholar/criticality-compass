@@ -1,0 +1,69 @@
+tree 0d3e36ead7b88b1f134996c04a4cd169707dfaf5
+head 8d9573bd775aa2e4c3f28a71a276e8d1e0702dc2
+seconds 123
+tier quick
+test test_budget ok 0.1
+test test_kernel ok 0.4
+test test_sign ok 0.4
+test test_resample ok 1.3
+test test_kernel_rs ok 0.7
+test test_declare ok 36.9
+test test_tables_cli ok 114.3
+test test_needle_x8 ok 1.7
+test test_b7 ok 6.5
+test test_w2 ok 6.8
+test test_two_start_c2 ok 2.1
+test test_detect_verdicts ok 40.7
+test test_breakers ok 0.6
+test test_breakers_red ok 13.9
+test test_golden ok 75.8
+test test_verdict_equivalence ok 1.3
+test test_scoreboard ok 3.8
+test test_view ok 20.0
+test test_tabulate ok 69.8
+test test_reverdict ok 7.9
+test test_along ok 13.5
+test test_family ok 4.4
+test test_x5 ok 8.9
+test test_axes ok 52.0
+test test_needle_o_start ok 0.5
+test test_run_all ok 17.2
+test test_code_hash ok 33.4
+test test_classify ok 0.5
+test test_probe ok 6.1
+test test_chain ok 24.3
+test test_ends ok 0.9
+quick: dropped test_golden case run-all-scratch: re-measure took 18 s, over the 8 s case budget
+quick: dropped test_golden case run-all-v01-scratch: re-measure took 18 s, over the 8 s case budget
+quick: dropped test_golden case run-dry-my-rules: re-measure took 24 s, over the 8 s case budget
+quick: dropped test_golden case run-dry-v01-my-rules: re-measure took 28 s, over the 8 s case budget
+quick: dropped test_golden case tables-drop-scratch: re-measure took 18 s, over the 8 s case budget
+quick: dropped test_golden case tables-drop-v01-scratch: re-measure took 24 s, over the 8 s case budget
+quick: dropped test_golden case tabulate-diff-v01-scratch: re-measure took 8.5 s, over the 8 s case budget
+quick: dropped test_golden case tabulate: re-measure took 42 s, over the 8 s case budget
+quick: dropped test_golden case validate-mvt: re-measure took 35 s, over the 8 s case budget
+quick: dropped test_golden case validate-my-rules: re-measure took 35 s, over the 8 s case budget
+quick: dropped test_golden case validate-refusals: re-measure took 33 s, over the 8 s case budget
+quick: dropped test_golden case validate-scratch-half: re-measure took 34 s, over the 8 s case budget
+quick: dropped test_golden case validate-scratch: re-measure took 36 s, over the 8 s case budget
+quick: dropped test_golden case validate-v01-scratch-half: re-measure took 42 s, over the 8 s case budget
+quick: dropped test_golden case validate-v01-scratch: re-measure took 44 s, over the 8 s case budget
+quick: dropped test_needle_o_start input x9c-potts: re-measure took 31 s, over the 8 s case budget
+quick: dropped test_run_all input b7-at-line-3: re-measure took 12 s, over the 8 s case budget
+quick: dropped test_run_all input b7-at-line-4: re-measure took 19 s, over the 8 s case budget
+quick: dropped test_run_all input b7-at-line-5: re-measure took 28 s, over the 8 s case budget
+quick: dropped test_run_all input b7-at-line: re-measure took 8.6 s, over the 8 s case budget
+quick: dropped test_run_all input w2-potts-2: re-measure took 16 s, over the 8 s case budget
+quick: dropped test_run_all input w2-potts: re-measure took 12 s, over the 8 s case budget
+quick: dropped test_run_all input x2-xy-line-2: re-measure took 23 s, over the 8 s case budget
+quick: dropped test_run_all input x2-xy-line-3: re-measure took 32 s, over the 8 s case budget
+quick: dropped test_run_all input x2-xy-line: re-measure took 20 s, over the 8 s case budget
+quick: dropped test_run_all input x2b-xy: re-measure took 330 s, over the 8 s case budget
+quick: dropped test_run_all input x3-clock6-2: re-measure took 33 s, over the 8 s case budget
+quick: dropped test_run_all input x3-clock6-3: re-measure took 45 s, over the 8 s case budget
+quick: dropped test_run_all input x3-clock6: re-measure took 28 s, over the 8 s case budget
+quick: dropped test_run_all input x5n-bilayer-2: re-measure took 19 s, over the 8 s case budget
+quick: dropped test_run_all input x5n-bilayer-3: re-measure took 24 s, over the 8 s case budget
+quick: dropped test_run_all input x5n-bilayer: re-measure took 15 s, over the 8 s case budget
+quick: dropped test_run_all input x9c-potts-2: re-measure took 39 s, over the 8 s case budget
+quick: dropped test_run_all input x9c-potts: re-measure took 34 s, over the 8 s case budget
