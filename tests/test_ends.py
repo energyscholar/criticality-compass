@@ -123,18 +123,42 @@ br3 = np.isin(at["bracket"], ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT"])
 interior_line = (at["points"] == "LINE") | ((at["f1"] == "VARIES") & (at["f2"] == "MARGINAL"))
 ep = (at["lower"] == "END-BKT-CANDIDATE") | (at["upper"] == "END-BKT-CANDIDATE")
 em = (at["lower"] == "END-MULTICRITICAL") | (at["upper"] == "END-MULTICRITICAL")
-special = br3 & interior_line & ep
+rom = at["f2"] == "REFUSE-OFF-MANIFOLD"                                 # plan 0871 G6: an off-manifold member point wins over every row below
+special = br3 & interior_line & ep & ~rom
 prior = np.broadcast_to(old[tuple(slice(None) if i < 3 else None for i in range(6))], new.shape)
 unread = np.isin(at["lower"], ["OPEN", "END-ORDER-UNMEASURED"]) & np.isin(at["upper"], ["OPEN", "END-ORDER-UNMEASURED"])     # plan 0871 G4: no readable end
-g4 = br3 & (at["points"] == "LINE") & unread
-carved = (br3 & (at["points"] == "LINE") & em & ~ep) | g4
+g4 = br3 & (at["points"] == "LINE") & unread & ~rom
+carved = (br3 & (at["points"] == "LINE") & em & ~ep & ~rom) | g4
 check("G4: interior LINE with both sides OPEN or END-ORDER-UNMEASURED reads LINE (a line whose end is not observed is still a line)", bool((new[g4] == "LINE").all()))
-check("G4: the family route to an interior LINE (f1 VARIES, f2 MARGINAL) with no readable end reads LINE too", bool((new[br3 & interior_line & unread] == "LINE").all()))
+check("G4: the family route to an interior LINE (f1 VARIES, f2 MARGINAL) with no readable end reads LINE too", bool((new[br3 & interior_line & unread & ~rom] == "LINE").all()))
+check(f"G6: f2 REFUSE-OFF-MANIFOLD reads REFUSE-OFF-MANIFOLD on all {int(rom.sum())} cells, whatever the bracket, points and sides read",
+      bool((new[rom] == "REFUSE-OFF-MANIFOLD").all()))
 check("BKT-END exactly when the bracket is directional, the interior reads LINE and a side is END-BKT-CANDIDATE",
       bool((new[special] == "BKT-END").all() and not (new[~special] == "BKT-END").any()), f"{(new[special] != 'BKT-END').sum()} missing")
 check("interior LINE with only a multicritical end, or no readable end, reads LINE (the end is reported, not read as BKT-END)", bool((new[carved] == "LINE").all()))
 check(f"every other of the {int((~special & ~carved).sum())} cells reads what v04-rules read (no existing family verdict can move)",
       bool((new[~special & ~carved] == prior[~special & ~carved]).all()), f"{int((new[~special & ~carved] != prior[~special & ~carved]).sum())} cells differ")
+
+# G6 planted through family.compute with an `along` pair reading REFUSE-OFF-MANIFOLD: the verdict must be the refusal for each plant that would
+# otherwise read LINE (G4) or BKT-END, and the same plant with a MARGINAL pair must still read what it read (the RED is the plant, not the table)
+FAMG = {**FAM}
+MG = {"instruments": ["along"], "eps": {}}
+
+
+def planted_f2(plant, cell):
+    sig = [{"point": q.split(":")[0], **PLANT["kind"][q.split(":")[1]]} for q in plant["points"]]
+    ins = plant["interior"]
+    res = {"signature": sig, "pair_readings": [{"instrument": "along", "unit": {"pair": [a, c]}, "cell": cell} for a, c in zip(ins, ins[1:])]}
+    return family.compute({"interior": ins}, res, None, FAM, FTEXT, MG, NULLS)
+
+
+for pl in PLANT["plant"]:
+    if pl["verdict"] in ("LINE", "BKT-END") and pl["points_code"] == "LINE" and len(pl["interior"]) > 1:
+        off = planted_f2(pl, "REFUSE-OFF-MANIFOLD")
+        check(f"G6 plant: {pl['name'][:60]} ... with an off-manifold member point reads REFUSE-OFF-MANIFOLD (was {pl['verdict']})",
+              off["f2"] == "REFUSE-OFF-MANIFOLD" and off["verdict"] == "REFUSE-OFF-MANIFOLD", f"{off['f2']} {off['verdict']}")
+        ok = planted_f2(pl, "ZERO!")
+        check(f"G6 control: the same plant with every pair MARGINAL still reads {pl['verdict']}", ok["f2"] == "MARGINAL" and ok["verdict"] == pl["verdict"], f"{ok['f2']} {ok['verdict']}")
 
 # validate refuses a side table or a side code that is not total
 with tempfile.TemporaryDirectory() as tmp:

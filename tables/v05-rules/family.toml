@@ -176,12 +176,17 @@ ends = ["END-BKT-CANDIDATE", "END-MULTICRITICAL", "END-ORDER-UNMEASURED"]       
 # ---- the family partition over (bracket, f1, f2, points, lower, upper); generated once from the P1 rows (bin/cc validate proves it disjoint and total)
 
 [[row]]
-when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT"], points = ["LINE"], upper = ["END-BKT-CANDIDATE"] }
+when = { f2 = ["REFUSE-OFF-MANIFOLD"] }
+verdict = "REFUSE-OFF-MANIFOLD"
+why = "plan 0871 G6: a member point off the manifold at L 243 is a fact about the chain; no row may override it, whatever the points and sides read (this row precedes the LINE and BKT-END rows by partition: they exclude it). It also explains a non-monotone bracket (X7a)"
+
+[[row]]
+when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT"], points = ["LINE"], upper = ["END-BKT-CANDIDATE"], f2 = ["MARGINAL", "RELEVANT", "WEAK", "IRRELEVANT", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
 verdict = "BKT-END"
 why = "plan 0871 E2: the interior reads LINE (every interior point reads per-point LINE after the probe, or the LINE row's own f1 VARIES and f2 MARGINAL) and a side of it reads END-BKT-CANDIDATE: a LINE run meets a sink run whose starts agree. CAVEAT (review 0870 3.2.2): a sweep that steps OFF its manifold reads exactly this; the family cannot tell the line ended from the sweep left the line, only the declaration and the blind decoy (K4/K5) can. Next: read lower, upper and end_bracket (bin/cc family) before believing it"
 
 [[row]]
-when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT"], points = ["LINE"], lower = ["END-BKT-CANDIDATE"], upper = ["END-MULTICRITICAL", "END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
+when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT"], points = ["LINE"], lower = ["END-BKT-CANDIDATE"], upper = ["END-MULTICRITICAL", "END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], f2 = ["MARGINAL", "RELEVANT", "WEAK", "IRRELEVANT", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
 verdict = "BKT-END"
 why = "plan 0871 E2: the interior reads LINE (every interior point reads per-point LINE after the probe, or the LINE row's own f1 VARIES and f2 MARGINAL) and a side of it reads END-BKT-CANDIDATE: a LINE run meets a sink run whose starts agree. CAVEAT (review 0870 3.2.2): a sweep that steps OFF its manifold reads exactly this; the family cannot tell the line ended from the sweep left the line, only the declaration and the blind decoy (K4/K5) can. Next: read lower, upper and end_bracket (bin/cc family) before believing it"
 
@@ -196,12 +201,12 @@ verdict = "BKT-END"
 why = "plan 0871 E2: the interior reads LINE (every interior point reads per-point LINE after the probe, or the LINE row's own f1 VARIES and f2 MARGINAL) and a side of it reads END-BKT-CANDIDATE: a LINE run meets a sink run whose starts agree. CAVEAT (review 0870 3.2.2): a sweep that steps OFF its manifold reads exactly this; the family cannot tell the line ended from the sweep left the line, only the declaration and the blind decoy (K4/K5) can. Next: read lower, upper and end_bracket (bin/cc family) before believing it"
 
 [[row]]
-when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT"], f2 = ["RELEVANT", "WEAK", "IRRELEVANT", "UNRES", "REFUSE-OFF-MANIFOLD", "NOT-EVALUATED", "NOT-MEASURED"], points = ["LINE"], lower = ["END-MULTICRITICAL", "END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], upper = ["END-MULTICRITICAL"] }
+when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT"], f2 = ["RELEVANT", "WEAK", "IRRELEVANT", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], points = ["LINE"], lower = ["END-MULTICRITICAL", "END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], upper = ["END-MULTICRITICAL"] }
 verdict = "LINE"
 why = "plan 0871 E2: every interior point reads per-point LINE and a side ends at a multicritical point (END-MULTICRITICAL, the AT 4-Potts lookalike): the interior is a LINE; the end is reported beside it (lower, upper) and is never read as BKT-END"
 
 [[row]]
-when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT"], f2 = ["RELEVANT", "WEAK", "IRRELEVANT", "UNRES", "REFUSE-OFF-MANIFOLD", "NOT-EVALUATED", "NOT-MEASURED"], points = ["LINE"], lower = ["END-MULTICRITICAL"], upper = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
+when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT"], f2 = ["RELEVANT", "WEAK", "IRRELEVANT", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], points = ["LINE"], lower = ["END-MULTICRITICAL"], upper = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
 verdict = "LINE"
 why = "plan 0871 E2: every interior point reads per-point LINE and a side ends at a multicritical point (END-MULTICRITICAL, the AT 4-Potts lookalike): the interior is a LINE; the end is reported beside it (lower, upper) and is never read as BKT-END"
 
@@ -236,7 +241,7 @@ verdict = "LINE"
 why = "B7 (SYNTHESIS-3): fingerprints 1 and 2 both resolved; X7a: POINT manifolds do not reach f2 MARGINAL"
 
 [[row]]
-when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT"], points = ["LINE"], lower = ["OPEN", "END-ORDER-UNMEASURED"], upper = ["OPEN", "END-ORDER-UNMEASURED"] }
+when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT"], points = ["LINE"], lower = ["OPEN", "END-ORDER-UNMEASURED"], upper = ["OPEN", "END-ORDER-UNMEASURED"], f2 = ["MARGINAL", "RELEVANT", "WEAK", "IRRELEVANT", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
 verdict = "LINE"
 why = "plan 0871 G4: every interior point reads per-point LINE and no side shows a readable end (both sides OPEN or END-ORDER-UNMEASURED): a line whose end is not observed is still a line; the sides are reported beside it (lower, upper) and are never read as BKT-END"
 
@@ -249,46 +254,6 @@ why = "B7 (SYNTHESIS-3): fingerprints 1 and 2 both resolved; X7a: POINT manifold
 when = { bracket = ["NO-MID", "NOT-MEASURED"], f1 = ["VARIES"], f2 = ["MARGINAL"], lower = ["END-BKT-CANDIDATE"], upper = ["END-MULTICRITICAL", "END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
 verdict = "LINE"
 why = "B7 (SYNTHESIS-3): fingerprints 1 and 2 both resolved; X7a: POINT manifolds do not reach f2 MARGINAL"
-
-[[row]]
-when = { bracket = ["NO-MID", "NON-MONOTONE", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], f2 = ["REFUSE-OFF-MANIFOLD"], lower = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], upper = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
-verdict = "REFUSE-OFF-MANIFOLD"
-why = "X7a: a member point off the manifold at L 243 (it also explains a non-monotone bracket, so it is read first by partition)"
-
-[[row]]
-when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT"], f2 = ["REFUSE-OFF-MANIFOLD"], points = ["NOT-LINE", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], lower = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], upper = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
-verdict = "REFUSE-OFF-MANIFOLD"
-why = "X7a: a member point off the manifold at L 243 (it also explains a non-monotone bracket, so it is read first by partition)"
-
-[[row]]
-when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT"], f2 = ["REFUSE-OFF-MANIFOLD"], points = ["LINE"], lower = ["NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], upper = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
-verdict = "REFUSE-OFF-MANIFOLD"
-why = "X7a: a member point off the manifold at L 243 (it also explains a non-monotone bracket, so it is read first by partition)"
-
-[[row]]
-when = { bracket = ["BRACKET-UP", "BRACKET-DOWN", "BRACKET-FLAT"], f2 = ["REFUSE-OFF-MANIFOLD"], points = ["LINE"], lower = ["END-ORDER-UNMEASURED", "OPEN"], upper = ["NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
-verdict = "REFUSE-OFF-MANIFOLD"
-why = "X7a: a member point off the manifold at L 243 (it also explains a non-monotone bracket, so it is read first by partition)"
-
-[[row]]
-when = { f2 = ["REFUSE-OFF-MANIFOLD"], points = ["NOT-LINE", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], upper = ["END-BKT-CANDIDATE", "END-MULTICRITICAL"] }
-verdict = "REFUSE-OFF-MANIFOLD"
-why = "X7a: a member point off the manifold at L 243 (it also explains a non-monotone bracket, so it is read first by partition)"
-
-[[row]]
-when = { f2 = ["REFUSE-OFF-MANIFOLD"], points = ["NOT-LINE", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], lower = ["END-BKT-CANDIDATE", "END-MULTICRITICAL"], upper = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
-verdict = "REFUSE-OFF-MANIFOLD"
-why = "X7a: a member point off the manifold at L 243 (it also explains a non-monotone bracket, so it is read first by partition)"
-
-[[row]]
-when = { bracket = ["NO-MID", "NON-MONOTONE", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], f2 = ["REFUSE-OFF-MANIFOLD"], points = ["LINE"], upper = ["END-BKT-CANDIDATE", "END-MULTICRITICAL"] }
-verdict = "REFUSE-OFF-MANIFOLD"
-why = "X7a: a member point off the manifold at L 243 (it also explains a non-monotone bracket, so it is read first by partition)"
-
-[[row]]
-when = { bracket = ["NO-MID", "NON-MONOTONE", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"], f2 = ["REFUSE-OFF-MANIFOLD"], points = ["LINE"], lower = ["END-BKT-CANDIDATE", "END-MULTICRITICAL"], upper = ["END-ORDER-UNMEASURED", "OPEN", "NO-END", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
-verdict = "REFUSE-OFF-MANIFOLD"
-why = "X7a: a member point off the manifold at L 243 (it also explains a non-monotone bracket, so it is read first by partition)"
 
 [[row]]
 when = { bracket = ["NON-MONOTONE"], f2 = ["MARGINAL", "RELEVANT", "WEAK", "IRRELEVANT", "UNRES", "NOT-EVALUATED", "NOT-MEASURED"] }
