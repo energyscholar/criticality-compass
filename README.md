@@ -189,7 +189,9 @@ point 0.0   case coupled-ising-bilinear
 kind of positive verdict belongs to a **family**, not a point: the points of `b7-at-line-2` taken together read LINE
 (`bin/cc family b7-at-line-2`, `TUTORIAL.md` part 3). LINE, WALKING and FIRST-ORDER still appear in no real
 per-point result: the other 76 points give NOT or a refusal, and only synthetic test cases reach those rows.
-`HOWTO.md` ("Known limits of v0.1") says what the family verdict means.
+`HOWTO.md` ("Known limits of v0.1") says what the family verdict means. Under `v05-rules` a family can also read where a line **ends**
+(`bin/cc family x2b-xy --tables v05-rules`, `TUTORIAL.md` part 5, HOWTO "LINE-END families"): `lower` and `upper` name each side of the interior
+and its end kind, and the end is reported as a bracket (`end_bracket`), not a point.
 
 ## Before you commit
 

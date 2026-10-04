@@ -318,3 +318,25 @@ One probed direction cannot tell a point from a line, so the point refuses and t
 `bin/cc family x5n-g --tables v04-rules` reads the same system over its three g values: f1 CONSTANT (the exponent does not change),
 f2 IRRELEVANT (the difference between neighbouring g shrinks relative to the size), so the verdict is POINT-MANIFOLD, class POINT.
 The point class is earned by the family, never by one probed direction. HOWTO has the full transcripts and the rules.
+
+## Part 5: where a line ends (v05-rules)
+
+A line of fixed points has an end. `bin/cc family x2b-xy --tables v05-rules` reads the XY temperature sweep X2b: five low-phase temperatures
+(the **interior**, T <= 0.85) and then T_KT = 0.89294, 0.95, 1.0 and 1.1. Read it from the top.
+
+1. `bracket BRACKET-DOWN`: along the chain the needle goes from MID to DIS once (edge `0.89294->0.95`). v05 reads either direction; v01 to v04
+   would have called a T-ordered chain NON-MONOTONE.
+2. `f1 UNRES`, `f2 WEAK`: three of the ten f1 pairs are unresolved, so f1 is unresolved; and three of the four neighbour pairs shrink slowly
+   with size (SLOW-), so f2 reads WEAK, not MARGINAL. Neither fingerprint gives the LINE signature (f1 VARIES with f2 MARGINAL) here, and f2 is
+   not IRRELEVANT either, so the POINT-MANIFOLD row does not fire.
+3. `points NOT-LINE`: LINE needs every interior point to read LINE, and the list below it shows T 0.6 reading WALKING.
+4. `lower OPEN`, `upper END-BKT-CANDIDATE`: the upper side's boundary is 0.89294 (MID, flow STOPPED) and what lies beyond it (0.95, 1.0, 1.1) is
+   disordered, with the two starts agreeing. A line ended in a disordered phase.
+5. `end 0.89294 (bracket 0.89294 .. 0.95)`: the end is a bracket, the boundary and the first point beyond. T_KT lies inside it.
+6. The verdict is a refusal, `REFUSE-UNCLASSIFIED-v0` (its printed `why`, "no positive row yet", is the default of a cell the rulebook has no
+   positive row for): BKT-END needs the interior to read LINE, and it does not. The family found the end and declined to name it.
+   T_KT is a grid point of this sweep (0.89294), so "the bracket contains T_KT" is nearly automatic; the check that still bites is an end that
+   sits too early or too late.
+
+Two cautions travel with every BKT-END. A sweep that merely leaves its manifold reads the same as a real end. And just above T_KT the correlation
+length exceeds the largest size, so an end bracket can sit too high; a bracket that does not contain T_KT is a finite-size miss. HOWTO has the rows.

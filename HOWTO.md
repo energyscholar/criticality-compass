@@ -332,6 +332,103 @@ family x7a-bc-lambda   rules: v01-rules   input: x7a-bc   interior: 0.0 1.0 1.5 
 (The Blume-Capel lambda sweep: the needle reads DIS at two points, so no pair is on the manifold and f2 is the
 door value; the family verdict is a refusal, not LINE.)
 
+## LINE-END families (v05-rules, plan 0871)
+
+A line of fixed points can END: the XY low phase is a line up to T_KT, then the sweep meets a disordered sink. `v05-rules` reads
+that from a family, with four additions to the three columns above (all in `tables/v05-rules/family.toml`; nothing in v01 to v04
+changes):
+
+- **The bracket is direction-agnostic.** `bracket` is `BRACKET-UP` (the needle steps from a lower to a higher sink along the chain),
+  `BRACKET-DOWN`, `BRACKET-FLAT` (a MID chain with no step), `NON-MONOTONE` (an ascent AND a descent) or `NO-MID`. A T-ordered chain
+  reads `BRACKET-DOWN` here where v01 to v04 refused it; the direction comes from the declared chain, never from an assumption.
+- **`points`** is LINE only when every interior point reads per-point LINE (the geometry after the probe).
+- **`lower` and `upper` are the two SIDES** of the declared interior: the points of `axes.point` before the first and after the last
+  `interior` point. The side's **boundary** is the last point of the contiguous run of MID needles that reaches outward from the
+  interior's edge point (positional, no threshold); the points past it are the **beyond** points. A side reads, from the boundary
+  (needle MID, flow STOPPED, SLOW or UNRES) and the beyond points (every needle a sink, DIS or ORD):
+  - the **end kind**, decided by the beyond points' ORDER axis and `two_start`: `END-BKT-CANDIDATE` (the starts agree, order OFF-WINDOW),
+    `END-MULTICRITICAL` (the starts stay apart: the AT 4-Potts lookalike), `END-ORDER-UNMEASURED` (one start only);
+  - `OPEN` (no points on that side), `NO-END` (a MID point re-appears after a sink), or `UNRES` / a null.
+- **`end_point` and `end_bracket`.** The family names the boundary of each side that ENDS a line (`end_point`) and the pair
+  (boundary, first beyond point) (`end_bracket`).
+
+The verdict rows: interior LINE and a side `END-BKT-CANDIDATE` is `BKT-END`; interior LINE with only an `END-MULTICRITICAL` side, or with no
+readable end (both sides OPEN or END-ORDER-UNMEASURED), is `LINE`, the sides reported beside it; an f2 that reads `REFUSE-OFF-MANIFOLD`
+reads `REFUSE-OFF-MANIFOLD` whatever the points and sides say (plan 0871 G6: a member point off the manifold is a fact about the chain).
+Every other cell reads what v04-rules read.
+
+**End-bracket scoring.** The grid cannot place an end closer than its spacing, so an end is a BRACKET, not a point. `bin/cc tabulate`
+adds a **Family ends** section for a family whose input joins a `BKT-END` truth point (the case `xy-tkt`): the truth point scores `agree`
+when it lies inside the family's `end_bracket`, `disagree` when it does not (or the family reads LINE, or a non-BKT-END class), and
+`refused` when the family refuses. A refusal is a miss, never an agreement.
+
+**Two caveats the rule cannot remove.**
+
+- *An off-manifold step reads the same as an end.* A sweep that leaves its manifold (a decoy) shows a MID run followed by a sink run just
+  as a real end does; the family cannot tell. Only the declaration and a blind decoy can. The `why` of every BKT-END row says so.
+- *BKT finite-size: xi is larger than L just above T_KT.* The BKT correlation length is xi ~ exp(b / sqrt(t)) with t = (T - T_KT) / T_KT; with
+  b of order 1.5 it is already about 400 sites at T = 0.95, more than the largest size here (L = 243). A block-lattice needle can still read
+  the sign of its velocity there (DIS, SIG-), but a family whose first beyond point lies a long way above T_KT reads an end bracket that
+  is too high. An `end_bracket` that does not contain T_KT is a finite-size MISS and is recorded as one.
+
+`families/x2b-xy.toml` reads the XY sweep X2b (nine T from 0.5 to 1.1, interior T <= 0.85). As it was read:
+
+```
+$ bin/cc family x2b-xy --tables v05-rules
+family x2b-xy   rules: v05-rules   input: x2b-xy   interior: 0.5 0.6 0.7 0.8 0.85
+  bracket BRACKET-DOWN
+    edge 0.5->0.6 NO-DESCENT,NO-ASCENT
+    edge 0.6->0.7 NO-DESCENT,NO-ASCENT
+    edge 0.7->0.8 NO-DESCENT,NO-ASCENT
+    edge 0.8->0.85 NO-DESCENT,NO-ASCENT
+    edge 0.85->0.89294 NO-DESCENT,NO-ASCENT
+    edge 0.89294->0.95 DESCENT,NO-ASCENT
+    edge 0.95->1.0 NO-DESCENT,NO-ASCENT
+    edge 1.0->1.1 NO-DESCENT,NO-ASCENT
+  f1      UNRES
+    0.5->0.6 y_last +0.130 [-0.042, +0.290] UNRES  -> UNRES
+    0.5->0.7 y_last +0.024 [-0.146, +0.178] ZERO!  -> CONSTANT
+    0.6->0.7 y_last -0.106 [-0.253, +0.041] UNRES  -> UNRES
+    0.5->0.8 y_last +0.056 [-0.087, +0.221] ZERO!  -> CONSTANT
+    0.6->0.8 y_last -0.074 [-0.201, +0.055] ZERO!  -> CONSTANT
+    0.7->0.8 y_last +0.032 [-0.095, +0.160] ZERO!  -> CONSTANT
+    0.5->0.85 y_last +0.113 [-0.058, +0.270] UNRES  -> UNRES
+    0.6->0.85 y_last -0.017 [-0.158, +0.136] ZERO!  -> CONSTANT
+    0.7->0.85 y_last +0.089 [-0.061, +0.226] ZERO!  -> CONSTANT
+    0.8->0.85 y_last +0.057 [-0.076, +0.198] ZERO!  -> CONSTANT
+  f2      WEAK
+    0.5->0.6 along SLOW-  -> WEAK
+    0.6->0.7 along SLOW-  -> WEAK
+    0.7->0.8 along SLOW-  -> WEAK
+    0.8->0.85 along ZERO!  -> MARGINAL
+  points  NOT-LINE
+    0.5 geometry LINE  -> LINE
+    0.6 geometry WALKING  -> NOT-LINE
+    0.7 geometry LINE  -> LINE
+    0.8 geometry LINE  -> LINE
+    0.85 geometry LINE  -> LINE
+  lower   OPEN   boundary 0.5, beyond (none)
+    reads boundary_needle MID, boundary_flow STOPPED, beyond_needles NONE, beyond_order NONE  -> family.toml side_row line 510
+    why: no point lies on this side of the declared interior
+  upper   END-BKT-CANDIDATE   boundary 0.89294, beyond 0.95 1.0 1.1
+    reads boundary_needle MID, boundary_flow STOPPED, beyond_needles SINK, beyond_order INDEP  -> family.toml side_row line 560
+    why: plan 0871 E2: the boundary is MID (flow stopped, slow or unresolved: at T_KT the flow is marginal-slow), every point beyond it is a sink (sink-agnostic: a clock's lower end exits to ORD) and the starts AGREE there (OFF-WINDOW, two_start INDEP): the end of a line, a BKT candidate. A sweep that steps off its manifold reads the same (review 3.2.2)
+  end     0.89294 (bracket 0.89294 .. 0.95)
+  => family verdict REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 448
+     why: 0863: no positive row yet (0862 X7b/X2-X4 decide)
+```
+
+Read the lines in order. `f1` and `f2` combine their pair codes by a declared rank (`[f1] rank`, `[f2] rank` in `family.toml`): for f1 one resolved
+VARIES pair is enough while CONSTANT needs every pair CONSTANT, so a single UNRES pair makes the column UNRES; f2 reads its weakest pair the same way.
+The interior is NOT-LINE because T 0.6 reads WALKING (see Known limits). `lower OPEN` is a statement about the grid, not about the physics: no point
+of the sweep lies below the interior (the printed boundary and reads on that line are just the interior's edge point). The upper side is
+`END-BKT-CANDIDATE`: the boundary is 0.89294 (its needle still reads MID, flow STOPPED) and every point past it is a DIS sink (a sink is a needle that
+left the window, DIS disordered or ORD ordered) whose two starts agree. The `end` line prints `end_point` first and `end_bracket` in brackets after it.
+`end_bracket` is `[0.89294, 0.95]`. T_KT = 0.89294 is itself a grid point here, so "the bracket contains T_KT" is nearly true by construction: what
+the test can still catch is an end that sits too early (boundary 0.85) or too late (first beyond 1.0 or higher, a finite-size miss). The verdict is
+the refusal `REFUSE-UNCLASSIFIED-v0`, the family rulebook's default for a cell with no positive row (its printed `why`, "no positive row yet"):
+BKT-END needs an interior that reads LINE, and this one does not.
+
 ## A new instrument
 
 `bin/cc new instrument <id>` writes `instruments/<id>.toml` and a stub module `cc/instruments/<id>.py`:
@@ -700,6 +797,11 @@ Read these before you trust a verdict.
   its flow reads STOPPED, and a fluctuation of `across` (+0.696, a 2.5 sigma reading) with stability CROSSING reaches the WALKING row. The clock's
   ordered end (needle ORD, verdict NOT either way) is STOPPED by a converging drift, which the declared predictions said no clock point would be.
   Both are recorded in `expected/v04-rules.toml` as findings about the rule, not repaired.
+- **v05-rules: x2b-xy reads a refusal, not BKT-END (plan 0871 P4, recorded and not repaired).** Three predictions declared before the run missed:
+  T 0.6 reads WALKING (stability CROSSING, the same cell as x2-xy-line-3), T 0.89294 reads POINT (across RELEVANT +0.17, flow STOPPED), and f1 reads
+  UNRES. What held: probe COMPLETE everywhere; drift CONVERGING and flow STOPPED at T <= 0.8; the upper side END-BKT-CANDIDATE with an
+  end_bracket [0.89294, 0.95] that contains T_KT; f2 WEAK (not IRRELEVANT, so no POINT-MANIFOLD). `expected/v05-rules.toml` keeps the declaration and the
+  after-run `[[change]]` that lists each miss. The end is therefore found by the family, but the BKT-END verdict is withheld because the interior is not LINE.
 - **v04-rules: `needle_chain` needs the level stack at three sizes, and its drift is NOT-EVALUATED wherever the velocity changes sign** (b7, x5n,
   x9c q3-q8, the clock's T1 and the XY T_KT). A drift that cannot be formed refuses nothing: the flow is the top pair's.
 - **v04-rules: `couplings.toml` sits beside `m.toml` rather than inside it,** because an `m.toml` that a stored result read cannot change
