@@ -681,6 +681,14 @@ def same(p, loc, got, want, what):
                 "fix the list")
 
 
+EDGE_AXES = (("descent", "edge_code", "descent_rank"), ("ascent", "ascent_code", "ascent_rank"))   # plan 0871 E1: each declared edge axis is one factor of the bracket table
+
+
+def bracket_axes(b):
+    """[(axis, step -> edge code, rank)] of the edge axes a bracket section declares (v01-v04: descent only); the table is over these and mid."""
+    return [(n, b[c], b[r]) for n, c, r in EDGE_AXES if c in b]
+
+
 def chk_family(p, d, c, stem=None):
     """A set's family rule: the three fingerprint sections against the codes, the registry and the alphabets, then the
     partition over (bracket, f1, f2) (every cell of the product has exactly one row)."""
@@ -696,7 +704,8 @@ def chk_family(p, d, c, stem=None):
     out += [at(p, f"alphabets.{k}", f"must include {x}", f"add {x}") for k in al for x in ("UNRES", *nulls) if x not in al[k]]
     out += chk_classes(p, d, c)
     out += shape(p, b, {"reads": str, "rank": dict, "edge_code": dict, "descent_rank": list, "point_code": dict,
-                        "mid_rank": list, "table": dict}, pre="bracket.")
+                        "mid_rank": list, "table": dict}, {"ascent_code": dict, "ascent_rank": list}, pre="bracket.")
+    out += when(("ascent_code" in b) != ("ascent_rank" in b), p, "bracket.ascent_code", "ascent_code and ascent_rank come together", "declare both or neither")
     out += shape(p, d["f1"], {"reads": str, "relation": str, "eps": str, "code": dict, "rank": list}, pre="f1.")
     out += shape(p, d["f2"], {"reads": str, "relation": str, "code": dict, "rank": list}, pre="f2.")
     if out or set(al) != set(cols):
@@ -706,9 +715,11 @@ def chk_family(p, d, c, stem=None):
     out += same(p, "bracket.rank", b["rank"], sig.get(b["reads"], {}).get("alphabet", []), "rank keys = that column's alphabet")
     out += same(p, "bracket.point_code", b["point_code"], b["rank"], "point_code keys = rank keys")
     out += same(p, "bracket.edge_code", b["edge_code"], ("SIG-", "UNRES", "SIG+"), "edge_code keys (eps 0 reaches three cells)")
-    out += same(p, "bracket.descent_rank", b["descent_rank"], [*nulls, *set(b["edge_code"].values())], "descent_rank")
+    axes = bracket_axes(b)
+    out += [x for n, code, rank in axes for x in same(p, f"bracket.{n}_rank", rank, [*nulls, *set(code.values())], f"{n}_rank")]
+    out += [x for n, code, _ in axes[1:] for x in same(p, f"bracket.{n}_code", code, ("SIG-", "UNRES", "SIG+"), f"{n}_code keys")]
     out += same(p, "bracket.mid_rank", b["mid_rank"], [*nulls, *set(b["point_code"].values())], "mid_rank")
-    out += same(p, "bracket.table", b["table"], [f"{x},{y}" for x in b["descent_rank"] for y in b["mid_rank"]], "table keys (total)")
+    out += same(p, "bracket.table", b["table"], [",".join(k) for k in itertools.product(*[r for _, _, r in axes], b["mid_rank"])], "table keys (total)")
     out += [at(p, f'bracket.table."{k}"', f"'{v}' is not in alphabets.bracket", "use a bracket value")
             for k, v in b["table"].items() if v not in al["bracket"]]
     inst, _, col = d["f1"]["reads"].partition(".")

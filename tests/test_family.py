@@ -30,7 +30,7 @@ def cc(*args):
 for f in sorted((ROOT / "expected").glob("*.toml")):
     for want in tomllib.loads(f.read_text()).get("family", []):
         msg, got = family.run(ROOT, want["id"], f.stem)
-        have = got and {k: got[1][k] for k in ("verdict", "bracket", "f1", "f2")}
+        have = got and {k: got[1].get(k, "<absent>") for k in want if k != "id"}   # plan 0871: every key a lock names, the new columns included
         check(f"{want['id']} under {f.stem}: {want['verdict']}", got is not None and all(have[k] == v for k, v in want.items() if k != "id"),
               f"{msg} {have} vs {want}")
 nnn = family.run(ROOT, "x7a-nnn-manifold", "v01-rules")[1]

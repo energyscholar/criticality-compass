@@ -29,15 +29,18 @@ def relation(kind, labels):
 
 
 def bracket_of(fam, res, nulls):
-    """(code, [(a, b, edge code)]) over ALL points of the input in declared order, on the signature column `reads`."""
+    """(code, [(a, b, edge codes)]) over ALL points of the input in declared order, on the signature column `reads`.
+    One code per declared edge axis (descent; plan 0871 E1 adds ascent), each combined over the edges, then one total table."""
     b, labels = fam["bracket"], [s["point"] for s in res["signature"]]
     codes = [s[b["reads"]] for s in res["signature"]]
     rel, pairs = relation("chain", labels)
     steps = fingerprint.code_steps(admit.nodefield([b["rank"].get(c, 0) for c in codes]), rel)   # a null point's rank is a placeholder
     ends = [[c for c in codes[k:k + 2] if c in nulls] for k in range(len(steps))]   # the null endpoints of each edge
-    edges = [low(n, b["descent_rank"]) if n else b["edge_code"][st] for n, st in zip(ends, steps)]
+    axes = declare.bracket_axes(b)
+    edges = [[low(n, rank) if n else code[st] for _, code, rank in axes] for n, st in zip(ends, steps)]   # one code per axis
     mid = low([c if c in nulls else b["point_code"][c] for c in codes], b["mid_rank"])
-    return b["table"][f"{low(edges, b['descent_rank'])},{mid}"], [(*p, e) for p, e in zip(pairs, edges)]
+    over = [low([e[i] for e in edges], axes[i][2]) for i in range(len(axes))]
+    return b["table"][",".join([*over, mid])], [(*p, ",".join(e)) for p, e in zip(pairs, edges)]
 
 
 def f1_of(fam, decl, res, z, m, nulls):
