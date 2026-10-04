@@ -1,0 +1,20 @@
+# instruments/needle_chain.toml - the drift of the needle's matched velocity down the size chain (plan 0870 P2): the needle's
+# maths (A over a matched pair) on TWO pairs, (243, 81) and (81, 27); ln|v| through door:logcoord (a sign that is not constant
+# is NOT-EVALUATED by construction); drift = omega_eff - 1 with omega_eff = -A(ln|v|) / ln(size ratio). Read against [eps] drift.
+# Declared with needle on an input that has two matched pairs; an input without it reads the drift NOT-MEASURED.
+schema = 1
+kind = "instrument"
+module = "needle_chain"                        # cc/instruments/needle_chain.py
+quantity = "velocity"                          # the name a sign refusal gives the logged quantity
+operators = ["A"]
+unit = "point"
+reports = ["velocity_prev"]                    # reported, never coded: the previous pair's matched velocity
+arrays = ["GL"]                                # 2-D level stacks at the three sizes
+axes = ["point", "size"]
+relations = ["chain", "size"]
+sidecar = ["observable", "block_map"]
+flags = []
+pipeline = ["stage:reduce", "door:nodefield", "stage:chain", "door:logcoord", "stage:drift"]
+
+[columns]                                      # column -> the eps key its interval is read against
+drift = "drift"

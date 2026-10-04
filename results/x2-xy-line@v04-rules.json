@@ -5,8 +5,8 @@
  "input": "x2-xy-line",
  "tables": "v04-rules",
  "derived_from": null,
- "code_commit": "f59a8cb0ec601836b7cc1e32854129bde2a09594",
- "code_hash": "3cb28eb8b06e87c75dc595e5037ef844857493c15d910e267450c6c3160efce2",
+ "code_commit": "b476fa942988a4642436da1fb16c7c5d0829c093",
+ "code_hash": "3262bebd6b6ab8976f5820d5ef8e20fe4d03962c25830b1950769410ab7527fa",
  "interval": {
   "method": "block",
   "b": 400,
@@ -20,8 +20,8 @@
   "instruments/across.toml": "8f6803e8af6cd80d4f7bb69b1be8148cf5eb8742892caf5f3f8392f38b3c0944",
   "instruments/stability.toml": "2fc7bb21b58a2d6eceab15ca62424aadedd309eb1f9dd6125bdee57d52588170",
   "instruments/two_start.toml": "30503b8a483a80faa442f419d04edc10a9498b56fb24c68554fa643c8679fa38",
-  "tables/v04-rules/codes.toml": "a115bfdfec3cbbb140f5e5a91b35ad56df96892b28119d8708c46ef5c89b9280",
-  "tables/v04-rules/verdict.toml": "6563b018f64a4df6fd7b3398973a49057b94bf29b10df34aed3bd02fd98d5554",
+  "tables/v04-rules/codes.toml": "65bec6f9821ca6cda151d4a189470b1c5be0456d802323eb0584088f506b6567",
+  "tables/v04-rules/verdict.toml": "b5f2e27b8ab3cf6bb4dc28ee40bc25a427e6d120b9973928b4b4e8141bf9a799",
   "tables/v04-rules/geometry.toml": "05c3737d287a1ef321fe66d01de27ed9d5661519a2df279e4eb2e3ec78f42805",
   "tables/v04-rules/probe.toml": "38a288f312a29c0a4abe3b0f93a9294d5a0e4e96cabe6b6e930bc1a1e1f6b076",
   "tables/v04-rules/order.toml": "ab789dc52e449c1e46ce382630894247d40d0b199ddd7724a872519f1eaf5978",
@@ -159,6 +159,24 @@
    ],
    "reason": null,
    "vector_key": "needle/d_dis/point=0.5"
+  },
+  {
+   "instrument": "needle_chain",
+   "column": "drift",
+   "unit": {
+    "point": "0.5"
+   },
+   "eps_key": "drift",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_chain is not declared on this input",
+   "vector_key": null
   },
   {
    "instrument": "needle_o",
@@ -380,6 +398,24 @@
    "vector_key": "needle/d_dis/point=0.6"
   },
   {
+   "instrument": "needle_chain",
+   "column": "drift",
+   "unit": {
+    "point": "0.6"
+   },
+   "eps_key": "drift",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_chain is not declared on this input",
+   "vector_key": null
+  },
+  {
    "instrument": "needle_o",
    "column": "velocity",
    "unit": {
@@ -597,6 +633,24 @@
    ],
    "reason": null,
    "vector_key": "needle/d_dis/point=0.7"
+  },
+  {
+   "instrument": "needle_chain",
+   "column": "drift",
+   "unit": {
+    "point": "0.7"
+   },
+   "eps_key": "drift",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_chain is not declared on this input",
+   "vector_key": null
   },
   {
    "instrument": "needle_o",
@@ -818,6 +872,24 @@
    "vector_key": "needle/d_dis/point=0.89294"
   },
   {
+   "instrument": "needle_chain",
+   "column": "drift",
+   "unit": {
+    "point": "0.89294"
+   },
+   "eps_key": "drift",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_chain is not declared on this input",
+   "vector_key": null
+  },
+  {
    "instrument": "needle_o",
    "column": "velocity",
    "unit": {
@@ -1035,6 +1107,24 @@
    ],
    "reason": null,
    "vector_key": "needle/d_dis/point=1.1"
+  },
+  {
+   "instrument": "needle_chain",
+   "column": "drift",
+   "unit": {
+    "point": "1.1"
+   },
+   "eps_key": "drift",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_chain is not declared on this input",
+   "vector_key": null
   },
   {
    "instrument": "needle_o",
@@ -1334,6 +1424,7 @@
   "sink",
   "needle",
   "needle_pair",
+  "drift_code",
   "flow",
   "across",
   "stability",
@@ -1347,6 +1438,7 @@
    "sink": "NEITHER",
    "needle": "MID",
    "needle_pair": "NOT-MEASURED",
+   "drift_code": "NOT-MEASURED",
    "flow": "SLOW",
    "across": "UNRES",
    "stability": "UNRES",
@@ -1379,7 +1471,7 @@
    },
    "verdict": "REFUSE-SLOW",
    "verdict_class": "REFUSE",
-   "row_line": 89,
+   "row_line": 90,
    "why": "verdict_x STAGE3: slow flow (Q2, 2026-10-02: only across MARGINAL with stable stability leaves this row)",
    "geometry": "REFUSE-SLOW",
    "order": "EQUILIBRATED",
@@ -1396,6 +1488,7 @@
    "sink": "NEITHER",
    "needle": "MID",
    "needle_pair": "NOT-MEASURED",
+   "drift_code": "NOT-MEASURED",
    "flow": "SLOW",
    "across": "RELEVANT",
    "stability": "CROSSING",
@@ -1428,7 +1521,7 @@
    },
    "verdict": "REFUSE-SLOW",
    "verdict_class": "REFUSE",
-   "row_line": 89,
+   "row_line": 90,
    "why": "verdict_x STAGE3: slow flow (Q2, 2026-10-02: only across MARGINAL with stable stability leaves this row)",
    "geometry": "REFUSE-SLOW",
    "order": "EQUILIBRATED",
@@ -1445,6 +1538,7 @@
    "sink": "NEITHER",
    "needle": "MID",
    "needle_pair": "NOT-MEASURED",
+   "drift_code": "NOT-MEASURED",
    "flow": "SLOW",
    "across": "UNRES",
    "stability": "UNRES",
@@ -1477,7 +1571,7 @@
    },
    "verdict": "REFUSE-SLOW",
    "verdict_class": "REFUSE",
-   "row_line": 89,
+   "row_line": 90,
    "why": "verdict_x STAGE3: slow flow (Q2, 2026-10-02: only across MARGINAL with stable stability leaves this row)",
    "geometry": "REFUSE-SLOW",
    "order": "EQUILIBRATED",
@@ -1494,6 +1588,7 @@
    "sink": "NEITHER",
    "needle": "MID",
    "needle_pair": "NOT-MEASURED",
+   "drift_code": "NOT-MEASURED",
    "flow": "STOPPED",
    "across": "UNRES",
    "stability": "UNRES",
@@ -1526,7 +1621,7 @@
    },
    "verdict": "REFUSE-UNRES",
    "verdict_class": "REFUSE",
-   "row_line": 244,
+   "row_line": 245,
    "why": "verdict_x CAND_GS: across unresolved, whatever stability reads",
    "geometry": "REFUSE-UNRES",
    "order": "EQUILIBRATED",
@@ -1543,6 +1638,7 @@
    "sink": "NEITHER",
    "needle": "DIS",
    "needle_pair": "NOT-MEASURED",
+   "drift_code": "NOT-MEASURED",
    "flow": "FLOWING",
    "across": "IRRELEVANT",
    "stability": "OFF",
@@ -1575,7 +1671,7 @@
    },
    "verdict": "NOT",
    "verdict_class": "NOT",
-   "row_line": 32,
+   "row_line": 33,
    "why": "verdict_x STAGE1: off the window",
    "geometry": "NOT",
    "order": "OFF-WINDOW",

@@ -128,8 +128,9 @@ def codes_of(cells, tables):
             if isinstance(src, str):
                 raw = cells.get(src, "NOT-MEASURED")
                 if isinstance(raw, list):
-                    pick = {None: raw, "top": raw[-1:], "rest": raw[:-1] or raw}[c["combine"].get("select")]   # sizes ascend: top = the largest
-                    memo[name] = min((one(name, x) for x in pick), key=c["combine"]["rank"].index)
+                    got = [one(name, x) for x in raw]    # sizes ascend: a code in top_only counts only when the LARGEST size reads it (plan 0870)
+                    memo[name] = min((v for i, v in enumerate(got) if v not in c["combine"].get("top_only", []) or i == len(got) - 1),
+                                     key=c["combine"]["rank"].index)
                 else:
                     memo[name] = one(name, raw)
             else:

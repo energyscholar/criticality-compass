@@ -1,0 +1,12 @@
+# inputs/x9c-potts/points.toml - the point -> case JOIN (taxonomy; NEVER frozen; read only by tabulate and the full validate)
+schema = 1
+kind = "points"
+input = "x9c-potts-2"
+
+[points]
+"3" = "potts-q3"
+"4" = "none"                             # no potts-q4 case yet: declared, not omitted
+"5" = "potts-q5"
+"6" = "potts-q6"
+"8" = "potts-q8"
+"10" = "potts-q10"

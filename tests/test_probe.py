@@ -30,7 +30,14 @@ for f in sorted((ROOT / "expected").glob("*.toml")):
     for inp, want in tomllib.loads(f.read_text()).get("geometry", {}).items():
         got = {s["point"]: s["geometry"] for s in result(inp, f.stem)["signature"]}
         miss = {p: (w, got[p]) for p, w in want.items() if got[p] not in ([w] if isinstance(w, str) else w)}
-        check(f"{inp} under {f.stem}: the geometry lock (declared before the run)", not miss and set(got) == set(want), str(miss))
+        check(f"{inp} under {f.stem}: the geometry lock (declared before the run)", not miss and set(want) <= set(got), str(miss))
+for f in sorted((ROOT / "expected").glob("*.toml")):     # plan 0870 P2: locks on a signature column, declared before the run; a point not named is unlocked
+    lock = tomllib.loads(f.read_text())
+    for col in ("drift_code", "flow", "probe", "verdict_set"):
+        for inp, want in lock.get(col, {}).items():
+            got = {s["point"]: s["verdict" if col == "verdict_set" else col] for s in result(inp, f.stem)["signature"]}
+            miss = {p: (w, got[p]) for p, w in want.items() if got[p] not in ([w] if isinstance(w, str) else w)}
+            check(f"{inp} under {f.stem}: the {col} lock (declared before the run)", not miss and set(want) <= set(got), str(miss))
 x5 = result("x5n-bilayer-2")
 check("x5n-bilayer-2@v04-rules: verdict REFUSE-PROBE-INCOMPLETE x3 and signature probe INCOMPLETE",
       [(s["verdict"], s["probe"]) for s in x5["signature"]] == [("REFUSE-PROBE-INCOMPLETE", "INCOMPLETE")] * 3, str([(s["verdict"], s["probe"]) for s in x5["signature"]]))

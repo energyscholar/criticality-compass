@@ -48,7 +48,7 @@ commands = ["show", "explain", "run", "new case", "tables fork", "tables drop", 
 
 [check]                         # bin/cc check --fast (the pre-commit hook) skips the `slow` tests
 fast_budget_s = 30              # elapsed time is printed against it; over budget WARNS, never fails
-slow = ["test_w2", "test_detect_verdicts", "test_breakers_red", "test_view", "test_golden", "test_along", "test_axes", "test_tables_cli", "test_tabulate", "test_needle_o_start", "test_run_all", "test_code_hash"]   # each phase appends its > 5 s tests
+slow = ["test_w2", "test_detect_verdicts", "test_breakers_red", "test_view", "test_golden", "test_along", "test_axes", "test_tables_cli", "test_tabulate", "test_needle_o_start", "test_run_all", "test_code_hash", "test_chain"]   # each phase appends its > 5 s tests
 
 # A regolden's changed lines are PARTITIONED by these classes (plan 0869 P3): the first class (in key order) whose
 # `files` globs match the transcript and whose `match` regexes match the line; a line no class claims is (e) OTHER.

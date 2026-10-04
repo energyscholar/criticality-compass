@@ -4,10 +4,11 @@
 # value of that column (nulls included). A row's `why` is printed by `bin/cc explain`.
 schema = 1
 kind = "verdict"
-columns = ["needle", "needle_pair", "sink", "flow", "across", "stability", "two_start", "probe"]   # = codes.toml signature
-ignores = ["sink"]                             # read by no row: declared, with the reason
+columns = ["needle", "needle_pair", "sink", "flow", "across", "stability", "two_start", "probe", "drift_code"]   # = codes.toml signature
+ignores = ["sink", "drift_code"]                             # read by no row: declared, with the reason
 ignores_reason = """v0 transcribes verdict_x, which has no sink column; the sink already acts \
-through the derived needle code (codes.toml columns.signature.needle)."""
+through the derived needle code (codes.toml columns.signature.needle). drift_code (plan 0870 P2, Bruce R2) is the visible flag \
+of a finite-size correction: it acts through the derived flow code and no row reads it; it stays in every result."""
 verdicts = [
   "POINT", "LINE", "WALKING", "FIRST-ORDER", "NOT", "REFUSE-EQUIL", "REFUSE-SLOW", "REFUSE-FLOW",
   "REFUSE-WEAK", "REFUSE-OFF", "REFUSE-IRRELEVANT", "REFUSE-UNRES", "REFUSE-NEEDLE-UNMEASURED",

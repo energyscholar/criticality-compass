@@ -27,6 +27,6 @@ tables/golden-bad/verdict.toml: 252 uncovered cells in 1 patterns
   when.flow = ["SLOW"]
   when.two_start = ["INDEP"]
   Next: add a [[row]] with one of these when-lines, or widen a neighbouring row
-checked: 22 case, 1 cc, 6 codes, 3 compose, 24 couplings, 24 data-manifest, 4 family, 4 family-decl, 3 geometry, 24 input, 7 instrument, 4 membership, 3 order, 24 points, 1 probe, 6 verdict
+checked: 22 case, 1 cc, 6 codes, 3 compose, 28 couplings, 28 data-manifest, 4 family, 4 family-decl, 3 geometry, 28 input, 8 instrument, 4 membership, 3 order, 28 points, 1 probe, 6 verdict
 validate: 12 findings
 exit 1

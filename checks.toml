@@ -4,7 +4,7 @@
 maths = [
   "cc/kernel.py", "cc/sign.py", "cc/resample.py", "cc/project.py", "cc/readout.py",
   "cc/instruments/needle.py", "cc/instruments/across.py", "cc/instruments/stability.py",
-  "cc/instruments/two_start.py", "cc/instruments/along.py", "cc/instruments/fluct.py", "cc/fingerprint.py",
+  "cc/instruments/two_start.py", "cc/instruments/along.py", "cc/instruments/fluct.py", "cc/instruments/needle_chain.py", "cc/fingerprint.py",
 ]
 plumbing = ["bin/cc", "cc/admit.py", "cc/declare.py", "cc/author.py", "cc/door.py", "cc/detect.py", "cc/view.py", "cc/score.py", "cc/family.py", "tests/reference/verdict_x.py",
   ".githooks/pre-commit"]
@@ -20,7 +20,7 @@ tests = [
   "tests/test_scoreboard.py", "tests/test_view.py", "tests/test_tabulate.py", "tests/test_reverdict.py",
   "tests/test_along.py", "tests/test_family.py", "tests/test_x5.py", "tests/test_axes.py", "tests/test_needle_o_start.py",
   "tests/test_run_all.py", "tests/test_code_hash.py",
-  "tests/test_classify.py", "tests/test_probe.py",
+  "tests/test_classify.py", "tests/test_probe.py", "tests/test_chain.py",
 ]
 
 [allow]

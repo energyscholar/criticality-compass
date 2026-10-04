@@ -566,3 +566,97 @@ COEXIST; otherwise the lowest rank over the non-COEXIST cells) moves NO stored t
 x9c-potts, q7 of w1-potts and q6 of w3-potts read COEXIST at the largest size; x9c-potts q5 stays UNRES). The drift column and the derived flow \
 exist only on inputs that declare needle_chain (new inputs with two matched pairs): every existing input has ONE matched pair, so its flow is the \
 v03-rules flow. Any other moved cell on an existing input is a stop"""
+
+# ---- plan 0870 P2: the inputs with TWO matched pairs (needle_chain), locked from the toolset's m.toml block [V04] BEFORE their first run.
+# [drift_code.*], [flow.*], [probe.*], [verdict_set.*] hold a point -> allowed code or a LIST of allowed codes (read by tests/test_probe.py);
+# a point a prediction does not name is left out: those cells are unlocked on purpose, and are reported as read, never repaired.
+[drift_code.x2-xy-line-3]            # V04-1: omega_eff 2.1 / 1.8 / 1.6 at T 0.5 / 0.6 / 0.7 -> CONVERGING or UNRES, NEVER PERSISTENT
+"0.5" = ["CONVERGING", "UNRES"]
+"0.6" = ["CONVERGING", "UNRES"]
+"0.7" = ["CONVERGING", "UNRES"]
+
+[flow.x2-xy-line-3]                  # V04-1: STOPPED where CONVERGING, else SLOW; T 0.89294 STOPPED (v2 ZERO!); T 1.1 FLOWING
+"0.5" = ["STOPPED", "SLOW"]
+"0.6" = ["STOPPED", "SLOW"]
+"0.7" = ["STOPPED", "SLOW"]
+"0.89294" = ["STOPPED"]
+"1.1" = ["FLOWING"]
+
+[verdict_set.x2-xy-line-3]           # V04-1: T 1.1 verdict NOT. RISK (review F3): T 0.6 reaching STOPPED reads WALKING (a possible BAD), recorded and never repaired; so 0.6 is unlocked
+"1.1" = ["NOT"]
+
+[probe.x2-xy-line-3]                 # one coupling T, probed: COMPLETE (a positive per-point class here is certified by the probe, not by the family)
+"0.5" = ["COMPLETE"]
+"0.6" = ["COMPLETE"]
+"0.7" = ["COMPLETE"]
+"0.89294" = ["COMPLETE"]
+"1.1" = ["COMPLETE"]
+
+[drift_code.x3-clock6-3]             # V04-2: omega_eff 0.35-0.54 in the critical phase -> PERSISTENT or MARGINAL-DRIFT; T1 (0.7014) NOT-EVALUATED or PERSISTENT
+"0.7014" = ["NOT-EVALUATED", "PERSISTENT"]
+"0.75" = ["PERSISTENT", "MARGINAL-DRIFT"]
+"0.8" = ["PERSISTENT", "MARGINAL-DRIFT"]
+"0.85" = ["PERSISTENT", "MARGINAL-DRIFT"]
+"0.9008" = ["PERSISTENT", "MARGINAL-DRIFT"]
+
+[flow.x3-clock6-3]                   # V04-2: the four critical-phase points read SLOW; NO clock point becomes STOPPED via CONVERGING (checked over every point and reported)
+"0.75" = ["SLOW"]
+"0.8" = ["SLOW"]
+"0.85" = ["SLOW"]
+"0.9008" = ["SLOW"]
+
+[probe.x3-clock6-3]
+"0.7014" = ["COMPLETE"]
+"0.75" = ["COMPLETE"]
+"0.8" = ["COMPLETE"]
+"0.85" = ["COMPLETE"]
+"0.9008" = ["COMPLETE"]
+
+[drift_code.x9c-potts-2]             # V04-3: q3 drift NOT-EVALUATED (sign reversal)
+"3" = ["NOT-EVALUATED"]
+
+[verdicts.x9c-potts-2]               # V04-3: every q verdict as x9c-potts
+"3" = "REFUSE-FLOW"
+"4" = "REFUSE-FLOW"
+"5" = "NOT"
+"6" = "FIRST-ORDER"
+"8" = "FIRST-ORDER"
+"10" = "FIRST-ORDER"
+
+[drift_code.b7-at-line-5]            # V04-4: 0.07, 0.14, 0.2747 drift NOT-EVALUATED (sign reversal / v1 ~ 0)
+"0.07" = ["NOT-EVALUATED"]
+"0.14" = ["NOT-EVALUATED"]
+"0.2747" = ["NOT-EVALUATED"]
+
+[geometry.b7-at-line-5]              # V04-4: REFUSE-PROBE-INCOMPLETE wherever v03 geometry read POINT (b7-at-line-4: 0.0 and 0.07)
+"0.0" = ["REFUSE-PROBE-INCOMPLETE"]
+"0.07" = ["REFUSE-PROBE-INCOMPLETE"]
+
+[needle_pair.x9c-potts-2]            # the same data and the same needle_o as x9c-potts: its needle_pair lock carried over (read by tests/test_axes.py)
+"3" = ["SAME-WINDOW"]
+"4" = ["SAME-WINDOW"]
+"5" = ["HALF-PINNED"]
+"6" = ["HALF-PINNED"]
+"8" = ["PINNED-BETWEEN-PHASES"]
+"10" = ["PINNED-BETWEEN-PHASES"]
+
+[[change]]
+date = "2026-10-03"
+points = ["x2-xy-line-3:*", "x3-clock6-3:*", "x9c-potts-2:*", "b7-at-line-5:*"]
+why = """DECLARED BEFORE THE FIRST RUN of the four two-pair inputs (plan 0870 P2), transcribed from the toolset's m.toml block [V04] (declared \
+2026-10-03 19:02 PDT from the Fable review's point estimates), with [eps] drift = 0.5 declared in the plan and never tuned. x2-xy-line-3: \
+drift_code CONVERGING or UNRES (never PERSISTENT) at T 0.5/0.6/0.7, flow STOPPED where CONVERGING else SLOW, T 0.89294 STOPPED, T 1.1 FLOWING and \
+NOT; a T 0.6 WALKING is a predicted possible BAD (review F3), recorded and not repaired. x3-clock6-3: drift_code PERSISTENT or MARGINAL-DRIFT and flow \
+SLOW at T 0.75/0.8/0.85/0.9008, T 0.7014 NOT-EVALUATED or PERSISTENT, no point STOPPED via CONVERGING. x9c-potts-2: q3 drift NOT-EVALUATED, every \
+verdict as x9c-potts. b7-at-line-5: 0.07/0.14/0.2747 NOT-EVALUATED, geometry REFUSE-PROBE-INCOMPLETE at 0.0 and 0.07. A cell not named here is \
+unlocked and is reported as read"""
+
+[[change]]
+date = "2026-10-03"
+points = ["x2-xy-line-3:0.6", "x3-clock6-3:0.5"]
+why = """AFTER THE RUN of the four two-pair inputs (plan 0870 P2): every lock above held. Two readings the declarations flagged or did not cover are \
+RECORDED, never repaired. (1) x2-xy-line-3 T 0.6: drift_code CONVERGING (omega_eff - 1 = 0.820 [0.399, 1.332], POS), so flow is STOPPED, and across RELEVANT \
+(+0.696) with stability CROSSING (+0.911) reads WALKING: the predicted possible BAD of review F3 (a LINE point read WALKING; today's REFUSE-SLOW was masking a 2.5 \
+sigma fluctuation of across). (2) x3-clock6-3 T 0.5 (the ordered end, needle ORD): flow_top SLOW+ with drift CONVERGING (3.376 [3.035, 3.809]) reads \
+flow STOPPED, which is a clock point becoming STOPPED via CONVERGING, contrary to the V04-2 sentence 'no clock point becomes STOPPED via CONVERGING' \
+(its four critical-phase points and T 0.7014 held); the verdict is NOT either way, so nothing moved. Both are findings about the rule, not edits of this file"""

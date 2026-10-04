@@ -24,12 +24,12 @@ DECLARED = {"probe": ("COMPLETE", "INCOMPLETE", "UNKNOWN")}   # code columns rea
 SIZE_KEY = "L"                 # the one scalar a data file holds that is the lattice size, not a coupling
 SIDECARS = ("observable", "block_map", "conjugate", "sinks", "two_start")
 TEMPLATES = {"chain": {"axis": str}, "pair": {"axis": str, "pairs": list}, "all-pairs": {"axis": str},
-             "matched": {"axis": str, "big": int, "small": int}}
+             "matched": {"axis": str, "big": int, "small": int}, "matched-chain": {"axis": str, "pairs": list}}
 SECTION_HINT = {"obtained.": "write one of: truth | navigated | observed (cc.toml alphabets.obtained)",
                 "points.": 'write a case id from cases/ (see bin/cc help), or "none"'}
 HINT = {"family": "a short description of the model", "mechanism": "one sentence on what drives the transition",
         "key": "the array's key in the data file (np.load(path).files lists them)",
-        "template": "one of: chain, pair, all-pairs, matched (and that template's fields)"}
+        "template": "one of: chain, pair, all-pairs, matched, matched-chain (and that template's fields)"}
 NUM = (int, float)
 
 
@@ -247,7 +247,8 @@ def chk_points(p, d, c, stem=None):
 def unit_blocks(m, inst):
     """(sizes, starts) the instrument reads at every point: the matched pair, all sizes, the start pair."""
     rels, ax = m.get("relations", {}), m["axes"]
-    sizes = [rels["matched"]["big"], rels["matched"]["small"]] if "matched" in inst["relations"] else list(ax["size"])
+    sizes = ([rels["matched"]["big"], rels["matched"]["small"]] if "matched" in inst["relations"]
+             else list(dict.fromkeys(x for pr in rels["chain"]["pairs"] for x in pr)) if "chain" in inst["relations"] else list(ax["size"]))
     pair = rels.get("start", {}).get("pairs", [[ax["main_start"]]])[0]
     return sizes, (list(pair) if "starts" in inst["axes"] else [inst.get("start", ax["main_start"])])   # `start`: read this start, not main_start (plan 0867)
 
@@ -345,11 +346,14 @@ def chk_relations(p, d, c, use, sz):
             continue
         out += shape(p, r, {"template": str, "provenance": str, "direction_from": str, **t}, pre=f"relations.{rn}.")
         out += inalpha(p, f"relations.{rn}.provenance", r.get("provenance"), ("Coupling", "Continuation"))
-        if r["template"] == "matched" and "observable" in d and {r.get("big"), r.get("small")} <= set(sz):
-            lb, ls = (d["observable"]["levels"][sz.index(r[k])] for k in ("big", "small"))
+        prs = r["pairs"] if r["template"] == "matched-chain" else [[r.get("big"), r.get("small")]]
+        for big, small in (x for x in prs if r["template"] in ("matched", "matched-chain") and "observable" in d and len(x) == 2 and set(x) <= set(sz)):
+            lb, ls = (d["observable"]["levels"][sz.index(x)] for x in (big, small))
             out += when(ls != lb - 1, p, f"relations.{rn}",
                         f"matched needs small levels = big levels - 1 (found {ls} and {lb})",
                         "fix observable.levels or the sizes")
+        out += when(r["template"] == "matched-chain" and any(len(x) != 2 or set(x) - set(sz) for x in prs), p, f"relations.{rn}.pairs",
+                    "each pair is [big, small], both declared sizes", "write pairs = [[243, 81], [81, 27]]")
     return out + [at(p, "relations", f"relation '{rn}' is not used by any declared instrument", "delete it")
                   for rn in rels if rn not in need]
 
@@ -558,9 +562,9 @@ def chk_column(p, loc, col, c, allc):
     out += when(needs != (cb is not None), p, loc + ".combine",
                 "required for a point-size source" if needs else "only a point-size source combines", "fix")
     if cb is not None:
-        out += shape(p, cb, {"over": str, "rank": list}, {"select": str}, pre=loc + ".combine.")
-        out += when(cb.get("select", "top") not in ("top", "rest"), p, loc + ".combine.select", f"'{cb.get('select')}' is not top or rest",
-                    "select the largest size (top) or the smaller ones (rest), or omit it for all sizes")
+        out += shape(p, cb, {"over": str, "rank": list}, {"top_only": list}, pre=loc + ".combine.")
+        out += [at(p, loc + ".combine.top_only", f"'{x}' is not in the alphabet {alpha}", "list codes of this column")
+                for x in cb.get("top_only", []) if x not in alpha]
         out += when(sorted(cb.get("rank", [])) != sorted(alpha + nulls), p, loc + ".combine.rank",
                     f"must list {sorted(alpha + nulls)} exactly once each", "fix the list")
     return out
@@ -886,12 +890,14 @@ def chk_compose(p, d, c, stem=None):
     return out if out else chk_partition(p, ["geometry", "order"], [dom["geometry"], dom["order"]], [r["when"] for r in d["row"]], Path(c.root, p).read_text())
 
 
-def table_values(d, dom, cols, key="verdict"):
-    """The array of every row's `key` over the product of `dom` (column -> alphabet) in the order of `cols`."""
+def table_values(d, dom, cols, key="verdict", vocab=None):
+    """The array of every row's `key` over the product of `dom` (column -> alphabet) in the order of `cols`; with a `vocab`
+    (name -> int, grown here) the values are int16 codes, which keeps a product of tens of millions of cells in memory."""
     owner = np.full([len(dom[x]) for x in cols], -1)
     for k, row in enumerate(d["row"]):
         owner[np.ix_(*[[dom[x].index(v) for v in row["when"].get(x, dom[x])] for x in cols])] = k
-    return np.array([r[key] for r in d["row"]])[owner]
+    vals = [r[key] for r in d["row"]]
+    return (np.array(vals) if vocab is None else np.array([vocab.setdefault(x, len(vocab)) for x in vals], np.int16))[owner]
 
 
 def lifted(arr, cols, full, dom):
@@ -913,27 +919,26 @@ def factorisation(root, tset):
         return [at(at_, "", f"geometry, order and compose go together; this set has only {have}", "add the missing files, or remove these")], 0
     codes, v, g, o, cm = (tomllib.loads((t / f).read_text()) for f in ("codes.toml", "verdict.toml", "geometry.toml", "order.toml", "compose.toml"))
     dom = {k: list(x["alphabet"]) + list(nulls) for k, x in code_cols(codes).items()}
-    full = v["columns"] + [x for x in dict.fromkeys(g["columns"] + o["columns"]) if x not in v["columns"]]
-    vv = lifted(table_values(v, dom, v["columns"]), v["columns"], full, dom)
-    gv = lifted(table_values(g, dom, g["columns"]), g["columns"], full, dom)
-    ov = lifted(table_values(o, dom, o["columns"]), o["columns"], full, dom)
-    if pr:   # the probe projection: geometry' = (probe, geometry) -> @geometry or a refusal
-        pdom = {"probe": dom["probe"], "geometry": g["verdicts"]}
-        pv = table_values(pr, pdom, ["probe", "geometry"])
-        pi, gj = np.broadcast_arrays(lifted(np.arange(len(pdom["probe"])), ["probe"], full, dom), np.vectorize(pdom["geometry"].index)(gv))
-        got_p = pv[pi, gj]
-        gv = np.where(got_p == "@geometry", gv, got_p)
+    full, voc = v["columns"] + [x for x in dict.fromkeys(g["columns"] + o["columns"]) if x not in v["columns"]], {}
     cdom = {"geometry": pr["verdicts"] if pr else g["verdicts"], "order": o["values"]}
-    comp = table_values(cm, cdom, ["geometry", "order"])
-    gi, oi = (np.vectorize(cdom[k].index)(x) for k, x in (("geometry", gv), ("order", ov)))
-    got = np.where(comp[gi, oi] == "@geometry", gv, comp[gi, oi])
-    got, vb = np.broadcast_arrays(got, vv)
+    pdom = {"probe": dom.get("probe", []), "geometry": g["verdicts"]}
+    vv, gv, ov = (lifted(table_values(tb, dom, tb["columns"], vocab=voc), tb["columns"], full, dom) for tb in (v, g, o))
+    pv = table_values(pr, pdom, ["probe", "geometry"], vocab=voc) if pr else None
+    comp = table_values(cm, cdom, ["geometry", "order"], vocab=voc)
+    names, keep = list(voc), voc.get("@geometry", -1)
+    lut = lambda alpha: np.array([alpha.index(n) if n in alpha else 0 for n in names], np.int16)   # noqa: E731  vocabulary code -> index in `alpha`
+    if pr:   # the probe projection: geometry' = (probe, geometry) -> @geometry or a refusal
+        got_p = pv[lifted(np.arange(len(pdom["probe"]), dtype=np.int16), ["probe"], full, dom), lut(pdom["geometry"])[gv]]
+        gv = np.where(got_p == keep, gv, got_p)
+    c = comp[lut(cdom["geometry"])[gv], lut(cdom["order"])[ov]]
+    got, vb = np.broadcast_arrays(np.where(c == keep, gv, c), vv)
     bad = got != vb
     if not bad.any():
         return [], int(vb.size)
-    cell = dict(zip(full, (dom[x][i] for x, i in zip(full, np.argwhere(bad)[0]))))
+    first = tuple(np.argwhere(bad)[0])
+    cell = dict(zip(full, (dom[x][i] for x, i in zip(full, first))))
     return [at(at_, "", f"compose(geometry, order) differs from verdict.toml on {int(bad.sum())} of {int(vb.size)} rows, first: {cell} "
-                        f"(composed {got[tuple(np.argwhere(bad)[0])]}, verdict {vb[tuple(np.argwhere(bad)[0])]})",
+                        f"(composed {names[int(got[first])]}, verdict {names[int(vb[first])]})",
                "fix geometry.toml, order.toml or compose.toml so the factorisation holds on every row")], 0
 
 

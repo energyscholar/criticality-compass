@@ -1,4 +1,5 @@
 """door.py - between the data and the maths: context, relations, the resample plan, the doors (plumbing)."""
+import itertools
 from dataclasses import dataclass
 from pathlib import Path
 import numpy as np
@@ -48,9 +49,11 @@ def relations_for(m, name):
         n, edges = 2 * len(r["pairs"]), [(2 * k + 1, 2 * k) for k in range(len(r["pairs"]))]
     elif r["template"] == "all-pairs":
         n, edges = len(ax[r["axis"]]), [(j, i) for j in range(1, len(ax[r["axis"]])) for i in range(j)]
-    else:
-        nb = m["observable"]["levels"][ax["size"].index(r["big"])]
-        n, edges = 2 * nb - 1, [(k, nb + k - 1) for k in range(1, nb)]
+    else:   # matched: one pair (big, small); matched-chain: pairs laid end to end, each with its own nodes
+        lv, prs = m["observable"]["levels"], r["pairs"] if r["template"] == "matched-chain" else [[r["big"], r["small"]]]
+        nbs = [lv[ax["size"].index(b)] for b, _ in prs]
+        offs = [0, *itertools.accumulate(2 * nb - 1 for nb in nbs)]
+        n, edges = offs[-1], [(o + k, o + nb + k - 1) for o, nb in zip(offs, nbs) for k in range(1, nb)]
     return admit.declare(n, edges, [Provenance(r["provenance"])] * len(edges))
 
 
@@ -78,7 +81,9 @@ def context(m, inst, size=None):
     if "size" in rel:
         prov = Provenance(m["relations"]["size"]["provenance"])
         rel["steps"] = admit.declare(k, [(i + 1, i) for i in range(k - 1)], [prov] * (k - 1))
-    nb = m["observable"]["levels"][sizes.index(m["relations"]["matched"]["big"])] if "matched" in rel else 0
+    rm = m.get("relations", {})
+    big = rm["matched"]["big"] if "matched" in rel else rm["chain"]["pairs"][0][0] if "chain" in rel else None   # the top pair's big size
+    nb = m["observable"]["levels"][sizes.index(big)] if big is not None else 0
     pair = inst["unit"] == "pair"
     unit_rel = admit.declare(2, [(1, 0)], [Provenance(m["relations"]["control"]["provenance"])]) if pair else None
     return Ctx(

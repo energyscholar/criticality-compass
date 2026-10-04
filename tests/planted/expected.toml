@@ -48,7 +48,7 @@ text = "tests/planted/points-missing-point.toml:points.\"5\": point is not joine
 [[plant]]
 file = "input-unknown-instrument.toml"
 fix = ["instruments = [\"two_start\", \"nosuch\"]", "instruments = [\"two_start\"]"]
-text = "tests/planted/input-unknown-instrument.toml:instruments: 'nosuch' is not in the instrument registry\n  Next: use one of: across along fluct needle needle_o stability two_start"
+text = "tests/planted/input-unknown-instrument.toml:instruments: 'nosuch' is not in the instrument registry\n  Next: use one of: across along fluct needle needle_chain needle_o stability two_start"
 
 [[plant]]
 file = "input-eps-missing.toml"
@@ -63,7 +63,7 @@ text = "tests/planted/input-eps-not-required.toml:eps.step: eps key not required
 [[plant]]
 file = "input-unknown-template.toml"
 fix = ["template = \"ring\"", "template = \"pair\""]
-text = "tests/planted/input-unknown-template.toml:relations.start.template: unknown template 'ring'\n  Next: use one of: chain pair all-pairs matched"
+text = "tests/planted/input-unknown-template.toml:relations.start.template: unknown template 'ring'\n  Next: use one of: chain pair all-pairs matched matched-chain"
 
 [[plant]]
 file = "input-level-on-1d.toml"

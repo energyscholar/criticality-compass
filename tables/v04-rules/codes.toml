@@ -50,6 +50,20 @@ alphabet = ["DIS", "MID", "ORD"]
 "SIG+" = "ORD"
 "UNRES" = "MID"
 
+[columns.helper.flow_top]                       # plan 0870 P2: the flow of the TOP size pair alone (verdict_x FLOW_CODE on the matched velocity; v03-rules' flow)
+from = "needle.velocity"
+alphabet = ["STOPPED", "SLOW", "FLOWING", "UNRES"]
+
+[columns.helper.flow_top.map]
+"SIG-" = "FLOWING"
+"NEG" = "SLOW"                                 # v01-rules (plan 0864 Q1 c'): inside eps is SLOW, never FLOWING
+"SLOW-" = "SLOW"
+"ZERO!" = "STOPPED"
+"SLOW+" = "SLOW"
+"POS" = "SLOW"                                 # v01-rules (plan 0864 Q1 c')
+"SIG+" = "FLOWING"
+"UNRES" = "UNRES"
+
 [columns.helper.fluct]                         # v02-rules (plan 0866 P-B): the fluctuation witness on A over ln var(e)
 from = "fluct.y_last"                          # read by order.toml ONLY, and only with the starts INDEP; never by verdict.toml
 alphabet = ["PERSISTS", "VANISHES", "GROWS", "UNRES"]
@@ -181,19 +195,50 @@ alphabet = ["SAME-WINDOW", "PINNED-BETWEEN-PHASES", "SAME-SINK", "HALF-PINNED", 
 "MID,DIS" = "HALF-PINNED"
 "ORD,DIS" = "CROSSED"
 
-[columns.signature.flow]                       # verdict_x FLOW_CODE on the matched velocity
-from = "needle.velocity"
+[columns.signature.drift_code]                 # plan 0870 P2: how the needle's drift decays down the size chain (omega_eff - 1, needle_chain.drift, read against [eps] drift)
+from = "needle_chain.drift"                    # the VISIBLE FLAG of Bruce's R2: kept in every result, listed in verdict.toml `ignores`, read only by `flow`
+alphabet = ["CONVERGING", "MARGINAL-DRIFT", "PERSISTENT", "UNRES"]
+
+[columns.signature.drift_code.map]
+"SIG-" = "PERSISTENT"                          # omega_eff well below 1: a genuine slow flow (log corrections included)
+"NEG" = "PERSISTENT"
+"SLOW-" = "MARGINAL-DRIFT"                     # omega_eff within eps of 1: undecidable at this eps
+"ZERO!" = "MARGINAL-DRIFT"
+"SLOW+" = "MARGINAL-DRIFT"
+"POS" = "CONVERGING"                           # omega_eff above 1: a finite-size correction that decays
+"SIG+" = "CONVERGING"
+"UNRES" = "UNRES"
+
+[columns.signature.flow]                       # plan 0870 P2: (flow of the top pair, drift_code) -> flow; a SLOW top-pair flow whose drift CONVERGES reads STOPPED; every other cell is the top pair's
+from = ["flow_top", "drift_code"]
+nullable = true                                # a null drift_code (one size pair, or a sign that is not constant) is a cell of the map, not a null flow
 alphabet = ["STOPPED", "SLOW", "FLOWING", "UNRES"]
 
 [columns.signature.flow.map]
-"SIG-" = "FLOWING"
-"NEG" = "SLOW"                                 # v01-rules (plan 0864 Q1 c'): inside eps is SLOW, never FLOWING
-"SLOW-" = "SLOW"
-"ZERO!" = "STOPPED"
-"SLOW+" = "SLOW"
-"POS" = "SLOW"                                 # v01-rules (plan 0864 Q1 c')
-"SIG+" = "FLOWING"
-"UNRES" = "UNRES"
+"STOPPED,CONVERGING" = "STOPPED"
+"STOPPED,MARGINAL-DRIFT" = "STOPPED"
+"STOPPED,PERSISTENT" = "STOPPED"
+"STOPPED,UNRES" = "STOPPED"
+"STOPPED,NOT-MEASURED" = "STOPPED"
+"STOPPED,NOT-EVALUATED" = "STOPPED"
+"SLOW,CONVERGING" = "STOPPED"
+"SLOW,MARGINAL-DRIFT" = "SLOW"
+"SLOW,PERSISTENT" = "SLOW"
+"SLOW,UNRES" = "SLOW"
+"SLOW,NOT-MEASURED" = "SLOW"
+"SLOW,NOT-EVALUATED" = "SLOW"
+"FLOWING,CONVERGING" = "FLOWING"
+"FLOWING,MARGINAL-DRIFT" = "FLOWING"
+"FLOWING,PERSISTENT" = "FLOWING"
+"FLOWING,UNRES" = "FLOWING"
+"FLOWING,NOT-MEASURED" = "FLOWING"
+"FLOWING,NOT-EVALUATED" = "FLOWING"
+"UNRES,CONVERGING" = "UNRES"
+"UNRES,MARGINAL-DRIFT" = "UNRES"
+"UNRES,PERSISTENT" = "UNRES"
+"UNRES,UNRES" = "UNRES"
+"UNRES,NOT-MEASURED" = "UNRES"
+"UNRES,NOT-EVALUATED" = "UNRES"
 
 [columns.signature.across]                     # B4 direction_table (verdict_x GROWTH_CODE)
 from = "across.y_last"
@@ -227,6 +272,7 @@ alphabet = ["STABLE", "CROSSING", "OFF", "UNRES"]
 from = "two_start.D"
 alphabet = ["COEXIST", "FLUCT", "UNRES", "INDEP"]
 combine.over = "size"
+combine.top_only = ["COEXIST"]                 # plan 0870 P2 (the narrow rule): COEXIST counts only when the LARGEST size reads it
 combine.rank = [                               # lowest rank present wins
   "NOT-MEASURED", "NOT-EVALUATED", "COEXIST", "FLUCT", "UNRES", "INDEP",
 ]
