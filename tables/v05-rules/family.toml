@@ -115,6 +115,7 @@ rank = ["NOT-MEASURED", "NOT-EVALUATED", "UNRES", "NOT-LINE", "LINE"]           
 needle_code = { DIS = "SINK", MID = "MID", ORD = "SINK" }                           # sink-agnostic: a clock's lower end exits to ORD
 needle_rank = ["NOT-MEASURED", "NOT-EVALUATED", "MID", "SINK", "NONE"]            # beyond needles combined; NONE (no point on the side) loses to every point, so it is read only when the side is empty
 order_rank = ["COEXIST", "UNRES", "UNMEASURED", "INDEP", "NONE"]                  # beyond orders combined, lowest first; INDEP only when EVERY point beyond reads it
+ends = ["END-BKT-CANDIDATE", "END-MULTICRITICAL", "END-ORDER-UNMEASURED"]       # plan 0871 E3: the side codes that END a line: their boundary is the family's end_point, (boundary, first beyond) its end_bracket
 
 [side.order_code]                              # (the ORDER axis value, two_start) of one beyond point -> its end order. A sink's order axis reads OFF-WINDOW whether the starts agree or one start was never run, so the end kind reads two_start too
 "COEXIST-AT-WINDOW,COEXIST" = "COEXIST"

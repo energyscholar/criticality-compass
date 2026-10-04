@@ -754,7 +754,7 @@ def chk_sides(p, d, c, codes, al):
     total partition over (boundary needle, boundary flow, beyond needles, beyond order). Every key set is the declared alphabet it reads."""
     here, sig, pt, sd = Path(c.root, p).parent, codes["columns"]["signature"], d["points"], d["side"]
     out = shape(p, pt, {"reads": str, "code": dict, "rank": list}, pre="points.")
-    out += shape(p, sd, {"needle_code": dict, "needle_rank": list, "order_code": dict, "order_rank": list}, pre="side.")
+    out += shape(p, sd, {"needle_code": dict, "needle_rank": list, "order_code": dict, "order_rank": list, "ends": list}, pre="side.")
     out += when(al["lower"] != al["upper"], p, "alphabets.upper", "must equal alphabets.lower (one side alphabet)", "fix the list")
     probe, order = (load(here / f"{n}.toml", c.root) for n in ("probe", "order"))
     geom = (probe[0] or load(here / "geometry.toml", c.root)[0] or {}).get("verdicts", [])
@@ -768,6 +768,7 @@ def chk_sides(p, d, c, codes, al):
     out += same(p, "points.code", pt["code"], geom, "points.code keys = the geometry values of probe.toml")
     out += same(p, "points.rank", pt["rank"], al["points"], "points.rank")
     out += [at(p, f"points.code.{k}", f"'{v}' is not in alphabets.points", "use a value of that alphabet") for k, v in pt["code"].items() if v not in al["points"]]
+    out += [at(p, "side.ends", f"'{x}' is not in alphabets.lower", "list side codes that name an end") for x in sd["ends"] if x not in al["lower"]]
     out += same(p, "side.needle_code", sd["needle_code"], needles, "side.needle_code keys = the needle alphabet")
     out += same(p, "side.needle_rank", sd["needle_rank"], [*c.alpha["nulls"], *set(sd["needle_code"].values()), "NONE"], "side.needle_rank (nulls, the codes, NONE for no point)")
     out += same(p, "side.order_code", sd["order_code"], ovals, "side.order_code keys = order value x two_start (nulls included)")

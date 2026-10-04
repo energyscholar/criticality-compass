@@ -5,6 +5,7 @@ from pathlib import Path
 import numpy as np
 import declare
 import detect
+import family
 import view
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -41,6 +42,36 @@ def axis_tallies(rows, T, tr, otr):
     ge = agreement([(cls(sig["geometry"]), tr[case]) for sig, case in both if otr[case] != "FIRST-ORDER"])
     return [f"Order against order_truth: " + ", ".join(f"{n} {k}" for k, n in o.items()),
             f"Geometry against class_truth (order_truth not FIRST-ORDER): " + ", ".join(f"{n} {k}" for k, n in ge.items())]
+
+
+def end_scores(out, points, truth):
+    """[(point, agree | refused | disagree)] for every point whose truth class is BKT-END (plan 0871 E3). An end read from a grid is a
+    BRACKET, not a point: AGREE when the family reads BKT-END and the point lies inside one of its end_brackets (grid order, ends included);
+    a family that refuses is refused (a miss, never an agreement); any other family class, or a BKT-END read that misses the point, disagrees."""
+    pos = {p: i for i, p in enumerate(points)}
+    inside = lambda p: any(min(pos[a], pos[b]) <= pos[p] <= max(pos[a], pos[b]) for a, b in out["end_bracket"])   # noqa: E731
+    return [(p, "refused" if out["class"] == "REFUSE" else "agree" if out["class"] == "BKT-END" and inside(p) else "disagree")
+            for p in points if truth.get(p) == "BKT-END"]
+
+
+def family_ends(tset, inputs, tr, joins, root, findings):
+    """The `## Family ends` section of one set: each family of this set that names an end and joins a BKT-END truth point, the family
+    class read at that point. A family that cannot be read is a finding, never a silent skip. [] when no family has such a point."""
+    got, tally, lines = [], {"agree": 0, "refused": 0, "disagree": 0}, []
+    for f in sorted((Path(root) / "families").glob("*.toml")):
+        decl = family.load_decl(root, f.stem)
+        if decl and decl["input"] in inputs and (Path(root) / "tables" / tset / "family.toml").is_file():
+            msg, ran = family.run(root, f.stem, tset)
+            findings += [msg] * (ran is None)
+            got += [ran] * (ran is not None and "end_bracket" in ran[1])
+    for decl, out, _ in got:
+        jn = (joins or {}).get(decl["input"]) or join(decl["input"], root) or {}
+        res = end_scores(out, detect.load_input(decl["input"])["axes"]["point"], {p: tr.get(c) for p, c in jn.items()})
+        lines += (res and [f"- `{decl['id']}`: family {out['verdict']} (class {out['class']}), end_point {out['end_point']}, end_bracket {out['end_bracket']}"]
+                  + [f"  - point {p} (case `{jn[p]}`, truth BKT-END): {k}" for p, k in res]) or []
+        for _, k in res:
+            tally[k] += 1
+    return (["", f"## Family ends ({tset})", ""] + lines + ["", "Family end against truth: " + ", ".join(f"{n} {k}" for k, n in tally.items())]) * bool(lines)
 
 
 def sizes_of(input_id, root):
@@ -96,6 +127,7 @@ def tabulate(results, root=ROOT, joins=None):
         out += [f"- `{', '.join(f'{c}={v}' for c, v in zip(cols, k))}`: "
                 + " vs ".join(f"{t} ({', '.join(p)})" for t, p in sorted(g.items()) if t not in ("none", "UNJOINED"))
                 for k, g in clash] or ["none"]
+        out += family_ends(tset, {r["input"] for r in rs}, tr, joins, root, findings)
         out.append("")
     return "\n".join(out) + "\n", findings
 

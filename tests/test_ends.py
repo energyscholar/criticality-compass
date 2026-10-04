@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "cc" / "instruments")]
 import declare  # noqa: E402
 import family  # noqa: E402
+import score  # noqa: E402
 
 bad = []
 NULLS = ["NOT-MEASURED", "NOT-EVALUATED"]
@@ -82,7 +83,7 @@ def planted(plant, fam=FAM, text=FTEXT):
 
 for pl in PLANT["plant"]:
     got = planted(pl)
-    want = {k: pl[k] for k in ("bracket", "lower", "upper", "verdict", "class")} | {"points": pl["points_code"]}
+    want = {k: pl[k] for k in ("bracket", "lower", "upper", "verdict", "class", "end_point", "end_bracket")} | {"points": pl["points_code"]}
     check(f"planted: {pl['name']}", all(got[k] == v for k, v in want.items()), f"{ {k: got[k] for k in want} } vs {want}")
     if "v04_verdict" in pl:
         old = family.compute({"interior": pl["interior"]}, {"signature": [{"point": q.split(":")[0], **PLANT["kind"][q.split(":")[1]]} for q in pl["points"]]},
@@ -147,6 +148,50 @@ with tempfile.TemporaryDirectory() as tmp:
     check("two side rows that overlap are refused", any("overlap" in x.msg for x in found), str(found))
     f.write_text(FTEXT.replace('lower = ["END-BKT-CANDIDATE"', 'lower = ["END-BKT-CANDIDATEX"', 1))
     check("a lower alphabet that differs from upper is refused", any("alphabets.upper" in x.loc for x in declare.check_file(f, ROOT)))
+
+
+# ---------------------------------------------------------------- P3: the family names its end, and the end is scored as a BRACKET against a truth point
+xy = planted(PLANT["plant"][0])                         # BKT-END, end_bracket [c, d] on the chain a b c d
+pts = ["a", "b", "c", "d"]
+check("an end read from a grid is a bracket: a BKT-END truth point inside end_bracket AGREES", score.end_scores(xy, pts, {"d": "BKT-END"}) == [("d", "agree")])
+check("the boundary itself is inside its own bracket", score.end_scores(xy, pts, {"c": "BKT-END"}) == [("c", "agree")])
+check("a BKT-END truth point OUTSIDE the bracket disagrees even when the family reads BKT-END (a finite-size miss is a miss)",
+      score.end_scores(xy, pts, {"a": "BKT-END"}) == [("a", "disagree")])
+check("a point whose truth is not BKT-END is not scored by the end", score.end_scores(xy, pts, {"a": "LINE", "d": "POINT", "b": None}) == [])
+decoy = planted(PLANT["plant"][5])
+check("a refusing family is refused at a BKT-END truth point: a refusal is a miss, never an agreement", score.end_scores(decoy, pts, {"d": "BKT-END"}) == [("d", "refused")])
+at4 = planted(PLANT["plant"][2])
+check("a family that reads LINE with a multicritical end disagrees at a BKT-END truth point", score.end_scores(at4, pts, {"d": "BKT-END"}) == [("d", "disagree")])
+clock, cpts = planted(PLANT["plant"][4]), ["o1", "o2", "a", "b", "c", "d", "e"]
+check("a lower end's bracket runs outward from its boundary: o2 is inside [a, o2], o1 is not",
+      score.end_scores(clock, cpts, {"o2": "BKT-END", "o1": "BKT-END", "d": "BKT-END", "e": "BKT-END"})
+      == [("o1", "disagree"), ("o2", "agree"), ("d", "agree"), ("e", "disagree")])
+
+# the tabulate section, through the real function: family.run is replaced by a stored-result stand-in (the planted family), the join and truths are planted
+class Stand:
+    run = staticmethod(lambda root, fid, tset: (None, ({"id": fid, "input": "x8-ising-needle"},
+                                                     {"verdict": "BKT-END", "class": "BKT-END", "end_point": ["1.00"], "end_bracket": [["1.00", "1.01"]]}, tset)))
+    load_decl = staticmethod(lambda root, fid: {"id": fid, "input": "x8-ising-needle"})
+
+
+with tempfile.TemporaryDirectory() as tmp:
+    (Path(tmp) / "families").mkdir()
+    (Path(tmp) / "families" / "p.toml").write_text("")
+    (Path(tmp) / "tables" / "v05-rules").mkdir(parents=True)
+    (Path(tmp) / "tables" / "v05-rules" / "family.toml").write_text("")
+    real, score.family = score.family, Stand
+    try:
+        found = []
+        sec = score.family_ends("v05-rules", {"x8-ising-needle"}, {"xy-tkt": "BKT-END", "xy-low-phase": "LINE"},
+                                {"x8-ising-needle": {"0.90": "xy-tkt", "1.00": "xy-low-phase", "1.01": "xy-tkt"}}, tmp, found)
+        none = score.family_ends("v05-rules", {"x8-ising-needle"}, {"xy-tkt": "LINE"}, {"x8-ising-needle": {"1.01": "xy-tkt"}}, tmp, found)
+    finally:
+        score.family = real
+    check("tabulate's Family ends section names the family, its end_bracket and each BKT-END truth point's reading",
+          "## Family ends (v05-rules)" in sec and "- `p`: family BKT-END (class BKT-END), end_point ['1.00'], end_bracket [['1.00', '1.01']]" in sec
+          and "  - point 0.90 (case `xy-tkt`, truth BKT-END): disagree" in sec and "  - point 1.01 (case `xy-tkt`, truth BKT-END): agree" in sec
+          and sec[-1] == "Family end against truth: 1 agree, 0 refused, 1 disagree" and not found, "\n".join(sec))
+    check("a set with no BKT-END truth point prints no Family ends section (the existing SIGNATURE-TABLE is unchanged)", none == [], str(none))
 
 print("".join(f"FAILED {x}\n" for x in bad) + "test_ends: " + ("FAILED" if bad else "all passed"))
 sys.exit(1 if bad else 0)
