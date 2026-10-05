@@ -1,0 +1,75 @@
+# expected/v08-rules.toml - the SCOREBOARD LOCK for v08-rules (plan 0877), DECLARED BEFORE ANY v08-rules RUN. Committed in P2 as expected/v08-rules.declared and renamed to .toml
+# once the run exists (the scoreboard tests read every expected/*.toml against stored results). Transcribed from the toolset's results/0877-P0.txt (the ruling-A table; NOT results/OBS2.txt,
+# the pre-ruling original) and m.toml [0877-P0] with its two addenda (P0-d, P0-e); the D2 column, which at 600k equals the v08-D column (no covariance across is a null there).
+# v08-rules = v07-rules + stability on the Delta basis (instrument stability_delta, no TRANSFORMED) + Bruce's ruling A (across_dlt maps SLOW- / SLOW+ to MARGINAL) + D2 (nullable = "either")
+# + f1 on the Delta basis (family.toml f1 reads across_delta.y_last, per consecutive interior pair). v08 applies ONLY to inputs that declare stability_delta: x2b-xy-3 is the one
+# input locked here (every other input's stability reads NOT-MEASURED under v08 by construction: no scoreboard is claimed for them, and none is run).
+# It is NOT truth: agreement with class_truth / order_truth is reported by bin/cc tabulate (cc/score.py), never here.
+schema = 1
+kind = "expected"
+tables = "v08-rules"
+
+[verdicts.x2b-xy-3]                  # 0877-P0 600k, v08-D / D2 columns: LINE at all five low-phase points (the ruling-A readings), REFUSE-UNRES at T_KT 0.89294, NOT above
+"0.5" = "LINE"
+"0.6" = "LINE"
+"0.7" = "LINE"
+"0.8" = "LINE"
+"0.85" = "LINE"
+"0.89294" = "REFUSE-UNRES"
+"0.95" = "NOT"
+"1.0" = "NOT"
+"1.1" = "NOT"
+
+[stability.x2b-xy-3]                 # 0877-P0 stab_D column: d_D STABLE at every point but 1.0 (pairs 0.95->1.0 STABLE and 1.0->1.1 OFF disagree: UNRES) and 1.1 (OFF, d_D -0.5063)
+"0.5" = ["STABLE"]
+"0.6" = ["STABLE"]
+"0.7" = ["STABLE"]
+"0.8" = ["STABLE"]
+"0.85" = ["STABLE"]
+"0.89294" = ["STABLE"]
+"0.95" = ["STABLE"]
+"1.0" = ["UNRES"]
+"1.1" = ["OFF"]
+
+[across.x2b-xy-3]                    # 0877-P0 across_D column (raw yD2, every pair RAW, ruling A): MARGINAL at 0.5-0.85; 0.89294 UNRES (pairs MARGINAL, RELEVANT); 0.95 RELEVANT; 1.0 UNRES; 1.1 MARGINAL
+"0.5" = ["MARGINAL"]
+"0.6" = ["MARGINAL"]
+"0.7" = ["MARGINAL"]
+"0.8" = ["MARGINAL"]
+"0.85" = ["MARGINAL"]
+"0.89294" = ["UNRES"]
+"0.95" = ["RELEVANT"]
+"1.0" = ["UNRES"]
+"1.1" = ["MARGINAL"]
+
+[geometry.x2b-xy-3]                  # the verdicts above, as the geometry axis (the probe is COMPLETE: one coupling T, probed)
+"0.5" = ["LINE"]
+"0.6" = ["LINE"]
+"0.7" = ["LINE"]
+"0.8" = ["LINE"]
+"0.85" = ["LINE"]
+"0.89294" = ["REFUSE-UNRES"]
+"0.95" = ["NOT"]
+"1.0" = ["NOT"]
+"1.1" = ["NOT"]
+
+[family_set.x2b-xy-3]                # P0-d (family verdict and bracket unchanged from x2b-xy-2@v07: BKT-END, end 0.89294, bracket [0.89294, 0.95]) + P0-e (f1 CONSTANT on the pair-unit Delta basis) + the
+                                     # remaining columns derived by the red-team (research/compass-F2-0877-redteam.md N4) from the stored x2b-xy-2 codes: bracket BRACKET-DOWN, f2 WEAK, points LINE, lower OPEN, upper END-BKT-CANDIDATE
+bracket = ["BRACKET-DOWN"]
+f1 = ["CONSTANT"]
+f2 = ["WEAK"]
+points = ["LINE"]
+lower = ["OPEN"]
+upper = ["END-BKT-CANDIDATE"]
+verdict = ["BKT-END"]
+end_point = [["0.89294"]]
+end_bracket = [[["0.89294", "0.95"]]]
+
+[[change]]
+date = "2026-10-05"
+points = ["x2b-xy-3:*", "x2b-xy-3"]
+why = """DECLARED BEFORE ANY v08-rules RUN (plan 0877 P2): v08-rules = v07-rules + stability on the Delta basis (the new instrument stability_delta, d_D = yD2 - yD1 per control pair, \
+no transform, no TRANSFORMED cell) + Bruce's ruling A of 2026-10-05 (across_dlt's map reads SLOW- and SLOW+ MARGINAL, not WEAK) + D2 (a covariance across that is a null no longer blocks a live Delta reading) + \
+f1 on the Delta basis. The NEW input x2b-xy-3 (= x2b-xy-2 + stability_delta, the same 54 pinned files) and its family are the only things locked: no existing input is read under v08 (none declares \
+stability_delta: its stability would read NOT-MEASURED by construction), and every v01-v07 cell, expected/v0?-rules.toml, results/*@v0?-rules.* and tables/v07-rules must not move. The cells are the 0877-P0 table \
+(toolset results/0877-P0.txt, ruling-A table) and m.toml [0877-P0] P0-d / P0-e; a reading that differs is a finding, reported, never adjusted"""
