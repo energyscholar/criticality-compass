@@ -84,7 +84,8 @@ with tempfile.TemporaryDirectory() as t:
         + [("x2-xy-line-3", "0.6", "REFUSE-UNRES", "REFUSE-SLOW"), ("x2b-xy", "0.6", "LINE", "REFUSE-SLOW")] \
         + [("x2b-xy-2", pt, v, "REFUSE-SLOW") for pt, v in (("0.5", "LINE"), ("0.6", "REFUSE-UNRES"), ("0.7", "REFUSE-WEAK"), ("0.8", "REFUSE-UNRES"), ("0.85", "REFUSE-UNRES"))] \
         + [("x2b-xy-2", "0.89294", "REFUSE-UNRES", "POINT")] \
-        + [("x2b-xy-2", pt, "LINE", "REFUSE-SLOW") for pt in ("0.6", "0.7", "0.8", "0.85")]   # plan 0872 P4 (v06 results; Auditor listing edit, class b); plan 0874 P2: the four x2b-xy-2 points that move to LINE under v07-rules (class b)
+        + [("x2b-xy-3", pt, "LINE", "REFUSE-SLOW") for pt in ("0.5", "0.6", "0.7", "0.8", "0.85")] + [("x2b-xy-3", "0.89294", "REFUSE-UNRES", "POINT")] \
+        + [("x2b-xy-2", pt, "LINE", "REFUSE-SLOW") for pt in ("0.6", "0.7", "0.8", "0.85")]   # plan 0877 P2: the six x2b-xy-3 points under v08-rules (class b); plan 0872 P4 (v06 results; Auditor listing edit, class b); plan 0874 P2: the four x2b-xy-2 points that move to LINE under v07-rules (class b)
     # plan 0871 G5: the DISTINCT (input, point, stored verdict, flipped verdict) the D13 flip moves is the finding (declared above); how many times each moves is
     # derived from the results on disk - one per stored result of that input whose point holds that stored verdict - so a new table set needs no hand edit
     verdict_at = {(r["input"], s["point"], r["run_id"]): s["verdict"] for r in results for s in r["signature"]}

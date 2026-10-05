@@ -1,6 +1,6 @@
 $ bin/cc validate --mvt --advanced
 
-checked: 21 case, 1 cc, 8 codes, 6 compose, 32 couplings, 32 data-manifest, 7 family, 7 family-decl, 6 geometry, 32 input, 10 instrument, 7 membership, 6 order, 32 points, 4 probe, 8 verdict
+checked: 21 case, 1 cc, 9 codes, 7 compose, 33 couplings, 33 data-manifest, 8 family, 8 family-decl, 7 geometry, 33 input, 11 instrument, 8 membership, 7 order, 33 points, 5 probe, 9 verdict
 validate: clean
 -- MVT gate (report only; no status is changed)
   PASS  1 POINT: >= 2 in-table cases with different mechanisms :: 4 case(s) ['bc-lambda-line', 'ising-2d', 'nnn-ising-manifold', 'potts-q3'], 4 distinct mechanism(s)
