@@ -20,7 +20,7 @@ SIGNS = ("SIG-", "NEG", "SLOW-", "ZERO!", "SLOW+", "POS", "SIG+", "UNRES")
 RESULT_FIELDS = (  # the result field set that cc.toml [basic] must partition (view.py reads it from here)
     "instrument", "unit", "column", "eps_key", "eps", "estimate", "lo", "hi", "cell", "code", "per_size",
     "flags", "reason", "vector_key", "point", "obtained", "verdict", "verdict_class", "row_line", "why",
-    "read", "code_commit", "code_hash", "measure_hash", "interval", "reports", "derived_from", "pair_readings", "pairs", "geometry", "order", "axis_lines", "declared")
+    "read", "code_commit", "code_hash", "measure_hash", "peak_rss_mb", "interval", "reports", "derived_from", "pair_readings", "pairs", "geometry", "order", "axis_lines", "declared")
 RESERVED = {"door", "declare", "author", "detect", "view", "score", "admit"}
 DECLARED = {"probe": ("COMPLETE", "INCOMPLETE", "UNKNOWN")}   # code columns read from an input's declaration (couplings.toml), never from data
 SIZE_KEY = "L"                 # the one scalar a data file holds that is the lattice size, not a coupling
@@ -188,7 +188,7 @@ def chk_cc(p, d, c, stem=None):
             for x in sorted((keeps | discards) - set(RESULT_FIELDS))]
     out += [at(p, "basic", f"field '{x}' is in both keeps and discards", "keep it in one list")
             for x in sorted(keeps & discards)]
-    out += shape(p, d["check"], {"fast_budget_s": int, "slow": list}, pre="check.")
+    out += shape(p, d["check"], {"fast_budget_s": int, "slow": list, "memory_gb": (int, float)}, pre="check.")
     classes = d["golden"].get("classes", {})
     out += [at(p, f"golden.classes.{k}", "must have files and match, each a list of strings", "write files = [...] and match = [...]")
             for k, v in sorted(classes.items())

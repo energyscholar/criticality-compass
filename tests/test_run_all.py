@@ -10,6 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "cc" / "instruments")]
 import detect  # noqa: E402
+import resources  # noqa: E402
 
 SET = "v03-rules"
 
@@ -23,7 +24,13 @@ def measure(name):
 if __name__ == "__main__":
     names = sorted(p.name for p in (ROOT / "inputs").iterdir() if p.is_dir() and not p.name.startswith("TEMPLATE"))
     expected = tomllib.loads((ROOT / "expected" / f"{SET}.toml").read_text())["verdicts"]
-    with ProcessPoolExecutor(max(1, (os.cpu_count() or 3) - 2)) as pool:
+    memory_gb = tomllib.loads((ROOT / "cc.toml").read_text())["check"]["memory_gb"]
+    peaks = resources.recorded_peaks(ROOT, names, SET)
+    workers = resources.pool_size(memory_gb, peaks, os.cpu_count() or 3)
+    known = [p for p in peaks.values() if p is not None]
+    print(f"test_run_all: pool {workers} workers = floor({memory_gb} GB x 1024 / {max(known, default=memory_gb * 1024):.0f} MB largest peak; "
+          f"{len(known)} of {len(names)} inputs record one), at most cpu_count-2")
+    with ProcessPoolExecutor(workers) as pool:
         done = list(pool.map(measure, names))
     got = {name: g for name, g, _ in done}
     if os.environ.get("CC_VERBOSE") == "1":

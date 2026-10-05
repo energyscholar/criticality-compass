@@ -13,6 +13,7 @@ import numpy as np
 import declare
 import door
 import readout
+import resources
 
 ROOT = Path(__file__).resolve().parent.parent
 AXES = ("geometry", "order", "compose")
@@ -417,7 +418,9 @@ def run_keyed(input_id, tables, write, tables_dir=None, reuse=True):
         if write:
             (ROOT / "results" / f"{rid}.json").write_text(json.dumps(res, indent=1) + "\n")
         return res, "re-verdicted"
+    resources.reset_peak()
     out = measure(m, c, reg, T)
+    peak = resources.peak_mb()   # the high-water mark of this one input's measurement (plan 0881 P1.1)
     cols = declare.code_cols(T.codes)
     direct = {s["from"]: n for n, s in cols.items() if isinstance(s["from"], str)}
     readings, reports, vectors, signature = [], [], {}, []
@@ -452,7 +455,7 @@ def run_keyed(input_id, tables, write, tables_dir=None, reuse=True):
         r = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True)
         commit = r.stdout.strip() or "none"
     res = {"schema": 1, "kind": "result", "run_id": rid, "input": input_id, "tables": tables,
-           "derived_from": None, "code_commit": commit, "code_hash": chash, "measure_hash": mhash, "interval": dict(m["interval"]), "read": read,
+           "derived_from": None, "code_commit": commit, "code_hash": chash, "measure_hash": mhash, "peak_rss_mb": round(peak, 1), "interval": dict(m["interval"]), "read": read,
            "vectors": f"results/{rid}.npz",
            "readings": readings, "pair_readings": pair_readings, "reports": reports + pair_reports,
            "signature_columns": list(T.codes["columns"]["signature"]), "signature": signature, "pairs": pairs,
