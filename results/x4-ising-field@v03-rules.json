@@ -5,9 +5,10 @@
  "input": "x4-ising-field",
  "tables": "v03-rules",
  "derived_from": null,
- "code_commit": "ebdd61696334bcc85bce554f2f13781b837ac971",
- "code_hash": "cd46cc159b8d1a3ea96b62f6fc4433ef02646e901ead86f852c3533fe325dbf9",
- "measure_hash": "c69ea6b5022f25c3f22c360fe135fc5bf7f103a3ae6889f6fb89967709333918",
+ "code_commit": "e53561709a5e6517e4cf055e48b2ddf3bdb6f6e0",
+ "code_hash": "0a67671f8fac36e4d6f5b4a2aba1b0cd3d39f8142d49ba4d88163b8ea36633b9",
+ "measure_hash": "5dfe95f3b5ff1d353b69e443fa37d5fb810f0a9c90effb032a6f071b6d2a6322",
+ "peak_rss_mb": 1099.2,
  "interval": {
   "method": "block",
   "b": 400,

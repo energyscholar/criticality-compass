@@ -5,9 +5,10 @@
  "input": "x7a-bc",
  "tables": "v03-rules",
  "derived_from": null,
- "code_commit": "ebdd61696334bcc85bce554f2f13781b837ac971",
- "code_hash": "cd46cc159b8d1a3ea96b62f6fc4433ef02646e901ead86f852c3533fe325dbf9",
- "measure_hash": "ca9282bc26504a24380b43b3151ac1d9dfc26282fb777dd7ceab8f5fc0b63000",
+ "code_commit": "e53561709a5e6517e4cf055e48b2ddf3bdb6f6e0",
+ "code_hash": "0a67671f8fac36e4d6f5b4a2aba1b0cd3d39f8142d49ba4d88163b8ea36633b9",
+ "measure_hash": "9d6110481d676154b6eb4e55458c15ba5493a5dac8d0c86bf18e4cb89c4fe1f6",
+ "peak_rss_mb": 1099.3,
  "interval": {
   "method": "block",
   "b": 400,

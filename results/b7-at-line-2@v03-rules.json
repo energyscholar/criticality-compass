@@ -5,9 +5,10 @@
  "input": "b7-at-line-2",
  "tables": "v03-rules",
  "derived_from": null,
- "code_commit": "ebdd61696334bcc85bce554f2f13781b837ac971",
- "code_hash": "cd46cc159b8d1a3ea96b62f6fc4433ef02646e901ead86f852c3533fe325dbf9",
- "measure_hash": "f0dd626ac5d21b34c2d99789f3133fc62b3e73449328bc34f23a278125fdba3a",
+ "code_commit": "e53561709a5e6517e4cf055e48b2ddf3bdb6f6e0",
+ "code_hash": "0a67671f8fac36e4d6f5b4a2aba1b0cd3d39f8142d49ba4d88163b8ea36633b9",
+ "measure_hash": "248035ace27568bcdfdb3da550b4a49612291340fb63c76b32d4e4840a7f751d",
+ "peak_rss_mb": 68.6,
  "interval": {
   "method": "block",
   "b": 400,

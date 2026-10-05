@@ -5,9 +5,10 @@
  "input": "w2-potts",
  "tables": "v03-rules",
  "derived_from": null,
- "code_commit": "ebdd61696334bcc85bce554f2f13781b837ac971",
- "code_hash": "cd46cc159b8d1a3ea96b62f6fc4433ef02646e901ead86f852c3533fe325dbf9",
- "measure_hash": "bbdeecc77dc517c32c47598a226478ac45ab5228bfbb705de6bf9e0b1fc6a559",
+ "code_commit": "e53561709a5e6517e4cf055e48b2ddf3bdb6f6e0",
+ "code_hash": "0a67671f8fac36e4d6f5b4a2aba1b0cd3d39f8142d49ba4d88163b8ea36633b9",
+ "measure_hash": "d62aba38395b17c8d96dcdd0a51a8349ec17b17a3e3e6f8065f4f148ff744706",
+ "peak_rss_mb": 82.3,
  "interval": {
   "method": "block",
   "b": 400,
