@@ -55,7 +55,7 @@ Q = 1                           # the two-start order parameter per snapshot
 keeps = ["point", "column", "estimate", "lo", "hi", "cell", "code", "reason", "verdict", "why", "pairs", "geometry", "order"]
 discards = [
   "instrument", "unit", "eps_key", "eps", "flags", "obtained", "vector_key",
-  "verdict_class", "row_line", "per_size", "read", "code_commit", "code_hash", "interval", "reports", "derived_from",
+  "verdict_class", "row_line", "per_size", "read", "code_commit", "code_hash", "measure_hash", "interval", "reports", "derived_from",
   "pair_readings", "axis_lines", "declared",
 ]
 blank = ["NOT-MEASURED", "NOT-EVALUATED", "UNRES"]  # shown as BLANK (<value>: <reason>)

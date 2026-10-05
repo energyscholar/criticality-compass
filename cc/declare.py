@@ -1,4 +1,5 @@
 """declare.py - plugin loaders, schemas, cross-references, the partition checker, validate (plumbing)."""
+import ast
 import difflib
 import fnmatch
 import hashlib
@@ -19,7 +20,7 @@ SIGNS = ("SIG-", "NEG", "SLOW-", "ZERO!", "SLOW+", "POS", "SIG+", "UNRES")
 RESULT_FIELDS = (  # the result field set that cc.toml [basic] must partition (view.py reads it from here)
     "instrument", "unit", "column", "eps_key", "eps", "estimate", "lo", "hi", "cell", "code", "per_size",
     "flags", "reason", "vector_key", "point", "obtained", "verdict", "verdict_class", "row_line", "why",
-    "read", "code_commit", "code_hash", "interval", "reports", "derived_from", "pair_readings", "pairs", "geometry", "order", "axis_lines", "declared")
+    "read", "code_commit", "code_hash", "measure_hash", "interval", "reports", "derived_from", "pair_readings", "pairs", "geometry", "order", "axis_lines", "declared")
 RESERVED = {"door", "declare", "author", "detect", "view", "score", "admit"}
 DECLARED = {"probe": ("COMPLETE", "INCOMPLETE", "UNKNOWN")}   # code columns read from an input's declaration (couplings.toml), never from data
 SIZE_KEY = "L"                 # the one scalar a data file holds that is the lattice size, not a coupling
@@ -458,6 +459,38 @@ def classify_changes(classes, name, old, new):
                    if any(fnmatch.fnmatch(name, g) for g in c["files"]) and any(re.search(r, ln) for r in c["match"])]
             out.append((hit[0] if hit else "e", ln))
     return out
+
+
+def import_closure(root, starts):
+    """{path relative to root: content sha} of the import closure, within cc/, of the module files `starts` (paths relative to root).
+    Imports are READ from the syntax tree (every Import / ImportFrom node, lazy ones inside functions too), never listed by hand.
+    A module that cannot be followed statically (a dynamic import, exec, eval) is refused, never widened to 'all of cc/'."""
+    root, seen, todo = Path(root), {}, list(starts)
+    where = lambda name: next((r for r in (f"cc/{name}.py", f"cc/instruments/{name}.py") if (root / r).is_file()), None)   # noqa: E731
+    while todo:
+        rel = todo.pop()
+        if rel in seen:
+            continue
+        seen[rel] = sha(root / rel)
+        for n in ast.walk(ast.parse((root / rel).read_text())):
+            if isinstance(n, ast.Call) and (nm := getattr(n.func, "id", getattr(n.func, "attr", None))) in ("__import__", "import_module", "exec", "eval"):
+                raise ValueError(f"{rel} line {n.lineno} calls {nm}: its import closure cannot be computed statically\n"
+                                 "  Next: import the module with an import statement, so the measurement key can read it")
+            mods = [a.name for a in n.names] if isinstance(n, ast.Import) else [n.module or ""] if isinstance(n, ast.ImportFrom) and not n.level else []
+            if isinstance(n, ast.ImportFrom) and n.level:
+                raise ValueError(f"{rel} line {n.lineno}: a relative import is not followed\n  Next: use an absolute import (import <module>)")
+            todo += [r for m in mods if (r := where(m.split(".")[0])) is not None]
+    return seen
+
+
+def measure_hash(root, instrument_modules):
+    """sha256 over (path, content sha) of what MEASURES: the import closure, within cc/, of cc/door.py and of each module
+    in `instrument_modules` (cc/instruments/<m>.py). A result's reuse key is this plus its `read`; `code_hash` stays provenance."""
+    files = import_closure(root, ["cc/door.py", *(f"cc/instruments/{m}.py" for m in sorted(set(instrument_modules)))])
+    h = hashlib.sha256()
+    for rel in sorted(files):
+        h.update(f"{rel}\0{files[rel]}\n".encode())
+    return h.hexdigest()
 
 
 def code_hash(root, committed=False):

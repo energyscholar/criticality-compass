@@ -673,10 +673,13 @@ validate: clean
 | full | `bin/cc check` | the end of every Generator phase, and the Auditor's gate: `validate`, EVERY test script and the scoreboard |
 
 Nothing is dropped by a list. `detect.run` is content-keyed: a result stored under the same input and table set whose `read` hashes
-and `code_hash` equal this run's IS the result (nothing is measured or re-written); a measured result under another set whose key
+and `measure_hash` equal this run's IS the result (nothing is measured or re-written); a measured result under another set whose key
 differs only in its `tables/*` entries is re-verdicted (`derived_from` set), unless the sets' `membership.toml` differ; anything
-else is measured. An edit to anything under `cc/` or `bin/cc` changes the code hash, so a result is reused only after a run at the
-current code has stored it (`bin/cc run <input>` writes it).
+else is measured. `measure_hash` is the sha over (path, content sha) of the import closure, within `cc/`, of `cc/door.py` and of the
+modules of the instruments the input declares, parsed from the import statements (`declare.measure_hash`); an edit to a file in no
+closure (view.py, score.py, ...) keeps the key, an edit to kernel.py or an instrument module moves it. A closure that cannot be read
+statically (a dynamic import) is refused. `code_hash` (all of `cc/` and `bin/cc`) stays recorded as provenance and `freeze` still
+demands it. A result with no `measure_hash` has no key: `bin/cc run <input>` writes it.
 A green full check writes `tests/BASELINE.txt` (tree, HEAD, every test's name, status and seconds); `bin/cc check --baseline`
 reads it back when the tree is unchanged.
 
