@@ -1,0 +1,28 @@
+# tests/golden/<id>.<mode>.reads.toml - the RECORDED READ SET of one transcript (written by bin/cc test --regolden test_golden;
+# never typed). Each entry: kinds (R read, S stat, D directory listed) and a path (~data/ = the data root).
+schema = 1
+kind = "golden-reads"
+key = "2d7569eb173e8142c2f9c5077e150d7b8ebd47549a09eeac9961dc05ddc0e010"
+paths = [
+  "RS bin/cc",
+  "R cc.toml",
+  "R cc/author.py",
+  "RS cc/declare.py",
+  "RS cc/formats.py",
+  "R cc/reduce.py",
+  "R checks.toml",
+  "RS inputs/w2-potts/m.toml",
+  "S inputs/w2b",
+  "DS instruments",
+  "R instruments/across.toml",
+  "R instruments/across_delta.toml",
+  "R instruments/along.toml",
+  "R instruments/fluct.toml",
+  "R instruments/needle.toml",
+  "R instruments/needle_chain.toml",
+  "R instruments/needle_o.toml",
+  "R instruments/stability.toml",
+  "R instruments/stability_delta.toml",
+  "R instruments/transform.toml",
+  "R instruments/two_start.toml",
+]

@@ -6,7 +6,7 @@ maths = [
   "cc/instruments/needle.py", "cc/instruments/across.py", "cc/instruments/stability.py",
   "cc/instruments/two_start.py", "cc/instruments/along.py", "cc/instruments/fluct.py", "cc/instruments/needle_chain.py", "cc/instruments/across_delta.py", "cc/instruments/stability_delta.py", "cc/instruments/transform.py", "cc/fingerprint.py", "cc/reduce.py",
 ]
-plumbing = ["bin/cc", "cc/admit.py", "cc/declare.py", "cc/author.py", "cc/door.py", "cc/formats.py", "cc/detect.py", "cc/resources.py", "cc/view.py", "cc/score.py", "cc/reverdict.py", "cc/family.py", "tests/reference/verdict_x.py",
+plumbing = ["bin/cc", "cc/admit.py", "cc/declare.py", "cc/author.py", "cc/door.py", "cc/formats.py", "cc/detect.py", "cc/resources.py", "cc/view.py", "cc/score.py", "cc/reverdict.py", "cc/family.py", "tests/reference/verdict_x.py", "tests/trace/sitecustomize.py",
   ".githooks/pre-commit"]
 benchmark = []
 methods = ["cc/detect.py"]

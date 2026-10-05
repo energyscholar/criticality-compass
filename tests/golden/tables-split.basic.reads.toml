@@ -1,0 +1,43 @@
+# tests/golden/<id>.<mode>.reads.toml - the RECORDED READ SET of one transcript (written by bin/cc test --regolden test_golden;
+# never typed). Each entry: kinds (R read, S stat, D directory listed) and a path (~data/ = the data root).
+schema = 1
+kind = "golden-reads"
+key = "3159adf611863d43305ab11c92157d35c4e0b0e02c062e291dbef14a54d80ba8"
+paths = [
+  "S .",
+  "RS FROZEN.json",
+  "RS bin/cc",
+  "R cc.toml",
+  "R cc/author.py",
+  "RS cc/declare.py",
+  "RS cc/formats.py",
+  "R cc/reduce.py",
+  "R checks.toml",
+  "DS instruments",
+  "R instruments/across.toml",
+  "R instruments/across_delta.toml",
+  "R instruments/along.toml",
+  "R instruments/fluct.toml",
+  "R instruments/needle.toml",
+  "R instruments/needle_chain.toml",
+  "R instruments/needle_o.toml",
+  "R instruments/stability.toml",
+  "R instruments/stability_delta.toml",
+  "R instruments/transform.toml",
+  "R instruments/two_start.toml",
+  "DS tables",
+  "DS tables/mine",
+  "RS tables/mine/codes.toml",
+  "RS tables/mine/verdict.toml",
+  "S tables/v01-rules",
+  "S tables/v02-rules",
+  "S tables/v03-rules",
+  "S tables/v04-rules",
+  "S tables/v05-rules",
+  "S tables/v06-rules",
+  "S tables/v07-rules",
+  "S tables/v08-rules",
+  "DS tables/verdict-x-rules",
+  "R tables/verdict-x-rules/codes.toml",
+  "R tables/verdict-x-rules/verdict.toml",
+]
