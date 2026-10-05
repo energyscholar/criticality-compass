@@ -515,7 +515,9 @@ def cmd_freeze(args):
             print(bad)
             return 1
         frozen = json.loads((ROOT / "FROZEN.json").read_text())
-        if f"results/{rid}.json" not in frozen["files"] and res.get("measure_hash") != committed_measure_hash(name):   # a frozen result was judged when it was frozen
+        parent = res.get("derived_from")   # a re-verdicted result measured nothing: it stands on its parent, which is judged when frozen
+        judged = f"results/{rid}.json" in frozen["files"] or (parent is not None and f"results/{parent}.json" in frozen["files"])   # a frozen result was judged when it was frozen
+        if not judged and res.get("measure_hash") != committed_measure_hash(name):
             print(f"REFUSED: {rid} was not made by the committed measurement (its measure_hash differs from the HEAD tree's, "
                   "or it records none; code_hash is provenance and is not compared).\n"
                   f"  Next: commit the code, then bin/cc run {name} --tables {tset}, then bin/cc freeze {rid}")
