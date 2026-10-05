@@ -1,4 +1,4 @@
-"""test_code_hash - a result records the content hash of the code that made it; `freeze` refuses a result whose
+"""test_code_hash - a result records the content hash of the code that made it (provenance); `freeze` refuses a result whose measure_hash (plan 0881 P1.3; was code_hash)
 hash is not the committed tree's (plan 0869 P2). Planted (plan 0876 B: an edit to a module in every closure, project.py; one in no closure keeps the reuse key, so a re-run would reuse): run, commit a code edit, freeze -> RED; run again -> green."""
 import shutil
 import subprocess
@@ -39,7 +39,7 @@ with tempfile.TemporaryDirectory() as t:
     git("commit", "-q", "-a", "-m", "plant")
     rc, out = cc("freeze", rid)
     check("freeze refuses a result made by other code than the committed tree's (RED)",
-          rc == 1 and "REFUSED" in out and "code_hash" in out and "Next:" in out, out)
+          rc == 1 and "REFUSED" in out and "measure_hash" in out and "Next:" in out, out)
     rc, out = cc("run", "b7-at-line", "--tables", "t3")
     rc, out = cc("freeze", rid)
     check("freeze accepts the result once it is re-run at the committed code", rc == 0 and out.startswith("froze "), out)

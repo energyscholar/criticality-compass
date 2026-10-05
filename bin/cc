@@ -482,6 +482,18 @@ def freeze_files(rid, read, vectors):
     return tdir, want + [f"{tdir}/{q.name}" for q in sorted((ROOT / tdir).iterdir())]
 
 
+def committed_measure_hash(name):
+    """The measurement key (declare.measure_hash) of input `name` as the HEAD tree computes it: HEAD's cc/ is unpacked and hashed."""
+    import declare
+    import detect
+    mods = [detect.instrument(n)[0]["module"] for n in detect.load_input(name)["instruments"]]
+    if not (ROOT / ".git").exists():
+        return declare.measure_hash(ROOT, mods)
+    with tempfile.TemporaryDirectory() as t:
+        subprocess.run(["tar", "-x", "-C", t], input=subprocess.run(["git", "-C", str(ROOT), "archive", "HEAD", "cc"], capture_output=True, check=True).stdout, check=True)
+        return declare.measure_hash(t, mods)
+
+
 def cmd_freeze(args):
     import declare
     import view
@@ -503,9 +515,9 @@ def cmd_freeze(args):
             print(bad)
             return 1
         frozen = json.loads((ROOT / "FROZEN.json").read_text())
-        if f"results/{rid}.json" not in frozen["files"] and res.get("code_hash") != declare.code_hash(ROOT, committed=True):   # a frozen result was judged when it was frozen
-            print(f"REFUSED: {rid} was not made by the committed code (its code_hash differs from the HEAD tree's, "
-                  "or it records none).\n"
+        if f"results/{rid}.json" not in frozen["files"] and res.get("measure_hash") != committed_measure_hash(name):   # a frozen result was judged when it was frozen
+            print(f"REFUSED: {rid} was not made by the committed measurement (its measure_hash differs from the HEAD tree's, "
+                  "or it records none; code_hash is provenance and is not compared).\n"
                   f"  Next: commit the code, then bin/cc run {name} --tables {tset}, then bin/cc freeze {rid}")
             return 1
         tdir, want = freeze_files(rid, read, res["vectors"])
