@@ -5,7 +5,9 @@
  "input": "b7-at-line-4",
  "tables": "v03-rules",
  "derived_from": null,
- "code_commit": "0268a89e4b59259b7e37cf5a60e56124d8327049",
+ "code_commit": "ebdd61696334bcc85bce554f2f13781b837ac971",
+ "code_hash": "cd46cc159b8d1a3ea96b62f6fc4433ef02646e901ead86f852c3533fe325dbf9",
+ "measure_hash": "f400b656e37c369a302b251770b684dac78973fe7b7e7b4fb5bd903e788707e2",
  "interval": {
   "method": "block",
   "b": 400,

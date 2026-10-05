@@ -5,7 +5,9 @@
  "input": "x7a-nnn",
  "tables": "v03-rules",
  "derived_from": null,
- "code_commit": "b1ecb47f818d4a28cc98cda23d691138faf73104",
+ "code_commit": "ebdd61696334bcc85bce554f2f13781b837ac971",
+ "code_hash": "cd46cc159b8d1a3ea96b62f6fc4433ef02646e901ead86f852c3533fe325dbf9",
+ "measure_hash": "ca9282bc26504a24380b43b3151ac1d9dfc26282fb777dd7ceab8f5fc0b63000",
  "interval": {
   "method": "block",
   "b": 400,

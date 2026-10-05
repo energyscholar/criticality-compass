@@ -5,7 +5,9 @@
  "input": "w1-potts",
  "tables": "v03-rules",
  "derived_from": null,
- "code_commit": "b1ecb47f818d4a28cc98cda23d691138faf73104",
+ "code_commit": "ebdd61696334bcc85bce554f2f13781b837ac971",
+ "code_hash": "cd46cc159b8d1a3ea96b62f6fc4433ef02646e901ead86f852c3533fe325dbf9",
+ "measure_hash": "4f9ec50ea9bd6b4f3f4dd0e13a851d35f2210e482053de8ce9c86a328af885d4",
  "interval": {
   "method": "block",
   "b": 400,
