@@ -27,8 +27,9 @@ check("a 1.1 GB peak and 8 cpus: the budget decides, not the cpu count",
       resources.pool_size(5.0, {"a": 1100.0, "b": 600.0}, 64) == 4, str(resources.pool_size(5.0, {"a": 1100.0, "b": 600.0}, 64)))
 check("many cpus, small peaks: cpu_count-2 is the cap", resources.pool_size(5.0, {"a": 100.0}, 8) == 6)
 check("PLANT: an input declaring 4 GB makes the pool one", resources.pool_size(5.0, {"a": 600.0, "big": 4096.0}, 64) == 1)
-check("an input with no recorded peak counts as the largest recorded",
-      resources.pool_size(5.0, {"a": 1100.0, "b": None}, 64) == resources.pool_size(5.0, {"a": 1100.0, "b": 1100.0}, 64) == 4)
+check("PLANT: an unrecorded input never shares the pool: it is listed for its own slot and does not size the pool",
+      resources.unrecorded({"a": 1100.0, "b": None, "c": 900.0, "d": None}) == ["b", "d"]
+      and resources.pool_size(5.0, {"a": 1100.0, "b": None}, 64) == 4)
 check("no peak recorded at all: a pool of one", resources.pool_size(5.0, {"a": None}, 64) == 1)
 check("a peak above the whole budget still gives one worker", resources.pool_size(5.0, {"a": 9000.0}, 64) == 1)
 with tempfile.TemporaryDirectory() as t:

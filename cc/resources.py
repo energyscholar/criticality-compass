@@ -24,8 +24,13 @@ def recorded_peaks(root, names, tables):
     return out
 
 
+def unrecorded(peaks):
+    """The inputs whose peak is not recorded: their size is unknown, so each is measured ALONE, never in the pool."""
+    return sorted(n for n, p in peaks.items() if p is None)
+
+
 def pool_size(memory_gb, peaks, cpus):
-    """max(1, floor(memory_gb*1024 / the largest peak), at most cpus-2). An input with no recorded peak counts as the largest
-    recorded one; with none recorded at all, as the whole budget (a pool of one)."""
+    """max(1, floor(memory_gb*1024 / the largest RECORDED peak), at most cpus-2). Only inputs with a recorded peak belong to the pool
+    (an unrecorded one is `unrecorded(peaks)`: its own slot); with none recorded the pool is one."""
     worst = max((p for p in peaks.values() if p is not None), default=memory_gb * 1024)
     return max(1, min(int(memory_gb * 1024 // worst), cpus - 2))

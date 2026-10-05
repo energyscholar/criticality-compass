@@ -27,11 +27,13 @@ if __name__ == "__main__":
     memory_gb = tomllib.loads((ROOT / "cc.toml").read_text())["check"]["memory_gb"]
     peaks = resources.recorded_peaks(ROOT, names, SET)
     workers = resources.pool_size(memory_gb, peaks, os.cpu_count() or 3)
-    known = [p for p in peaks.values() if p is not None]
-    print(f"test_run_all: pool {workers} workers = floor({memory_gb} GB x 1024 / {max(known, default=memory_gb * 1024):.0f} MB largest peak; "
-          f"{len(known)} of {len(names)} inputs record one), at most cpu_count-2")
+    alone, pooled = resources.unrecorded(peaks), [n for n in names if peaks[n] is not None]
+    print(f"test_run_all: pool {workers} workers = floor({memory_gb} GB x 1024 / {max((p for p in peaks.values() if p is not None), default=memory_gb * 1024):.0f} MB "
+          f"largest recorded peak), at most cpu_count-2, for {len(pooled)} inputs; {len(alone)} with no recorded peak run one at a time after it")
     with ProcessPoolExecutor(workers) as pool:
-        done = list(pool.map(measure, names))
+        done = list(pool.map(measure, pooled))
+    with ProcessPoolExecutor(1) as one:   # an input of unknown size gets the host to itself: never beside another measurement
+        done += list(one.map(measure, alone))
     got = {name: g for name, g, _ in done}
     if os.environ.get("CC_VERBOSE") == "1":
         print("".join(f"seconds {sec:7.1f}  {name}\n" for name, _, sec in sorted(done, key=lambda d: -d[2])), end="")
