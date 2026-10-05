@@ -10,18 +10,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "cc" / "instruments")]
 import detect  # noqa: E402
-import quick  # noqa: E402
 
 SET = "v03-rules"
 
 
 def measure(name):
     t0 = time.time()
-    if name in quick.heavy("test_run_all", "inputs"):   # `check --quick`: the declared heavy input is read from storage, not re-measured
-        res, _, problem = quick.stored(ROOT, name, SET)
-        if problem:
-            raise SystemExit(f"test_run_all: FAILED quick cannot read the stored {name}:\n{problem}")
-        return name, {s["point"]: s["verdict"] for s in res["signature"]}, time.time() - t0
     got = {s["point"]: s["verdict"] for s in detect.run(name, SET, write=False)["signature"]}
     return name, got, time.time() - t0
 
@@ -32,8 +26,6 @@ if __name__ == "__main__":
     with ProcessPoolExecutor(max(1, (os.cpu_count() or 3) - 2)) as pool:
         done = list(pool.map(measure, names))
     got = {name: g for name, g, _ in done}
-    for name, secs in quick.heavy("test_run_all", "inputs").items():
-        quick.note("test_run_all", "inputs", name, secs)
     if os.environ.get("CC_VERBOSE") == "1":
         print("".join(f"seconds {sec:7.1f}  {name}\n" for name, _, sec in sorted(done, key=lambda d: -d[2])), end="")
     bad, n = [], 0

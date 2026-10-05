@@ -21,7 +21,7 @@ cc - Criticality Compass   (ADVANCED)
   bin/cc tables drop <set> [--with-results]                   delete an unfrozen rulebook
   bin/cc tables split <set> --column C --value V --verdict X  override one cell family
   bin/cc validate [--input ID --tables SET | --mvt]           check every file; each problem has a Next line
-  bin/cc check [--fast | --quick]                             validate + tests; run it before a commit (three tiers, see Tests)
+  bin/cc check [--fast | --baseline]                          validate + tests; run it before a commit (two tiers, see Tests)
   bin/cc test [-v] [<name> ...]                               run the named tests (default all)
   bin/cc mutate <relpath> (--sed E | --py E) -- <test> ...    run tests against a temporary mutation
   bin/cc help [--advanced]                                    this text
@@ -665,24 +665,20 @@ validate: clean
 
 ## Tests, mutations and the testing system
 
-`bin/cc check` has three tiers; pick by what you are about to do:
+`bin/cc check` has two tiers; pick by what you are about to do:
 
-| tier | command | wall time | when |
-|---|---|---|---|
-| fast | `bin/cc check --fast` | about 25 s (budget 30 s) | the pre-commit hook runs it; it skips the tests listed in `cc.toml [check].slow` |
-| quick | `bin/cc check --quick` | about 2 min | routine: the end of every Generator phase |
-| full | `bin/cc check` | about 8-10 min | a full revision test: plan close, or the Auditor's gate at plan end |
+| tier | command | when |
+|---|---|---|
+| fast | `bin/cc check --fast` | the pre-commit hook runs it (about 25 s, budget 30 s); it skips the tests listed in `cc.toml [check].slow` |
+| full | `bin/cc check` | the end of every Generator phase, and the Auditor's gate: `validate`, EVERY test script and the scoreboard |
 
-Quick runs `validate`, EVERY test script and the scoreboard, exactly as full does. What it drops are the HEAVY CASES named
-in `cc.toml [check.quick]`: a case (an input in `test_run_all` or `test_needle_o_start`, a golden case id in `test_golden`) whose
-re-measure took more than `case_budget_s` (8 s), each with the seconds it took. A dropped input is read from its stored,
-hash-pinned `results/` file (re-verdicted under the set when stored under another) instead of re-measured, so a changed
-stored verdict is still caught; a dropped golden case is not re-run, and its transcript stays on disk unread; `test_needle_o_start`
-does not run its mutation re-measure. `check --quick` prints every drop and why. `validate` refuses a name in the list
-that does not exist or whose figure is not over the budget. Re-measuring a heavy input is what only the full check does.
-Each tier writes its own record: `bin/cc check` writes `tests/BASELINE.txt`, `bin/cc check --quick` writes
-`tests/BASELINE-QUICK.txt` (a `tier quick` line, and the drops); a quick check never overwrites the full record, and
-`bin/cc check --baseline [--quick]` reads the record of the tier for this tree.
+Nothing is dropped by a list. `detect.run` is content-keyed: a result stored under the same input and table set whose `read` hashes
+and `code_hash` equal this run's IS the result (nothing is measured or re-written); a measured result under another set whose key
+differs only in its `tables/*` entries is re-verdicted (`derived_from` set), unless the sets' `membership.toml` differ; anything
+else is measured. An edit to anything under `cc/` or `bin/cc` changes the code hash, so a result is reused only after a run at the
+current code has stored it (`bin/cc run <input>` writes it).
+A green full check writes `tests/BASELINE.txt` (tree, HEAD, every test's name, status and seconds); `bin/cc check --baseline`
+reads it back when the tree is unchanged.
 
 `bin/cc test` runs every test, `bin/cc test <name> …` the named
 ones, `-v` prints each test's lines. Tests are plain scripts, and a test that cannot find its data fails with

@@ -66,54 +66,6 @@ commands = ["show", "explain", "run", "new case", "tables fork", "tables drop", 
 fast_budget_s = 30              # elapsed time is printed against it; over budget WARNS, never fails
 slow = ["test_w2", "test_detect_verdicts", "test_breakers_red", "test_view", "test_golden", "test_along", "test_axes", "test_tables_cli", "test_tabulate", "test_needle_o_start", "test_run_all", "test_code_hash", "test_chain", "test_across_delta", "test_end_note", "test_delta_basis", "test_reduce", "test_stack_door", "test_reuse"]   # each phase appends its > 5 s tests
 
-# The QUICK tier (bin/cc check --quick, cc/quick.py): every test script still runs; what quick drops are the HEAVY CASES named
-# here - a case whose re-measure took more than case_budget_s - and a dropped case is read from results/ (hash-pinned) instead
-# of re-measured. The figure beside a name is the seconds its re-measure took (test_run_all / test_golden with -v, 2026-10-04);
-# validate refuses a name that does not exist or a figure that is not over the budget. `check --quick` prints each drop.
-[check.quick]
-case_budget_s = 8
-[check.quick.test_run_all.inputs]    # inputs: read the stored result (re-verdicted under the set when stored under another)
-x2b-xy = 330
-x2b-xy-2 = 565
-x3-clock6-3 = 45
-x9c-potts-2 = 39
-x9c-potts = 34
-x3-clock6-2 = 33
-x2-xy-line-3 = 32
-b7-at-line-5 = 28
-x3-clock6 = 28
-x5n-bilayer-3 = 24
-x2-xy-line-2 = 23
-x2-xy-line = 20
-x5n-bilayer-2 = 19
-b7-at-line-4 = 19
-w2-potts-2 = 16
-x5n-bilayer = 15
-w2-potts = 12
-b7-at-line-3 = 12
-b7-at-line = 8.6
-[check.quick.test_needle_o_start.inputs]   # x9c-potts is read from storage; the mutation breaker (a second re-measure) is not run
-x9c-potts = 31
-[check.quick.test_golden.cases]      # golden cases (both modes summed): not re-run; the recorded transcript stays on disk, unread
-validate-v01-scratch = 44
-tabulate = 42
-validate-v01-scratch-half = 42
-validate-scratch = 36
-validate-my-rules = 35
-validate-mvt = 35
-validate-scratch-half = 34
-validate-refusals = 33
-run-dry-v01-my-rules = 28
-run-dry-my-rules = 24
-tables-drop-v01-scratch = 24
-tables-drop-scratch = 18
-run-all-v01-scratch = 18
-run-all-scratch = 18
-tabulate-diff-v01-scratch = 8.5
-
-# A regolden's changed lines are PARTITIONED by these classes (plan 0869 P3): the first class (in key order) whose
-# `files` globs match the transcript and whose `match` regexes match the line; a line no class claims is (e) OTHER.
-# A Generator may commit a regolden whose lines are all a-d; any (e) is a STOP (bin/cc test --regolden --classify).
 [golden.classes.a]    # help text or a new command
 files = ["help.*.txt", "new-*.txt"]
 match = ['^[-+]\s+bin/cc ', '^[-+]wrote ', '^[-+]  Next: ']

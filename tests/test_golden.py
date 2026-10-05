@@ -14,7 +14,6 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path[:0] = [str(ROOT / "cc")]
-import quick  # noqa: E402
 GOLD = ROOT / "tests" / "golden"
 REGOLDEN = os.environ.get("CC_REGOLDEN") == "1"
 VERBOSE = os.environ.get("CC_VERBOSE") == "1"
@@ -45,11 +44,7 @@ def timed(job):
 
 
 cases = tomllib.loads((GOLD / "golden.toml").read_text())["case"]
-dropped = quick.heavy("test_golden", "cases")   # `check --quick`: a declared heavy case is not re-run (its transcript stays on disk)
-for case in cases:
-    if case["id"] in dropped:
-        quick.note("test_golden", "cases", case["id"], dropped[case["id"]])
-jobs = [(case, mode) for case in cases if case["id"] not in dropped for mode in ("basic", "advanced")]
+jobs = [(case, mode) for case in cases for mode in ("basic", "advanced")]
 with ThreadPoolExecutor(max(1, (os.cpu_count() or 3) - 2)) as pool:   # each transcript has its own temp copy
     done = list(pool.map(timed, jobs))   # in order: the output below is the same as when run serially
 bad, written = [], []

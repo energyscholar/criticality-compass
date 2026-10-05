@@ -15,7 +15,7 @@ cc - Criticality Compass   (ADVANCED)
   bin/cc tables drop <set> [--with-results]                   delete an unfrozen rulebook
   bin/cc tables split <set> --column C --value V --verdict X  override one cell family
   bin/cc validate [--input ID --tables SET | --mvt]           check every file; each problem has a Next line
-  bin/cc check [--fast | --quick | --baseline]                validate + tests; run it before a commit; --quick drops declared heavy cases; --baseline reads the recorded green run of this tree
+  bin/cc check [--fast | --baseline]                          validate + tests; run it before a commit; --baseline reads the recorded green run of this tree
   bin/cc test [-v] [--regolden [--classify]] [<name> ...]     run the named tests (default all); --classify tags a regolden's changed lines a-e and undoes it on any (e)
   bin/cc mutate <relpath> (--sed E | --py E) -- <test> ...    run tests against a temporary mutation
   bin/cc help [--advanced]                                    this text

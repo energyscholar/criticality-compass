@@ -32,7 +32,7 @@ ADVANCED = [
     ("tables drop <set> [--with-results]", "delete an unfrozen rulebook"),
     ("tables split <set> --column C --value V --verdict X", "override one cell family"),
     ("validate [--input ID --tables SET | --mvt]", "check every file; each problem has a Next line"),
-    ("check [--fast | --quick | --baseline]", "validate + tests; run it before a commit; --quick drops declared heavy cases; --baseline reads the recorded green run of this tree"),
+    ("check [--fast | --baseline]", "validate + tests; run it before a commit; --baseline reads the recorded green run of this tree"),
     ("test [-v] [--regolden [--classify]] [<name> ...]", "run the named tests (default all); --classify tags a regolden's changed lines a-e and undoes it on any (e)"),
     ("mutate <relpath> (--sed E | --py E) -- <test> ...", "run tests against a temporary mutation"),
     ("help [--advanced]", "this text"),
@@ -177,7 +177,7 @@ def tree_hash():
     try:
         git("read-tree", "HEAD")
         git("add", "-A", "--", ".")
-        git("rm", "--cached", "-q", "--ignore-unmatch", *RECORDS.values())   # no record can name itself, and a quick record never moves the full one
+        git("rm", "--cached", "-q", "--ignore-unmatch", RECORD)   # the record cannot name itself
         return git("write-tree")
     finally:
         Path(env["GIT_INDEX_FILE"]).unlink(missing_ok=True)
@@ -188,26 +188,24 @@ def head_hash():
     return r.stdout.strip() or "none"
 
 
-RECORDS = {"full": "tests/BASELINE.txt", "quick": "tests/BASELINE-QUICK.txt"}   # one record per tier: a quick run never overwrites the full one
+RECORD = "tests/BASELINE.txt"
 
 
-def write_baseline(res, took, tier="full", dropped=()):
-    """A green check records what it ran on: tier, tree, HEAD, and every test's NAME, status and seconds (quick: what it dropped)."""
+def write_baseline(res, took):
+    """A green check records what it ran on: tree, HEAD, and every test's NAME, status and seconds."""
     rows = [f"test {stem} {'ok' if ok else 'FAIL'} {sec:.1f}" for stem, ok, _, sec in res]
-    tierline = ["tier quick"] if tier == "quick" else []
-    (ROOT / RECORDS[tier]).write_text(f"tree {tree_hash()}\nhead {head_hash()}\nseconds {took:.0f}\n" + "".join(f"{ln}\n" for ln in tierline)
-                                      + "\n".join(rows) + "\n" + "".join(f"{d}\n" for d in dropped))
+    (ROOT / RECORD).write_text(f"tree {tree_hash()}\nhead {head_hash()}\nseconds {took:.0f}\n" + "\n".join(rows) + "\n")
 
 
-def cmd_baseline(tier="full"):
-    """check --baseline: print the recorded baseline of a tier if its tree is this tree (exit 0), else say run the check."""
-    f = ROOT / RECORDS[tier]
+def cmd_baseline():
+    """check --baseline: print the recorded baseline if its tree is this tree (exit 0), else say run the check."""
+    f = ROOT / RECORD
     have = dict(ln.split(" ", 1) for ln in f.read_text().splitlines() if ln.startswith("tree ")) if f.is_file() else {}
     if have.get("tree") == tree_hash() != "none":
         print(f.read_text(), end="")
-        print(f"baseline: this tree was checked green by the {tier} check (read it instead of running bin/cc check{' --quick' * (tier == 'quick')})")
+        print("baseline: this tree was checked green by the full check (read it instead of running bin/cc check)")
         return 0
-    print(f"baseline: no recorded {tier} baseline for this tree.\n  Next: bin/cc check{' --quick' * (tier == 'quick')}")
+    print("baseline: no recorded baseline for this tree.\n  Next: bin/cc check")
     return 1
 
 
@@ -216,12 +214,8 @@ def cmd_check(args):
     if "--regolden" in args:
         print("check never regoldens.\n  Next: bin/cc test --regolden test_golden")
         return 1
-    quick_tier = "--quick" in args
-    if quick_tier and "--fast" in args:
-        print("check: --fast and --quick are two tiers.\n  Next: bin/cc check --fast (the hook) or bin/cc check --quick (routine)")
-        return 1
     if "--baseline" in args:
-        return cmd_baseline("quick" if quick_tier else "full")
+        return cmd_baseline()
     t0, fast = time.time(), "--fast" in args
     found, _ = declare.validate(ROOT)
     if found:
@@ -230,22 +224,11 @@ def cmd_check(args):
         return 1
     print("check: validate clean")
     slow = config()["check"]["slow"] if fast else []
-    qlog = None
-    if quick_tier:   # every test still runs; the tests read the declared heavy cases (cc.toml [check.quick]) from storage
-        qlog = tempfile.mktemp(prefix="cc-quick-")
-        os.environ["CC_QUICK"], os.environ["CC_QUICK_LOG"] = "1", qlog
     res, _, _ = run_tests([], slow)
-    dropped = sorted(Path(qlog).read_text().splitlines()) if qlog and Path(qlog).is_file() else []
-    if qlog:
-        Path(qlog).unlink(missing_ok=True)
-        os.environ.pop("CC_QUICK", None)
-        os.environ.pop("CC_QUICK_LOG", None)
     bad = [r for r in res if not r[1]]
-    skipped = f" (fast: {len(slow)} slow tests skipped; bin/cc check runs them)" if fast else (
-        f" (quick: {len(dropped)} heavy cases read from storage; bin/cc check re-measures them)" if quick_tier else "")
+    skipped = f" (fast: {len(slow)} slow tests skipped; bin/cc check runs them)" if fast else ""
     print(f"check: {len(res) - len(bad)} tests passed, {len(bad)} failed{skipped}")
     print("\n".join("check: " + ln.strip() for _, _, tail, _ in res for ln in tail if ln.strip().startswith("scoreboard ")))
-    print("\n".join("check: " + d for d in dropped))
     print("check: seconds per test\n" + "\n".join(f"  {sec:7.1f} s  {stem}" for stem, _, _, sec in res))
     for stem, _, tail, _ in bad:
         print(f"check: FAILED: {stem}\n" + "\n".join("    " + ln for ln in tail) + f"\n  Next: bin/cc test {stem}")
@@ -253,9 +236,8 @@ def cmd_check(args):
     if not bad:
         print(f"check: clean in {took:.0f} s (fast budget {budget} s)")
         if not fast:
-            tier = "quick" if quick_tier else "full"
-            write_baseline(res, took, tier, dropped)
-            print(f"check: wrote {RECORDS[tier]}")
+            write_baseline(res, took)
+            print(f"check: wrote {RECORD}")
         if fast and took > budget:
             worst = max(res, key=lambda r: r[3])
             print(f"  Next: move the slowest fast test ({worst[0]}, {worst[3]:.0f} s) to cc.toml [check].slow")

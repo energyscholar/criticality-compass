@@ -187,9 +187,7 @@ def chk_cc(p, d, c, stem=None):
             for x in sorted((keeps | discards) - set(RESULT_FIELDS))]
     out += [at(p, "basic", f"field '{x}' is in both keeps and discards", "keep it in one list")
             for x in sorted(keeps & discards)]
-    out += shape(p, d["check"], {"fast_budget_s": int, "slow": list}, {"quick": dict}, pre="check.")
-    import quick   # the QUICK tier's heavy-case lists (cc/quick.py); absent means quick drops nothing
-    out += [at(p, f, msg, nxt) for f, msg, nxt in quick.findings(c.root, d["check"]["quick"])] if isinstance(d["check"].get("quick"), dict) else []
+    out += shape(p, d["check"], {"fast_budget_s": int, "slow": list}, pre="check.")
     classes = d["golden"].get("classes", {})
     out += [at(p, f"golden.classes.{k}", "must have files and match, each a list of strings", "write files = [...] and match = [...]")
             for k, v in sorted(classes.items())

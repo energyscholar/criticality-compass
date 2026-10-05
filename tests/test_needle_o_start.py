@@ -11,7 +11,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "cc" / "instruments")]
 import detect  # noqa: E402
-import quick  # noqa: E402
 
 bad = []
 
@@ -22,21 +21,14 @@ def check(name, ok, why=""):
         bad.append(name)
 
 
-heavy = quick.heavy("test_needle_o_start", "inputs").get("x9c-potts")   # `check --quick`: x9c-potts is read from storage, and its mutation re-measure is not run
-if heavy:
-    res, _, problem = quick.stored(ROOT, "x9c-potts", "v03-rules")
-    if problem:
-        raise SystemExit(f"test_needle_o_start: FAILED quick cannot read the stored x9c-potts:\n{problem}")
-    quick.note("test_needle_o_start", "inputs", "x9c-potts", heavy)
-else:
-    res = detect.run("x9c-potts", "v03-rules", write=False)
+res = detect.run("x9c-potts", "v03-rules", write=False)
 sig = {s["point"]: s for s in res["signature"]}["8"]
 o = {r["column"]: r["code"] for r in res["readings"] if r["instrument"] == "needle_o" and r["unit"]["point"] == "8"}
 check("q8: the random start's needle reads DIS", sig["needle"] == "DIS", sig["needle"])
 check("q8: the ordered start's needle_o reads ORD (velocity ORD, d_ord AT, d_dis NOT-AT)",
       (o["velocity"], o["d_ord"], o["d_dis"]) == ("ORD", "AT", "NOT-AT"), str(o))
 check("q8: the pair is PINNED-BETWEEN-PHASES", sig["needle_pair"] == "PINNED-BETWEEN-PHASES", sig["needle_pair"])
-if not os.environ.get("CC_NEEDLE_O_INNER") and not heavy:
+if not os.environ.get("CC_NEEDLE_O_INNER"):
     r = subprocess.run([str(ROOT / "bin" / "cc"), "mutate", "instruments/needle_o.toml", "--sed", 's/^start = "ordered"/start = "random"/',
                         "--", "test_needle_o_start"], capture_output=True, text=True, cwd=ROOT, env={**os.environ, "CC_NEEDLE_O_INNER": "1"})
     check("the mutation start = \"random\" turns this test red", "RED   test_needle_o_start" in r.stdout, r.stdout[-300:] + r.stderr[-300:])
