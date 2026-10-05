@@ -27,6 +27,21 @@ def membership_of(root, name, declared):
     return {k: v for k, v in d.items() if k not in ("schema", "kind") and (not isinstance(v, dict) or k in declared)}
 
 
+def signature_sources(root, name):
+    """{signature column: the instruments it is derived from} of a table set (plan 0877)."""
+    d = declare.load(Path(root) / "tables" / name / "codes.toml", root)[0] or {"columns": {"signature": {}}}
+    cols = declare.code_cols(d)
+    return {n: {x.partition(".")[0] for x in detect.sources(n, cols)} - {"declared"} for n in d["columns"]["signature"]}
+
+
+def replaced(res, new, declared, root=ROOT):
+    """(column, instruments) of the first signature column that `new` derives from an instrument the input does not declare while NOT also reading what
+    the result's own set read (a REPLACEMENT, e.g. stability.d -> stability_delta.d): the stored cells hold no reading for it, so the column would read a
+    null that no cell of the map names. A column that only gains a source (across gains across_delta) keeps its old source, which is its declared fallback."""
+    old, nw = signature_sources(root, res["tables"]), signature_sources(root, new)
+    return next(((n, sorted(nw[n] - old[n] - set(declared))) for n in nw if n in old and not old[n] <= nw[n] and nw[n] - old[n] - set(declared)), None)
+
+
 def reverdict_refusal(res, new, root=ROOT):
     """A refusal is a VALUE: the text saying why `res` cannot be re-verdicted under set `new`, else None.
     A set that changes what a door or membership read decided which units ran; those readings are not
@@ -35,6 +50,10 @@ def reverdict_refusal(res, new, root=ROOT):
     declared = tomllib.loads(m.read_text()).get("instruments", []) if m.is_file() else []
     changed = membership_of(root, res["tables"], declared) != membership_of(root, new, declared)
     lacks = bool(declare.declared_cols(declare.load(Path(root) / "tables" / new / "codes.toml", root)[0] or {"columns": {}})) and "declared" not in res   # plan 0870: a declared column is read from couplings.toml at run time
+    gone = replaced(res, new, declared, root)
+    if gone:
+        return (f"REFUSED: tables/{new} derives the column {gone[0]} from {', '.join(gone[1])}, which {res['input']} does not declare, so {res['run_id']} holds no reading of it.\n"
+                f"  Next: declare it in inputs/{res['input']}/m.toml and re-measure with bin/cc run {res['input']} --tables {new}")
     return f"REFUSED: tables/{new} reads a declared column that {res['run_id']} was not run with.\n  Next: re-measure with bin/cc run {res['input']} --tables {new}" if lacks else None if not changed else (
         f"REFUSED: tables/{new} changes membership.toml, which decided which units of {res['input']} ran.\n"
         f"  Next: re-measure with bin/cc run {res['input']} --tables {new}")

@@ -597,9 +597,12 @@ def doms(d, nulls):
 
 def chk_column(p, loc, col, c, allc):
     """One code column: where it comes from, its map (total, no foreign values) and its combine rule."""
-    e = shape(p, col, {"from": (str, list), "alphabet": list, "map": dict}, {"combine": dict, "nullable": bool}, pre=loc + ".")
+    e = shape(p, col, {"from": (str, list), "alphabet": list, "map": dict}, {"combine": dict, "nullable": (bool, str)}, pre=loc + ".")   # nullable: false | true (a null of the 2nd source is a cell) | "either" (plan 0877 D2: a null of either)
     if e:
         return e
+    nl = col.get("nullable")
+    if isinstance(nl, str) and nl != "either":
+        return [at(p, loc + ".nullable", f"'{nl}' is not true, false or \"either\"", "write nullable = true, nullable = false or nullable = \"either\"")]
     src, alpha, nulls = col["from"], col["alphabet"], c.alpha["nulls"]
     if isinstance(src, str):
         inst, _, column = src.partition(".")
@@ -620,15 +623,16 @@ def chk_column(p, loc, col, c, allc):
         if len(src) != 2 or [x for x in src if x not in allc]:
             return [at(p, loc + ".from", f"derived columns name two helper/signature columns, not {src}",
                        "fix the list")]
-        second = list(allc[src[1]].get("alphabet", [])) + list(nulls) * bool(col.get("nullable"))   # nullable: a null of the 2nd source is a named cell
-        want = [f"{a},{b}" for a, b in itertools.product(allc[src[0]].get("alphabet", []), second)]
+        second = list(allc[src[1]].get("alphabet", [])) + list(nulls) * bool(nl)   # nullable: a null of the 2nd source is a named cell
+        first = list(allc[src[0]].get("alphabet", [])) + list(nulls) * (nl == "either")   # "either": a null of the 1st source too (plan 0877 D2)
+        want = [f"{a},{b}" for a, b in itertools.product(first, second)]
         needs = False
     mk, cb = col["map"], col.get("combine")
     out = [at(p, loc + ".map", f"missing key '{k}'", f'add "{k}" = <code>') for k in want if k not in mk]
     out += [at(p, loc + ".map", f"foreign key '{k}'" + (" (nulls are never keys)" if k in nulls else ""), "remove it")
             for k in mk if k not in want]
     out += [at(p, f'{loc}.map."{k}"', f"'{v}' is not in the alphabet {alpha}", f"use one of: {' '.join(alpha)}")
-            for k, v in mk.items() if v not in alpha]
+            for k, v in mk.items() if v not in alpha and not (nl == "either" and v in nulls and set(k.split(",")) <= set(nulls))]   # a null value only where BOTH sources are null
     out += when(needs != (cb is not None), p, loc + ".combine",
                 "required for a point-size source" if needs else "only a point-size source combines", "fix")
     if cb is not None:

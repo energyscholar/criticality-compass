@@ -50,8 +50,9 @@ def f1_of(fam, decl, res, z, m, nulls):
     f, (inst, _, col) = fam["f1"], fam["f1"]["reads"].partition(".")
     if inst not in m["instruments"]:
         return "NOT-MEASURED", []
-    rows = {r["unit"]["point"]: r for r in res["readings"] if (r["instrument"], r["column"]) == (inst, col)}
-    pts = decl["interior"]
+    pair = detect.instrument(inst)[0]["unit"] == "pair"   # plan 0877: a pair instrument is read at the consecutive interior pairs (control edges), one unit per pair
+    rows = {"->".join(r["unit"]["pair"]) if pair else r["unit"]["point"]: r for r in res["pair_readings" if pair else "readings"] if (r["instrument"], r["column"]) == (inst, col)}
+    pts = ["->".join(u) for u in zip(decl["interior"], decl["interior"][1:])] if pair else decl["interior"]
     zero = np.zeros(res["interval"]["resamples"] + 1)
     y = np.stack([z[rows[p]["vector_key"]] if rows[p]["vector_key"] else zero for p in pts], axis=1)   # [R+1, n]
     rel, pairs = relation("all-pairs", pts)

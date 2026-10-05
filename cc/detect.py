@@ -143,7 +143,8 @@ def codes_of(cells, tables):
                     memo[name] = one(name, raw)
             else:
                 a, b = val(src[0]), val(src[1])
-                hit = [x for x in nulls if x in ((a,) if c.get("nullable") else (a, b))]   # nullable: a null of the second source is a cell of the map
+                watch = () if c.get("nullable") == "either" else (a,) if c.get("nullable") else (a, b)   # nullable: a null of the 2nd source is a cell of the map; "either": of both (plan 0877 D2)
+                hit = [x for x in nulls if x in watch]
                 memo[name] = hit[0] if hit else c["map"][f"{a},{b}"]
         return memo[name]
     return {n: val(n) for n in cols}
