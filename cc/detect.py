@@ -369,11 +369,48 @@ def pair_results(m, c, reg, out, vectors):
     return readings, pairs, reports
 
 
+def keyed(st, read, chash, own_tables=True):
+    """True when stored result `st` has this run's key: the same read hashes (without the tables/* entries when `own_tables` is
+    False) and the same code hash. A result without a code hash has no key. A derived result also reads its parent's file:
+    that must still hash as recorded."""
+    parent = {k for k in st["read"] if k.startswith("results/")}
+    take = lambda r: {k: h for k, h in r.items() if k not in parent and (own_tables or not k.startswith("tables/"))}   # noqa: E731
+    return (st.get("code_hash") == chash and take(st["read"]) == take(read) and (ROOT / st.get("vectors", "")).is_file()
+            and all((ROOT / k).is_file() and declare.sha(ROOT / k) == st["read"][k] for k in parent))
+
+
+def stored(input_id, tables, read, chash):
+    """The stored result that IS this run's result (plan 0876), else None: the same key under the same set; or a measured result
+    under another set whose key differs only in tables/* and whose membership decided nothing different, to be re-verdicted
+    (`derived_from` set, nothing measured). Hash equality is the only policy."""
+    import score
+    p = ROOT / "results" / f"{input_id}@{tables}.json"
+    if p.is_file() and keyed(st := json.loads(p.read_text()), read, chash):
+        return st
+    for q in sorted((ROOT / "results").glob(f"{input_id}@*.json")):
+        st = json.loads(q.read_text())
+        if (st["tables"] != tables and st.get("derived_from") is None and keyed(st, read, chash, False)
+                and score.reverdict_refusal(st, tables) is None):
+            return st
+    return None
+
+
 def run(input_id, tables, write, tables_dir=None):
     m, c, T = load_input(input_id), declare.Ctx(ROOT), load_tables(tables, tables_dir)
     reg = {n: instrument(n) for n in sorted(c.reg)}
-    read, out, decl = read_hashes(m, input_id, tables, T, c), measure(m, c, reg, T), declared_of(input_id, m, T)
+    read, decl = read_hashes(m, input_id, tables, T, c), declared_of(input_id, m, T)
     read.update({f"inputs/{input_id}/couplings.toml": declare.sha(ROOT / "inputs" / input_id / "couplings.toml")} if decl else {})
+    chash, rid = declare.code_hash(ROOT), f"{input_id}@{tables}"
+    if tables_dir is None and (st := stored(input_id, tables, read, chash)) is not None:
+        if st["tables"] == tables:
+            return st   # the stored result IS the result: nothing is re-written
+        import score
+        git = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip() if write else ""
+        res = score.reverdict_result(st, T, git or "none")
+        if write:
+            (ROOT / "results" / f"{rid}.json").write_text(json.dumps(res, indent=1) + "\n")
+        return res
+    out = measure(m, c, reg, T)
     cols = declare.code_cols(T.codes)
     direct = {s["from"]: n for n, s in cols.items() if isinstance(s["from"], str)}
     readings, reports, vectors, signature = [], [], {}, []
@@ -407,9 +444,8 @@ def run(input_id, tables, write, tables_dir=None):
     if write and (ROOT / ".git").exists():
         r = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True)
         commit = r.stdout.strip() or "none"
-    rid = f"{input_id}@{tables}"
     res = {"schema": 1, "kind": "result", "run_id": rid, "input": input_id, "tables": tables,
-           "derived_from": None, "code_commit": commit, "code_hash": declare.code_hash(ROOT), "interval": dict(m["interval"]), "read": read,
+           "derived_from": None, "code_commit": commit, "code_hash": chash, "interval": dict(m["interval"]), "read": read,
            "vectors": f"results/{rid}.npz",
            "readings": readings, "pair_readings": pair_readings, "reports": reports + pair_reports,
            "signature_columns": list(T.codes["columns"]["signature"]), "signature": signature, "pairs": pairs,
