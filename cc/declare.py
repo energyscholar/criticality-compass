@@ -1,5 +1,6 @@
 """declare.py - plugin loaders, schemas, cross-references, the partition checker, validate (plumbing)."""
 import ast
+import copy
 import difflib
 import fnmatch
 import hashlib
@@ -8,7 +9,10 @@ import os
 import re
 import subprocess
 import tomllib
+import zipfile
 from collections import namedtuple
+from contextlib import contextmanager
+from functools import lru_cache
 from dataclasses import dataclass, fields as dc_fields
 from pathlib import Path
 import numpy as np
@@ -57,9 +61,19 @@ def tn(t):
     return "/".join(x.__name__ for x in (t if isinstance(t, tuple) else (t,)))
 
 
+@lru_cache(maxsize=None)
+def _parsed(text):
+    return tomllib.loads(text)
+
+
+def parse(text):
+    """tomllib.loads, once per distinct text per process (a pure function of its argument; every caller gets its own copy)."""
+    return copy.deepcopy(_parsed(text))
+
+
 def load(p, root=ROOT):
     try:
-        return tomllib.loads(Path(p).read_text()), []
+        return parse(Path(p).read_text()), []
     except (OSError, tomllib.TOMLDecodeError) as e:
         return None, [at(rel(p, root), "", f"cannot read: {e}", "fix the TOML syntax of this file")]
 
@@ -144,7 +158,7 @@ class Ctx:
     """What the checks cross-reference: cc.toml, the registry, checks.toml, the data root (overridable)."""
 
     def __init__(self, root=ROOT, **over):
-        self.root, self.over, self.shapes = Path(root), over, {}
+        self.root, self.over, self.shapes, self.heads = Path(root), over, {}, {}
         self.cfg = tomllib.loads((self.root / "cc.toml").read_text())
         self.reg = {f.stem: load(f)[0] or {} for f in sorted((self.root / "instruments").glob("*.toml"))}
         self.checks = tomllib.loads(Path(over.get("checks") or self.root / "checks.toml").read_text())
@@ -261,14 +275,26 @@ def unit_blocks(m, inst):
     return sizes, (list(pair) if "starts" in inst["axes"] else [inst.get("start", ax["main_start"])])   # `start`: read this start, not main_start (plan 0867)
 
 
+def shapes_of(c, path):
+    """What a data file declares about its arrays, from the npy HEADERS only (no array is loaded): the shape of a bare .npy, or
+    {key: shape} for an .npz in file order; cached per file on the Ctx."""
+    if str(path) not in c.heads:
+        with open(path, "rb") as f:
+            zipped = f.read(4) == b"PK\x03\x04"
+        if zipped:
+            with zipfile.ZipFile(path) as z:
+                c.heads[str(path)] = {n[:-4]: formats.head_of(z.open(n))[0] for n in z.namelist() if n.endswith(".npy")}
+        else:
+            with open(path, "rb") as f:
+                c.heads[str(path)] = formats.head_of(f)[0]
+    return c.heads[str(path)]
+
+
 def stored(c, path, key):
     """(shape of the stored array, None) or (None, the keys the file does hold); cached per file and key."""
     if (str(path), key) not in c.shapes:
-        z = np.load(path)
-        if isinstance(z, np.ndarray):
-            c.shapes[(str(path), key)] = (z.shape, None)
-        else:
-            c.shapes[(str(path), key)] = (z[key].shape if key in z.files else None, list(z.files))
+        h = shapes_of(c, path)
+        c.shapes[(str(path), key)] = (h, None) if isinstance(h, tuple) else (h.get(key), list(h))
     return c.shapes[(str(path), key)]
 
 
@@ -447,8 +473,34 @@ def chk_input(p, d, c, stem=None):
 
 
 # ---------------------------------------------------------------- manifest, instrument, codes
+_SHA_ONCE = None   # {absolute path: sha256} while a READ-ONLY operation holds hashing_once(); None otherwise
+
+
+@contextmanager
+def hashing_once():
+    """Within the block each file is hashed once. For an operation that writes none of the files it hashes (validate, tabulate):
+    the memo lives exactly as long as the block, so it is a function of what the block read and can never outlive a write."""
+    global _SHA_ONCE
+    outer = _SHA_ONCE
+    _SHA_ONCE = {} if outer is None else outer
+    try:
+        yield
+    finally:
+        _SHA_ONCE = outer
+
+
+def _sha(path):
+    with open(path, "rb") as f:
+        return hashlib.file_digest(f, "sha256").hexdigest()
+
+
 def sha(path):
-    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+    if _SHA_ONCE is None:
+        return _sha(path)
+    key = os.path.abspath(path)
+    if key not in _SHA_ONCE:
+        _SHA_ONCE[key] = _sha(path)
+    return _SHA_ONCE[key]
 
 
 def classify_changes(classes, name, old, new):
@@ -969,8 +1021,8 @@ def scalar_keys(m, c):
     """The 0-d arrays (the sampler's parameters) the data files of an input hold, minus the size key: [] when none are stored."""
     keys = set()
     for path in sorted({c.data_root / b["path"] for b in m["data"]["files"]}):
-        z = np.load(path) if path.is_file() else None
-        keys |= {k for k in (z.files if z is not None and not isinstance(z, np.ndarray) else []) if z[k].ndim == 0}
+        h = shapes_of(c, path) if path.is_file() else ()
+        keys |= {k for k, shp in (h.items() if isinstance(h, dict) else []) if shp == ()}
     return sorted(keys - {SIZE_KEY})
 
 
@@ -1054,7 +1106,7 @@ def factorisation(root, tset):
         return [], 0
     if len(have) < 3:
         return [at(at_, "", f"geometry, order and compose go together; this set has only {have}", "add the missing files, or remove these")], 0
-    codes, v, g, o, cm = (tomllib.loads((t / f).read_text()) for f in ("codes.toml", "verdict.toml", "geometry.toml", "order.toml", "compose.toml"))
+    codes, v, g, o, cm = (parse((t / f).read_text()) for f in ("codes.toml", "verdict.toml", "geometry.toml", "order.toml", "compose.toml"))
     dom = {k: list(x["alphabet"]) + list(nulls) for k, x in code_cols(codes).items()}
     full, voc = v["columns"] + [x for x in dict.fromkeys(g["columns"] + o["columns"]) if x not in v["columns"]], {}
     cdom = {"geometry": pr["verdicts"] if pr else g["verdicts"], "order": o["values"]}
@@ -1085,9 +1137,10 @@ KIND = {"membership": chk_membership, "case": chk_case, "points": chk_points, "i
         "compose": chk_compose, "probe": chk_probe, "couplings": chk_couplings}
 
 
-def check_file(path, root=ROOT, **over):
-    """Findings for one plugin file; `over` swaps cross-references (checks, data_root, codes, input)."""
-    c, path = Ctx(Path(root).resolve(), **over), Path(path)
+def check_file(path, root=ROOT, ctx=None, **over):
+    """Findings for one plugin file; `over` swaps cross-references (checks, data_root, codes, input). `ctx`: the Ctx a caller
+    that checks many files builds once (it carries no `over`)."""
+    c, path = ctx or Ctx(Path(root).resolve(), **over), Path(path)
     p = rel(path.resolve() if path.is_absolute() else path, c.root)
     real = c.root in path.resolve().parents and "planted" not in path.parts
     stem = (path.parent.name if path.name in ("m.toml", "points.toml", "couplings.toml") else path.stem) if real else None
@@ -1100,8 +1153,14 @@ def check_file(path, root=ROOT, **over):
 
 
 def validate(root=ROOT, input_id=None, tables=None):
-    """Full validate, or the scoped one (cc.toml, one input, its instruments, one table set, its manifest)."""
+    """Full validate, or the scoped one (cc.toml, one input, its instruments, one table set, its manifest).
+    Read-only: ONE Ctx for the whole call, and each manifest-pinned file is hashed once."""
     root = Path(root).resolve()
+    with hashing_once():
+        return _validate(root, Ctx(root), input_id, tables)
+
+
+def _validate(root, ctx, input_id, tables):
     sets = [tables] if tables else sorted(t.name for t in (root / "tables").glob("*") if t.is_dir())
     if input_id:
         m = root / "inputs" / input_id / "m.toml"
@@ -1123,7 +1182,7 @@ def validate(root=ROOT, input_id=None, tables=None):
     for f in files:
         kind = (load(f, root)[0] or {}).get("kind", "?")
         n[kind] = n.get(kind, 0) + 1
-        out += check_file(f, root)
+        out += check_file(f, root, ctx)
     reads_decl = [s for s in sets if declared_cols((load(root / "tables" / s / "codes.toml", root)[0] or {"columns": {}}))]   # a set with a declared column needs every input's couplings.toml
     out += [at(f"inputs/{i}/couplings.toml", "", f"missing, and tables/{reads_decl[0]} reads a declared column",
                f"write it: kind = \"couplings\", id, names (from the Hamiltonian) and probes (which of them across probes)")
@@ -1131,15 +1190,15 @@ def validate(root=ROOT, input_id=None, tables=None):
             if reads_decl and not (root / "inputs" / i / "couplings.toml").is_file()]
     if not out:
         out += [x for s in sets for x in factorisation(root, s)[0]]
-    return out + (member_need(root, input_id, tables) if input_id and tables else []), n
+    return out + (member_need(root, input_id, tables, ctx) if input_id and tables else []), n
 
 
-def member_need(root, input_id, tset):
+def member_need(root, input_id, tset, ctx=None):
     """A table set must hold a valid membership rule for every declared instrument that runs door:off_manifold."""
-    m, c = load(root / "inputs" / input_id / "m.toml", root)[0] or {}, Ctx(root)
+    m, c = load(root / "inputs" / input_id / "m.toml", root)[0] or {}, ctx or Ctx(root)
     mp = root / "tables" / tset / "membership.toml"
     have = (load(mp, root)[0] or {}) if mp.is_file() else {}
     need = [n for n in m.get("instruments", []) if "door:off_manifold" in c.reg.get(n, {}).get("pipeline", [])]
     return [at(f"tables/{tset}/membership.toml", n, f"{n} runs door:off_manifold on {input_id} but this set has no rule for it",
                f"copy tables/v01-rules/membership.toml into tables/{tset}/, or fork from v01-rules (bin/cc tables fork v01-rules <new-name>)")
-            for n in need if not isinstance(have.get(n), dict)] + (check_file(mp, root) if need and mp.is_file() else [])
+            for n in need if not isinstance(have.get(n), dict)] + (check_file(mp, root, ctx) if need and mp.is_file() else [])

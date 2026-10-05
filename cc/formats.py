@@ -33,6 +33,11 @@ def header(path, key):
         return _head(f)
 
 
+def head_of(f):
+    """(shape, dtype, None) from an open npy stream positioned at its magic."""
+    return _head(f)
+
+
 def _head(f):
     v = npy.read_magic(f)
     shape, _, dtype = npy.read_array_header_1_0(f) if v == (1, 0) else npy.read_array_header_2_0(f)
