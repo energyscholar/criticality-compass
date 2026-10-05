@@ -14,8 +14,24 @@ class_truth = ["POINT", "LINE", "WALKING", "FIRST-ORDER", "MULTI", "BKT-END", "N
 order_truth = ["CONTINUOUS", "FIRST-ORDER", "NONE"]   # a case's true order of the transition (cases/*.toml order_truth)
 status = ["declared", "sampler-tested", "run", "in-signature-table"]    # ordered
 obtained = ["truth", "navigated", "observed"]   # how a point was obtained (m.toml [obtained])
-formats = ["npz-v1", "npy-v1"]
+formats = ["npz-v1", "npy-v1", "snapshots-v1", "image-stack-v1"]
+limited = ["none", "assigned", "resolution-limited"]   # [block_map] limited: what the finest level is (plan 0873): a value that is not a measured site
 nulls = ["NOT-MEASURED", "NOT-EVALUATED"]       # the honest nulls, in rank order; never map keys
+
+# A STACK format is raw frames the door reduces itself (cc/reduce.py) through the input's declared [block_map] and [observable]: the
+# schema is DATA here (cc/formats.py holds no per-format code). reduces = the array kinds computed from the stack; dims/dtypes = the raw
+# stack s[N, L, L]; readers = one importable module per file extension (a module that is absent is a refusal with a Next line, never a skip).
+[formats.snapshots-v1]
+reduces = ["G", "GL"]
+dims = 3
+dtypes = ["int8", "int16", "int32", "int64"]
+readers = { ".npy" = "numpy", ".npz" = "numpy" }
+
+[formats.image-stack-v1]
+reduces = ["G", "GL"]
+dims = 3
+dtypes = ["uint8"]
+readers = { ".npy" = "numpy", ".tif" = "tifffile", ".tiff" = "tifffile" }
 
 [flags]                         # flag code -> the words every output prints (never the bare code)
 T = "truth point"

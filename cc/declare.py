@@ -11,6 +11,7 @@ from collections import namedtuple
 from dataclasses import dataclass, fields as dc_fields
 from pathlib import Path
 import numpy as np
+import formats
 
 ROOT = Path(__file__).resolve().parent.parent
 F = namedtuple("F", "loc msg nxt")
@@ -170,9 +171,13 @@ def _regex_ok(x):
 
 def chk_cc(p, d, c, stem=None):
     top = {k: dict for k in ("defaults", "data", "alphabets", "flags", "obtained_flag", "arrays", "basic", "check", "golden")}
-    out = header(p, d, "cc") + shape(p, d, top)
+    out = header(p, d, "cc") + shape(p, d, top, {"formats": dict})
     if out:
         return out
+    for n, v in {n: v for n, v in d.get("formats", {}).items() if isinstance(v, dict)}.items():   # a stack format's schema is data (plan 0873)
+        out += inalpha(p, f"formats.{n}", n, d["alphabets"]["formats"]) + shape(p, v, {"reduces": list, "dims": int, "dtypes": list, "readers": dict}, {"pip": dict}, pre=f"formats.{n}.")
+        out += [at(p, f"formats.{n}.readers", f"'{x}' is not a reader this code has", f"use one of: {' '.join(formats.READ)}")
+                for x in (v["readers"].values() if isinstance(v.get("readers"), dict) else []) if x not in formats.READ]
     b, keeps, discards = d["basic"], set(d["basic"].get("keeps", [])), set(d["basic"].get("discards", []))
     out += shape(p, b, {"keeps": list, "discards": list, "blank": list, "blank_refuse": bool, "commands": list},
                  pre="basic.")
@@ -278,6 +283,10 @@ def chk_array(p, loc, name, a, b, fp, m, c):
     e = shape(p, a, {"key": str}, {"level": int}, pre=at_ + ".")
     if e or name not in dims:
         return out + e
+    fmt_ = m["data"]["format"]
+    if name in formats.schemas(str(c.root)).get(fmt_, {"reduces": ()})["reduces"]:   # reduced from a raw stack by the door (plan 0873)
+        return out + [at(p, f, msg, nxt) for f, msg, nxt in formats.problems(fmt_, loc, name, a, b, fp, m, str(c.root))] + when(
+            2 - ("level" in a) != dims[name], p, at_, f"selects a {2 - ('level' in a)}-D array but {name} is {dims[name]}-D in cc.toml [arrays]", "fix level")
     shp, keys = stored(c, fp, a["key"])
     if shp is None:
         return out + [at(p, at_, f"key '{a['key']}' absent from {b['path']} (keys: {' '.join(keys)})", "fix the key")]
@@ -360,6 +369,17 @@ def chk_relations(p, d, c, use, sz):
                   for rn in rels if rn not in need]
 
 
+SIDECAR_OPT = {"observable": {"level_floor": int}, "block_map": {"limited": str}}   # plan 0873: level 0 exclusion, declared
+
+
+def limited(p, d, c):
+    """A block map that is not a measured site per cell (assigned, resolution-limited) must exclude level 0 from every matched edge."""
+    lim, floor = d.get("block_map", {}).get("limited", "none"), d.get("observable", {}).get("level_floor", 0)
+    return inalpha(p, "block_map.limited", lim, c.alpha.get("limited", ("none",))) + when(
+        lim != "none" and floor < 1, p, "observable.level_floor", f"block_map.limited = '{lim}' but level 0 is not excluded (level_floor {floor})",
+        "set [observable] level_floor = 1: the finest level carries the cell or instrument scale, not the system")
+
+
 def chk_input(p, d, c, stem=None):
     todo = list(todos(p, d))
     if [t for t in todo if not t.loc.split(":", 1)[1].startswith("obtained")]:
@@ -393,7 +413,8 @@ def chk_input(p, d, c, stem=None):
                     f"add [{name}]")
         out += when(not want and name in d, p, name, "table present but no declared instrument uses it",
                     f"delete [{name}], or declare the instrument")
-        out += shape(p, d[name], SIDECAR_SHAPE[name], pre=f"{name}.") if name in d else []
+        out += shape(p, d[name], SIDECAR_SHAPE[name], SIDECAR_OPT.get(name), pre=f"{name}.") if name in d else []
+    out += limited(p, d, c)
     out += when("two_start" in d and isinstance(d["two_start"].get("unit_scale"), dict)
                 and sorted(d["two_start"]["unit_scale"]) != sorted(map(str, sz)), p, "two_start.unit_scale",
                 f"must declare a unit scale for every size {list(map(str, sz))}", "add the missing sizes, or remove the extra ones")

@@ -28,6 +28,7 @@ name = "TODO"
 factor = "TODO"
 keeps = "TODO"
 discards = "TODO"
+limited = "none"                               # none | assigned | resolution-limited: a limited input must also set [observable] level_floor = 1 (level 0 excluded)
 
 [relations.TODO]                               # rename TODO: size | matched | start
 template = "TODO"                              # chain | pair | matched (+ that template's fields)
