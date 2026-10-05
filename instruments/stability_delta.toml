@@ -1,0 +1,22 @@
+# instruments/stability_delta.toml (plan 0877) - does the DIFFERENCE estimator's growth exponent change between size steps: d_D = yD2 - yD1, A over the chain of
+# Delta-step exponents at its last edge (stability's curvature on the Delta basis). A pair instrument; per_point: a point reads the cells of the control pairs that touch it,
+# combined by the set's codes.toml (every pair must agree to resolve). Reads NO drift and NO transform: the column is the same under every membership rule.
+schema = 1
+kind = "instrument"
+module = "stability_delta"
+quantity = "Delta"
+operators = ["A"]
+unit = "pair"
+per_point = true
+reports = ["y_steps"]                         # reported, never coded: the step exponents (yD1, yD2) this d was read from
+arrays = ["G"]
+axes = ["point", "size"]
+relations = ["size", "control"]
+sidecar = ["observable", "block_map"]
+requires = []                                 # no membership door: nothing to wait for
+door_values = []
+flags = []
+pipeline = ["stage:reduce", "door:nodefield", "stage:delta", "door:logcoord", "stage:growth", "door:steps", "stage:curvature"]
+
+[columns]
+d = "y"                                       # read against [eps] y (0.25 on every XY/clock input), as stability.d is
