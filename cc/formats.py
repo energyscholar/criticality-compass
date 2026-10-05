@@ -69,6 +69,11 @@ def levels_for(L, final, factor):
     return n if final == L else None
 
 
+def shape_of(fmt, path, key, root=str(ROOT)):
+    """The shape of the stored stack, read from its header through the reader its extension names."""
+    return HEADER[schemas(root)[fmt]["readers"][Path(path).suffix]](path, key)[0]
+
+
 def read(fmt, path, key, root=str(ROOT)):
     """The raw stack s[N, L, L] of one file through the reader its extension names."""
     return READ[schemas(root)[fmt]["readers"][Path(path).suffix]](path, key)
