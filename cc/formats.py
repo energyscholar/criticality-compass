@@ -85,7 +85,7 @@ def problems(fmt, loc, name, a, b, path, m, root=str(ROOT)):
     sch, ext, at_ = schemas(root)[fmt], Path(path).suffix, f"{loc}.arrays.{name}"
     mod = sch["readers"].get(ext)
     if mod is None:
-        return [(f"{loc}.path", f"{b['path']}: '{ext}' is not a {fmt} file", f"use a file with one of: {' '.join(sch['readers'])}")]
+        return [(f"{loc}.path", f"{b['path']}: '{ext}' is not a file of format {fmt}", f"use a file with one of: {' '.join(sch['readers'])}")]
     if not have(mod):
         return [(f"{loc}.path", f"{b['path']}: no reader for {ext} files ({mod} is not importable)",
                  f"pip install {sch.get('pip', {}).get(mod, mod)}, or convert the stack to .npy (shape [N, L, L])")]

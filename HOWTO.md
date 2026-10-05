@@ -133,6 +133,35 @@ write it, and `validate` names a missing one.
 To change a frozen input, do not edit it. Make `<id>-2` with `--like <id>`, run `data add`, and run it as a new
 input; the old results stay readable.
 
+## A new input over raw snapshots (a stack format, plan 0873)
+
+Use this when the data are the raw configurations `s[N, L, L]` (N snapshots of an L x L lattice), not a stored observable. CC reduces the stack
+itself: the declared `[block_map]` blocks each snapshot down to `[observable] final_size` and the observable (`g1`) is read at every level,
+so `G` (one level) and `GL` (every level) are computed from the snapshots, never trusted from a file. The format is a name in `data.format`:
+
+| `data.format` | the file | reader |
+|---|---|---|
+| `snapshots-v1` | `.npy`, or `.npz` with the stack under a key; integer spins `s[N, L, L]` | numpy |
+| `image-stack-v1` | `.npy` or `.tif` / `.tiff`; `uint8` `[N, L, L]` | numpy; `tifffile` for TIFF (if it is not installed `validate` refuses with `pip install tifffile` and the `.npy` alternative; nothing is skipped) |
+
+The schemas (dims, dtypes, which array kinds are reduced, which reader for which extension) are DATA in `cc.toml [formats.<name>]`.
+
+1. Copy the working stack input: `bin/cc new input <id> --like x4s-stack` (add `--instruments across,stability` to keep fewer instruments;
+   it drops the tables they do not need). Fix the `TODO` lines of `points.toml`.
+2. In `m.toml` each `[[data.files]]` block names the stack: `arrays.GL = { key = "S" }` (every level) and `arrays.G = { key = "S", level = 2 }`
+   (one level) are REDUCED from the stack under `key`; `arrays.E = { key = "O", level = 0 }` is an ordinary stored column read as before.
+3. Declare the geometry: `[observable] final_size` and `[block_map] factor` must satisfy `L = final_size * factor^k` for every size, and
+   `observable.levels` is the derived `k + 1` (validate refuses a disagreement, naming both numbers). `block_map.name` is `majority3`
+   (3x3 majority of +-1 spins) or `mean3` (block mean of a real field).
+4. `bin/cc data add <id>` pins the raw files. `inputs/<id>/couplings.toml` is copied from the like-input (change `id`; `names` are the scalars the files store).
+5. `bin/cc validate`, then `bin/cc run <id> --tables v07-rules`.
+
+The first run reduces the stacks (about 8 s for 8 000 snapshots at L = 243) and keeps the result under `results/reduced/<id>/<sha>.npz`; the
+name is the sha of the raw file, the code hash, the key, the map and the level count, so a changed file or changed code reduces again. It is a build
+cache: git ignores it and deleting it changes nothing. A block map that is not a measured site per cell (`block_map.limited = "assigned"` or
+`"resolution-limited"`) must also declare `[observable] level_floor = 1`: level 0 is then excluded, and validate refuses a limited input that keeps it.
+There is no interpolation option, flagged or not: a value is either a measured site or a declared assignment of one.
+
 ## Changing the rules
 
 `bin/cc tables fork v01-rules <name>` copies the rulebook: `codes.toml`, `verdict.toml`, and the two files the
