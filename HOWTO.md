@@ -146,17 +146,19 @@ so `G` (one level) and `GL` (every level) are computed from the snapshots, never
 
 The schemas (dims, dtypes, which array kinds are reduced, which reader for which extension) are DATA in `cc.toml [formats.<name>]`.
 
-1. Copy the working stack input: `bin/cc new input <id> --like x4s-stack` (add `--instruments across,stability` to keep fewer instruments;
-   it drops the tables they do not need). Fix the `TODO` lines of `points.toml`.
+1. Copy the working stack input: `bin/cc new input <id> --like x4s-stack` (add `--instruments needle,across` to keep fewer instruments;
+   it drops the tables they do not need). That writes a complete `m.toml` (nothing to edit unless the data differ) and a `points.toml`
+   whose `"0.46" = "TODO"` line you replace with a case id: `ising-field-decoy` (the like-input's).
 2. In `m.toml` each `[[data.files]]` block names the stack: `arrays.GL = { key = "S" }` (every level) and `arrays.G = { key = "S", level = 2 }`
    (one level) are REDUCED from the stack under `key`; `arrays.E = { key = "O", level = 0 }` is an ordinary stored column read as before.
 3. Declare the geometry: `[observable] final_size` and `[block_map] factor` must satisfy `L = final_size * factor^k` for every size, and
    `observable.levels` is the derived `k + 1` (validate refuses a disagreement, naming both numbers). `block_map.name` is `majority3`
    (3x3 majority of +-1 spins) or `mean3` (block mean of a real field).
-4. `bin/cc data add <id>` pins the raw files. `inputs/<id>/couplings.toml` is copied from the like-input (change `id`; `names` are the scalars the files store).
-5. `bin/cc validate`, then `bin/cc run <id> --tables v07-rules`.
+4. `bin/cc data add <id>` pins the raw files. `new input` does NOT write `inputs/<id>/couplings.toml`: copy it from the like-input by hand and change `id`.
+5. `bin/cc validate`, then `bin/cc run <id> --tables v07-rules`. Keep `needle` among the instruments: `stability` and the verdict
+   read it (a stack input without `needle` reads `REFUSE-NEEDLE-UNMEASURED`, an honest refusal, not an error).
 
-The first run reduces the stacks (about 8 s for 8 000 snapshots at L = 243) and keeps the result under `results/reduced/<id>/<sha>.npz`; the
+The first run, `--dry` included, reduces the stacks (about 8 s for the three files alone; a minute or more when the machine is busy) and keeps the result under `results/reduced/<id>/<sha>.npz`; the
 name is the sha of the raw file, the code hash, the key, the map and the level count, so a changed file or changed code reduces again. It is a build
 cache: git ignores it and deleting it changes nothing. A block map that is not a measured site per cell (`block_map.limited = "assigned"` or
 `"resolution-limited"`) must also declare `[observable] level_floor = 1`: level 0 is then excluded, and validate refuses a limited input that keeps it.
