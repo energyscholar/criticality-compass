@@ -418,6 +418,80 @@
 <li class=never>line 281: REFUSE-ACROSS-UNMEASURED
 <li class=never>line 289: REFUSE-STABILITY-UNMEASURED
 </ul>
+<h2>Rules: v08-rules (9525600 cells)</h2>
+<h3>POINT</h3><table><tr><th>when<th>verdict<th>why<th>line<th>cells<th>hit by
+<tr data-cells="756"><td><code>needle = MID; two_start = INDEP; flow = STOPPED; across = RELEVANT; stability = STABLE; probe = COMPLETE, NOT-MEASURED, NOT-EVALUATED</code><td>POINT<td>verdict_x CAND_GS: relevant and stable<td>124<td>756<td>
+</table>
+<h3>LINE</h3><table><tr><th>when<th>verdict<th>why<th>line<th>cells<th>hit by
+<tr data-cells="756"><td><code>needle = MID; two_start = INDEP; flow = SLOW; across = MARGINAL; stability = STABLE; probe = COMPLETE, NOT-MEASURED, NOT-EVALUATED</code><td>LINE<td>Q2, 2026-10-02: slow flow with a marginal, stable exponent is a line (STAGE3 line = BKT-end flaw split by across; every other slow cell still refuses)<td>62<td>756<td>
+<tr data-cells="756"><td><code>needle = MID; two_start = INDEP; flow = STOPPED; across = MARGINAL; stability = STABLE; probe = COMPLETE, NOT-MEASURED, NOT-EVALUATED</code><td>LINE<td>verdict_x CAND_GS: marginal and stable<td>154<td>756<td>x2b-xy-3:0.5 x2b-xy-3:0.6 x2b-xy-3:0.7 x2b-xy-3:0.8 x2b-xy-3:0.85
+</table>
+<h3>WALKING</h3><table><tr><th>when<th>verdict<th>why<th>line<th>cells<th>hit by
+<tr data-cells="1512"><td><code>needle = MID; two_start = INDEP; flow = STOPPED; across = RELEVANT, MARGINAL; stability = CROSSING; probe = COMPLETE, NOT-MEASURED, NOT-EVALUATED</code><td>WALKING<td>verdict_x CAND_GS: the exponent crosses with size<td>184<td>1512<td>
+</table>
+<h3>FIRST-ORDER</h3><table><tr><th>when<th>verdict<th>why<th>line<th>cells<th>hit by
+<tr data-cells="90720"><td><code>needle = DIS, ORD; needle_pair = PINNED-BETWEEN-PHASES; two_start = COEXIST</code><td>FIRST-ORDER<td>plan 0867: the random start sits at one sink and the ordered start at the other, and the two starts stay apart: coexistence between the phases (the window is where the two phases&#x27; flows part)<td>29<td>90720<td>
+<tr data-cells="317520"><td><code>needle = MID; two_start = COEXIST</code><td>FIRST-ORDER<td>verdict_x STAGE2: the two starts coexist at the window<td>49<td>317520<td>
+</table>
+<h3>NOT</h3><table><tr><th>when<th>verdict<th>why<th>line<th>cells<th>hit by
+<tr data-cells="3265920"><td><code>needle = DIS, ORD; needle_pair = SAME-WINDOW, SAME-SINK, HALF-PINNED, CROSSED, NOT-MEASURED, NOT-EVALUATED</code><td>NOT<td>verdict_x STAGE1: off the window<td>36<td>3265920<td>x2b-xy-3:0.95 x2b-xy-3:1.0 x2b-xy-3:1.1
+<tr data-cells="453600"><td><code>needle = DIS, ORD; needle_pair = PINNED-BETWEEN-PHASES; two_start = FLUCT, UNRES, INDEP, NOT-MEASURED, NOT-EVALUATED</code><td>NOT<td>verdict_x STAGE1: off the window (pinned between the phases, but the starts do not stay apart)<td>42<td>453600<td>
+<tr data-cells="52920"><td><code>needle = MID; two_start = INDEP; flow = FLOWING</code><td>NOT<td>verdict_x STAGE3: the needle still flows<td>110<td>52920<td>
+</table>
+<h3>REFUSE</h3><table><tr><th>when<th>verdict<th>why<th>line<th>cells<th>hit by
+<tr data-cells="635040"><td><code>needle = MID; two_start = FLUCT, UNRES</code><td>REFUSE-EQUIL<td>verdict_x STAGE2: an unresolved or fluctuating two-start difference cannot certify equilibrium (open choice: UNRES could instead pass with INDEP)<td>55<td>635040<td>
+<tr data-cells="252"><td><code>needle = MID; two_start = INDEP; flow = SLOW; across = MARGINAL; stability = STABLE; probe = INCOMPLETE</code><td>REFUSE-PROBE-INCOMPLETE<td>plan 0870: a second coupling exists and is not probed here (across probes one direction only): a positive per-point class is not certified; read the family over the unprobed coupling. Next: declare the second coupling&#x27;s instrument, or read the family<td>73<td>252<td>
+<tr data-cells="252"><td><code>needle = MID; two_start = INDEP; flow = SLOW; across = MARGINAL; stability = STABLE; probe = UNKNOWN</code><td>REFUSE-PROBE-UNKNOWN<td>plan 0870: the couplings of this system are unknown, so no direction can be said to be probed: a positive per-point class is not certified. Next: declare the system&#x27;s couplings from its Hamiltonian; if they are unknown this instrument reads the position only<td>83<td>252<td>
+<tr data-cells="45360"><td><code>needle = MID; two_start = INDEP; flow = SLOW; across = RELEVANT, WEAK, IRRELEVANT, UNRES, NOT-MEASURED, NOT-EVALUATED</code><td>REFUSE-SLOW<td>verdict_x STAGE3: slow flow (Q2, 2026-10-02: only across MARGINAL with stable stability leaves this row)<td>93<td>45360<td>
+<tr data-cells="6300"><td><code>needle = MID; two_start = INDEP; flow = SLOW; across = MARGINAL; stability = CROSSING, OFF, UNRES, NOT-MEASURED, NOT-EVALUATED</code><td>REFUSE-SLOW<td>verdict_x STAGE3: slow flow (Q2, 2026-10-02: a marginal across that is not stable still refuses)<td>101<td>6300<td>
+<tr data-cells="52920"><td><code>needle = MID; two_start = INDEP; flow = UNRES</code><td>REFUSE-FLOW<td>verdict_x STAGE3: flow unresolved<td>117<td>52920<td>
+<tr data-cells="252"><td><code>needle = MID; two_start = INDEP; flow = STOPPED; across = RELEVANT; stability = STABLE; probe = INCOMPLETE</code><td>REFUSE-PROBE-INCOMPLETE<td>plan 0870: a second coupling exists and is not probed here (across probes one direction only): a positive per-point class is not certified; read the family over the unprobed coupling. Next: declare the second coupling&#x27;s instrument, or read the family<td>134<td>252<td>
+<tr data-cells="252"><td><code>needle = MID; two_start = INDEP; flow = STOPPED; across = RELEVANT; stability = STABLE; probe = UNKNOWN</code><td>REFUSE-PROBE-UNKNOWN<td>plan 0870: the couplings of this system are unknown, so no direction can be said to be probed: a positive per-point class is not certified. Next: declare the system&#x27;s couplings from its Hamiltonian; if they are unknown this instrument reads the position only<td>144<td>252<td>
+<tr data-cells="252"><td><code>needle = MID; two_start = INDEP; flow = STOPPED; across = MARGINAL; stability = STABLE; probe = INCOMPLETE</code><td>REFUSE-PROBE-INCOMPLETE<td>plan 0870: a second coupling exists and is not probed here (across probes one direction only): a positive per-point class is not certified; read the family over the unprobed coupling. Next: declare the second coupling&#x27;s instrument, or read the family<td>164<td>252<td>
+<tr data-cells="252"><td><code>needle = MID; two_start = INDEP; flow = STOPPED; across = MARGINAL; stability = STABLE; probe = UNKNOWN</code><td>REFUSE-PROBE-UNKNOWN<td>plan 0870: the couplings of this system are unknown, so no direction can be said to be probed: a positive per-point class is not certified. Next: declare the system&#x27;s couplings from its Hamiltonian; if they are unknown this instrument reads the position only<td>174<td>252<td>
+<tr data-cells="504"><td><code>needle = MID; two_start = INDEP; flow = STOPPED; across = RELEVANT, MARGINAL; stability = CROSSING; probe = INCOMPLETE</code><td>REFUSE-PROBE-INCOMPLETE<td>plan 0870: a second coupling exists and is not probed here (across probes one direction only): a positive per-point class is not certified; read the family over the unprobed coupling. Next: declare the second coupling&#x27;s instrument, or read the family<td>194<td>504<td>
+<tr data-cells="504"><td><code>needle = MID; two_start = INDEP; flow = STOPPED; across = RELEVANT, MARGINAL; stability = CROSSING; probe = UNKNOWN</code><td>REFUSE-PROBE-UNKNOWN<td>plan 0870: the couplings of this system are unknown, so no direction can be said to be probed: a positive per-point class is not certified. Next: declare the system&#x27;s couplings from its Hamiltonian; if they are unknown this instrument reads the position only<td>204<td>504<td>
+<tr data-cells="2520"><td><code>needle = MID; two_start = INDEP; flow = STOPPED; across = RELEVANT, MARGINAL; stability = OFF</code><td>REFUSE-OFF<td>verdict_x CAND_GS: stability reads off<td>214<td>2520<td>
+<tr data-cells="2520"><td><code>needle = MID; two_start = INDEP; flow = STOPPED; across = RELEVANT, MARGINAL; stability = UNRES</code><td>REFUSE-UNRES<td>verdict_x CAND_GS: stability unresolved<td>223<td>2520<td>
+<tr data-cells="7560"><td><code>needle = MID; two_start = INDEP; flow = STOPPED; across = WEAK</code><td>REFUSE-WEAK<td>verdict_x CAND_GS: WEAK refuses whatever stability reads (nulls included)<td>232<td>7560<td>
+<tr data-cells="7560"><td><code>needle = MID; two_start = INDEP; flow = STOPPED; across = IRRELEVANT</code><td>REFUSE-IRRELEVANT<td>verdict_x CAND_GS: IRRELEVANT refuses whatever stability reads<td>240<td>7560<td>
+<tr data-cells="7560"><td><code>needle = MID; two_start = INDEP; flow = STOPPED; across = UNRES</code><td>REFUSE-UNRES<td>verdict_x CAND_GS: across unresolved, whatever stability reads<td>248<td>7560<td>x2b-xy-3:0.89294
+<tr data-cells="3810240"><td><code>needle = NOT-MEASURED, NOT-EVALUATED</code><td>REFUSE-NEEDLE-UNMEASURED<td>honest null (not in verdict_x): the needle was not measured or not evaluated<td>256<td>3810240<td>
+<tr data-cells="635040"><td><code>needle = MID; two_start = NOT-MEASURED, NOT-EVALUATED</code><td>REFUSE-TWO-START-UNMEASURED<td>honest null: the two-start difference was not measured or not evaluated<td>261<td>635040<td>
+<tr data-cells="105840"><td><code>needle = MID; two_start = INDEP; flow = NOT-MEASURED, NOT-EVALUATED</code><td>REFUSE-FLOW-UNMEASURED<td>honest null: flow was not measured or not evaluated<td>267<td>105840<td>
+<tr data-cells="15120"><td><code>needle = MID; two_start = INDEP; flow = STOPPED; across = NOT-MEASURED, NOT-EVALUATED</code><td>REFUSE-ACROSS-UNMEASURED<td>honest null: across was not measured or not evaluated<td>274<td>15120<td>
+<tr data-cells="5040"><td><code>needle = MID; two_start = INDEP; flow = STOPPED; across = RELEVANT, MARGINAL; stability = NOT-MEASURED, NOT-EVALUATED</code><td>REFUSE-STABILITY-UNMEASURED<td>honest null: stability was not measured or not evaluated<td>282<td>5040<td>
+</table>
+<h3>Rows never hit by any result</h3><ul>
+<li class=never>line 29: FIRST-ORDER
+<li class=never>line 42: NOT
+<li class=never>line 49: FIRST-ORDER
+<li class=never>line 55: REFUSE-EQUIL
+<li class=never>line 62: LINE
+<li class=never>line 73: REFUSE-PROBE-INCOMPLETE
+<li class=never>line 83: REFUSE-PROBE-UNKNOWN
+<li class=never>line 93: REFUSE-SLOW
+<li class=never>line 101: REFUSE-SLOW
+<li class=never>line 110: NOT
+<li class=never>line 117: REFUSE-FLOW
+<li class=never>line 124: POINT
+<li class=never>line 134: REFUSE-PROBE-INCOMPLETE
+<li class=never>line 144: REFUSE-PROBE-UNKNOWN
+<li class=never>line 164: REFUSE-PROBE-INCOMPLETE
+<li class=never>line 174: REFUSE-PROBE-UNKNOWN
+<li class=never>line 184: WALKING
+<li class=never>line 194: REFUSE-PROBE-INCOMPLETE
+<li class=never>line 204: REFUSE-PROBE-UNKNOWN
+<li class=never>line 214: REFUSE-OFF
+<li class=never>line 223: REFUSE-UNRES
+<li class=never>line 232: REFUSE-WEAK
+<li class=never>line 240: REFUSE-IRRELEVANT
+<li class=never>line 256: REFUSE-NEEDLE-UNMEASURED
+<li class=never>line 261: REFUSE-TWO-START-UNMEASURED
+<li class=never>line 267: REFUSE-FLOW-UNMEASURED
+<li class=never>line 274: REFUSE-ACROSS-UNMEASURED
+<li class=never>line 282: REFUSE-STABILITY-UNMEASURED
+</ul>
 <h2>Rules: verdict-x-rules (45360 cells)</h2>
 <h3>POINT</h3><table><tr><th>when<th>verdict<th>why<th>line<th>cells<th>hit by
 <tr data-cells="6"><td><code>needle = MID; two_start = INDEP; flow = STOPPED; across = RELEVANT; stability = STABLE</code><td>POINT<td>verdict_x CAND_GS: relevant and stable<td>64<td>6<td>x5n-bilayer:0.0 x5n-bilayer:0.1 x5n-bilayer:0.3

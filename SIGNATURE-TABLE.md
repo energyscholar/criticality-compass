@@ -1134,6 +1134,35 @@ Geometry against class_truth (order_truth not FIRST-ORDER): 18 agree, 97 refused
 
 Family end against truth: 2 agree, 0 refused, 0 disagree
 
+## Rules: v08-rules
+
+| run | point | case | truth | sizes | sink | needle | needle_pair | drift_code | flow | across | stability | two_start | probe | verdict | class | geometry | order |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| x2b-xy-3@v08-rules | 0.5 | `xy-low-phase` | LINE | 27 81 243 | NEITHER (T) | MID (T) | NOT-MEASURED (T) | CONVERGING (T) | STOPPED (T) | MARGINAL (HT) | STABLE (T) | INDEP (T) | COMPLETE | LINE | LINE | LINE | CONTINUOUS |
+| x2b-xy-3@v08-rules | 0.6 | `xy-low-phase` | LINE | 27 81 243 | NEITHER (T) | MID (T) | NOT-MEASURED (T) | CONVERGING (T) | STOPPED (T) | MARGINAL (HT) | STABLE (T) | INDEP (T) | COMPLETE | LINE | LINE | LINE | CONTINUOUS |
+| x2b-xy-3@v08-rules | 0.7 | `xy-low-phase` | LINE | 27 81 243 | NEITHER (T) | MID (T) | NOT-MEASURED (T) | CONVERGING (T) | STOPPED (T) | MARGINAL (HT) | STABLE (T) | INDEP (T) | COMPLETE | LINE | LINE | LINE | CONTINUOUS |
+| x2b-xy-3@v08-rules | 0.8 | `xy-low-phase` | LINE | 27 81 243 | NEITHER (T) | MID (T) | NOT-MEASURED (T) | CONVERGING (T) | STOPPED (T) | MARGINAL (HT) | STABLE (T) | INDEP (T) | COMPLETE | LINE | LINE | LINE | CONTINUOUS |
+| x2b-xy-3@v08-rules | 0.85 | `xy-low-phase` | LINE | 27 81 243 | NEITHER (T) | MID (T) | NOT-MEASURED (T) | CONVERGING (T) | STOPPED (T) | MARGINAL (HT) | STABLE (T) | INDEP (T) | COMPLETE | LINE | LINE | LINE | CONTINUOUS |
+| x2b-xy-3@v08-rules | 0.89294 | `xy-tkt` | BKT-END | 27 81 243 | NEITHER (T) | MID (T) | NOT-MEASURED (T) | NOT-EVALUATED (T) | STOPPED (T) | UNRES (HT) | STABLE (T) | INDEP (T) | COMPLETE | REFUSE-UNRES | REFUSE | REFUSE-UNRES | CONTINUOUS |
+| x2b-xy-3@v08-rules | 0.95 | `none` | none | 27 81 243 | NEITHER (T) | DIS (T) | NOT-MEASURED (T) | PERSISTENT (T) | FLOWING (T) | RELEVANT (HT) | STABLE (T) | INDEP (T) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
+| x2b-xy-3@v08-rules | 1.0 | `none` | none | 27 81 243 | NEITHER (T) | DIS (T) | NOT-MEASURED (T) | PERSISTENT (T) | FLOWING (T) | UNRES (HT) | UNRES (T) | INDEP (T) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
+| x2b-xy-3@v08-rules | 1.1 | `none` | none | 27 81 243 | NEITHER (T) | DIS (T) | NOT-MEASURED (T) | PERSISTENT (T) | FLOWING (T) | MARGINAL (HT) | OFF (T) | INDEP (T) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
+
+Verdict class against truth: 5 agree, 1 refused, 0 disagree, 3 no truth
+Order against order_truth: 6 agree, 0 refused, 0 disagree
+Geometry against class_truth (order_truth not FIRST-ORDER): 5 agree, 1 refused, 0 disagree
+
+## Collisions (v08-rules)
+
+none
+
+## Family ends (v08-rules)
+
+- `x2b-xy-3`: family BKT-END (class BKT-END), end_point ['0.89294'], end_bracket [['0.89294', '0.95']]
+  - point 0.89294 (case `xy-tkt`, truth BKT-END): agree
+
+Family end against truth: 1 agree, 0 refused, 0 disagree
+
 ## Rules: verdict-x-rules
 
 | run | point | case | truth | sizes | sink | needle | flow | across | stability | two_start | verdict | class |
