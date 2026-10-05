@@ -1,4 +1,5 @@
 """test_tables_cli - bin/cc authoring, run and freeze commands, as a subprocess inside a temp copy of the repo."""
+import json
 import os
 import shutil
 import subprocess
@@ -115,6 +116,10 @@ with tempfile.TemporaryDirectory() as t:
 
     cc("tables", "fork", "verdict-x-rules", "t2")    # the live verdict-x-rules is already frozen
     rid = "c2-bc-two-start@t2"
+    frozen = json.loads((repo / "FROZEN.json").read_text())["files"]
+    for q in (repo / "results").glob("c2-bc-two-start@*"):   # plan 0876 B: a keyed result under another set would make this run a re-verdict (JSON only, vectors named in the parent's NPZ); the test is of a MEASURED run
+        if f"results/{q.name}" not in frozen:
+            q.unlink()
     rc, out = cc("run", "c2-bc-two-start", "--tables", "t2")
     check("run writes the result JSON and NPZ",
           rc == 0 and (repo / f"results/{rid}.json").is_file() and (repo / f"results/{rid}.npz").is_file(), out)

@@ -53,7 +53,7 @@ def refused(msg, nxt):
 @functools.lru_cache(maxsize=None)
 def instrument(name):
     d = tomllib.loads((ROOT / "instruments" / f"{name}.toml").read_text())
-    return d, importlib.import_module(d["module"])
+    return d, importlib.import_module(d["module"])   # measure-key: seeded
 
 
 def load_input(input_id):
@@ -383,34 +383,40 @@ def stored(input_id, tables, read, mhash):
     """The stored result that IS this run's result (plan 0876), else None: the same key under the same set; or a measured result
     under another set whose key differs only in tables/* and whose membership decided nothing different, to be re-verdicted
     (`derived_from` set, nothing measured). Hash equality is the only policy."""
-    import score
+    import reverdict
     p = ROOT / "results" / f"{input_id}@{tables}.json"
     if p.is_file() and keyed(st := json.loads(p.read_text()), read, mhash):
         return st
     for q in sorted((ROOT / "results").glob(f"{input_id}@*.json")):
         st = json.loads(q.read_text())
         if (st["tables"] != tables and st.get("derived_from") is None and keyed(st, read, mhash, False)
-                and score.reverdict_refusal(st, tables) is None):
+                and reverdict.reverdict_refusal(st, tables) is None):
             return st
     return None
 
 
-def run(input_id, tables, write, tables_dir=None):
+def run(input_id, tables, write, tables_dir=None, reuse=True):
+    """The result of one input under one table set. `reuse=False` always measures (a replay test exists to re-measure)."""
+    return run_keyed(input_id, tables, write, tables_dir, reuse)[0]
+
+
+def run_keyed(input_id, tables, write, tables_dir=None, reuse=True):
+    """(result, how): how is 'measured', 'stored' (the keyed stored result) or 're-verdicted' (from a stored result under another set)."""
     m, c, T = load_input(input_id), declare.Ctx(ROOT), load_tables(tables, tables_dir)
     reg = {n: instrument(n) for n in sorted(c.reg)}
     read, decl = read_hashes(m, input_id, tables, T, c), declared_of(input_id, m, T)
     read.update({f"inputs/{input_id}/couplings.toml": declare.sha(ROOT / "inputs" / input_id / "couplings.toml")} if decl else {})
     chash, rid = declare.code_hash(ROOT), f"{input_id}@{tables}"
     mhash = declare.measure_hash(ROOT, [reg[n][0]["module"] for n in m["instruments"]])
-    if tables_dir is None and (st := stored(input_id, tables, read, mhash)) is not None:
+    if reuse and tables_dir is None and (st := stored(input_id, tables, read, mhash)) is not None:
         if st["tables"] == tables:
-            return st   # the stored result IS the result: nothing is re-written
-        import score
+            return st, "stored"   # the stored result IS the result: nothing is re-written
+        import reverdict
         git = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip() if write else ""
-        res = score.reverdict_result(st, T, git or "none")
+        res = reverdict.reverdict_result(st, T, git or "none")
         if write:
             (ROOT / "results" / f"{rid}.json").write_text(json.dumps(res, indent=1) + "\n")
-        return res
+        return res, "re-verdicted"
     out = measure(m, c, reg, T)
     cols = declare.code_cols(T.codes)
     direct = {s["from"]: n for n, s in cols.items() if isinstance(s["from"], str)}
@@ -455,4 +461,4 @@ def run(input_id, tables, write, tables_dir=None):
         (ROOT / "results").mkdir(exist_ok=True)
         (ROOT / "results" / f"{rid}.json").write_text(json.dumps(res, indent=1) + "\n")
         np.savez(ROOT / "results" / f"{rid}.npz", **vectors)
-    return res
+    return res, "measured"

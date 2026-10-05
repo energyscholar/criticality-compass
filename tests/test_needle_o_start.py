@@ -21,7 +21,7 @@ def check(name, ok, why=""):
         bad.append(name)
 
 
-res = detect.run("x9c-potts", "v03-rules", write=False)
+res = detect.run("x9c-potts", "v03-rules", write=False, reuse=False)
 sig = {s["point"]: s for s in res["signature"]}["8"]
 o = {r["column"]: r["code"] for r in res["readings"] if r["instrument"] == "needle_o" and r["unit"]["point"] == "8"}
 check("q8: the random start's needle reads DIS", sig["needle"] == "DIS", sig["needle"])

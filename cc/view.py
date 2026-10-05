@@ -7,6 +7,7 @@ import declare
 import detect
 import door
 import sign
+from reverdict import cells_of   # noqa: F401
 
 ROOT = Path(__file__).resolve().parent.parent
 UNRES_REASON = "interval straddles 0 and a margin edge"   # sign.py's meaning of UNRES
@@ -24,15 +25,6 @@ def stale(res, root=ROOT):
             return (f"REFUSED: {k} changed since {res['run_id']} was run.\n"
                     f"  Next: bin/cc run {res['input']} --tables {res['tables']} (or restore the file)")
     return None
-
-
-def cells_of(res, pt):
-    """The sign cells of one point as `<instrument>.<column>` -> cell (a list per size for a point-size column)."""
-    return {**{f"declared.{k}": v for k, v in res.get("declared", {}).items()},
-            **{f"{r['instrument']}.{r['column']}": [q["cell"] for q in r["per_size"]] if r["per_size"] else r["cell"]
-               for r in res["readings"] if r["unit"]["point"] == pt},
-            **{f"{r['instrument']}.{r['column']}@door": [q["door"] for q in r["per_size"]]   # plan 0874: the door value each pair read on, beside its cell
-               for r in res["readings"] if r["unit"]["point"] == pt and r["per_size"] and "door" in r["per_size"][0]}}
 
 
 def feeders(res, pt, col, cols):

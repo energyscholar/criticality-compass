@@ -675,9 +675,11 @@ validate: clean
 Nothing is dropped by a list. `detect.run` is content-keyed: a result stored under the same input and table set whose `read` hashes
 and `measure_hash` equal this run's IS the result (nothing is measured or re-written); a measured result under another set whose key
 differs only in its `tables/*` entries is re-verdicted (`derived_from` set), unless the sets' `membership.toml` differ; anything
-else is measured. `measure_hash` is the sha over (path, content sha) of the import closure, within `cc/`, of `cc/door.py` and of the
+else is measured. `measure_hash` is the sha over (path, content sha) of the import closure, within `cc/`, of `cc/detect.py` (the measurement entry: readout, sign, door and what they read), `cc/door.py` and of the
 modules of the instruments the input declares, parsed from the import statements (`declare.measure_hash`); an edit to a file in no
-closure (view.py, score.py, ...) keeps the key, an edit to kernel.py or an instrument module moves it. A closure that cannot be read
+closure (view.py, score.py, ...) keeps the key, an edit to sign.py, kernel.py or an instrument module moves it. `detect.run(..., reuse=False)`
+always measures (the replay tests test_run_all, test_chain, test_needle_o_start use it); `bin/cc run --all` prints how many inputs were
+measured, reused and re-verdicted. A closure that cannot be read
 statically (a dynamic import) is refused. `code_hash` (all of `cc/` and `bin/cc`) stays recorded as provenance and `freeze` still
 demands it. A result with no `measure_hash` has no key: `bin/cc run <input>` writes it.
 A green full check writes `tests/BASELINE.txt` (tree, HEAD, every test's name, status and seconds); `bin/cc check --baseline`

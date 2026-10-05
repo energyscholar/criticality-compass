@@ -461,6 +461,9 @@ def classify_changes(classes, name, old, new):
     return out
 
 
+MEASURE_SEEDED = "# measure-key: seeded"   # on the one line that imports an instrument module by its declared name: the key seeds every instrument module the input declares
+
+
 def import_closure(root, starts):
     """{path relative to root: content sha} of the import closure, within cc/, of the module files `starts` (paths relative to root).
     Imports are READ from the syntax tree (every Import / ImportFrom node, lazy ones inside functions too), never listed by hand.
@@ -472,8 +475,10 @@ def import_closure(root, starts):
         if rel in seen:
             continue
         seen[rel] = sha(root / rel)
-        for n in ast.walk(ast.parse((root / rel).read_text())):
-            if isinstance(n, ast.Call) and (nm := getattr(n.func, "id", getattr(n.func, "attr", None))) in ("__import__", "import_module", "exec", "eval"):
+        text = (root / rel).read_text()
+        for n in ast.walk(ast.parse(text)):
+            if isinstance(n, ast.Call) and (nm := getattr(n.func, "id", getattr(n.func, "attr", None))) in ("__import__", "import_module", "exec", "eval") \
+                    and MEASURE_SEEDED not in text.splitlines()[n.lineno - 1]:
                 raise ValueError(f"{rel} line {n.lineno} calls {nm}: its import closure cannot be computed statically\n"
                                  "  Next: import the module with an import statement, so the measurement key can read it")
             mods = [a.name for a in n.names] if isinstance(n, ast.Import) else [n.module or ""] if isinstance(n, ast.ImportFrom) and not n.level else []
@@ -484,9 +489,10 @@ def import_closure(root, starts):
 
 
 def measure_hash(root, instrument_modules):
-    """sha256 over (path, content sha) of what MEASURES: the import closure, within cc/, of cc/door.py and of each module
-    in `instrument_modules` (cc/instruments/<m>.py). A result's reuse key is this plus its `read`; `code_hash` stays provenance."""
-    files = import_closure(root, ["cc/door.py", *(f"cc/instruments/{m}.py" for m in sorted(set(instrument_modules)))])
+    """sha256 over (path, content sha) of what MEASURES: the import closure, within cc/, of cc/detect.py (the measurement entry:
+    readout, sign and what they read), cc/door.py and each module in `instrument_modules` (cc/instruments/<m>.py). A result's
+    reuse key is this plus its `read`; `code_hash` stays provenance."""
+    files = import_closure(root, ["cc/detect.py", "cc/door.py", *(f"cc/instruments/{m}.py" for m in sorted(set(instrument_modules)))])
     h = hashlib.sha256()
     for rel in sorted(files):
         h.update(f"{rel}\0{files[rel]}\n".encode())

@@ -16,7 +16,7 @@ SET = "v03-rules"
 
 def measure(name):
     t0 = time.time()
-    got = {s["point"]: s["verdict"] for s in detect.run(name, SET, write=False)["signature"]}
+    got = {s["point"]: s["verdict"] for s in detect.run(name, SET, write=False, reuse=False)["signature"]}
     return name, got, time.time() - t0
 
 

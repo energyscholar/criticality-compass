@@ -70,7 +70,7 @@ for f in sorted((ROOT / "results").glob("*@v03-rules.json")):
         moved |= {(a["input"], sa["point"], k) for k in sa if k not in ("row_line", "why", "axis_lines", "flags") and sa[k] != sb[k]}
     check(f"{a['input']}: a one-pair input reads drift_code NOT-MEASURED under v04-rules", {x["drift_code"] for x in b["signature"]} == {"NOT-MEASURED"})
 check(f"{n} points: no cell outside the declared [[change]] list moved from v03-rules to v04-rules on an existing input", moved == MOVED, str(sorted(moved ^ MOVED)))
-fresh = detect.run("x2-xy-line-3", "v04-rules", False)      # re-measured now, against the stored result: the drift maths is under test, not only its codes
+fresh = detect.run("x2-xy-line-3", "v04-rules", False, reuse=False)      # re-measured now, against the stored result: the drift maths is under test, not only its codes
 stored = json.loads((ROOT / "results" / "x2-xy-line-3@v04-rules.json").read_text())
 pick = lambda r: [(x["unit"]["point"], x["column"], x["estimate"], x["cell"]) for x in r["readings"] if x["instrument"] == "needle_chain"]   # noqa: E731
 check("x2-xy-line-3 re-measured: the drift readings equal the stored ones", pick(fresh) == pick(stored) and len(pick(stored)) == 5, str(pick(fresh)[:2]))

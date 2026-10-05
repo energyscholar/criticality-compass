@@ -287,7 +287,7 @@ def structure_gate():
     return None
 
 
-def run_one(name, tables, dry):
+def run_one(name, tables, dry, how=None):
     """(refusal text, None) or (None, result): checks first, then the run."""
     import declare
     import detect
@@ -310,7 +310,9 @@ def run_one(name, tables, dry):
                 f"  Next: bin/cc tables fork {tables} <new-name>, edit tables/<new-name>/verdict.toml, "
                 f"then bin/cc run {name} --tables <new-name>"), None
     try:
-        return None, detect.run(name, tables, not dry)
+        res, got = detect.run_keyed(name, tables, not dry)
+        (how if how is not None else []).append(got)
+        return None, res
     except ValueError as e:
         return str(e), None
 
@@ -387,9 +389,9 @@ def cmd_run(args):
     if not names:
         print(f"no input named.\n  Next: bin/cc run <one of: {' '.join(inputs())}>   (or --all)")
         return 1
-    bad = 0
+    bad, how = 0, []
     for name in names:
-        msg, res = run_one(name, tables, "--dry" in args)
+        msg, res = run_one(name, tables, "--dry" in args, how)
         if res is None:
             bad += 1
             print(msg if len(names) == 1 else f"{name}: REFUSED: {msg.splitlines()[0]}")
@@ -401,6 +403,9 @@ def cmd_run(args):
         bad += emit(view_lines)
         if len(names) > 1:
             print(f"{name}: ran")
+    if len(names) > 1:
+        print(f"run: {how.count('measured')} measured, {how.count('stored')} reused from the stored result, "
+              f"{how.count('re-verdicted')} re-verdicted from another set, {bad} refused")
     return 1 if bad else 0
 
 
