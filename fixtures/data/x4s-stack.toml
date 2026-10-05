@@ -1,0 +1,9 @@
+# fixtures/data/x4s-stack.toml - written by bin/cc data add: sha256 of every data file
+schema = 1
+kind = "data-manifest"
+input = "x4s-stack"
+
+[files]
+"x4s/K0.4600-h0.0000-L27-plus.npz" = "aba73f004203d142235bbb4cf4a912276cb766f73e7827b79f3563ae2c37d025"
+"x4s/K0.4600-h0.0000-L81-plus.npz" = "6eaf639951ddaa5fcc19064f65019d5a193fa2b962039b3b8d602b71e42fe91c"
+"x4s/K0.4600-h0.0000-L243-plus.npz" = "78bf0a57785c5c52e23bf2595cb1385bf268336ad628aefbef7c9e0bb3b82aea"

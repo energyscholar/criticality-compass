@@ -1,0 +1,98 @@
+# THIS IS CC's m.toml (Kernel V8's M for ONE input: what was measured and how).
+# It is NOT the toolset's m.toml (scratch/compass-toolset/m.toml, the study log).
+# inputs/x4s-stack/m.toml - plan 0873 A1: the x4-ising-field declarations over the RAW snapshots (toolset [X4s]: K = 0.46, h = 0, start plus,
+# L = 27/81/243, S[8000, L, L] int8). data.format snapshots-v1: CC reduces S itself through the declared [block_map] (cc/reduce.py), and
+# its stored G (bit-identical to the frozen data/x4 G) is read only as the check. One point and one start exist, so no two_start / start relation.
+schema = 1
+kind = "input"
+id = "x4s-stack"
+instruments = ["needle", "across", "stability"]
+
+[obtained]                     # point label -> truth | navigated | observed
+"0.46" = "truth"
+
+[axes]
+point = ["0.46"]
+size = [27, 81, 243]
+starts = ["random"]
+main_start = "random"
+
+[observable]
+name = "g1 of the majority block lattice"
+definition = "open-pair nearest-neighbour correlation of each block lattice (cc/reduce.py g1, verbatim toolset tools/flow.py), every level down to final size 9; the file name is plus (role: random)"
+levels = [2, 3, 4]                             # derived from (L, final_size, factor); validate refuses a disagreement
+final_size = 9
+
+[block_map]
+name = "majority3"
+factor = 3
+keeps = "the sign of the local majority; tie-free"
+discards = "the magnitude of the local magnetisation"
+limited = "none"                               # plain lattice snapshots: every level, level 0 included, is a measured site
+
+[relations.size]
+template = "chain"
+axis = "size"
+provenance = "Coupling"
+direction_from = "the declared blocking map: one more blocking step relates L to L/3"
+
+[relations.matched]
+template = "matched"
+axis = "size"
+big = 243
+small = 81
+provenance = "Coupling"
+direction_from = "one extra declared blocking step at equal block-lattice size ([P2] relations)"
+
+[sinks]
+ordered = 1.0
+disordered = 0.0
+
+[interval]
+method = "block"
+b = 400
+resamples = 400
+level = 0.95
+seed = 64
+
+[eps]
+step = 0.01
+sink = 0.02
+y = 0.25
+
+[conjugate]
+observable = "E"
+conjugate_to = "beta (inverse temperature; E is h-even)"
+hamiltonian_knowledge = true
+
+[kernel]
+uses = ["A"]
+
+[data]
+format = "snapshots-v1"
+
+[[data.files]]
+point = "0.46"
+size = 27
+start = "random"
+path = "x4s/K0.4600-h0.0000-L27-plus.npz"
+arrays.G = { key = "S", level = 1 }
+arrays.E = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.46"
+size = 81
+start = "random"
+path = "x4s/K0.4600-h0.0000-L81-plus.npz"
+arrays.GL = { key = "S" }
+arrays.G = { key = "S", level = 2 }
+arrays.E = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.46"
+size = 243
+start = "random"
+path = "x4s/K0.4600-h0.0000-L243-plus.npz"
+arrays.GL = { key = "S" }
+arrays.G = { key = "S", level = 3 }
+arrays.E = { key = "O", level = 0 }
