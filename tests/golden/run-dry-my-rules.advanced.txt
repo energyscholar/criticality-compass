@@ -3,7 +3,7 @@ run w2-potts@my-rules
 w2-potts   rules: my-rules   result: results/w2-potts@my-rules.json (dry: nothing written)
   interval: block resamples 400, level 0.95, seed 31
   code_commit: none
-  read results/w2-potts@v03-rules.json 0c1a1281340d
+  read results/w2-potts@v03-rules.json measure_hash cf980b7c4b73
   read inputs/w2-potts/m.toml 9f77295ee127
   read instruments/across.toml 8f6803e8af6c
   read instruments/stability.toml 2fc7bb21b58a

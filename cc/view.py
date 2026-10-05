@@ -1,5 +1,6 @@
 """view.py - show and explain: one result printed as BASIC (a declared projection) or ADVANCED (every field).
 Pure over the result: a view never changes it. Plumbing."""
+import json
 import tomllib
 from pathlib import Path
 import numpy as np
@@ -126,6 +127,15 @@ def pair_lines(res, mode, cfg):
     return out
 
 
+def identity(key, sha):
+    """What a `read` line prints for one read file: its sha12, except for a stored RESULT, whose bytes move whenever anything it was
+    measured with is refreshed. A result prints its stable identity: its input@set (its name) and the measure_hash it carries."""
+    if not key.startswith("results/"):
+        return sha[:12]
+    mh = json.loads((ROOT / key).read_text()).get("measure_hash")
+    return f"measure_hash {mh[:12]}" if mh else "measure_hash none"
+
+
 def show(res, join, mode, note="", tables_dir=None):
     """Every point of a result: a header, one line per signature column, a verdict line and its why."""
     bad = stale(res)
@@ -138,7 +148,7 @@ def show(res, join, mode, note="", tables_dir=None):
         files = [k for k in res["read"] if not k.startswith("~")]
         out += [f"  interval: {iv['method']} resamples {iv['resamples']}, level {iv['level']}, seed {iv['seed']}",
                 f"  code_commit: {res['code_commit']}",
-                *[f"  read {k} {res['read'][k][:12]}" for k in files],
+                *[f"  read {k} {identity(k, res['read'][k])}" for k in files],
                 f"  read {len(res['read']) - len(files)} data files, sha256 match the pinned manifest"]
     import family   # plan 0872 F3: lazy (family imports view)
     notes = family.end_notes(ROOT, res)
