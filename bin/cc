@@ -94,9 +94,12 @@ def run_tests(names, skip=()):
         r = subprocess.run([sys.executable, str(t)], capture_output=True, text=True, cwd=ROOT)
         lines = (r.stdout + r.stderr).strip().splitlines()
         return (t.stem, r.returncode == 0, lines[-keep:], time.time() - t0)
+    alone = set(config()["check"]["exclusive"])   # cc.toml [check] exclusive: test NAMES that run by themselves, after the parallel batch (plan 0881)
+    batch = [t for t in picked if t.stem not in alone]
     with ThreadPoolExecutor(max(1, (os.cpu_count() or 3) - 2)) as pool:   # each script is its own subprocess
-        res = list(pool.map(one, picked))   # map returns in submission order: the printed order is fixed
-    return res, missing, allt
+        done = dict(zip((t.stem for t in batch), pool.map(one, batch)))   # map returns in submission order
+    done.update({t.stem: one(t) for t in picked if t.stem in alone})
+    return [done[t.stem] for t in picked], missing, allt   # the printed order is the checks.toml order, as before
 
 
 def cmd_test(names):

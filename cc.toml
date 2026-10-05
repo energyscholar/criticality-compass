@@ -64,6 +64,7 @@ commands = ["show", "explain", "run", "new case", "tables fork", "tables drop", 
 
 [check]                         # bin/cc check --fast (the pre-commit hook) skips the `slow` tests
 memory_gb = 5.0                # this host's memory budget for measuring workers (6.3 GB installed); test_run_all's pool is sized from it and the recorded peaks (plan 0881)
+exclusive = ["test_run_all"]    # these tests run ALONE after the parallel batch (test_run_all sizes its own worker pool from memory_gb)
 fast_budget_s = 30              # elapsed time is printed against it; over budget WARNS, never fails
 slow = ["test_w2", "test_detect_verdicts", "test_breakers_red", "test_view", "test_golden", "test_along", "test_axes", "test_tables_cli", "test_tabulate", "test_needle_o_start", "test_run_all", "test_code_hash", "test_chain", "test_across_delta", "test_end_note", "test_delta_basis", "test_reduce", "test_stack_door", "test_reuse"]   # each phase appends its > 5 s tests
 
