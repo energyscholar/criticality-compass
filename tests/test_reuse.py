@@ -56,6 +56,10 @@ with tempfile.TemporaryDirectory() as t:
     for q in [repo, *repo.rglob("*")]:
         q.chmod(q.stat().st_mode | stat.S_IWUSR)
 
+    for q in (repo / "results").glob(f"{INPUT}@*"):   # the copy starts with one stored result of INPUT (the frozen v01, no measure hash): any keyed one under another set would be the re-verdict parent
+        if not q.name.startswith(f"{INPUT}@{SET}."):
+            q.unlink()
+
     def run(name, tables):
         r = subprocess.run([sys.executable, "-c", DRIVER, str(repo), name, tables], capture_output=True, text=True)
         return json.loads(r.stdout.splitlines()[-1]) if r.returncode == 0 else {"error": r.stderr[-400:]}

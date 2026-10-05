@@ -237,7 +237,8 @@ def reverdict_result(res, T, commit="none"):
             **({f"tables/{T.name}/membership.toml": declare.sha(T.membership_path)}
                if T.membership_path and any(k.endswith("/membership.toml") for k in res["read"]) else {})}
     return {**res, "run_id": f"{res['input']}@{T.name}", "tables": T.name, "derived_from": old_id,
-            "code_commit": commit, "code_hash": declare.code_hash(ROOT), "read": read, "readings": readings, "signature": signature}
+            "code_commit": commit, "code_hash": declare.code_hash(ROOT), "read": read, "readings": readings, "signature": signature,
+            "signature_columns": list(T.codes["columns"]["signature"])}   # plan 0876 B: the new set's columns, as `run` writes them (the old set's would name a column this set lacks)
 
 
 def diff(ta, tb, ra=(), rb=()):

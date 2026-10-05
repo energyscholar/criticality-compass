@@ -1,5 +1,5 @@
 """test_code_hash - a result records the content hash of the code that made it; `freeze` refuses a result whose
-hash is not the committed tree's (plan 0869 P2). Planted: run, commit a code edit, freeze -> RED; run again -> green."""
+hash is not the committed tree's (plan 0869 P2). Planted (plan 0876 B: an edit to a module in every closure, project.py; one in no closure keeps the reuse key, so a re-run would reuse): run, commit a code edit, freeze -> RED; run again -> green."""
 import shutil
 import subprocess
 import sys
@@ -35,7 +35,7 @@ with tempfile.TemporaryDirectory() as t:
     rid = "b7-at-line@t3"
     rc, out = cc("run", "b7-at-line", "--tables", "t3")
     check("run succeeds in the committed copy", rc == 0, out[:300])
-    (repo / "cc" / "view.py").write_text((repo / "cc" / "view.py").read_text() + "\n# planted: code the result did not run\n")
+    (repo / "cc" / "project.py").write_text((repo / "cc" / "project.py").read_text() + "\n# planted: code the result did not run\n")
     git("commit", "-q", "-a", "-m", "plant")
     rc, out = cc("freeze", rid)
     check("freeze refuses a result made by other code than the committed tree's (RED)",
