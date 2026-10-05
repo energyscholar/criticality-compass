@@ -462,11 +462,13 @@ def cmd_diff(args):
 
 
 def cmd_tabulate(args):
+    import declare
     import score
     if "--diff" in args:
         return cmd_diff(args)
     results = [json.loads(p.read_text()) for p in sorted((ROOT / "results").glob("*.json"))]
-    md, found = score.tabulate(results)
+    with declare.hashing_once():   # read-only: each data file is hashed once, not once per result that read it
+        md, found = score.tabulate(results)
     (ROOT / "SIGNATURE-TABLE.md").write_text(md)
     (ROOT / "docs").mkdir(exist_ok=True)
     (ROOT / "docs" / "verdict-table.html").write_text(score.page(results, None, []))
