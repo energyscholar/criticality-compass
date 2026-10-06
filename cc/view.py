@@ -146,7 +146,7 @@ def show(res, join, mode, note="", tables_dir=None):
     out = [f"{res['input']}   rules: {res['tables']}   result: results/{res['run_id']}.json {note}".rstrip()]
     if mode == "advanced":
         files = [k for k in res["read"] if not k.startswith("~")]
-        out += [f"  interval: {iv['method']} resamples {iv['resamples']}, level {iv['level']}, seed {iv['seed']}",
+        out += [f"  interval: {iv['method']} " + cfg["interval_fields"][iv["method"]]["show"].format(**iv),
                 f"  code_commit: {res['code_commit']}",
                 *[f"  read {k} {identity(k, res['read'][k])}" for k in files],
                 f"  read {len(res['read']) - len(files)} data files, sha256 match the pinned manifest"]
@@ -223,9 +223,8 @@ def read_steps(q, r, lv, text, dcol, mode, cfg):
     if q["estimate"] is None:
         return [(5, "READING", shown(q["cell"] or r["cell"], r["reason"], mode, cfg))]
     e, (bl, bu) = r["eps"], (int(v) for v in sign.position(q["lo"], q["hi"], r["eps"]))
-    block = f", b {lv['b']}" if lv["method"] == "block" else ""
     return [(5, "READING", f"{r['column']} {q['estimate']:.4g}  interval [{q['lo']:.4g}, {q['hi']:.4g}]  "
-                           f"({lv['level'] * 100:g} %, {lv['resamples']} {lv['method']} resamples{block})"),
+                           f"({lv['level'] * 100:g} %, {cfg['interval_fields'][lv['method']]['read'].format(**lv)})"),
             (6, "SIGN", f"cuts {-e:g} 0 +{e:g} (eps {r['eps_key']}): bL {bl}, bU {bu} -> {shown(q['cell'], None, mode, cfg)}"),
             (7, "CODE", f"{dcol}: codes.toml line {map_line(text, dcol, q['cell'])}: {q['cell']} -> "
                         f"{shown(q['code'], None, mode, cfg)}")]
@@ -341,7 +340,7 @@ def explain_pair(res, pair, mode, tables_dir=None):
         f"  3 KERNEL    ln|Delta| {nums(ln)}; A over size {nums(steps)}; B at the top edge {steps.sum():.4g}; "
         f"over the log span {ctx.log_span:.4g}: {steps.sum() / ctx.log_span:.4g}",
         f"  4 READING   {r['column']} {r['estimate']:.4g}  interval [{r['lo']:.4g}, {r['hi']:.4g}]  "
-        f"({lv['level'] * 100:g} %, {lv['resamples']} {lv['method']} resamples)",
+        f"({lv['level'] * 100:g} %, {cfg['interval_fields'][lv['method']]['read_pair'].format(**lv)})",
         f"  5 SIGN      cuts {-e:g} 0 +{e:g} (eps {r['eps_key']}): bL {bl}, bU {bu} -> {shown(r['cell'], None, mode, cfg)}",
         "  6 CODE      " + (f"family.toml line {f2_code_line(text)} [f2.code]: {r['cell']} -> {code}" if code else
                             "no family code for this cell in this set (a family's [f2.code] codes a pair)")]

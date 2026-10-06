@@ -33,3 +33,13 @@ def density_var(e, scale):
     and the time order of the snapshots)."""
     d = e / scale - np.mean(e / scale)
     return np.mean(d * d)
+
+
+def cov_of_means(mg, me, mge):
+    """R = cov(G, E) from the means of G, E and G*E: the same projection as cov, read on the Gamma-method's three primaries (plan 0878)."""
+    return mge - mg * me
+
+
+def density_var_of_means(m, m2):
+    """var of e from the means of e and e*e: the same projection as density_var, read on its two primaries (plan 0878)."""
+    return m2 - m * m

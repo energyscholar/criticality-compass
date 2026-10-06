@@ -10,6 +10,16 @@ def reduce(arrays, ctx):
     return np.hstack([m[j] for k in range(len(m) - 1) for j in (k, k + 1)])
 
 
+def series(arrays, ctx):
+    """the primaries per file (plan 0878): every level of G at each size, [n, levels]."""
+    return list(arrays["GL"])
+
+
+def from_means(ms, ctx):
+    """reduce from the per-file primary means: the matched pairs laid end to end."""
+    return np.hstack([ms[j] for k in range(len(ms) - 1) for j in (k, k + 1)])
+
+
 def chain(x, ctx):
     """A over both matched pairs: the coarsest edge of each is its velocity. [previous, top] go to the log door."""
     v = A(x, ctx.rel["chain"]).spatial

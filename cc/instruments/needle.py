@@ -10,6 +10,16 @@ def reduce(arrays, ctx):
     return np.hstack([project.level_means(big), project.level_means(small)])
 
 
+def series(arrays, ctx):
+    """the primaries per file (plan 0878): every level of G at the big and the small lattice, [n, levels] each."""
+    return list(arrays["GL"])
+
+
+def from_means(ms, ctx):
+    """reduce from the per-file primary means: the same 7-node vector."""
+    return np.hstack(ms)
+
+
 def matched(x, ctx):
     """A over the matched relation; the coarsest edge is the velocity; distances to the two declared sinks."""
     v_all = A(x, ctx.rel["matched"]).spatial

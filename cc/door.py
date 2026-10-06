@@ -1,11 +1,14 @@
 """door.py - between the data and the maths: context, relations, the resample plan, the doors (plumbing)."""
+import functools
 import hashlib
 import itertools
 import os
+import tomllib
 from dataclasses import dataclass
 from pathlib import Path
 import numpy as np
 import admit
+import gamma
 import schema
 import formats
 import project
@@ -44,6 +47,8 @@ class Ctx:
     member: dict = None              # a pair unit: {"door": value, "reason": text} from the membership rule
     quantity: str = "R"              # the name a sign refusal gives the logged quantity
     ratio: object = None             # a pair unit with door:basis: the correction ratio r per resample row (0 on a RAW pair; plan 0874)
+    interval: dict = None            # the input's declared [interval] (plan 0878: the Gamma-method reads window_s, window_max, door_z from it)
+    lin: object = None               # method gamma: the unit's Lin (its primaries' series, displacements and window), None under a resampling method
 
 
 def relations_for(m, name):
@@ -93,7 +98,8 @@ def context(m, inst, size=None):
     pair = inst["unit"] == "pair"
     unit_rel = admit.declare(2, [(1, 0)], [Provenance(m["relations"]["control"]["provenance"])]) if pair else None
     return Ctx(
-        unit_rel=unit_rel, component_shape=(m["interval"]["resamples"] + 1, len(sizes)) if pair else None,
+        unit_rel=unit_rel, component_shape=(m["interval"].get("resamples", -1) + 1, len(sizes)) if pair else None,   # method gamma: the row count is known once the unit's primaries are (measure replaces it)
+        interval=m["interval"],
         pair_shape=(len(sizes), 2) if pair else None, n_size=len(sizes), quantity=inst.get("quantity", "Delta" if pair else "R"),
         level=m["interval"]["level"], eps={c: m["eps"][e] for c, e in inst["columns"].items()}, rel=rel,
         log_ratio=np.log(np.array(sizes[1:], float) / np.array(sizes[:-1], float)),
@@ -160,20 +166,92 @@ def resample_plan(m, ns):
             yield [resample.iid_indices(n, rng) for n in ns]
 
 
+@dataclass(frozen=True)
+class GammaStat:
+    """The Gamma-method's statistics of ONE reading: its SE, the window W and tau_int. A statistic of the interval projection C (plan 0878; Robin Q0):
+    it places the reading's sign cell and is never an operator input. It is a TYPE of its own, so no door can build a NodeField from it."""
+    se: float
+    window: int
+    tau_int: float
+
+
+@dataclass(frozen=True)
+class Lin:
+    """The linearisation of ONE unit (plan 0878): per file (block) the primaries' series [n_i, p_i], their means, the displacement h of every primary (its naive SE),
+    and each file's offset into the P primaries. Row j >= 1 of linearise_plan displaces primary j by h[j - 1]; the stages then run on 1 + P rows."""
+    ser: tuple
+    mean: tuple
+    h: object
+    off: tuple
+
+
+def linearise(ser, step):
+    """The Lin of a unit from its per-file primary series. h = step * SE_naive, SE_naive = sd/sqrt(n) of each primary (step: cc.toml [interval_fields.gamma] diff_step,
+    small enough that a nonlinear stage such as ln stays in its linear range); a primary with no variance has no fluctuation to propagate, so its displacement is
+    any positive step (sqrt(eps) of its scale), never zero."""
+    mean = tuple(s.mean(axis=0) for s in ser)
+    h = step * np.concatenate([s.std(axis=0) / np.sqrt(len(s)) for s in ser])
+    scale = np.concatenate([1 + np.abs(m) for m in mean])
+    off = tuple(itertools.accumulate((s.shape[1] for s in ser), initial=0))[:-1]
+    return Lin(tuple(ser), mean, np.where(h > 0, h, np.sqrt(np.finfo(float).eps) * scale), off)
+
+
+def linearise_plan(lin):
+    """The row plan of method gamma, beside resample_plan: row 0 is the estimate (the primaries' means); each next row displaces ONE primary's mean by its h.
+    Yields the per-file means; the instrument's from_means turns each into one reduce output."""
+    yield [m.copy() for m in lin.mean]
+    for i, m in enumerate(lin.mean):
+        for q in range(len(m)):
+            ms = [x.copy() for x in lin.mean]
+            ms[i][q] += lin.h[lin.off[i] + q]
+            yield ms
+
+
+def gamma_stat(lin, v, iv):
+    """GammaStat of one reading from its value over the linearisation rows (v[0] the estimate, v[1:] the displaced rows), or None when no window is found by window_max.
+    The gradient is the row difference over h; Gamma_F(t) = sum over files of c^T Gamma(t) c (files are independent; each weighted n/n_i, n the shortest file), then Wolff's window."""
+    g, n = (np.asarray(v, float)[1:] - v[0]) / lin.h, min(len(s) for s in lin.ser)
+    gam = sum(n / len(s) * gamma.autocov((s @ g[o:o + s.shape[1]])[:, None], iv["window_max"])[:, 0, 0] for s, o in zip(lin.ser, lin.off))
+    w = gamma.window(gam, n, iv["window_s"])
+    return None if w is None else GammaStat(float(np.sqrt(gamma.variance(gam, w[0], n))), int(w[0]), float(w[1]))
+
+
+@functools.lru_cache(maxsize=None)
+def diff_step():
+    """The finite-difference step of method gamma's linearisation rows, from cc.toml [interval_fields.gamma] (a fraction of each primary's naive SE)."""
+    return tomllib.loads((schema.ROOT / "cc.toml").read_text())["interval_fields"]["gamma"]["diff_step"]
+
+
+@functools.lru_cache(maxsize=None)
+def z_of(level):
+    """The z of a declared level, from cc.toml [levels] (validate refuses a level the table does not hold)."""
+    return tomllib.loads((schema.ROOT / "cc.toml").read_text())["levels"][str(level)]
+
+
 def nodefield(x, ctx):
-    """The reduce outputs as a NodeField: every leading axis flattened into components (C order)."""
+    """The reduce outputs as a NodeField: every leading axis flattened into components (C order). A Gamma statistic is refused: the interval is not an operator input."""
+    if isinstance(x, GammaStat):
+        raise ValueError("a Gamma-method statistic (SE, window W, tau_int) is a projection C output: it feeds the sign cell only and is never an operator input\n"
+                         "  Next: read it through readout.reading_se; do not route it into a stage or a door")
     x = x.reshape(-1, x.shape[-1])
     return admit.nodefield(x) if np.isfinite(x).all() else Null("NOT-EVALUATED", "non-finite value")
 
 
 def logcoord(x, ctx):
     """ln(s v) when the logged quantity (R, or Delta from a delta stage) keeps one non-zero sign s over the
-    estimate and every resample, else a refusal."""
+    estimate and every resample, else a refusal. Under method gamma the rows are the estimate and its linearisation rows (not resamples), and the
+    door is the declared number: |v| > door_z * SE_Gamma for every component (plan 0878), else a refusal."""
     x, q = (x["delta"] if isinstance(x, dict) else x), ctx.quantity
     s = np.sign(x[0])
     if (s == 0).any():
         return Null("NOT-EVALUATED", f"{q} = 0")
-    if not (np.sign(x) == s).all():
+    if ctx.lin is not None:
+        stats = [gamma_stat(ctx.lin, x[:, k], ctx.interval) for k in range(x.shape[1])]
+        if None in stats:
+            return Null("NOT-EVALUATED", f"no window: the autocorrelation of {q} is not summable at this N (window_max {ctx.interval['window_max']})")
+        if not all(abs(x[0, k]) > ctx.interval["door_z"] * st.se for k, st in enumerate(stats)):
+            return Null("NOT-EVALUATED", f"|{q}| <= door_z * SE ({ctx.interval['door_z']:g} Gamma-method SE): the sign of {q} is not resolved at this N")
+    elif not (np.sign(x) == s).all():
         return Null("NOT-EVALUATED", f"sign of {q} not constant across the point estimate and every resample")
     return nodefield(project.logcoord(x, s), ctx)
 
@@ -208,7 +286,10 @@ def ratio_of(door_value, drift, pair, log_ratio, rows):
 
 
 def basis(x, ctx):
-    """A TRANSFORMED pair is read only where the endpoints' correction decays (r < 1 at the estimate and every resample); a RAW pair has r = 0 and passes."""
+    """A TRANSFORMED pair is read only where the endpoints' correction decays (r < 1 at the estimate and every resample); a RAW pair has r = 0 and passes.
+    Under method gamma a TRANSFORMED pair has no ratio (its r would need the drift and the pair linearised together): ctx.ratio is None and it is refused."""
+    if ctx.ratio is None:
+        return Null("NOT-EVALUATED", "method gamma does not declare the joint linearisation of the pair and the needle drift that a TRANSFORMED basis needs")
     return x if (ctx.ratio < 1).all() else Null("NOT-EVALUATED", "the endpoints' needle correction does not decay (r >= 1) at the estimate or a resample: y_inf is undefined")
 
 

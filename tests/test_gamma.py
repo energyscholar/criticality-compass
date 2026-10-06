@@ -45,6 +45,24 @@ def iid_variance(g, w, n):
     return g[0] / n
 
 
+def autocov_reference(a, tmax):
+    """the toolset's studies/OBS3/coverage.py autocov, verbatim (pads to the power of two above 2n)"""
+    n, p = a.shape
+    a = a - a.mean(axis=0)
+    m = 1 << int(np.ceil(np.log2(2 * n)))
+    f = np.fft.rfft(a, m, axis=0)
+    g = np.empty((tmax + 1, p, p))
+    for i in range(p):
+        for j in range(p):
+            c = np.fft.irfft(np.conj(f[:, i]) * f[:, j], m)[: tmax + 1]
+            g[:, i, j] = c / (n - np.arange(tmax + 1))
+    return g
+
+
+two = np.stack([ar1(2), ar1(3) + 0.3 * ar1(2)], axis=1)
+check("autocov (5-smooth padding) equals the reference's (power-of-two padding) for every pair, to rounding", np.allclose(gamma.autocov(two, TMAX), autocov_reference(two, TMAX), rtol=0, atol=1e-9 * float(np.abs(two).max() ** 2)))
+check("the padded FFT length is at least n + tmax and 5-smooth", all(int(gamma.SMOOTH[np.searchsorted(gamma.SMOOTH, k)]) >= k for k in (N + TMAX, 600400, 7)))
+
 good = [se_ratio(ar1(k), S) for k in SEEDS]
 r_good = [r for r, _ in good]
 tau_w = [w[1] for _, w in good]

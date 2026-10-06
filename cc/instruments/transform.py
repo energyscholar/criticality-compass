@@ -14,6 +14,19 @@ def reduce(arrays, ctx):
     return np.hstack([needle, r[::-1]])
 
 
+def series(arrays, ctx):
+    """the primaries per file (plan 0878): G, E and G*E, then every level of G, at each size, [n, 3 + levels]."""
+    return [np.hstack([np.stack([g, e, g * e], axis=1), gl]) for gl, g, e in zip(arrays["GL"], arrays["G"], arrays["E"])]
+
+
+def from_means(ms, ctx):
+    """reduce from the per-file primary means: the matched-chain level means laid end to end, then R per size ASCENDING."""
+    split = [(project.cov_of_means(mg, me, mge), np.array(lv)) for mg, me, mge, *lv in ms]
+    levels = [lv for _, lv in split]
+    needle = np.hstack([levels[j] for k in range(len(levels) - 1) for j in (k, k + 1)])
+    return np.hstack([needle, np.stack([r for r, _ in split])[::-1]])
+
+
 def velocity(x, ctx):
     """A over the matched chain: the previous and top velocities (as needle_chain); R per size is the trailing block. All go to the log door."""
     v = A(x, ctx.rel["chain"]).spatial

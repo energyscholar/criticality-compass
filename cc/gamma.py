@@ -5,12 +5,16 @@ Wolff 2004 (Comput. Phys. Commun. 156, 143), the automatic windowing of section 
 reading's sign cell against its declared margin and is never an operator input."""
 import numpy as np
 
+SMOOTH = np.array(sorted({2 ** a * 3 ** b * 5 ** c for a in range(30) for b in range(12) for c in range(8)}))   # form: the 5-smooth lengths (fast FFT sizes), up to 7.6e18; tolerance: the ranges only bound the table
+
 
 def autocov(a, tmax):
-    """Gamma_ab(t), t = 0..tmax, for the columns of a [n, p] (means removed): (1/(n-t)) sum_i a(i) b(i+t); FFT, every pair."""
+    """Gamma_ab(t), t = 0..tmax, for the columns of a [n, p] (means removed): (1/(n-t)) sum_i a(i) b(i+t); FFT, every pair.
+    One change from the reference, in the FFT LENGTH only: the reference pads to the power of two above 2n; any length m >= n + tmax gives the same Gamma(t) for
+    t <= tmax (no wrap-around), so the smallest 5-smooth m >= n + tmax is used (tests/test_gamma.py asserts equality with the reference's padding)."""
     n, p = a.shape
     a = a - a.mean(axis=0)
-    m = 1 << int(np.ceil(np.log2(2 * n)))   # form: the FFT length, the next power of two above 2n (zero padding: the linear, not the circular, correlation)
+    m = int(SMOOTH[np.searchsorted(SMOOTH, n + tmax)])   # form: the FFT length (zero padding past n + tmax: the linear, not the circular, correlation)
     f = np.fft.rfft(a, m, axis=0)
     g = np.empty((tmax + 1, p, p))
     for i in range(p):

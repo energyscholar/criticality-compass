@@ -9,6 +9,17 @@ def reduce(arrays, ctx):
     return np.stack([project.density_var(e, s) for e, s in zip(arrays["E"], ctx.unit_scales)])
 
 
+def series(arrays, ctx):
+    """the primaries per file (plan 0878): e and e*e per size, e = E / the declared unit scale, [n, 2]."""
+    d = [e / s for e, s in zip(arrays["E"], ctx.unit_scales)]
+    return [np.stack([x, x * x], axis=1) for x in d]
+
+
+def from_means(ms, ctx):
+    """reduce from the per-file primary means: var(e) per size."""
+    return np.stack([project.density_var_of_means(*m) for m in ms])
+
+
 def growth(x, ctx):
     """x holds ln var(e) per size; A over the size chain divided by the declared ln of the size ratio."""
     y = A(x, ctx.rel["size"]).spatial / ctx.log_ratio

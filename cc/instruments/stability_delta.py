@@ -10,6 +10,16 @@ def reduce(arrays, ctx):
     return np.stack([np.mean(g) for g in arrays["G"]]).reshape(ctx.pair_shape)
 
 
+def series(arrays, ctx):
+    """the primaries per file (plan 0878): G per (size, member of the pair), [n, 1]."""
+    return [g[:, None] for g in arrays["G"]]
+
+
+def from_means(ms, ctx):
+    """reduce from the per-file primary means: the mean of G per (size ascending, member of the pair), one [n_size, 2] array."""
+    return np.stack([m[0] for m in ms]).reshape(ctx.pair_shape)
+
+
 def delta(x, ctx):
     """Delta(L) = A over the ONE declared control edge (b - a); sizes and resample rows are components."""
     return {"delta": project.p_delta(A(x, ctx.unit_rel).spatial[:, 0], ctx.component_shape)}

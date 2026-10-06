@@ -27,18 +27,29 @@ nulls = ["NOT-MEASURED", "NOT-EVALUATED"]       # the honest nulls, in rank orde
 
 # [interval_fields.<method>] (plan 0878): the fields of an input's [interval] for each method of alphabets.interval_method, as DATA (validate reads it; there is no if-ladder per method).
 # required / optional: field -> type name (str | int | num). A field in neither is refused as unknown for that method. min_blocks (block only) is the floor on n // b per declared file.
+# show / read / read_pair: the words `show --advanced` and `explain` print for the method ({field} is read from the result's interval block; view.py holds no per-method text).
 [interval_fields.block]
 required = { method = "str", resamples = "int", level = "num", seed = "int", b = "int" }
 optional = { tau_declared = "int", min_blocks = "int" }
+show = "resamples {resamples}, level {level}, seed {seed}"
+read = "{resamples} {method} resamples, b {b}"
+read_pair = "{resamples} {method} resamples"
 
 [interval_fields.iid]
 required = { method = "str", resamples = "int", level = "num", seed = "int", tau_declared = "int" }
 optional = { b = "int" }
+show = "resamples {resamples}, level {level}, seed {seed}"
+read = "{resamples} {method} resamples"
+read_pair = "{resamples} {method} resamples"
 
 [interval_fields.gamma]
 required = { method = "str", level = "num", window_s = "num", window_max = "int", door_z = "num" }
 optional = {}
 level_in = "levels"
+diff_step = 0.001     # the finite-difference step of the linearisation rows, as a fraction of each primary's naive SE (a stage may be nonlinear, e.g. ln: the step must stay small against the quantity)
+show = "window_s {window_s}, window_max {window_max}, door_z {door_z}, level {level}"
+read = "{method}, window_s {window_s}, window_max {window_max}"
+read_pair = "{method}, window_s {window_s}, window_max {window_max}"
 
 # A STACK format is raw frames the door reduces itself (cc/reduce.py) through the input's declared [block_map] and [observable]: the
 # schema is DATA here (cc/formats.py holds no per-format code). reduces = the array kinds computed from the stack; dims/dtypes = the raw

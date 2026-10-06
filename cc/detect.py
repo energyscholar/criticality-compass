@@ -33,6 +33,7 @@ class Reading:
     reason: str = None
     vector: object = None
     door: str = None          # a pair reading: the membership door value that decided whether its unit ran
+    window: int = None        # method gamma: the window W the reading's SE was summed over (plan 0878; reported, never tuned)
 
 
 @dataclass
@@ -85,9 +86,16 @@ def context_for(input_id, instrument_name, point, size=None):
 
 def read_vector(instrument_name, column, v, ctx):
     """The readout of one resampled column: estimate, interval and sign cell against its declared eps."""
-    est, lo, hi, cell = readout.reading(np.asarray(v, float), ctx.level, ctx.eps[column])
-    eps_key = instrument(instrument_name)[0]["columns"][column]
-    return Reading(float(est), float(lo), float(hi), cell, eps_key, ctx.eps[column], None, np.asarray(v))
+    eps_key, v = instrument(instrument_name)[0]["columns"][column], np.asarray(v, float)
+    if ctx.lin is None:
+        est, lo, hi, cell = readout.reading(v, ctx.level, ctx.eps[column])
+        return Reading(float(est), float(lo), float(hi), cell, eps_key, ctx.eps[column], None, v)
+    st = door.gamma_stat(ctx.lin, v, ctx.interval)   # method gamma (plan 0878): the interval is est +- z SE_Gamma, a projection that places the sign cell
+    if st is None:
+        return Reading(None, None, None, "NOT-EVALUATED", eps_key, ctx.eps[column],
+                       f"no window: the autocorrelation of {column} is not summable at this N (window_max {ctx.interval['window_max']})", v)
+    est, lo, hi, cell = readout.reading_se(v[0], st.se, door.z_of(ctx.level), ctx.eps[column])
+    return Reading(float(est), float(lo), float(hi), cell, eps_key, ctx.eps[column], None, v, None, st.window)
 
 
 def after(name, x, ctx):
@@ -264,15 +272,8 @@ def cells_of_rows(rows):
             **{src + "@door": [r.door for _, r in per] for _, _, _, _, per, src in rows if per[0][1].door is not None}}   # plan 0874: the door value each pair read on, beside its cell
 
 
-def measure(m, c, reg, T):
-    """The streaming pass: one resample plan; every unit of every declared instrument reduced row by row,
-    then its door and stage steps and readout. Two passes after the stream: instruments with empty `requires`
-    first and coded, then the dependents, whose membership door reads those codes.
-    Returns {(instrument, unit, size): (readings, reports)}."""
-    blocks = door.load_blocks(m, c.data_root)
-    pos = {k: i for i, (k, _) in enumerate(blocks)}
-    units = [(n, u, sz) for n in m["instruments"] for u, sz in door.unit_labels(m, reg[n][0])]
-    ctxs = {(n, sz): door.context(m, reg[n][0], sz) for n, _, sz in units}
+def rows_resampled(m, reg, blocks, pos, units, ctxs):
+    """Methods block and iid: one resample plan; every unit reduced row by row (row 0 the estimate, rows 1..R resamples). Returns (rows per unit, ctx per unit)."""
     acc = {u: [] for u in units}
     for idx in door.resample_plan(m, [len(next(iter(a.values()))) for _, a in blocks]):
         cache = {}
@@ -281,18 +282,54 @@ def measure(m, c, reg, T):
             keys = door.unit_keys(m, inst, u, sz)
             arrays = {a: [gather(cache, blocks, idx, pos[k], a) for k in keys] for a in inst["arrays"]}
             acc[(n, u, sz)].append(reg[n][1].reduce(arrays, ctxs[(n, sz)]))
-    first = {u: after(u[0], np.stack(v), ctxs[(u[0], u[2])]) for u, v in acc.items() if not reg[u[0]][0].get("requires")}
+    return acc, {u: ctxs[(u[0], u[2])] for u in units}
+
+
+def rows_linearised(m, reg, blocks, pos, units, ctxs):
+    """Method gamma (plan 0878): no resampling. Each unit's primaries are named by its instrument's series(); the rows are the estimate and one row per primary with
+    its mean displaced by h (door.linearise_plan), each turned into a reduce output by from_means. The unit's ctx carries the linearisation and the row count."""
+    acc, uctx = {}, {}
+    for n, u, sz in units:
+        inst, ctx = reg[n][0], ctxs[(n, sz)]
+        arrays = {a: [blocks[pos[k]][1][a] for k in door.unit_keys(m, inst, u, sz)] for a in inst["arrays"]}
+        lin = door.linearise(reg[n][1].series(arrays, ctx), door.diff_step())
+        acc[(n, u, sz)] = [reg[n][1].from_means(ms, ctx) for ms in door.linearise_plan(lin)]
+        uctx[(n, u, sz)] = dataclasses.replace(ctx, lin=lin, component_shape=None if ctx.component_shape is None else (len(acc[(n, u, sz)]), ctx.n_size))
+    return acc, uctx
+
+
+ROWS = {"block": rows_resampled, "iid": rows_resampled, "gamma": rows_linearised}   # [interval] method -> how a unit's rows are made (cc.toml alphabets.interval_method)
+
+
+def measure(m, c, reg, T):
+    """The streaming pass: the rows of every unit of every declared instrument (ROWS[method]: resampled, or linearised for the Gamma-method),
+    then its door and stage steps and readout. Two passes after the rows: instruments with empty `requires`
+    first and coded, then the dependents, whose membership door reads those codes.
+    Returns {(instrument, unit, size): (readings, reports)}."""
+    blocks = door.load_blocks(m, c.data_root)
+    pos = {k: i for i, (k, _) in enumerate(blocks)}
+    units = [(n, u, sz) for n in m["instruments"] for u, sz in door.unit_labels(m, reg[n][0])]
+    ctxs = {(n, sz): door.context(m, reg[n][0], sz) for n, _, sz in units}
+    acc, uctx = ROWS[m["interval"]["method"]](m, reg, blocks, pos, units, ctxs)
+    first = {u: after(u[0], np.stack(v), uctx[u]) for u, v in acc.items() if not reg[u[0]][0].get("requires")}
     wait = {n for n in m["instruments"] if reg[n][0].get("requires")}
     codes = {pt: codes_of(cells_of_rows(point_rows(m, c, reg, first, pt, used(T), wait)), T) for pt in m["axes"]["point"]}
     nc = ctxs.get(("needle_chain", None))   # plan 0874: the endpoints' resampled drift gives a TRANSFORMED pair its ratio r
     for u, v in acc.items():
         if reg[u[0]][0].get("requires"):
-            inst, ctx = reg[u[0]][0], ctxs[(u[0], u[2])]
+            inst, ctx = reg[u[0]][0], uctx[u]
             mem = door.member_for(inst, T.membership, u[0], u[1], codes)
-            ratio = door.ratio_of(mem["door"], lambda pt: first[("needle_chain", pt, None)][0]["drift"].vector, u[1],
-                                  lambda: nc.log_ratio[nc.top], ctx.component_shape[0]) if "door:basis" in inst["pipeline"] else None
+            ratio = (None if ctx.lin is not None and mem["door"] == "TRANSFORMED" else   # method gamma: a TRANSFORMED pair needs the joint linearisation with the needle drift (door.basis refuses it)
+                     door.ratio_of(mem["door"], lambda pt: first[("needle_chain", pt, None)][0]["drift"].vector, u[1],
+                                   lambda: nc.log_ratio[nc.top], ctx.component_shape[0])) if "door:basis" in inst["pipeline"] else None
             first[u] = after(u[0], np.stack(v), dataclasses.replace(ctx, member=mem, ratio=ratio))
     return first
+
+
+def window_reports(n, unit, readings):
+    """Method gamma (plan 0878): the window W of each reading, as report rows (name W:<column>, one per size for a point-size column). Empty under a resampling method."""
+    return [{"instrument": n, "name": f"W:{col}" + (f"@size={sz}" if sz is not None else ""), "unit": unit, "estimate": r.window, "vector_key": None}
+            for col, per in readings for sz, r in per if r.window is not None]
 
 
 def labelled(m, inst, n, pt, on):
@@ -356,6 +393,7 @@ def pair_results(m, c, reg, out, vectors):
             unit, first = {"pair": list(pair)}, res[next(iter(inst["columns"]))]
             flags = sorted(set(inst["flags"]) | {flagmap[m["obtained"][pt]] for pt in pair}
                            | ({"U"} if first.door == "RUN-FLAG-U" else set()))
+            reports += window_reports(n, unit, [(col, [(None, res[col])]) for col in inst["columns"]])
             for col, ek in inst["columns"].items():
                 readings.append(reading_dict((n, col, ek, flags, [(None, res[col])], f"{n}.{col}"), unit, {}, {}, {}))
                 if res[col].vector is not None:
@@ -438,6 +476,7 @@ def run_keyed(input_id, tables, write, tables_dir=None, reuse=True):
                     reports.append({"instrument": n, "name": rn, "unit": {"point": pt},
                                     "estimate": np.asarray(v)[0].tolist(), "vector_key": key})
                     vectors[key] = np.asarray(v)
+        reports += [w for n, col, ek, flags, per, src in rows if reg[n][0]["unit"] != "pair" for w in window_reports(n, {"point": pt}, [(col, per)])]
         codes = codes_of(cells, T)
         sig = {n: codes[n] for n in T.codes["columns"]["signature"]}
         verdict, cls, line, why = verdict_of(sig, T)
