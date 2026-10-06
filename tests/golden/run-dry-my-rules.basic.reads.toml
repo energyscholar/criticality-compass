@@ -2,7 +2,7 @@
 # never typed). Each entry: kinds (R read, S stat, D directory listed) and a path (~data/ = the data root).
 schema = 1
 kind = "golden-reads"
-key = "cd4a361403ae6a91faab24776eeb0200cae2504d92a29c84d87074b29d109be6"
+key = "1b764f10d541f3c982e0a1330fa5d88c97f4215bb91e50cff49af5668534207e"
 paths = [
   "S .",
   "RS FROZEN.json",
@@ -83,6 +83,7 @@ paths = [
   "S cc/sys.py",
   "S cc/tifffile.py",
   "S cc/tomllib.py",
+  "RS cc/transducer.py",
   "RS cc/view.py",
   "S cc/zipfile.py",
   "R checks.toml",
@@ -100,6 +101,7 @@ paths = [
   "DS inputs",
   "S inputs/TEMPLATE.m.toml.in",
   "S inputs/TEMPLATE.points.toml.in",
+  "S inputs/TEMPLATE.transducer.toml.in",
   "S inputs/b7-at-line",
   "S inputs/b7-at-line-2",
   "S inputs/b7-at-line-2/couplings.toml",
@@ -123,6 +125,7 @@ paths = [
   "RS inputs/w2-potts/couplings.toml",
   "RS inputs/w2-potts/m.toml",
   "RS inputs/w2-potts/points.toml",
+  "RS inputs/w2-potts/transducer.toml",
   "S inputs/w3-potts",
   "S inputs/w3-potts/couplings.toml",
   "S inputs/x2-xy-line",

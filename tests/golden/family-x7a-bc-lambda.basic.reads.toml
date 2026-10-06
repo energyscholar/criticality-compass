@@ -2,7 +2,7 @@
 # never typed). Each entry: kinds (R read, S stat, D directory listed) and a path (~data/ = the data root).
 schema = 1
 kind = "golden-reads"
-key = "786e52950bd49995000029d8b9e4dc32f7763437ff6995f01996f38c0cde07cb"
+key = "2d369925239d89d52e344bc770642b0fdb42c1516a2c59afec4006ac2817fd15"
 paths = [
   "S .",
   "RS bin/cc",
@@ -23,6 +23,7 @@ paths = [
   "RS cc/reverdict.py",
   "RS cc/schema.py",
   "R cc/sign.py",
+  "R cc/transducer.py",
   "RS cc/view.py",
   "R checks.toml",
   "DS families",
