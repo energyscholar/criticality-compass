@@ -1,4 +1,4 @@
 $ bin/cc new input b7c --like b7-at-line --add-instrument along
-wrote inputs/b7c/m.toml and points.toml (like b7-at-line)
+wrote inputs/b7c/m.toml, points.toml and transducer.toml (like b7-at-line)
   Next: fix every TODO, then bin/cc data add b7c and bin/cc validate
 exit 0
