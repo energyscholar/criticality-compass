@@ -2,7 +2,7 @@
 # never typed). Each entry: kinds (R read, S stat, D directory listed) and a path (~data/ = the data root).
 schema = 1
 kind = "golden-reads"
-key = "c9f0a315a2b79a7181355762582057b7e8d2f8d9ccbd1164e7172bc99931f67f"
+key = "b3d28f13683639d229d4f14098e38ca6e1b8905daf7968c254d64383dc3fb84d"
 paths = [
   "DS .",
   "D .githooks",
@@ -52,6 +52,7 @@ paths = [
   "R cc/family.py",
   "R cc/fingerprint.py",
   "R cc/formats.py",
+  "R cc/gamma.py",
   "D cc/instruments",
   "R cc/instruments/across.py",
   "R cc/instruments/across_delta.py",
@@ -422,12 +423,15 @@ paths = [
   "R results/reduced/x4s-stack/6e82c1c2479fef2f8eb8e36a7a1b2d339e6943520c0924367be4f46481942a02.npz",
   "R results/reduced/x4s-stack/712a50ae56cf1322aa5547639dd729f102b437f277e35a82b218c8e6dfa179e5.npz",
   "R results/reduced/x4s-stack/762052ecafd348c184af1eb64e45d1c6b2695713fef5b36a3f7856ee49248d00.npz",
+  "R results/reduced/x4s-stack/7a4384369b695ccaeecb86f62decec447236bc39dec9a59140467e25d02e9858.npz",
   "R results/reduced/x4s-stack/7e9d20295282e557e63776e48a7f3367c9a809d031c0945449d10690a76bac60.npz",
   "R results/reduced/x4s-stack/7ee38da2a0d8d19d118e8d7ca07dae3a2b2a729701c0f2ede4e7885cce9c52e5.npz",
   "R results/reduced/x4s-stack/811a00444026db7afb1ae7abb00712a5a13ac8c61fe55ff1b9472d308a4ebdde.npz",
   "R results/reduced/x4s-stack/87230e1a36d141dfbbcea2a58fd39f9a0c7c2eb5e2507358949553a1d36bd118.npz",
   "R results/reduced/x4s-stack/87f18366c27344fe5e523929fcaddf2bb31a1c8f50fae3bd52ef1e02a3a923d0.npz",
+  "R results/reduced/x4s-stack/90a45855ddda0a346a5da3ee72da065cc327429c5278d6a06d51c46d88c8bba5.npz",
   "R results/reduced/x4s-stack/98a4d77a6f5698bc13cd7bf453963e5f11d96d2b6f712faaf87486f2a4cccd5e.npz",
+  "R results/reduced/x4s-stack/99a72fc2d90d3d88ef298015c950cc99ed964e8f987a27cada68e1c50a54f6ba.npz",
   "R results/reduced/x4s-stack/a3df655a762bc2cdc28f4866deb5d98b37b53b16eb2db6f62f7d0578a14b2b9e.npz",
   "R results/reduced/x4s-stack/a7675e6a67b4f825691a4ce5ede7a1b0b6e1a6a1e97e070d8608c502f5fb4458.npz",
   "R results/reduced/x4s-stack/b1672bb89e9ae75dd719ccffe77f3321005749e5efae9bf74f1da61983e7610e.npz",
@@ -985,8 +989,11 @@ paths = [
   "R tests/planted/input-data-absent.toml",
   "R tests/planted/input-eps-missing.toml",
   "R tests/planted/input-eps-not-required.toml",
+  "R tests/planted/input-gamma-level.toml",
+  "R tests/planted/input-gamma-with-b.toml",
   "R tests/planted/input-level-on-1d.toml",
   "R tests/planted/input-levels-contradict.toml",
+  "R tests/planted/input-min-blocks.toml",
   "R tests/planted/input-ok.toml",
   "R tests/planted/input-operators-outside-uses.toml",
   "R tests/planted/input-unknown-instrument.toml",
@@ -1029,6 +1036,8 @@ paths = [
   "R tests/test_ends.py",
   "R tests/test_family.py",
   "R tests/test_freeze_key.py",
+  "R tests/test_gamma.py",
+  "R tests/test_gamma_plan.py",
   "R tests/test_golden.py",
   "R tests/test_kernel.py",
   "R tests/test_kernel_rs.py",

@@ -2,7 +2,7 @@
 # never typed). Each entry: kinds (R read, S stat, D directory listed) and a path (~data/ = the data root).
 schema = 1
 kind = "golden-reads"
-key = "d9e2e98c26029e20164e2bcaea88f35b58deeaf7fcf8f62905504aa7819e36a9"
+key = "9b3e1330d38e38ab0e18cd608fddaed45850cd5ce626ec0a9cfeb77d30d2a901"
 paths = [
   "S .",
   "RS FROZEN.json",
@@ -30,6 +30,7 @@ paths = [
   "RS cc/fingerprint.py",
   "RS cc/formats.py",
   "S cc/functools.py",
+  "RS cc/gamma.py",
   "S cc/hashlib.py",
   "S cc/importlib.py",
   "DS cc/instruments",

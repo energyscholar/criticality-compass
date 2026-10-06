@@ -3,7 +3,7 @@ run b7-at-line@scratch -> results/b7-at-line@scratch.json
 b7-at-line   rules: scratch   result: results/b7-at-line@scratch.json (not frozen)
   interval: block resamples 400, level 0.95, seed 22
   code_commit: none
-  read results/b7-at-line@v03-rules.json measure_hash fee730c7cbd0
+  read results/b7-at-line@v03-rules.json measure_hash 07e446dccf33
   read inputs/b7-at-line/m.toml d0d267e3857c
   read inputs/b7-at-line/transducer.toml 4d3b7e84e84b
   read instruments/across.toml 8f6803e8af6c
