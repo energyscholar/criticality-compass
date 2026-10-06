@@ -5,19 +5,21 @@
  "input": "x2b-xy-4",
  "tables": "v08-rules",
  "derived_from": null,
- "code_commit": "39877d4ee112283219a912ea376efd9c7db4624f",
- "code_hash": "9d444803fff70bc801fed81be6e4df5d63eb6d44b5b17dab459125b1dcfb770d",
+ "code_commit": "ee7e75c989c7f382e8664f449dde79b095ba47ec",
+ "code_hash": "cf76da881084eda541fe8f3c6790851fe14fe96b00df034004fe3a28dc4a8f7b",
  "measure_hash": "b7cfa88d8bec19b1f28109c0d151bc3864f4bde9c9bfc3a072879be761142342",
- "peak_rss_mb": 1108.8,
+ "peak_rss_mb": 1108.3,
  "interval": {
   "method": "gamma",
   "level": 0.95,
   "window_s": 1.5,
   "window_max": 400,
-  "door_z": 3.0
+  "door_z": 3.0,
+  "tau_declared": 36,
+  "tau_source": "upper bound: the largest Gamma window W over this input's stored readings (results/x2b-xy-4@v08-rules.json, 110 W:* reports, max 36 samples); W >= tau_int (plan 0889 measured W ~ 10 tau_int, tau_int 2.04 on one series), so conservative for the floor; n = 600000 per file"
  },
  "read": {
-  "inputs/x2b-xy-4/m.toml": "36ecd08f5714b95df8efcacd591d9f440811921dbc9a84154a5f038d673c66ca",
+  "inputs/x2b-xy-4/m.toml": "efc838a93dea7afc3e8eb5b539781b76aea6d3a339d1e6e2148657ad18a4c40e",
   "inputs/x2b-xy-4/transducer.toml": "846073cccbef5ae00b403ab3dc282df464506bbf3531412a283dc8b6895a3868",
   "instruments/needle.toml": "03c8e390df85cdcef367ecba33043ebf9e0445c30f27fa626242a87387fb3ef0",
   "instruments/across.toml": "8f6803e8af6cd80d4f7bb69b1be8148cf5eb8742892caf5f3f8392f38b3c0944",
