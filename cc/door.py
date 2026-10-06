@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from pathlib import Path
 import numpy as np
 import admit
-import declare
+import schema
 import formats
 import project
 import reduce
@@ -106,7 +106,7 @@ def context(m, inst, size=None):
 
 def unit_keys(m, inst, point, size=None):
     """The data blocks one unit of the instrument reads, in the order its reduce expects them."""
-    sizes, starts = declare.unit_blocks(m, inst)
+    sizes, starts = schema.unit_blocks(m, inst)
     pts = point if isinstance(point, tuple) else (point,)   # a pair unit reads both of its points, a then b
     return [(pt, s, st) for s in ([size] if inst["unit"] == "point-size" else sizes) for pt in pts for st in starts]
 
@@ -114,11 +114,11 @@ def unit_keys(m, inst, point, size=None):
 def reduced(m, path, key):
     """GL [N, levels]: a raw stack reduced through the input's declared [block_map] and [observable] (cc/reduce.py), cached under
     results/reduced/<input>/<sha>.npz; the name is the sha of (the raw file's sha, the code hash, the key, the map, the level count)."""
-    root, bm, ob, fmt = declare.ROOT, m["block_map"], m["observable"], m["data"]["format"]
+    root, bm, ob, fmt = schema.ROOT, m["block_map"], m["observable"], m["data"]["format"]
     n = formats.levels_for(formats.shape_of(fmt, path, key, str(root))[1], ob["final_size"], bm["factor"])
     if n is None:
         raise ValueError(f"{path}: L is not final_size * factor^k (bin/cc validate says so, with a Next line)")
-    name = hashlib.sha256("\0".join([declare.sha(path), declare.code_hash(root), key, bm["name"], str(n)]).encode()).hexdigest()
+    name = hashlib.sha256("\0".join([schema.sha(path), schema.code_hash(root), key, bm["name"], str(n)]).encode()).hexdigest()
     f = root / "results" / "reduced" / m["id"] / f"{name}.npz"
     if not f.is_file():
         gl = np.array([reduce.snapshot(x, bm["name"], n) for x in formats.read(fmt, path, key, str(root))])
@@ -137,7 +137,7 @@ def memo(cache, key, make):
 def load_blocks(m, data_root):
     """[(block key, {array name: ndarray})] in data.files order, each array cut to its declared level. In a stack format (cc.toml
     [formats.*]) the arrays of a kind it `reduces` are computed from the raw stack by the declared reduction (once per file and key)."""
-    cache, out, sch = {}, [], formats.schemas(str(declare.ROOT)).get(m["data"]["format"], {"reduces": ()})
+    cache, out, sch = {}, [], formats.schemas(str(schema.ROOT)).get(m["data"]["format"], {"reduces": ()})
     for b in m["data"]["files"]:
         path, arrs = str(Path(data_root) / b["path"]), {}
         for name, a in b["arrays"].items():

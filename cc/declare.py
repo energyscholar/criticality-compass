@@ -1,25 +1,17 @@
 """declare.py - plugin loaders, schemas, cross-references, the partition checker, validate (plumbing)."""
-import ast
-import copy
 import difflib
 import fnmatch
-import hashlib
 import itertools
 import os
 import re
-import subprocess
 import tomllib
 import zipfile
-from collections import namedtuple
-from contextlib import contextmanager
-from functools import lru_cache
 from dataclasses import dataclass, fields as dc_fields
 from pathlib import Path
 import numpy as np
 import formats
+from schema import ROOT, F, at, rel, _parsed, parse, load, row_lines, Ctx, unit_blocks, _SHA_ONCE, hashing_once, _sha, sha, MEASURE_SEEDED, import_closure, measure_hash, code_hash, code_cols, declared_cols  # noqa: F401  (moved by plan 0886; re-exported: the call sites keep `declare.<name>`)
 
-ROOT = Path(__file__).resolve().parent.parent
-F = namedtuple("F", "loc msg nxt")
 SIGNS = ("SIG-", "NEG", "SLOW-", "ZERO!", "SLOW+", "POS", "SIG+", "UNRES")
 RESULT_FIELDS = (  # the result field set that cc.toml [basic] must partition (view.py reads it from here)
     "instrument", "unit", "column", "eps_key", "eps", "estimate", "lo", "hi", "cell", "code", "per_size",
@@ -43,39 +35,12 @@ def fmt(f):
     return f"{f.loc}: {f.msg}\n  Next: {f.nxt}"
 
 
-def at(p, field, msg, nxt):
-    """One finding located at file:field (the file alone when field is empty)."""
-    return F(f"{p}:{field}" if field else p, msg, nxt)
-
-
 def when(cond, p, field, msg, nxt):
     return [at(p, field, msg, nxt)] if cond else []
 
 
-def rel(p, root=ROOT):
-    p = Path(p)
-    return str(p.relative_to(root)) if p.is_absolute() and root in p.parents else str(p)
-
-
 def tn(t):
     return "/".join(x.__name__ for x in (t if isinstance(t, tuple) else (t,)))
-
-
-@lru_cache(maxsize=None)
-def _parsed(text):
-    return tomllib.loads(text)
-
-
-def parse(text):
-    """tomllib.loads, once per distinct text per process (a pure function of its argument; every caller gets its own copy)."""
-    return copy.deepcopy(_parsed(text))
-
-
-def load(p, root=ROOT):
-    try:
-        return parse(Path(p).read_text()), []
-    except (OSError, tomllib.TOMLDecodeError) as e:
-        return None, [at(rel(p, root), "", f"cannot read: {e}", "fix the TOML syntax of this file")]
 
 
 def shape(p, d, req, opt=None, pre=""):
@@ -118,10 +83,6 @@ def todos(p, d, pre=""):
                     yield from todos(p, x, f"{pre}{k}[{i}].")
 
 
-def row_lines(text, key="row"):
-    return [i + 1 for i, ln in enumerate(text.splitlines()) if ln.strip() == f"[[{key}]]"]
-
-
 @dataclass(frozen=True)
 class Case:
     """A case WITHOUT its class: the loader drops the taxonomy truth (score.py alone reads it)."""
@@ -150,23 +111,13 @@ def load_truth(path):
     return tomllib.loads(Path(path).read_text())["class_truth"]
 
 
+def case_truths(c):
+    """{case id: class truth} of cases/ (declare-side: no measurement-closure module calls it, so the taxonomy truth never enters the key)."""
+    return {f.stem: load_truth(f) for f in sorted((c.root / "cases").glob("*.toml"))}
+
+
 def load_order_truth(path):
     return tomllib.loads(Path(path).read_text())["order_truth"]
-
-
-class Ctx:
-    """What the checks cross-reference: cc.toml, the registry, checks.toml, the data root (overridable)."""
-
-    def __init__(self, root=ROOT, **over):
-        self.root, self.over, self.shapes, self.heads = Path(root), over, {}, {}
-        self.cfg = tomllib.loads((self.root / "cc.toml").read_text())
-        self.reg = {f.stem: load(f)[0] or {} for f in sorted((self.root / "instruments").glob("*.toml"))}
-        self.checks = tomllib.loads(Path(over.get("checks") or self.root / "checks.toml").read_text())
-        self.data_root = Path(over.get("data_root") or os.path.expanduser(self.cfg["data"]["root"]))
-        self.alpha = self.cfg["alphabets"]
-
-    def truths(self):
-        return {f.stem: load_truth(f) for f in sorted((self.root / "cases").glob("*.toml"))}
 
 
 def id_check(p, field, got, want, what):
@@ -230,7 +181,7 @@ def chk_case(p, d, c, stem=None):
     out += shape(p, d["controls"], {"names": list, "range": str}, pre="controls.")
     out += shape(p, d["observables"], {"list": list, "conjugate_observable": bool}, pre="observables.")
     out += id_check(p, "id", d["id"], stem, "the file name")
-    classes, truths, dec = c.alpha["class_truth"], c.truths(), d["decoy_of"]
+    classes, truths, dec = c.alpha["class_truth"], case_truths(c), d["decoy_of"]
     out += inalpha(p, "class_truth", d["class_truth"], classes)
     out += inalpha(p, "order_truth", d["order_truth"], c.alpha["order_truth"]) if "order_truth" in d else when(
         stem is not None, p, "order_truth", "missing required field", f"add order_truth = ... to {p}")
@@ -255,7 +206,7 @@ def chk_points(p, d, c, stem=None):
     m, bad = load(c.over.get("input") or c.root / "inputs" / d["input"] / "m.toml", c.root)
     if bad:
         return out + bad
-    pts, known = list(m["axes"]["point"]), set(c.truths()) | {"none"}
+    pts, known = list(m["axes"]["point"]), set(case_truths(c)) | {"none"}
     out += [at(p, f'points."{x}"', "point is not joined", f'add "{x}" = <case id or "none"> to [points]')
             for x in pts if x not in d["points"]]
     out += [at(p, f'points."{x}"', f"{x} is not a point of {d['input']}", "remove it")
@@ -266,15 +217,6 @@ def chk_points(p, d, c, stem=None):
 
 
 # ---------------------------------------------------------------- input (m.toml)
-def unit_blocks(m, inst):
-    """(sizes, starts) the instrument reads at every point: the matched pair, all sizes, the start pair."""
-    rels, ax = m.get("relations", {}), m["axes"]
-    sizes = ([rels["matched"]["big"], rels["matched"]["small"]] if "matched" in inst["relations"]
-             else list(dict.fromkeys(x for pr in rels["chain"]["pairs"] for x in pr)) if "chain" in inst["relations"] else list(ax["size"]))
-    pair = rels.get("start", {}).get("pairs", [[ax["main_start"]]])[0]
-    return sizes, (list(pair) if "starts" in inst["axes"] else [inst.get("start", ax["main_start"])])   # `start`: read this start, not main_start (plan 0867)
-
-
 def shapes_of(c, path):
     """What a data file declares about its arrays, from the npy HEADERS only (no array is loaded): the shape of a bare .npy, or
     {key: shape} for an .npz in file order; cached per file on the Ctx."""
@@ -473,36 +415,6 @@ def chk_input(p, d, c, stem=None):
 
 
 # ---------------------------------------------------------------- manifest, instrument, codes
-_SHA_ONCE = None   # {absolute path: sha256} while a READ-ONLY operation holds hashing_once(); None otherwise
-
-
-@contextmanager
-def hashing_once():
-    """Within the block each file is hashed once. For an operation that writes none of the files it hashes (validate, tabulate):
-    the memo lives exactly as long as the block, so it is a function of what the block read and can never outlive a write."""
-    global _SHA_ONCE
-    outer = _SHA_ONCE
-    _SHA_ONCE = {} if outer is None else outer
-    try:
-        yield
-    finally:
-        _SHA_ONCE = outer
-
-
-def _sha(path):
-    with open(path, "rb") as f:
-        return hashlib.file_digest(f, "sha256").hexdigest()
-
-
-def sha(path):
-    if _SHA_ONCE is None:
-        return _sha(path)
-    key = os.path.abspath(path)
-    if key not in _SHA_ONCE:
-        _SHA_ONCE[key] = _sha(path)
-    return _SHA_ONCE[key]
-
-
 def classify_changes(classes, name, old, new):
     """[(class, line)] for every line a regolden of transcript `name` changes. `classes` is cc.toml [golden.classes]:
     the first class whose files globs match `name` and whose regexes match the line claims it; the rest is 'e'."""
@@ -513,63 +425,6 @@ def classify_changes(classes, name, old, new):
                    if any(fnmatch.fnmatch(name, g) for g in c["files"]) and any(re.search(r, ln) for r in c["match"])]
             out.append((hit[0] if hit else "e", ln))
     return out
-
-
-MEASURE_SEEDED = "# measure-key: seeded"   # on the one line that imports an instrument module by its declared name: the key seeds every instrument module the input declares
-
-
-def import_closure(root, starts):
-    """{path relative to root: content sha} of the import closure, within cc/, of the module files `starts` (paths relative to root).
-    Imports are READ from the syntax tree (every Import / ImportFrom node, lazy ones inside functions too), never listed by hand.
-    A module that cannot be followed statically (a dynamic import, exec, eval) is refused, never widened to 'all of cc/'."""
-    root, seen, todo = Path(root), {}, list(starts)
-    where = lambda name: next((r for r in (f"cc/{name}.py", f"cc/instruments/{name}.py") if (root / r).is_file()), None)   # noqa: E731
-    while todo:
-        rel = todo.pop()
-        if rel in seen:
-            continue
-        seen[rel] = sha(root / rel)
-        text = (root / rel).read_text()
-        for n in ast.walk(ast.parse(text)):
-            if isinstance(n, ast.Call) and (nm := getattr(n.func, "id", getattr(n.func, "attr", None))) in ("__import__", "import_module", "exec", "eval") \
-                    and MEASURE_SEEDED not in text.splitlines()[n.lineno - 1]:
-                raise ValueError(f"{rel} line {n.lineno} calls {nm}: its import closure cannot be computed statically\n"
-                                 "  Next: import the module with an import statement, so the measurement key can read it")
-            mods = [a.name for a in n.names] if isinstance(n, ast.Import) else [n.module or ""] if isinstance(n, ast.ImportFrom) and not n.level else []
-            if isinstance(n, ast.ImportFrom) and n.level:
-                raise ValueError(f"{rel} line {n.lineno}: a relative import is not followed\n  Next: use an absolute import (import <module>)")
-            todo += [r for m in mods if (r := where(m.split(".")[0])) is not None]
-    return seen
-
-
-def measure_hash(root, instrument_modules):
-    """sha256 over (path, content sha) of what MEASURES: the import closure, within cc/, of cc/detect.py (the measurement entry:
-    readout, sign and what they read), cc/door.py and each module in `instrument_modules` (cc/instruments/<m>.py). A result's
-    reuse key is this plus its `read`; `code_hash` stays provenance."""
-    files = import_closure(root, ["cc/detect.py", "cc/door.py", *(f"cc/instruments/{m}.py" for m in sorted(set(instrument_modules)))])
-    h = hashlib.sha256()
-    for rel in sorted(files):
-        h.update(f"{rel}\0{files[rel]}\n".encode())
-    return h.hexdigest()
-
-
-def code_hash(root, committed=False):
-    """sha256 over (path, content sha) of every file of cc/ and bin/cc: as read from disk, or from the HEAD tree
-    when `committed` and the repo has one. A result records the first; freeze demands it equals the second."""
-    root, git = Path(root), ["git", "-C", str(root)]
-    use_git = committed and (root / ".git").exists()
-    if use_git:
-        rels = subprocess.run(git + ["ls-tree", "-r", "--name-only", "HEAD", "--", "cc", "bin/cc"],
-                              capture_output=True, text=True, check=True).stdout.split()
-    else:
-        rels = [str(q.relative_to(root)) for q in (root / "cc").rglob("*") if q.is_file() and "__pycache__" not in q.parts]
-        rels.append("bin/cc")
-    h = hashlib.sha256()
-    for rel in sorted(rels):
-        data = (subprocess.run(git + ["show", f"HEAD:{rel}"], capture_output=True, check=True).stdout
-                if use_git else (root / rel).read_bytes())
-        h.update(f"{rel}\0{hashlib.sha256(data).hexdigest()}\n".encode())
-    return h.hexdigest()
 
 
 def chk_manifest(p, d, c, stem=None):
@@ -631,15 +486,6 @@ def chk_instrument(p, d, c, stem=None):
         out += when(kind in ("stage", "door") and text is not None and f"def {name}(" not in text, p, "pipeline",
                     f"{step}: no def {name}( in {where}", "write the function")
     return out
-
-
-def code_cols(d):
-    return {**d["columns"].get("helper", {}), **d["columns"].get("signature", {})}
-
-
-def declared_cols(d):
-    """{column: 'declared.<kind>'} of the code columns a codes.toml reads from an input's declaration, not from data."""
-    return {k: v["from"] for k, v in code_cols(d).items() if isinstance(v.get("from"), str) and v["from"].startswith("declared.")}
 
 
 def doms(d, nulls):

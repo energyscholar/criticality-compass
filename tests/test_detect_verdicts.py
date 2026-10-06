@@ -26,7 +26,7 @@ ROWS = [  # input, point, codes, verdict, class, why
        "REFUSE-NEEDLE-UNMEASURED", "REFUSE", NEEDLE_NM) for k in ("2.0", "2.3", "2.6", "3.0")],
 ]
 text = (ROOT / "tables/verdict-x-rules/verdict.toml").read_text()
-whys, lines = [r["why"] for r in tomllib.loads(text)["row"]], detect.declare.row_lines(text)
+whys, lines = [r["why"] for r in tomllib.loads(text)["row"]], detect.schema.row_lines(text)
 bad, runs = [], {}
 for inp, pt, codes, verdict, cls, why in ROWS:
     result = runs.setdefault(inp, detect.run(inp, "verdict-x-rules", write=False))

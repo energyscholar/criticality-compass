@@ -1,9 +1,9 @@
 """reverdict.py - a stored result under another table set, from its stored sign cells alone (no data, no instrument).
-It lives apart from score.py so the measurement key (declare.measure_hash) can follow `detect.run` into it without following score,
+It lives apart from score.py so the measurement key (schema.measure_hash) can follow `detect.run` into it without following score,
 family and view (plan 0876 B). Plumbing."""
 import tomllib
 from pathlib import Path
-import declare
+import schema
 import detect
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -29,8 +29,8 @@ def membership_of(root, name, declared):
 
 def signature_sources(root, name):
     """{signature column: the instruments it is derived from} of a table set (plan 0877)."""
-    d = declare.load(Path(root) / "tables" / name / "codes.toml", root)[0] or {"columns": {"signature": {}}}
-    cols = declare.code_cols(d)
+    d = schema.load(Path(root) / "tables" / name / "codes.toml", root)[0] or {"columns": {"signature": {}}}
+    cols = schema.code_cols(d)
     return {n: {x.partition(".")[0] for x in detect.sources(n, cols)} - {"declared"} for n in d["columns"]["signature"]}
 
 
@@ -49,7 +49,7 @@ def reverdict_refusal(res, new, root=ROOT):
     m = Path(root) / "inputs" / res["input"] / "m.toml"
     declared = tomllib.loads(m.read_text()).get("instruments", []) if m.is_file() else []
     changed = membership_of(root, res["tables"], declared) != membership_of(root, new, declared)
-    lacks = bool(declare.declared_cols(declare.load(Path(root) / "tables" / new / "codes.toml", root)[0] or {"columns": {}})) and "declared" not in res   # plan 0870: a declared column is read from couplings.toml at run time
+    lacks = bool(schema.declared_cols(schema.load(Path(root) / "tables" / new / "codes.toml", root)[0] or {"columns": {}})) and "declared" not in res   # plan 0870: a declared column is read from couplings.toml at run time
     gone = replaced(res, new, declared, root)
     if gone:
         return (f"REFUSED: tables/{new} derives the column {gone[0]} from {', '.join(gone[1])}, which {res['input']} does not declare, so {res['run_id']} holds no reading of it.\n"
@@ -70,7 +70,7 @@ def recode(rd, codes, direct, cols):
 
 def reverdict_result(res, T, commit="none"):
     """The result `res` would have under table set T, from its stored sign cells alone (no data, no instrument)."""
-    cols = declare.code_cols(T.codes)
+    cols = schema.code_cols(T.codes)
     direct = {s["from"]: n for n, s in cols.items() if isinstance(s["from"], str)}
     readings, signature = [], []
     for old in res["signature"]:
@@ -86,11 +86,11 @@ def reverdict_result(res, T, commit="none"):
         signature.append({"point": pt, "obtained": old["obtained"], **sig, "flags": {s: f for s, f in flags.items() if f},
                           "verdict": verdict, "verdict_class": cls, "row_line": line, "why": why, **detect.axes_of(codes, T)})
     old_id = res["run_id"]
-    read = {f"results/{old_id}.json": declare.sha(ROOT / "results" / f"{old_id}.json"),
+    read = {f"results/{old_id}.json": schema.sha(ROOT / "results" / f"{old_id}.json"),
             **{k: h for k, h in res["read"].items() if not k.startswith("tables/")},
-            **{f"tables/{T.name}/{q.name}": declare.sha(q) for q in T.paths},
-            **({f"tables/{T.name}/membership.toml": declare.sha(T.membership_path)}
+            **{f"tables/{T.name}/{q.name}": schema.sha(q) for q in T.paths},
+            **({f"tables/{T.name}/membership.toml": schema.sha(T.membership_path)}
                if T.membership_path and any(k.endswith("/membership.toml") for k in res["read"]) else {})}
     return {**res, "run_id": f"{res['input']}@{T.name}", "tables": T.name, "derived_from": old_id,
-            "code_commit": commit, "code_hash": declare.code_hash(ROOT), "read": read, "readings": readings, "signature": signature,
+            "code_commit": commit, "code_hash": schema.code_hash(ROOT), "read": read, "readings": readings, "signature": signature,
             "signature_columns": list(T.codes["columns"]["signature"])}   # plan 0876 B: the new set's columns, as `run` writes them (the old set's would name a column this set lacks)

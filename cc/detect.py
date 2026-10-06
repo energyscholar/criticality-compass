@@ -10,7 +10,7 @@ import tomllib
 from dataclasses import dataclass
 from pathlib import Path
 import numpy as np
-import declare
+import schema
 import door
 import readout
 import resources
@@ -72,13 +72,10 @@ def load_tables(name, tables_dir=None):
         raise refused(f"no table set '{name}'. Sets: {sets}", "bin/cc tables fork verdict-x-rules <name>")
     mp = d / "membership.toml"
     ax = [d / f"{n}.toml" for n in AXIS_FILES if (d / f"{n}.toml").is_file()]
-    bad = [f for q in (d / "codes.toml", d / "verdict.toml", *[mp] * mp.is_file(), *ax) for f in declare.check_file(q, ROOT)]
-    if bad:
-        raise ValueError("\n".join(declare.fmt(f) for f in bad))
     texts = [(d / f).read_text() for f in ("codes.toml", "verdict.toml")]
     rules = {k: v for k, v in tomllib.loads(mp.read_text()).items() if isinstance(v, dict)} if mp.is_file() else {}
-    axes = {q.stem: (tomllib.loads(q.read_text()), declare.row_lines(q.read_text())) for q in ax}
-    return Tables(name, tomllib.loads(texts[0]), tomllib.loads(texts[1]), declare.row_lines(texts[1]),
+    axes = {q.stem: (tomllib.loads(q.read_text()), schema.row_lines(q.read_text())) for q in ax}
+    return Tables(name, tomllib.loads(texts[0]), tomllib.loads(texts[1]), schema.row_lines(texts[1]),
                   (d / "codes.toml", d / "verdict.toml", *ax), rules, mp if mp.is_file() else None, axes)
 
 
@@ -122,7 +119,7 @@ def preferred(got, doors, prefer):
 
 def codes_of(cells, tables):
     """Every helper and signature column for one point; nulls pass through; a point-size source is combined."""
-    cols, nulls = declare.code_cols(tables.codes), tables.codes["null_rank"]
+    cols, nulls = schema.code_cols(tables.codes), tables.codes["null_rank"]
     memo = {}
 
     def one(name, cell):
@@ -195,7 +192,7 @@ def axes_of(codes, T):
 
 def used(T):
     """The registry columns ('<instrument>.<column>') some code column of this set reads."""
-    cols = declare.code_cols(T.codes)
+    cols = schema.code_cols(T.codes)
     return set().union(*(sources(n, cols) for n in cols))
 
 
@@ -215,25 +212,25 @@ def gather(cache, blocks, idx, bi, array):
 def read_hashes(m, input_id, tables, T, c):
     """sha256 of exactly the files a run reads; a data file that differs from its pin is refused."""
     name = f"inputs/{input_id}/m.toml"
-    read = {name: declare.sha(ROOT / name)}
+    read = {name: schema.sha(ROOT / name)}
     for n in m["instruments"]:
-        read[f"instruments/{n}.toml"] = declare.sha(ROOT / "instruments" / f"{n}.toml")
+        read[f"instruments/{n}.toml"] = schema.sha(ROOT / "instruments" / f"{n}.toml")
     for path in T.paths:
-        read[f"tables/{tables}/{path.name}"] = declare.sha(path)
+        read[f"tables/{tables}/{path.name}"] = schema.sha(path)
     if any("door:off_manifold" in c.reg[n]["pipeline"] for n in m["instruments"]) and T.membership_path is None:
         raise refused(f"tables/{tables} has no membership.toml, and {input_id} declares an instrument whose "
                       "door reads one", f"copy tables/v01-rules/membership.toml into tables/{tables}/")
     if T.membership_path is not None and any({"door:off_manifold", "door:basis"} & set(c.reg[n]["pipeline"]) for n in m["instruments"]):   # plan 0874: door:basis reads a rule when the set has one
-        read[f"tables/{tables}/membership.toml"] = declare.sha(T.membership_path)
+        read[f"tables/{tables}/membership.toml"] = schema.sha(T.membership_path)
     mf = ROOT / "fixtures" / "data" / f"{input_id}.toml"
     if not mf.is_file():
         raise refused(f"no data manifest fixtures/data/{input_id}.toml", f"bin/cc data add {input_id}")
-    read[f"fixtures/data/{input_id}.toml"] = declare.sha(mf)
+    read[f"fixtures/data/{input_id}.toml"] = schema.sha(mf)
     pinned = tomllib.loads(mf.read_text())["files"]
     for b in m["data"]["files"]:
         key = f"{c.cfg['data']['root']}/{b['path']}"
         if key not in read:
-            read[key] = declare.sha(c.data_root / b["path"])
+            read[key] = schema.sha(c.data_root / b["path"])
             if pinned.get(b["path"]) != read[key]:
                 raise refused(f"fixtures/data/{input_id}.toml: {b['path']} changed since it was pinned",
                               f"if intended, make a new input: bin/cc new input {input_id}-2 --like {input_id}, "
@@ -250,7 +247,7 @@ def probe_of(m, cp):
 
 def declared_of(input_id, m, T):
     """{'declared.<kind>': cell} for the declared columns of the set (empty for a set with none); the file is read, never guessed."""
-    if not declare.declared_cols(T.codes):
+    if not schema.declared_cols(T.codes):
         return {}
     p = ROOT / "inputs" / input_id / "couplings.toml"
     if not p.is_file():
@@ -378,7 +375,7 @@ def keyed(st, read, mhash, own_tables=True):
     parent = {k for k in st["read"] if k.startswith("results/")}
     take = lambda r: {k: h for k, h in r.items() if k not in parent and (own_tables or not k.startswith("tables/"))}   # noqa: E731
     return (st.get("measure_hash") == mhash and take(st["read"]) == take(read) and (ROOT / st.get("vectors", "")).is_file()
-            and all((ROOT / k).is_file() and declare.sha(ROOT / k) == st["read"][k] for k in parent))
+            and all((ROOT / k).is_file() and schema.sha(ROOT / k) == st["read"][k] for k in parent))
 
 
 def stored(input_id, tables, read, mhash):
@@ -404,12 +401,12 @@ def run(input_id, tables, write, tables_dir=None, reuse=True):
 
 def run_keyed(input_id, tables, write, tables_dir=None, reuse=True):
     """(result, how): how is 'measured', 'stored' (the keyed stored result) or 're-verdicted' (from a stored result under another set)."""
-    m, c, T = load_input(input_id), declare.Ctx(ROOT), load_tables(tables, tables_dir)
+    m, c, T = load_input(input_id), schema.Ctx(ROOT), load_tables(tables, tables_dir)
     reg = {n: instrument(n) for n in sorted(c.reg)}
     read, decl = read_hashes(m, input_id, tables, T, c), declared_of(input_id, m, T)
-    read.update({f"inputs/{input_id}/couplings.toml": declare.sha(ROOT / "inputs" / input_id / "couplings.toml")} if decl else {})
-    chash, rid = declare.code_hash(ROOT), f"{input_id}@{tables}"
-    mhash = declare.measure_hash(ROOT, [reg[n][0]["module"] for n in m["instruments"]])
+    read.update({f"inputs/{input_id}/couplings.toml": schema.sha(ROOT / "inputs" / input_id / "couplings.toml")} if decl else {})
+    chash, rid = schema.code_hash(ROOT), f"{input_id}@{tables}"
+    mhash = schema.measure_hash(ROOT, [reg[n][0]["module"] for n in m["instruments"]])
     if reuse and tables_dir is None and (st := stored(input_id, tables, read, mhash)) is not None:
         if st["tables"] == tables:
             return st, "stored"   # the stored result IS the result: nothing is re-written
@@ -422,7 +419,7 @@ def run_keyed(input_id, tables, write, tables_dir=None, reuse=True):
     resources.reset_peak()
     out = measure(m, c, reg, T)
     peak = resources.peak_mb()   # the high-water mark of this one input's measurement (plan 0881 P1.1)
-    cols = declare.code_cols(T.codes)
+    cols = schema.code_cols(T.codes)
     direct = {s["from"]: n for n, s in cols.items() if isinstance(s["from"], str)}
     readings, reports, vectors, signature = [], [], {}, []
     for pt in m["axes"]["point"]:
