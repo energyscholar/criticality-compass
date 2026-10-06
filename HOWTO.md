@@ -45,10 +45,10 @@ Taxonomy changes (cases, joins) and rule changes (verdict rows) are data edits. 
 3. **Re-verdict or re-run.** If your change touched only `verdict.toml` or `codes.toml`, the readings do not change:
    `bin/cc reverdict <input> --tables <name>` applies the new rules to the stored readings, in seconds, with no
    measurement (see "Re-verdicting without measuring" below). Otherwise `bin/cc run --all --tables <name>` measures
-   again (about half a minute for the eleven inputs).
+   again, every input on disk (34 at this commit; `bin/cc help` lists them; "half a minute for the eleven inputs" was the first eleven, and the larger inputs now take longer: time it, do not assume. The whole gate, tests and the replay of the 24 locked inputs, took 238 s at `d128fed`).
 4. **Look.** `bin/cc show <input> --tables <name>`, `bin/cc explain …`, and
    `bin/cc tabulate --diff v01-rules <name>`.
-5. **Freeze what you keep.** `bin/cc freeze --all --tables <name>`. Drop what you do not:
+5. **Freeze what you keep.** `bin/cc freeze --all --tables <name>` (it compares each result's `measure_hash` with the committed tree's: a result written before plan 0876 records none and is refused, and freezing it means re-measuring). Drop what you do not:
    `bin/cc tables drop <name> --with-results`.
 6. **Before you commit,** `bin/cc check`.
 
@@ -109,7 +109,7 @@ Then:
 4. `bin/cc data add <id>` writes `fixtures/data/<id>.toml`, the sha256 of every file the input reads. From then on
    `validate` refuses a mismatch. `data add` refuses to overwrite an existing manifest:
 
-**`[interval]`:** two methods are declared in `cc.toml [interval_fields]`. `method = "block"` (or `"iid"`) resamples: it needs `b`, `resamples`, `level`, `seed`, and takes an optional `min_blocks` (the template writes 30): `validate` and `run` refuse a file with `n // b < min_blocks`, and the refusal's Next line names the two routes (`method = "gamma"`, or a `b` that still satisfies `b >= k*tau`, with the `k*tau` the record admits). `method = "gamma"` (the Gamma-method, Wolff's automatic window) needs `level` (a level listed in `cc.toml [levels]`), `window_s`, `window_max`, `door_z`, and refuses `b`, `resamples`, `seed` and `tau_declared`. Gamma is declared but NOT yet used on real inputs; plan 0878 recorded a one-cell disagreement with the bootstrap twin, pending a numbered explanation.
+**`[interval]`:** two methods are declared in `cc.toml [interval_fields]`. `method = "block"` (or `"iid"`) resamples: it needs `b`, `resamples`, `level`, `seed`, and takes an optional `min_blocks` (the template writes 30): `validate` and `run` refuse a file with `n // b < min_blocks`, and the refusal's Next line names the two routes (`method = "gamma"`, or a `b` that still satisfies `b >= k*tau`, with the `k*tau` the record admits). `method = "gamma"` (the Gamma-method, Wolff's automatic window) needs `level` (a level listed in `cc.toml [levels]`), `window_s`, `window_max`, `door_z`, and refuses `b`, `resamples`, `seed` and `tau_declared`. Gamma is declared but NOT yet used on real inputs; plan 0878 recorded a one-cell disagreement with the bootstrap twin, pending a numbered explanation. plan 0889: a sign cell whose deciding endpoint lies inside its interval method's own resample noise is not a stable reading (x2b-xy-3@v08, stability_delta.d 0.85→0.89294: 6 of 11 bootstrap seeds read ZERO!); Γ is the deterministic centre.
 
 ```
 $ bin/cc data add w2-potts
