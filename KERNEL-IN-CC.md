@@ -26,6 +26,13 @@ enough). Read it when you want to know what a number means, or before you touch 
 The data are never the nodes. A node holds a number reduced from data (a mean, a covariance); the reduction is
 step 2 of `explain`, and it is applied identically to the original data (row 0) and to every resample.
 
+The simulator enters M as a declared transducer, never as an observable of its own: `inputs/<id>/transducer.toml` names the
+sampler (the frozen toolset file and its sha256), and says that one recorded configuration is one observation and that the
+recorded sequence is not a process sequence. The per-locus mean is a declared bounded reduction before A, with what it keeps
+(the typical value of the observable at the locus) and what it discards (the configuration-to-configuration variation and the
+order of the configurations) stated in that file. The bootstrap interval is a projection C: it places the reading's sign cell
+against its declared margin, and is never an operator input (Robin, toolset LOG E307).
+
 ## The relations, in ASCII
 
 An arrow points from an edge's source to its target. `A` is source value minus target value.

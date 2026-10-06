@@ -67,7 +67,7 @@ existing input:
 
 ```
 $ bin/cc new input w2b --like w2-potts --points 6,7
-wrote inputs/w2b/m.toml and points.toml (like w2-potts)
+wrote inputs/w2b/m.toml, points.toml and transducer.toml (like w2-potts)
   Next: fix every TODO, then bin/cc data add w2b and bin/cc validate
 ```
 
@@ -93,7 +93,7 @@ A copy of `b7-at-line` that gains the `along` instrument:
 
 ```
 $ bin/cc new input b7c --like b7-at-line --add-instrument along
-wrote inputs/b7c/m.toml and points.toml (like b7-at-line)
+wrote inputs/b7c/m.toml, points.toml and transducer.toml (like b7-at-line)
   Next: fix every TODO, then bin/cc data add b7c and bin/cc validate
 ```
 
@@ -101,9 +101,12 @@ Then:
 
 1. Fix every `TODO` in `inputs/<id>/m.toml` and `inputs/<id>/points.toml`. `obtained` says how each point was
    obtained: `truth` (the exact critical point), `navigated` (found by a procedure) or `observed`.
-2. Put the data files where `m.toml` says, under the data root named in `cc.toml [data]`. CC never copies or
+2. Write `inputs/<id>/transducer.toml` from the template (`new input` writes it, every field `TODO`; `--like` never copies the
+   like-input's: provenance is not inherited): the sampler (the frozen toolset file and its sha256), what the per-locus mean
+   keeps and discards, and the interval's role. `validate` refuses an input without it.
+3. Put the data files where `m.toml` says, under the data root named in `cc.toml [data]`. CC never copies or
    writes data; it reads them in place.
-3. `bin/cc data add <id>` writes `fixtures/data/<id>.toml`, the sha256 of every file the input reads. From then on
+4. `bin/cc data add <id>` writes `fixtures/data/<id>.toml`, the sha256 of every file the input reads. From then on
    `validate` refuses a mismatch. `data add` refuses to overwrite an existing manifest:
 
 ```
@@ -112,7 +115,7 @@ fixtures/data/w2-potts.toml already exists.
   Next: delete it first if it is unfrozen and you mean to re-pin
 ```
 
-4. `bin/cc validate`, then `bin/cc run <id>` and `bin/cc show <id>`.
+5. `bin/cc validate`, then `bin/cc run <id>` and `bin/cc show <id>`.
 
 **Which tables each instrument needs.** `m.toml` must contain exactly the tables its declared instruments need:
 a missing one is refused and so is an unused one.
