@@ -8,6 +8,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 bad = []
+# plan 0881 P2.7: an input with NO frozen result under any set (b7-at-line has a frozen v03 parent, so a re-verdict stood on it and the plant could not be refused)
+INPUT = "b7-at-line-5"
 
 
 def check(name, ok, why=""):
@@ -31,16 +33,16 @@ with tempfile.TemporaryDirectory() as t:
     git("init", "-q")
     git("add", "-A")
     git("commit", "-q", "-m", "copy")
-    cc("tables", "fork", "verdict-x-rules", "t3")
-    rid = "b7-at-line@t3"
-    rc, out = cc("run", "b7-at-line", "--tables", "t3")
+    cc("tables", "fork", "v01-rules", "t3")
+    rid = f"{INPUT}@t3"
+    rc, out = cc("run", INPUT, "--tables", "t3")
     check("run succeeds in the committed copy", rc == 0, out[:300])
     (repo / "cc" / "project.py").write_text((repo / "cc" / "project.py").read_text() + "\n# planted: code the result did not run\n")
     git("commit", "-q", "-a", "-m", "plant")
     rc, out = cc("freeze", rid)
     check("freeze refuses a result made by other code than the committed tree's (RED)",
           rc == 1 and "REFUSED" in out and "measure_hash" in out and "Next:" in out, out)
-    rc, out = cc("run", "b7-at-line", "--tables", "t3")
+    rc, out = cc("run", INPUT, "--tables", "t3")
     rc, out = cc("freeze", rid)
     check("freeze accepts the result once it is re-run at the committed code", rc == 0 and out.startswith("froze "), out)
 print("test_code_hash: " + ("FAILED" if bad else "all passed"))

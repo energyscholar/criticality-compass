@@ -114,24 +114,25 @@ with tempfile.TemporaryDirectory() as t:
     check("run names the inputs when the name is wrong",
           rc == 1 and "no input 'w2'. Inputs:" in out and "Next:" in out, out)
 
+    # plan 0881 P2.7: the measured input has NO frozen or keyed result under any set (c2-bc-two-start has frozen v03 results, so its run was a re-verdict)
     cc("tables", "fork", "verdict-x-rules", "t2")    # the live verdict-x-rules is already frozen
-    rid = "c2-bc-two-start@t2"
+    rid = "x3-clock6-3@t2"
     frozen = json.loads((repo / "FROZEN.json").read_text())["files"]
-    for q in (repo / "results").glob("c2-bc-two-start@*"):   # plan 0876 B: a keyed result under another set would make this run a re-verdict (JSON only, vectors named in the parent's NPZ); the test is of a MEASURED run
+    for q in (repo / "results").glob("x3-clock6-3@*"):   # plan 0876 B: a keyed result under another set would make this run a re-verdict (JSON only, vectors named in the parent's NPZ); the test is of a MEASURED run
         if f"results/{q.name}" not in frozen:
             q.unlink()
-    rc, out = cc("run", "c2-bc-two-start", "--tables", "t2")
+    rc, out = cc("run", "x3-clock6-3", "--tables", "t2")
     check("run writes the result JSON and NPZ",
           rc == 0 and (repo / f"results/{rid}.json").is_file() and (repo / f"results/{rid}.npz").is_file(), out)
     rc, out = cc("freeze", rid)
     check("freeze freezes the result, what it read, and the table set",
           rc == 0 and out.startswith("froze ") and "1 dir for" in out, out)
-    rc, out = cc("run", "c2-bc-two-start", "--tables", "t2")
+    rc, out = cc("run", "x3-clock6-3", "--tables", "t2")
     refused = f"REFUSED: results/{rid}.json is frozen (a frozen result never changes)."
     nxt = ("Next: bin/cc tables fork t2 <new-name>, edit tables/<new-name>/verdict.toml, "
-           "then bin/cc run c2-bc-two-start --tables <new-name>")
+           "then bin/cc run x3-clock6-3 --tables <new-name>")
     check("a frozen result id is refused with its Next line", rc == 1 and refused in out and nxt in out, out)
-    rc, out = cc("run", "c2-bc-two-start", "--tables", "t2", "--dry")
+    rc, out = cc("run", "x3-clock6-3", "--tables", "t2", "--dry")
     check("a dry run of a frozen id writes nothing and is allowed", rc == 0 and "dry: nothing written" in out, out)
     rc, out = cc("tables", "drop", "t2")
     check("a frozen set is never dropped", rc == 1 and "Next:" in out, out)
