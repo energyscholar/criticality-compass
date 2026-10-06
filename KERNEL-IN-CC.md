@@ -1,6 +1,6 @@
 # The kernel in CC
 
-What the six instruments compute, and the family fingerprints, in the kernel's terms, and where the code is built so that a wrong state
+What the nine instruments of the verdict path compute, and the family fingerprints, in the kernel's terms, and where the code is built so that a wrong state
 cannot be reached instead of being checked for afterwards. You do not need this to use CC (`README.md` is
 enough). Read it when you want to know what a number means, or before you touch an instrument.
 
@@ -57,7 +57,9 @@ all-pairs over points        0.0, 0.07, 0.14, 0.21              edges: every (j 
 
 An `along` unit is one edge of the control relation, restricted to its two points (edge `b -> a`).
 
-## The six instruments
+## The nine instruments of the verdict path
+
+CC has 11 instrument modules: the nine the verdict path reads (needle, across, stability, two_start, fluct, along, needle_chain, across_delta, stability_delta), needle_o (a start test: the needle's maths on the ordered start, so it needs no section), and transform — an independent conventional estimate, not a Compass reading (its own section below). The sections below follow the order the verdict path reads them.
 
 ### needle: does one more blocking step move the observable, and where does it sit?
 
@@ -144,6 +146,82 @@ An `along` unit is one edge of the control relation, restricted to its two point
   gives `0.005433` and `-0.2495`; B accumulates them to `-0.244`; over the log span `2.197` that is `-0.1111`,
   interval `[-0.2479, 0.005093]`, inside the margin of 0.25: `ZERO!`.
 
+### needle_chain: does the needle's velocity die away down the size chain?
+
+- **Relation:** `chain` (template `matched-chain`): the needle's matched relation taken at two neighbouring size pairs,
+  (243, 81) and (81, 27), laid end to end; then a chain over the two **steps**. **Nodes:** the level means of all three
+  sizes (twelve nodes here). **Operator:** A over each matched pair gives that pair's velocity; `ln|v|` of the two
+  velocities goes through `door:logcoord`; A over the steps chain, divided by the declared `ln(size ratio) = ln 3`.
+- **Reads:** `drift = omega_eff - 1`, where `omega_eff = -A(ln|v|) / ln 3` is the rate at which the velocity decays per
+  blocking step. Read against `[eps] drift = 0.5`. `velocity_prev` (the smaller pair's velocity) is reported, not coded.
+- **Means:** a velocity that shrinks faster than the size grows (omega_eff above 1 by more than eps) is a finite-size
+  correction dying away: `drift_code` CONVERGING. Within eps of 1: MARGINAL-DRIFT. Below: PERSISTENT, a genuine slow
+  flow. The derived `flow` column is a total table over (flow of the top pair, drift_code): SLOW with CONVERGING reads
+  STOPPED; every other cell is the top pair's flow. `drift_code` stays in every result and is read by no verdict row.
+  Where the velocity changes sign at the estimate or any resample, `ln|v|` is not defined and the drift is
+  NOT-EVALUATED with that reason; the flow is then the top pair's, as on an input with one size pair.
+- **A number:** x2b-xy-2 at T 0.7: the top pair's velocity is `0.001459` (the needle's `v_all [0.07625, 0.01112,
+  0.001459]`, last edge), the (81, 27) pair's velocity is `velocity_prev 0.011158` (report). `ln 0.011158 - ln 0.001459 =
+  2.034`, over `ln 3 = 1.0986` gives `omega_eff = 1.852`, so `drift = 0.8515`, interval `[0.7556, 0.9427]`, cuts
+  `-0.5 0 +0.5`: `SIG+` -> CONVERGING (codes.toml line 211). The velocity itself reads `SLOW+` (eps step 0.01) ->
+  flow_top SLOW, and `flow = STOPPED (codes.toml line 226)`. At T 0.89294 the drift is
+  `NOT-EVALUATED (sign of velocity not constant across the point estimate and every resample)`.
+
+### across_delta: how the difference between two neighbouring points grows with size (the TRANSFORMED door is v07 only)
+
+- **Relation:** one edge `a -> b` of the declared `control` chain (here T increasing), and the `size` chain.
+  **Nodes:** the mean observable of the two points at each size; then `ln(s Delta)` at each size, `Delta(L) =
+  g1(b) - g1(a)`, with `s` the constant sign the door found. **Operator:** A over the control edge gives `Delta(L)`;
+  `door:logcoord`; A over the size chain divided by `ln 3` gives the step exponents `yD1` (27 -> 81) and `yD2`
+  (81 -> 243). This is `along`'s difference read as `across`'s exponent at the top step, with the same eps (`y`).
+- **Door (the pair basis, v07):** `membership.toml [across_delta]` reads both endpoints' `drift_code`; both
+  CONVERGING -> door value TRANSFORMED and `r` = the mean over the two endpoints of `3^-(drift + 1)` per resample
+  (the needle's own |v_top|/|v_prev|); any other pair -> RAW, `r = 0`. `door:basis` refuses a TRANSFORMED pair where
+  `r >= 1` anywhere (NOT-EVALUATED). A set with no `[across_delta]` rule reads every pair RAW (`member_default`).
+- **Reads:** `y_last = (yD2 - r yD1) / (1 - r)` (so `yD2` on a RAW pair). It is `per_point`: a point reads the cells
+  of every control pair touching it, combined by `codes.toml [columns.helper.across_dlt]`: only the TRANSFORMED pairs
+  when it has one; a resolved code counts only when every combined pair reads it, else UNRES. The signature column
+  `across` is then ONE declared choice per input: `across_dlt` when the input declares `across_delta`, else the
+  covariance `across_cov`; a declared delta that is NOT-EVALUATED reads UNRES, never the covariance.
+- **Means:** two points on the same line keep a difference that neither grows nor shrinks with size beyond eps:
+  MARGINAL. Above: RELEVANT (they sit on different fixed points). On a pair read on the TRANSFORMED basis (v07), the reading is the transform's limit rather than the exponent at L 243: a transform-basis claim, not relationally admissible (Robin Q3, 2026-10-05; see Rulings below), superseded by the Delta-basis sets (v08).
+- **A number:** pair `0.7->0.8`: `Delta` is `-0.02660, -0.02436, -0.02412` at 27, 81, 243 (sign constant, `s = -1`);
+  `ln|Delta| = -3.627, -3.715, -3.725`; `yD1 = -0.0802`, `yD2 = -0.00913` (report `y_steps`). Both endpoints read
+  CONVERGING (drift 0.8515 and 0.8781), so the door is TRANSFORMED and `r = (0.1308 + 0.1270) / 2 = 0.1289` (report
+  `ratio`); `y_last = (-0.00913 + 0.1289 x 0.0802) / 0.8711 = 0.00139`, interval `[-0.008635, 0.01197]`, `ZERO!`
+  -> MARGINAL (codes.toml line 277). Pair `0.85->0.89294`: 0.89294's drift is NOT-EVALUATED -> OTHER -> RAW, `r =
+  0`, `y_last = yD2 = 0.04746 [0.02579, 0.06894]`, `SLOW+` -> WEAK. Point 0.7 combines `0.6->0.7` and `0.7->0.8`, both
+  TRANSFORMED and MARGINAL -> MARGINAL; `across = MARGINAL (codes.toml line 297)`.
+- **What `explain` prints:** `explain <input> a->b` prints one section per instrument that reads the pair, each from its own stored vectors (plan 0881 P2.1). Under `across_delta`: `Delta` per size, then the stored `y_steps` (`yD1`, `yD2`) and `ratio`, then the reading, the sign and the family code. For `0.85->0.89294` on x2b-xy-3: `y_steps [0.09186, 0.04746]; ratio 0`, `y_last 0.04746 [0.02579, 0.06894]`, `SLOW+`; the `along` section of the same pair keeps its own `ln|Delta|`, A, B trace (`y_along 0.06966`).
+### stability_delta: does the difference estimator's exponent change between size steps?
+
+- **Relation:** one edge `a -> b` of the declared `control` chain and the `size` chain, as `across_delta`. **Operator:** A over the control edge gives `Delta(L)`; `door:logcoord`; A over the size chain gives the step exponents `yD1`, `yD2`; `door:steps`, then A over the chain of those steps gives `d = yD2 - yD1`. It reads no drift and no transform, and needs no membership door: the column is the same under every rule (plan 0877, `v08-rules`).
+- **Reads:** `d`, per control pair, against `eps y` (0.25), `per_point`: a point reads the cells of the pairs that touch it and every pair must agree to resolve. This is stability on the Delta basis: where v06/v07 reported a TRANSFORMED cell, v08's alphabet has none.
+- **Means:** the exponent of the difference holds from one size step to the next (STABLE) or it changes, without any finite-size correction being assumed.
+- **A number:** x2b-xy-3, pair `0.85->0.89294` (`bin/cc explain x2b-xy-3 '0.85->0.89294' --tables v08-rules`): `y_steps [0.09186, 0.04746]`, so `d = 0.04746 - 0.09186 = -0.0444`, interval `[-0.08474, -0.003254]`, cuts `-0.25 0 +0.25`: `SLOW-`. The sign cell is not a stable reading: plan 0889 records that a sign cell whose deciding endpoint lies inside its interval method's own resample noise is not a stable reading (6 of 11 bootstrap seeds read `ZERO!`); the Gamma-method interval (plan 0878) is the deterministic centre.
+
+## Not an instrument of the verdict path: transform
+
+### transform: an independent conventional estimate — not a Compass reading (reported, read by no row)
+
+- **Relation:** the `size` chain (for `R = cov(G, E)` at each size, as `across` and `stability`) and the
+  `matched-chain` (for the needle's two velocities, as `needle_chain`). **Operator:** A over the size chain gives
+  `y1`, `y2`, the growth exponents of `ln(s R)` over the two steps; A over the matched pairs gives the two velocities;
+  `ln r = ln|v_top| - ln|v_prev|` (`door:logcoord` on both); `door:decays` refuses unless `ln r < 0` at the estimate
+  and every resample.
+- **Reads:** `y_inf = y2 + r (y2 - y1) / (1 - r) = (y2 - r y1) / (1 - r)`: the limit of an exponent whose correction
+  decays by the factor `r` per blocking step. `r` is the ONE point's own ratio (across_delta uses the mean of two
+  endpoints). Helper code `y_inf_code` (RELEVANT .. IRRELEVANT, eps `y`), flag H (uses the conjugate);
+  NOT-EVALUATED where `R` or `v` changes sign or the correction does not decay.
+- **Means:** an independent conventional estimate — not a Compass reading (Robin Q3, 2026-10-05: there is no observation at infinite size, and the shared-omega assumption is an undeclared prior). It is what a conventional finite-size extrapolation would give if the needle's correction were the whole finite-size effect. No verdict row in any set reads it, and none in any set after v07 may; plan 0877 keeps it report-only in v08.
+  `stability` TRANSFORMED is the related, row-read fact:
+  `d = y2 - y1` inside eps on a CONVERGING point.
+- **A number:** T 0.7: `R = 0.1146, 0.107, 0.1026` at 27, 81, 243; `y_steps [-0.06243, -0.03832]` so `y1 = -0.06243`,
+  `y2 = -0.03832` (the `across` trace); `r = 0.001459 / 0.011158 = 0.1308`; `y_inf = -0.03832 + 0.1308 x 0.02411 /
+  0.8692 = -0.03469`, interval `[-0.1551, 0.0672]`, `ZERO!` -> `y_inf_code MARGINAL` (readings of
+  `results/x2b-xy-2@v07-rules.json`: `transform.y_inf`). `d = y2 - y1 = 0.02411 [-0.09121, 0.121]` is `stability_raw`
+  STABLE, so `stability = TRANSFORMED (codes.toml line 363)`. At T 0.89294: `NOT-EVALUATED (sign of R not constant across the point estimate and every resample)`. `show` and `explain` print the `y_inf` reading with the label above (`cc.toml [conventional]`: one declared string; plan 0881 P2.3).
+
 ## The family fingerprints
 
 A family reads the points of one input together, from the stored result and its resample vectors; it never
@@ -175,6 +253,16 @@ of (geometry, order); `validate` proves that it gives `verdict.toml`'s verdict o
 factorisation is a refactor and nothing else: `bin/cc tabulate --diff v01-rules v02-rules` prints 0 cells and 0 points. What
 it buys is that a coexisting point still has a geometry, and a non-coexisting point still has an order, without a side
 table. No operator is involved: both axes are lookups in tables, so this section changes no kernel declaration.
+
+## What the rulings bound (Robin, 2026-10-05)
+
+These are rulings about what CC may claim and what it does not implement. The Q0 ruling is the transducer paragraph under "Kernel V8 on one page".
+
+- **Q1 - reweighting.** Reweighting the configurations is outside the relational treatment. The navigator never acts on a reweighted quantity as a reading, and nothing in CC implements it.
+- **Q3 - the transform.** There is no observation at infinite size; the shared-omega assumption of the finite-size transform is an undeclared prior. The `transform` output is an independent conventional estimate — not a Compass reading; no verdict row in any set after v07 may read it. The v06/v07 claims that rest on a TRANSFORMED basis (`x2b-xy-2@v06-rules` and `@v07-rules`: LINE, BKT-END) are transform basis — not relationally admissible; superseded by `x2b-xy-3@v08-rules`.
+- **Q4 - the star.** A single edge is the Primary kernel, Delta to Sigma. A radial chain is A, then B, then R, with `rho_base` and `chi_0` declared (plan 0885).
+- **Q5 - stacks.** Simulated stacks are Phase 1 only; real movies are Phase 2 eligible.
+- **The principle.** Universal operators are not a universal model of systems. Every input's M is a complete Origin declaration: what was measured, by what, what a node keeps and discards. Plan 0884 is the first real one.
 
 ## Where structure replaces control
 
