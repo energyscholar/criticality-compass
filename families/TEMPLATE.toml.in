@@ -5,3 +5,4 @@ kind = "family-decl"
 id = "<ID>"
 input = "TODO"                                 # an input id; its axes.point order is the family order (v0.1: one input)
 interior = ["TODO", "TODO"]                    # >= 2 point labels of that input, in its declared order
+# or the rule (plan 0879; the default for a new family, mandatory when every point is observed): interior = "mid-run-open"

@@ -330,6 +330,14 @@ wrote families/b7-demo.toml
   Fill every `TODO` (an input and at least two of its points); `validate` refuses any left. One input per family
   in v0.1, and control edges only if the input declares `along`.
 
+  `interior` is a list of points, or the declared rule `interior = "mid-run-open"` (plan 0879): the contiguous run of
+  points whose `needle` code reads MID under the set's `[side] needle_code`, less the run's end point on each side where a
+  sink point lies beyond it. A family is declared with the rule by default from now on, and MANDATORILY for inputs with no
+  truth or navigated points (every point observed; `validate` refuses a hand list there); hand lists remain for the frozen
+  record. The rule is total: it reads only the needle codes, takes exactly one MID run, and finding fewer than 2 points,
+  several runs, a set with no `[side] needle_code`, or a pair that is not a control edge makes `bin/cc family` refuse
+  with the reason and a Next line (a null, never a cell). `bin/cc family` prints the resolved list, marked `(rule mid-run-open)`.
+
 - `tables/<set>/family.toml`, the rules: three columns (`bracket`, `f1`, `f2`), each with an alphabet that includes
   `UNRES`, `NOT-EVALUATED` and `NOT-MEASURED`; how each column is read (`[bracket]`, `[f1]`, `[f2]`); and `[[row]]`
   blocks that partition the product of the three alphabets into family verdicts, exactly as `verdict.toml` does for
@@ -364,6 +372,8 @@ family x7a-bc-lambda   rules: v01-rules   input: x7a-bc   interior: 0.0 1.0 1.5 
 door value; the family verdict is a refusal, not LINE.)
 
 ## LINE-END families (v05-rules, plan 0871)
+
+The sides read the same needle codes the interior rule reads: a family declared with `interior = "mid-run-open"` (see Families above) takes its interior from the MID run and then reads its two sides from the points beyond it.
 
 A line of fixed points can END: the XY low phase is a line up to T_KT, then the sweep meets a disordered sink. `v05-rules` reads
 that from a family, with four additions to the three columns above (all in `tables/v05-rules/family.toml`; nothing in v01 to v04

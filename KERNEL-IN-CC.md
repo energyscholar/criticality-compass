@@ -156,6 +156,8 @@ Where a point reads a null (`NOT-MEASURED`, `NOT-EVALUATED`), the edges and pair
 null is plumbing around the maths, and only ranked codes reach A. The family verdict is one lookup in a
 partition of the three columns (`family.toml`), validated total and disjoint, with no priority chain.
 
+The declared interior rule `interior = "mid-run-open"` is a projection C over the needle sign cells: it keeps the MID run (less the end a sink lies beyond), discards every value and every other column, and reads nothing else.
+
 ## Geometry and order: one verdict as two axes
 
 `v02-rules` reads the signature row twice and composes. The **geometry** axis (`geometry.toml`) is the verdict the rulebook
