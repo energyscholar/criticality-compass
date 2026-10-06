@@ -141,6 +141,11 @@ fix = ["\"verdict\"]", "\"verdict\", \"why\"]"]
 text = "tests/planted/cc-basic-field-missing.toml:basic: field 'why' is in neither keeps nor discards\n  Next: add it to basic.keeps or basic.discards"
 
 [[plant]]
+file = "cc-replay-missing.toml"
+fix = ["[check]", "[check]\nreplay = \"locked\""]
+text = "tests/planted/cc-replay-missing.toml:check.replay: missing required field\n  Next: add replay = ... to tests/planted/cc-replay-missing.toml"
+
+[[plant]]
 file = "cc-conventional-unknown.toml"
 fix = ["nonesuch = ", "transform = "]
 text = "tests/planted/cc-conventional-unknown.toml:conventional.nonesuch: not an instrument of the registry\n  Next: use one of: across across_delta along fluct needle needle_chain needle_o stability stability_delta transform two_start"

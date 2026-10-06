@@ -14,6 +14,7 @@ class_truth = ["POINT", "LINE", "WALKING", "FIRST-ORDER", "MULTI", "BKT-END", "N
 status = ["declared", "sampler-tested", "run", "in-signature-table"]    # ordered
 obtained = ["truth", "navigated", "observed"]   # how a point was obtained (m.toml [obtained])
 formats = ["npz-v1", "npy-v1"]
+replay = ["locked", "all"]
 nulls = ["NOT-MEASURED", "NOT-EVALUATED"]       # the honest nulls, in rank order; never map keys
 
 [flags]                         # flag code -> the words every output prints (never the bare code)
@@ -47,6 +48,7 @@ blank_refuse = true             # a verdict in the set's `refuse` list shows as 
 commands = ["show", "explain", "run", "new case", "tables fork", "tables drop", "validate", "check", "help"]
 
 [check]                         # bin/cc check --fast (the pre-commit hook) skips the `slow` tests
+replay = "locked"
 fast_budget_s = 30              # elapsed time is printed against it; over budget WARNS, never fails
 slow = []                       # each phase appends every test it creates that takes > 5 s alone
 
