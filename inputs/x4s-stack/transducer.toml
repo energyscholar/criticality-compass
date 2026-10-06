@@ -1,0 +1,24 @@
+# inputs/x4s-stack/transducer.toml - the transducer file (plan 0883, Q0): the sampler, what the per-locus mean keeps and discards, the interval's role.
+schema = 1
+kind = "transducer"
+id = "x4s-stack"
+
+[transducer]
+model = "as [X4] at (0.46, 0), raw snapshots S[N, L, L] saved"
+update = ["tools/lattice_field.py sha256 4162eb36e9e8f34fec82461e319beebd8bb2099bd533df5ef4a5859584cbb465"]
+inputs = "m.toml [X4s] · studies/X4s/simulate.py (sha256 d83c2636cce05ab1ef2f4c4172fe94aa9b20621fdfda73aebffb1aee5467fdbb)"
+output = "one configuration per recorded sweep; each configuration is one observation; the recorded sequence is NOT a process sequence (Phase 1 only)"
+
+[reduction]
+name = "per-locus mean of the declared observable over the declared configurations"
+keeps = "the typical value of the observable at the locus (one point, one size, one start)"
+discards = "the configuration-to-configuration variation and the order of the configurations"
+
+[interval]
+role = "projection C: places the reading's sign cell against its declared margin; never an operator input"
+keeps = "the position of the interval ends among the cuts -eps, 0, +eps"
+discards = "the shape of the resampled distribution"
+
+[provenance_note]
+declared_after = []
+note = "driver and data/x4s NOT in FROZEN.json (pinned by CC); output is the RAW snapshot stack — CC applies the declared [block_map] itself (cc/reduce.py)"
