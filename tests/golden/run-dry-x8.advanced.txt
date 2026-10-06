@@ -3,8 +3,9 @@ run x8-ising-needle@v01-rules
 x8-ising-needle   rules: v01-rules   result: results/x8-ising-needle@v01-rules.json (dry: nothing written)
   interval: iid resamples 400, level 0.95, seed 8
   code_commit: none
-  read results/x8-ising-needle@v03-rules.json measure_hash f20cfc184a09
+  read results/x8-ising-needle@v03-rules.json measure_hash cdc0020fe36a
   read inputs/x8-ising-needle/m.toml 22509a573d76
+  read inputs/x8-ising-needle/transducer.toml 5313210b0f6a
   read instruments/needle.toml 03c8e390df85
   read fixtures/data/x8-ising-needle.toml b39f44060af4
   read tables/v01-rules/codes.toml 1fd20de97e25
