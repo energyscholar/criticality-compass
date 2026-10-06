@@ -172,7 +172,8 @@ def new_input(root, iid, like=None, points=None, pattern=None, instruments=None,
         d.mkdir()
         (d / "m.toml").write_text((ins / "TEMPLATE.m.toml.in").read_text().replace("<ID>", iid))
         (d / "points.toml").write_text((ins / "TEMPLATE.points.toml.in").read_text().replace("<ID>", iid))
-        print(f"wrote inputs/{iid}/m.toml and points.toml\n  Next: replace every TODO, add the [[data.files]] "
+        (d / "transducer.toml").write_text((ins / "TEMPLATE.transducer.toml.in").read_text().replace("<ID>", iid))
+        print(f"wrote inputs/{iid}/m.toml, points.toml and transducer.toml\n  Next: replace every TODO, add the [[data.files]] "
               f"blocks, then bin/cc data add {iid} and bin/cc validate")
         return 0
     src, reg = ins / like / "m.toml", declare.Ctx(root).reg
@@ -208,7 +209,8 @@ def new_input(root, iid, like=None, points=None, pattern=None, instruments=None,
     (d / "points.toml").write_text(
         f"# inputs/{iid}/points.toml - the point -> case JOIN (taxonomy; never frozen)\n"
         f'schema = 1\nkind = "points"\ninput = "{iid}"\n\n[points]\n{pts}\n')
-    print(f"wrote inputs/{iid}/m.toml and points.toml (like {like})\n"
+    (d / "transducer.toml").write_text((ins / "TEMPLATE.transducer.toml.in").read_text().replace("<ID>", iid))   # provenance is not inherited: --like never copies the like-input's file
+    print(f"wrote inputs/{iid}/m.toml, points.toml and transducer.toml (like {like})\n"
           f"  Next: fix every TODO, then bin/cc data add {iid} and bin/cc validate")
     return 0
 
