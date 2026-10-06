@@ -1,0 +1,24 @@
+# inputs/x7a-nnn/transducer.toml - the transducer file (plan 0883, Q0): the sampler, what the per-locus mean keeps and discards, the interval's role.
+schema = 1
+kind = "transducer"
+id = "x7a-nnn"
+
+[transducer]
+model = "2D Ising at exact K_c (Swendsen–Wang) and nn + nnn Ising at K2 = 0.1"
+update = ["tools/lattice.py sha256 80a40933370f7f91711076c11fea4dc3e802b2ce478d0fd7fb0c678931d75a42", "tools/lattice_nnn.py sha256 06032fd13127409a99edef403679aa1b3a1c770c404046482aeb82dbed61ec3e"]
+inputs = "m.toml [P3] (data/p3) + [B3b] (data/b3) · studies/P3/simulate.py + studies/B3/simulate.py"
+output = "one configuration per recorded sweep; each configuration is one observation; the recorded sequence is NOT a process sequence (Phase 1 only)"
+
+[reduction]
+name = "per-locus mean of the declared observable over the declared configurations"
+keeps = "the typical value of the observable at the locus (one point, one size, one start)"
+discards = "the configuration-to-configuration variation and the order of the configurations"
+
+[interval]
+role = "projection C: places the reading's sign cell against its declared margin; never an operator input"
+keeps = "the position of the interval ends among the cuts -eps, 0, +eps"
+discards = "the shape of the resampled distribution"
+
+[provenance_note]
+declared_after = ["x7a-nnn@v01-rules", "x7a-nnn@v02-rules", "x7a-nnn@v03-rules", "x7a-nnn@v04-rules", "x7a-nnn@v05-rules", "x7a-nnn@v06-rules", "x7a-nnn@v07-rules"]
+note = "two samplers, one per data directory (the m.toml says so)"
