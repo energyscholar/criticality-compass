@@ -18,6 +18,7 @@ interior_rule = ["mid-run-open"]   # a family's `interior` as a declared rule (p
 formats = ["npz-v1", "npy-v1", "snapshots-v1", "image-stack-v1"]
 limited = ["none", "assigned", "resolution-limited"]   # [block_map] limited: what the finest level is (plan 0873): a value that is not a measured site
 replay = ["locked", "all"]   # [check] replay (plan 0886): `locked` replays the inputs expected/<set>.toml names; `all` replays every input on disk
+interval_method = ["block", "iid"]   # [interval] method of an input's m.toml (plan 0883: was a tuple in declare.py; plan 0878 adds "gamma" with the code)
 nulls = ["NOT-MEASURED", "NOT-EVALUATED"]       # the honest nulls, in rank order; never map keys
 
 # A STACK format is raw frames the door reduces itself (cc/reduce.py) through the input's declared [block_map] and [observable]: the
@@ -34,6 +35,13 @@ reduces = ["G", "GL"]
 dims = 3
 dtypes = ["uint8"]
 readers = { ".npy" = "numpy", ".tif" = "tifffile", ".tiff" = "tifffile" }
+
+# The transducer file inputs/<id>/transducer.toml (plan 0883; Q0): the sentences it must carry are DATA here, compared by equality.
+[transducer]
+kinds = ["transducer", "record"]
+phase1_output = "one configuration per recorded sweep; each configuration is one observation; the recorded sequence is NOT a process sequence (Phase 1 only)"
+phase2_output = "one frame per recorded time; the recorded sequence IS a declared process sequence (Phase 2; real transient record only)"
+interval_role = "projection C: places the reading's sign cell against its declared margin; never an operator input"
 
 [flags]                         # flag code -> the words every output prints (never the bare code)
 T = "truth point"

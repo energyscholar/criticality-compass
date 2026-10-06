@@ -137,9 +137,16 @@ def _regex_ok(x):
 
 def chk_cc(p, d, c, stem=None):
     top = {k: dict for k in ("defaults", "data", "alphabets", "flags", "obtained_flag", "arrays", "basic", "check", "golden")}
-    out = header(p, d, "cc") + shape(p, d, top, {"formats": dict})
+    out = header(p, d, "cc") + shape(p, d, top, {"formats": dict, "transducer": dict})
     if out:
         return out
+    out += when("interval_method" not in d["alphabets"], p, "alphabets.interval_method", "missing", 'write interval_method = ["block", "iid"]')
+    if "transducer" in d:   # plan 0883: the transducer file's sentences are data; the kinds are the two this code has a schema for
+        out += shape(p, d["transducer"], {"kinds": list, "phase1_output": str, "phase2_output": str, "interval_role": str}, pre="transducer.")
+        out += when(d["transducer"].get("kinds") != ["transducer", "record"], p, "transducer.kinds", f"{d['transducer'].get('kinds')} is not ['transducer', 'record']",
+                    'write kinds = ["transducer", "record"]')
+        if out:
+            return out
     for n, v in {n: v for n, v in d.get("formats", {}).items() if isinstance(v, dict)}.items():   # a stack format's schema is data (plan 0873)
         out += inalpha(p, f"formats.{n}", n, d["alphabets"]["formats"]) + shape(p, v, {"reduces": list, "dims": int, "dtypes": list, "readers": dict}, {"pip": dict}, pre=f"formats.{n}.")
         out += [at(p, f"formats.{n}.readers", f"'{x}' is not a reader this code has", f"use one of: {' '.join(formats.READ)}")
@@ -407,7 +414,7 @@ def chk_input(p, d, c, stem=None):
     iv = d["interval"]
     out += shape(p, iv, {"method": str, "resamples": int, "level": NUM, "seed": int},
                  {"b": int, "tau_declared": int}, pre="interval.")
-    out += inalpha(p, "interval.method", iv.get("method"), ("block", "iid"))
+    out += inalpha(p, "interval.method", iv.get("method"), c.alpha["interval_method"])   # plan 0883: the alphabet is cc.toml data
     out += when(iv.get("method") == "block" and "b" not in iv, p, "interval.b", "block resampling needs b",
                 "add b = <block length>")
     out += when(iv.get("method") == "iid" and iv.get("tau_declared") != 1, p, "interval.tau_declared",
