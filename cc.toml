@@ -91,6 +91,9 @@ GL = 2                          # the observable's full level stack [N, levels]
 E = 1                           # the conjugate (energy) per snapshot
 Q = 1                           # the two-start order parameter per snapshot
 
+[conventional]                  # plan 0881 P2.3 (Robin Q3, 2026-10-05): an instrument whose output show/explain print WITH this label and no verdict row after v07 may read: no observation exists at infinite size, and the shared-omega assumption is an undeclared prior
+transform = "independent conventional estimate — not a Compass reading"
+
 [basic]                         # BASIC is a DECLARED PROJECTION of the full result
 keeps = ["point", "column", "estimate", "lo", "hi", "cell", "code", "reason", "verdict", "why", "pairs", "geometry", "order"]
 discards = [
@@ -107,7 +110,7 @@ memory_gb = 5.0                # this host's memory budget for measuring workers
 replay = "locked"                # test_run_all replays the inputs the lock file names (an input is in the gate iff expected/<set>.toml names it)
 exclusive = ["test_run_all"]    # these tests run ALONE after the parallel batch (test_run_all sizes its own worker pool from memory_gb)
 fast_budget_s = 30              # elapsed time is printed against it; over budget WARNS, never fails
-slow = ["test_w2", "test_detect_verdicts", "test_breakers_red", "test_view", "test_golden", "test_along", "test_axes", "test_tables_cli", "test_tabulate", "test_needle_o_start", "test_run_all", "test_declare", "test_freeze_key", "test_code_hash", "test_chain", "test_across_delta", "test_end_note", "test_delta_basis", "test_reduce", "test_stack_door", "test_reuse", "test_probe", "test_transducer", "test_gamma_twin", "test_explain_pair", "test_check_summary"]   # each phase appends its > 5 s tests
+slow = ["test_w2", "test_detect_verdicts", "test_breakers_red", "test_view", "test_golden", "test_along", "test_axes", "test_tables_cli", "test_tabulate", "test_needle_o_start", "test_run_all", "test_declare", "test_freeze_key", "test_code_hash", "test_chain", "test_across_delta", "test_end_note", "test_delta_basis", "test_reduce", "test_stack_door", "test_reuse", "test_probe", "test_transducer", "test_gamma_twin", "test_explain_pair", "test_check_summary", "test_conventional"]   # each phase appends its > 5 s tests
 
 [golden.classes.a]    # help text or a new command
 files = ["help.*.txt", "new-*.txt"]

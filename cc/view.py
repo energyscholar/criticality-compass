@@ -85,6 +85,23 @@ def column_line(col, rs, sig, mode, cfg):
     return f"  {col:<10} " + join_line(items, mode, cfg)
 
 
+def conventional_lines(res, pt, mode, cfg, pad="  "):
+    """The readings of the instruments cc.toml [conventional] labels (plan 0881 P2.3): the column stays printed and the declared
+    label rides with it. The label is one string in cc.toml, never a per-command edit."""
+    out = []
+    for r in res["readings"]:
+        label = cfg.get("conventional", {}).get(r["instrument"])
+        if label is None or r["unit"].get("point") != pt:
+            continue
+        items = [("column", f"{r['column']} ({label})")]
+        if r["estimate"] is not None:
+            items += [("estimate", f"{r['estimate']:.4g}"), ("lo", f"[{r['lo']:.4g},"), ("hi", f"{r['hi']:.4g}]")]
+        items += [("cell", shown(r["cell"], r["reason"], mode, cfg)), ("eps", f"eps {r['eps_key']}={r['eps']}")] if r["cell"] is not None else []
+        items += [("reason", f"({r['reason']})")] if r["reason"] and not (mode == "basic" and r["cell"] in cfg["basic"]["blank"]) else []
+        out.append(f"{pad}{r['instrument']:<10} " + join_line(items, mode, cfg))
+    return out
+
+
 def verdict_lines(sig, mode, cfg, pad="  "):
     blank = mode == "basic" and cfg["basic"]["blank_refuse"] and sig["verdict_class"] == "REFUSE"
     v = f"BLANK ({sig['verdict']})" if blank else sig["verdict"]
@@ -159,7 +176,7 @@ def show(res, join, mode, note="", tables_dir=None):
         out += [column_line(c, feeders(res, pt, c, cols), sig, mode, cfg) for c in res["signature_columns"]]
         wit = detect.codes_of(cells_of(res, pt), T)
         out += [column_line(c, feeders(res, pt, c, cols), {**sig, c: wit[c]}, mode, cfg) for c in witnesses(T, res)]
-        out += verdict_lines(sig, mode, cfg) + axes_lines(sig, mode, cfg) + family.note_lines(notes, pt)
+        out += conventional_lines(res, pt, mode, cfg) + verdict_lines(sig, mode, cfg) + axes_lines(sig, mode, cfg) + family.note_lines(notes, pt)
     return out + pair_lines(res, mode, cfg)
 
 
@@ -281,6 +298,7 @@ def explain(res, pt, join, mode, tables_dir=None):
             ln = map_line(text, d, f"{codes[a]},{codes[b]}")
             out.append(f"  7 CODE      {d} = {shown(codes[d], None, mode, cfg)} from {a} {codes[a]} and {b} {codes[b]}"
                        + f"  (codes.toml line {ln})" * bool(ln))
+    out += conventional_lines(res, pt, mode, cfg)
     row = T.verdict["row"][T.lines.index(sig["row_line"])]
     out.append(f"8 VERDICT   verdict.toml line {sig['row_line']}: "
                + "; ".join(f"when.{k} = [{', '.join(v)}]" for k, v in row["when"].items()))

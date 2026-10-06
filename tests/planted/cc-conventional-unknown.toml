@@ -1,0 +1,55 @@
+# cc.toml - Criticality Compass configuration (plumbing reads it; every field required)
+schema = 1
+kind = "cc"
+
+[defaults]
+tables = "verdict-x-rules"      # the working table set (a directory under tables/)
+mode = "basic"                  # basic | advanced; the flag --advanced overrides per command
+
+[data]
+root = "~/software/scratch/compass-toolset/data"   # read-only; every m.toml path is relative to it
+
+[alphabets]
+class_truth = ["POINT", "LINE", "WALKING", "FIRST-ORDER", "MULTI", "BKT-END", "NOT"]
+status = ["declared", "sampler-tested", "run", "in-signature-table"]    # ordered
+obtained = ["truth", "navigated", "observed"]   # how a point was obtained (m.toml [obtained])
+formats = ["npz-v1", "npy-v1"]
+nulls = ["NOT-MEASURED", "NOT-EVALUATED"]       # the honest nulls, in rank order; never map keys
+
+[flags]                         # flag code -> the words every output prints (never the bare code)
+T = "truth point"
+N = "navigated point"
+C = "observed point"
+H = "uses Hamiltonian knowledge"
+
+[obtained_flag]                 # m.toml [obtained] value -> flag code
+truth = "T"
+navigated = "N"
+observed = "C"
+
+[arrays]                        # array kind -> dimensions after the declared level selection
+G = 1                           # the observable at final size, one value per snapshot
+GL = 2                          # the observable's full level stack [N, levels]
+E = 1                           # the conjugate (energy) per snapshot
+Q = 1                           # the two-start order parameter per snapshot
+
+[conventional]
+nonesuch = "a label for an instrument the registry does not have"
+
+[basic]                         # BASIC is a DECLARED PROJECTION of the full result
+keeps = ["point", "column", "estimate", "lo", "hi", "cell", "code", "reason", "verdict", "why"]
+discards = [
+  "instrument", "unit", "eps_key", "eps", "flags", "obtained", "vector_key",
+  "verdict_class", "row_line", "per_size", "read", "code_commit", "code_hash", "interval", "reports",
+]
+blank = ["NOT-MEASURED", "NOT-EVALUATED", "UNRES"]  # shown as BLANK (<value>: <reason>)
+blank_refuse = true             # a verdict in the set's `refuse` list shows as BLANK (<verdict>)
+commands = ["show", "explain", "run", "new case", "tables fork", "tables drop", "validate", "check", "help"]
+
+[check]                         # bin/cc check --fast (the pre-commit hook) skips the `slow` tests
+fast_budget_s = 30              # elapsed time is printed against it; over budget WARNS, never fails
+slow = []                       # each phase appends every test it creates that takes > 5 s alone
+
+[golden.classes.a]
+files = ["help.*.txt"]
+match = ['^[-+]\s+bin/cc ']

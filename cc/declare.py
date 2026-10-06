@@ -139,13 +139,16 @@ def _regex_ok(x):
 
 def chk_cc(p, d, c, stem=None):
     top = {k: dict for k in ("defaults", "data", "alphabets", "flags", "obtained_flag", "arrays", "basic", "check", "golden")}
-    out = header(p, d, "cc") + shape(p, d, top, {"formats": dict, "transducer": dict, "levels": dict, "interval_fields": dict})
+    out = header(p, d, "cc") + shape(p, d, top, {"formats": dict, "transducer": dict, "levels": dict, "interval_fields": dict, "conventional": dict})
     if out:
         return out
     out += when("interval_method" not in d["alphabets"], p, "alphabets.interval_method", "missing", 'write interval_method = ["block", "iid"]')
     methods, fields_ = d["alphabets"].get("interval_method", []), d.get("interval_fields", {})   # plan 0878: every method of the alphabet has its fields table, and no table names a method outside it
     out += [at(p, f"interval_fields.{k}", "no [interval_fields] table for this method of alphabets.interval_method" if k in methods else "not a method of alphabets.interval_method",
                f"add [interval_fields.{k}] with required = {{...}}" if k in methods else f"delete [interval_fields.{k}]") for k in sorted(set(methods) ^ set(fields_))]
+    out += [at(p, f"conventional.{k}", "not an instrument of the registry" if k not in c.reg else "the label must be a non-empty string",
+               f"use one of: {' '.join(c.reg)}" if k not in c.reg else "write the label as a string")
+            for k, v in d.get("conventional", {}).items() if k not in c.reg or not (isinstance(v, str) and v.strip())]   # plan 0881 P2.3
     out += [at(p, f"levels.{k}", "a level's z must be a number above 0", "write the z of that level, e.g. \"0.95\" = 1.959964")
             for k, v in d.get("levels", {}).items() if not (isinstance(v, NUM) and v > 0)]
     if "transducer" in d:   # plan 0883: the transducer file's sentences are data; the kinds are the two this code has a schema for

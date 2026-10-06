@@ -490,7 +490,7 @@ exponents and r are reported (`y_steps`, `ratio`).
 its touching pairs (RAW), then the v06 rule applies (a resolved code counts only when every combined pair reads it). A converging point is thus read from its converging neighbours and never from a
 pair that crosses into a non-converging region. `bin/cc explain <input> <point>` prints the rule beside the combine rank.
 
-## Across by the difference estimator, the finite-size transform and the end note (v06-rules, plan 0872)
+## Across by the difference estimator, the finite-size transform (an independent conventional estimate) and the end note (v06-rules, plan 0872)
 
 v06-rules = v05-rules + three things, each declared before it ran (`expected/v06-rules.toml`).
 
@@ -506,7 +506,7 @@ T-ordered input by adding `across_delta` to `instruments` and the coupling line 
 **TRANSFORMED stability (F1).** `stability` is a total table over (`stability_raw`, `drift_code`): on a point whose needle drift is CONVERGING (a measured pre-asymptotic small pair), a raw STABLE
 or CROSSING reads TRANSFORMED; OFF and UNRES stay; every other drift keeps today's reading, so a real walking (CROSSING off a CONVERGING point) is still WALKING. `geometry.toml` accepts
 TRANSFORMED wherever a line accepted STABLE; a RELEVANT exponent on a TRANSFORMED point refuses (REFUSE-UNRES: not certified as a point, with its Next line). The declared transform
-`y_inf = (y2 - r y1)/(1 - r)` (r = the needle's own v2/v1) is the `transform` instrument; its helper column `y_inf_code` is visible in `show` and read by no verdict row, and it is NOT-EVALUATED where the correction does not decay.
+`y_inf = (y2 - r y1)/(1 - r)` (r = the needle's own v2/v1) is the `transform` instrument: an **independent conventional estimate — not a Compass reading** (Robin Q3, 2026-10-05: there is no observation at infinite size, and the shared-omega assumption is an undeclared prior). The column stays printed as the record, and `show` and `explain` print its `y_inf` with that label (one string, `cc.toml [conventional]`; it was never printed before, the old sentence saying `y_inf_code` was visible in `show` was wrong). No verdict row in any set reads it, and none in any set after v07 may; it is NOT-EVALUATED where the correction does not decay. The TRANSFORMED stability and TRANSFORMED across_delta pairs of v06/v07 are transform-basis claims, classified in `docs/CHANGELOG-TABLES.md` and `results/README.md`.
 
 **The end note (F3).** A family names each end point (`ends`: point, side, END-kind). `bin/cc show` and `explain` of that point print `end of a LINE run (family <id>, END-<kind>)` beside its per-point
 reading (read from the stored family; nothing for a dry run, a set without family sides, or a point that ends nothing). No verdict changes.
