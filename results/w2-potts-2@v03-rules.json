@@ -5,10 +5,10 @@
  "input": "w2-potts-2",
  "tables": "v03-rules",
  "derived_from": null,
- "code_commit": "513f622af6135ed93857302377f6b95a15cb0f4e",
- "code_hash": "9c313ca07702261ff3dd227838180f09e7827805142094874753c0599d31ea7c",
- "measure_hash": "6bcf26ef00f27c5953b8285d24c5e4c20db4aac4ec298261076a9fa6fac2d86f",
- "peak_rss_mb": 83.5,
+ "code_commit": "f1eff9d56eccb2864896f4e2b97559c401855f1a",
+ "code_hash": "a213013bcc01bbbb77d00ec8f7adf07d0953d75aa11c7d5e7c20518e55d5c74e",
+ "measure_hash": "f5465e3cbe0c324d8c6fd5d22e6c51d1cabb460fd837ce020d6e750eb1b9c248",
+ "peak_rss_mb": 83.3,
  "interval": {
   "method": "block",
   "b": 400,
@@ -18,6 +18,7 @@
  },
  "read": {
   "inputs/w2-potts-2/m.toml": "aad69339070e83c99d7e52f5d1b2242c928300c30945a26f358f8c13035963f9",
+  "inputs/w2-potts-2/transducer.toml": "7bc6833c1813b898ecd523328207dae0aaa8ca166b769e62bbba90fca2c85739",
   "instruments/across.toml": "8f6803e8af6cd80d4f7bb69b1be8148cf5eb8742892caf5f3f8392f38b3c0944",
   "instruments/stability.toml": "2fc7bb21b58a2d6eceab15ca62424aadedd309eb1f9dd6125bdee57d52588170",
   "instruments/two_start.toml": "30503b8a483a80faa442f419d04edc10a9498b56fb24c68554fa643c8679fa38",

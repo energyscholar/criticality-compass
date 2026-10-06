@@ -5,10 +5,10 @@
  "input": "b7-at-line-2",
  "tables": "v03-rules",
  "derived_from": null,
- "code_commit": "513f622af6135ed93857302377f6b95a15cb0f4e",
- "code_hash": "9c313ca07702261ff3dd227838180f09e7827805142094874753c0599d31ea7c",
- "measure_hash": "10129ac4f46b367de4d77cb89a044e4388d122e4564a2750f72da13048e44fcf",
- "peak_rss_mb": 63.4,
+ "code_commit": "f1eff9d56eccb2864896f4e2b97559c401855f1a",
+ "code_hash": "a213013bcc01bbbb77d00ec8f7adf07d0953d75aa11c7d5e7c20518e55d5c74e",
+ "measure_hash": "1cdf84a043ab0709c36a4f980b2f90b4be9f2ee9bd547e92d47e91d1d4186c5a",
+ "peak_rss_mb": 65.8,
  "interval": {
   "method": "block",
   "b": 400,
@@ -18,6 +18,7 @@
  },
  "read": {
   "inputs/b7-at-line-2/m.toml": "52e052d5f8469afe4f5e0ce6d0d84b8954d490614bf7404a44fd8c210e2f65c9",
+  "inputs/b7-at-line-2/transducer.toml": "6990730032dc94f7cd79a81334b005b232eee9392ade15513e949c075c938a45",
   "instruments/across.toml": "8f6803e8af6cd80d4f7bb69b1be8148cf5eb8742892caf5f3f8392f38b3c0944",
   "instruments/stability.toml": "2fc7bb21b58a2d6eceab15ca62424aadedd309eb1f9dd6125bdee57d52588170",
   "instruments/along.toml": "f3fd87ddb9aa9a2786e3a0110340106e673670e305642a1e4bf30b1a8b2b4ef6",
