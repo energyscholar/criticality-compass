@@ -1,0 +1,24 @@
+# inputs/x2b-xy/transducer.toml - the transducer file (plan 0883, Q0): the sampler, what the per-locus mean keeps and discards, the interval's role.
+schema = 1
+kind = "transducer"
+id = "x2b-xy"
+
+[transducer]
+model = "2D XY as [X2], finer grid, both starts"
+update = ["tools/lattice_xy.py sha256 7fd3f80a26232340dbf92ac4baae657b388d344434326d872a99bd616520a70d"]
+inputs = "m.toml [X2b] · studies/X2b/simulate.py (sha256 b0090e0d5310f4ef95ebe712e8764a3afad94c9235b7e05887fc45df2d502024)"
+output = "one configuration per recorded sweep; each configuration is one observation; the recorded sequence is NOT a process sequence (Phase 1 only)"
+
+[reduction]
+name = "per-locus mean of the declared observable over the declared configurations"
+keeps = "the typical value of the observable at the locus (one point, one size, one start)"
+discards = "the configuration-to-configuration variation and the order of the configurations"
+
+[interval]
+role = "projection C: places the reading's sign cell against its declared margin; never an operator input"
+keeps = "the position of the interval ends among the cuts -eps, 0, +eps"
+discards = "the shape of the resampled distribution"
+
+[provenance_note]
+declared_after = ["x2b-xy@v05-rules", "x2b-xy@v06-rules", "x2b-xy@v07-rules"]
+note = "driver studies/X2b/simulate.py and data/x2b are NOT in the toolset FROZEN.json; pinned by fixtures/data/<id>.toml and by the toolset git (history from 2026-10-05, LOG E291)"
