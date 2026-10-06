@@ -1,0 +1,23 @@
+# inputs/x9c-potts-2/transducer.toml - the transducer file (plan 0883, Q0): the sampler, what the per-locus mean keeps and discards, the interval's role.
+schema = 1
+kind = "transducer"
+id = "x9c-potts-2"
+
+[transducer]
+model = "q-state Potts at exact K_c, q 3–8, two starts"
+update = ["tools/lattice_potts.py sha256 217107466df633194f8a53e0ee226e58e9498b5364885f09220551b859a10985"]
+inputs = "m.toml [X9c] · studies/X9/simulate.py"
+output = "one configuration per recorded sweep; each configuration is one observation; the recorded sequence is NOT a process sequence (Phase 1 only)"
+
+[reduction]
+name = "per-locus mean of the declared observable over the declared configurations"
+keeps = "the typical value of the observable at the locus (one point, one size, one start)"
+discards = "the configuration-to-configuration variation and the order of the configurations"
+
+[interval]
+role = "projection C: places the reading's sign cell against its declared margin; never an operator input"
+keeps = "the position of the interval ends among the cuts -eps, 0, +eps"
+discards = "the shape of the resampled distribution"
+
+[provenance_note]
+declared_after = ["x9c-potts-2@v04-rules", "x9c-potts-2@v05-rules", "x9c-potts-2@v06-rules", "x9c-potts-2@v07-rules"]
