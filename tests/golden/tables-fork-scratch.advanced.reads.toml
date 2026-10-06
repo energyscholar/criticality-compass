@@ -2,13 +2,14 @@
 # never typed). Each entry: kinds (R read, S stat, D directory listed) and a path (~data/ = the data root).
 schema = 1
 kind = "golden-reads"
-key = "56869bf72820954c9ad5fec12774b2262cabedb8d97043e527545e9494ff7488"
+key = "9449159bf8fe82b14fa16d931d44b2ae5c03684823423865278abfc3e42ed634"
 paths = [
   "RS bin/cc",
   "R cc/author.py",
-  "RS cc/declare.py",
+  "R cc/declare.py",
   "RS cc/formats.py",
   "R cc/reduce.py",
+  "RS cc/schema.py",
   "DS tables",
   "DS tables/scratch",
   "S tables/scratch/codes.toml",

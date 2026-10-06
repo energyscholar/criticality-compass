@@ -2,16 +2,15 @@
 # never typed). Each entry: kinds (R read, S stat, D directory listed) and a path (~data/ = the data root).
 schema = 1
 kind = "golden-reads"
-key = "75acf7519724a7094a55070d4cf30ce2c85888bbc8f817b7b1544216eae4cac9"
+key = "580fef811d1765666e93a19a0a90905315342e301bf33d349fe7cdc2ac913c9e"
 paths = [
-  "S .",
   "R FROZEN.json",
   "RS bin/cc",
   "S cases/xy-low-phase.toml",
   "S cases/xy-tkt.toml",
   "R cc.toml",
   "R cc/admit.py",
-  "RS cc/declare.py",
+  "R cc/declare.py",
   "RS cc/detect.py",
   "R cc/door.py",
   "RS cc/family.py",
@@ -24,10 +23,10 @@ paths = [
   "R cc/resample.py",
   "R cc/resources.py",
   "RS cc/reverdict.py",
+  "RS cc/schema.py",
   "RS cc/score.py",
   "R cc/sign.py",
   "RS cc/view.py",
-  "R checks.toml",
   "S families",
   "RS fixtures/data/x2-xy-line.toml",
   "DS inputs",
@@ -68,17 +67,9 @@ paths = [
   "S inputs/x8-ising-needle",
   "S inputs/x9c-potts",
   "S inputs/x9c-potts-2",
-  "DS instruments",
   "RS instruments/across.toml",
-  "R instruments/across_delta.toml",
-  "R instruments/along.toml",
-  "R instruments/fluct.toml",
   "RS instruments/needle.toml",
-  "R instruments/needle_chain.toml",
-  "R instruments/needle_o.toml",
   "RS instruments/stability.toml",
-  "R instruments/stability_delta.toml",
-  "R instruments/transform.toml",
   "RS instruments/two_start.toml",
   "RS results/x2-xy-line@v01-rules.json",
   "S results/x2-xy-line@v01-rules.npz",

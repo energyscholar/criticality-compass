@@ -2,13 +2,12 @@
 # never typed). Each entry: kinds (R read, S stat, D directory listed) and a path (~data/ = the data root).
 schema = 1
 kind = "golden-reads"
-key = "5a30bbeef5c744c73b92ab34b29f4431453fe4ad723479085c3c457dde0413aa"
+key = "d074139cfe8eaaf9b5a8cd94243f0f36d6feafd409842266b5da70467fdc7b48"
 paths = [
-  "S .",
   "RS bin/cc",
   "R cc.toml",
   "R cc/admit.py",
-  "RS cc/declare.py",
+  "R cc/declare.py",
   "RS cc/detect.py",
   "R cc/door.py",
   "RS cc/family.py",
@@ -21,10 +20,10 @@ paths = [
   "R cc/resample.py",
   "R cc/resources.py",
   "RS cc/reverdict.py",
+  "RS cc/schema.py",
   "RS cc/score.py",
   "R cc/sign.py",
   "RS cc/view.py",
-  "R checks.toml",
   "RS fixtures/data/x7a-bc.toml",
   "DS inputs",
   "S inputs/TEMPLATE.m.toml.in",
@@ -63,18 +62,8 @@ paths = [
   "S inputs/x8-ising-needle",
   "S inputs/x9c-potts",
   "S inputs/x9c-potts-2",
-  "DS instruments",
-  "R instruments/across.toml",
-  "R instruments/across_delta.toml",
   "RS instruments/along.toml",
-  "R instruments/fluct.toml",
   "RS instruments/needle.toml",
-  "R instruments/needle_chain.toml",
-  "R instruments/needle_o.toml",
-  "R instruments/stability.toml",
-  "R instruments/stability_delta.toml",
-  "R instruments/transform.toml",
-  "R instruments/two_start.toml",
   "RS results/x7a-bc@v01-rules.json",
   "S tables/v01-rules",
   "RS tables/v01-rules/codes.toml",

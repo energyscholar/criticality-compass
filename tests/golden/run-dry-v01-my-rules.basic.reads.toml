@@ -2,7 +2,7 @@
 # never typed). Each entry: kinds (R read, S stat, D directory listed) and a path (~data/ = the data root).
 schema = 1
 kind = "golden-reads"
-key = "898f9555caff10032cd578d05d30a3d03bb8bcd784f457b3fedae7875ad45b28"
+key = "4b6f11a1aad8af42461a3958e0ccf98afa8f3a043ea16aa10fbe796fb9e440c9"
 paths = [
   "S .",
   "RS FROZEN.json",
@@ -24,12 +24,10 @@ paths = [
   "S cc/dataclasses.py",
   "RS cc/declare.py",
   "RS cc/detect.py",
-  "S cc/difflib.py",
   "RS cc/door.py",
   "S cc/enum.py",
   "RS cc/family.py",
   "RS cc/fingerprint.py",
-  "S cc/fnmatch.py",
   "RS cc/formats.py",
   "S cc/functools.py",
   "S cc/hashlib.py",
@@ -43,10 +41,8 @@ paths = [
   "S cc/instruments/contextlib.py",
   "S cc/instruments/copy.py",
   "S cc/instruments/dataclasses.py",
-  "S cc/instruments/difflib.py",
   "S cc/instruments/enum.py",
   "RS cc/instruments/fluct.py",
-  "S cc/instruments/fnmatch.py",
   "S cc/instruments/functools.py",
   "S cc/instruments/hashlib.py",
   "S cc/instruments/importlib.py",
@@ -57,7 +53,6 @@ paths = [
   "S cc/instruments/numpy.py",
   "S cc/instruments/os.py",
   "S cc/instruments/pathlib.py",
-  "S cc/instruments/re.py",
   "S cc/instruments/resource.py",
   "RS cc/instruments/stability.py",
   "RS cc/instruments/stability_delta.py",
@@ -75,13 +70,13 @@ paths = [
   "S cc/os.py",
   "S cc/pathlib.py",
   "RS cc/project.py",
-  "S cc/re.py",
   "RS cc/readout.py",
   "RS cc/reduce.py",
   "RS cc/resample.py",
   "S cc/resource.py",
   "RS cc/resources.py",
   "RS cc/reverdict.py",
+  "RS cc/schema.py",
   "RS cc/score.py",
   "RS cc/sign.py",
   "S cc/subprocess.py",
