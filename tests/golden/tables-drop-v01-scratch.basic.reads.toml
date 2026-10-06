@@ -1,8 +1,8 @@
 # tests/golden/<id>.<mode>.reads.toml - the RECORDED READ SET of one transcript (written by bin/cc test --regolden test_golden;
-# never typed). Each entry: kinds (R read, S stat, D directory listed) and a path (~data/ = the data root).
+# never typed). Each entry: kinds (R read, S stat, D directory listed) and a path (~data/ = the data root, ~toolset/ = the rest of the toolset root).
 schema = 1
 kind = "golden-reads"
-key = "e931c001e920ef136955826c8e1a6cf04de594a2b615bebcd433328e9c101a17"
+key = "a67b927209072e27fb859450e57bf8f86e04643e84459bf810c74e3e78f9ed01"
 paths = [
   "S .",
   "RS FROZEN.json",
@@ -384,4 +384,5 @@ paths = [
   "RS ~data/b7/L4-0.2747-L243.npz",
   "RS ~data/b7/L4-0.2747-L27.npz",
   "RS ~data/b7/L4-0.2747-L81.npz",
+  "RS ~toolset/tools/lattice_at.py",
 ]

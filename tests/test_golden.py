@@ -30,6 +30,7 @@ ROOT = Path(__file__).resolve().parent.parent
 GOLD = ROOT / "tests" / "golden"
 TRACE = ROOT / "tests" / "trace"
 DATA = Path(os.path.expanduser(tomllib.loads((ROOT / "cc.toml").read_text())["data"]["root"]))
+TOOLSET = DATA.parent   # the toolset root: a transducer's `update` sha check reads the sampler files here (plan 0890 P3)
 REGOLDEN = os.environ.get("CC_REGOLDEN") == "1"
 VERBOSE = os.environ.get("CC_VERBOSE") == "1"
 UNKEYED = os.environ.get("CC_UNKEYED") == "1"
@@ -49,7 +50,7 @@ def transcript(case, mode, traced=False):
         if traced:
             log.touch()
             env = {**os.environ, "PYTHONPATH": os.pathsep.join([str(TRACE), *filter(None, [os.environ.get("PYTHONPATH")])]),
-                   "CC_TRACE_LOG": str(log), "CC_TRACE_ROOT": str(repo), "CC_TRACE_DATA": str(DATA)}
+                   "CC_TRACE_LOG": str(log), "CC_TRACE_ROOT": str(repo), "CC_TRACE_DATA": str(DATA), "CC_TRACE_TOOLSET": str(TOOLSET)}
 
         def cc(args):
             return subprocess.run([sys.executable, str(repo / "bin" / "cc"), *args], capture_output=True, text=True, cwd=repo, env=env)
@@ -68,8 +69,9 @@ def read_set(log, repo):
     out = {"bin/cc": {"R"}}
     for line in log.splitlines():
         kind, p = line.split(" ", 1)
-        d = str(DATA).rstrip("/")
-        rel = (".", p[len(repo) + 1:])[p != repo] if p == repo or p.startswith(repo + "/") else "~data" + p[len(d):] if p == d or p.startswith(d + "/") else None
+        d, ts = str(DATA).rstrip("/"), str(TOOLSET).rstrip("/")
+        rel = ((".", p[len(repo) + 1:])[p != repo] if p == repo or p.startswith(repo + "/") else "~data" + p[len(d):] if p == d or p.startswith(d + "/")
+               else "~toolset" + p[len(ts):] if p == ts or p.startswith(ts + "/") else None)
         if rel is not None and not any(fnmatch.fnmatch(part, pat) for part in rel.split("/") for pat in NOT_READ):
             out.setdefault(rel, set()).add(kind)
     return {p: "".join(sorted(k)) for p, k in sorted(out.items())}
@@ -86,7 +88,7 @@ def sha(path):
 
 
 def live_path(rel):
-    return DATA / rel[len("~data/"):] if rel.startswith("~data") else ROOT / rel
+    return DATA / rel[len("~data/"):] if rel.startswith("~data") else TOOLSET / rel[len("~toolset/"):] if rel.startswith("~toolset") else ROOT / rel
 
 
 def listing(p):
@@ -120,7 +122,7 @@ def key_of(case, mode, paths):
 def reads_text(key, paths):
     body = "".join(f'  "{k} {p}",\n' for p, k in paths.items())
     return ("# tests/golden/<id>.<mode>.reads.toml - the RECORDED READ SET of one transcript (written by bin/cc test --regolden test_golden;\n"
-            "# never typed). Each entry: kinds (R read, S stat, D directory listed) and a path (~data/ = the data root).\n"
+            "# never typed). Each entry: kinds (R read, S stat, D directory listed) and a path (~data/ = the data root, ~toolset/ = the rest of the toolset root).\n"
             f'schema = 1\nkind = "golden-reads"\nkey = "{key}"\npaths = [\n{body}]\n')
 
 

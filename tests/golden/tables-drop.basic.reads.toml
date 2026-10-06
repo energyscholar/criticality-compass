@@ -1,8 +1,8 @@
 # tests/golden/<id>.<mode>.reads.toml - the RECORDED READ SET of one transcript (written by bin/cc test --regolden test_golden;
-# never typed). Each entry: kinds (R read, S stat, D directory listed) and a path (~data/ = the data root).
+# never typed). Each entry: kinds (R read, S stat, D directory listed) and a path (~data/ = the data root, ~toolset/ = the rest of the toolset root).
 schema = 1
 kind = "golden-reads"
-key = "12fdb3ba7d5be85c7671bb96764566051996e028e7493d5399a276191acbf43d"
+key = "7e4492405d1d136740d886e413de6b505621692660ecc960355ef16beb340a17"
 paths = [
   "RS FROZEN.json",
   "RS bin/cc",

@@ -5,7 +5,7 @@ process, appended at once (a process that ends by os._exit loses nothing):
   S <path>  stat'ed (exists, is_file, is_dir, stat().st_size ...), present or not
   D <path>  a directory listing taken (os.scandir, os.listdir: glob, iterdir, rglob, walk)
 and, at exit, R for every module file the process imported. Only paths under CC_TRACE_ROOT (the transcript's copy of the repo) and
-CC_TRACE_DATA (the data root) are logged; nothing else is part of the read set."""
+CC_TRACE_DATA (the data root) and CC_TRACE_TOOLSET (the toolset root, the data root's parent: where a transducer's `update` sha check reads) are logged; nothing else is part of the read set."""
 import atexit
 import io
 import os
@@ -15,13 +15,14 @@ _LOG = os.environ.get("CC_TRACE_LOG")
 if _LOG:
     _ROOT = os.environ["CC_TRACE_ROOT"].rstrip("/") + "/"
     _DATA = os.environ["CC_TRACE_DATA"].rstrip("/") + "/"
+    _TOOLSET = os.environ["CC_TRACE_TOOLSET"].rstrip("/") + "/"
     _seen = set()
     _fd = os.open(_LOG, os.O_WRONLY | os.O_APPEND | os.O_CREAT)
 
     def _note(kind, p):
         try:
             p = os.path.abspath(os.fsdecode(os.fspath(p)))
-            if (p + "/").startswith(_ROOT) or p.startswith(_ROOT) or p.startswith(_DATA) or (p + "/") == _ROOT or (p + "/") == _DATA:
+            if (p + "/").startswith(_ROOT) or p.startswith(_ROOT) or p.startswith(_DATA) or p.startswith(_TOOLSET) or (p + "/") == _ROOT or (p + "/") == _DATA or (p + "/") == _TOOLSET:
                 if (kind, p) not in _seen:
                     _seen.add((kind, p))
                     os.write(_fd, f"{kind} {p}\n".encode())
