@@ -7,7 +7,10 @@ Plan 0876 B (the key is the MEASUREMENT hash: the import closure, within cc/, of
 4. a one-byte edit to cc/view.py (in no closure) keeps every input's key, and `run` re-measures nothing
 5. a one-byte edit to cc/instruments/needle.py changes the key of exactly the inputs declaring an instrument whose module is needle
 6. a one-byte edit to cc/sign.py (readout's cut) changes every input's key (the closure is seeded from detect.py, door.py and the instruments)
-7. a one-byte edit to cc/kernel.py (in every closure) changes every input's key"""
+7. a one-byte edit to cc/kernel.py (in every closure) changes every input's key
+Plan 0886 (the validators are outside the closure; cc/schema.py holds what a measurement reads; stated on KEYS, nothing is measured):
+8. a one-byte edit to cc/declare.py (what `validate` checks) keeps every input's key
+9. a one-byte edit to cc/schema.py (what the measurement reads) changes every input's key"""
 import json
 import shutil
 import stat
@@ -120,5 +123,13 @@ with tempfile.TemporaryDirectory() as t:
     k3 = keys()
     check("one edited byte of cc/kernel.py (in every closure): every input's key moves", all(k3[n][0] != k2b[n][0] for n in k2b),
           str([n for n in k2b if k3[n][0] == k2b[n][0]]))
+    plant("cc/declare.py")
+    k4 = keys()
+    check(f"one edited byte of cc/declare.py (the validators, outside the measurement closure): every input keeps its key ({sum(k4[n][0] == k3[n][0] for n in k3)} of {len(k3)})",
+          all(k4[n][0] == k3[n][0] for n in k3), str([n for n in k3 if k4[n][0] != k3[n][0]]))
+    plant("cc/schema.py")
+    k5 = keys()
+    check(f"one edited byte of cc/schema.py (what the measurement reads): every input's key moves ({sum(k5[n][0] != k4[n][0] for n in k4)} of {len(k4)})",
+          all(k5[n][0] != k4[n][0] for n in k4), str([n for n in k4 if k5[n][0] == k4[n][0]]))
 print("test_reuse: " + ("FAILED" if bad else "all passed"))
 sys.exit(1 if bad else 0)
