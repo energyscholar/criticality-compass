@@ -82,7 +82,7 @@ start: bin/cc show b7-at-line
 
 # ------------------------------------------------------------------ test, validate, check
 def run_tests(names, skip=()):
-    """Run the scripts of checks.toml [roles].tests by absolute path: [(stem, ok, last lines, seconds)]."""
+    """Run the scripts of checks.toml [roles].tests by absolute path: [(stem, ok, last lines, seconds, all lines)]."""
     allt = [ROOT / f for f in tomllib.loads((ROOT / "checks.toml").read_text())["roles"]["tests"]]
     key = lambda t: (t.stem, t.name, str(t.relative_to(ROOT)))  # noqa: E731
     picked = [t for t in allt if (not names or set(names) & set(key(t))) and t.stem not in skip]
@@ -93,7 +93,7 @@ def run_tests(names, skip=()):
         t0 = time.time()
         r = subprocess.run([sys.executable, str(t)], capture_output=True, text=True, cwd=ROOT)
         lines = (r.stdout + r.stderr).strip().splitlines()
-        return (t.stem, r.returncode == 0, lines[-keep:], time.time() - t0)
+        return (t.stem, r.returncode == 0, lines[-keep:], time.time() - t0, lines)   # the tail is for printing; the FULL output is for the scoreboard lines (plan 0881 P2.2)
     alone = set(config()["check"]["exclusive"])   # cc.toml [check] exclusive: test NAMES that run by themselves, after the parallel batch (plan 0881)
     batch = [t for t in picked if t.stem not in alone]
     with ThreadPoolExecutor(max(1, (os.cpu_count() or 3) - 2)) as pool:   # each script is its own subprocess
@@ -118,16 +118,16 @@ def cmd_test(names):
     for n in missing:
         print(f"no test '{n}' in checks.toml [roles].tests\n  Next: bin/cc test <one of: "
               f"{' '.join(t.stem for t in allt)}>")
-    for stem, ok, tail, _ in res:
+    for stem, ok, tail, _, _ in res:
         print(f"{'ok  ' if ok else 'FAIL'} {stem}")
         if not ok or (VERBOSE and not regold):
             print("\n".join("    " + ln for ln in tail))
     if regold:
-        lines = [ln.strip() for _, _, tail, _ in res for ln in tail if ln.strip().startswith("REGOLDENED")]
+        lines = [ln.strip() for _, _, tail, _, _ in res for ln in tail if ln.strip().startswith("REGOLDENED")]
         print("\n".join(lines) + f"\nregoldened {len(lines)} files: review them with git diff tests/golden/")
-    if classify and not missing and all(ok for _, ok, _, _ in res):
+    if classify and not missing and all(ok for _, ok, _, _, _ in res):
         return report_classes(gold, before)
-    return 1 if missing or not all(ok for _, ok, _, _ in res) else 0
+    return 1 if missing or not all(ok for _, ok, _, _, _ in res) else 0
 
 
 def report_classes(gold, before):
@@ -196,7 +196,7 @@ RECORD = "tests/BASELINE.txt"
 
 def write_baseline(res, took):
     """A green check records what it ran on: tree, HEAD, and every test's NAME, status and seconds."""
-    rows = [f"test {stem} {'ok' if ok else 'FAIL'} {sec:.1f}" for stem, ok, _, sec in res]
+    rows = [f"test {stem} {'ok' if ok else 'FAIL'} {sec:.1f}" for stem, ok, _, sec, _ in res]
     (ROOT / RECORD).write_text(f"tree {tree_hash()}\nhead {head_hash()}\nseconds {took:.0f}\n" + "\n".join(rows) + "\n")
 
 
@@ -231,9 +231,9 @@ def cmd_check(args):
     bad = [r for r in res if not r[1]]
     skipped = f" (fast: {len(slow)} slow tests skipped; bin/cc check runs them)" if fast else ""
     print(f"check: {len(res) - len(bad)} tests passed, {len(bad)} failed{skipped}")
-    print("\n".join("check: " + ln.strip() for _, _, tail, _ in res for ln in tail if ln.strip().startswith("scoreboard ")))
-    print("check: seconds per test\n" + "\n".join(f"  {sec:7.1f} s  {stem}" for stem, _, _, sec in res))
-    for stem, _, tail, _ in bad:
+    print("\n".join("check: " + ln.strip() for _, _, _, _, full in res for ln in full if ln.strip().startswith("scoreboard ")))
+    print("check: seconds per test\n" + "\n".join(f"  {sec:7.1f} s  {stem}" for stem, _, _, sec, _ in res))
+    for stem, _, tail, _, _ in bad:
         print(f"check: FAILED: {stem}\n" + "\n".join("    " + ln for ln in tail) + f"\n  Next: bin/cc test {stem}")
     took, budget = time.time() - t0, config()["check"]["fast_budget_s"]
     if not bad:
