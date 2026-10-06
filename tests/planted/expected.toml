@@ -167,3 +167,24 @@ text = "tests/planted/input-along-two-sizes.toml:axes.size: along accumulates B 
 file = "instrument-requires-unknown.toml"
 fix = ["requires = [\"nosuch\"]", "requires = [\"needle\"]"]
 text = "tests/planted/instrument-requires-unknown.toml:requires: 'nosuch' must be a registry instrument with no requires of its own\n  Next: name an instrument that is read first (one level in v0.1)"
+
+[[plant]]
+file = "transducer-reduction-no-discards.toml"
+fix = ['''keeps = "the typical value at the locus"
+''', '''keeps = "the typical value at the locus"
+discards = "the order of the configurations"
+''']
+text = '''tests/planted/transducer-reduction-no-discards.toml:reduction.discards: missing required field
+  Next: add discards = ... to tests/planted/transducer-reduction-no-discards.toml'''
+
+[[plant]]
+file = "transducer-role-not-the-sentence.toml"
+fix = ['''the interval is an operator input''', '''projection C: places the reading's sign cell against its declared margin; never an operator input''']
+text = '''tests/planted/transducer-role-not-the-sentence.toml:interval.role: 'the interval is an operator input' is not the declared role
+  Next: write role = "projection C: places the reading's sign cell against its declared margin; never an operator input"'''
+
+[[plant]]
+file = "transducer-sha-one-digit-off.toml"
+fix = ['''4f63c0016880c2ce9a55c77cd8de739755bac8f8b26418ad029f61ff3bec9880''', '''4f63c0016880c2ce9a55c77cd8de739755bac8f8b26418ad029f61ff3bec9886''']
+text = '''tests/planted/transducer-sha-one-digit-off.toml:transducer.update[0]: tools/lattice_at.py sha256 4f63c0016880c2ce9a55c77cd8de739755bac8f8b26418ad029f61ff3bec9880 differs from the toolset file's 4f63c0016880c2ce9a55c77cd8de739755bac8f8b26418ad029f61ff3bec9886
+  Next: write tools/lattice_at.py sha256 4f63c0016880c2ce9a55c77cd8de739755bac8f8b26418ad029f61ff3bec9886'''

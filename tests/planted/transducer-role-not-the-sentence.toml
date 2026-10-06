@@ -1,0 +1,20 @@
+# tests/planted/transducer-role-not-the-sentence.toml - PLANT (plan 0883): [interval] role is not the declared sentence
+schema = 1
+kind = "transducer"
+id = "plant"
+
+[transducer]
+model = "2D Ashkin-Teller, periodic simulated lattice"
+update = ["tools/lattice_at.py sha256 4f63c0016880c2ce9a55c77cd8de739755bac8f8b26418ad029f61ff3bec9886"]
+inputs = "m.toml [B7], studies/B7/simulate.py"
+output = "one configuration per recorded sweep; each configuration is one observation; the recorded sequence is NOT a process sequence (Phase 1 only)"
+
+[reduction]
+name = "per-locus mean"
+keeps = "the typical value at the locus"
+discards = "the order of the configurations"
+
+[interval]
+role = "the interval is an operator input"
+keeps = "the position of the interval ends among the cuts"
+discards = "the shape of the resampled distribution"

@@ -213,6 +213,7 @@ def read_hashes(m, input_id, tables, T, c):
     """sha256 of exactly the files a run reads; a data file that differs from its pin is refused."""
     name = f"inputs/{input_id}/m.toml"
     read = {name: schema.sha(ROOT / name)}
+    read[f"inputs/{input_id}/transducer.toml"] = schema.sha(ROOT / "inputs" / input_id / "transducer.toml")   # plan 0883: the transducer file is pinned (unconditionally: validate refuses an input without it)
     for n in m["instruments"]:
         read[f"instruments/{n}.toml"] = schema.sha(ROOT / "instruments" / f"{n}.toml")
     for path in T.paths:

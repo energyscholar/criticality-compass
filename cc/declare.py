@@ -10,6 +10,7 @@ from dataclasses import dataclass, fields as dc_fields
 from pathlib import Path
 import numpy as np
 import formats
+from transducer import chk_transducer
 from schema import ROOT, F, at, rel, _parsed, parse, load, row_lines, Ctx, unit_blocks, _SHA_ONCE, hashing_once, _sha, sha, MEASURE_SEEDED, import_closure, measure_hash, code_hash, code_cols, declared_cols  # noqa: F401  (moved by plan 0886; re-exported: the call sites keep `declare.<name>`)
 
 SIGNS = ("SIG-", "NEG", "SLOW-", "ZERO!", "SLOW+", "POS", "SIG+", "UNRES")
@@ -992,7 +993,8 @@ def factorisation(root, tset):
 KIND = {"membership": chk_membership, "case": chk_case, "points": chk_points, "input": chk_input, "instrument": chk_instrument,
         "codes": chk_codes, "verdict": chk_verdict, "data-manifest": chk_manifest, "cc": chk_cc,
         "family": chk_family, "family-decl": chk_family_decl, "geometry": chk_geometry, "order": chk_order,
-        "compose": chk_compose, "probe": chk_probe, "couplings": chk_couplings}
+        "compose": chk_compose, "probe": chk_probe, "couplings": chk_couplings,
+        "transducer": chk_transducer, "record": chk_transducer}
 
 
 def check_file(path, root=ROOT, ctx=None, **over):
@@ -1001,7 +1003,7 @@ def check_file(path, root=ROOT, ctx=None, **over):
     c, path = ctx or Ctx(Path(root).resolve(), **over), Path(path)
     p = rel(path.resolve() if path.is_absolute() else path, c.root)
     real = c.root in path.resolve().parents and "planted" not in path.parts
-    stem = (path.parent.name if path.name in ("m.toml", "points.toml", "couplings.toml") else path.stem) if real else None
+    stem = (path.parent.name if path.name in ("m.toml", "points.toml", "couplings.toml", "transducer.toml") else path.stem) if real else None
     d, bad = load(path, c.root)
     if bad:
         return bad
@@ -1025,18 +1027,22 @@ def _validate(root, ctx, input_id, tables):
         names = (load(m, root)[0] or {}).get("instruments", [])
         files = [root / "cc.toml", m] + [root / "instruments" / f"{i}.toml" for i in names]
         files += [root / "fixtures" / "data" / f"{input_id}.toml"]
+        tfiles = [root / "inputs" / input_id / "transducer.toml"]
     else:
         ins = sorted((root / "inputs").glob("*/m.toml"))
         files = [root / "cc.toml"] + ins + sorted((root / "instruments").glob("*.toml"))
         files += [root / "fixtures" / "data" / f"{m.parent.name}.toml" for m in ins]
         files += sorted(f for f in (root / "cases").glob("*.toml") if not f.name.startswith("TEMPLATE"))
         files += sorted((root / "inputs").glob("*/points.toml"))
+        tfiles = [m.parent / "transducer.toml" for m in ins]
     files += [root / "tables" / s / f for s in sets for f in ("codes.toml", "verdict.toml")]
     files += [f for s in sets if not input_id for n in ("membership", "family") if (f := root / "tables" / s / f"{n}.toml").is_file()]
     files += [f for s in sets for n in ("geometry", "order", "probe", "compose") if (f := root / "tables" / s / f"{n}.toml").is_file()]
     files += [f for f in sorted((root / "inputs").glob("*/couplings.toml")) if not input_id or f.parent.name == input_id]
     files += sorted((root / "families").glob("*.toml")) if not input_id and (root / "families").is_dir() else []
     out, n = [], {}
+    files += [f for f in tfiles if f.is_file()]
+    out += [at(rel(f, root), "", "missing", f"copy inputs/TEMPLATE.transducer.toml.in to inputs/{f.parent.name}/transducer.toml and fill every TODO") for f in tfiles if not f.is_file()]   # plan 0883: total, a refusal never a skip
     for f in files:
         kind = (load(f, root)[0] or {}).get("kind", "?")
         n[kind] = n.get(kind, 0) + 1
