@@ -49,6 +49,8 @@ level = 0.95
 window_s = 1.5
 window_max = 400
 door_z = 3.0
+tau_declared = 36    # samples (plan 0891). The floor n >= k_gamma * tau_declared reads THIS, never Gamma's own estimate
+tau_source = "this input's own stored result results/x2b-xy-4@v08-rules.json: the largest Wolff window W over its 110 W:* reports is 36 samples (an upper bound on the correlation time there; the 0889 cell's tau_int is 2.04); n = 600000 per file"
 
 [eps]
 step = 0.01

@@ -51,7 +51,7 @@ definition = "TODO"
 unit_scale = { "TODO" = "TODO" }               # size (quoted) -> declared unit scale
 
 [interval]
-method = "TODO"                                # block (needs b) | iid (needs tau_declared = 1) | gamma (window_s, window_max, door_z, level; no b/resamples/seed): cc.toml [interval_fields]
+method = "TODO"                                # block (needs b) | iid (needs tau_declared = 1) | gamma (window_s, window_max, door_z, level, tau_declared, tau_source; no b/resamples/seed; n >= k_gamma * tau_declared): cc.toml [interval_fields]
 b = "TODO"
 resamples = "TODO"
 level = "TODO"

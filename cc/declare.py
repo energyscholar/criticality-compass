@@ -313,6 +313,26 @@ def block_floor(p, iv, lengths):
                f"b must also be >= k*tau for the record's integrated autocorrelation time tau, so this record admits k*tau <= {n // mb}")]
 
 
+def gamma_floor(p, iv, lengths, k):
+    """plan 0891: method gamma declares the input's own correlation time (`tau_declared`, with its `tau_source`) and every declared file must hold n >= k_gamma * tau_declared
+    samples (k_gamma: cc.toml [interval_fields.gamma], derived in the toolset's results/0891.txt), else the input is refused (a finding at validate and at run; never a warning).
+    The floor reads the DECLARED tau, never Gamma's own estimate (biased low on exactly the short series the floor guards). A missing or non-integer tau_declared is the schema's refusal."""
+    td = iv.get("tau_declared")
+    if iv.get("method") != "gamma" or not isinstance(td, int) or isinstance(td, bool):
+        return []
+    if td < 1:
+        return [at(p, "interval.tau_declared", f"tau_declared = {td} is not a correlation time of at least 1 sample", "declare tau_declared as the record's measured correlation time in samples (>= 1), with its tau_source")]
+    need = k * td
+    short = sorted((n, path, key) for path, key, n in lengths if n < need)
+    if not short:
+        return []
+    n, path, key = short[0]
+    return [at(p, "interval.tau_declared",
+               f"{len(short)} of {len(lengths)} declared arrays hold fewer than k_gamma * tau_declared = {k} * {td} = {need} samples (the shortest: {path} key {key}, n {n})",
+               f"the record is shorter than its own correlation time allows: use a longer record, or correct tau_declared = {td} (and its tau_source) if it is wrong; the floor is n >= k_gamma * tau_declared "
+               f"with k_gamma = {k} (cc.toml [interval_fields.gamma]), so this record admits tau_declared <= {n // k}")]
+
+
 def chk_data(p, m, c):
     d, out, blocks, ax, lengths = m["data"], [], {}, m["axes"], []
     out += shape(p, d, {"format": str, "files": list}, pre="data.")
@@ -339,6 +359,7 @@ def chk_data(p, m, c):
             out += got
             lengths += [] if got else [(b["path"], a["key"], series_length(m, name, fp, a["key"], c))]
     out += block_floor(p, m["interval"], lengths)
+    out += gamma_floor(p, m["interval"], lengths, c.cfg["interval_fields"]["gamma"]["k_gamma"])
     for iname in m["instruments"]:
         inst = c.reg[iname]
         sizes, starts = unit_blocks(m, inst)

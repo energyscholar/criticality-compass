@@ -43,9 +43,10 @@ read = "{resamples} {method} resamples"
 read_pair = "{resamples} {method} resamples"
 
 [interval_fields.gamma]
-required = { method = "str", level = "num", window_s = "num", window_max = "int", door_z = "num" }
+required = { method = "str", level = "num", window_s = "num", window_max = "int", door_z = "num", tau_declared = "int", tau_source = "str" }
 optional = {}
 level_in = "levels"
+k_gamma = 64          # plan 0891: the floor n >= k_gamma * tau_declared on every declared array. DERIVED, not chosen: the smallest n/tau at which the nominal-95 % Gamma interval covers >= 0.90 at every tau in {2, 7, 30, 100, 250} (toolset results/0891.txt, 2000 AR(1) series per cell). tau_declared is the INPUT's declared tau, never Gamma's own estimate (that is biased low on a short series)
 diff_step = 0.001     # the finite-difference step of the linearisation rows, as a fraction of each primary's naive SE (a stage may be nonlinear, e.g. ln: the step must stay small against the quantity)
 show = "window_s {window_s}, window_max {window_max}, door_z {door_z}, level {level}"
 read = "{method}, window_s {window_s}, window_max {window_max}"

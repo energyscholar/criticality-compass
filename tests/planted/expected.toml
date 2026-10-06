@@ -216,3 +216,16 @@ text = "tests/planted/input-gamma-with-b.toml:interval.b: unknown field\n  Next:
 file = "input-gamma-level.toml"
 fix = ["level = 0.9\n", "level = 0.95\n"]
 text = "tests/planted/input-gamma-level.toml:interval.level: level 0.9 has no z in cc.toml [levels] (declared: 0.95)\n  Next: use one of the declared levels: 0.95; or add the z of that level to cc.toml [levels]"
+
+# plan 0891: method gamma declares the input's own tau (`tau_declared` + `tau_source`) and refuses n < k_gamma * tau_declared (k_gamma 64, cc.toml [interval_fields.gamma]).
+# input-gamma-short.toml: x8-ising-needle read as gamma, tau_declared 40 (64 * 40 = 2560 > n 1600); the fix tau_declared = 25 (64 * 25 = 1600) passes the floor.
+[[plant]]
+file = "input-gamma-short.toml"
+fix = ["tau_declared = 40\n", "tau_declared = 25\n"]
+text = "tests/planted/input-gamma-short.toml:interval.tau_declared: 18 of 18 declared arrays hold fewer than k_gamma * tau_declared = 64 * 40 = 2560 samples (the shortest: p1/g1-0.90.npy key npy, n 1600)\n  Next: the record is shorter than its own correlation time allows: use a longer record, or correct tau_declared = 40 (and its tau_source) if it is wrong; the floor is n >= k_gamma * tau_declared with k_gamma = 64 (cc.toml [interval_fields.gamma]), so this record admits tau_declared <= 25"
+
+# input-gamma-no-tau.toml: the same input as gamma with no tau_declared: refused (total), never defaulted.
+[[plant]]
+file = "input-gamma-no-tau.toml"
+fix = ["window_s = 1.5\n", "window_s = 1.5\ntau_declared = 25\n"]
+text = "tests/planted/input-gamma-no-tau.toml:interval.tau_declared: missing required field\n  Next: add tau_declared = ... to tests/planted/input-gamma-no-tau.toml"
