@@ -2,7 +2,7 @@
 # never typed). Each entry: kinds (R read, S stat, D directory listed) and a path (~data/ = the data root).
 schema = 1
 kind = "golden-reads"
-key = "76c30f7190f41ee08615a4cfd91d6179f12d05f5fcf8da924300acada37df1f5"
+key = "b823a2d67e0321b7f18bd8dbf78ead3534cc445d8f8bdd47936055ed6632a3d6"
 paths = [
   "DS .",
   "D .githooks",
@@ -368,17 +368,21 @@ paths = [
   "R results/reduced/x4s-stack/0b39788e6e6d0b20f3e0a5b91fe75b30056893c4e68ce8ffc1b6c01e665eaa08.npz",
   "R results/reduced/x4s-stack/0d074c05e691f4f8c4ba7d5335c4ade32a479b5e0d3e0af9e4e881eb77360cfc.npz",
   "R results/reduced/x4s-stack/0dc8306ac9dad46db69b2aa22f862e11d64f12120e4d5fe11ab82122913c320f.npz",
+  "R results/reduced/x4s-stack/1391301a54f7c77fda9ec62dfda92c089567340cef0c35296fa3a33795e6e301.npz",
   "R results/reduced/x4s-stack/13a9cdecef783de3b20155ed393db63cb8278257889b6eac1606d5bfa1ab8335.npz",
   "R results/reduced/x4s-stack/14091479a616de4f27afb2fc39964c35a0f2bc6593c2b5263fb11e4bcb17cbfa.npz",
   "R results/reduced/x4s-stack/140e9d5a4294e7764069c1245a48f6654ca88e8d83d74b36650f73e567f575b5.npz",
   "R results/reduced/x4s-stack/1786312be2b9b1fa6e1ca36e5ec3cb469afa11bfe9946ca5bb713152d8d07d49.npz",
   "R results/reduced/x4s-stack/1830f130761a18957ce6476862ea6818038d88e15e4d9744f8af82c72c3f7fb9.npz",
+  "R results/reduced/x4s-stack/1c9a6ccf8a60c777d7e0c976b7d5dbec12f16b1e03ec5dbde24c624bddb5e072.npz",
   "R results/reduced/x4s-stack/3d3714bb382d0713d70a40dc7cc8e79f6b49c82284cc7f00892d4de8407775dc.npz",
   "R results/reduced/x4s-stack/4e9dbea43de093943c87cede542a275395bb5ea044da77998e8e9364556da537.npz",
+  "R results/reduced/x4s-stack/56b42a3f33893b4a16415f8f9699389b4f89cbcb9c9d058058854bf66baf598d.npz",
   "R results/reduced/x4s-stack/5d0441f25cc0cb97dea46a40264382db37d48b5784c8008d5e83fa2862cc933d.npz",
   "R results/reduced/x4s-stack/5e84d2049765acb5bfacc34fa3a88cb11e44dff5314b64c4d33e4e057ec1cb51.npz",
   "R results/reduced/x4s-stack/63ce0362da913056e70047cfe927619b203312388cfceea98bb817dde9afc753.npz",
   "R results/reduced/x4s-stack/6e82c1c2479fef2f8eb8e36a7a1b2d339e6943520c0924367be4f46481942a02.npz",
+  "R results/reduced/x4s-stack/712a50ae56cf1322aa5547639dd729f102b437f277e35a82b218c8e6dfa179e5.npz",
   "R results/reduced/x4s-stack/762052ecafd348c184af1eb64e45d1c6b2695713fef5b36a3f7856ee49248d00.npz",
   "R results/reduced/x4s-stack/7e9d20295282e557e63776e48a7f3367c9a809d031c0945449d10690a76bac60.npz",
   "R results/reduced/x4s-stack/7ee38da2a0d8d19d118e8d7ca07dae3a2b2a729701c0f2ede4e7885cce9c52e5.npz",
@@ -395,11 +399,13 @@ paths = [
   "R results/reduced/x4s-stack/c35369396cef9462c36911acb6604a8f49d1fd51988e17827789b31618cf8fb1.npz",
   "R results/reduced/x4s-stack/c724c0d17151e209b376260a24dbcafcbe603b224156be00f93aa83643e2c02e.npz",
   "R results/reduced/x4s-stack/cfa25ff161fc85b11730d5daeb923a201fa01cf5d1342f4347b6359d595b153b.npz",
+  "R results/reduced/x4s-stack/d33e989265df9e33bbb88b0793a14d3105ed8b58b56bce6b6ed089b15fb0e4d3.npz",
   "R results/reduced/x4s-stack/d7eed0c5cafb5a7571227ab162835095440684bbc4d66787ff57b6908edabc1a.npz",
   "R results/reduced/x4s-stack/d839f90cd57fcded60aef561c59bcef5c12491c09b96eac7df6e72aa8bce8106.npz",
   "R results/reduced/x4s-stack/d9dc112bad522839ac82da989dab29d9ff179b49b4b5499a9dc2bef27c3a60ae.npz",
   "R results/reduced/x4s-stack/e6c679a9bf79169be03f35de1256c06b747438e7fd59053a728f810465a958cb.npz",
   "R results/reduced/x4s-stack/ed819b0c09414a6f3f0dd746fb6415b356d1baef61a95ddba2e01d166e954242.npz",
+  "R results/reduced/x4s-stack/f5bf8f8b1c499c2b02bd375566dbe175bc8f9d6b093da523ddaa2f24e8edf881.npz",
   "R results/reduced/x4s-stack/f9bbf2c387917c5149c0ec14797d245246f89c2ece137595e989e7677478872a.npz",
   "R results/reduced/x4s-stack/f9db28f74c07e5f3d7fbfe93aff46e79cf4d17a5d26c570a1767d89b57164ec1.npz",
   "R results/reduced/x4s-stack/fa0dc0a8d4d6b11000e231d0f2c34646ca7e7df52d3a6ce21e7882296452e646.npz",
