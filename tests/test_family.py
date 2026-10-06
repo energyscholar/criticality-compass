@@ -59,6 +59,15 @@ with tempfile.TemporaryDirectory() as tmp:
         (Path(tmp) / "d.toml").write_text('schema = 1\nkind = "family-decl"\nid = "d"\n' + body + "\n")
         found = declare.check_file(Path(tmp) / "d.toml", ROOT)
         check(f"a declaration with {name} is refused", any(frag in f.msg for f in found), str(found))
+    pre = 'schema = 1\nkind = "family-decl"\nid = "d"\n'
+    for name, body, frag in (("an unknown rule name", 'input = "x2b-xy-3"\ninterior = "mid-run"', "mid-run-open"),
+                             ("a hand list on an all-observed input", 'input = "c2-bc-two-start"\ninterior = ["d2.0-K1.0", "d2.0-K1.2"]',
+                              'interior = "mid-run-open"')):
+        (Path(tmp) / "d.toml").write_text(pre + body + "\n")
+        found = declare.check_file(Path(tmp) / "d.toml", ROOT)
+        check(f"a declaration with {name} is refused naming the rule", any(frag in f.msg + f.nxt for f in found), str(found))
+    (Path(tmp) / "d.toml").write_text(pre + 'input = "x2b-xy-3"\ninterior = "mid-run-open"\n')
+    check("interior = \"mid-run-open\" on x2b-xy-3 is accepted", declare.check_file(Path(tmp) / "d.toml", ROOT) == [])
     (Path(tmp) / "r" / "families").mkdir(parents=True)
     (Path(tmp) / "r" / "families" / "TEMPLATE.toml.in").write_text((ROOT / "families" / "TEMPLATE.toml.in").read_text())
     author.new_family(Path(tmp) / "r", "fresh")

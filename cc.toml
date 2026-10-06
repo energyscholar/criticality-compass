@@ -14,6 +14,7 @@ class_truth = ["POINT", "LINE", "WALKING", "FIRST-ORDER", "MULTI", "BKT-END", "N
 order_truth = ["CONTINUOUS", "FIRST-ORDER", "NONE"]   # a case's true order of the transition (cases/*.toml order_truth)
 status = ["declared", "sampler-tested", "run", "in-signature-table"]    # ordered
 obtained = ["truth", "navigated", "observed"]   # how a point was obtained (m.toml [obtained])
+interior_rule = ["mid-run-open"]   # a family's `interior` as a declared rule (plan 0879): the MID run of the needle codes, open at a sink side
 formats = ["npz-v1", "npy-v1", "snapshots-v1", "image-stack-v1"]
 limited = ["none", "assigned", "resolution-limited"]   # [block_map] limited: what the finest level is (plan 0873): a value that is not a measured site
 replay = ["locked", "all"]   # [check] replay (plan 0886): `locked` replays the inputs expected/<set>.toml names; `all` replays every input on disk

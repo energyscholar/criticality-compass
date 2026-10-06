@@ -763,7 +763,7 @@ def chk_family_decl(p, d, c, stem=None):
     """A family declaration: an input, >= 2 interior points of it, and (when it declares a pair instrument) control edges."""
     import door
     out = list(todos(p, d))
-    out = out or header(p, d, "family-decl") + shape(p, d, {"id": str, "input": str, "interior": list})
+    out = out or header(p, d, "family-decl") + shape(p, d, {"id": str, "input": str, "interior": (list, str)})
     out = out or id_check(p, "id", d["id"], stem, "the file name")
     if out:
         return out
@@ -771,6 +771,10 @@ def chk_family_decl(p, d, c, stem=None):
     if bad:
         return [at(p, "input", f"no input '{d['input']}'",
                    f"use one of: {' '.join(sorted(q.parent.name for q in (c.root / 'inputs').glob('*/m.toml')))}")]
+    if isinstance(d["interior"], str):   # plan 0879: the interior is a declared rule (cc/family.py interior_of), not a list
+        return inalpha(p, "interior", d["interior"], c.alpha["interior_rule"])
+    if m.get("obtained") and set(m["obtained"].values()) == {"observed"}:   # nobody knows the interior of an all-observed record
+        return [at(p, "interior", f"{d['input']} has only observed points, so a hand list would be written from the answer", 'use interior = "mid-run-open"')]
     pts, inner = m["axes"]["point"], d["interior"]
     out += when(len(inner) < 2, p, "interior", "a family needs at least two points", "list two or more points of the input")
     out += [at(p, "interior", f"'{x}' is not a point of {d['input']}", f"use points of {' '.join(pts)}") for x in inner if x not in pts]
