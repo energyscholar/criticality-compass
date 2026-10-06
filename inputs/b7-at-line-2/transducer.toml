@@ -1,0 +1,23 @@
+# inputs/b7-at-line-2/transducer.toml - the transducer file (plan 0883, Q0): the sampler, what the per-locus mean keeps and discards, the interval's role.
+schema = 1
+kind = "transducer"
+id = "b7-at-line-2"
+
+[transducer]
+model = "2D Ashkin–Teller on the self-dual line, periodic SIMULATED lattice"
+update = ["tools/lattice_at.py sha256 4f63c0016880c2ce9a55c77cd8de739755bac8f8b26418ad029f61ff3bec9886"]
+inputs = "m.toml [B7] · studies/B7/simulate.py"
+output = "one configuration per recorded sweep; each configuration is one observation; the recorded sequence is NOT a process sequence (Phase 1 only)"
+
+[reduction]
+name = "per-locus mean of the declared observable over the declared configurations"
+keeps = "the typical value of the observable at the locus (one point, one size, one start)"
+discards = "the configuration-to-configuration variation and the order of the configurations"
+
+[interval]
+role = "projection C: places the reading's sign cell against its declared margin; never an operator input"
+keeps = "the position of the interval ends among the cuts -eps, 0, +eps"
+discards = "the shape of the resampled distribution"
+
+[provenance_note]
+declared_after = ["b7-at-line-2@v01-rules", "b7-at-line-2@v02-rules", "b7-at-line-2@v03-rules", "b7-at-line-2@v04-rules", "b7-at-line-2@v05-rules", "b7-at-line-2@v06-rules", "b7-at-line-2@v07-rules"]
