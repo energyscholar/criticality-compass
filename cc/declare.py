@@ -30,6 +30,7 @@ HINT = {"family": "a short description of the model", "mechanism": "one sentence
         "key": "the array's key in the data file (np.load(path).files lists them)",
         "template": "one of: chain, pair, all-pairs, matched, matched-chain (and that template's fields)"}
 NUM = (int, float)
+FIELD_TYPES = {"str": str, "int": int, "num": NUM}   # cc.toml [interval_fields] names a field's type by these words
 
 
 def fmt(f):
@@ -138,10 +139,15 @@ def _regex_ok(x):
 
 def chk_cc(p, d, c, stem=None):
     top = {k: dict for k in ("defaults", "data", "alphabets", "flags", "obtained_flag", "arrays", "basic", "check", "golden")}
-    out = header(p, d, "cc") + shape(p, d, top, {"formats": dict, "transducer": dict})
+    out = header(p, d, "cc") + shape(p, d, top, {"formats": dict, "transducer": dict, "levels": dict, "interval_fields": dict})
     if out:
         return out
     out += when("interval_method" not in d["alphabets"], p, "alphabets.interval_method", "missing", 'write interval_method = ["block", "iid"]')
+    methods, fields_ = d["alphabets"].get("interval_method", []), d.get("interval_fields", {})   # plan 0878: every method of the alphabet has its fields table, and no table names a method outside it
+    out += [at(p, f"interval_fields.{k}", "no [interval_fields] table for this method of alphabets.interval_method" if k in methods else "not a method of alphabets.interval_method",
+               f"add [interval_fields.{k}] with required = {{...}}" if k in methods else f"delete [interval_fields.{k}]") for k in sorted(set(methods) ^ set(fields_))]
+    out += [at(p, f"levels.{k}", "a level's z must be a number above 0", "write the z of that level, e.g. \"0.95\" = 1.959964")
+            for k, v in d.get("levels", {}).items() if not (isinstance(v, NUM) and v > 0)]
     if "transducer" in d:   # plan 0883: the transducer file's sentences are data; the kinds are the two this code has a schema for
         out += shape(p, d["transducer"], {"kinds": list, "phase1_output": str, "phase2_output": str, "interval_role": str}, pre="transducer.")
         out += when(d["transducer"].get("kinds") != ["transducer", "record"], p, "transducer.kinds", f"{d['transducer'].get('kinds')} is not ['transducer', 'record']",
@@ -281,8 +287,30 @@ def chk_array(p, loc, name, a, b, fp, m, c):
                    if bad_levels else [])
 
 
+def series_length(m, name, fp, key, c):
+    """n, the number of snapshots one declared array holds, from the file's HEADER (a stack's raw N, or the stored array's first axis)."""
+    shp = formats.shape_of(m["data"]["format"], fp, key, str(c.root)) if name in formats.schemas(str(c.root)).get(m["data"]["format"], {"reduces": ()})["reduces"] else stored(c, fp, key)[0]
+    return shp[0]
+
+
+def block_floor(p, iv, lengths):
+    """plan 0878: with [interval] min_blocks declared (block method), every declared file must hold n // b >= min_blocks blocks, else the input is refused
+    (a Null at run, a finding at validate; never a warning). The Next line names the two declared routes."""
+    mb, b = iv.get("min_blocks"), iv.get("b")
+    if mb is None or iv.get("method") != "block" or not isinstance(b, int) or b < 1:
+        return []
+    short = sorted((n // b, path, key, n) for path, key, n in lengths)
+    if not short or short[0][0] >= mb:
+        return []
+    k, path, key, n = short[0]
+    return [at(p, "interval.min_blocks",
+               f"{sum(x[0] < mb for x in short)} of {len(short)} declared arrays hold fewer than min_blocks = {mb} blocks of b = {b} (the shortest: {path} key {key}, n {n} // b {b} = {k})",
+               f'declare method = "gamma" (window_s, window_max, door_z, level; cc.toml [interval_fields.gamma]), or keep method = "block" with b <= {n // mb} (n {n} // min_blocks {mb}): '
+               f"b must also be >= k*tau for the record's integrated autocorrelation time tau, so this record admits k*tau <= {n // mb}")]
+
+
 def chk_data(p, m, c):
-    d, out, blocks, ax = m["data"], [], {}, m["axes"]
+    d, out, blocks, ax, lengths = m["data"], [], {}, m["axes"], []
     out += shape(p, d, {"format": str, "files": list}, pre="data.")
     out += inalpha(p, "data.format", d.get("format"), c.alpha["formats"])
     for i, b in enumerate(d.get("files", [])):
@@ -303,7 +331,10 @@ def chk_data(p, m, c):
                           "fix the path, or put the file there"))
             continue
         for name, a in b["arrays"].items():
-            out += chk_array(p, loc, name, a, b, fp, m, c)
+            got = chk_array(p, loc, name, a, b, fp, m, c)
+            out += got
+            lengths += [] if got else [(b["path"], a["key"], series_length(m, name, fp, a["key"], c))]
+    out += block_floor(p, m["interval"], lengths)
     for iname in m["instruments"]:
         inst = c.reg[iname]
         sizes, starts = unit_blocks(m, inst)
@@ -413,11 +444,13 @@ def chk_input(p, d, c, stem=None):
                 f"operators {sorted(need('operators') - set(d['kernel'].get('uses', [])))} of declared "
                 "instruments are not in kernel.uses", "add them")
     iv = d["interval"]
-    out += shape(p, iv, {"method": str, "resamples": int, "level": NUM, "seed": int},
-                 {"b": int, "tau_declared": int}, pre="interval.")
     out += inalpha(p, "interval.method", iv.get("method"), c.alpha["interval_method"])   # plan 0883: the alphabet is cc.toml data
-    out += when(iv.get("method") == "block" and "b" not in iv, p, "interval.b", "block resampling needs b",
-                "add b = <block length>")
+    spec = c.cfg["interval_fields"].get(iv.get("method"), {})   # plan 0878: the fields of each method are cc.toml data too ([interval_fields.<method>])
+    out += shape(p, iv, {k: FIELD_TYPES[t] for k, t in spec.get("required", {}).items()}, {k: FIELD_TYPES[t] for k, t in spec.get("optional", {}).items()}, pre="interval.") if spec else []
+    z = c.cfg[spec["level_in"]] if "level_in" in spec else None   # a method that reads z from a declared table refuses a level the table does not hold
+    out += when(z is not None and isinstance(iv.get("level"), NUM) and str(iv["level"]) not in z, p, "interval.level",
+                f"level {iv.get('level')} has no z in cc.toml [{spec.get('level_in')}] (declared: {' '.join(z or {})})",
+                f"use one of the declared levels: {' '.join(z or {})}; or add the z of that level to cc.toml [{spec.get('level_in')}]")
     out += when(iv.get("method") == "iid" and iv.get("tau_declared") != 1, p, "interval.tau_declared",
                 "iid resampling needs tau_declared = 1", "add tau_declared = 1")
     return todo + (out if out else chk_data(p, d, c))

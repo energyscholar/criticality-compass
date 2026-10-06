@@ -188,3 +188,21 @@ file = "transducer-sha-one-digit-off.toml"
 fix = ['''4f63c0016880c2ce9a55c77cd8de739755bac8f8b26418ad029f61ff3bec9880''', '''4f63c0016880c2ce9a55c77cd8de739755bac8f8b26418ad029f61ff3bec9886''']
 text = '''tests/planted/transducer-sha-one-digit-off.toml:transducer.update[0]: tools/lattice_at.py sha256 4f63c0016880c2ce9a55c77cd8de739755bac8f8b26418ad029f61ff3bec9880 differs from the toolset file's 4f63c0016880c2ce9a55c77cd8de739755bac8f8b26418ad029f61ff3bec9886
   Next: write tools/lattice_at.py sha256 4f63c0016880c2ce9a55c77cd8de739755bac8f8b26418ad029f61ff3bec9886'''
+
+# plan 0878: min_blocks (block method; the floor on n // b per declared file) and the gamma method's fields (cc.toml [interval_fields], [levels]).
+# input-min-blocks.toml is a copy of x8-ising-needle's m.toml read as block, b = 400, min_blocks = 30 (n 1600: 4 blocks, refused); the fix b = 50 gives 32 >= 30 and passes.
+[[plant]]
+file = "input-min-blocks.toml"
+fix = ["b = 400\n", "b = 50\n"]
+text = '''tests/planted/input-min-blocks.toml:interval.min_blocks: 18 of 18 declared arrays hold fewer than min_blocks = 30 blocks of b = 400 (the shortest: p1/g1-0.90.npy key npy, n 1600 // b 400 = 4)
+  Next: declare method = "gamma" (window_s, window_max, door_z, level; cc.toml [interval_fields.gamma]), or keep method = "block" with b <= 53 (n 1600 // min_blocks 30): b must also be >= k*tau for the record's integrated autocorrelation time tau, so this record admits k*tau <= 53'''
+
+[[plant]]
+file = "input-gamma-with-b.toml"
+fix = ["b = 400\n", ""]
+text = "tests/planted/input-gamma-with-b.toml:interval.b: unknown field\n  Next: remove b, or check its spelling against the schema"
+
+[[plant]]
+file = "input-gamma-level.toml"
+fix = ["level = 0.9\n", "level = 0.95\n"]
+text = "tests/planted/input-gamma-level.toml:interval.level: level 0.9 has no z in cc.toml [levels] (declared: 0.95)\n  Next: use one of the declared levels: 0.95; or add the z of that level to cc.toml [levels]"

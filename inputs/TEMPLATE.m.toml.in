@@ -51,11 +51,12 @@ definition = "TODO"
 unit_scale = { "TODO" = "TODO" }               # size (quoted) -> declared unit scale
 
 [interval]
-method = "TODO"                                # block (needs b) | iid (needs tau_declared = 1)
+method = "TODO"                                # block (needs b) | iid (needs tau_declared = 1) | gamma (window_s, window_max, door_z, level; no b/resamples/seed): cc.toml [interval_fields]
 b = "TODO"
 resamples = "TODO"
 level = "TODO"
 seed = "TODO"
+min_blocks = 30                                # block method only: validate and run refuse a file with n // b < min_blocks (a floor, never a warning); delete this line for iid or gamma
 
 [eps]
 TODO = "TODO"                                  # exactly the eps keys the instruments name

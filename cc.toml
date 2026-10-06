@@ -18,8 +18,27 @@ interior_rule = ["mid-run-open"]   # a family's `interior` as a declared rule (p
 formats = ["npz-v1", "npy-v1", "snapshots-v1", "image-stack-v1"]
 limited = ["none", "assigned", "resolution-limited"]   # [block_map] limited: what the finest level is (plan 0873): a value that is not a measured site
 replay = ["locked", "all"]   # [check] replay (plan 0886): `locked` replays the inputs expected/<set>.toml names; `all` replays every input on disk
-interval_method = ["block", "iid"]   # [interval] method of an input's m.toml (plan 0883: was a tuple in declare.py; plan 0878 adds "gamma" with the code)
+interval_method = ["block", "iid", "gamma"]   # [interval] method of an input's m.toml (plan 0883: was a tuple in declare.py; plan 0878 adds "gamma"); each has a [interval_fields.<method>] table below
 nulls = ["NOT-MEASURED", "NOT-EVALUATED"]       # the honest nulls, in rank order; never map keys
+
+# [levels]: the z of each declared interval level (plan 0878). A method whose [interval_fields.<method>] names level_in = "levels" refuses any level that is not a key here; no scipy.
+[levels]
+"0.95" = 1.959964
+
+# [interval_fields.<method>] (plan 0878): the fields of an input's [interval] for each method of alphabets.interval_method, as DATA (validate reads it; there is no if-ladder per method).
+# required / optional: field -> type name (str | int | num). A field in neither is refused as unknown for that method. min_blocks (block only) is the floor on n // b per declared file.
+[interval_fields.block]
+required = { method = "str", resamples = "int", level = "num", seed = "int", b = "int" }
+optional = { tau_declared = "int", min_blocks = "int" }
+
+[interval_fields.iid]
+required = { method = "str", resamples = "int", level = "num", seed = "int", tau_declared = "int" }
+optional = { b = "int" }
+
+[interval_fields.gamma]
+required = { method = "str", level = "num", window_s = "num", window_max = "int", door_z = "num" }
+optional = {}
+level_in = "levels"
 
 # A STACK format is raw frames the door reduces itself (cc/reduce.py) through the input's declared [block_map] and [observable]: the
 # schema is DATA here (cc/formats.py holds no per-format code). reduces = the array kinds computed from the stack; dims/dtypes = the raw
