@@ -31,7 +31,7 @@ sampler (the frozen toolset file and its sha256), and says that one recorded con
 recorded sequence is not a process sequence. The per-locus mean is a declared bounded reduction before A, with what it keeps
 (the typical value of the observable at the locus) and what it discards (the configuration-to-configuration variation and the
 order of the configurations) stated in that file. The bootstrap interval is a projection C: it places the reading's sign cell
-against its declared margin, and is never an operator input (Robin, toolset LOG E307).
+against its declared margin, and is never an operator input (Robin, toolset LOG E307). The same holds for the Gamma-method interval: its window W and integrated autocorrelation time are statistics of the projection C and feed the sign cell only (gamma is declared but NOT yet used on real inputs; plan 0878 recorded a one-cell disagreement with the bootstrap twin, pending a numbered explanation).
 
 ## The relations, in ASCII
 

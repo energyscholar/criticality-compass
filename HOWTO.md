@@ -109,6 +109,8 @@ Then:
 4. `bin/cc data add <id>` writes `fixtures/data/<id>.toml`, the sha256 of every file the input reads. From then on
    `validate` refuses a mismatch. `data add` refuses to overwrite an existing manifest:
 
+**`[interval]`:** two methods are declared in `cc.toml [interval_fields]`. `method = "block"` (or `"iid"`) resamples: it needs `b`, `resamples`, `level`, `seed`, and takes an optional `min_blocks` (the template writes 30): `validate` and `run` refuse a file with `n // b < min_blocks`, and the refusal's Next line names the two routes (`method = "gamma"`, or a `b` that still satisfies `b >= k*tau`, with the `k*tau` the record admits). `method = "gamma"` (the Gamma-method, Wolff's automatic window) needs `level` (a level listed in `cc.toml [levels]`), `window_s`, `window_max`, `door_z`, and refuses `b`, `resamples`, `seed` and `tau_declared`. Gamma is declared but NOT yet used on real inputs; plan 0878 recorded a one-cell disagreement with the bootstrap twin, pending a numbered explanation.
+
 ```
 $ bin/cc data add w2-potts
 fixtures/data/w2-potts.toml already exists.
