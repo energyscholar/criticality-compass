@@ -2,7 +2,7 @@
 # never typed). Each entry: kinds (R read, S stat, D directory listed) and a path (~data/ = the data root).
 schema = 1
 kind = "golden-reads"
-key = "3af7edf1af3c6306acf0bf9ca75c79c8bbbf90a27b7eb24ac209b15bdb3393b9"
+key = "54abedc652bdc1a3d21a9b8a6f33e4b1ec7520b8fb9f04ad8367c0deeb248345"
 paths = [
   "RS bin/cc",
   "R cc.toml",
