@@ -6,7 +6,7 @@ from pathlib import Path
 
 CAP = 5000
 VERBATIM = [
-    "cc/admit.py", "cc/reduce.py", "tests/test_kernel.py", "tests/test_sign.py", "tests/test_resample.py",
+    "cc/admit.py", "cc/reduce.py", "cc/gamma.py", "tests/test_kernel.py", "tests/test_sign.py", "tests/test_resample.py",
     "tests/test_kernel_rs.py", "tests/reference/verdict_x.py",
 ]
 ROOT = Path(__file__).resolve().parent.parent
