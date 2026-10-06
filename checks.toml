@@ -32,3 +32,7 @@ numpy = [
 
 # [tables] is deliberately absent: CC's tables are TOML data whose totality and partition are
 # checked by `bin/cc validate` (cc/declare.py), not by checks.py C6.
+
+[closure.measure]               # plan 0886: the measurement closure, declared. Membership is COMPUTED (schema.import_closure); only these two lists are data.
+entries = ["cc/detect.py", "cc/door.py"]        # + each input's instrument modules (seeded at measure time: schema.MEASURE_SEEDED)
+outside = ["cc/declare.py", "cc/author.py", "cc/view.py", "cc/score.py", "cc/family.py", "cc/fingerprint.py", "bin/cc"]

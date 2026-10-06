@@ -277,7 +277,7 @@ def cmd_author(cmd, args):
 def structure_gate():
     """Run checks.py (the hook cannot see subprocesses). Returns the refusal text, or None when clean."""
     r = subprocess.run([sys.executable, str(TOOLS / "checks.py"), str(ROOT)], capture_output=True, text=True)
-    found = [ln for ln in r.stdout.splitlines() if ln[:2] in ("C1", "C2", "C3", "C6", "C7", "W0")]
+    found = [ln for ln in r.stdout.splitlines() if ln[:2] in ("C1", "C2", "C3", "C6", "C7", "C8", "W0")]
     for ln in found:
         if ln.startswith("C7"):
             key = ln.split()[3]
