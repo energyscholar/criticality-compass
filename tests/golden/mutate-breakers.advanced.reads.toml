@@ -2,7 +2,7 @@
 # never typed). Each entry: kinds (R read, S stat, D directory listed) and a path (~data/ = the data root).
 schema = 1
 kind = "golden-reads"
-key = "bad0c612c14387f31facb013cbf073adfd1b5e726db8a52e464e7caf6c8ef13a"
+key = "585b2083a84dcb58be7baf90116bbc5b1f7f9644ecafe36c1c46d734a4a34196"
 paths = [
   "DS .",
   "D .githooks",
@@ -118,6 +118,7 @@ paths = [
   "R fixtures/data/x2-xy-line.toml",
   "R fixtures/data/x2b-xy-2.toml",
   "R fixtures/data/x2b-xy-3.toml",
+  "R fixtures/data/x2b-xy-4.toml",
   "R fixtures/data/x2b-xy.toml",
   "R fixtures/data/x3-clock6-2.toml",
   "R fixtures/data/x3-clock6-3.toml",
@@ -216,6 +217,11 @@ paths = [
   "R inputs/x2b-xy-3/m.toml",
   "R inputs/x2b-xy-3/points.toml",
   "R inputs/x2b-xy-3/transducer.toml",
+  "D inputs/x2b-xy-4",
+  "R inputs/x2b-xy-4/couplings.toml",
+  "R inputs/x2b-xy-4/m.toml",
+  "R inputs/x2b-xy-4/points.toml",
+  "R inputs/x2b-xy-4/transducer.toml",
   "R inputs/x2b-xy/couplings.toml",
   "R inputs/x2b-xy/m.toml",
   "R inputs/x2b-xy/points.toml",
@@ -549,6 +555,8 @@ paths = [
   "R results/x2b-xy-2@v07-rules.npz",
   "R results/x2b-xy-3@v08-rules.json",
   "R results/x2b-xy-3@v08-rules.npz",
+  "R results/x2b-xy-4@v08-rules.json",
+  "R results/x2b-xy-4@v08-rules.npz",
   "R results/x2b-xy@v05-rules.json",
   "R results/x2b-xy@v05-rules.npz",
   "R results/x2b-xy@v06-rules.json",
@@ -1038,6 +1046,7 @@ paths = [
   "R tests/test_freeze_key.py",
   "R tests/test_gamma.py",
   "R tests/test_gamma_plan.py",
+  "R tests/test_gamma_twin.py",
   "R tests/test_golden.py",
   "R tests/test_kernel.py",
   "R tests/test_kernel_rs.py",

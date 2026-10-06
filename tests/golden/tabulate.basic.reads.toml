@@ -2,7 +2,7 @@
 # never typed). Each entry: kinds (R read, S stat, D directory listed) and a path (~data/ = the data root).
 schema = 1
 kind = "golden-reads"
-key = "0cfda47cedd93f529318746b551e1efb36e34dbbc1720a8051900b33f87c4e62"
+key = "8c409510acf15cc5b03eb21752db97f4eff15f8de3f280c2e2fa4ee27a550802"
 paths = [
   "S .",
   "RS bin/cc",
@@ -77,6 +77,7 @@ paths = [
   "RS fixtures/data/x2-xy-line.toml",
   "RS fixtures/data/x2b-xy-2.toml",
   "RS fixtures/data/x2b-xy-3.toml",
+  "RS fixtures/data/x2b-xy-4.toml",
   "RS fixtures/data/x2b-xy.toml",
   "RS fixtures/data/x3-clock6-2.toml",
   "RS fixtures/data/x3-clock6-3.toml",
@@ -150,6 +151,10 @@ paths = [
   "RS inputs/x2b-xy-3/couplings.toml",
   "RS inputs/x2b-xy-3/m.toml",
   "RS inputs/x2b-xy-3/points.toml",
+  "RS inputs/x2b-xy-4/couplings.toml",
+  "RS inputs/x2b-xy-4/m.toml",
+  "RS inputs/x2b-xy-4/points.toml",
+  "RS inputs/x2b-xy-4/transducer.toml",
   "RS inputs/x2b-xy/couplings.toml",
   "RS inputs/x2b-xy/m.toml",
   "RS inputs/x2b-xy/points.toml",
@@ -322,6 +327,7 @@ paths = [
   "R results/x2b-xy-2@v07-rules.npz",
   "RS results/x2b-xy-3@v08-rules.json",
   "R results/x2b-xy-3@v08-rules.npz",
+  "R results/x2b-xy-4@v08-rules.json",
   "RS results/x2b-xy@v05-rules.json",
   "R results/x2b-xy@v05-rules.npz",
   "RS results/x2b-xy@v06-rules.json",
