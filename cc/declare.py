@@ -153,7 +153,8 @@ def chk_cc(p, d, c, stem=None):
             for x in sorted((keeps | discards) - set(RESULT_FIELDS))]
     out += [at(p, "basic", f"field '{x}' is in both keeps and discards", "keep it in one list")
             for x in sorted(keeps & discards)]
-    out += shape(p, d["check"], {"fast_budget_s": int, "slow": list, "memory_gb": (int, float), "exclusive": list}, pre="check.")
+    out += shape(p, d["check"], {"fast_budget_s": int, "slow": list, "memory_gb": (int, float), "exclusive": list, "replay": str}, pre="check.")
+    out += inalpha(p, "check.replay", d["check"].get("replay"), d["alphabets"]["replay"])   # plan 0886: which inputs test_run_all replays
     classes = d["golden"].get("classes", {})
     out += [at(p, f"golden.classes.{k}", "must have files and match, each a list of strings", "write files = [...] and match = [...]")
             for k, v in sorted(classes.items())

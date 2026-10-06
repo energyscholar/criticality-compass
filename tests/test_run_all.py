@@ -1,5 +1,9 @@
 """test_run_all - one full `run --all` (every input, in-process, nothing written) under the scoreboard's
-widest set; every point the expected/<set>.toml lock names must read its locked verdict (plan 0869 P1)."""
+widest set; every point the expected/<set>.toml lock names must read its locked verdict (plan 0869 P1).
+Plan 0886: cc.toml [check] replay = "locked" replays exactly the inputs expected/<SET>.toml names (an input the lock names but the tree
+lacks is a FAILED line, never a skip); "all" replays every input on disk. An input is in the gate iff the lock file names it: after
+this phase no check measures b7-at-line-5, x2b-xy, x2b-xy-2, x2b-xy-3, x3-clock6-3, x4s-stack, x5n-bilayer-3, x9c-potts-2 (x2-xy-line-3
+is measured by test_chain). test_stack_door reuses x4s-stack; test_v08_result reads the stored x2b-xy-3."""
 import os
 import sys
 import time
@@ -22,9 +26,15 @@ def measure(name):
 
 
 if __name__ == "__main__":
-    names = sorted(p.name for p in (ROOT / "inputs").iterdir() if p.is_dir() and not p.name.startswith("TEMPLATE"))
+    on_disk = sorted(p.name for p in (ROOT / "inputs").iterdir() if p.is_dir() and not p.name.startswith("TEMPLATE"))
     expected = tomllib.loads((ROOT / "expected" / f"{SET}.toml").read_text())["verdicts"]
-    memory_gb = tomllib.loads((ROOT / "cc.toml").read_text())["check"]["memory_gb"]
+    check = tomllib.loads((ROOT / "cc.toml").read_text())["check"]
+    memory_gb, replay = check["memory_gb"], check["replay"]
+    names = [n for n in on_disk if n in expected] if replay == "locked" else on_disk
+    absent = sorted(set(expected) - set(on_disk)) if replay == "locked" else []   # a lock for an input the tree lacks: a failure, never a skip
+    unlocked = sorted(set(on_disk) - set(expected))
+    print(f"test_run_all: replay={replay} - replaying {len(names)} of {len(on_disk)} inputs ({len(unlocked)} without a lock under {SET}"
+          + (f", not replayed by declaration: {' '.join(unlocked)})" if replay == "locked" else ", replayed anyway)"))
     peaks = resources.recorded_peaks(ROOT, names, SET)
     workers = resources.pool_size(memory_gb, peaks, os.cpu_count() or 3)
     alone, pooled = resources.unrecorded(peaks), [n for n in names if peaks[n] is not None]
@@ -37,7 +47,7 @@ if __name__ == "__main__":
     got = {name: g for name, g, _ in done}
     if os.environ.get("CC_VERBOSE") == "1":
         print("".join(f"seconds {sec:7.1f}  {name}\n" for name, _, sec in sorted(done, key=lambda d: -d[2])), end="")
-    bad, n = [], 0
+    bad, n = [f"{a}: the lock under {SET} names an input the tree lacks" for a in absent], 0
     for name in names:
         for pt, want in expected.get(name, {}).items():
             n += 1
