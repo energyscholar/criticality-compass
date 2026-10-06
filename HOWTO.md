@@ -676,12 +676,13 @@ Nothing is dropped by a list. `detect.run` is content-keyed: a result stored und
 and `measure_hash` equal this run's IS the result (nothing is measured or re-written); a measured result under another set whose key
 differs only in its `tables/*` entries is re-verdicted (`derived_from` set), unless the sets' `membership.toml` differ; anything
 else is measured. `measure_hash` is the sha over (path, content sha) of the import closure, within `cc/`, of `cc/detect.py` (the measurement entry: readout, sign, door and what they read), `cc/door.py` and of the
-modules of the instruments the input declares, parsed from the import statements (`declare.measure_hash`); an edit to a file in no
+modules of the instruments the input declares, parsed from the import statements (`schema.measure_hash`); an edit to a file in no
 closure (view.py, score.py, ...) keeps the key, an edit to sign.py, kernel.py or an instrument module moves it. `detect.run(..., reuse=False)`
 always measures (the replay tests test_run_all, test_chain, test_needle_o_start use it); `bin/cc run --all` prints how many inputs were
 measured, reused and re-verdicted. A closure that cannot be read
 statically (a dynamic import) is refused. `code_hash` (all of `cc/` and `bin/cc`) stays recorded as provenance and `freeze` still
 demands it. A result with no `measure_hash` has no key: `bin/cc run <input>` writes it.
+**What moves the measure key.** `cc/schema.py` holds exactly what a measurement reads (paths, parsing, `Ctx`, the content hashes, `measure_hash`); `cc/declare.py` holds what `validate` checks and is OUTSIDE the closure, so a validator edit moves no key (an edit to schema.py, detect.py, door.py, reverdict.py, readout.py, resources.py, formats.py, sign.py, kernel.py or an instrument module moves every key it reaches, and costs one `bin/cc run <the stored inputs> --tables v03-rules` refresh). `checks.toml [closure.measure]` declares the closure: `entries` and `outside` are the only data, membership is computed (`schema.import_closure`); `tests/test_closure.py` prints it and fails if a file declared outside is in it, and the structure gate refuses a measurement with a `C8 closure` line. A name moves to schema.py only if a closure module calls or reads it, transitively; a method no closure module calls stays declare-side (the class-truth firewall rests on it). The replay set is the lock set: `cc.toml [check] replay = "locked"` makes test_run_all replay exactly the inputs `expected/<set>.toml` names (an input is in the gate iff the lock file names it); after this, no check measures b7-at-line-5, x2b-xy, x2b-xy-2, x2b-xy-3, x3-clock6-3, x4s-stack, x5n-bilayer-3 or x9c-potts-2 (x2-xy-line-3 is measured by test_chain); `replay = "all"` restores the full replay.
 A green full check writes `tests/BASELINE.txt` (tree, HEAD, every test's name, status and seconds); `bin/cc check --baseline`
 reads it back when the tree is unchanged.
 
