@@ -424,7 +424,7 @@
 </table>
 <h3>LINE</h3><table><tr><th>when<th>verdict<th>why<th>line<th>cells<th>hit by
 <tr data-cells="756"><td><code>needle = MID; two_start = INDEP; flow = SLOW; across = MARGINAL; stability = STABLE; probe = COMPLETE, NOT-MEASURED, NOT-EVALUATED</code><td>LINE<td>Q2, 2026-10-02: slow flow with a marginal, stable exponent is a line (STAGE3 line = BKT-end flaw split by across; every other slow cell still refuses)<td>62<td>756<td>
-<tr data-cells="756"><td><code>needle = MID; two_start = INDEP; flow = STOPPED; across = MARGINAL; stability = STABLE; probe = COMPLETE, NOT-MEASURED, NOT-EVALUATED</code><td>LINE<td>verdict_x CAND_GS: marginal and stable<td>154<td>756<td>x2b-xy-3:0.5 x2b-xy-3:0.6 x2b-xy-3:0.7 x2b-xy-3:0.8 x2b-xy-3:0.85
+<tr data-cells="756"><td><code>needle = MID; two_start = INDEP; flow = STOPPED; across = MARGINAL; stability = STABLE; probe = COMPLETE, NOT-MEASURED, NOT-EVALUATED</code><td>LINE<td>verdict_x CAND_GS: marginal and stable<td>154<td>756<td>x2b-xy-3:0.5 x2b-xy-3:0.6 x2b-xy-3:0.7 x2b-xy-3:0.8 x2b-xy-3:0.85 x2b-xy-4:0.5 x2b-xy-4:0.6 x2b-xy-4:0.7 x2b-xy-4:0.8 x2b-xy-4:0.85
 </table>
 <h3>WALKING</h3><table><tr><th>when<th>verdict<th>why<th>line<th>cells<th>hit by
 <tr data-cells="1512"><td><code>needle = MID; two_start = INDEP; flow = STOPPED; across = RELEVANT, MARGINAL; stability = CROSSING; probe = COMPLETE, NOT-MEASURED, NOT-EVALUATED</code><td>WALKING<td>verdict_x CAND_GS: the exponent crosses with size<td>184<td>1512<td>
@@ -434,7 +434,7 @@
 <tr data-cells="317520"><td><code>needle = MID; two_start = COEXIST</code><td>FIRST-ORDER<td>verdict_x STAGE2: the two starts coexist at the window<td>49<td>317520<td>
 </table>
 <h3>NOT</h3><table><tr><th>when<th>verdict<th>why<th>line<th>cells<th>hit by
-<tr data-cells="3265920"><td><code>needle = DIS, ORD; needle_pair = SAME-WINDOW, SAME-SINK, HALF-PINNED, CROSSED, NOT-MEASURED, NOT-EVALUATED</code><td>NOT<td>verdict_x STAGE1: off the window<td>36<td>3265920<td>x2b-xy-3:0.95 x2b-xy-3:1.0 x2b-xy-3:1.1
+<tr data-cells="3265920"><td><code>needle = DIS, ORD; needle_pair = SAME-WINDOW, SAME-SINK, HALF-PINNED, CROSSED, NOT-MEASURED, NOT-EVALUATED</code><td>NOT<td>verdict_x STAGE1: off the window<td>36<td>3265920<td>x2b-xy-3:0.95 x2b-xy-3:1.0 x2b-xy-3:1.1 x2b-xy-4:0.95 x2b-xy-4:1.0 x2b-xy-4:1.1
 <tr data-cells="453600"><td><code>needle = DIS, ORD; needle_pair = PINNED-BETWEEN-PHASES; two_start = FLUCT, UNRES, INDEP, NOT-MEASURED, NOT-EVALUATED</code><td>NOT<td>verdict_x STAGE1: off the window (pinned between the phases, but the starts do not stay apart)<td>42<td>453600<td>
 <tr data-cells="52920"><td><code>needle = MID; two_start = INDEP; flow = FLOWING</code><td>NOT<td>verdict_x STAGE3: the needle still flows<td>110<td>52920<td>
 </table>
@@ -455,7 +455,7 @@
 <tr data-cells="2520"><td><code>needle = MID; two_start = INDEP; flow = STOPPED; across = RELEVANT, MARGINAL; stability = UNRES</code><td>REFUSE-UNRES<td>verdict_x CAND_GS: stability unresolved<td>223<td>2520<td>
 <tr data-cells="7560"><td><code>needle = MID; two_start = INDEP; flow = STOPPED; across = WEAK</code><td>REFUSE-WEAK<td>verdict_x CAND_GS: WEAK refuses whatever stability reads (nulls included)<td>232<td>7560<td>
 <tr data-cells="7560"><td><code>needle = MID; two_start = INDEP; flow = STOPPED; across = IRRELEVANT</code><td>REFUSE-IRRELEVANT<td>verdict_x CAND_GS: IRRELEVANT refuses whatever stability reads<td>240<td>7560<td>
-<tr data-cells="7560"><td><code>needle = MID; two_start = INDEP; flow = STOPPED; across = UNRES</code><td>REFUSE-UNRES<td>verdict_x CAND_GS: across unresolved, whatever stability reads<td>248<td>7560<td>x2b-xy-3:0.89294
+<tr data-cells="7560"><td><code>needle = MID; two_start = INDEP; flow = STOPPED; across = UNRES</code><td>REFUSE-UNRES<td>verdict_x CAND_GS: across unresolved, whatever stability reads<td>248<td>7560<td>x2b-xy-3:0.89294 x2b-xy-4:0.89294
 <tr data-cells="3810240"><td><code>needle = NOT-MEASURED, NOT-EVALUATED</code><td>REFUSE-NEEDLE-UNMEASURED<td>honest null (not in verdict_x): the needle was not measured or not evaluated<td>256<td>3810240<td>
 <tr data-cells="635040"><td><code>needle = MID; two_start = NOT-MEASURED, NOT-EVALUATED</code><td>REFUSE-TWO-START-UNMEASURED<td>honest null: the two-start difference was not measured or not evaluated<td>261<td>635040<td>
 <tr data-cells="105840"><td><code>needle = MID; two_start = INDEP; flow = NOT-MEASURED, NOT-EVALUATED</code><td>REFUSE-FLOW-UNMEASURED<td>honest null: flow was not measured or not evaluated<td>267<td>105840<td>
