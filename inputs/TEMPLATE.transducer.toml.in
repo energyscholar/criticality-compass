@@ -1,6 +1,6 @@
 # inputs/TEMPLATE.transducer.toml.in - read by `bin/cc new input <id>`; writes inputs/<id>/transducer.toml
 # (the transducer file, plan 0883: how the data entered M, what the per-locus mean keeps and discards, the interval's role).
-# Replace every "TODO". The two sentences below are checked by equality against cc.toml [transducer]; do not reword them.
+# Replace every TODO value. The two sentences below are checked by equality against cc.toml [transducer]; do not reword them.
 # A real-data input: set kind = "record", delete [transducer], and write [record] (apparatus, preparation, observation,
 # authors_projection, source) in its place.
 schema = 1

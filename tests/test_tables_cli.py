@@ -83,7 +83,7 @@ with tempfile.TemporaryDirectory() as t:
     todo = [f"inputs/w2e/m.toml:{k}: still TODO\n  Next: " for k in (
         "relations.matched.template", "sinks.ordered", "sinks.disordered", "eps.step", "eps.sink",
         "data.files[0].arrays.GL.key", "obtained.6")] + ['inputs/w2e/points.toml:points.6: still TODO\n  Next: write a case id']
-    want_n = (m + (repo / "inputs/w2e/points.toml").read_text()).count('"TODO"')
+    want_n = (m + (repo / "inputs/w2e/points.toml").read_text() + (repo / "inputs/w2e/transducer.toml").read_text()).count('"TODO"')   # plan 0883: + the transducer file's TODOs
     got_n = len([x for x in out.splitlines() if x.startswith("inputs/w2e/") and "still TODO" in x])
     check("--add-instrument writes TODOs that validate names, each with a Next line",
           rc == 1 and want_n == got_n > 15 and all(t in out for t in todo) and "obtained.6: still TODO\n  Next: write one of: truth" in out, out[:900])
