@@ -1,0 +1,23 @@
+# inputs/x5n-bilayer-3/transducer.toml - the transducer file (plan 0883, Q0): the sampler, what the per-locus mean keeps and discards, the interval's role.
+schema = 1
+kind = "transducer"
+id = "x5n-bilayer-3"
+
+[transducer]
+model = "as x5-bilayer; points navigated (flag N)"
+update = ["tools/lattice_bilayer2.py sha256 21f790b859a7133d1c026f5129b94b13f828002fcf39cb5f4475f5fe08c85c1d"]
+inputs = "m.toml [X5n] · studies/X5/navigate3.py → the frozen studies/X5/simulate.py"
+output = "one configuration per recorded sweep; each configuration is one observation; the recorded sequence is NOT a process sequence (Phase 1 only)"
+
+[reduction]
+name = "per-locus mean of the declared observable over the declared configurations"
+keeps = "the typical value of the observable at the locus (one point, one size, one start)"
+discards = "the configuration-to-configuration variation and the order of the configurations"
+
+[interval]
+role = "projection C: places the reading's sign cell against its declared margin; never an operator input"
+keeps = "the position of the interval ends among the cuts -eps, 0, +eps"
+discards = "the shape of the resampled distribution"
+
+[provenance_note]
+declared_after = ["x5n-bilayer-3@v04-rules", "x5n-bilayer-3@v05-rules", "x5n-bilayer-3@v06-rules", "x5n-bilayer-3@v07-rules"]
