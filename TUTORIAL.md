@@ -169,7 +169,7 @@ run b7-at-line@scratch -> results/b7-at-line@scratch.json
 x8-ising-needle: ran
 ```
 
-This measures again (about half a minute for all eleven inputs) and writes eleven
+This measures again (the time grows with the inputs on disk: time it, do not assume) and writes the
 results under the id `<input>@scratch`. The `…@v01-rules` results are untouched. It prints every point of every
 input as it goes; the lines that matter are the tables below.
 
@@ -220,7 +220,7 @@ dropped tables/scratch and 22 result files
 ```
 
 `drop` never deletes a frozen rulebook or the default one; `--with-results` also deletes the unfrozen results
-that were run under it (a `.json` and a `.npz` for each of eleven inputs).
+that were run under it (a `.json` and a `.npz` for each input).
 
 ## Part 3: a family
 

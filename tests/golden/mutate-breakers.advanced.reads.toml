@@ -2,7 +2,7 @@
 # never typed). Each entry: kinds (R read, S stat, D directory listed) and a path (~data/ = the data root, ~toolset/ = the rest of the toolset root).
 schema = 1
 kind = "golden-reads"
-key = "a962fa6ae38982fc15a34a89924213c325174b1ed1676923e04a551def56ad8f"
+key = "ee3ccc31ec15a6011fd4dcfa54559c0b50bc0435e6d13f78de58e96923ac6985"
 paths = [
   "DS .",
   "D .githooks",
