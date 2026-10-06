@@ -110,9 +110,39 @@ def load_decl(root, fid):
     return tomllib.loads(p.read_text()) if p.is_file() else None
 
 
+def interior_of(decl, res, fam, m):
+    """(interior list, None) or (None, reason): the interior a declaration names. A list is returned as declared. The rule "mid-run-open" (plan 0879)
+    reads ONLY the per-point `needle` code through the set's [side] needle_code: ONE maximal contiguous MID run in axes.point order; on each side the
+    run's end point is dropped iff ANY point beyond the run reads SINK (a null beyond is not a sink). < 2 points left, no or several runs, a set
+    with no [side] needle_code, or an interior pair that is not an edge of relations.control is a null: a reason, never a default cell."""
+    if isinstance(decl["interior"], list):
+        return decl["interior"], None
+    code = fam.get("side", {}).get("needle_code")
+    if code is None:
+        return None, "its family.toml has no [side] needle_code to read the needle codes through"
+    pts, sg = m["axes"]["point"], {s["point"]: s for s in res["signature"]}
+    reads = [code.get(sg[q]["needle"]) for q in pts]
+    runs = [list(g) for hit, g in itertools.groupby(range(len(pts)), key=lambda i: reads[i] == "MID") if hit]
+    if len(runs) != 1:
+        return None, f"interior rule found {len(runs)} runs of MID points, it needs exactly one"
+    run = runs[0]
+    keep = run[int("SINK" in reads[:run[0]]):len(run) - int("SINK" in reads[run[-1] + 1:])]
+    if len(keep) < 2:
+        return None, f"interior rule found {len(keep)} points (the MID run of {len(run)}, less the ends that a sink lies beyond), it needs at least 2"
+    inner = [pts[i] for i in keep]
+    edges = {tuple(e) for e in door.control_pairs(m)} if "control" in m.get("relations", {}) else None
+    off = [f"{a}->{b}" for a, b in zip(inner, inner[1:]) if edges is not None and (a, b) not in edges]
+    return (None, f"interior rule found {off[0]}, which is not an edge of relations.control") if off else (inner, None)
+
+
 def compute(decl, res, z, fam, text, m, nulls):
     """The family verdict from one stored result: one code per declared column (+ cells), then verdict, class, line, why.
-    A set whose family.toml lists the column `points` also reads the interior's geometry and the two sides (plan 0871)."""
+    A set whose family.toml lists the column `points` also reads the interior's geometry and the two sides (plan 0871).
+    The interior is resolved FIRST through interior_of; a null there returns {"interior": None, "refusal": reason} and nothing else."""
+    inner, why = interior_of(decl, res, fam, m)
+    if inner is None:
+        return {"interior": None, "refusal": why}
+    decl = {**decl, "interior": inner, "rule": decl["interior"] if isinstance(decl["interior"], str) else None}
     out = {"bracket": bracket_of(fam, res, nulls), "f1": f1_of(fam, decl, res, z, m, nulls), "f2": f2_of(fam, decl, res, m, nulls)}
     side_lines = declare.row_lines(text, "side_row")
     if "points" in fam["columns"]:
@@ -124,7 +154,7 @@ def compute(decl, res, z, fam, text, m, nulls):
     ends = [e for _, _, e in sides]
     named = {"end_point": [e["boundary"] for e in ends], "end_bracket": [[e["boundary"], e["beyond"][0]] for e in ends],
              "ends": [{"point": e["boundary"], "side": w, "kind": k} for w, k, e in sides]} if "points" in out else {}   # plan 0872 F3: each end point, named with its side and kind
-    return {**codes, **named, "cells": {c: v[1] for c, v in out.items()}, "verdict": verdict, "class": cls, "line": line, "why": why}
+    return {**codes, **named, "interior": inner, "rule": decl["rule"], "cells": {c: v[1] for c, v in out.items()}, "verdict": verdict, "class": cls, "line": line, "why": why}
 
 
 def run(root, fid, tables):
@@ -152,7 +182,11 @@ def run(root, fid, tables):
     fam, nulls = tomllib.loads(ft.read_text()), declare.Ctx(root).alpha["nulls"]
     m = detect.load_input(decl["input"])
     with np.load(root / res["vectors"]) as z:
-        return None, (decl, compute(decl, res, z, fam, ft.read_text(), m, nulls), tables)
+        out = compute(decl, res, z, fam, ft.read_text(), m, nulls)
+    if out["interior"] is None:
+        return (f"family {fid} reads NOT-EVALUATED: {out['refusal']}.\n  Next: bin/cc show {decl['input']} --tables {tables} (the needle column), "
+                f"then declare the points the family covers, or measure more points"), None
+    return None, (decl, out, tables)
 
 
 def end_notes(root, res):
@@ -171,7 +205,7 @@ def end_notes(root, res):
         if decl["input"] == res["input"]:
             with np.load(root / res["vectors"]) as z:
                 got = compute(decl, res, z, fam, ft.read_text(), detect.load_input(res["input"]), nulls)
-            for e in got["ends"]:
+            for e in got.get("ends", []):
                 notes.setdefault(e["point"], []).append((decl["id"], e["kind"]))
     return notes
 
@@ -184,7 +218,7 @@ def note_lines(notes, pt, pad="  "):
 def show(decl, out, tables):
     """The printed family: each fingerprint with its cells, then the verdict and the row's why."""
     c = out["cells"]
-    lines = [f"family {decl['id']}   rules: {tables}   input: {decl['input']}   interior: {' '.join(decl['interior'])}",
+    lines = [f"family {decl['id']}   rules: {tables}   input: {decl['input']}   interior: {' '.join(out['interior'])}{' (rule ' + out['rule'] + ')' if out['rule'] else ''}",
              f"  bracket {out['bracket']}"] + [f"    edge {a}->{b} {e}" for a, b, e in c["bracket"]]
     lines += [f"  f1      {out['f1']}"] + [f"    {a}->{b} y_last {t}  -> {k}" for a, b, t, k in c["f1"]]
     lines += [f"  f2      {out['f2']}"] + [f"    {a}->{b} along {t}  -> {k}" for a, b, t, k in c["f2"]]
