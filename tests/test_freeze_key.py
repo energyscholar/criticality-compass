@@ -9,6 +9,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 bad = []
+# plan 0881 P2.7: an input with NO frozen result under any set. A re-verdict stands on its frozen parent (it measured nothing), so once the v03 results were
+# frozen the old input (b7-at-line, which has a v03 result) was judged by its parent and the closure plant could no longer be refused: the test must start from an unfrozen input.
+INPUT = "b7-at-line-5"
 
 
 def check(name, ok, why=""):
@@ -34,12 +37,12 @@ def scenario(rel):
         git("init", "-q")
         git("add", "-A")
         git("commit", "-q", "-m", "copy")
-        cc("tables", "fork", "verdict-x-rules", "t4")
-        rc, out = cc("run", "b7-at-line", "--tables", "t4")
+        cc("tables", "fork", "v01-rules", "t4")
+        rc, out = cc("run", INPUT, "--tables", "t4")
         check(f"run succeeds ({rel})", rc == 0, out[:300])
         (repo / rel).write_text((repo / rel).read_text() + "\n# planted\n")
         git("commit", "-q", "-a", "-m", f"plant {rel}")
-        return cc("freeze", "b7-at-line@t4")
+        return cc("freeze", f"{INPUT}@t4")
 
 
 rc, out = scenario("cc/view.py")
