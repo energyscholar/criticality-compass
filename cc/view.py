@@ -307,17 +307,18 @@ def f2_code_line(text):
     return 0
 
 
-def explain_pair(res, pair, mode, tables_dir=None):
-    """The numbered trace of one control pair (a label `a->b`): membership door, Delta per size, A then B, the
-    interval against eps, the cell, the family's code. Read from the stored result; nothing is re-measured."""
-    bad = stale(res)
-    if bad:
-        return bad.splitlines()
-    cfg, T, m = config(), detect.load_tables(res["tables"], tables_dir), detect.load_input(res["input"])
+def stored(res, instrument, pair):
+    """The vectors an instrument reported for one pair, name -> value, read from the stored result (nothing is re-measured)."""
+    pre = f"{instrument}/"
+    return {q["name"]: q["estimate"] for q in res["reports"] if q["vector_key"].startswith(pre) and q["vector_key"].endswith(f"/pair={pair}")}
+
+
+def pair_section(res, r, pair, mode, cfg, T, m, text, code_map):
+    """One instrument's numbered trace of one control pair: membership door, the stored vectors, the kernel steps its own
+    declared operators run, the interval against eps, the cell, the family's code. Every number is the stored one."""
     a, b = pair.split("->")
-    r = next(q for q in res["pair_readings"] if q["unit"]["pair"] == [a, b])
     sig, rule = {s["point"]: s for s in res["signature"]}, T.membership.get(r["instrument"])   # plan 0872: across_delta has no membership rule
-    out = [f"explain {res['input']} {pair}   rules: {res['tables']}", f"{r['instrument']}   (pair {pair})"]
+    out = [f"{r['instrument']}   (pair {pair})"]
     if rule:
         got = [(pt, sig[pt][rule["reads"]], rule["map"][sig[pt][rule["reads"]]]) for pt in (a, b)]
         mem = door.member(T.membership, r["instrument"], (a, b), sig)
@@ -326,21 +327,41 @@ def explain_pair(res, pair, mode, tables_dir=None):
                    + (f"   flags: {words(r['flags'], cfg)}" if r["flags"] else ""))
     if r["estimate"] is None:
         return out + [f"  2 READING   {shown(r['cell'], r['reason'], mode, cfg)}"]
-    delta = next(q for q in res["reports"] if q["vector_key"] == f"{r['instrument']}/delta/pair={pair}")["estimate"]
-    ctx, e, lv = detect.context_for(res["input"], r["instrument"], None), r["eps"], res["interval"]
-    ln = np.log(np.abs(delta))
-    steps = np.diff(ln)
+    vec, e, lv = stored(res, r["instrument"], pair), r["eps"], res["interval"]
+    ops = tomllib.loads((ROOT / "instruments" / f"{r['instrument']}.toml").read_text())["operators"]
+    delta = vec.pop("delta", None)
+    if delta is not None:
+        sizes = ", ".join(f"{s} {d:.4g}" for s, d in zip(m["axes"]["size"], delta))
+        out.append(f"  2 DELTA     A over the control edge {a}->{b}, row 0: {sizes}")
+    if delta is not None and "B" in ops:   # the instrument declares B: A over the size chain, then B at the top edge, is its own reading
+        ctx, ln = detect.context_for(res["input"], r["instrument"], None), np.log(np.abs(delta))
+        steps = np.diff(ln)
+        out.append(f"  3 KERNEL    ln|Delta| {nums(ln)}; A over size {nums(steps)}; B at the top edge {steps.sum():.4g}; "
+                   f"over the log span {ctx.log_span:.4g}: {steps.sum() / ctx.log_span:.4g}")
+    elif vec:
+        out.append("  3 REPORTED  " + "; ".join(f"{k} {nums(v) if isinstance(v, list) else f'{v:.4g}'}" for k, v in vec.items()))
     bl, bu = (int(v) for v in sign.position(r["lo"], r["hi"], e))
-    fam = T.paths[0].parent / "family.toml"
-    text = fam.read_text() if fam.is_file() else ""
-    code = tomllib.loads(text).get("f2", {}).get("code", {}).get(r["cell"]) if text else None
-    sizes = ", ".join(f"{s} {d:.4g}" for s, d in zip(m["axes"]["size"], delta))
+    code = code_map.get(r["cell"])
     return out + [
-        f"  2 DELTA     A over the control edge {a}->{b}, row 0: {sizes}",
-        f"  3 KERNEL    ln|Delta| {nums(ln)}; A over size {nums(steps)}; B at the top edge {steps.sum():.4g}; "
-        f"over the log span {ctx.log_span:.4g}: {steps.sum() / ctx.log_span:.4g}",
         f"  4 READING   {r['column']} {r['estimate']:.4g}  interval [{r['lo']:.4g}, {r['hi']:.4g}]  "
         f"({lv['level'] * 100:g} %, {cfg['interval_fields'][lv['method']]['read_pair'].format(**lv)})",
         f"  5 SIGN      cuts {-e:g} 0 +{e:g} (eps {r['eps_key']}): bL {bl}, bU {bu} -> {shown(r['cell'], None, mode, cfg)}",
         "  6 CODE      " + (f"family.toml line {f2_code_line(text)} [f2.code]: {r['cell']} -> {code}" if code else
                             "no family code for this cell in this set (a family's [f2.code] codes a pair)")]
+
+
+def explain_pair(res, pair, mode, tables_dir=None):
+    """The numbered trace of one control pair (a label `a->b`): one section per instrument that reads the pair, each from its
+    own stored vectors. Read from the stored result; nothing is re-measured."""
+    bad = stale(res)
+    if bad:
+        return bad.splitlines()
+    cfg, T, m = config(), detect.load_tables(res["tables"], tables_dir), detect.load_input(res["input"])
+    a, b = pair.split("->")
+    fam = T.paths[0].parent / "family.toml"
+    text = fam.read_text() if fam.is_file() else ""
+    code_map = tomllib.loads(text).get("f2", {}).get("code", {}) if text else {}
+    out = [f"explain {res['input']} {pair}   rules: {res['tables']}"]
+    for r in (q for q in res["pair_readings"] if q["unit"]["pair"] == [a, b]):
+        out += pair_section(res, r, pair, mode, cfg, T, m, text, code_map)
+    return out
