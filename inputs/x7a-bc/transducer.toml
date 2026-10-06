@@ -1,0 +1,24 @@
+# inputs/x7a-bc/transducer.toml - the transducer file (plan 0883, Q0): the sampler, what the per-locus mean keeps and discards, the interval's role.
+schema = 1
+kind = "transducer"
+id = "x7a-bc"
+
+[transducer]
+model = "2D Blume–Capel lambda-line points; vacant-0 block value ([C1a])"
+update = ["tools/lattice_bc.py sha256 2acbe8a9b058f7eb860d5803b2f0e7c12a5d3b2c21981c9850ac695939f70396"]
+inputs = "m.toml [C1b] + [C1b2] · studies/C1/simulate_b.py + simulate_b2.py"
+output = "one configuration per recorded sweep; each configuration is one observation; the recorded sequence is NOT a process sequence (Phase 1 only)"
+
+[reduction]
+name = "per-locus mean of the declared observable over the declared configurations"
+keeps = "the typical value of the observable at the locus (one point, one size, one start)"
+discards = "the configuration-to-configuration variation and the order of the configurations"
+
+[interval]
+role = "projection C: places the reading's sign cell against its declared margin; never an operator input"
+keeps = "the position of the interval ends among the cuts -eps, 0, +eps"
+discards = "the shape of the resampled distribution"
+
+[provenance_note]
+declared_after = ["x7a-bc@v01-rules", "x7a-bc@v02-rules", "x7a-bc@v03-rules", "x7a-bc@v04-rules", "x7a-bc@v05-rules", "x7a-bc@v06-rules", "x7a-bc@v07-rules"]
+note = "two drivers, one sampler"
