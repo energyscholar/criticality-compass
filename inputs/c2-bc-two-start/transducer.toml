@@ -1,0 +1,24 @@
+# inputs/c2-bc-two-start/transducer.toml - the transducer file (plan 0883, Q0): the sampler, what the per-locus mean keeps and discards, the interval's role.
+schema = 1
+kind = "transducer"
+id = "c2-bc-two-start"
+
+[transducer]
+model = "2D Blume–Capel, L 81, path D = delta K"
+update = ["tools/lattice_bc.py sha256 2acbe8a9b058f7eb860d5803b2f0e7c12a5d3b2c21981c9850ac695939f70396"]
+inputs = "m.toml [C2] · studies/C2/run.py (the run script samples and writes data/c2)"
+output = "one configuration per recorded sweep; each configuration is one observation; the recorded sequence is NOT a process sequence (Phase 1 only)"
+
+[reduction]
+name = "per-locus mean of the declared observable over the declared configurations"
+keeps = "the typical value of the observable at the locus (one point, one size, one start)"
+discards = "the configuration-to-configuration variation and the order of the configurations"
+
+[interval]
+role = "projection C: places the reading's sign cell against its declared margin; never an operator input"
+keeps = "the position of the interval ends among the cuts -eps, 0, +eps"
+discards = "the shape of the resampled distribution"
+
+[provenance_note]
+declared_after = ["c2-bc-two-start@v01-rules", "c2-bc-two-start@v02-rules", "c2-bc-two-start@v03-rules", "c2-bc-two-start@v04-rules", "c2-bc-two-start@v05-rules", "c2-bc-two-start@v06-rules", "c2-bc-two-start@v07-rules", "c2-bc-two-start@verdict-x-rules"]
+note = "driver is a run script, not a simulate.py"
