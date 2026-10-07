@@ -225,7 +225,8 @@ CC has 11 instrument modules: the nine the verdict path reads (needle, across, s
 ## The family fingerprints
 
 A family reads the points of one input together, from the stored result and its resample vectors; it never
-measures again. Its three columns are built with the same operators:
+measures again. Its columns are ordered differences of stored readings over the interior run (the paragraph "The
+family layer is a projection C" below says where they are computed and what the verdict is):
 
 - **bracket: A over a chain of codes.** Each point's needle code is given a declared rank (DIS 0, MID 1, ORD 2),
   the ranks are a NodeField over the chain of points in their declared order, and A takes the difference of
@@ -240,6 +241,15 @@ measures again. Its three columns are built with the same operators:
 Where a point reads a null (`NOT-MEASURED`, `NOT-EVALUATED`), the edges and pairs that touch it read that null: a
 null is plumbing around the maths, and only ranked codes reach A. The family verdict is one lookup in a
 partition of the three columns (`family.toml`), validated total and disjoint, with no priority chain.
+
+**The family layer is a projection C (Robin Q19, 2026-10-06).** The bracket and f1 differences are computed inside C, as
+ordered differences of the stored per-point readings over the interior run (`y(j) - y(i)` for the `across_delta.y_last`
+vectors, `rank(i+1) - rank(i)` for the needle codes); they are not A over a declared relation, and the family layer is not a
+second relational pass. This supersedes the former sentence "Its three columns are built with the same operators" (corrected above) and the
+headings "A over a chain of codes" and "A over the `all-pairs` relation" of the bullets above, which describe the code as of plan 0879. The family verdict
+(LINE, BKT-END, POINT-MANIFOLD, REFUSE-*) is a **declared report**, a projection C over per-point sign cells, not a relational
+reading; the sign-cell rule stands unchanged. The code change is plan 0892 P2; until it lands the arithmetic is the same and only
+its description is corrected. The verdict words and the tables are unchanged.
 
 The declared interior rule `interior = "mid-run-open"` is a projection C over the needle sign cells: it keeps the MID run (less the end a sink lies beyond), discards every value and every other column, and reads nothing else.
 
