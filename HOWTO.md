@@ -349,7 +349,9 @@ wrote families/b7-demo.toml
   points. `validate` checks the partition is total and disjoint. How an `along` cell becomes an f2 code (ZERO! is
   MARGINAL, SLOW+ is WEAK, and so on) is the `code` map in `[f2]`; the f1 map is `[f1] code`; neither lives in `codes.toml`.
 
-`bin/cc family <id> [--tables SET]` prints the family verdict from the stored result. It re-measures nothing, and
+`bin/cc family <id> [--tables SET]` prints the family report from the stored result (plan 0892, Robin Q19, 2026-10-06: the family
+layer is a declared projection C over per-point sign cells, not a relational reading; the verdict words and the tables do not
+change). It re-measures nothing, and
 refuses with a Next line if the set has no `family.toml` or the input has no result under the set. A family
 whose points the membership door refuses reads that, rather than a class:
 
