@@ -89,6 +89,13 @@ Robin's ruling: the transform has no observation at infinite size, and the share
   any set reads it; none in any set after v07 may.
 - A superseded set is still frozen where it can be (see below).
 
+## The family layer is a projection C (Robin Q19, 2026-10-06; plan 0892)
+
+Every `tables/*/family.toml` header says "the differences are maths (cc/fingerprint.py, by A)". That sentence is superseded by Robin Q19
+(2026-10-06): since plan 0892 the bracket and f1 differences are computed inside C (a declared projection over per-point sign cells), not by A
+over a declared relation, and the family verdict is a declared report. The tables are unchanged (hash-pinned by every stored result); the
+verdict words are unchanged. Until plan 0892 P2 lands the code still applies A and only the description is corrected here.
+
 ## Cross-cutting notes
 
 - `cc.toml [defaults] tables = "v01-rules"`: `show`/`run`/`help` without `--tables` read the oldest set.
