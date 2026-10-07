@@ -2,7 +2,7 @@
 # never typed). Each entry: kinds (R read, S stat, D directory listed) and a path (~data/ = the data root, ~toolset/ = the rest of the toolset root).
 schema = 1
 kind = "golden-reads"
-key = "9f5e47124fb8974b934ccffa74bae70a5e739fb586d208937e452a820b8b5877"
+key = "99ac80e7fac4727f16551ee518edb76ca3c9b550dade67c7b93c09a4618187c4"
 paths = [
   "S .",
   "RS FROZEN.json",
@@ -94,6 +94,7 @@ paths = [
   "RS fixtures/data/b7-at-line-4.toml",
   "RS fixtures/data/b7-at-line.toml",
   "RS fixtures/data/c2-bc-two-start.toml",
+  "RS fixtures/data/k4-m1.toml",
   "RS fixtures/data/w1-potts.toml",
   "RS fixtures/data/w2-potts-2.toml",
   "RS fixtures/data/w2-potts.toml",
@@ -139,6 +140,10 @@ paths = [
   "S inputs/c2-bc-two-start/couplings.toml",
   "RS inputs/c2-bc-two-start/m.toml",
   "RS inputs/c2-bc-two-start/transducer.toml",
+  "S inputs/k4-m1",
+  "RS inputs/k4-m1/couplings.toml",
+  "RS inputs/k4-m1/m.toml",
+  "RS inputs/k4-m1/transducer.toml",
   "S inputs/w1-potts",
   "S inputs/w1-potts/couplings.toml",
   "RS inputs/w1-potts/m.toml",
@@ -267,6 +272,8 @@ paths = [
   "RS results/c2-bc-two-start@v03-rules.npz",
   "RS results/c2-bc-two-start@verdict-x-rules.json",
   "RS results/c2-bc-two-start@verdict-x-rules.npz",
+  "RS results/k4-m1@v08-rules.json",
+  "RS results/k4-m1@v08-rules.npz",
   "RS results/w1-potts@v03-rules.json",
   "RS results/w1-potts@v03-rules.npz",
   "RS results/w2-potts-2@v03-rules.json",
@@ -363,7 +370,15 @@ paths = [
   "S tables/v05-rules",
   "S tables/v06-rules",
   "S tables/v07-rules",
-  "S tables/v08-rules",
+  "DS tables/v08-rules",
+  "RS tables/v08-rules/codes.toml",
+  "RS tables/v08-rules/compose.toml",
+  "RS tables/v08-rules/family.toml",
+  "RS tables/v08-rules/geometry.toml",
+  "RS tables/v08-rules/membership.toml",
+  "RS tables/v08-rules/order.toml",
+  "RS tables/v08-rules/probe.toml",
+  "RS tables/v08-rules/verdict.toml",
   "DS tables/verdict-x-rules",
   "RS tables/verdict-x-rules/codes.toml",
   "RS tables/verdict-x-rules/verdict.toml",

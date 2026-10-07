@@ -1,3 +1,11 @@
 $ bin/cc tabulate --advanced
-tabulate: 189 results -> SIGNATURE-TABLE.md, docs/verdict-table.html
-exit 0
+family k4-m1 reads NOT-EVALUATED: its family.toml has no [side] needle_code to read the needle codes through.
+  Next: bin/cc show k4-m1 --tables v01-rules (the needle column), then declare the points the family covers, or measure more points
+family k4-m1 reads NOT-EVALUATED: its family.toml has no [side] needle_code to read the needle codes through.
+  Next: bin/cc show k4-m1 --tables v02-rules (the needle column), then declare the points the family covers, or measure more points
+family k4-m1 reads NOT-EVALUATED: its family.toml has no [side] needle_code to read the needle codes through.
+  Next: bin/cc show k4-m1 --tables v03-rules (the needle column), then declare the points the family covers, or measure more points
+family k4-m1 reads NOT-EVALUATED: its family.toml has no [side] needle_code to read the needle codes through.
+  Next: bin/cc show k4-m1 --tables v04-rules (the needle column), then declare the points the family covers, or measure more points
+tabulate: 197 results -> SIGNATURE-TABLE.md, docs/verdict-table.html
+exit 1

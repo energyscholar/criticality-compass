@@ -2,7 +2,7 @@
 # never typed). Each entry: kinds (R read, S stat, D directory listed) and a path (~data/ = the data root, ~toolset/ = the rest of the toolset root).
 schema = 1
 kind = "golden-reads"
-key = "761db1f299c64987e9f45e87981da4cb19ce4d0502325d5c83854bfb0bac0c11"
+key = "436bd3b9abcf2214f7d267e3a486311b8c3dc501928f3d9deb263624277119ef"
 paths = [
   "RS bin/cc",
   "R cc/author.py",
