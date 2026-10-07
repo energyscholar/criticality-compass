@@ -72,7 +72,7 @@ if (tdir / "geometry.toml").is_file():
     out += section("Compose (step 12; (geometry, order) -> verdict)", tdir / "compose.toml", "row", None, C, w2)
 if (tdir / "family.toml").is_file():
     f = tomllib.loads((tdir / "family.toml").read_text())
-    out += section("Family verdict (`bin/cc family`: a lookup over bracket, f1, f2, points, lower, upper)", tdir / "family.toml", "row", f["verdicts"], C, w2)
+    out += section("Family report (a declared projection C over bracket, f1, f2, points, lower, upper)", tdir / "family.toml", "row", f["verdicts"], C, w2)
     out.append("  class_of: " + kv(f["class_of"]))
     out += section("Side (lower/upper) end kinds; an END-* side names end_point and end_bracket", tdir / "family.toml", "side_row", None, C, w2)
 if (tdir / "membership.toml").is_file():
