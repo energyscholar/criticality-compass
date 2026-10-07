@@ -1,0 +1,6 @@
+# families/k4-m1.toml (plan 0880 P2) - the k4-m1 temperature sweep; interior by the declared rule (plan 0879), never a hand list
+schema = 1
+kind = "family-decl"
+id = "k4-m1"
+input = "k4-m1"
+interior = "mid-run-open"
