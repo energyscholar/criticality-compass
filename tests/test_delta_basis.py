@@ -3,6 +3,7 @@ yD2 on any other pair (RAW); a point combines ONLY its TRANSFORMED touching pair
 needle drift (a, b CONVERGING with r = 0.1; c PERSISTENT with r = 2), measured through detect.measure with the REAL instruments under v07-rules and v06-rules."""
 import dataclasses
 import shutil
+import stat
 import sys
 import tempfile
 from pathlib import Path
@@ -139,6 +140,8 @@ for why, path, edit, find in (
         shutil.copy(ROOT / "cc.toml", t)
         shutil.copy(ROOT / "checks.toml", t)
         shutil.copytree(ROOT / "instruments", Path(t) / "instruments")
+        for q in [Path(t) / "instruments", *(Path(t) / "instruments").rglob("*")]:   # instruments/ is frozen (read-only): restore owner-write on the COPY only (ruling 5)
+            q.chmod(q.stat().st_mode | stat.S_IWUSR)
         shutil.copytree(ROOT / "tables" / "v07-rules", Path(t) / "tables" / "v07-rules")
         shutil.copytree(ROOT / "cc", Path(t) / "cc")
         f = Path(t) / path
