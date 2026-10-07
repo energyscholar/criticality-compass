@@ -43,6 +43,23 @@ Written by `bin/cc tabulate`. Truth is joined here only (cc/score.py); no result
 | c2-bc-two-start@v01-rules | d1.9-K2.3 | `bc-off-critical` | NOT | 81 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | INDEP (C) | REFUSE-NEEDLE-UNMEASURED | REFUSE |
 | c2-bc-two-start@v01-rules | d1.9-K2.6 | `bc-off-critical` | NOT | 81 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | INDEP (C) | REFUSE-NEEDLE-UNMEASURED | REFUSE |
 | c2-bc-two-start@v01-rules | d1.9-K3.0 | `bc-off-critical` | NOT | 81 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | COEXIST (C) | REFUSE-NEEDLE-UNMEASURED | REFUSE |
+| k4-m1@v01-rules | 0.30 | `none` | none | 27 81 243 | ORD (C) | ORD (C) | SLOW (C) | NOT-EVALUATED (CH) | NOT-EVALUATED (CH) | INDEP (C) | NOT | NOT |
+| k4-m1@v01-rules | 0.35 | `none` | none | 27 81 243 | ORD (C) | ORD (C) | SLOW (C) | IRRELEVANT (CH) | OFF (CH) | INDEP (C) | NOT | NOT |
+| k4-m1@v01-rules | 0.40 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | SLOW (C) | RELEVANT (CH) | STABLE (CH) | INDEP (C) | REFUSE-SLOW | REFUSE |
+| k4-m1@v01-rules | 0.45 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | SLOW (C) | MARGINAL (CH) | STABLE (CH) | INDEP (C) | LINE | LINE |
+| k4-m1@v01-rules | 0.50 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | SLOW (C) | RELEVANT (CH) | CROSSING (CH) | INDEP (C) | REFUSE-SLOW | REFUSE |
+| k4-m1@v01-rules | 0.55 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | SLOW (C) | UNRES (CH) | STABLE (CH) | INDEP (C) | REFUSE-SLOW | REFUSE |
+| k4-m1@v01-rules | 0.60 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | SLOW (C) | MARGINAL (CH) | STABLE (CH) | INDEP (C) | LINE | LINE |
+| k4-m1@v01-rules | 0.65 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | SLOW (C) | MARGINAL (CH) | UNRES (CH) | INDEP (C) | REFUSE-SLOW | REFUSE |
+| k4-m1@v01-rules | 0.70 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | SLOW (C) | MARGINAL (CH) | STABLE (CH) | INDEP (C) | LINE | LINE |
+| k4-m1@v01-rules | 0.75 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | SLOW (C) | MARGINAL (CH) | STABLE (CH) | INDEP (C) | LINE | LINE |
+| k4-m1@v01-rules | 0.80 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | SLOW (C) | MARGINAL (CH) | STABLE (CH) | INDEP (C) | LINE | LINE |
+| k4-m1@v01-rules | 0.85 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | SLOW (C) | WEAK (CH) | STABLE (CH) | INDEP (C) | REFUSE-SLOW | REFUSE |
+| k4-m1@v01-rules | 0.90 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | SLOW (C) | RELEVANT (CH) | STABLE (CH) | INDEP (C) | REFUSE-SLOW | REFUSE |
+| k4-m1@v01-rules | 0.95 | `none` | none | 27 81 243 | NEITHER (C) | DIS (C) | FLOWING (C) | RELEVANT (CH) | STABLE (CH) | INDEP (C) | NOT | NOT |
+| k4-m1@v01-rules | 1.00 | `none` | none | 27 81 243 | NEITHER (C) | DIS (C) | FLOWING (C) | RELEVANT (CH) | OFF (CH) | INDEP (C) | NOT | NOT |
+| k4-m1@v01-rules | 1.05 | `none` | none | 27 81 243 | NEITHER (C) | DIS (C) | FLOWING (C) | MARGINAL (CH) | OFF (CH) | INDEP (C) | NOT | NOT |
+| k4-m1@v01-rules | 1.10 | `none` | none | 27 81 243 | NEITHER (C) | DIS (C) | FLOWING (C) | IRRELEVANT (CH) | OFF (CH) | INDEP (C) | NOT | NOT |
 | w2-potts@v01-rules | 2 | `ising-2d` | POINT | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | STABLE (HT) | INDEP (T) | REFUSE-NEEDLE-UNMEASURED | REFUSE |
 | w2-potts@v01-rules | 3 | `potts-q3` | POINT | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | STABLE (HT) | INDEP (T) | REFUSE-NEEDLE-UNMEASURED | REFUSE |
 | w2-potts@v01-rules | 4 | `none` | none | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | STABLE (HT) | INDEP (T) | REFUSE-NEEDLE-UNMEASURED | REFUSE |
@@ -86,7 +103,7 @@ Written by `bin/cc tabulate`. Truth is joined here only (cc/score.py); no result
 | x8-ising-needle@v01-rules | 1.05 | `ising-off-critical` | NOT | 81 243 | ORD (T) | ORD (T) | FLOWING (T) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT |
 | x8-ising-needle@v01-rules | 1.10 | `ising-off-critical` | NOT | 81 243 | ORD (T) | ORD (T) | SLOW (T) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT |
 
-Verdict class against truth: 11 agree, 47 refused, 8 disagree, 13 no truth
+Verdict class against truth: 11 agree, 47 refused, 8 disagree, 30 no truth
 
 ## Collisions (v01-rules)
 
@@ -140,6 +157,23 @@ Verdict class against truth: 11 agree, 47 refused, 8 disagree, 13 no truth
 | c2-bc-two-start@v02-rules | d1.9-K2.3 | `bc-off-critical` | NOT | 81 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | INDEP (C) | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
 | c2-bc-two-start@v02-rules | d1.9-K2.6 | `bc-off-critical` | NOT | 81 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | INDEP (C) | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
 | c2-bc-two-start@v02-rules | d1.9-K3.0 | `bc-off-critical` | NOT | 81 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | COEXIST (C) | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
+| k4-m1@v02-rules | 0.30 | `none` | none | 27 81 243 | ORD (C) | ORD (C) | SLOW (C) | NOT-EVALUATED (CH) | NOT-EVALUATED (CH) | INDEP (C) | NOT | NOT | NOT | OFF-WINDOW |
+| k4-m1@v02-rules | 0.35 | `none` | none | 27 81 243 | ORD (C) | ORD (C) | SLOW (C) | IRRELEVANT (CH) | OFF (CH) | INDEP (C) | NOT | NOT | NOT | OFF-WINDOW |
+| k4-m1@v02-rules | 0.40 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | SLOW (C) | RELEVANT (CH) | STABLE (CH) | INDEP (C) | REFUSE-SLOW | REFUSE | REFUSE-SLOW | EQUILIBRATED |
+| k4-m1@v02-rules | 0.45 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | SLOW (C) | MARGINAL (CH) | STABLE (CH) | INDEP (C) | LINE | LINE | LINE | EQUILIBRATED |
+| k4-m1@v02-rules | 0.50 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | SLOW (C) | RELEVANT (CH) | CROSSING (CH) | INDEP (C) | REFUSE-SLOW | REFUSE | REFUSE-SLOW | EQUILIBRATED |
+| k4-m1@v02-rules | 0.55 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | SLOW (C) | UNRES (CH) | STABLE (CH) | INDEP (C) | REFUSE-SLOW | REFUSE | REFUSE-SLOW | EQUILIBRATED |
+| k4-m1@v02-rules | 0.60 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | SLOW (C) | MARGINAL (CH) | STABLE (CH) | INDEP (C) | LINE | LINE | LINE | EQUILIBRATED |
+| k4-m1@v02-rules | 0.65 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | SLOW (C) | MARGINAL (CH) | UNRES (CH) | INDEP (C) | REFUSE-SLOW | REFUSE | REFUSE-SLOW | EQUILIBRATED |
+| k4-m1@v02-rules | 0.70 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | SLOW (C) | MARGINAL (CH) | STABLE (CH) | INDEP (C) | LINE | LINE | LINE | EQUILIBRATED |
+| k4-m1@v02-rules | 0.75 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | SLOW (C) | MARGINAL (CH) | STABLE (CH) | INDEP (C) | LINE | LINE | LINE | EQUILIBRATED |
+| k4-m1@v02-rules | 0.80 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | SLOW (C) | MARGINAL (CH) | STABLE (CH) | INDEP (C) | LINE | LINE | LINE | EQUILIBRATED |
+| k4-m1@v02-rules | 0.85 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | SLOW (C) | WEAK (CH) | STABLE (CH) | INDEP (C) | REFUSE-SLOW | REFUSE | REFUSE-SLOW | EQUILIBRATED |
+| k4-m1@v02-rules | 0.90 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | SLOW (C) | RELEVANT (CH) | STABLE (CH) | INDEP (C) | REFUSE-SLOW | REFUSE | REFUSE-SLOW | EQUILIBRATED |
+| k4-m1@v02-rules | 0.95 | `none` | none | 27 81 243 | NEITHER (C) | DIS (C) | FLOWING (C) | RELEVANT (CH) | STABLE (CH) | INDEP (C) | NOT | NOT | NOT | OFF-WINDOW |
+| k4-m1@v02-rules | 1.00 | `none` | none | 27 81 243 | NEITHER (C) | DIS (C) | FLOWING (C) | RELEVANT (CH) | OFF (CH) | INDEP (C) | NOT | NOT | NOT | OFF-WINDOW |
+| k4-m1@v02-rules | 1.05 | `none` | none | 27 81 243 | NEITHER (C) | DIS (C) | FLOWING (C) | MARGINAL (CH) | OFF (CH) | INDEP (C) | NOT | NOT | NOT | OFF-WINDOW |
+| k4-m1@v02-rules | 1.10 | `none` | none | 27 81 243 | NEITHER (C) | DIS (C) | FLOWING (C) | IRRELEVANT (CH) | OFF (CH) | INDEP (C) | NOT | NOT | NOT | OFF-WINDOW |
 | w1-potts@v02-rules | 2 | `ising-2d` | POINT | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | STABLE (HT) | INDEP (T) | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
 | w1-potts@v02-rules | 3 | `potts-q3` | POINT | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | UNRES (HT) | INDEP (T) | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
 | w1-potts@v02-rules | 4 | `none` | none | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | UNRES (HT) | UNRES (T) | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
@@ -216,7 +250,7 @@ Verdict class against truth: 11 agree, 47 refused, 8 disagree, 13 no truth
 | x8-ising-needle@v02-rules | 1.05 | `ising-off-critical` | NOT | 81 243 | ORD (T) | ORD (T) | FLOWING (T) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT | NOT | OFF-WINDOW |
 | x8-ising-needle@v02-rules | 1.10 | `ising-off-critical` | NOT | 81 243 | ORD (T) | ORD (T) | SLOW (T) | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT | NOT | NOT | OFF-WINDOW |
 
-Verdict class against truth: 11 agree, 72 refused, 15 disagree, 19 no truth
+Verdict class against truth: 11 agree, 72 refused, 15 disagree, 36 no truth
 Order against order_truth: 22 agree, 61 refused, 15 disagree
 Geometry against class_truth (order_truth not FIRST-ORDER): 11 agree, 66 refused, 6 disagree
 
@@ -277,6 +311,23 @@ Geometry against class_truth (order_truth not FIRST-ORDER): 11 agree, 66 refused
 | c2-bc-two-start@v03-rules | d1.9-K2.3 | `bc-off-critical` | NOT | 81 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | INDEP (C) | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
 | c2-bc-two-start@v03-rules | d1.9-K2.6 | `bc-off-critical` | NOT | 81 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | INDEP (C) | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
 | c2-bc-two-start@v03-rules | d1.9-K3.0 | `bc-off-critical` | NOT | 81 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | COEXIST (C) | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
+| k4-m1@v03-rules | 0.30 | `none` | none | 27 81 243 | ORD (C) | ORD (C) | NOT-MEASURED (C) | SLOW (C) | NOT-EVALUATED (CH) | NOT-EVALUATED (CH) | INDEP (C) | NOT | NOT | NOT | OFF-WINDOW |
+| k4-m1@v03-rules | 0.35 | `none` | none | 27 81 243 | ORD (C) | ORD (C) | NOT-MEASURED (C) | SLOW (C) | IRRELEVANT (CH) | OFF (CH) | INDEP (C) | NOT | NOT | NOT | OFF-WINDOW |
+| k4-m1@v03-rules | 0.40 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | SLOW (C) | RELEVANT (CH) | STABLE (CH) | INDEP (C) | REFUSE-SLOW | REFUSE | REFUSE-SLOW | EQUILIBRATED |
+| k4-m1@v03-rules | 0.45 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | SLOW (C) | MARGINAL (CH) | STABLE (CH) | INDEP (C) | LINE | LINE | LINE | EQUILIBRATED |
+| k4-m1@v03-rules | 0.50 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | SLOW (C) | RELEVANT (CH) | CROSSING (CH) | INDEP (C) | REFUSE-SLOW | REFUSE | REFUSE-SLOW | EQUILIBRATED |
+| k4-m1@v03-rules | 0.55 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | SLOW (C) | UNRES (CH) | STABLE (CH) | INDEP (C) | REFUSE-SLOW | REFUSE | REFUSE-SLOW | EQUILIBRATED |
+| k4-m1@v03-rules | 0.60 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | SLOW (C) | MARGINAL (CH) | STABLE (CH) | INDEP (C) | LINE | LINE | LINE | EQUILIBRATED |
+| k4-m1@v03-rules | 0.65 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | SLOW (C) | MARGINAL (CH) | UNRES (CH) | INDEP (C) | REFUSE-SLOW | REFUSE | REFUSE-SLOW | EQUILIBRATED |
+| k4-m1@v03-rules | 0.70 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | SLOW (C) | MARGINAL (CH) | STABLE (CH) | INDEP (C) | LINE | LINE | LINE | EQUILIBRATED |
+| k4-m1@v03-rules | 0.75 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | SLOW (C) | MARGINAL (CH) | STABLE (CH) | INDEP (C) | LINE | LINE | LINE | EQUILIBRATED |
+| k4-m1@v03-rules | 0.80 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | SLOW (C) | MARGINAL (CH) | STABLE (CH) | INDEP (C) | LINE | LINE | LINE | EQUILIBRATED |
+| k4-m1@v03-rules | 0.85 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | SLOW (C) | WEAK (CH) | STABLE (CH) | INDEP (C) | REFUSE-SLOW | REFUSE | REFUSE-SLOW | EQUILIBRATED |
+| k4-m1@v03-rules | 0.90 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | SLOW (C) | RELEVANT (CH) | STABLE (CH) | INDEP (C) | REFUSE-SLOW | REFUSE | REFUSE-SLOW | EQUILIBRATED |
+| k4-m1@v03-rules | 0.95 | `none` | none | 27 81 243 | NEITHER (C) | DIS (C) | NOT-MEASURED (C) | FLOWING (C) | RELEVANT (CH) | STABLE (CH) | INDEP (C) | NOT | NOT | NOT | OFF-WINDOW |
+| k4-m1@v03-rules | 1.00 | `none` | none | 27 81 243 | NEITHER (C) | DIS (C) | NOT-MEASURED (C) | FLOWING (C) | RELEVANT (CH) | OFF (CH) | INDEP (C) | NOT | NOT | NOT | OFF-WINDOW |
+| k4-m1@v03-rules | 1.05 | `none` | none | 27 81 243 | NEITHER (C) | DIS (C) | NOT-MEASURED (C) | FLOWING (C) | MARGINAL (CH) | OFF (CH) | INDEP (C) | NOT | NOT | NOT | OFF-WINDOW |
+| k4-m1@v03-rules | 1.10 | `none` | none | 27 81 243 | NEITHER (C) | DIS (C) | NOT-MEASURED (C) | FLOWING (C) | IRRELEVANT (CH) | OFF (CH) | INDEP (C) | NOT | NOT | NOT | OFF-WINDOW |
 | w1-potts@v03-rules | 2 | `ising-2d` | POINT | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | STABLE (HT) | INDEP (T) | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
 | w1-potts@v03-rules | 3 | `potts-q3` | POINT | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | UNRES (HT) | INDEP (T) | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
 | w1-potts@v03-rules | 4 | `none` | none | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | UNRES (HT) | UNRES (T) | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
@@ -362,7 +413,7 @@ Geometry against class_truth (order_truth not FIRST-ORDER): 11 agree, 66 refused
 | x9c-potts@v03-rules | 8 | `potts-q8` | FIRST-ORDER | 27 81 243 | NEITHER (T) | DIS (T) | PINNED-BETWEEN-PHASES (T) | FLOWING (T) | IRRELEVANT (HT) | OFF (HT) | COEXIST (T) | FIRST-ORDER | FIRST-ORDER | NOT | COEXIST-AT-WINDOW |
 | x9c-potts@v03-rules | 10 | `potts-q10` | FIRST-ORDER | 27 81 243 | NEITHER (T) | DIS (T) | PINNED-BETWEEN-PHASES (T) | FLOWING (T) | UNRES (HT) | UNRES (HT) | COEXIST (T) | FIRST-ORDER | FIRST-ORDER | NOT | COEXIST-AT-WINDOW |
 
-Verdict class against truth: 16 agree, 78 refused, 17 disagree, 20 no truth
+Verdict class against truth: 16 agree, 78 refused, 17 disagree, 37 no truth
 Order against order_truth: 29 agree, 66 refused, 16 disagree
 Geometry against class_truth (order_truth not FIRST-ORDER): 14 agree, 70 refused, 8 disagree
 
@@ -428,6 +479,23 @@ Geometry against class_truth (order_truth not FIRST-ORDER): 14 agree, 70 refused
 | c2-bc-two-start@v04-rules | d1.9-K2.3 | `bc-off-critical` | NOT | 81 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | INDEP (C) | NOT-MEASURED | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
 | c2-bc-two-start@v04-rules | d1.9-K2.6 | `bc-off-critical` | NOT | 81 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | INDEP (C) | NOT-MEASURED | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
 | c2-bc-two-start@v04-rules | d1.9-K3.0 | `bc-off-critical` | NOT | 81 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | COEXIST (C) | NOT-MEASURED | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
+| k4-m1@v04-rules | 0.30 | `none` | none | 27 81 243 | ORD (C) | ORD (C) | NOT-MEASURED (C) | CONVERGING (C) | STOPPED (C) | NOT-EVALUATED (CH) | NOT-EVALUATED (CH) | INDEP (C) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
+| k4-m1@v04-rules | 0.35 | `none` | none | 27 81 243 | ORD (C) | ORD (C) | NOT-MEASURED (C) | MARGINAL-DRIFT (C) | SLOW (C) | IRRELEVANT (CH) | OFF (CH) | INDEP (C) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
+| k4-m1@v04-rules | 0.40 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | PERSISTENT (C) | SLOW (C) | RELEVANT (CH) | STABLE (CH) | INDEP (C) | COMPLETE | REFUSE-SLOW | REFUSE | REFUSE-SLOW | CONTINUOUS |
+| k4-m1@v04-rules | 0.45 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | PERSISTENT (C) | SLOW (C) | MARGINAL (CH) | STABLE (CH) | INDEP (C) | COMPLETE | LINE | LINE | LINE | CONTINUOUS |
+| k4-m1@v04-rules | 0.50 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | PERSISTENT (C) | SLOW (C) | RELEVANT (CH) | CROSSING (CH) | INDEP (C) | COMPLETE | REFUSE-SLOW | REFUSE | REFUSE-SLOW | CONTINUOUS |
+| k4-m1@v04-rules | 0.55 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | UNRES (C) | SLOW (C) | UNRES (CH) | STABLE (CH) | INDEP (C) | COMPLETE | REFUSE-SLOW | REFUSE | REFUSE-SLOW | CONTINUOUS |
+| k4-m1@v04-rules | 0.60 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | UNRES (C) | SLOW (C) | MARGINAL (CH) | STABLE (CH) | INDEP (C) | COMPLETE | LINE | LINE | LINE | CONTINUOUS |
+| k4-m1@v04-rules | 0.65 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | UNRES (C) | SLOW (C) | MARGINAL (CH) | UNRES (CH) | INDEP (C) | COMPLETE | REFUSE-SLOW | REFUSE | REFUSE-SLOW | CONTINUOUS |
+| k4-m1@v04-rules | 0.70 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | UNRES (C) | SLOW (C) | MARGINAL (CH) | STABLE (CH) | INDEP (C) | COMPLETE | LINE | LINE | LINE | CONTINUOUS |
+| k4-m1@v04-rules | 0.75 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | UNRES (C) | SLOW (C) | MARGINAL (CH) | STABLE (CH) | INDEP (C) | COMPLETE | LINE | LINE | LINE | CONTINUOUS |
+| k4-m1@v04-rules | 0.80 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | MARGINAL-DRIFT (C) | SLOW (C) | MARGINAL (CH) | STABLE (CH) | INDEP (C) | COMPLETE | LINE | LINE | LINE | CONTINUOUS |
+| k4-m1@v04-rules | 0.85 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | PERSISTENT (C) | SLOW (C) | WEAK (CH) | STABLE (CH) | INDEP (C) | COMPLETE | REFUSE-SLOW | REFUSE | REFUSE-SLOW | CONTINUOUS |
+| k4-m1@v04-rules | 0.90 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | PERSISTENT (C) | SLOW (C) | RELEVANT (CH) | STABLE (CH) | INDEP (C) | COMPLETE | REFUSE-SLOW | REFUSE | REFUSE-SLOW | CONTINUOUS |
+| k4-m1@v04-rules | 0.95 | `none` | none | 27 81 243 | NEITHER (C) | DIS (C) | NOT-MEASURED (C) | PERSISTENT (C) | FLOWING (C) | RELEVANT (CH) | STABLE (CH) | INDEP (C) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
+| k4-m1@v04-rules | 1.00 | `none` | none | 27 81 243 | NEITHER (C) | DIS (C) | NOT-MEASURED (C) | PERSISTENT (C) | FLOWING (C) | RELEVANT (CH) | OFF (CH) | INDEP (C) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
+| k4-m1@v04-rules | 1.05 | `none` | none | 27 81 243 | NEITHER (C) | DIS (C) | NOT-MEASURED (C) | PERSISTENT (C) | FLOWING (C) | MARGINAL (CH) | OFF (CH) | INDEP (C) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
+| k4-m1@v04-rules | 1.10 | `none` | none | 27 81 243 | NEITHER (C) | DIS (C) | NOT-MEASURED (C) | PERSISTENT (C) | FLOWING (C) | IRRELEVANT (CH) | OFF (CH) | INDEP (C) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
 | w1-potts@v04-rules | 2 | `ising-2d` | POINT | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | STABLE (HT) | INDEP (T) | COMPLETE | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
 | w1-potts@v04-rules | 3 | `potts-q3` | POINT | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | UNRES (HT) | INDEP (T) | COMPLETE | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
 | w1-potts@v04-rules | 4 | `none` | none | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | UNRES (HT) | UNRES (T) | COMPLETE | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
@@ -534,7 +602,7 @@ Geometry against class_truth (order_truth not FIRST-ORDER): 14 agree, 70 refused
 | x9c-potts@v04-rules | 8 | `potts-q8` | FIRST-ORDER | 27 81 243 | NEITHER (T) | DIS (T) | PINNED-BETWEEN-PHASES (T) | NOT-MEASURED | FLOWING (T) | IRRELEVANT (HT) | OFF (HT) | COEXIST (T) | COMPLETE | FIRST-ORDER | FIRST-ORDER | NOT | COEXIST-AT-WINDOW |
 | x9c-potts@v04-rules | 10 | `potts-q10` | FIRST-ORDER | 27 81 243 | NEITHER (T) | DIS (T) | PINNED-BETWEEN-PHASES (T) | NOT-MEASURED | FLOWING (T) | UNRES (HT) | UNRES (HT) | COEXIST (T) | COMPLETE | FIRST-ORDER | FIRST-ORDER | NOT | COEXIST-AT-WINDOW |
 
-Verdict class against truth: 12 agree, 101 refused, 20 disagree, 24 no truth
+Verdict class against truth: 12 agree, 101 refused, 20 disagree, 41 no truth
 Order against order_truth: 45 agree, 71 refused, 17 disagree
 Geometry against class_truth (order_truth not FIRST-ORDER): 8 agree, 95 refused, 7 disagree
 
@@ -601,6 +669,23 @@ Geometry against class_truth (order_truth not FIRST-ORDER): 8 agree, 95 refused,
 | c2-bc-two-start@v05-rules | d1.9-K2.3 | `bc-off-critical` | NOT | 81 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | INDEP (C) | NOT-MEASURED | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
 | c2-bc-two-start@v05-rules | d1.9-K2.6 | `bc-off-critical` | NOT | 81 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | INDEP (C) | NOT-MEASURED | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
 | c2-bc-two-start@v05-rules | d1.9-K3.0 | `bc-off-critical` | NOT | 81 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | COEXIST (C) | NOT-MEASURED | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
+| k4-m1@v05-rules | 0.30 | `none` | none | 27 81 243 | ORD (C) | ORD (C) | NOT-MEASURED (C) | CONVERGING (C) | STOPPED (C) | NOT-EVALUATED (CH) | NOT-EVALUATED (CH) | INDEP (C) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
+| k4-m1@v05-rules | 0.35 | `none` | none | 27 81 243 | ORD (C) | ORD (C) | NOT-MEASURED (C) | MARGINAL-DRIFT (C) | SLOW (C) | IRRELEVANT (CH) | OFF (CH) | INDEP (C) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
+| k4-m1@v05-rules | 0.40 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | PERSISTENT (C) | SLOW (C) | RELEVANT (CH) | STABLE (CH) | INDEP (C) | COMPLETE | REFUSE-SLOW | REFUSE | REFUSE-SLOW | CONTINUOUS |
+| k4-m1@v05-rules | 0.45 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | PERSISTENT (C) | SLOW (C) | MARGINAL (CH) | STABLE (CH) | INDEP (C) | COMPLETE | LINE | LINE | LINE | CONTINUOUS |
+| k4-m1@v05-rules | 0.50 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | PERSISTENT (C) | SLOW (C) | RELEVANT (CH) | CROSSING (CH) | INDEP (C) | COMPLETE | REFUSE-SLOW | REFUSE | REFUSE-SLOW | CONTINUOUS |
+| k4-m1@v05-rules | 0.55 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | UNRES (C) | SLOW (C) | UNRES (CH) | STABLE (CH) | INDEP (C) | COMPLETE | REFUSE-SLOW | REFUSE | REFUSE-SLOW | CONTINUOUS |
+| k4-m1@v05-rules | 0.60 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | UNRES (C) | SLOW (C) | MARGINAL (CH) | STABLE (CH) | INDEP (C) | COMPLETE | LINE | LINE | LINE | CONTINUOUS |
+| k4-m1@v05-rules | 0.65 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | UNRES (C) | SLOW (C) | MARGINAL (CH) | UNRES (CH) | INDEP (C) | COMPLETE | REFUSE-SLOW | REFUSE | REFUSE-SLOW | CONTINUOUS |
+| k4-m1@v05-rules | 0.70 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | UNRES (C) | SLOW (C) | MARGINAL (CH) | STABLE (CH) | INDEP (C) | COMPLETE | LINE | LINE | LINE | CONTINUOUS |
+| k4-m1@v05-rules | 0.75 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | UNRES (C) | SLOW (C) | MARGINAL (CH) | STABLE (CH) | INDEP (C) | COMPLETE | LINE | LINE | LINE | CONTINUOUS |
+| k4-m1@v05-rules | 0.80 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | MARGINAL-DRIFT (C) | SLOW (C) | MARGINAL (CH) | STABLE (CH) | INDEP (C) | COMPLETE | LINE | LINE | LINE | CONTINUOUS |
+| k4-m1@v05-rules | 0.85 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | PERSISTENT (C) | SLOW (C) | WEAK (CH) | STABLE (CH) | INDEP (C) | COMPLETE | REFUSE-SLOW | REFUSE | REFUSE-SLOW | CONTINUOUS |
+| k4-m1@v05-rules | 0.90 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | PERSISTENT (C) | SLOW (C) | RELEVANT (CH) | STABLE (CH) | INDEP (C) | COMPLETE | REFUSE-SLOW | REFUSE | REFUSE-SLOW | CONTINUOUS |
+| k4-m1@v05-rules | 0.95 | `none` | none | 27 81 243 | NEITHER (C) | DIS (C) | NOT-MEASURED (C) | PERSISTENT (C) | FLOWING (C) | RELEVANT (CH) | STABLE (CH) | INDEP (C) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
+| k4-m1@v05-rules | 1.00 | `none` | none | 27 81 243 | NEITHER (C) | DIS (C) | NOT-MEASURED (C) | PERSISTENT (C) | FLOWING (C) | RELEVANT (CH) | OFF (CH) | INDEP (C) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
+| k4-m1@v05-rules | 1.05 | `none` | none | 27 81 243 | NEITHER (C) | DIS (C) | NOT-MEASURED (C) | PERSISTENT (C) | FLOWING (C) | MARGINAL (CH) | OFF (CH) | INDEP (C) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
+| k4-m1@v05-rules | 1.10 | `none` | none | 27 81 243 | NEITHER (C) | DIS (C) | NOT-MEASURED (C) | PERSISTENT (C) | FLOWING (C) | IRRELEVANT (CH) | OFF (CH) | INDEP (C) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
 | w1-potts@v05-rules | 2 | `ising-2d` | POINT | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | STABLE (HT) | INDEP (T) | COMPLETE | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
 | w1-potts@v05-rules | 3 | `potts-q3` | POINT | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | UNRES (HT) | INDEP (T) | COMPLETE | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
 | w1-potts@v05-rules | 4 | `none` | none | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | UNRES (HT) | UNRES (T) | COMPLETE | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
@@ -716,7 +801,7 @@ Geometry against class_truth (order_truth not FIRST-ORDER): 8 agree, 95 refused,
 | x9c-potts@v05-rules | 8 | `potts-q8` | FIRST-ORDER | 27 81 243 | NEITHER (T) | DIS (T) | PINNED-BETWEEN-PHASES (T) | NOT-MEASURED | FLOWING (T) | IRRELEVANT (HT) | OFF (HT) | COEXIST (T) | COMPLETE | FIRST-ORDER | FIRST-ORDER | NOT | COEXIST-AT-WINDOW |
 | x9c-potts@v05-rules | 10 | `potts-q10` | FIRST-ORDER | 27 81 243 | NEITHER (T) | DIS (T) | PINNED-BETWEEN-PHASES (T) | NOT-MEASURED | FLOWING (T) | UNRES (HT) | UNRES (HT) | COEXIST (T) | COMPLETE | FIRST-ORDER | FIRST-ORDER | NOT | COEXIST-AT-WINDOW |
 
-Verdict class against truth: 16 agree, 101 refused, 22 disagree, 27 no truth
+Verdict class against truth: 16 agree, 101 refused, 22 disagree, 44 no truth
 Order against order_truth: 51 agree, 71 refused, 17 disagree
 Geometry against class_truth (order_truth not FIRST-ORDER): 12 agree, 95 refused, 9 disagree
 
@@ -790,6 +875,23 @@ Family end against truth: 0 agree, 1 refused, 0 disagree
 | c2-bc-two-start@v06-rules | d1.9-K2.3 | `bc-off-critical` | NOT | 81 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | INDEP (C) | NOT-MEASURED | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
 | c2-bc-two-start@v06-rules | d1.9-K2.6 | `bc-off-critical` | NOT | 81 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | INDEP (C) | NOT-MEASURED | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
 | c2-bc-two-start@v06-rules | d1.9-K3.0 | `bc-off-critical` | NOT | 81 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | COEXIST (C) | NOT-MEASURED | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
+| k4-m1@v06-rules | 0.30 | `none` | none | 27 81 243 | ORD (C) | ORD (C) | NOT-MEASURED (C) | CONVERGING (C) | STOPPED (C) | NOT-EVALUATED (CH) | NOT-EVALUATED (CH) | INDEP (C) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
+| k4-m1@v06-rules | 0.35 | `none` | none | 27 81 243 | ORD (C) | ORD (C) | NOT-MEASURED (C) | MARGINAL-DRIFT (C) | SLOW (C) | UNRES (CH) | OFF (CH) | INDEP (C) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
+| k4-m1@v06-rules | 0.40 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | PERSISTENT (C) | SLOW (C) | UNRES (CH) | STABLE (CH) | INDEP (C) | COMPLETE | REFUSE-SLOW | REFUSE | REFUSE-SLOW | CONTINUOUS |
+| k4-m1@v06-rules | 0.45 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | PERSISTENT (C) | SLOW (C) | UNRES (CH) | STABLE (CH) | INDEP (C) | COMPLETE | REFUSE-SLOW | REFUSE | REFUSE-SLOW | CONTINUOUS |
+| k4-m1@v06-rules | 0.50 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | PERSISTENT (C) | SLOW (C) | UNRES (CH) | CROSSING (CH) | INDEP (C) | COMPLETE | REFUSE-SLOW | REFUSE | REFUSE-SLOW | CONTINUOUS |
+| k4-m1@v06-rules | 0.55 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | UNRES (C) | SLOW (C) | UNRES (CH) | STABLE (CH) | INDEP (C) | COMPLETE | REFUSE-SLOW | REFUSE | REFUSE-SLOW | CONTINUOUS |
+| k4-m1@v06-rules | 0.60 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | UNRES (C) | SLOW (C) | UNRES (CH) | STABLE (CH) | INDEP (C) | COMPLETE | REFUSE-SLOW | REFUSE | REFUSE-SLOW | CONTINUOUS |
+| k4-m1@v06-rules | 0.65 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | UNRES (C) | SLOW (C) | MARGINAL (CH) | UNRES (CH) | INDEP (C) | COMPLETE | REFUSE-SLOW | REFUSE | REFUSE-SLOW | CONTINUOUS |
+| k4-m1@v06-rules | 0.70 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | UNRES (C) | SLOW (C) | MARGINAL (CH) | STABLE (CH) | INDEP (C) | COMPLETE | LINE | LINE | LINE | CONTINUOUS |
+| k4-m1@v06-rules | 0.75 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | UNRES (C) | SLOW (C) | MARGINAL (CH) | STABLE (CH) | INDEP (C) | COMPLETE | LINE | LINE | LINE | CONTINUOUS |
+| k4-m1@v06-rules | 0.80 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | MARGINAL-DRIFT (C) | SLOW (C) | UNRES (CH) | STABLE (CH) | INDEP (C) | COMPLETE | REFUSE-SLOW | REFUSE | REFUSE-SLOW | CONTINUOUS |
+| k4-m1@v06-rules | 0.85 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | PERSISTENT (C) | SLOW (C) | WEAK (CH) | STABLE (CH) | INDEP (C) | COMPLETE | REFUSE-SLOW | REFUSE | REFUSE-SLOW | CONTINUOUS |
+| k4-m1@v06-rules | 0.90 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | PERSISTENT (C) | SLOW (C) | UNRES (CH) | STABLE (CH) | INDEP (C) | COMPLETE | REFUSE-SLOW | REFUSE | REFUSE-SLOW | CONTINUOUS |
+| k4-m1@v06-rules | 0.95 | `none` | none | 27 81 243 | NEITHER (C) | DIS (C) | NOT-MEASURED (C) | PERSISTENT (C) | FLOWING (C) | RELEVANT (CH) | STABLE (CH) | INDEP (C) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
+| k4-m1@v06-rules | 1.00 | `none` | none | 27 81 243 | NEITHER (C) | DIS (C) | NOT-MEASURED (C) | PERSISTENT (C) | FLOWING (C) | UNRES (CH) | OFF (CH) | INDEP (C) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
+| k4-m1@v06-rules | 1.05 | `none` | none | 27 81 243 | NEITHER (C) | DIS (C) | NOT-MEASURED (C) | PERSISTENT (C) | FLOWING (C) | WEAK (CH) | OFF (CH) | INDEP (C) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
+| k4-m1@v06-rules | 1.10 | `none` | none | 27 81 243 | NEITHER (C) | DIS (C) | NOT-MEASURED (C) | PERSISTENT (C) | FLOWING (C) | WEAK (CH) | OFF (CH) | INDEP (C) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
 | w1-potts@v06-rules | 2 | `ising-2d` | POINT | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | STABLE (HT) | INDEP (T) | COMPLETE | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
 | w1-potts@v06-rules | 3 | `potts-q3` | POINT | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | UNRES (HT) | INDEP (T) | COMPLETE | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
 | w1-potts@v06-rules | 4 | `none` | none | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | UNRES (HT) | UNRES (T) | COMPLETE | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
@@ -914,7 +1016,7 @@ Family end against truth: 0 agree, 1 refused, 0 disagree
 | x9c-potts@v06-rules | 8 | `potts-q8` | FIRST-ORDER | 27 81 243 | NEITHER (T) | DIS (T) | PINNED-BETWEEN-PHASES (T) | NOT-MEASURED | FLOWING (T) | IRRELEVANT (HT) | OFF (HT) | COEXIST (T) | COMPLETE | FIRST-ORDER | FIRST-ORDER | NOT | COEXIST-AT-WINDOW |
 | x9c-potts@v06-rules | 10 | `potts-q10` | FIRST-ORDER | 27 81 243 | NEITHER (T) | DIS (T) | PINNED-BETWEEN-PHASES (T) | NOT-MEASURED | FLOWING (T) | UNRES (HT) | UNRES (HT) | COEXIST (T) | COMPLETE | FIRST-ORDER | FIRST-ORDER | NOT | COEXIST-AT-WINDOW |
 
-Verdict class against truth: 18 agree, 107 refused, 20 disagree, 30 no truth
+Verdict class against truth: 18 agree, 107 refused, 20 disagree, 47 no truth
 Order against order_truth: 57 agree, 71 refused, 17 disagree
 Geometry against class_truth (order_truth not FIRST-ORDER): 14 agree, 101 refused, 7 disagree
 
@@ -990,6 +1092,23 @@ Family end against truth: 1 agree, 1 refused, 0 disagree
 | c2-bc-two-start@v07-rules | d1.9-K2.3 | `bc-off-critical` | NOT | 81 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | INDEP (C) | NOT-MEASURED | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
 | c2-bc-two-start@v07-rules | d1.9-K2.6 | `bc-off-critical` | NOT | 81 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | INDEP (C) | NOT-MEASURED | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
 | c2-bc-two-start@v07-rules | d1.9-K3.0 | `bc-off-critical` | NOT | 81 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | COEXIST (C) | NOT-MEASURED | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
+| k4-m1@v07-rules | 0.30 | `none` | none | 27 81 243 | ORD (C) | ORD (C) | NOT-MEASURED (C) | CONVERGING (C) | STOPPED (C) | NOT-EVALUATED (CH) | NOT-EVALUATED (CH) | INDEP (C) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
+| k4-m1@v07-rules | 0.35 | `none` | none | 27 81 243 | ORD (C) | ORD (C) | NOT-MEASURED (C) | MARGINAL-DRIFT (C) | SLOW (C) | UNRES (CH) | OFF (CH) | INDEP (C) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
+| k4-m1@v07-rules | 0.40 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | PERSISTENT (C) | SLOW (C) | UNRES (CH) | STABLE (CH) | INDEP (C) | COMPLETE | REFUSE-SLOW | REFUSE | REFUSE-SLOW | CONTINUOUS |
+| k4-m1@v07-rules | 0.45 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | PERSISTENT (C) | SLOW (C) | UNRES (CH) | STABLE (CH) | INDEP (C) | COMPLETE | REFUSE-SLOW | REFUSE | REFUSE-SLOW | CONTINUOUS |
+| k4-m1@v07-rules | 0.50 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | PERSISTENT (C) | SLOW (C) | UNRES (CH) | CROSSING (CH) | INDEP (C) | COMPLETE | REFUSE-SLOW | REFUSE | REFUSE-SLOW | CONTINUOUS |
+| k4-m1@v07-rules | 0.55 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | UNRES (C) | SLOW (C) | UNRES (CH) | STABLE (CH) | INDEP (C) | COMPLETE | REFUSE-SLOW | REFUSE | REFUSE-SLOW | CONTINUOUS |
+| k4-m1@v07-rules | 0.60 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | UNRES (C) | SLOW (C) | UNRES (CH) | STABLE (CH) | INDEP (C) | COMPLETE | REFUSE-SLOW | REFUSE | REFUSE-SLOW | CONTINUOUS |
+| k4-m1@v07-rules | 0.65 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | UNRES (C) | SLOW (C) | MARGINAL (CH) | UNRES (CH) | INDEP (C) | COMPLETE | REFUSE-SLOW | REFUSE | REFUSE-SLOW | CONTINUOUS |
+| k4-m1@v07-rules | 0.70 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | UNRES (C) | SLOW (C) | MARGINAL (CH) | STABLE (CH) | INDEP (C) | COMPLETE | LINE | LINE | LINE | CONTINUOUS |
+| k4-m1@v07-rules | 0.75 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | UNRES (C) | SLOW (C) | MARGINAL (CH) | STABLE (CH) | INDEP (C) | COMPLETE | LINE | LINE | LINE | CONTINUOUS |
+| k4-m1@v07-rules | 0.80 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | MARGINAL-DRIFT (C) | SLOW (C) | UNRES (CH) | STABLE (CH) | INDEP (C) | COMPLETE | REFUSE-SLOW | REFUSE | REFUSE-SLOW | CONTINUOUS |
+| k4-m1@v07-rules | 0.85 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | PERSISTENT (C) | SLOW (C) | WEAK (CH) | STABLE (CH) | INDEP (C) | COMPLETE | REFUSE-SLOW | REFUSE | REFUSE-SLOW | CONTINUOUS |
+| k4-m1@v07-rules | 0.90 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | PERSISTENT (C) | SLOW (C) | UNRES (CH) | STABLE (CH) | INDEP (C) | COMPLETE | REFUSE-SLOW | REFUSE | REFUSE-SLOW | CONTINUOUS |
+| k4-m1@v07-rules | 0.95 | `none` | none | 27 81 243 | NEITHER (C) | DIS (C) | NOT-MEASURED (C) | PERSISTENT (C) | FLOWING (C) | RELEVANT (CH) | STABLE (CH) | INDEP (C) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
+| k4-m1@v07-rules | 1.00 | `none` | none | 27 81 243 | NEITHER (C) | DIS (C) | NOT-MEASURED (C) | PERSISTENT (C) | FLOWING (C) | UNRES (CH) | OFF (CH) | INDEP (C) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
+| k4-m1@v07-rules | 1.05 | `none` | none | 27 81 243 | NEITHER (C) | DIS (C) | NOT-MEASURED (C) | PERSISTENT (C) | FLOWING (C) | WEAK (CH) | OFF (CH) | INDEP (C) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
+| k4-m1@v07-rules | 1.10 | `none` | none | 27 81 243 | NEITHER (C) | DIS (C) | NOT-MEASURED (C) | PERSISTENT (C) | FLOWING (C) | WEAK (CH) | OFF (CH) | INDEP (C) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
 | w1-potts@v07-rules | 2 | `ising-2d` | POINT | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | STABLE (HT) | INDEP (T) | COMPLETE | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
 | w1-potts@v07-rules | 3 | `potts-q3` | POINT | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | UNRES (HT) | INDEP (T) | COMPLETE | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
 | w1-potts@v07-rules | 4 | `none` | none | 27 81 243 | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | NOT-MEASURED | RELEVANT (HT) | UNRES (HT) | UNRES (T) | COMPLETE | REFUSE-NEEDLE-UNMEASURED | REFUSE | REFUSE-NEEDLE-UNMEASURED | NEEDLE-UNMEASURED |
@@ -1114,7 +1233,7 @@ Family end against truth: 1 agree, 1 refused, 0 disagree
 | x9c-potts@v07-rules | 8 | `potts-q8` | FIRST-ORDER | 27 81 243 | NEITHER (T) | DIS (T) | PINNED-BETWEEN-PHASES (T) | NOT-MEASURED | FLOWING (T) | IRRELEVANT (HT) | OFF (HT) | COEXIST (T) | COMPLETE | FIRST-ORDER | FIRST-ORDER | NOT | COEXIST-AT-WINDOW |
 | x9c-potts@v07-rules | 10 | `potts-q10` | FIRST-ORDER | 27 81 243 | NEITHER (T) | DIS (T) | PINNED-BETWEEN-PHASES (T) | NOT-MEASURED | FLOWING (T) | UNRES (HT) | UNRES (HT) | COEXIST (T) | COMPLETE | FIRST-ORDER | FIRST-ORDER | NOT | COEXIST-AT-WINDOW |
 
-Verdict class against truth: 22 agree, 103 refused, 20 disagree, 30 no truth
+Verdict class against truth: 22 agree, 103 refused, 20 disagree, 47 no truth
 Order against order_truth: 57 agree, 71 refused, 17 disagree
 Geometry against class_truth (order_truth not FIRST-ORDER): 18 agree, 97 refused, 7 disagree
 
@@ -1138,6 +1257,23 @@ Family end against truth: 2 agree, 0 refused, 0 disagree
 
 | run | point | case | truth | sizes | sink | needle | needle_pair | drift_code | flow | across | stability | two_start | probe | verdict | class | geometry | order |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| k4-m1@v08-rules | 0.30 | `none` | none | 27 81 243 | ORD (C) | ORD (C) | NOT-MEASURED (C) | CONVERGING (C) | STOPPED (C) | IRRELEVANT (CH) | OFF (C) | INDEP (C) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
+| k4-m1@v08-rules | 0.35 | `none` | none | 27 81 243 | ORD (C) | ORD (C) | NOT-MEASURED (C) | MARGINAL-DRIFT (C) | SLOW (C) | UNRES (CH) | OFF (C) | INDEP (C) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
+| k4-m1@v08-rules | 0.40 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | PERSISTENT (C) | SLOW (C) | UNRES (CH) | UNRES (C) | INDEP (C) | COMPLETE | REFUSE-SLOW | REFUSE | REFUSE-SLOW | CONTINUOUS |
+| k4-m1@v08-rules | 0.45 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | PERSISTENT (C) | SLOW (C) | UNRES (CH) | STABLE (C) | INDEP (C) | COMPLETE | REFUSE-SLOW | REFUSE | REFUSE-SLOW | CONTINUOUS |
+| k4-m1@v08-rules | 0.50 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | PERSISTENT (C) | SLOW (C) | MARGINAL (CH) | STABLE (C) | INDEP (C) | COMPLETE | LINE | LINE | LINE | CONTINUOUS |
+| k4-m1@v08-rules | 0.55 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | UNRES (C) | SLOW (C) | MARGINAL (CH) | STABLE (C) | INDEP (C) | COMPLETE | LINE | LINE | LINE | CONTINUOUS |
+| k4-m1@v08-rules | 0.60 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | UNRES (C) | SLOW (C) | MARGINAL (CH) | STABLE (C) | INDEP (C) | COMPLETE | LINE | LINE | LINE | CONTINUOUS |
+| k4-m1@v08-rules | 0.65 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | UNRES (C) | SLOW (C) | MARGINAL (CH) | STABLE (C) | INDEP (C) | COMPLETE | LINE | LINE | LINE | CONTINUOUS |
+| k4-m1@v08-rules | 0.70 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | UNRES (C) | SLOW (C) | MARGINAL (CH) | STABLE (C) | INDEP (C) | COMPLETE | LINE | LINE | LINE | CONTINUOUS |
+| k4-m1@v08-rules | 0.75 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | UNRES (C) | SLOW (C) | MARGINAL (CH) | STABLE (C) | INDEP (C) | COMPLETE | LINE | LINE | LINE | CONTINUOUS |
+| k4-m1@v08-rules | 0.80 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | MARGINAL-DRIFT (C) | SLOW (C) | MARGINAL (CH) | STABLE (C) | INDEP (C) | COMPLETE | LINE | LINE | LINE | CONTINUOUS |
+| k4-m1@v08-rules | 0.85 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | PERSISTENT (C) | SLOW (C) | MARGINAL (CH) | STABLE (C) | INDEP (C) | COMPLETE | LINE | LINE | LINE | CONTINUOUS |
+| k4-m1@v08-rules | 0.90 | `none` | none | 27 81 243 | NEITHER (C) | MID (C) | NOT-MEASURED (C) | PERSISTENT (C) | SLOW (C) | UNRES (CH) | STABLE (C) | INDEP (C) | COMPLETE | REFUSE-SLOW | REFUSE | REFUSE-SLOW | CONTINUOUS |
+| k4-m1@v08-rules | 0.95 | `none` | none | 27 81 243 | NEITHER (C) | DIS (C) | NOT-MEASURED (C) | PERSISTENT (C) | FLOWING (C) | RELEVANT (CH) | STABLE (C) | INDEP (C) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
+| k4-m1@v08-rules | 1.00 | `none` | none | 27 81 243 | NEITHER (C) | DIS (C) | NOT-MEASURED (C) | PERSISTENT (C) | FLOWING (C) | UNRES (CH) | UNRES (C) | INDEP (C) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
+| k4-m1@v08-rules | 1.05 | `none` | none | 27 81 243 | NEITHER (C) | DIS (C) | NOT-MEASURED (C) | PERSISTENT (C) | FLOWING (C) | MARGINAL (CH) | OFF (C) | INDEP (C) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
+| k4-m1@v08-rules | 1.10 | `none` | none | 27 81 243 | NEITHER (C) | DIS (C) | NOT-MEASURED (C) | PERSISTENT (C) | FLOWING (C) | MARGINAL (CH) | OFF (C) | INDEP (C) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
 | x2b-xy-3@v08-rules | 0.5 | `xy-low-phase` | LINE | 27 81 243 | NEITHER (T) | MID (T) | NOT-MEASURED (T) | CONVERGING (T) | STOPPED (T) | MARGINAL (HT) | STABLE (T) | INDEP (T) | COMPLETE | LINE | LINE | LINE | CONTINUOUS |
 | x2b-xy-3@v08-rules | 0.6 | `xy-low-phase` | LINE | 27 81 243 | NEITHER (T) | MID (T) | NOT-MEASURED (T) | CONVERGING (T) | STOPPED (T) | MARGINAL (HT) | STABLE (T) | INDEP (T) | COMPLETE | LINE | LINE | LINE | CONTINUOUS |
 | x2b-xy-3@v08-rules | 0.7 | `xy-low-phase` | LINE | 27 81 243 | NEITHER (T) | MID (T) | NOT-MEASURED (T) | CONVERGING (T) | STOPPED (T) | MARGINAL (HT) | STABLE (T) | INDEP (T) | COMPLETE | LINE | LINE | LINE | CONTINUOUS |
@@ -1157,7 +1293,7 @@ Family end against truth: 2 agree, 0 refused, 0 disagree
 | x2b-xy-4@v08-rules | 1.0 | `none` | none | 27 81 243 | NEITHER (T) | DIS (T) | NOT-MEASURED (T) | PERSISTENT (T) | FLOWING (T) | UNRES (HT) | UNRES (T) | INDEP (T) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
 | x2b-xy-4@v08-rules | 1.1 | `none` | none | 27 81 243 | NEITHER (T) | DIS (T) | NOT-MEASURED (T) | PERSISTENT (T) | FLOWING (T) | MARGINAL (HT) | OFF (T) | INDEP (T) | COMPLETE | NOT | NOT | NOT | OFF-WINDOW |
 
-Verdict class against truth: 10 agree, 2 refused, 0 disagree, 6 no truth
+Verdict class against truth: 10 agree, 2 refused, 0 disagree, 23 no truth
 Order against order_truth: 12 agree, 0 refused, 0 disagree
 Geometry against class_truth (order_truth not FIRST-ORDER): 10 agree, 2 refused, 0 disagree
 
