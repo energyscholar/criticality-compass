@@ -18,9 +18,9 @@ VERBOSE = False
 MODE = "basic"
 TOOLS = Path.home() / "software/scratch/structure-checks"
 ADVANCED = [
-    ("show <input>", "every reading of an input, and each point's verdict"),
-    ("explain <input> <point>", "the whole chain for one point: data -> verdict"),
-    ("run <input> | --all [--tables SET] [--dry]", "measure; --dry writes nothing"),
+    ("show <input>", "every reading of an input, and each point's verdict (a declared report: cc.toml [report] verdict)"),
+    ("explain <input> <point>", "the whole chain for one point: data -> verdict (a declared report: cc.toml [report] verdict)"),
+    ("run <input> | --all [--tables SET] [--dry]", "measure; each verdict is a declared report (cc.toml [report] verdict); --dry writes nothing"),
     ("reverdict <input> --tables SET [--from SET]", "re-verdict a stored result under another rulebook; measures nothing"),
     ("freeze <run-id> | --all [--tables SET]", "make a result and what it read read-only"),
     ("tabulate [--diff A B]", "write SIGNATURE-TABLE.md + docs/verdict-table.html; --diff prints only"),
@@ -36,7 +36,7 @@ ADVANCED = [
     ("test [-v] [--regolden [--classify]] [<name> ...]", "run the named tests (default all); --classify tags a regolden's changed lines a-e and undoes it on any (e)"),
     ("mutate <relpath> (--sed E | --py E) -- <test> ...", "run tests against a temporary mutation"),
     ("help [--advanced]", "this text"),
-    ("family <id> [--tables SET]", "the family verdict (bracket, f1, f2) of a stored result; measures nothing"),
+    ("family <id> [--tables SET]", "the family report (a declared projection C over bracket, f1, f2: cc.toml [report] family) of a stored result; measures nothing"),
     ("new family <id>", "start a family declaration from the template"),
 ]
 
@@ -63,9 +63,9 @@ def help_text(advanced):
         return f"cc - Criticality Compass   (ADVANCED)\n\n{body}\n"
     return f"""cc - Criticality Compass   (BASIC; `bin/cc help --advanced` lists every command)
 
-  bin/cc show <input>                   every reading of an input, and each point's verdict
-  bin/cc explain <input> <point>        the whole chain for one point: data -> verdict
-  bin/cc run <input> | --all [--dry]    measure under the working rules (--dry writes nothing)
+  bin/cc show <input>                   every reading of an input, and each point's verdict (a declared report)
+  bin/cc explain <input> <point>        the whole chain for one point: data -> verdict (a declared report)
+  bin/cc run <input> | --all [--dry]    measure under the working rules; verdicts are declared reports (--dry writes nothing)
   bin/cc new case <id>                  start a case file (taxonomy) from the template
   bin/cc tables fork <from> <to>        copy a rulebook so you can edit it
   bin/cc tables drop <set>              delete a rulebook you no longer want

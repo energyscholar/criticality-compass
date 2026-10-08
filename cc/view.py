@@ -160,7 +160,8 @@ def show(res, join, mode, note="", tables_dir=None):
         return bad.splitlines()
     cfg, T = config(), detect.load_tables(res["tables"], tables_dir)
     cols, iv = declare.code_cols(T.codes), res["interval"]
-    out = [f"{res['input']}   rules: {res['tables']}   result: results/{res['run_id']}.json {note}".rstrip()]
+    out = [f"{res['input']}   rules: {res['tables']}   result: results/{res['run_id']}.json {note}".rstrip(),
+           f"report: {cfg['report']['verdict']}"]   # plan 0893 R1: what every verdict below IS, once per result (cc.toml [report])
     if mode == "advanced":
         files = [k for k in res["read"] if not k.startswith("~")]
         out += [f"  interval: {iv['method']} " + cfg["interval_fields"][iv["method"]]["show"].format(**iv),
@@ -208,8 +209,16 @@ def nums(v):
     return "[" + ", ".join(f"{x:.4g}" for x in np.atleast_1d(v)) + "]"
 
 
+def step_labels(inst, cfg):
+    """(step-3 label per relation name, the step-4 label): cc.toml [step_labels] by NAME, and the distinct [step_labels.operator] words
+    of the instrument's relations in declared order, joined by "+" (plan 0893 P1, R2)."""
+    lab = cfg["step_labels"]
+    ops = list(dict.fromkeys(lab["operator"][lab[n]] for n in inst["relations"]))
+    return {n: lab[n] for n in inst["relations"]}, "+".join(ops)
+
+
 def trace(m, res, r, sz):
-    """Steps 1-4 of one instrument unit: the data, what reduce computed at row 0, the relations, the kernel."""
+    """Steps 1-4 of one instrument unit: the data, what reduce computed at row 0, the declared comparisons and relations, the operator."""
     inst, mod = detect.instrument(r["instrument"])
     pt, ctx = r["unit"]["point"], detect.context_for(res["input"], r["instrument"], r["unit"]["point"], sz)
     blocks = dict(door.load_blocks(m, declare.Ctx(ROOT).data_root))
@@ -223,16 +232,17 @@ def trace(m, res, r, sz):
     out = [(1, "DATA", f"{files[0]['path']} [{keyed}] ... {len(files)} blocks; sha256 matches "
                        f"fixtures/data/{res['input']}.toml"),
            (2, "REDUCE", "row 0: " + ", ".join(f"{k} {v:.4g}" for k, v in zip(lab, x0)))]
-    out += [(3, "RELATION", f"{n}: {m['relations'][n]['template']}, {m['relations'][n]['provenance']}   "
-                            f"{ascii_relation(m, n)}") for n in inst["relations"]]
+    three, four = step_labels(inst, config())
+    out += [(3, three[n], f"{n}: {m['relations'][n]['template']}, {m['relations'][n]['provenance']}   "
+                          f"{ascii_relation(m, n)}") for n in inst["relations"]]
     x = x0[None]
     for step in inst["pipeline"][1:]:
         kind, _, fn = step.partition(":")
         x = getattr(door if kind == "door" else mod, fn)(x, ctx)
         if isinstance(x, door.Null):
-            return out + [(4, "KERNEL", f"{step} refused: {x.value} ({x.reason})")]
+            return out + [(4, four, f"{step} refused: {x.value} ({x.reason})")]
     ops, rels = "/".join(inst["operators"]), ", ".join(inst["relations"])
-    return out + [(4, "KERNEL", f"operator {ops} over {rels}; row 0: " + "; ".join(f"{k} {nums(v[0])}" for k, v in x.items()))]
+    return out + [(4, four, f"operator {ops} over {rels}; row 0: " + "; ".join(f"{k} {nums(v[0])}" for k, v in x.items()))]
 
 
 def read_steps(q, r, lv, text, dcol, mode, cfg):
@@ -354,7 +364,8 @@ def pair_section(res, r, pair, mode, cfg, T, m, text, code_map):
     if delta is not None and "B" in ops:   # the instrument declares B: A over the size chain, then B at the top edge, is its own reading
         ctx, ln = detect.context_for(res["input"], r["instrument"], None), np.log(np.abs(delta))
         steps = np.diff(ln)
-        out.append(f"  3 KERNEL    ln|Delta| {nums(ln)}; A over size {nums(steps)}; B at the top edge {steps.sum():.4g}; "
+        lab = cfg["step_labels"]
+        out.append(f"  3 {lab['operator'][lab['size']]:<9} ln|Delta| {nums(ln)}; A over size {nums(steps)}; B at the top edge {steps.sum():.4g}; "
                    f"over the log span {ctx.log_span:.4g}: {steps.sum() / ctx.log_span:.4g}")
     elif vec:
         out.append("  3 REPORTED  " + "; ".join(f"{k} {nums(v) if isinstance(v, list) else f'{v:.4g}'}" for k, v in vec.items()))

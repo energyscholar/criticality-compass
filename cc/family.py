@@ -228,5 +228,6 @@ def show(decl, out, tables):
         f"    why: {c[w]['why']}")]
     lines += [f"  end     {', '.join(f'{q} (bracket {a} .. {z})' for q, (a, z) in zip(out[k], out['end_bracket'])) or '(none)'}" for k in ("end_point",) if k in out]
     lines += [f"    {e['point']}: end of a LINE run ({e['side']} side, {e['kind']})" for e in out.get("ends", [])]
-    return lines + [f"  => family verdict {out['verdict']}   class {out['class']}, family.toml line {out['line']}",
+    return lines + [f"  => family report {out['verdict']}   class {out['class']}, family.toml line {out['line']}",
+                    f"     report: {view.config()['report']['family']}",   # plan 0892 (Robin Q19): the declared label, cc.toml [report] family
                     f"     why: {out['why']}"]

@@ -140,7 +140,7 @@ with tempfile.TemporaryDirectory() as tmp:   # run() on a rule family whose set 
           got is None and "NOT-EVALUATED" in msg and "needle_code" in msg and "Next: " in msg, str(msg))
 
 rc, out = cc("family", "b7-at-line-2")
-check("bin/cc family prints the verdict, each fingerprint and its cells", rc == 0 and "=> family verdict LINE" in out
+check("bin/cc family prints the report, each fingerprint and its cells", rc == 0 and "=> family report LINE" in out   # plan 0892 P2.3: verdict -> report
       and "f2      MARGINAL" in out and "0.0->0.21 y_last" in out, out)
 rc, out = cc("family", "b7-at-line-2", "--tables", "verdict-x-rules")
 check("a set with no family.toml is refused with the copy to make", rc == 1 and "Next: copy tables/v01-rules/family.toml" in out, out)

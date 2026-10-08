@@ -23,8 +23,8 @@ check("one section per instrument that reads the pair", set(sec) == {"across_del
 ad, al = sec.get("across_delta", ""), sec.get("along", "")
 check("across_delta shows its stored y_steps (0.09186, 0.04746) and ratio", "y_steps" in ad and "0.09186" in ad and "ratio 0" in ad, ad)
 check("across_delta shows its own reading y_last 0.04746", "y_last 0.04746" in ad)
-check("across_delta carries NO along trace (the along B value 0.06966 is not under its heading)", "0.06966" not in ad and "KERNEL" not in ad, ad)
-check("along keeps its ln|Delta| A,B trace and its own reading", "KERNEL" in al and "0.06966" in al and "y_along 0.06966" in al, al)
+check("across_delta carries NO along trace (the along B value 0.06966 is not under its heading)", "0.06966" not in ad and "ln|Delta|" not in ad, ad)   # plan 0893 R3: the step label is cc.toml data; the trace is found by its text
+check("along keeps its ln|Delta| A,B trace and its own reading", "ln|Delta|" in al and "0.06966" in al and "y_along 0.06966" in al, al)
 check("stability_delta shows its stored y_steps", "y_steps" in sec.get("stability_delta", "") and "d -0.0444" in sec.get("stability_delta", ""))
 print("test_explain_pair: " + ("FAILED" if bad else "all passed"))
 sys.exit(1 if bad else 0)

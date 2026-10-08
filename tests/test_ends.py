@@ -218,7 +218,8 @@ with tempfile.TemporaryDirectory() as tmp:
     check("tabulate's Family ends section names the family, its end_bracket and each BKT-END truth point's reading",
           "## Family ends (v05-rules)" in sec and "- `p`: family BKT-END (class BKT-END), end_point ['1.00'], end_bracket [['1.00', '1.01']]" in sec
           and "  - point 0.90 (case `xy-tkt`, truth BKT-END): disagree" in sec and "  - point 1.01 (case `xy-tkt`, truth BKT-END): agree" in sec
-          and sec[-1] == "Family end against truth: 1 agree, 0 refused, 1 disagree" and not found, "\n".join(sec))
+          and sec[-1] == "Family end against truth: 1 agree, 0 refused, 1 disagree" + f"   (report: {tomllib.loads((ROOT / 'cc.toml').read_text())['report']['family']})"   # plan 0892 R5: the tally line carries the declared label
+          and sec[2] == f"report: {tomllib.loads((ROOT / 'cc.toml').read_text())['report']['family']}" and not found, "\n".join(sec))
     check("a set with no BKT-END truth point prints no Family ends section (the existing SIGNATURE-TABLE is unchanged)", none == [], str(none))
 
 print("".join(f"FAILED {x}\n" for x in bad) + "test_ends: " + ("FAILED" if bad else "all passed"))
