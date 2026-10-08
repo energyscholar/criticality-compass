@@ -117,9 +117,9 @@ with tempfile.TemporaryDirectory() as t:
     # plan 0881 P2.7: the measured input has NO frozen or keyed result under any set (c2-bc-two-start has frozen v03 results, so its run was a re-verdict)
     cc("tables", "fork", "verdict-x-rules", "t2")    # the live verdict-x-rules is already frozen
     rid = "x3-clock6-3@t2"
-    frozen = json.loads((repo / "FROZEN.json").read_text())["files"]
+    frozen_files = json.loads((repo / "FROZEN.json").read_text())["files"]
     for q in (repo / "results").glob("x3-clock6-3@*"):   # plan 0876 B: a keyed result under another set would make this run a re-verdict (JSON only, vectors named in the parent's NPZ); the test is of a MEASURED run
-        if f"results/{q.name}" not in frozen:
+        if f"results/{q.name}" not in frozen_files:
             q.unlink()
     rc, out = cc("run", "x3-clock6-3", "--tables", "t2")
     check("run writes the result JSON and NPZ",
