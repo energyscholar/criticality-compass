@@ -229,3 +229,23 @@ text = "tests/planted/input-gamma-short.toml:interval.tau_declared: 18 of 18 dec
 file = "input-gamma-no-tau.toml"
 fix = ["window_s = 1.5\n", "window_s = 1.5\ntau_declared = 25\n"]
 text = "tests/planted/input-gamma-no-tau.toml:interval.tau_declared: missing required field\n  Next: add tau_declared = ... to tests/planted/input-gamma-no-tau.toml"
+
+[[plant]]
+file = "cc-report-empty.toml"
+fix = ['verdict = "" # "declared', 'verdict = "declared']
+text = "tests/planted/cc-report-empty.toml:report.verdict: the report label must be a non-empty string\n  Next: write verdict = \"declared report — ...\" under [report]"
+
+[[plant]]
+file = "cc-projection-empty.toml"
+fix = ['keeps = "" # "the interior', 'keeps = "the interior']
+text = "tests/planted/cc-projection-empty.toml:projections.family.keeps: must be a non-empty string\n  Next: write keeps = \"...\" under [projections.family]"
+
+[[plant]]
+file = "cc-step-label-missing.toml"
+fix = ["matched = \"COMPARISON\"\n", "matched = \"COMPARISON\"\nchain = \"COMPARISON\"\n"]
+text = "tests/planted/cc-step-label-missing.toml:step_labels.chain: no step label for this relation name of instruments/*.toml\n  Next: write chain = one of: COMPARISON RELATION"
+
+[[plant]]
+file = "cc-step-label-unknown.toml"
+fix = ['control = "RELATON"', 'control = "RELATION"']
+text = "tests/planted/cc-step-label-unknown.toml:step_labels.control: 'RELATON' is not a key of [step_labels.operator]\n  Next: write control = one of: COMPARISON RELATION"

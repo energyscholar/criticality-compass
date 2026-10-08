@@ -139,7 +139,8 @@ def _regex_ok(x):
 
 def chk_cc(p, d, c, stem=None):
     top = {k: dict for k in ("defaults", "data", "alphabets", "flags", "obtained_flag", "arrays", "basic", "check", "golden")}
-    out = header(p, d, "cc") + shape(p, d, top, {"formats": dict, "transducer": dict, "levels": dict, "interval_fields": dict, "conventional": dict})
+    out = header(p, d, "cc") + shape(p, d, top, {"formats": dict, "transducer": dict, "levels": dict, "interval_fields": dict, "conventional": dict,
+                                                 "report": dict, "step_labels": dict, "projections": dict})
     if out:
         return out
     out += when("interval_method" not in d["alphabets"], p, "alphabets.interval_method", "missing", 'write interval_method = ["block", "iid"]')
@@ -149,6 +150,16 @@ def chk_cc(p, d, c, stem=None):
     out += [at(p, f"conventional.{k}", "not an instrument of the registry" if k not in c.reg else "the label must be a non-empty string",
                f"use one of: {' '.join(c.reg)}" if k not in c.reg else "write the label as a string")
             for k, v in d.get("conventional", {}).items() if k not in c.reg or not (isinstance(v, str) and v.strip())]   # plan 0881 P2.3
+    rep, labels, pj = d.get("report", {}), dict(d.get("step_labels", {})), d.get("projections", {})   # plans 0892/0893: three total checks over data, no per-key branch
+    ops = labels.pop("operator", {})
+    out += [at(p, f"report.{k}", "the report label must be a non-empty string", f'write {k} = "declared report — ..." under [report]')
+            for k in sorted({"family", "verdict"} | set(rep)) if not (isinstance(rep.get(k), str) and rep[k].strip())]
+    out += [at(p, f"step_labels.{n}", "no step label for this relation name of instruments/*.toml" if n not in labels else f"'{labels[n]}' is not a key of [step_labels.operator]",
+               f"write {n} = one of: {' '.join(ops)}")
+            for n in sorted({r for i in c.reg.values() for r in i.get("relations", [])} | set(labels)) if not (isinstance(labels.get(n), str) and labels[n] in ops)]
+    out += [at(p, f"projections.{n}.{k}", "must be a non-empty string", f'write {k} = "..." under [projections.{n}]')
+            for n in sorted({"family"} | {n for n, v in labels.items() if v == "COMPARISON"} | set(pj)) for k in ("keeps", "discards")   # R6: every COMPARISON name is a projection C
+            if not (isinstance(pj.get(n), dict) and isinstance(pj[n].get(k), str) and pj[n][k].strip())]
     out += [at(p, f"levels.{k}", "a level's z must be a number above 0", "write the z of that level, e.g. \"0.95\" = 1.959964")
             for k, v in d.get("levels", {}).items() if not (isinstance(v, NUM) and v > 0)]
     if "transducer" in d:   # plan 0883: the transducer file's sentences are data; the kinds are the two this code has a schema for
