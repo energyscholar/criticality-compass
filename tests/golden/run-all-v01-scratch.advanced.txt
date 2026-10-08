@@ -3,14 +3,14 @@ run b7-at-line@scratch -> results/b7-at-line@scratch.json
 b7-at-line   rules: scratch   result: results/b7-at-line@scratch.json (not frozen)
   interval: block resamples 400, level 0.95, seed 22
   code_commit: none
-  read results/b7-at-line@v03-rules.json measure_hash 07e446dccf33
   read inputs/b7-at-line/m.toml d0d267e3857c
   read inputs/b7-at-line/transducer.toml 4d3b7e84e84b
   read instruments/across.toml 8f6803e8af6c
   read instruments/stability.toml 2fc7bb21b58a
-  read fixtures/data/b7-at-line.toml bd62cf008da6
   read tables/scratch/codes.toml 1fd20de97e25
   read tables/scratch/verdict.toml 6e1989a49f0b
+  read fixtures/data/b7-at-line.toml bd62cf008da6
+  read inputs/b7-at-line/couplings.toml 9949d9c9021a
   read 15 data files, sha256 match the pinned manifest
 point 0.0   case at-self-dual-line   obtained: truth
   sink       NOT-MEASURED (needle is not declared on this input)

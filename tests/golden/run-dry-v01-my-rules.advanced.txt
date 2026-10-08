@@ -3,15 +3,15 @@ run w2-potts@my-rules
 w2-potts   rules: my-rules   result: results/w2-potts@my-rules.json (dry: nothing written)
   interval: block resamples 400, level 0.95, seed 31
   code_commit: none
-  read results/w2-potts@v03-rules.json measure_hash 29e26d15e931
   read inputs/w2-potts/m.toml 9f77295ee127
   read inputs/w2-potts/transducer.toml 0edffdb020ec
   read instruments/across.toml 8f6803e8af6c
   read instruments/stability.toml 2fc7bb21b58a
   read instruments/two_start.toml 30503b8a483a
-  read fixtures/data/w2-potts.toml d8a28f7f37e6
   read tables/my-rules/codes.toml 1fd20de97e25
   read tables/my-rules/verdict.toml 37c9e5c9d78a
+  read fixtures/data/w2-potts.toml d8a28f7f37e6
+  read inputs/w2-potts/couplings.toml cfde06a9a534
   read 24 data files, sha256 match the pinned manifest
 point 2   case ising-2d   obtained: truth
   sink       NOT-MEASURED (needle is not declared on this input)
