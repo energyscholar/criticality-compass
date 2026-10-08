@@ -33,9 +33,33 @@ def keys(x):
         q for v in x.values() if isinstance(v, list) for e in v if isinstance(e, dict) for q in keys(e)}
 
 
+# plan 0894 P4 (E391): the population this test is ABOUT, declared - the 34 inputs that existed at bc8a6ec^ (the parent of the commit that added
+# k4-m1, which joins no case and reads NOT-EVALUATED under v01-v04). The test asserts on the results of these inputs only, so a new input cannot trip it.
+POPULATION = (
+    "b7-at-line", "b7-at-line-2", "b7-at-line-3", "b7-at-line-4",
+    "b7-at-line-5", "c2-bc-two-start", "w1-potts", "w2-potts",
+    "w2-potts-2", "w3-potts", "x2-xy-line", "x2-xy-line-2",
+    "x2-xy-line-3", "x2b-xy", "x2b-xy-2", "x2b-xy-3",
+    "x2b-xy-4", "x3-clock6", "x3-clock6-2", "x3-clock6-3",
+    "x4-ising-field", "x4-ising-field-2", "x4-ising-field-3", "x4s-stack",
+    "x5-bilayer", "x5-bilayer-2", "x5n-bilayer", "x5n-bilayer-2",
+    "x5n-bilayer-3", "x7a-bc", "x7a-nnn", "x8-ising-needle",
+    "x9c-potts", "x9c-potts-2",
+)
+
+
+def population(rs):
+    return [r for r in rs if r["input"] in POPULATION]
+
+
 files = sorted((ROOT / "results").glob("*.json"))
-results = [json.loads(f.read_text()) for f in files]
+every = [json.loads(f.read_text()) for f in files]
+results = population(every)
 md, found = score.tabulate(results)
+planted_extra = copy.deepcopy(next(r for r in every if r["input"] == "b7-at-line"))
+planted_extra.update(input="zz-planted-input", run_id="zz-planted-input@v01-rules")
+check("a planted extra input changes nothing: the declared population is the same, and so is the table", population(every + [planted_extra]) == results
+      and score.tabulate(population(every + [planted_extra]))[0] == md)
 rows = [ln for ln in md.splitlines() if ln.startswith("| ") and not ln.startswith(("| run", "|---"))]
 sets = sorted({r["tables"] for r in results})          # plan 0871 G5: every count below is derived from the result sets on disk, never a hand-listed set name
 have = {t: sum(len(r["signature"]) for r in results if r["tables"] == t) for t in sets}

@@ -63,7 +63,32 @@ MOVED = {("x5n-bilayer", p, k) for p in ("0.0", "0.1", "0.3") for k in ("verdict
     | {("x5n-bilayer-2", p, k) for p in ("0.0", "0.1", "0.3") for k in ("verdict", "verdict_class", "geometry")} \
     | {("b7-at-line-4", p, "geometry") for p in ("0.0", "0.07")}      # expected/v04-rules.toml [[change]], declared in plan 0870 P-1
 moved, n = set(), 0
-for f in sorted((ROOT / "results").glob("*@v03-rules.json")):
+# plan 0894 P4 (E391): the population this test is ABOUT, declared - the 34 inputs that existed at bc8a6ec^ (the parent of the commit that added
+# k4-m1, which joins no case and reads NOT-EVALUATED under v01-v04). The test asserts on the results of these inputs only, so a new input cannot trip it.
+POPULATION = (
+    "b7-at-line", "b7-at-line-2", "b7-at-line-3", "b7-at-line-4",
+    "b7-at-line-5", "c2-bc-two-start", "w1-potts", "w2-potts",
+    "w2-potts-2", "w3-potts", "x2-xy-line", "x2-xy-line-2",
+    "x2-xy-line-3", "x2b-xy", "x2b-xy-2", "x2b-xy-3",
+    "x2b-xy-4", "x3-clock6", "x3-clock6-2", "x3-clock6-3",
+    "x4-ising-field", "x4-ising-field-2", "x4-ising-field-3", "x4s-stack",
+    "x5-bilayer", "x5-bilayer-2", "x5n-bilayer", "x5n-bilayer-2",
+    "x5n-bilayer-3", "x7a-bc", "x7a-nnn", "x8-ising-needle",
+    "x9c-potts", "x9c-potts-2",
+)
+
+
+def v03_files(results_dir):
+    return sorted(Path(results_dir) / f"{i}@v03-rules.json" for i in POPULATION if (Path(results_dir) / f"{i}@v03-rules.json").is_file())
+
+
+with tempfile.TemporaryDirectory() as t:
+    for q in (ROOT / "results").glob("*@v03-rules.json"):
+        shutil.copy(q, t)
+    before = [q.name for q in v03_files(t)]
+    shutil.copy(ROOT / "results" / "b7-at-line@v03-rules.json", Path(t) / "zz-planted-input@v03-rules.json")
+    check("a planted extra input changes nothing: the declared population is the same files", [q.name for q in v03_files(t)] == before and len(before) > 20, str(before[-3:]))
+for f in v03_files(ROOT / "results"):
     a, b = json.loads(f.read_text()), json.loads(Path(str(f).replace("v03-rules", "v04-rules")).read_text())
     for sa, sb in zip(a["signature"], b["signature"]):
         n += 1
