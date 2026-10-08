@@ -7,7 +7,6 @@ import tomllib
 from pathlib import Path
 from types import SimpleNamespace
 import numpy as np
-import admit
 import declare
 import detect
 import door
@@ -24,19 +23,14 @@ def low(xs, rank):
     return min(xs, key=rank.index)
 
 
-def relation(kind, labels):
-    """(declared relation, its (a, b) label pairs in edge order) over the family's labels, built by the door."""
-    m = {"axes": {"p": list(labels)}, "relations": {"r": {"template": kind, "axis": "p", "provenance": "Continuation"}}}
-    return door.relations_for(m, "r"), door.control_pairs(m, "r")
-
-
 def bracket_of(fam, res, nulls):
     """(code, [(a, b, edge codes)]) over ALL points of the input in declared order, on the signature column `reads`.
     One code per declared edge axis (descent; plan 0871 E1 adds ascent), each combined over the edges, then one total table."""
     b, labels = fam["bracket"], [s["point"] for s in res["signature"]]
     codes = [s[b["reads"]] for s in res["signature"]]
-    rel, pairs = relation("chain", labels)
-    steps = fingerprint.code_steps(admit.nodefield([b["rank"].get(c, 0) for c in codes]), rel)   # a null point's rank is a placeholder
+    ij = fingerprint.chain_pairs(len(labels))   # plan 0892: the differences are computed inside C, over index pairs (Robin Q19)
+    pairs = [(labels[i], labels[j]) for i, j in ij]
+    steps = fingerprint.code_steps([b["rank"].get(c, 0) for c in codes], ij)   # a null point's rank is a placeholder
     ends = [[c for c in codes[k:k + 2] if c in nulls] for k in range(len(steps))]   # the null endpoints of each edge
     axes = declare.bracket_axes(b)
     edges = [[low(n, rank) if n else code[st] for _, code, rank in axes] for n, st in zip(ends, steps)]   # one code per axis
@@ -55,8 +49,9 @@ def f1_of(fam, decl, res, z, m, nulls):
     pts = ["->".join(u) for u in zip(decl["interior"], decl["interior"][1:])] if pair else decl["interior"]
     zero = np.zeros(res["interval"]["resamples"] + 1)
     y = np.stack([z[rows[p]["vector_key"]] if rows[p]["vector_key"] else zero for p in pts], axis=1)   # [R+1, n]
-    rel, pairs = relation("all-pairs", pts)
-    diff, out = fingerprint.pair_differences(admit.nodefield(y), rel), []
+    ij = fingerprint.all_pairs(len(pts))
+    pairs = [(pts[i], pts[j]) for i, j in ij]
+    diff, out = fingerprint.pair_differences(y, ij), []
     for e, (a, c) in enumerate(pairs):
         nul = [rows[p]["cell"] for p in (a, c) if rows[p]["cell"] in nulls]
         if nul:

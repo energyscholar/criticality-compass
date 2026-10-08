@@ -1,5 +1,6 @@
 """test_family - the family layer: the four families against expected/<set>.toml [[family]], the bracket on synthetic codes
 through family.py's OWN function, the 240-cell partition, the declarations, and the commands."""
+import ast
 import json
 import math
 import subprocess
@@ -145,5 +146,19 @@ rc, out = cc("family", "b7-at-line-2", "--tables", "verdict-x-rules")
 check("a set with no family.toml is refused with the copy to make", rc == 1 and "Next: copy tables/v01-rules/family.toml" in out, out)
 rc, out = cc("family", "nope")
 check("an unknown family is refused with the list", rc == 1 and "Families: " in out and "Next: bin/cc family" in out, out)
+
+
+def kernel_imports(text):
+    """The modules of kernel / admit / door a module's source imports (plan 0892: the family differences are computed inside C)."""
+    tree = ast.parse(text)
+    got = [a.name for n in ast.walk(tree) if isinstance(n, ast.Import) for a in n.names]
+    got += [n.module for n in ast.walk(tree) if isinstance(n, ast.ImportFrom) and n.module]
+    return sorted({g.split(".")[0] for g in got} & {"kernel", "admit", "door"})
+
+
+src = (ROOT / "cc" / "fingerprint.py").read_text()
+check("fingerprint.py imports neither kernel nor admit nor door (plan 0892)", kernel_imports(src) == [], str(kernel_imports(src)))
+check("a planted `from kernel import A` in a scratch copy of fingerprint.py is refused", kernel_imports(src + "\nfrom kernel import A\n") == ["kernel"])
+check("a planted `import door` in a scratch copy of fingerprint.py is refused", kernel_imports(src + "\nimport door\n") == ["door"])
 print("".join(f"FAILED {b}\n" for b in bad) + "test_family: " + ("FAILED" if bad else "all passed"))
 sys.exit(1 if bad else 0)
