@@ -94,7 +94,19 @@ Robin's ruling: the transform has no observation at infinite size, and the share
 Every `tables/*/family.toml` header says "the differences are maths (cc/fingerprint.py, by A)". That sentence is superseded by Robin Q19
 (2026-10-06): since plan 0892 the bracket and f1 differences are computed inside C (a declared projection over per-point sign cells), not by A
 over a declared relation, and the family verdict is a declared report. The tables are unchanged (hash-pinned by every stored result); the
-verdict words are unchanged. Until plan 0892 P2 lands the code still applies A and only the description is corrected here.
+verdict words are unchanged. Plan 0892 P2 (2026-10-08) landed: `cc/fingerprint.py` computes the same differences over index pairs and
+imports no kernel, admit or door; every family transcript is byte-identical, and `bin/cc family` prints `=> family report` with the label
+`cc.toml [report] family`.
+
+## The per-point verdict path is a projection C (Robin, 2026-10-06, LOG E382; plan 0893 P1, 2026-10-08)
+
+Every table header (`codes.toml`, `verdict.toml`, `family.toml`) that calls a size chain, the matched levels or the two-start pair a "relation",
+or its difference "A", is superseded by Robin's ruling of 2026-10-06 (LOG E382): the L and L/3 observations are independent, each through its
+own M; the blocking-map comparison between them is admissible in a downstream projection C, and "A over that size edge as the needle" is not.
+These are declared **comparisons**; the per-point verdict is a **declared report** (`cc.toml [report] verdict`, printed once under every
+`show` header and in each `## Rules:` section of SIGNATURE-TABLE.md). The tables are unchanged (hash-pinned), the verdict words are
+unchanged, and no number moves; the code still computes these differences with `kernel.A` until plan 0893 P2. The start comparison is pending
+Robin R1 and the control edge (a relation) pending R2.
 
 ## Cross-cutting notes
 

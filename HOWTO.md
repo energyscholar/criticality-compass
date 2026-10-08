@@ -214,6 +214,7 @@ measures nothing:
 $ bin/cc reverdict w2-potts --tables rv
 reverdict w2-potts@v01-rules -> results/w2-potts@rv.json (no instrument was run)
 w2-potts   rules: rv   result: results/w2-potts@rv.json (not frozen)
+report: declared report — a projection C over sign cells of declared comparisons (the blocking-map comparison of independent sizes; the two-start difference), not a relational reading (Robin, 2026-10-06, LOG E382)
 …
 point 5   case potts-q5
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
@@ -303,7 +304,7 @@ explain b7-at-line-2 0.14->0.21   rules: v01-rules
 along   (pair 0.14->0.21)
   1 MEMBER    membership.toml [along] reads needle: 0.14 NOT-MEASURED -> UNCHECKED, 0.21 NOT-MEASURED -> UNCHECKED; lowest rank decides -> door RUN-FLAG-U   flags: truth point, membership unchecked (the upstream needle was not measured)
   2 DELTA     A over the control edge 0.14->0.21, row 0: 27 0.05402, 81 0.05431, 243 0.04232
-  3 KERNEL    ln|Delta| [-2.918, -2.913, -3.162]; A over size [0.005433, -0.2495]; B at the top edge -0.244; over the log span 2.197: -0.1111
+  3 C         ln|Delta| [-2.918, -2.913, -3.162]; A over size [0.005433, -0.2495]; B at the top edge -0.244; over the log span 2.197: -0.1111
   4 READING   y_along -0.1111  interval [-0.2479, 0.005093]  (95 %, 400 block resamples)
   5 SIGN      cuts -0.25 0 +0.25 (eps y): bL 1, bU 2 -> ZERO!
   6 CODE      family.toml line 52 [f2.code]: ZERO! -> MARGINAL
@@ -371,7 +372,8 @@ family x7a-bc-lambda   rules: v01-rules   input: x7a-bc   interior: 0.0 1.0 1.5 
     1.5->1.8 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
     1.8->1.9 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
     1.9->1.95 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
-  => family verdict REFUSE-OFF-MANIFOLD   class REFUSE, family.toml line 60
+  => family report REFUSE-OFF-MANIFOLD   class REFUSE, family.toml line 60
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
      why: X7a: a member point off the manifold at L 243 (it also explains a non-monotone bracket, so it is read first by partition)
 ```
 
@@ -462,7 +464,8 @@ family x2b-xy   rules: v05-rules   input: x2b-xy   interior: 0.5 0.6 0.7 0.8 0.8
     reads boundary_needle MID, boundary_flow STOPPED, beyond_needles SINK, beyond_order INDEP  -> family.toml side_row line 560
     why: plan 0871 E2: the boundary is MID (flow stopped, slow or unresolved: at T_KT the flow is marginal-slow), every point beyond it is a sink (sink-agnostic: a clock's lower end exits to ORD) and the starts AGREE there (OFF-WINDOW, two_start INDEP): the end of a line, a BKT candidate. A sweep that steps off its manifold reads the same (review 3.2.2)
   end     0.89294 (bracket 0.89294 .. 0.95)
-  => family verdict REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 448
+  => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 448
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
      why: 0863: no positive row yet (0862 X7b/X2-X4 decide)
 ```
 
@@ -853,7 +856,8 @@ family x5n-g   rules: v04-rules   input: x5n-bilayer-3   interior: 0.0 0.1 0.3
   f2      IRRELEVANT
     0.0->0.1 along SIG-  -> IRRELEVANT
     0.1->0.3 along NEG  -> IRRELEVANT
-  => family verdict POINT-MANIFOLD   class POINT, family.toml line 75
+  => family report POINT-MANIFOLD   class POINT, family.toml line 75
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
      why: plan 0870 P3: …
 ```
 

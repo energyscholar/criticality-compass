@@ -8,8 +8,9 @@ re-measured, so those numbers do not move. `v08-rules` (the frontier) is describ
 
 CC is a batch instrument. You give it finite snapshots of a system at declared points in parameter space and at
 three lattice sizes, plus a declaration (`inputs/<id>/m.toml`, the kernel's M) of exactly what was measured and
-how. It reduces the snapshots to a few numbers per point, takes **directed differences** of those numbers along
-**declared relations** (size chains, matched block levels, a start pair, neighbouring points), reads each difference
+how. It reduces the snapshots to a few numbers per point, takes **directed differences** of those numbers over
+**declared comparisons** (size chains, matched block levels, a start pair: independent observations related through the
+declared blocking map, inside a projection C) and one declared relation (neighbouring points, pending Robin R2), reads each difference
 with a resampled interval against a declared margin, turns the interval's position into a word, and looks the words
 up in a rulebook that is plain TOML data. Per point the answer is POINT, LINE, WALKING, FIRST-ORDER, NOT or a named
 refusal; a family of points can also read BKT-END or POINT-MANIFOLD. "Not measured" and "not evaluated" are values
@@ -52,10 +53,13 @@ transducer file), `resources.py` 36, `author.py` 363 (authoring).
 2. **REDUCE** - the instrument's `reduce(arrays, ctx)` turns one resample row into node numbers; row 0 is the data,
    rows 1..400 are moving-block resamples (`b 400`, one generator). Here the needle's seven
    level means: `0.8006, 0.8769, 0.8883, 0.892 | 0.8007, 0.8772, 0.8905`.
-3. **RELATION** - `door.relations_for` -> `admit.declare`: nodes and directed edges from one of four templates
-   (`chain`, `matched`, `pair`, `matched-chain`), provenance `Coupling`, declared before data. Here
+3. **COMPARISON / RELATION** (the label is `cc.toml [step_labels]`, by relation name) - `door.relations_for` -> `admit.declare`:
+   nodes and directed edges from one of four templates (`chain`, `matched`, `pair`, `matched-chain`), declared before data;
+   `m.toml` still writes provenance `Coupling`, which a comparison does not claim (Robin, 2026-10-06, LOG E382). Here
    `matched: (243,L1)->(81,L0) (243,L2)->(81,L1) (243,L3)->(81,L2)`.
-4. **KERNEL** - `kernel.A`: `A(x)[e] = x[source] - x[target]` on every declared edge (`B` only for `along`). Between
+4. **C** (or **C+KERNEL** where a control edge is read) - `kernel.A`: `A(x)[e] = x[source] - x[target]` on every declared edge
+   (`B` only for `along`); over a comparison it is the same arithmetic computed as a C comparison, until plan 0893 P2 moves it out of
+   `kernel`. Between
    stages the doors run: `nodefield` (non-finite -> NOT-EVALUATED), `logcoord` (ln(s q) only when q keeps one sign at
    the estimate and every resample), `basis`, `decays`, `off_manifold`; a `door.Null` becomes a reading whose cell is
    the null, reason kept (`detect.after`). Here `velocity [0.001459]`, `d_ord [0.108]`.

@@ -10,6 +10,7 @@ Read `README.md` first for the words.
 ```
 $ bin/cc show w2-potts
 w2-potts   rules: v01-rules   result: results/w2-potts@v01-rules.json (frozen)
+report: declared report — a projection C over sign cells of declared comparisons (the blocking-map comparison of independent sizes; the two-start difference), not a relational reading (Robin, 2026-10-06, LOG E382)
 …
 point 5   case potts-q5
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
@@ -46,11 +47,12 @@ here, the covariance of the observable with the energy, which grows as a power o
 ### The size chain
 
 ```
-  3 RELATION  size: chain, Coupling   27 <- 81 <- 243
-  4 KERNEL    operator A over size; row 0: y_steps [1.598, 1.679]; y_last [1.679]
+  3 COMPARISON size: chain, Coupling   27 <- 81 <- 243
+  4 C         operator A over size; row 0: y_steps [1.598, 1.679]; y_last [1.679]
 ```
 
-The relation says which numbers are neighbours: 243 is connected to 81 and 81 to 27. Operator A takes the
+The comparison says which numbers are compared: 243 with 81 and 81 with 27, one blocking step apart (a declared
+comparison, inside a projection C; Robin, 2026-10-06, LOG E382). The step takes the
 difference along each connection (a difference of logarithms, divided by the log of the size ratio), giving
 one growth exponent per step: 1.598 from 27 to 81 and 1.679 from 81 to 243. `across` reports the last one,
 1.679.
@@ -254,7 +256,8 @@ family b7-at-line-2   rules: v01-rules   input: b7-at-line-2   interior: 0.0 0.0
     0.0->0.07 along ZERO!  -> MARGINAL
     0.07->0.14 along ZERO!  -> MARGINAL
     0.14->0.21 along ZERO!  -> MARGINAL
-  => family verdict LINE   class LINE, family.toml line 55
+  => family report LINE   class LINE, family.toml line 55
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
      why: B7 (SYNTHESIS-3): fingerprints 1 and 2 both resolved; X7a: POINT manifolds do not reach f2 MARGINAL
 ```
 
@@ -293,7 +296,7 @@ explain b7-at-line-2 0.14->0.21   rules: v01-rules
 along   (pair 0.14->0.21)
   1 MEMBER    membership.toml [along] reads needle: 0.14 NOT-MEASURED -> UNCHECKED, 0.21 NOT-MEASURED -> UNCHECKED; lowest rank decides -> door RUN-FLAG-U   flags: truth point, membership unchecked (the upstream needle was not measured)
   2 DELTA     A over the control edge 0.14->0.21, row 0: 27 0.05402, 81 0.05431, 243 0.04232
-  3 KERNEL    ln|Delta| [-2.918, -2.913, -3.162]; A over size [0.005433, -0.2495]; B at the top edge -0.244; over the log span 2.197: -0.1111
+  3 C         ln|Delta| [-2.918, -2.913, -3.162]; A over size [0.005433, -0.2495]; B at the top edge -0.244; over the log span 2.197: -0.1111
   4 READING   y_along -0.1111  interval [-0.2479, 0.005093]  (95 %, 400 block resamples)
   5 SIGN      cuts -0.25 0 +0.25 (eps y): bL 1, bU 2 -> ZERO!
   6 CODE      family.toml line 52 [f2.code]: ZERO! -> MARGINAL

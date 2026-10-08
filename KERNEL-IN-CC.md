@@ -8,20 +8,31 @@ enough). Read it when you want to know what a number means, or before you touch 
 
 - A **NodeField** is one scalar for each node of a declared set of nodes: the 27, 81 and 243 sizes with one
   number each, or the two starts with one number each.
-- A **declared relation** is a set of nodes and directed edges, each edge with its provenance (here `Coupling`),
-  declared before any data are touched. CC builds every relation from a closed set of four templates, in
-  `m.toml`, and the kernel refuses a relation with a cycle. In `explain`, a relation prints as step 3.
+- A **declared relation** is a set of nodes and directed edges, each edge with its provenance, declared before any
+  data are touched; the kernel refuses a relation with a cycle. On the current inputs the one candidate is the
+  `control` edge between two neighbouring points (`along`, `across_delta`, `stability_delta`), pending Robin R2.
+- A **declared comparison** (Robin, 2026-10-06, LOG E382) is a set of ordered differences between values observed
+  independently, each through its own M, that the analysis supplies: the blocking-map comparison of independent
+  sizes (`size`, `matched`, `chain`: one blocking step relates L to L/3) and the two-start difference (`start`,
+  pending Robin R1). It is not a kernel relation and claims no provenance (not Coupling, not Continuation, not
+  Persistence); it is admissible in a downstream projection C. `m.toml` still declares both in its `[relations.*]`
+  tables, from a closed set of templates, until plan 0893 P2. In `explain`, step 3 prints each by its name as
+  COMPARISON or RELATION (`cc.toml [step_labels]`), and `cc.toml [projections.<name>]` says what each comparison
+  keeps and discards.
 - An **EdgeField** is one scalar for each declared edge.
-- **A** is the one operator that takes a NodeField to an EdgeField: for each declared edge,
-  `A(x)[edge] = x[source] - x[target]`, the difference of the two node values. There is no other way to get an
-  EdgeField, and no implicit way back; where CC wants a NodeField again it declares a projection and says what the
-  projection keeps and discards.
-- **B** (accumulation along continuation) is used by one instrument, `along` (below): `B(g)[e] = g[e]` plus the
-  sum of `g[f]` over the edges that continue `e`, so that a step along the size chain accumulates what lies beyond
-  it. **R** (circulation) is not used. `kernel.uses` lists the operators an input's instruments apply: `["A"]`, or
-  `["A", "B"]` when `along` is declared.
-- **M** is what an input declares: its `m.toml`. It says which nodes, which edges, which margins; CC refuses to
-  run anything the M did not declare.
+- **A** is the kernel's one operator that takes a NodeField to an EdgeField: for each declared edge,
+  `A(x)[edge] = x[source] - x[target]`, the difference of the two node values. The size-direction differences are
+  the same arithmetic computed as a C comparison, not a relational reading ("A over that size edge as the needle:
+  NOT ADMISSIBLE", E382): the code still calls `kernel.A` for them until plan 0893 P2 moves them out, and step 4 of
+  `explain` prints `C` (or `C+KERNEL` where a control edge is also read) to say what the number is. Where CC wants a
+  NodeField again it declares a projection and says what the projection keeps and discards.
+- **B** (accumulation along continuation) and **R** (circulation) are unused as kernel operators on any current
+  input. `along` (below) sums the steps of its size comparison to the top edge: `B(g)[e] = g[e]` plus the sum of
+  `g[f]` over the edges that continue `e`, which over a comparison is the plain C sum it already is (the code calls
+  `kernel.B` until plan 0893 P2). `kernel.uses` lists what the code calls today: `["A"]`, or `["A", "B"]` when
+  `along` is declared.
+- **M** is what an input declares: its `m.toml`. It says which nodes, which comparisons and relations, which
+  margins; CC refuses to run anything the M did not declare.
 
 The data are never the nodes. A node holds a number reduced from data (a mean, a covariance); the reduction is
 step 2 of `explain`, and it is applied identically to the original data (row 0) and to every resample.
@@ -33,26 +44,27 @@ recorded sequence is not a process sequence. The per-locus mean is a declared bo
 order of the configurations) stated in that file. The bootstrap interval is a projection C: it places the reading's sign cell
 against its declared margin, and is never an operator input (Robin, toolset LOG E307). The same holds for the Gamma-method interval: its window W and integrated autocorrelation time are statistics of the projection C and feed the sign cell only (gamma is declared but NOT yet used on real inputs; plan 0878 recorded a one-cell disagreement with the bootstrap twin, pending a numbered explanation).
 
-## The relations, in ASCII
+## The comparisons and relations, in ASCII
 
-An arrow points from an edge's source to its target. `A` is source value minus target value.
+An arrow points from an edge's source to its target. The difference is source value minus target value.
 
 ```
-chain over size              27 <- 81 <- 243            edges: 81 -> 27, 243 -> 81
-pair over starts             random <- ordered          edge:  ordered -> random
-matched (big 243, small 81)
+size comparison (chain)      27 <- 81 <- 243            edges: 81 -> 27, 243 -> 81
+start comparison (pair)      random <- ordered          edge:  ordered -> random      (pending Robin R1)
+matched comparison (big 243, small 81)
 
    big 243:    L0   L1   L2   L3
                     \    \    \
    small 81:      L0   L1   L2        edges: (243,L1)->(81,L0) (243,L2)->(81,L1) (243,L3)->(81,L2)
 ```
 
-The matched relation pairs a big and a small system at the same block-lattice size, one blocking step apart.
-Two more relations are declared for `along` and the families:
+The matched comparison pairs a big and a small system at the same block-lattice size, one blocking step apart
+(the blocking map). One relation is declared for `along` and the delta instruments (pending Robin R2), and the
+families take their differences inside C over index pairs of the same two shapes:
 
 ```
-control over points          0.0 <- 0.07 <- 0.14 <- 0.21        edges: 0.07 -> 0.0, 0.14 -> 0.07, 0.21 -> 0.14
-all-pairs over points        0.0, 0.07, 0.14, 0.21              edges: every (j -> i) with i before j (6 for 4 points)
+control relation over points 0.0 <- 0.07 <- 0.14 <- 0.21        edges: 0.07 -> 0.0, 0.14 -> 0.07, 0.21 -> 0.14
+all-pairs (family f1, in C)  0.0, 0.07, 0.14, 0.21              pairs: every (j, i) with i before j (6 for 4 points)
 ```
 
 An `along` unit is one edge of the control relation, restricted to its two points (edge `b -> a`).
@@ -63,7 +75,7 @@ CC has 11 instrument modules: the nine the verdict path reads (needle, across, s
 
 ### needle: does one more blocking step move the observable, and where does it sit?
 
-- **Relation:** `matched`. **Nodes:** the observable `g1` of the big system's four block levels and the small
+- **Comparison:** `matched`. **Nodes:** the observable `g1` of the big system's four block levels and the small
   system's three, as one seven-node field. **Operator:** A over the matched edges.
 - **Reads:** the matched edge at the coarsest equal size is the **velocity**: `g1(big, level 3) - g1(small, level 2)`.
   Two more numbers locate the point against the two trivial fixed points: `d_ord` (the ordered value minus
@@ -79,7 +91,7 @@ CC has 11 instrument modules: the nine the verdict path reads (needle, across, s
 
 ### across: how the linear response grows with size
 
-- **Relation:** `size` chain. **Nodes:** `ln(s * R)` at each size, where `R` is the covariance of the
+- **Comparison:** `size` chain. **Nodes:** `ln(s * R)` at each size, where `R` is the covariance of the
   observable with the energy. **Operator:** A over the size edges, divided by the log of the size ratio of the
   edge.
 - **Reads:** `y_last`, the growth exponent of the last step. It carries the flag H in every table: it uses
@@ -92,7 +104,7 @@ CC has 11 instrument modules: the nine the verdict path reads (needle, across, s
 
 ### stability: does that exponent change between size steps?
 
-- **Relation:** the size chain, then a second chain over the *steps*: one node per step's exponent.
+- **Comparison:** the size chain, then a second chain over the *steps*: one node per step's exponent.
   **Operator:** A over the steps chain, at the last edge.
 - **Reads:** `d`, the change of the exponent from the second to the last step: `y_last - y_prev`.
 - **Means:** a walking or crossing fixed point makes the exponent drift with size; a stable line does not.
@@ -102,7 +114,7 @@ CC has 11 instrument modules: the nine the verdict path reads (needle, across, s
 
 ### two_start: do two ways of starting agree?
 
-- **Relation:** `pair` over the two starts, one edge per size. **Nodes:** the order parameter averaged from each
+- **Comparison (pending R1):** `start`, a `pair` over the two starts, one edge per size. **Nodes:** the order parameter averaged from each
   start, divided by its declared unit scale. **Operator:** A over the pair, `D = ordered - random`.
 - **Reads:** `D` at each size (the instrument is coded per size, then the sizes are combined by the codes
   table's `combine`).
@@ -115,7 +127,7 @@ CC has 11 instrument modules: the nine the verdict path reads (needle, across, s
 
 ### fluct: does the variance of the energy density persist with size?
 
-- **Relation:** the `size` chain. **Nodes:** `ln var(e)` at each size, `e = E / unit_scale`, the energy per bond (the
+- **Comparison:** the `size` chain. **Nodes:** `ln var(e)` at each size, `e = E / unit_scale`, the energy per bond (the
   `unit_scale` is declared in the input's `[two_start]` table). **Operator:** A over the size edges, divided by the log of
   the size ratio, like `across`; the door gives `ln` a positive argument by construction (variance is positive).
 - **M keeps** the second cumulant of the density and **discards** its higher cumulants and the time order of the snapshots.
@@ -130,8 +142,8 @@ CC has 11 instrument modules: the nine the verdict path reads (needle, across, s
 
 ### along: how fast does the difference between two neighbouring points grow with size?
 
-- **Relation:** a pair unit, one edge of the declared `control` relation (a chain over the points, `a <- b`), and
-  the `size` chain. **Nodes:** first the observable of the two points at each size (two nodes, one pair, per size),
+- **Relation (pending R2):** a pair unit, one edge of the declared `control` relation (a chain over the points,
+  `a <- b`). **Comparison:** the `size` chain. **Nodes:** first the observable of the two points at each size (two nodes, one pair, per size),
   then `ln(s * Delta)` at each size, where `Delta` is the difference of the two points. **Operators:** A over
   the control edge gives `Delta(L)`; A over the size chain gives the step of `ln(s * Delta)`; B over the size chain
   accumulates the steps to the top edge; the sum is divided by the log of the size span.
@@ -148,7 +160,7 @@ CC has 11 instrument modules: the nine the verdict path reads (needle, across, s
 
 ### needle_chain: does the needle's velocity die away down the size chain?
 
-- **Relation:** `chain` (template `matched-chain`): the needle's matched relation taken at two neighbouring size pairs,
+- **Comparison:** `chain` (template `matched-chain`): the needle's matched comparison taken at two neighbouring size pairs,
   (243, 81) and (81, 27), laid end to end; then a chain over the two **steps**. **Nodes:** the level means of all three
   sizes (twelve nodes here). **Operator:** A over each matched pair gives that pair's velocity; `ln|v|` of the two
   velocities goes through `door:logcoord`; A over the steps chain, divided by the declared `ln(size ratio) = ln 3`.
@@ -169,7 +181,7 @@ CC has 11 instrument modules: the nine the verdict path reads (needle, across, s
 
 ### across_delta: how the difference between two neighbouring points grows with size (the TRANSFORMED door is v07 only)
 
-- **Relation:** one edge `a -> b` of the declared `control` chain (here T increasing), and the `size` chain.
+- **Relation (pending R2):** one edge `a -> b` of the declared `control` chain (here T increasing). **Comparison:** the `size` chain.
   **Nodes:** the mean observable of the two points at each size; then `ln(s Delta)` at each size, `Delta(L) =
   g1(b) - g1(a)`, with `s` the constant sign the door found. **Operator:** A over the control edge gives `Delta(L)`;
   `door:logcoord`; A over the size chain divided by `ln 3` gives the step exponents `yD1` (27 -> 81) and `yD2`
@@ -195,7 +207,7 @@ CC has 11 instrument modules: the nine the verdict path reads (needle, across, s
 - **What `explain` prints:** `explain <input> a->b` prints one section per instrument that reads the pair, each from its own stored vectors (plan 0881 P2.1). Under `across_delta`: `Delta` per size, then the stored `y_steps` (`yD1`, `yD2`) and `ratio`, then the reading, the sign and the family code. For `0.85->0.89294` on x2b-xy-3: `y_steps [0.09186, 0.04746]; ratio 0`, `y_last 0.04746 [0.02579, 0.06894]`, `SLOW+`; the `along` section of the same pair keeps its own `ln|Delta|`, A, B trace (`y_along 0.06966`).
 ### stability_delta: does the difference estimator's exponent change between size steps?
 
-- **Relation:** one edge `a -> b` of the declared `control` chain and the `size` chain, as `across_delta`. **Operator:** A over the control edge gives `Delta(L)`; `door:logcoord`; A over the size chain gives the step exponents `yD1`, `yD2`; `door:steps`, then A over the chain of those steps gives `d = yD2 - yD1`. It reads no drift and no transform, and needs no membership door: the column is the same under every rule (plan 0877, `v08-rules`).
+- **Relation (pending R2):** one edge `a -> b` of the declared `control` chain; **Comparison:** the `size` chain, as `across_delta`. **Operator:** A over the control edge gives `Delta(L)`; `door:logcoord`; A over the size chain gives the step exponents `yD1`, `yD2`; `door:steps`, then A over the chain of those steps gives `d = yD2 - yD1`. It reads no drift and no transform, and needs no membership door: the column is the same under every rule (plan 0877, `v08-rules`).
 - **Reads:** `d`, per control pair, against `eps y` (0.25), `per_point`: a point reads the cells of the pairs that touch it and every pair must agree to resolve. This is stability on the Delta basis: where v06/v07 reported a TRANSFORMED cell, v08's alphabet has none.
 - **Means:** the exponent of the difference holds from one size step to the next (STABLE) or it changes, without any finite-size correction being assumed.
 - **A number:** x2b-xy-3, pair `0.85->0.89294` (`bin/cc explain x2b-xy-3 '0.85->0.89294' --tables v08-rules`): `y_steps [0.09186, 0.04746]`, so `d = 0.04746 - 0.09186 = -0.0444`, interval `[-0.08474, -0.003254]`, cuts `-0.25 0 +0.25`: `SLOW-`. The sign cell is not a stable reading: plan 0889 records that a sign cell whose deciding endpoint lies inside its interval method's own resample noise is not a stable reading (6 of 11 bootstrap seeds read `ZERO!`); the Gamma-method interval (plan 0878) is the deterministic centre.
@@ -204,7 +216,7 @@ CC has 11 instrument modules: the nine the verdict path reads (needle, across, s
 
 ### transform: an independent conventional estimate — not a Compass reading (reported, read by no row)
 
-- **Relation:** the `size` chain (for `R = cov(G, E)` at each size, as `across` and `stability`) and the
+- **Comparison:** the `size` chain (for `R = cov(G, E)` at each size, as `across` and `stability`) and the
   `matched-chain` (for the needle's two velocities, as `needle_chain`). **Operator:** A over the size chain gives
   `y1`, `y2`, the growth exponents of `ln(s R)` over the two steps; A over the matched pairs gives the two velocities;
   `ln r = ln|v_top| - ln|v_prev|` (`door:logcoord` on both); `door:decays` refuses unless `ln r < 0` at the estimate
@@ -228,28 +240,37 @@ A family reads the points of one input together, from the stored result and its 
 measures again. Its columns are ordered differences of stored readings over the interior run (the paragraph "The
 family layer is a projection C" below says where they are computed and what the verdict is):
 
-- **bracket: A over a chain of codes.** Each point's needle code is given a declared rank (DIS 0, MID 1, ORD 2),
-  the ranks are a NodeField over the chain of points in their declared order, and A takes the difference of
-  neighbours. Each difference is placed among the cells for `eps = 0` (three cells), so a step down is
+- **bracket: ordered differences of ranked codes, inside C.** Each point's needle code is given a declared rank
+  (DIS 0, MID 1, ORD 2), and the ranks, in the points' declared order, are differenced neighbour by neighbour
+  (`rank(i+1) - rank(i)`; `fingerprint.code_steps` over `chain_pairs`). Each difference is placed among the cells for `eps = 0` (three cells), so a step down is
   `DESCENT` and anything else is `NO-DESCENT`; the bracket is `BRACKET` when no step descends and some point is MID.
-- **f1: all-pairs differences.** The `across` exponent of each interior point, per resample, is a NodeField over
-  the points; A over the `all-pairs` relation gives `y(j) - y(i)` for every pair (6 pairs for 4 points), each with
-  its own interval, coded by its sign cell.
+- **f1: all-pairs differences, inside C.** The stored reading of each interior point, per resample, is differenced
+  over every index pair (`y(j) - y(i)`; `fingerprint.pair_differences` over `all_pairs`; 6 pairs for 4 points), each
+  with its own interval, coded by its sign cell.
 - **f2: along over the chain.** The `along` cell of each consecutive pair of interior points, coded through
   `[f2.code]`.
 
 Where a point reads a null (`NOT-MEASURED`, `NOT-EVALUATED`), the edges and pairs that touch it read that null: a
-null is plumbing around the maths, and only ranked codes reach A. The family verdict is one lookup in a
+null is plumbing around the maths, and only ranked codes reach the differences. The family verdict is one lookup in a
 partition of the three columns (`family.toml`), validated total and disjoint, with no priority chain.
 
 **The family layer is a projection C (Robin Q19, 2026-10-06).** The bracket and f1 differences are computed inside C, as
 ordered differences of the stored per-point readings over the interior run (`y(j) - y(i)` for the `across_delta.y_last`
 vectors, `rank(i+1) - rank(i)` for the needle codes); they are not A over a declared relation, and the family layer is not a
-second relational pass. This supersedes the former sentence "Its three columns are built with the same operators" (corrected above) and the
-headings "A over a chain of codes" and "A over the `all-pairs` relation" of the bullets above, which describe the code as of plan 0879. The family verdict
-(LINE, BKT-END, POINT-MANIFOLD, REFUSE-*) is a **declared report**, a projection C over per-point sign cells, not a relational
-reading; the sign-cell rule stands unchanged. The code change is plan 0892 P2; until it lands the arithmetic is the same and only
-its description is corrected. The verdict words and the tables are unchanged.
+second relational pass. This supersedes the former sentence "Its three columns are built with the same operators" and the
+former headings "A over a chain of codes" and "A over the `all-pairs` relation" (both corrected above). Plan 0892 P2 made the
+code say so: `cc/fingerprint.py` imports no kernel, admit or door, and computes the same arithmetic over index pairs in the
+door's former edge order (every family transcript byte-identical). The family verdict (LINE, BKT-END, POINT-MANIFOLD,
+REFUSE-*) is a **declared report**, a projection C over per-point sign cells, not a relational reading; the sign-cell rule
+stands unchanged. `bin/cc family` prints `=> family report` and the label `cc.toml [report] family` under it.
+
+**The per-point verdict path is a projection C as well (Robin, 2026-10-06, LOG E382).** The per-point sign cells the family
+reads are themselves sign cells of declared comparisons: the blocking-map comparison of independent sizes (the needle's
+matched levels, the size chains) and the two-start difference (pending Robin R1), each computed inside C, not A over a
+kernel relation. The per-point verdict is a **declared report** too; `show` prints the label `cc.toml [report] verdict` once
+under each result header, and `explain` labels steps 3 and 4 COMPARISON and C. Both labels are one table, `cc.toml [report]`;
+the verdict words and the tables are unchanged. The code that computes the per-point differences still calls `kernel.A`
+until plan 0893 P2 (a change that moves every measure key); the labels say what the numbers are now.
 
 The declared interior rule `interior = "mid-run-open"` is a projection C over the needle sign cells: it keeps the MID run (less the end a sink lies beyond), discards every value and every other column, and reads nothing else.
 
@@ -270,6 +291,8 @@ These are rulings about what CC may claim and what it does not implement. The Q0
 
 - **Q1 - reweighting.** Reweighting the configurations is outside the relational treatment. The navigator never acts on a reweighted quantity as a reading, and nothing in CC implements it.
 - **Q3 - the transform.** There is no observation at infinite size; the shared-omega assumption of the finite-size transform is an undeclared prior. The `transform` output is an independent conventional estimate — not a Compass reading; no verdict row in any set after v07 may read it. The v06/v07 claims that rest on a TRANSFORMED basis (`x2b-xy-2@v06-rules` and `@v07-rules`: LINE, BKT-END) are transform basis — not relationally admissible; superseded by `x2b-xy-3@v08-rules`.
+- **Q19 - the family layer (2026-10-06).** Not admissible as a second relational pass; admissible as a declared projection C over per-point sign cells. The family verdict is a declared report (above, "The family fingerprints").
+- **E382 - the needle (2026-10-06).** The L and L/3 observations are each admissible through their own M; "L -> L/3 as a Kernel edge: NOT ADMISSIBLE"; "A over that size edge as the needle: NOT ADMISSIBLE"; the declared blocking-map comparison is admissible in a downstream projection C. The needle is restated as a C comparison; no provenance class is added and Coupling is not broadened. The per-point verdict is a declared report (above).
 - **Q4 - the star.** A single edge is the Primary kernel, Delta to Sigma. A radial chain is A, then B, then R, with `rho_base` and `chi_0` declared (plan 0885).
 - **Q5 - stacks.** Simulated stacks are Phase 1 only; real movies are Phase 2 eligible.
 - **The principle.** Universal operators are not a universal model of systems. Every input's M is a complete Origin declaration: what was measured, by what, what a node keeps and discards. Plan 0884 is the first real one.
