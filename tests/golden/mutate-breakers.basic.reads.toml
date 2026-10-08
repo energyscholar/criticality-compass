@@ -2,7 +2,7 @@
 # never typed). Each entry: kinds (R read, S stat, D directory listed) and a path (~data/ = the data root, ~toolset/ = the rest of the toolset root).
 schema = 1
 kind = "golden-reads"
-key = "a879e503646390a74ab4e1067275d34413c5dad67048f916e4c8294b9a5c359c"
+key = "70e477246f109c4a6ed15a39ae0c89febba1e231c1b60f5778fad492f2e35ff7"
 paths = [
   "DS .",
   "D .githooks",
@@ -886,6 +886,7 @@ paths = [
   "R tests/breakers/unres-across-not-positive.toml",
   "R tests/breakers/unres-two-start-not-positive.toml",
   "R tests/breakers/w1-point-estimate-crossing.toml",
+  "R tests/frozen.py",
   "D tests/golden",
   "R tests/golden/data-add-pinned.advanced.txt",
   "R tests/golden/data-add-pinned.basic.txt",

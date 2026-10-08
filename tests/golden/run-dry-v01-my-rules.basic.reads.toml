@@ -2,7 +2,7 @@
 # never typed). Each entry: kinds (R read, S stat, D directory listed) and a path (~data/ = the data root, ~toolset/ = the rest of the toolset root).
 schema = 1
 kind = "golden-reads"
-key = "b1b454d45a7825b38c0dcb6ecb68c0a849d3838bb73b9162d93f8b9a8d216342"
+key = "ddd5e3c89ada42ef53383be63b8d4725c282897dd0c3d4fe5fd85b8dfd0b4d74"
 paths = [
   "S .",
   "RS FROZEN.json",
@@ -279,11 +279,16 @@ paths = [
   "RS results/w2-potts-2@v03-rules.json",
   "RS results/w2-potts-2@v03-rules.npz",
   "S results/w2-potts@my-rules.json",
+  "S results/w2-potts@my-rules.npz",
   "RS results/w2-potts@v01-rules.json",
   "RS results/w2-potts@v01-rules.npz",
   "R results/w2-potts@v02-rules.json",
   "RS results/w2-potts@v03-rules.json",
   "RS results/w2-potts@v03-rules.npz",
+  "R results/w2-potts@v04-rules.json",
+  "R results/w2-potts@v05-rules.json",
+  "R results/w2-potts@v06-rules.json",
+  "R results/w2-potts@v07-rules.json",
   "RS results/w2-potts@verdict-x-rules.json",
   "RS results/w2-potts@verdict-x-rules.npz",
   "RS results/w3-potts@v03-rules.json",
@@ -346,7 +351,7 @@ paths = [
   "DS tables/my-rules",
   "RS tables/my-rules/codes.toml",
   "S tables/my-rules/compose.toml",
-  "RS tables/my-rules/family.toml",
+  "S tables/my-rules/family.toml",
   "S tables/my-rules/geometry.toml",
   "RS tables/my-rules/membership.toml",
   "S tables/my-rules/order.toml",
