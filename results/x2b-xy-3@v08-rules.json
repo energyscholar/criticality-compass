@@ -5,10 +5,10 @@
  "input": "x2b-xy-3",
  "tables": "v08-rules",
  "derived_from": null,
- "code_commit": "7071da69f8bb19a6bff77390728187df18c58d02",
- "code_hash": "0ae0b6cc1e6fbfa1a436ad801d2d9bb9e1382b5a0c7fc90a136858fdaf8e8de9",
- "measure_hash": "4ce4328981b7e2a8ac6133ed6b2c34fde09db54c456419592a3bedcc3ce70864",
- "peak_rss_mb": 1123.7,
+ "code_commit": "15c797585fd861e4bb103a2abc230d30ee31090f",
+ "code_hash": "167bc5a2c0dc4eb8b7afc232216127bc82e9a17dea770ce66dd78662e2f0bbf4",
+ "measure_hash": "210813ef757cc4a3716a4db37ff06ac3e45cd5f046fedf678b92316ee009c57e",
+ "peak_rss_mb": 1117.8,
  "interval": {
   "method": "block",
   "b": 400,
@@ -18,6 +18,7 @@
  },
  "read": {
   "inputs/x2b-xy-3/m.toml": "47c7b0d2180bea746a45645c5f71a640a2ee1e1ba18db47eb4e64973c9d3361f",
+  "inputs/x2b-xy-3/transducer.toml": "25557f1ff89276386dd32dc0034f1f62be2dcd89a075d896a181c75415b775ee",
   "instruments/needle.toml": "03c8e390df85cdcef367ecba33043ebf9e0445c30f27fa626242a87387fb3ef0",
   "instruments/across.toml": "8f6803e8af6cd80d4f7bb69b1be8148cf5eb8742892caf5f3f8392f38b3c0944",
   "instruments/stability.toml": "2fc7bb21b58a2d6eceab15ca62424aadedd309eb1f9dd6125bdee57d52588170",
