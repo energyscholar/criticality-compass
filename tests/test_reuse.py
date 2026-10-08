@@ -13,11 +13,12 @@ Plan 0886 (the validators are outside the closure; cc/schema.py holds what a mea
 9. a one-byte edit to cc/schema.py (what the measurement reads) changes every input's key"""
 import json
 import shutil
-import stat
 import subprocess
 import sys
 import tempfile
 from pathlib import Path
+
+import frozen
 
 ROOT = Path(__file__).resolve().parent.parent
 bad = []
@@ -57,8 +58,7 @@ def check(name, ok, why=""):
 with tempfile.TemporaryDirectory() as t:
     repo = Path(t) / "repo"
     shutil.copytree(ROOT, repo, ignore=shutil.ignore_patterns(".git", "__pycache__"))
-    for q in [repo, *repo.rglob("*")]:
-        q.chmod(q.stat().st_mode | stat.S_IWUSR)
+    frozen.thaw(repo)   # the copy only; the live tree is frozen
 
     for q in (repo / "results").glob(f"{INPUT}@*"):   # the copy starts with one stored result of INPUT (the frozen v01, no measure hash): any keyed one under another set would be the re-verdict parent
         if not q.name.startswith(f"{INPUT}@{SET}."):
@@ -78,8 +78,7 @@ with tempfile.TemporaryDirectory() as t:
     check("an unchanged key returns the stored result: nothing measured, same signature, file bytes unchanged",
           again.get("calls") == 0 and again["signature"] == first["signature"] and file_sha(rid) == before, str(again)[:300])
     shutil.copytree(repo / "tables" / SET, repo / "tables" / FORK)
-    for q in (repo / "tables" / FORK).iterdir():
-        q.chmod(q.stat().st_mode | stat.S_IWUSR)
+    frozen.thaw(repo / "tables" / FORK)
     derived = run(INPUT, FORK)
     check("a table set that differs only in tables/*: re-verdict from the stored result, nothing measured",
           derived.get("calls") == 0 and derived["derived_from"] == rid and derived["signature"] == first["signature"], str(derived)[:300])

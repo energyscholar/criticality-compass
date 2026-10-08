@@ -14,7 +14,6 @@ import json
 import os
 import platform
 import shutil
-import stat
 import subprocess
 import sys
 import tempfile
@@ -24,6 +23,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import numpy as np
+import frozen  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -44,8 +44,7 @@ def transcript(case, mode, traced=False):
     with tempfile.TemporaryDirectory() as t:
         repo = Path(t).resolve() / "repo"
         shutil.copytree(ROOT, repo, ignore=shutil.ignore_patterns(*NOT_READ))
-        for p in [repo, *repo.rglob("*")]:
-            p.chmod(p.stat().st_mode | stat.S_IWUSR)
+        frozen.thaw(repo)   # the copy only; the live tree is frozen
         log, env = Path(t).resolve() / "trace.log", None
         if traced:
             log.touch()

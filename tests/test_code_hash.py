@@ -5,6 +5,7 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
+import frozen  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 bad = []
@@ -21,8 +22,7 @@ def check(name, ok, why=""):
 with tempfile.TemporaryDirectory() as t:
     repo = Path(t) / "repo"
     shutil.copytree(ROOT, repo, ignore=shutil.ignore_patterns(".git", "__pycache__"))
-    for q in [repo, *repo.rglob("*")]:
-        q.chmod(q.stat().st_mode | 0o200)
+    frozen.thaw(repo)   # the copy only; the live tree is frozen
 
     def cc(*args):
         r = subprocess.run([sys.executable, str(repo / "bin" / "cc"), *args], capture_output=True, text=True, cwd=repo)

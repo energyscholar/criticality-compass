@@ -13,6 +13,7 @@ sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "cc" / "instruments")]
 import detect  # noqa: E402
 import door  # noqa: E402
 import score  # noqa: E402
+import frozen  # noqa: E402
 
 bad = []
 
@@ -42,7 +43,7 @@ check("reverdict under v01-rules equals the real run under v01-rules (signature 
 with tempfile.TemporaryDirectory() as t:           # a set that really moves a code: across SIG+ reads WEAK, not RELEVANT
     shutil.copytree(ROOT / "tables" / "verdict-x-rules", Path(t) / "flip")
     f = Path(t) / "flip" / "codes.toml"
-    f.chmod(0o644)
+    frozen.thaw(f)
     f.write_text(f.read_text().replace('"SIG+" = "RELEVANT"', '"SIG+" = "WEAK"'))
     b7 = next(r for r in olds if r["input"] == "b7-at-line")
     flip = score.reverdict_result(b7, detect.load_tables("flip", t))
@@ -64,8 +65,7 @@ with tempfile.TemporaryDirectory() as t:
 with tempfile.TemporaryDirectory() as t:
     repo = Path(t) / "repo"
     shutil.copytree(ROOT, repo, ignore=shutil.ignore_patterns(".git", "__pycache__"))
-    for q in [repo, *repo.rglob("*")]:
-        q.chmod(q.stat().st_mode | 0o200)
+    frozen.thaw(repo)   # the copy only; the live tree is frozen
     for q in repo.glob("results/*@v01-rules.*"):
         q.unlink()
     fz = json.loads((repo / "FROZEN.json").read_text())   # the copy is writable: v01-rules results are unfrozen in it

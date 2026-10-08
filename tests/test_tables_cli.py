@@ -6,6 +6,7 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
+import frozen  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 bad = []
@@ -20,8 +21,7 @@ def check(name, ok, why=""):
 with tempfile.TemporaryDirectory() as t:
     repo = Path(t) / "repo"
     shutil.copytree(ROOT, repo, ignore=shutil.ignore_patterns(".git", "__pycache__"))
-    for q in [repo, *repo.rglob("*")]:               # the live tree is frozen; only this copy is made writable
-        q.chmod(q.stat().st_mode | 0o200)
+    frozen.thaw(repo)   # the copy only; the live tree is frozen
 
     def cc(*args):
         r = subprocess.run([sys.executable, str(repo / "bin" / "cc"), *args], capture_output=True, text=True, cwd=repo)
@@ -137,7 +137,7 @@ with tempfile.TemporaryDirectory() as t:
     rc, out = cc("tables", "drop", "t2")
     check("a frozen set is never dropped", rc == 1 and "Next:" in out, out)
     v = repo / "tables/verdict-x-rules/verdict.toml"
-    v.chmod(0o644)
+    frozen.thaw(v)
     v.write_text(v.read_text() + "\n# edited after it was frozen\n")
     rc, out = cc("run", "w2-potts", "--dry")
     check("an edited frozen table is refused (C7)",

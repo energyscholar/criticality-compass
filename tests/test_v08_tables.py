@@ -3,7 +3,6 @@ Cells are read through the set's own functions. A planted CONVERGING chain is me
 (the transform did not leak into the Delta basis), the raw exponent of the difference is read, ruling A reads its sub-eps residual MARGINAL. tables/v07-rules is byte-identical."""
 import hashlib
 import shutil
-import stat
 import sys
 import tempfile
 import tomllib
@@ -15,6 +14,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "cc" / "instruments")]
 import declare  # noqa: E402
 import detect  # noqa: E402
+import frozen  # noqa: E402
 
 bad = []
 
@@ -97,8 +97,7 @@ for why, edit, find in (
         shutil.copy(ROOT / "checks.toml", t)
         shutil.copytree(ROOT / "instruments", Path(t) / "instruments")
         shutil.copytree(ROOT / "tables" / "v08-rules", Path(t) / "tables" / "v08-rules")
-        for q in [Path(t) / "tables" / "v08-rules", *(Path(t) / "tables" / "v08-rules").rglob("*")]:   # the set is frozen (read-only): restore owner-write on the COPY only (ruled E378)
-            q.chmod(q.stat().st_mode | stat.S_IWUSR)
+        frozen.thaw(Path(t) / "tables" / "v08-rules")   # the set is frozen (read-only): owner-write on the COPY only (ruled E378)
         shutil.copytree(ROOT / "cc", Path(t) / "cc")
         f = Path(t) / "tables" / "v08-rules" / "codes.toml"
         f.write_text(edit(f.read_text()))

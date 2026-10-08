@@ -17,6 +17,7 @@ sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "cc" / "instruments")]
 import declare  # noqa: E402
 import detect  # noqa: E402
 import score  # noqa: E402
+import frozen  # noqa: E402
 
 bad = []
 
@@ -68,8 +69,7 @@ check("the page's cell counts sum to the product of each table set's declared co
       sum(cells) == sum(cells_of_set(t) for t in sets) and 'class=never' in page, f"{sum(cells)} vs {sum(cells_of_set(t) for t in sets)}")
 with tempfile.TemporaryDirectory() as t:
     shutil.copytree(ROOT / "tables" / "verdict-x-rules", Path(t) / "d13")
-    for q in [Path(t) / "d13", *(Path(t) / "d13").rglob("*")]:   # the copy only; the live set is frozen
-        q.chmod(q.stat().st_mode | 0o200)
+    frozen.thaw(Path(t) / "d13")   # the copy only; the live set is frozen
     f = Path(t) / "d13" / "verdict.toml"
     text = f.read_text()
     flip = text.replace('when.two_start = ["INDEP"]', 'when.two_start = ["INDEP", "UNRES"]').replace('["FLUCT", "UNRES"]', '["FLUCT"]')
