@@ -35,6 +35,12 @@ for q in sorted((ROOT / "results").glob("*@v03-rules.json")):
             for n in tomllib.loads((ROOT / "inputs" / res["input"] / "m.toml").read_text())["instruments"]]
     total += 1
     keyed += res.get("measure_hash") == schema.measure_hash(ROOT, mods)
+# plan 0894 P5 (E371): docs/gen-verdicts.py has a declared role (plumbing) and its output IS docs/VERDICTS.md, byte for byte (VERDICTS.md is generated, never edited)
+import subprocess  # noqa: E402
+roles = tomllib.loads((ROOT / "checks.toml").read_text())["roles"]
+check("docs/gen-verdicts.py is declared in checks.toml (plumbing)", "docs/gen-verdicts.py" in roles["plumbing"], str(sorted(r for rs in roles.values() for r in rs if "docs" in r)))
+gen = subprocess.run([sys.executable, "docs/gen-verdicts.py", ".", "v08-rules", "90", "compact"], capture_output=True, text=True, cwd=ROOT)   # the invocation VERDICTS.md records
+check("docs/gen-verdicts.py v08-rules 90 compact reproduces docs/VERDICTS.md byte for byte", gen.returncode == 0 and gen.stdout == (ROOT / "docs" / "VERDICTS.md").read_text(), gen.stderr[-200:])
 print(f"stored v03 results keyed to the current closure: {keyed} of {total}")
 print("test_closure: " + ("FAILED" if bad else "all passed"))
 sys.exit(1 if bad else 0)
