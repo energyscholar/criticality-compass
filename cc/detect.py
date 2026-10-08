@@ -443,7 +443,8 @@ def run_keyed(input_id, tables, write, tables_dir=None, reuse=True):
     m, c, T = load_input(input_id), schema.Ctx(ROOT), load_tables(tables, tables_dir)
     reg = {n: instrument(n) for n in sorted(c.reg)}
     read, decl = read_hashes(m, input_id, tables, T, c), declared_of(input_id, m, T)
-    read.update({f"inputs/{input_id}/couplings.toml": schema.sha(ROOT / "inputs" / input_id / "couplings.toml")} if decl else {})
+    cp = ROOT / "inputs" / input_id / "couplings.toml"   # plan 0894 P1: a file the input declares is read, whatever the rule set (the set does not decide what the input is)
+    read.update({f"inputs/{input_id}/couplings.toml": schema.sha(cp)} if cp.is_file() else {})
     chash, rid = schema.code_hash(ROOT), f"{input_id}@{tables}"
     mhash = schema.measure_hash(ROOT, [reg[n][0]["module"] for n in m["instruments"]])
     if reuse and tables_dir is None and (st := stored(input_id, tables, read, mhash)) is not None:

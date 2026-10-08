@@ -90,6 +90,18 @@ with tempfile.TemporaryDirectory() as t:
     check("one edited byte of a table: the input under that set is a re-verdict whose read names the edited table, never the stale stored result",
           edited.get("calls") == 0 and edited["derived_from"] == rid and edited["read"][key] != derived["read"][key], str(edited)[:300])
 
+    # plan 0894 P1 (E380): the couplings file an input declares is pinned whatever the rule set, so a result measured under a set with
+    # declared columns (v08) is the re-verdict parent of the same input under a set without them (v01), and not a needless re-measure.
+    OTHER = "b7-at-line-2"
+    for q in (repo / "results").glob(f"{OTHER}@*"):
+        q.unlink()
+    m08 = run(OTHER, "v08-rules")
+    c01 = run(OTHER, SET)
+    check("0894 P1: a result measured under v08 (declared columns) is re-verdicted, not re-measured, under v01 (the couplings file is pinned under every set)",
+          m08.get("calls") == 1 and c01.get("calls") == 0 and c01.get("derived_from") == f"{OTHER}@v08-rules", str((m08, c01))[:400])
+    check("0894 P1: the couplings file is in the read set under a set with no declared column",
+          f"inputs/{OTHER}/couplings.toml" in c01.get("read", {}), str(sorted(c01.get("read", {})))[:300])
+
     def keys():
         r = subprocess.run([sys.executable, "-c", KEYS, str(repo)], capture_output=True, text=True)
         return json.loads(r.stdout.splitlines()[-1]) if r.returncode == 0 else {"error": r.stderr[-400:]}
