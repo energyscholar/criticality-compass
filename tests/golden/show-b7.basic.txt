@@ -1,5 +1,6 @@
 $ bin/cc show b7-at-line
 b7-at-line   rules: v01-rules   result: results/b7-at-line@v01-rules.json (frozen)
+report: declared report — a projection C over sign cells of declared comparisons (the blocking-map comparison of independent sizes; the two-start difference), not a relational reading (Robin, 2026-10-06, LOG E382)
 point 0.0   case at-self-dual-line
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
   needle     BLANK (NOT-MEASURED: needle is not declared on this input)

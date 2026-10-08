@@ -166,3 +166,12 @@ match = ['^[-+]\s+code_(commit|hash): ']
 [golden.classes.d]    # the frozen flag
 files = ["*.txt"]
 match = ['\((not frozen|frozen)\)$']
+[golden.classes.f]    # plans 0892/0893 R4 (i): the report line inserted under a result header
+files = ["*.txt"]
+match = ['^\+report: declared report — ']
+[golden.classes.g]    # plans 0892/0893 R4 (ii): explain's step-3/4 label words (cc.toml [step_labels]); the regolden's numbers are checked apart
+files = ["explain-*.txt"]
+match = ['^[-+]  [34] (RELATION|COMPARISON|KERNEL|C\+KERNEL|C) ']
+[golden.classes.h]    # plans 0892/0893 R4 (iii): the family `=>` line and its label line
+files = ["family-*.txt"]
+match = ['^[-+]  => family (verdict|report) ', '^\+     report: declared report — ']

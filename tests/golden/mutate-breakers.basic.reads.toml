@@ -2,7 +2,7 @@
 # never typed). Each entry: kinds (R read, S stat, D directory listed) and a path (~data/ = the data root, ~toolset/ = the rest of the toolset root).
 schema = 1
 kind = "golden-reads"
-key = "70e477246f109c4a6ed15a39ae0c89febba1e231c1b60f5778fad492f2e35ff7"
+key = "10ee6bd7f737708a12fb4b172697b58c83153acce7874f1a0bbf94267c0a0246"
 paths = [
   "DS .",
   "D .githooks",
@@ -434,6 +434,7 @@ paths = [
   "R results/reduced/x4s-stack/0b1f036c983106813aad838decf7948ab230f89ac90b230f252affe87259bfc6.npz",
   "R results/reduced/x4s-stack/0b39788e6e6d0b20f3e0a5b91fe75b30056893c4e68ce8ffc1b6c01e665eaa08.npz",
   "R results/reduced/x4s-stack/0d074c05e691f4f8c4ba7d5335c4ade32a479b5e0d3e0af9e4e881eb77360cfc.npz",
+  "R results/reduced/x4s-stack/0dae2cebec351ec82fcf018ba2d083454bb9af01113927b4ba670b2dad480033.npz",
   "R results/reduced/x4s-stack/0dc8306ac9dad46db69b2aa22f862e11d64f12120e4d5fe11ab82122913c320f.npz",
   "R results/reduced/x4s-stack/1391301a54f7c77fda9ec62dfda92c089567340cef0c35296fa3a33795e6e301.npz",
   "R results/reduced/x4s-stack/13a9cdecef783de3b20155ed393db63cb8278257889b6eac1606d5bfa1ab8335.npz",
@@ -466,6 +467,7 @@ paths = [
   "R results/reduced/x4s-stack/98a4d77a6f5698bc13cd7bf453963e5f11d96d2b6f712faaf87486f2a4cccd5e.npz",
   "R results/reduced/x4s-stack/99a72fc2d90d3d88ef298015c950cc99ed964e8f987a27cada68e1c50a54f6ba.npz",
   "R results/reduced/x4s-stack/a03c83d68d1e2184275772cc153f2ccf35d12c8440391f58fa2635448a154e18.npz",
+  "R results/reduced/x4s-stack/a198ec0d596b88b3e876b7360fd4f020afab1bf897a020ee323328e9a5e932d1.npz",
   "R results/reduced/x4s-stack/a3df655a762bc2cdc28f4866deb5d98b37b53b16eb2db6f62f7d0578a14b2b9e.npz",
   "R results/reduced/x4s-stack/a7675e6a67b4f825691a4ce5ede7a1b0b6e1a6a1e97e070d8608c502f5fb4458.npz",
   "R results/reduced/x4s-stack/b1672bb89e9ae75dd719ccffe77f3321005749e5efae9bf74f1da61983e7610e.npz",
@@ -481,6 +483,7 @@ paths = [
   "R results/reduced/x4s-stack/d7eed0c5cafb5a7571227ab162835095440684bbc4d66787ff57b6908edabc1a.npz",
   "R results/reduced/x4s-stack/d839f90cd57fcded60aef561c59bcef5c12491c09b96eac7df6e72aa8bce8106.npz",
   "R results/reduced/x4s-stack/d9dc112bad522839ac82da989dab29d9ff179b49b4b5499a9dc2bef27c3a60ae.npz",
+  "R results/reduced/x4s-stack/de5f282dbb745d28182424bd2f375cb2d8fd6598f73279c8224aa4032d5a0594.npz",
   "R results/reduced/x4s-stack/de64f00cf48334e8f86daa826f0a55d8bc5ad1e1612d1ca79e81424d436f18ab.npz",
   "R results/reduced/x4s-stack/e6c679a9bf79169be03f35de1256c06b747438e7fd59053a728f810465a958cb.npz",
   "R results/reduced/x4s-stack/ed819b0c09414a6f3f0dd746fb6415b356d1baef61a95ddba2e01d166e954242.npz",
@@ -1004,7 +1007,11 @@ paths = [
   "R tests/planted/case-unknown-field.toml",
   "R tests/planted/cc-basic-field-missing.toml",
   "R tests/planted/cc-conventional-unknown.toml",
+  "R tests/planted/cc-projection-empty.toml",
   "R tests/planted/cc-replay-missing.toml",
+  "R tests/planted/cc-report-empty.toml",
+  "R tests/planted/cc-step-label-missing.toml",
+  "R tests/planted/cc-step-label-unknown.toml",
   "R tests/planted/checks-no-maths.toml",
   "R tests/planted/codes-foreign-value.toml",
   "R tests/planted/codes-mini.toml",

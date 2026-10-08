@@ -6,16 +6,16 @@ flow       BLANK (NOT-MEASURED: needle is not declared on this input)
 across
   1 DATA      b7/L4-0.0700-L27.npz [G key Gp, E key E2] ... 3 blocks; sha256 matches fixtures/data/b7-at-line.toml
   2 REDUCE    row 0: 27 17.93, 81 59.97, 243 195
-  3 RELATION  size: chain, Coupling   27 <- 81 <- 243
-  4 KERNEL    operator A over size; row 0: y_steps [1.099, 1.073]; y_last [1.073]
+  3 COMPARISON size: chain, Coupling   27 <- 81 <- 243
+  4 C         operator A over size; row 0: y_steps [1.099, 1.073]; y_last [1.073]
   5 READING   y_last 1.073  interval [1.04, 1.106]  (95 %, 400 block resamples, b 400)
   6 SIGN      cuts -0.25 0 +0.25 (eps y): bL 3, bU 3 -> SIG+
   7 CODE      across: codes.toml line 107: SIG+ -> RELEVANT
 stability
   1 DATA      b7/L4-0.0700-L27.npz [G key Gp, E key E2] ... 3 blocks; sha256 matches fixtures/data/b7-at-line.toml
   2 REDUCE    row 0: 27 17.93, 81 59.97, 243 195
-  3 RELATION  size: chain, Coupling   27 <- 81 <- 243
-  4 KERNEL    operator A over size; row 0: d [-0.02596]
+  3 COMPARISON size: chain, Coupling   27 <- 81 <- 243
+  4 C         operator A over size; row 0: d [-0.02596]
   5 READING   d -0.02596  interval [-0.07265, 0.02263]  (95 %, 400 block resamples, b 400)
   6 SIGN      cuts -0.25 0 +0.25 (eps y): bL 1, bU 2 -> ZERO!
   7 CODE      stability: codes.toml line 118: ZERO! -> STABLE

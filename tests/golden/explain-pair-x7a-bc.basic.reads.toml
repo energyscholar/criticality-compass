@@ -2,7 +2,7 @@
 # never typed). Each entry: kinds (R read, S stat, D directory listed) and a path (~data/ = the data root, ~toolset/ = the rest of the toolset root).
 schema = 1
 kind = "golden-reads"
-key = "c109f93c6c564bd0d44645b372f4495b64627bccbccb9b92db3798bb5ac4157a"
+key = "e13a0ab067d83bd4019d8fc4c5f939697b41051b6abaf483459168c31cd30872"
 paths = [
   "RS bin/cc",
   "R cc.toml",

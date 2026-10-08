@@ -2,7 +2,7 @@
 # never typed). Each entry: kinds (R read, S stat, D directory listed) and a path (~data/ = the data root, ~toolset/ = the rest of the toolset root).
 schema = 1
 kind = "golden-reads"
-key = "b82fd3094587798739afdd62f65e3dbd8476bb9b66edd0251b26b468edea960e"
+key = "1bb2a8a2c05ceb4adcfb8703b3ae42f861cdbecdbd66fea86dc83dafb1666c53"
 paths = [
   "R FROZEN.json",
   "RS bin/cc",
