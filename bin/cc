@@ -463,6 +463,7 @@ def cmd_diff(args):
 
 def cmd_tabulate(args):
     import declare
+    import family
     import score
     if "--diff" in args:
         return cmd_diff(args)
@@ -474,7 +475,7 @@ def cmd_tabulate(args):
     (ROOT / "docs" / "verdict-table.html").write_text(score.page(results, None, []))
     print("\n".join(found) + ("\n" if found else "") + f"tabulate: {len(results)} results -> SIGNATURE-TABLE.md, "
           "docs/verdict-table.html")
-    return 1 if found else 0
+    return 1 if any(not isinstance(f, family.Null) for f in found) else 0   # plan 0894 P3: a declared null is printed, not a failure
 
 
 def freeze_files(rid, read, vectors):

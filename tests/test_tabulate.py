@@ -104,5 +104,39 @@ with tempfile.TemporaryDirectory() as t:       # O2/R14: --diff prints and write
                        capture_output=True, text=True, cwd=repo)
     check("tabulate --diff writes neither SIGNATURE-TABLE.md nor docs/verdict-table.html",
           r.returncode == 0 and digest() == before and "wrote nothing" in r.stdout, r.stdout + r.stderr)
+# plan 0894 P3 (E388): a declared null (a family that reads NOT-EVALUATED) is printed and is not a failure; a REAL error still exits non-zero.
+with tempfile.TemporaryDirectory() as t:
+    mini = Path(t) / "mini"
+    shutil.copytree(ROOT, mini, ignore=shutil.ignore_patterns(".git", "__pycache__", "results", "rust"))
+    (mini / "results").mkdir()
+    frozen.thaw(mini)
+
+    def tab(*names):
+        for q in (mini / "results").iterdir():
+            q.unlink()
+        for n in names:
+            for ext in ("json", "npz"):
+                if (ROOT / "results" / f"{n}.{ext}").is_file():
+                    shutil.copy(ROOT / "results" / f"{n}.{ext}", mini / "results" / f"{n}.{ext}")
+        frozen.thaw(mini / "results")
+        return subprocess.run([sys.executable, str(mini / "bin" / "cc"), "tabulate"], capture_output=True, text=True, cwd=mini)
+    nul = tab("k4-m1@v01-rules")
+    check("a family that reads NOT-EVALUATED is printed and tabulate exits 0", "reads NOT-EVALUATED" in nul.stdout and nul.returncode == 0, str(nul.returncode) + nul.stdout[-300:] + nul.stderr[-300:])
+    good = tab("b7-at-line@v01-rules")
+    check("a clean result set exits 0", good.returncode == 0, good.stdout[-300:] + good.stderr[-300:])
+    tab("b7-at-line@v01-rules")
+    q = mini / "results" / "b7-at-line@v01-rules.json"
+    d = json.loads(q.read_text())
+    d["read"][next(k for k in d["read"] if k.startswith("instruments/"))] = "0" * 64   # a result that no longer matches what it read
+    q.write_text(json.dumps(d))
+    err = subprocess.run([sys.executable, str(mini / "bin" / "cc"), "tabulate"], capture_output=True, text=True, cwd=mini)
+    check("a broken (stale) result still exits non-zero, and is printed", err.returncode != 0 and err.stdout.strip() != "tabulate: 1 results", err.stdout[-300:])
+    tab("k4-m1@v01-rules", "b7-at-line@v01-rules")
+    q = mini / "results" / "b7-at-line@v01-rules.json"
+    d = json.loads(q.read_text())
+    d["read"][next(k for k in d["read"] if k.startswith("instruments/"))] = "0" * 64
+    q.write_text(json.dumps(d))
+    both = subprocess.run([sys.executable, str(mini / "bin" / "cc"), "tabulate"], capture_output=True, text=True, cwd=mini)
+    check("a null beside a real error: still non-zero", "reads NOT-EVALUATED" in both.stdout and both.returncode != 0, both.stdout[-300:])
 print("test_tabulate: " + ("FAILED" if bad else "all passed"))
 sys.exit(1 if bad else 0)

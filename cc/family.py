@@ -157,6 +157,10 @@ def compute(decl, res, z, fam, text, m, nulls):
     return {**codes, **named, "interior": inner, "rule": decl["rule"], "cells": {c: v[1] for c, v in out.items()}, "verdict": verdict, "class": cls, "line": line, "why": why}
 
 
+class Null(str):
+    """A refusal that is a DECLARED NULL (the family reads NOT-EVALUATED), not an error: printed like any message, but it is not a failure (plan 0894 P3)."""
+
+
 def run(root, fid, tables):
     """(refusal text, None) or (None, (decl, result dict, set name)): every refusal names its Next line."""
     root = Path(root)
@@ -184,8 +188,8 @@ def run(root, fid, tables):
     with np.load(root / res["vectors"]) as z:
         out = compute(decl, res, z, fam, ft.read_text(), m, nulls)
     if out["interior"] is None:
-        return (f"family {fid} reads NOT-EVALUATED: {out['refusal']}.\n  Next: bin/cc show {decl['input']} --tables {tables} (the needle column), "
-                f"then declare the points the family covers, or measure more points"), None
+        return Null(f"family {fid} reads NOT-EVALUATED: {out['refusal']}.\n  Next: bin/cc show {decl['input']} --tables {tables} (the needle column), "
+                    f"then declare the points the family covers, or measure more points"), None
     return None, (decl, out, tables)
 
 
