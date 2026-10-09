@@ -29,7 +29,16 @@ explains what the instruments compute.
 
 ## The first hour
 
-Run everything from the repository root. You need Python 3.11 and numpy; there is nothing to install.
+Install once, from a clone (the clone is the workspace: results, tables and inputs live beside the code, so the install is editable):
+
+```
+$ git clone <the repository> criticality-compass && cd criticality-compass
+$ python3 -m venv .venv && . .venv/bin/activate
+$ pip install -e .
+$ compass help
+```
+
+You need Python >= 3.11 (3.12 is the version tested) and numpy, which `pip install -e .` brings. `compass` is the console script; it runs this clone's `bin/cc` in the venv's interpreter, and `bin/cc` starts every script and test with that same interpreter (`sys.executable`). Called directly, `bin/cc` runs under whichever `python3` your PATH gives it, so activate the venv first. Run everything below from the repository root.
 
 ### 1. Ask for help
 
