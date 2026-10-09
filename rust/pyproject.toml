@@ -1,0 +1,16 @@
+# kernel_rs - the pinned Rust ABR kernel as a Python extension (plan 0929 P4, ruling D-0929-1 ii and iv). Built with maturin, abi3 floor 3.11.
+# The distribution name is a PLACEHOLDER (unclaimed on PyPI 2026-10-09; claiming it is D2.4). The licence is NOT applied (D2.2): the crate links
+# metatron_kernel_v8 (Apache-2.0, Copyright 2026 Metatron Dynamics, Inc.), whose notice a release must carry.
+[build-system]
+requires = ["maturin>=1.5,<2"]
+build-backend = "maturin"
+
+[project]
+name = "criticality-compass-kernel"
+version = "0.1.0"
+description = "kernel_rs: the Rust ABR kernel (abr-kernel rev 5c7941e) for Criticality Compass; optional, the Python kernel.py is the reference."
+requires-python = ">=3.11"
+license = { text = "PLACEHOLDER - no licence is applied (D2.2)" }
+
+[tool.maturin]
+module-name = "kernel_rs"
