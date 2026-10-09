@@ -2,6 +2,7 @@
 """cc - Criticality Compass CLI (plumbing). Root = parent of the directory holding this script."""
 import json
 import os
+import re
 import shutil
 import stat
 import subprocess
@@ -16,7 +17,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "cc" / "instruments")]
 VERBOSE = False
 MODE = "basic"
-TOOLS = Path.home() / "software/scratch/structure-checks"
+TOOLS = Path(os.environ.get("CC_STRUCTURE_CHECKS") or Path.home() / "software/scratch/structure-checks")   # the structure checker (checks.py, freeze.py); CC_STRUCTURE_CHECKS moves it (plan 0929)
 ADVANCED = [
     ("show <input>", "every reading of an input, and each point's verdict (a declared report: cc.toml [report] verdict)"),
     ("explain <input> <point>", "the whole chain for one point: data -> verdict (a declared report: cc.toml [report] verdict)"),
@@ -275,8 +276,18 @@ def cmd_author(cmd, args):
 
 # ------------------------------------------------------------------ run, freeze
 def structure_gate():
-    """Run checks.py (the hook cannot see subprocesses). Returns the refusal text, or None when clean."""
-    r = subprocess.run([sys.executable, str(TOOLS / "checks.py"), str(ROOT)], capture_output=True, text=True)
+    """Run checks.py (the hook cannot see subprocesses). Returns the refusal text, or None when the checker SAID clean.
+    The checker's last line is `-- N finding(s)`: a verdict exists only when that line is there and the exit code agrees with N.
+    Anything else (no checker, a crash, no trailer) is a REFUSAL, never 'clean' (plan 0929 blocker b: an empty output is not a zero)."""
+    tool = TOOLS / "checks.py"
+    if not tool.is_file():
+        return (f"REFUSED: the structure checker {tool} is not there, so no run can be shown to obey the structure rules.\n"
+                "  Next: install the structure checker, or point CC_STRUCTURE_CHECKS at the directory that holds checks.py")
+    r = subprocess.run([sys.executable, str(tool), str(ROOT)], capture_output=True, text=True)
+    trailer = [ln for ln in r.stdout.splitlines() if re.fullmatch(r"-- \d+ finding\(s\)", ln)]
+    if not trailer or r.returncode != (1 if int(trailer[-1].split()[1]) else 0):
+        return (f"REFUSED: the structure checker gave no verdict (exit {r.returncode}).\n"
+                f"{(r.stderr or r.stdout).strip()[-400:]}\n  Next: run {sys.executable} {tool} {ROOT} and fix what stops it")
     found = [ln for ln in r.stdout.splitlines() if ln[:2] in ("C1", "C2", "C3", "C6", "C7", "C8", "W0")]
     for ln in found:
         if ln.startswith("C7"):
@@ -580,6 +591,14 @@ def main(argv):
     advanced = "--advanced" in argv
     MODE = "advanced" if advanced else config()["defaults"]["mode"]
     argv = [a for a in argv if a != "--advanced"]
+    if "--data-root" in argv:   # global: where the data IS on this machine (the declared name in cc.toml [data] root is unchanged)
+        i = argv.index("--data-root")
+        if i + 1 >= len(argv):
+            print("--data-root needs a path.\n  Next: bin/cc --data-root <dir> <command>")
+            return 1
+        import schema
+        schema.DATA_ROOT_FLAG = argv[i + 1]
+        argv = argv[:i] + argv[i + 2:]
     cmd, rest = (argv[0] if argv else "help"), argv[1:]
     if cmd == "help":
         print(help_text(advanced), end="")

@@ -47,16 +47,36 @@ def row_lines(text, key="row"):
     return [i + 1 for i, ln in enumerate(text.splitlines()) if ln.strip() == f"[[{key}]]"]
 
 
+DATA_ROOT_FLAG = None   # set once by bin/cc from the global option --data-root PATH (plan 0929: the physical location of the data, never its name)
+
+
+def resolve_data_root(cfg, flag=None, env=None):
+    """(path, source) of the data root. The declaration is cc.toml [data] root; the physical location may be moved by CC_DATA_ROOT, and
+    that by --data-root. Precedence flag > env > cc.toml: a table in that order, the first one given wins, and the source is recorded."""
+    env = os.environ.get("CC_DATA_ROOT") if env is None else env
+    given = [(src, v) for src, v in (("flag", flag), ("env", env), ("cc.toml", cfg["data"]["root"])) if v]
+    src, v = given[0]
+    return Path(os.path.expanduser(v)), src
+
+
 class Ctx:
-    """What the checks cross-reference: cc.toml, the registry, checks.toml, the data root (overridable)."""
+    """What the checks cross-reference: cc.toml, the registry, checks.toml, the data root (overridable).
+    The declared root string `cfg['data']['root']` stays the NAME of a data file in a result's `read` map (reuse compares it);
+    `data_root` is where that name is found on this machine, `data_root_source` says who chose it."""
 
     def __init__(self, root=ROOT, **over):
         self.root, self.over, self.shapes, self.heads = Path(root), over, {}, {}
         self.cfg = tomllib.loads((self.root / "cc.toml").read_text())
         self.reg = {f.stem: load(f)[0] or {} for f in sorted((self.root / "instruments").glob("*.toml"))}
         self.checks = tomllib.loads(Path(over.get("checks") or self.root / "checks.toml").read_text())
-        self.data_root = Path(over.get("data_root") or os.path.expanduser(self.cfg["data"]["root"]))
+        self.data_root, self.data_root_source = ((Path(over["data_root"]), "override") if over.get("data_root")
+                                                 else resolve_data_root(self.cfg, DATA_ROOT_FLAG))
         self.alpha = self.cfg["alphabets"]
+
+    def physical(self, key):
+        """Where the file a `read` key names is on this machine: the declared data root maps to the effective one."""
+        name = self.cfg["data"]["root"]
+        return self.data_root / key[len(name) + 1:] if key.startswith(name + "/") else Path(key).expanduser() if key.startswith("~") else self.root / key
 
 
 def unit_blocks(m, inst):

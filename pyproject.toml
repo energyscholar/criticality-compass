@@ -1,0 +1,23 @@
+# Criticality Compass - packaging (plan 0929, ruling D-0929-1). The clone is the workspace: install it EDITABLE (`pip install -e .`).
+# Nothing here is applied to a public index: the name, the licence and the repository are Bruce's decisions (plan 0929 section 1, D2).
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "criticality-compass"          # PLACEHOLDER: unclaimed on PyPI 2026-10-09; claiming it is D2.4
+version = "1.0.0a0"
+description = "Criticality Compass: declared comparisons of sign cells of an ABR-kernel readout, a rulebook, and a stored result for every point."
+requires-python = ">=3.11"           # 3.9 is end-of-life; the stored results were made with numpy 2.4.4 (D-0929-1 iv)
+dependencies = ["numpy"]
+license = { text = "PLACEHOLDER - no licence is applied (D2.2)" }
+readme = "README.md"
+
+[project.optional-dependencies]
+rust = ["criticality-compass-kernel"]  # PLACEHOLDER name of the kernel_rs wheel built from rust/ (maturin); unclaimed; D2.4
+
+[project.scripts]
+compass = "criticality_compass:main"   # never `cc`: it is the C compiler, and Rust links with it (seen red, memo section 2.3)
+
+[tool.setuptools]
+packages = ["criticality_compass"]     # the launcher only; cc/ stays a flat directory of the clone (bare module names collide with PyPI packages)

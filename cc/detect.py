@@ -494,7 +494,7 @@ def run_keyed(input_id, tables, write, tables_dir=None, reuse=True):
         r = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True)
         commit = r.stdout.strip() or "none"
     res = {"schema": 1, "kind": "result", "run_id": rid, "input": input_id, "tables": tables,
-           "derived_from": None, "code_commit": commit, "code_hash": chash, "measure_hash": mhash, "peak_rss_mb": round(peak, 1), "interval": dict(m["interval"]), "read": read,
+           "derived_from": None, "code_commit": commit, "code_hash": chash, "measure_hash": mhash, "data_root_source": c.data_root_source, "peak_rss_mb": round(peak, 1), "interval": dict(m["interval"]), "read": read,
            "vectors": f"results/{rid}.npz",
            "readings": readings, "pair_readings": pair_readings, "reports": reports + pair_reports,
            "signature_columns": list(T.codes["columns"]["signature"]), "signature": signature, "pairs": pairs,

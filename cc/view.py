@@ -20,8 +20,9 @@ def config():
 
 def stale(res, root=ROOT):
     """The refusal text for a result whose recorded `read` hashes no longer match, else None."""
+    c = declare.Ctx(root)
     for k, h in res["read"].items():
-        p = Path(k).expanduser() if k.startswith("~") else Path(root) / k
+        p = c.physical(k)
         if not p.is_file() or declare.sha(p) != h:
             return (f"REFUSED: {k} changed since {res['run_id']} was run.\n"
                     f"  Next: bin/cc run {res['input']} --tables {res['tables']} (or restore the file)")
