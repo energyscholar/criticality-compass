@@ -1,16 +1,16 @@
 # Criticality Compass - packaging (plan 0929, ruling D-0929-1). The clone is the workspace: install it EDITABLE (`pip install -e .`).
-# Nothing here is applied to a public index: the name, the licence and the repository are Bruce's decisions (plan 0929 section 1, D2).
+# Nothing here is uploaded to a public index (queue S5.5: licence and name set; no PyPI upload, no public push).
 [build-system]
 requires = ["setuptools>=64"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "criticality-compass"          # PLACEHOLDER: unclaimed on PyPI 2026-10-09; claiming it is D2.4
+name = "criticality-compass"          # queue S5.5; unclaimed on PyPI 2026-10-09 and NOT uploaded
 version = "1.0.0a0"
 description = "Criticality Compass: declared comparisons of sign cells of an ABR-kernel readout, a rulebook, and a stored result for every point."
 requires-python = ">=3.11"           # 3.9 is end-of-life; the stored results were made with numpy 2.4.4 (D-0929-1 iv)
 dependencies = ["numpy"]
-license = { text = "PLACEHOLDER - no licence is applied (D2.2)" }
+license = { text = "Apache-2.0" }   # LICENSE + NOTICE at the repository root (queue S5.5)
 readme = "README.md"
 
 [project.optional-dependencies]
