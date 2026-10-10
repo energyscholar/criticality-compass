@@ -1,0 +1,15 @@
+# tables/v07-rules/membership.toml - membership rules for instruments with a door:off_manifold step (data).
+# validate: `reads` names a [columns.signature] column of this set's codes.toml; the keys of `map` equal that
+# column's alphabet plus cc.toml alphabets.nulls EXACTLY (a gap fails validate, never a run); `rank` lists the
+# membership values; `door` keys = rank. A pair takes the LOWEST-ranked membership of its two points.
+# Which code counts as "on the manifold" is a taxonomy decision that changes with the table set.
+schema = 1
+kind = "membership"
+
+[along]
+reads = "needle"                               # the signature column whose per-point code decides membership
+map = { DIS = "OFF", ORD = "OFF", MID = "ON", NOT-MEASURED = "UNCHECKED", NOT-EVALUATED = "NOT-EVALUATED" }
+rank = ["OFF", "NOT-EVALUATED", "UNCHECKED", "ON"]
+door = { OFF = "REFUSE-OFF-MANIFOLD", NOT-EVALUATED = "NOT-EVALUATED", UNCHECKED = "RUN-FLAG-U", ON = "RUN" }
+
+# plan 0877: the [across_delta] rule of v07-rules is REMOVED: no transform on the Delta basis, so every pair reads the instrument's member_default (RAW, r = 0, y_last = yD2).

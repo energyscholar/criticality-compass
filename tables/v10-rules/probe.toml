@@ -1,0 +1,39 @@
+# tables/v04-rules/probe.toml (plan 0870 P1) - the PROBE projection: (probe, geometry) -> geometry', a total partition (data).
+# A per-point instrument probes the declared conjugate only. When the input declares a second coupling that no per-point
+# instrument probes, "relevant and stopped" on the probed direction is consistent with a POINT and with a LINE alike, so a
+# positive geometry (POINT, LINE, WALKING) is replaced by a named refusal; every other geometry value passes (@geometry). An input
+# with no across has probe NOT-MEASURED and passes. compose.toml reads geometry'. Each refusal's why names a Next line.
+schema = 1
+kind = "probe"
+columns = ["probe", "geometry"]
+verdicts = ["POINT", "LINE", "WALKING", "NOT", "REFUSE-SLOW", "REFUSE-FLOW", "REFUSE-WEAK", "REFUSE-OFF", "REFUSE-IRRELEVANT", "REFUSE-UNRES", "REFUSE-NEEDLE-UNMEASURED", "REFUSE-FLOW-UNMEASURED", "REFUSE-ACROSS-UNMEASURED", "REFUSE-STABILITY-UNMEASURED", "REFUSE-PROBE-INCOMPLETE", "REFUSE-PROBE-UNKNOWN"]
+refuse = ["REFUSE-SLOW", "REFUSE-FLOW", "REFUSE-WEAK", "REFUSE-OFF", "REFUSE-IRRELEVANT", "REFUSE-UNRES", "REFUSE-NEEDLE-UNMEASURED", "REFUSE-FLOW-UNMEASURED", "REFUSE-ACROSS-UNMEASURED", "REFUSE-STABILITY-UNMEASURED", "REFUSE-PROBE-INCOMPLETE", "REFUSE-PROBE-UNKNOWN"]
+
+[[row]]
+when.probe = ["COMPLETE", "NOT-MEASURED", "NOT-EVALUATED"]
+verdict = "@geometry"
+why = "the declared couplings are all probed (or nothing is probed): the geometry stands"
+
+[[row]]
+when.probe = ["INCOMPLETE"]
+when.geometry = ["POINT", "LINE", "WALKING"]
+verdict = "REFUSE-PROBE-INCOMPLETE"
+why = "plan 0870: a second coupling exists and is not probed here: one probed direction cannot tell a point from a line. Next: declare the second coupling's instrument, or read the family over it"
+
+[[row]]
+when.probe = ["INCOMPLETE"]
+when.geometry = ["NOT", "REFUSE-SLOW", "REFUSE-FLOW", "REFUSE-WEAK", "REFUSE-OFF", "REFUSE-IRRELEVANT", "REFUSE-UNRES", "REFUSE-NEEDLE-UNMEASURED", "REFUSE-FLOW-UNMEASURED", "REFUSE-ACROSS-UNMEASURED", "REFUSE-STABILITY-UNMEASURED"]
+verdict = "@geometry"
+why = "a geometry that is not positive is not made more certain by an unprobed coupling: it stands"
+
+[[row]]
+when.probe = ["UNKNOWN"]
+when.geometry = ["POINT", "LINE", "WALKING"]
+verdict = "REFUSE-PROBE-UNKNOWN"
+why = "plan 0870: the couplings are unknown, so no direction can be said to be probed. Next: declare the system's couplings from its Hamiltonian; if they are unknown this instrument reads the position only"
+
+[[row]]
+when.probe = ["UNKNOWN"]
+when.geometry = ["NOT", "REFUSE-SLOW", "REFUSE-FLOW", "REFUSE-WEAK", "REFUSE-OFF", "REFUSE-IRRELEVANT", "REFUSE-UNRES", "REFUSE-NEEDLE-UNMEASURED", "REFUSE-FLOW-UNMEASURED", "REFUSE-ACROSS-UNMEASURED", "REFUSE-STABILITY-UNMEASURED"]
+verdict = "@geometry"
+why = "a geometry that is not positive is not made more certain by unknown couplings: it stands"

@@ -49,6 +49,7 @@ class Ctx:
     ratio: object = None             # a pair unit with door:basis: the correction ratio r per resample row (0 on a RAW pair; plan 0874)
     interval: dict = None            # the input's declared [interval] (plan 0878: the Gamma-method reads window_s, window_max, door_z from it)
     lin: object = None               # method gamma: the unit's Lin (its primaries' series, displacements and window), None under a resampling method
+    rank: int = None                 # method chains (plan 0937): r of the order statistics [v_(r), v_(m+1-r)] of the m chain rows; None under every other method
 
 
 def relations_for(m, name):
@@ -86,6 +87,13 @@ def unit_labels(m, inst):
     return [(p, s) for p in pts for s in (sizes if inst["unit"] == "point-size" else [None])]
 
 
+COVERAGE = {"block": lambda iv: iv["level"], "iid": lambda iv: iv["level"], "gamma": lambda iv: iv["level"], "chains": lambda iv: 1 - iv["alpha"]}
+"""Interval method -> the coverage a declared [interval] states (plan 0937): the level, or for `chains` 1 - alpha (the exact order-statistic coverage). TOTAL over
+cc.toml alphabets.interval_method (tests/test_chains.py asserts the keys equal the alphabet), so a method cannot be added without saying what it covers."""
+ROW_COUNT = {"block": lambda iv: iv["resamples"] + 1, "iid": lambda iv: iv["resamples"] + 1, "gamma": lambda iv: 0, "chains": lambda iv: iv["m"] + 1}
+"""Interval method -> the rows of one unit's reduce output (row 0 + the rest); gamma's is replaced once its primaries are known (measure)."""
+
+
 def context(m, inst, size=None):
     sizes, rel = m["axes"]["size"], {n: relations_for(m, n) for n in inst["relations"]}
     k = len(sizes) - 1
@@ -98,10 +106,10 @@ def context(m, inst, size=None):
     pair = inst["unit"] == "pair"
     unit_rel = admit.declare(2, [(1, 0)], [Provenance(m["relations"]["control"]["provenance"])]) if pair else None
     return Ctx(
-        unit_rel=unit_rel, component_shape=(m["interval"].get("resamples", -1) + 1, len(sizes)) if pair else None,   # method gamma: the row count is known once the unit's primaries are (measure replaces it)
+        unit_rel=unit_rel, component_shape=(ROW_COUNT[m["interval"]["method"]](m["interval"]), len(sizes)) if pair else None,   # method gamma: the row count is known once the unit's primaries are (measure replaces it)
         interval=m["interval"],
         pair_shape=(len(sizes), 2) if pair else None, n_size=len(sizes), quantity=inst.get("quantity", "Delta" if pair else "R"),
-        level=m["interval"]["level"], eps={c: m["eps"][e] for c, e in inst["columns"].items()}, rel=rel,
+        level=COVERAGE[m["interval"]["method"]](m["interval"]), rank=m["interval"].get("r"), eps={c: m["eps"][e] for c, e in inst["columns"].items()}, rel=rel,
         log_ratio=np.log(np.array(sizes[1:], float) / np.array(sizes[:-1], float)),
         log_span=float(np.log(sizes[-1] / sizes[0])), top=k - 1, top_steps=k - 2,
         coarsest=nb - 2, big_final=nb - 1,
@@ -141,7 +149,7 @@ def memo(cache, key, make):
 
 
 def load_blocks(m, data_root):
-    """[(block key, {array name: ndarray})] in data.files order, each array cut to its declared level. In a stack format (cc.toml
+    """[(block key, {array name: ndarray})] in data.files order (the key is (point, size, start), and (point, size, start, chain) under method chains), each array cut to its declared level. In a stack format (cc.toml
     [formats.*]) the arrays of a kind it `reduces` are computed from the raw stack by the declared reduction (once per file and key)."""
     cache, out, sch = {}, [], formats.schemas(str(schema.ROOT)).get(m["data"]["format"], {"reduces": ()})
     for b in m["data"]["files"]:
@@ -150,7 +158,7 @@ def load_blocks(m, data_root):
             z = memo(cache, (path, a["key"], "GL"), lambda: reduced(m, path, a["key"])) if name in sch["reduces"] else memo(cache, path, lambda: np.load(path))
             v = z if isinstance(z, np.ndarray) else z[a["key"]]
             arrs[name] = np.ascontiguousarray(v[:, a["level"]] if "level" in a else v)
-        out.append(((b["point"], b["size"], b["start"]), arrs))
+        out.append(((b["point"], b["size"], b["start"], *([b["chain"]] if "chain" in b else [])), arrs))   # plan 0937: a block of method chains is keyed by its chain as well
     return out
 
 

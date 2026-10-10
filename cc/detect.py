@@ -46,6 +46,7 @@ class Tables:
     membership: dict = dataclasses.field(default_factory=dict)   # instrument name -> its rule (membership.toml)
     membership_path: object = None
     axes: dict = dataclasses.field(default_factory=dict)         # geometry / order / compose -> (table, row lines); empty for a set without them
+    interval_methods: tuple = ()                                 # plan 0937: the [interval] methods this set reads (schema.interval_methods)
 
 
 def refused(msg, nxt):
@@ -76,8 +77,10 @@ def load_tables(name, tables_dir=None):
     texts = [(d / f).read_text() for f in ("codes.toml", "verdict.toml")]
     rules = {k: v for k, v in tomllib.loads(mp.read_text()).items() if isinstance(v, dict)} if mp.is_file() else {}
     axes = {q.stem: (tomllib.loads(q.read_text()), schema.row_lines(q.read_text())) for q in ax}
+    ib = [q for q in [d / "interval.toml"] if q.is_file()]   # plan 0937: a set that binds its interval methods carries them as data, and the file is one of what a run reads
     return Tables(name, tomllib.loads(texts[0]), tomllib.loads(texts[1]), schema.row_lines(texts[1]),
-                  (d / "codes.toml", d / "verdict.toml", *ax), rules, mp if mp.is_file() else None, axes)
+                  (d / "codes.toml", d / "verdict.toml", *ax, *ib), rules, mp if mp.is_file() else None, axes,
+                  tuple(schema.interval_methods(ROOT if tables_dir is None else d.parent.parent, name)))
 
 
 def context_for(input_id, instrument_name, point, size=None):
@@ -88,7 +91,8 @@ def read_vector(instrument_name, column, v, ctx):
     """The readout of one resampled column: estimate, interval and sign cell against its declared eps."""
     eps_key, v = instrument(instrument_name)[0]["columns"][column], np.asarray(v, float)
     if ctx.lin is None:
-        est, lo, hi, cell = readout.reading(v, ctx.level, ctx.eps[column])
+        est, lo, hi, cell = {False: lambda: readout.reading(v, ctx.level, ctx.eps[column]),
+                             True: lambda: readout.chains(v, ctx.rank, ctx.eps[column])}[ctx.rank is not None]()   # method chains (plan 0937): order statistics of the m chain rows
         return Reading(float(est), float(lo), float(hi), cell, eps_key, ctx.eps[column], None, v)
     st = door.gamma_stat(ctx.lin, v, ctx.interval)   # method gamma (plan 0878): the interval is est +- z SE_Gamma, a projection that places the sign cell
     if st is None:
@@ -285,6 +289,19 @@ def rows_resampled(m, reg, blocks, pos, units, ctxs):
     return acc, {u: ctxs[(u[0], u[2])] for u in units}
 
 
+def rows_chains(m, reg, blocks, pos, units, ctxs):
+    """Method chains (plan 0937, T18-B): no resampling. Row k + 1 is every unit reduced on the files of chain k (k = 0..m-1) alone, so each row IS the instrument's own reading of
+    one independent chain; row 0 is chain 0's reading again (the reference row the stages read: sign doors, reports; one reduce, not two). Eligibility (every cell holds exactly
+    the chains 0..m-1) is a declare-time schema, so no cell here can lack a chain."""
+    iv, acc = m["interval"], {u: [] for u in units}
+    for k in range(iv["m"]):
+        for n, u, sz in units:
+            inst = reg[n][0]
+            keys = [(*key, k) for key in door.unit_keys(m, inst, u, sz)]
+            acc[(n, u, sz)].append(reg[n][1].reduce({a: [blocks[pos[kk]][1][a] for kk in keys] for a in inst["arrays"]}, ctxs[(n, sz)]))
+    return {u: [rows[0], *rows] for u, rows in acc.items()}, {u: ctxs[(u[0], u[2])] for u in units}
+
+
 def rows_linearised(m, reg, blocks, pos, units, ctxs):
     """Method gamma (plan 0878): no resampling. Each unit's primaries are named by its instrument's series(); the rows are the estimate and one row per primary with
     its mean displaced by h (door.linearise_plan), each turned into a reduce output by from_means. The unit's ctx carries the linearisation and the row count."""
@@ -298,7 +315,7 @@ def rows_linearised(m, reg, blocks, pos, units, ctxs):
     return acc, uctx
 
 
-ROWS = {"block": rows_resampled, "iid": rows_resampled, "gamma": rows_linearised}   # [interval] method -> how a unit's rows are made (cc.toml alphabets.interval_method)
+ROWS = {"block": rows_resampled, "iid": rows_resampled, "gamma": rows_linearised, "chains": rows_chains}   # [interval] method -> how a unit's rows are made (cc.toml alphabets.interval_method)
 
 
 def measure(m, c, reg, T):
@@ -441,6 +458,9 @@ def run(input_id, tables, write, tables_dir=None, reuse=True):
 def run_keyed(input_id, tables, write, tables_dir=None, reuse=True):
     """(result, how): how is 'measured', 'stored' (the keyed stored result) or 're-verdicted' (from a stored result under another set)."""
     m, c, T = load_input(input_id), schema.Ctx(ROOT), load_tables(tables, tables_dir)
+    if m["interval"]["method"] not in T.interval_methods:   # plan 0937: the loader refuses a result the set does not read (a block result under v10-rules, a chains result under v09 and before)
+        raise refused(f"tables/{tables} reads interval methods {list(T.interval_methods)}; {input_id} declares method '{m['interval']['method']}'",
+                      f"run it under a set that reads '{m['interval']['method']}' (bin/cc tables fork <that set> <new-name> copies its interval binding)")
     reg = {n: instrument(n) for n in sorted(c.reg)}
     read, decl = read_hashes(m, input_id, tables, T, c), declared_of(input_id, m, T)
     cp = ROOT / "inputs" / input_id / "couplings.toml"   # plan 0894 P1: a file the input declares is read, whatever the rule set (the set does not decide what the input is)

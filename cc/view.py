@@ -252,7 +252,7 @@ def read_steps(q, r, lv, text, dcol, mode, cfg):
         return [(5, "READING", shown(q["cell"] or r["cell"], r["reason"], mode, cfg))]
     e, (bl, bu) = r["eps"], (int(v) for v in sign.position(q["lo"], q["hi"], r["eps"]))
     return [(5, "READING", f"{r['column']} {q['estimate']:.4g}  interval [{q['lo']:.4g}, {q['hi']:.4g}]  "
-                           f"({lv['level'] * 100:g} %, {cfg['interval_fields'][lv['method']]['read'].format(**lv)})"),
+                           f"({door.COVERAGE[lv['method']](lv) * 100:g} %, {cfg['interval_fields'][lv['method']]['read'].format(**lv)})"),
             (6, "SIGN", f"cuts {-e:g} 0 +{e:g} (eps {r['eps_key']}): bL {bl}, bU {bu} -> {shown(q['cell'], None, mode, cfg)}"),
             (7, "CODE", f"{dcol}: codes.toml line {map_line(text, dcol, q['cell'])}: {q['cell']} -> "
                         f"{shown(q['code'], None, mode, cfg)}")]
@@ -374,7 +374,7 @@ def pair_section(res, r, pair, mode, cfg, T, m, text, code_map):
     code = code_map.get(r["cell"])
     return out + [
         f"  4 READING   {r['column']} {r['estimate']:.4g}  interval [{r['lo']:.4g}, {r['hi']:.4g}]  "
-        f"({lv['level'] * 100:g} %, {cfg['interval_fields'][lv['method']]['read_pair'].format(**lv)})",
+        f"({door.COVERAGE[lv['method']](lv) * 100:g} %, {cfg['interval_fields'][lv['method']]['read_pair'].format(**lv)})",
         f"  5 SIGN      cuts {-e:g} 0 +{e:g} (eps {r['eps_key']}): bL {bl}, bU {bu} -> {shown(r['cell'], None, mode, cfg)}",
         "  6 CODE      " + (f"family.toml line {f2_code_line(text)} [f2.code]: {r['cell']} -> {code}" if code else
                             "no family code for this cell in this set (a family's [f2.code] codes a pair)")]

@@ -18,7 +18,7 @@ interior_rule = ["mid-run-open"]   # a family's `interior` as a declared rule (p
 formats = ["npz-v1", "npy-v1", "snapshots-v1", "image-stack-v1"]
 limited = ["none", "assigned", "resolution-limited"]   # [block_map] limited: what the finest level is (plan 0873): a value that is not a measured site
 replay = ["locked", "all"]   # [check] replay (plan 0886): `locked` replays the inputs expected/<set>.toml names; `all` replays every input on disk
-interval_method = ["block", "iid", "gamma"]   # [interval] method of an input's m.toml (plan 0883: was a tuple in declare.py; plan 0878 adds "gamma"); each has a [interval_fields.<method>] table below
+interval_method = ["block", "iid", "gamma", "chains"]   # [interval] method of an input's m.toml (plan 0883: was a tuple in declare.py; plan 0878 adds "gamma"); each has a [interval_fields.<method>] table below
 nulls = ["NOT-MEASURED", "NOT-EVALUATED"]       # the honest nulls, in rank order; never map keys
 
 # [levels]: the z of each declared interval level (plan 0878). A method whose [interval_fields.<method>] names level_in = "levels" refuses any level that is not a key here; no scipy.
@@ -28,7 +28,13 @@ nulls = ["NOT-MEASURED", "NOT-EVALUATED"]       # the honest nulls, in rank orde
 # [interval_fields.<method>] (plan 0878): the fields of an input's [interval] for each method of alphabets.interval_method, as DATA (validate reads it; there is no if-ladder per method).
 # required / optional: field -> type name (str | int | num). A field in neither is refused as unknown for that method. min_blocks (block only) is the floor on n // b per declared file.
 # show / read / read_pair: the words `show --advanced` and `explain` print for the method ({field} is read from the result's interval block; view.py holds no per-method text).
+# plan 0937: interval_binding.default = the methods a table set reads when it has no tables/<set>/interval.toml (v10-rules has one: ["chains"]).
+# chained = does an input of the method label every [[data.files]] block with its chain (method chains: m independent chains per cell, T18-B order statistics).
+[interval_binding]
+default = ["block", "iid", "gamma"]
+
 [interval_fields.block]
+chained = false
 required = { method = "str", resamples = "int", level = "num", seed = "int", b = "int" }
 optional = { tau_declared = "int", min_blocks = "int" }
 show = "resamples {resamples}, level {level}, seed {seed}"
@@ -36,6 +42,7 @@ read = "{resamples} {method} resamples, b {b}"
 read_pair = "{resamples} {method} resamples"
 
 [interval_fields.iid]
+chained = false
 required = { method = "str", resamples = "int", level = "num", seed = "int", tau_declared = "int" }
 optional = { b = "int" }
 show = "resamples {resamples}, level {level}, seed {seed}"
@@ -43,6 +50,7 @@ read = "{resamples} {method} resamples"
 read_pair = "{resamples} {method} resamples"
 
 [interval_fields.gamma]
+chained = false
 required = { method = "str", level = "num", window_s = "num", window_max = "int", door_z = "num", tau_declared = "int", tau_source = "str" }
 optional = {}
 level_in = "levels"
@@ -51,6 +59,16 @@ diff_step = 0.001     # the finite-difference step of the linearisation rows, as
 show = "window_s {window_s}, window_max {window_max}, door_z {door_z}, level {level}"
 read = "{method}, window_s {window_s}, window_max {window_max}"
 read_pair = "{method}, window_s {window_s}, window_max {window_max}"
+
+# plan 0937 / toolset m.toml [0937]: m independent chains per (point, size, start) cell, the interval [v_(r), v_(m+1-r)] of the m per-chain readings, r = rank(m, alpha)
+# (m 10, r 2, alpha 22/1024 => coverage 1 - alpha = 0.978515625); no resamples, level or seed. The estimate is the median of the m readings (reported, never in the sign cell).
+[interval_fields.chains]
+chained = true
+required = { method = "str", m = "int", r = "int", alpha = "num", chain_root = "str" }
+optional = {}
+show = "m {m} chains, r {r}, alpha {alpha}, chain_root {chain_root}"
+read = "{m} chains, order statistics r {r}"
+read_pair = "{m} chains, order statistics r {r}"
 
 # A STACK format is raw frames the door reduces itself (cc/reduce.py) through the input's declared [block_map] and [observable]: the
 # schema is DATA here (cc/formats.py holds no per-format code). reduces = the array kinds computed from the stack; dims/dtypes = the raw
@@ -150,10 +168,10 @@ commands = ["show", "explain", "run", "new case", "tables fork", "tables drop", 
 memory_gb = 5.0                # this host's memory budget for measuring workers (6.3 GB installed); test_run_all's pool is sized from it and the recorded peaks (plan 0881)
 replay = "locked"                # test_run_all replays the inputs the lock file names (an input is in the gate iff expected/<set>.toml names it)
 exclusive = ["test_run_all"]    # these tests run ALONE after the parallel batch (test_run_all sizes its own worker pool from memory_gb)
-needs_data = ["test_needle_x8", "test_b7", "test_two_start_c2", "test_reverdict", "test_family", "test_x5", "test_pool", "test_v08_result", "test_data_root"]   # plan 0929: these read the author's data root (7.6 GB) / toolset; measured by emptying both (a clean-install cell without the data runs the fast set minus these and needs_rust)
+needs_data = ["test_chains", "test_v10_readable", "test_needle_x8", "test_b7", "test_two_start_c2", "test_reverdict", "test_family", "test_x5", "test_pool", "test_v08_result", "test_data_root"]   # plan 0929: these read the author's data root (7.6 GB) / toolset; measured by emptying both (a clean-install cell without the data runs the fast set minus these and needs_rust)
 needs_rust = ["test_kernel_rs", "test_kernel_rs_bitwise"]   # plan 0929: these import kernel_rs (test_kernel_rs the committed cc/_ext .so, a linux ELF; test_kernel_rs_bitwise the INSTALLED wheel)
 fast_budget_s = 30              # elapsed time is printed against it; over budget WARNS, never fails
-slow = ["test_w2", "test_detect_verdicts", "test_breakers_red", "test_view", "test_golden", "test_along", "test_axes", "test_tables_cli", "test_tabulate", "test_needle_o_start", "test_run_all", "test_declare", "test_freeze_key", "test_code_hash", "test_chain", "test_across_delta", "test_end_note", "test_delta_basis", "test_reduce", "test_stack_door", "test_reuse", "test_probe", "test_transducer", "test_gamma_twin", "test_explain_pair", "test_check_summary", "test_conventional", "test_data_root"]   # each phase appends its > 5 s tests
+slow = ["test_v10_readable", "test_w2", "test_detect_verdicts", "test_breakers_red", "test_view", "test_golden", "test_along", "test_axes", "test_tables_cli", "test_tabulate", "test_needle_o_start", "test_run_all", "test_declare", "test_freeze_key", "test_code_hash", "test_chain", "test_across_delta", "test_end_note", "test_delta_basis", "test_reduce", "test_stack_door", "test_reuse", "test_probe", "test_transducer", "test_gamma_twin", "test_explain_pair", "test_check_summary", "test_conventional", "test_data_root"]   # each phase appends its > 5 s tests
 
 [golden.classes.a]    # help text or a new command
 files = ["help.*.txt", "new-*.txt"]

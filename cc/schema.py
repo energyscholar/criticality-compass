@@ -145,6 +145,14 @@ def import_closure(root, starts):
     return seen
 
 
+def interval_methods(root, tset):
+    """The [interval] methods the table set `tset` reads (plan 0937): its own tables/<set>/interval.toml `methods`, else cc.toml [interval_binding] default.
+    A total table over the sets: a set without the file reads the resampling methods and cannot read a chains result, and a set that carries the file (v10-rules) reads
+    only what it names, so a block result under v10-rules, or a chains result under v09 and before, is refused by the loader (detect.run_keyed, reverdict_refusal)."""
+    f = Path(root) / "tables" / tset / "interval.toml"
+    return list((tomllib.loads(f.read_text()) if f.is_file() else tomllib.loads((Path(root) / "cc.toml").read_text())["interval_binding"])["methods" if f.is_file() else "default"])
+
+
 def measure_hash(root, instrument_modules):
     """sha256 over (path, content sha) of what MEASURES: the import closure, within cc/, of cc/detect.py (the measurement entry:
     readout, sign and what they read), cc/door.py and each module in `instrument_modules` (cc/instruments/<m>.py). A result's

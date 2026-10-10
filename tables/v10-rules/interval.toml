@@ -1,0 +1,4 @@
+# tables/v10-rules/interval.toml (plan 0937): v10-rules = v08-rules (byte-identical codes, verdict, membership, axes) + this binding. It reads interval method `chains` ONLY.
+schema = 1
+kind = "interval-binding"
+methods = ["chains"]

@@ -1,0 +1,97 @@
+# tables/v03-rules/order.toml (= v02-rules + needle_pair, plan 0867 P1) - the ORDER axis: do the two starts agree at the window, and what does the energy
+# density's variance say? Read from the needle (is the point on the window at all), two_start and the fluct witness
+# ONLY, and fluct only when the starts agree (INDEP): under COEXIST a run that does not tunnel has a within-phase
+# variance that vanishes (the q7 trap), so there fluct is a partition cell, not evidence. A declared PARTITION of
+# (needle, two_start, fluct); `validate` proves it. Its values carry the honest nulls (ORDER-UNMEASURED, NEEDLE-UNMEASURED) and the position rule
+# (OFF-WINDOW) as VALUES, so no later table has to guess them. v03-rules (plan 0867): at a sink the needle_pair of the two
+# starts (random, ordered) is also read: pinned between the phases (DIS, ORD) with the starts apart is COEXIST-AT-WINDOW,
+# a PARTITION cell of (needle, needle_pair, two_start), not a priority over the off-window row.
+schema = 1
+kind = "order"
+columns = ["needle", "needle_pair", "two_start", "fluct"]
+values = [
+  "COEXIST-AT-WINDOW", "NOT-EQUILIBRATED", "EQUILIBRATED", "CONTINUOUS", "FIRST-ORDER-TUNNELLING", "EQUILIBRATED-UNRES",
+  "OFF-WINDOW", "ORDER-UNMEASURED", "NEEDLE-UNMEASURED",
+]
+# score: the class each order value stands for, against a case's order_truth (cc/score.py reports the agreement)
+[score]
+"COEXIST-AT-WINDOW" = "FIRST-ORDER"
+"OFF-WINDOW" = "NONE"
+"NOT-EQUILIBRATED" = "REFUSE"
+"EQUILIBRATED" = "REFUSE"
+"CONTINUOUS" = "CONTINUOUS"
+"FIRST-ORDER-TUNNELLING" = "FIRST-ORDER"
+"EQUILIBRATED-UNRES" = "REFUSE"
+"ORDER-UNMEASURED" = "REFUSE"
+"NEEDLE-UNMEASURED" = "REFUSE"
+
+[[row]]
+when.needle = ["DIS", "ORD"]
+when.needle_pair = ["PINNED-BETWEEN-PHASES"]
+when.two_start = ["COEXIST"]
+verdict = "COEXIST-AT-WINDOW"
+why = "plan 0867: the starts sit at opposite sinks and stay apart: the window is where the two phases' flows part, so this is coexistence"
+
+[[row]]
+when.needle = ["DIS", "ORD"]
+when.needle_pair = ["SAME-WINDOW", "SAME-SINK", "HALF-PINNED", "CROSSED", "NOT-MEASURED", "NOT-EVALUATED"]
+verdict = "OFF-WINDOW"
+why = "the needle sits at a sink: off the window the two starts say nothing about order (verdict_x STAGE1)"
+
+[[row]]
+when.needle = ["DIS", "ORD"]
+when.needle_pair = ["PINNED-BETWEEN-PHASES"]
+when.two_start = ["FLUCT", "UNRES", "INDEP", "NOT-MEASURED", "NOT-EVALUATED"]
+verdict = "OFF-WINDOW"
+why = "pinned between the phases but the starts do not stay apart: still off the window (the position rule)"
+
+[[row]]
+when.needle = ["NOT-MEASURED", "NOT-EVALUATED"]
+verdict = "NEEDLE-UNMEASURED"
+why = "honest null: without the needle there is no window to read the starts at"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["COEXIST"]
+verdict = "COEXIST-AT-WINDOW"
+why = "the two starts stay apart (D above the margin) at the window: coexistence"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["FLUCT", "UNRES"]
+verdict = "NOT-EQUILIBRATED"
+why = "D below the margin (a fluctuation, not coexistence) or unresolved: the starts cannot certify equilibrium"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.fluct = ["NOT-MEASURED"]
+verdict = "EQUILIBRATED"
+why = "the two starts agree within the margin at the window and the fluct witness was not measured (no split)"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.fluct = ["VANISHES"]
+verdict = "CONTINUOUS"
+why = "the starts agree and the variance of the energy density vanishes with size: a continuous transition"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.fluct = ["PERSISTS"]
+verdict = "FIRST-ORDER-TUNNELLING"
+why = "the starts agree (the sampler tunnelled) and the variance of the energy density persists with size: a discontinuity"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["INDEP"]
+when.fluct = ["GROWS", "UNRES", "NOT-EVALUATED"]
+verdict = "EQUILIBRATED-UNRES"
+why = "the starts agree but the fluct witness cannot say which side of zero (it grows, straddles, or was not evaluable): the split is unresolved"
+
+[[row]]
+when.needle = ["MID"]
+when.two_start = ["NOT-MEASURED", "NOT-EVALUATED"]
+verdict = "ORDER-UNMEASURED"
+why = "honest null: the two-start difference was not measured or not evaluated"

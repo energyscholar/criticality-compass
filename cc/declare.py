@@ -10,6 +10,7 @@ from dataclasses import dataclass, fields as dc_fields
 from pathlib import Path
 import numpy as np
 import formats
+import readout
 from transducer import chk_transducer
 from schema import ROOT, F, at, rel, _parsed, parse, load, row_lines, Ctx, unit_blocks, _SHA_ONCE, hashing_once, _sha, sha, MEASURE_SEEDED, import_closure, measure_hash, code_hash, code_cols, declared_cols  # noqa: F401  (moved by plan 0886; re-exported: the call sites keep `declare.<name>`)
 
@@ -138,7 +139,7 @@ def _regex_ok(x):
 
 
 def chk_cc(p, d, c, stem=None):
-    top = {k: dict for k in ("defaults", "data", "alphabets", "flags", "obtained_flag", "arrays", "basic", "check", "golden")}
+    top = {k: dict for k in ("defaults", "data", "alphabets", "flags", "obtained_flag", "arrays", "basic", "check", "golden", "interval_binding")}
     out = header(p, d, "cc") + shape(p, d, top, {"formats": dict, "transducer": dict, "levels": dict, "interval_fields": dict, "conventional": dict,
                                                  "report": dict, "step_labels": dict, "projections": dict})
     if out:
@@ -147,6 +148,11 @@ def chk_cc(p, d, c, stem=None):
     methods, fields_ = d["alphabets"].get("interval_method", []), d.get("interval_fields", {})   # plan 0878: every method of the alphabet has its fields table, and no table names a method outside it
     out += [at(p, f"interval_fields.{k}", "no [interval_fields] table for this method of alphabets.interval_method" if k in methods else "not a method of alphabets.interval_method",
                f"add [interval_fields.{k}] with required = {{...}}" if k in methods else f"delete [interval_fields.{k}]") for k in sorted(set(methods) ^ set(fields_))]
+    ib = d["interval_binding"].get("default")
+    out += [at(p, "interval_binding.default", "must be a non-empty list of methods of alphabets.interval_method", "write default = [\"block\", \"iid\", \"gamma\"]")
+            for _ in [0] if not (isinstance(ib, list) and ib and all(x in methods for x in ib))]
+    out += [at(p, f"interval_fields.{k}.chained", "must be true or false (plan 0937: does an input of this method declare [[data.files]] chain = ...?)", "write chained = false (or true for a method of independent chains)")
+            for k, v in fields_.items() if not isinstance(v, dict) or not isinstance(v.get("chained"), bool)]
     out += [at(p, f"conventional.{k}", "not an instrument of the registry" if k not in c.reg else "the label must be a non-empty string",
                f"use one of: {' '.join(c.reg)}" if k not in c.reg else "write the label as a string")
             for k, v in d.get("conventional", {}).items() if k not in c.reg or not (isinstance(v, str) and v.strip())]   # plan 0881 P2.3
@@ -347,21 +353,28 @@ def gamma_floor(p, iv, lengths, k):
 
 
 def chk_data(p, m, c):
-    d, out, blocks, ax, lengths = m["data"], [], {}, m["axes"], []
+    d, out, blocks, ax, lengths, seen = m["data"], [], {}, m["axes"], [], set()
+    iv, c_spec = m["interval"], c.cfg["interval_fields"].get(m["interval"].get("method"), {})
+    chained = c_spec.get("chained", False)   # plan 0937: an input of a method of independent chains labels every file with its chain; any other input labels none
     out += shape(p, d, {"format": str, "files": list}, pre="data.")
     out += inalpha(p, "data.format", d.get("format"), c.alpha["formats"])
     for i, b in enumerate(d.get("files", [])):
         loc = f"data.files[{i}]"
-        e = shape(p, b, {"point": str, "size": int, "start": str, "path": str, "arrays": dict}, pre=loc + ".")
+        base = {"point": str, "size": int, "start": str, "path": str, "arrays": dict}
+        e = shape(p, b, {**base, **({"chain": int} if chained else {})}, pre=loc + ".")
+        e += when("chain" in b and not chained, p, loc + ".chain", f"chain is declared only under an interval method of chains (this input's method is {iv.get('method')})",
+                  "delete chain, or declare [interval] method = \"chains\"")
         if e:
             out += e
             continue
         key = (b["point"], b["size"], b["start"])
-        out += when(key in blocks, p, loc, f"duplicate block (point {key[0]}, size {key[1]}, start {key[2]})",
+        ckey = (*key, b.get("chain"))
+        out += when(ckey in seen, p, loc, f"duplicate block (point {key[0]}, size {key[1]}, start {key[2]}" + (f", chain {b['chain']})" if chained else ")"),
                     "remove one of the two blocks")
+        seen.add(ckey)
         out += inalpha(p, loc + ".point", key[0], ax["point"]) + inalpha(p, loc + ".size", key[1], ax["size"])
         out += inalpha(p, loc + ".start", key[2], ax["starts"])
-        blocks[key] = b["arrays"]
+        blocks.setdefault(key, []).append(b["arrays"])
         fp = c.data_root / b["path"]
         if not fp.is_file():
             out.append(at(p, loc + ".path", f"{b['path']} does not exist under the data root",
@@ -377,10 +390,24 @@ def chk_data(p, m, c):
         inst = c.reg[iname]
         sizes, starts = unit_blocks(m, inst)
         for pt, sz, st, ar in itertools.product(ax["point"], sizes, starts, inst["arrays"]):
-            out += when(ar not in blocks.get((pt, sz, st), {}), p, "data.files",
+            out += when(not all(ar in a for a in blocks.get((pt, sz, st), [{}])), p, "data.files",
                         f"{iname} needs array {ar} at (point {pt}, size {sz}, start {st})",
                         "add that [[data.files]] block")
+    out += chain_cells(p, iv, blocks, seen) if chained else []
     return out
+
+
+def chain_cells(p, iv, blocks, seen):
+    """Plan 0937 eligibility, as a declare-time schema: an input of method `chains` is declarable only when r = rank(m, alpha) (r >= 1) and EVERY (point, size, start) cell
+    holds exactly the chains 0..m-1, so an ineligible reading (fewer or more chains, a repeated or skipped index) is unrepresentable: no run-time NOT_ESTABLISHED arises."""
+    m, r, a = iv["m"], iv["r"], iv["alpha"]
+    want = readout.rank(m, a)
+    out = when(r != want or want < 1, p, "interval.r", f"r = {r} is not rank(m, alpha) = {want} for m = {m}, alpha = {a} (the largest r >= 1 with 2 P(Bin(m, 1/2) <= r - 1) <= alpha)",
+               f"write r = {want}, or change alpha / m")
+    got = {k: sorted(c for (pt, sz, st, c) in seen if (pt, sz, st) == k) for k in blocks}
+    bad = {k: v for k, v in got.items() if v != list(range(m))}
+    return out + [at(p, "data.files", f"cell (point {k[0]}, size {k[1]}, start {k[2]}) holds chains {v}, not exactly 0..{m - 1} (m = {m})",
+                     f"declare one [[data.files]] block per chain 0..{m - 1} for this cell") for k, v in list(bad.items())[:5]]
 
 
 SIDECAR_SHAPE = {
@@ -873,6 +900,13 @@ def feeding(allc, name):
     return {src.partition(".")[0]} - {"declared"} if isinstance(src, str) else feeding(allc, src[0]) | feeding(allc, src[1])
 
 
+def chk_interval_binding(p, d, c, stem=None):
+    """tables/<set>/interval.toml (plan 0937): the [interval] methods the set reads, each a method of cc.toml alphabets.interval_method."""
+    out = header(p, d, "interval-binding") + shape(p, d, {"methods": list})
+    return out or [at(p, "methods", f"'{x}' is not a method of alphabets.interval_method" if isinstance(x, str) else "must be a method name", f"use one of: {' '.join(c.alpha['interval_method'])}")
+                   for x in d["methods"] if x not in c.alpha["interval_method"]] + when(not d["methods"], p, "methods", "empty: the set would read no result", "name at least one method")
+
+
 def chk_membership(p, d, c, stem=None):
     """One section per instrument that runs door:off_manifold: which signature column it reads, and how its codes
     become membership, a rank and a door value. Keys are checked here, so a gap fails validate and never a run."""
@@ -1064,7 +1098,7 @@ def factorisation(root, tset):
 KIND = {"membership": chk_membership, "case": chk_case, "points": chk_points, "input": chk_input, "instrument": chk_instrument,
         "codes": chk_codes, "verdict": chk_verdict, "data-manifest": chk_manifest, "cc": chk_cc,
         "family": chk_family, "family-decl": chk_family_decl, "geometry": chk_geometry, "order": chk_order,
-        "compose": chk_compose, "probe": chk_probe, "couplings": chk_couplings,
+        "compose": chk_compose, "probe": chk_probe, "couplings": chk_couplings, "interval-binding": chk_interval_binding,
         "transducer": chk_transducer, "record": chk_transducer}
 
 
@@ -1108,7 +1142,7 @@ def _validate(root, ctx, input_id, tables):
         tfiles = [m.parent / "transducer.toml" for m in ins]
     files += [root / "tables" / s / f for s in sets for f in ("codes.toml", "verdict.toml")]
     files += [f for s in sets if not input_id for n in ("membership", "family") if (f := root / "tables" / s / f"{n}.toml").is_file()]
-    files += [f for s in sets for n in ("geometry", "order", "probe", "compose") if (f := root / "tables" / s / f"{n}.toml").is_file()]
+    files += [f for s in sets for n in ("geometry", "order", "probe", "compose", "interval") if (f := root / "tables" / s / f"{n}.toml").is_file()]
     files += [f for f in sorted((root / "inputs").glob("*/couplings.toml")) if not input_id or f.parent.name == input_id]
     files += sorted((root / "families").glob("*.toml")) if not input_id and (root / "families").is_dir() else []
     out, n = [], {}
