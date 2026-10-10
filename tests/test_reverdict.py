@@ -57,7 +57,7 @@ with tempfile.TemporaryDirectory() as t:
         (Path(t) / "tables" / name).mkdir(parents=True)
         if text:
             (Path(t) / "tables" / name / "membership.toml").write_text(text)
-    res = {"input": "i", "tables": "a"}
+    res = {"input": "i", "tables": "a", "interval": {"method": "block"}}   # plan 0937: a stored result always names its interval method (the refusal reads it)
     refused = {k: score.reverdict_refusal(res, k, t) for k in "bcd"}
     check("a set whose membership differs is refused with the re-measure command",
           "bin/cc run i --tables b" in (refused["b"] or "") and "bin/cc run i --tables d" in (refused["d"] or ""), str(refused))

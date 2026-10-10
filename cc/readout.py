@@ -20,10 +20,10 @@ def rank(m, alpha):
     """r(m, alpha) = the largest r with miss(m, r) <= alpha, miss(m, r) = 2 P(Bin(m, 1/2) <= r - 1) = 2 sum_{i<r} C(m, i) / 2^m (the rank rule of
     navigator v2, studies/NAV-AT/nav2.py rank; plan 0937 [0937].alpha). Exact integer arithmetic: alpha is compared as alpha * 2^m, never as a float tail."""
     c, tail, hit = 1, 0, 0
-    for r in range(1, m // 2 + 1):
+    for r in range(1, m // 2 + 1):   # form: r runs 1..floor(m/2), the ranks whose two tails are disjoint
         tail += c                      # sum_{i < r} C(m, i)
         c = c * (m - r + 1) // r       # C(m, r)
-        hit += 2 * tail <= alpha * 2 ** m
+        hit += 2 * tail <= alpha * 2 ** m   # form: miss(m, r) <= alpha, both sides times 2^m (the two tails: the factor 2; the binomial denominator: 2^m)
     return hit
 
 

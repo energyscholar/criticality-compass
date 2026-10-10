@@ -51,8 +51,9 @@ def reverdict_refusal(res, new, root=ROOT):
     changed = membership_of(root, res["tables"], declared) != membership_of(root, new, declared)
     lacks = bool(schema.declared_cols(schema.load(Path(root) / "tables" / new / "codes.toml", root)[0] or {"columns": {}})) and "declared" not in res   # plan 0870: a declared column is read from couplings.toml at run time
     gone = replaced(res, new, declared, root)
-    if res["interval"]["method"] not in schema.interval_methods(root, new):   # plan 0937: a result made by another interval method is not what the set reads
-        return (f"REFUSED: tables/{new} reads interval methods {schema.interval_methods(root, new)}; {res['run_id']} was measured by method '{res['interval']['method']}'.\n"
+    reads = schema.interval_methods(schema.ROOT, new, Path(root) / "tables" / new)   # the set's own interval.toml (root may be a scratch tree), else the repo's cc.toml default
+    if res["interval"]["method"] not in reads:   # plan 0937: a result made by another interval method is not what the set reads
+        return (f"REFUSED: tables/{new} reads interval methods {reads}; {res['run_id']} was measured by method '{res['interval']['method']}'.\n"
                 f"  Next: re-measure under a set that reads it: bin/cc run {res['input']} --tables <that set>")
     if gone:
         return (f"REFUSED: tables/{new} derives the column {gone[0]} from {', '.join(gone[1])}, which {res['input']} does not declare, so {res['run_id']} holds no reading of it.\n"

@@ -2,7 +2,7 @@
 # never typed). Each entry: kinds (R read, S stat, D directory listed) and a path (~data/ = the data root, ~toolset/ = the rest of the toolset root).
 schema = 1
 kind = "golden-reads"
-key = "08184f1e3830bb9d180694e81f9ef2da3163e0760c97c97cbb9c7f4a401ac285"
+key = "839d03b77a097ad7549d8ca4f03de10d9663069e68b1e506467b1bdb8e6fecf3"
 paths = [
   "S .",
   "RS bin/cc",
@@ -15,8 +15,10 @@ paths = [
   "RS cc/instruments/across.py",
   "RS cc/instruments/along.py",
   "RS cc/instruments/stability.py",
+  "R cc/readout.py",
   "R cc/reduce.py",
   "RS cc/schema.py",
+  "R cc/sign.py",
   "R cc/transducer.py",
   "R checks.toml",
   "RS fixtures/data/b7-at-line-2.toml",
@@ -75,6 +77,7 @@ paths = [
   "RS tables/nomem/codes.toml",
   "S tables/nomem/compose.toml",
   "S tables/nomem/geometry.toml",
+  "S tables/nomem/interval.toml",
   "S tables/nomem/membership.toml",
   "S tables/nomem/order.toml",
   "S tables/nomem/probe.toml",
@@ -87,6 +90,7 @@ paths = [
   "S tables/v06-rules",
   "S tables/v07-rules",
   "S tables/v08-rules",
+  "S tables/v10-rules",
   "DS tables/verdict-x-rules",
   "R tables/verdict-x-rules/codes.toml",
   "R tables/verdict-x-rules/verdict.toml",
@@ -105,5 +109,4 @@ paths = [
   "RS ~data/b7/L4-0.2747-L243.npz",
   "RS ~data/b7/L4-0.2747-L27.npz",
   "RS ~data/b7/L4-0.2747-L81.npz",
-  "RS ~toolset/tools/lattice_at.py",
 ]

@@ -145,11 +145,11 @@ def import_closure(root, starts):
     return seen
 
 
-def interval_methods(root, tset):
+def interval_methods(root, tset, setdir=None):
     """The [interval] methods the table set `tset` reads (plan 0937): its own tables/<set>/interval.toml `methods`, else cc.toml [interval_binding] default.
     A total table over the sets: a set without the file reads the resampling methods and cannot read a chains result, and a set that carries the file (v10-rules) reads
     only what it names, so a block result under v10-rules, or a chains result under v09 and before, is refused by the loader (detect.run_keyed, reverdict_refusal)."""
-    f = Path(root) / "tables" / tset / "interval.toml"
+    f = Path(setdir or Path(root) / "tables" / tset) / "interval.toml"   # setdir: a set kept outside root/tables (a test's scratch dir); cc.toml is always the root's
     return list((tomllib.loads(f.read_text()) if f.is_file() else tomllib.loads((Path(root) / "cc.toml").read_text())["interval_binding"])["methods" if f.is_file() else "default"])
 
 

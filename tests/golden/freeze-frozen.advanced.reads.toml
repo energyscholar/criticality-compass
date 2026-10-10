@@ -2,7 +2,7 @@
 # never typed). Each entry: kinds (R read, S stat, D directory listed) and a path (~data/ = the data root, ~toolset/ = the rest of the toolset root).
 schema = 1
 kind = "golden-reads"
-key = "86631928e3bf620c9d68e1b6d3c2a66a0f13d40a73ac2f05a198ab9a1d0ae621"
+key = "e1197ebc982e00b9476ebe1ec2b862605997160436c433c5399ed9f74664f07c"
 paths = [
   "S .",
   "RS FROZEN.json",
@@ -25,10 +25,20 @@ paths = [
   "R cc/sign.py",
   "R cc/transducer.py",
   "RS cc/view.py",
+  "R checks.toml",
   "RS fixtures/data/w2-potts.toml",
   "RS inputs/w2-potts/m.toml",
+  "DS instruments",
   "RS instruments/across.toml",
+  "R instruments/across_delta.toml",
+  "R instruments/along.toml",
+  "R instruments/fluct.toml",
+  "R instruments/needle.toml",
+  "R instruments/needle_chain.toml",
+  "R instruments/needle_o.toml",
   "RS instruments/stability.toml",
+  "R instruments/stability_delta.toml",
+  "R instruments/transform.toml",
   "RS instruments/two_start.toml",
   "S results",
   "RS results/w2-potts@verdict-x-rules.json",

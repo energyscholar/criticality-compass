@@ -1,5 +1,5 @@
 """test_v10_readable - plan 0937 A4: the old Detector stays READABLE. Every stored result under results/ renders byte-identically through `show`
-and re-verdicts (under its own rules) byte-identically, as recorded by the tree BEFORE the v10 edits (tests/v10_readable.tsv: result id, sha256 of
+and re-verdicts (under its own rules) byte-identically (but for code_hash, which records the edited code), as recorded by the tree BEFORE the v10 edits (tests/v10_readable.tsv: result id, sha256 of
 the show text, sha256 of the re-verdicted JSON). measure_hash epoch 2 moves every result's reuse key (declared in advance, toolset LOG E597 and the
 Plan 0937 phase 1 commit message), never what a result says. `--record` rewrites the table (run it only on a tree whose readers are the reference)."""
 import hashlib
@@ -25,7 +25,7 @@ def digests():
         if res.get("kind") != "result":
             continue
         shown = "\n".join(view.show(res, score.join(res["input"]), "basic", ""))
-        again = json.dumps(reverdict.reverdict_result(res, detect.load_tables(res["tables"])), sort_keys=True)
+        again = json.dumps({k: v for k, v in reverdict.reverdict_result(res, detect.load_tables(res["tables"])).items() if k != "code_hash"}, sort_keys=True)   # code_hash records the code, which this plan edits by design
         out[res["run_id"]] = (H(shown), H(again))
     return out
 

@@ -398,7 +398,9 @@ def cmd_family(args):
     if len(pos) != 1:
         print("usage: bin/cc family <id> [--tables SET]\n  Next: bin/cc help --advanced")
         return 1
-    msg, got = family.run(ROOT, pos[0], tables)
+    import detect
+    msg, got = detect.family_refusal(ROOT, pos[0]), None   # plan 0937: a family over a chains input is refused (typed, with its reason) before family.py is entered
+    msg, got = (msg, None) if msg else family.run(ROOT, pos[0], tables)
     print(msg if got is None else "\n".join(family.show(*got)))
     return got is None
 

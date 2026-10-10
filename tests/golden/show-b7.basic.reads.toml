@@ -2,7 +2,7 @@
 # never typed). Each entry: kinds (R read, S stat, D directory listed) and a path (~data/ = the data root, ~toolset/ = the rest of the toolset root).
 schema = 1
 kind = "golden-reads"
-key = "b291491c822afb861fafd2810a03459e8aea102224f7b0928d9a6a885b2d78b9"
+key = "1452791308592762ce0b79aaaf8eb51650d3109d271ef738b0de5038361b8bd5"
 paths = [
   "R FROZEN.json",
   "RS bin/cc",
@@ -28,6 +28,7 @@ paths = [
   "R cc/sign.py",
   "R cc/transducer.py",
   "RS cc/view.py",
+  "R checks.toml",
   "S families",
   "RS fixtures/data/b7-at-line.toml",
   "DS inputs",
@@ -71,8 +72,18 @@ paths = [
   "S inputs/x8-ising-needle",
   "S inputs/x9c-potts",
   "S inputs/x9c-potts-2",
+  "DS instruments",
   "RS instruments/across.toml",
+  "R instruments/across_delta.toml",
+  "R instruments/along.toml",
+  "R instruments/fluct.toml",
+  "R instruments/needle.toml",
+  "R instruments/needle_chain.toml",
+  "R instruments/needle_o.toml",
   "RS instruments/stability.toml",
+  "R instruments/stability_delta.toml",
+  "R instruments/transform.toml",
+  "R instruments/two_start.toml",
   "RS results/b7-at-line@v01-rules.json",
   "S results/b7-at-line@v01-rules.npz",
   "S tables/v01-rules",
@@ -80,6 +91,7 @@ paths = [
   "S tables/v01-rules/compose.toml",
   "RS tables/v01-rules/family.toml",
   "S tables/v01-rules/geometry.toml",
+  "S tables/v01-rules/interval.toml",
   "RS tables/v01-rules/membership.toml",
   "S tables/v01-rules/order.toml",
   "S tables/v01-rules/probe.toml",

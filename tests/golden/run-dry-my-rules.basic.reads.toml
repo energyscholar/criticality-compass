@@ -2,7 +2,7 @@
 # never typed). Each entry: kinds (R read, S stat, D directory listed) and a path (~data/ = the data root, ~toolset/ = the rest of the toolset root).
 schema = 1
 kind = "golden-reads"
-key = "5aebb8717194c35e9711f5a185cb70beeea2a08f6e097f84c5fc3de7a59076e7"
+key = "79b6c9df05b96c1fe26584a73cd2209e56b243364dfc727c73ef9102c3659da4"
 paths = [
   "S .",
   "RS FROZEN.json",
@@ -351,6 +351,7 @@ paths = [
   "S tables/my-rules/compose.toml",
   "S tables/my-rules/family.toml",
   "S tables/my-rules/geometry.toml",
+  "S tables/my-rules/interval.toml",
   "S tables/my-rules/membership.toml",
   "S tables/my-rules/order.toml",
   "S tables/my-rules/probe.toml",
@@ -382,6 +383,7 @@ paths = [
   "RS tables/v08-rules/order.toml",
   "RS tables/v08-rules/probe.toml",
   "RS tables/v08-rules/verdict.toml",
+  "S tables/v10-rules",
   "DS tables/verdict-x-rules",
   "RS tables/verdict-x-rules/codes.toml",
   "RS tables/verdict-x-rules/verdict.toml",
@@ -413,5 +415,4 @@ paths = [
   "RS ~data/w2/q5-L27-random.npz",
   "RS ~data/w2/q5-L81-ordered.npz",
   "RS ~data/w2/q5-L81-random.npz",
-  "RS ~toolset/tools/lattice_potts.py",
 ]

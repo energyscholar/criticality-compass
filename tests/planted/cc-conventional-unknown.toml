@@ -55,3 +55,6 @@ slow = []                       # each phase appends every test it creates that 
 [golden.classes.a]
 files = ["help.*.txt"]
 match = ['^[-+]\s+bin/cc ']
+
+[interval_binding]    # plan 0937
+default = ["block", "iid", "gamma"]

@@ -2,7 +2,7 @@
 # never typed). Each entry: kinds (R read, S stat, D directory listed) and a path (~data/ = the data root, ~toolset/ = the rest of the toolset root).
 schema = 1
 kind = "golden-reads"
-key = "6bb3d8e26cff677c9fdc019d3d812b5f045e951c0b482e356a053b8f6b2d8010"
+key = "97baa97f45a4c106a7b99a8a020f0ae0336f6f14d487a1cbc9a15b4b9820dec1"
 paths = [
   "S .",
   "RS bin/cc",
@@ -482,6 +482,7 @@ paths = [
   "S tables/v01-rules/compose.toml",
   "RS tables/v01-rules/family.toml",
   "S tables/v01-rules/geometry.toml",
+  "S tables/v01-rules/interval.toml",
   "RS tables/v01-rules/membership.toml",
   "S tables/v01-rules/order.toml",
   "S tables/v01-rules/probe.toml",
@@ -491,6 +492,7 @@ paths = [
   "RS tables/v02-rules/compose.toml",
   "RS tables/v02-rules/family.toml",
   "RS tables/v02-rules/geometry.toml",
+  "S tables/v02-rules/interval.toml",
   "RS tables/v02-rules/membership.toml",
   "RS tables/v02-rules/order.toml",
   "S tables/v02-rules/probe.toml",
@@ -500,6 +502,7 @@ paths = [
   "RS tables/v03-rules/compose.toml",
   "RS tables/v03-rules/family.toml",
   "RS tables/v03-rules/geometry.toml",
+  "S tables/v03-rules/interval.toml",
   "RS tables/v03-rules/membership.toml",
   "RS tables/v03-rules/order.toml",
   "S tables/v03-rules/probe.toml",
@@ -509,6 +512,7 @@ paths = [
   "RS tables/v04-rules/compose.toml",
   "RS tables/v04-rules/family.toml",
   "RS tables/v04-rules/geometry.toml",
+  "S tables/v04-rules/interval.toml",
   "RS tables/v04-rules/membership.toml",
   "RS tables/v04-rules/order.toml",
   "RS tables/v04-rules/probe.toml",
@@ -518,6 +522,7 @@ paths = [
   "RS tables/v05-rules/compose.toml",
   "RS tables/v05-rules/family.toml",
   "RS tables/v05-rules/geometry.toml",
+  "S tables/v05-rules/interval.toml",
   "RS tables/v05-rules/membership.toml",
   "RS tables/v05-rules/order.toml",
   "RS tables/v05-rules/probe.toml",
@@ -527,6 +532,7 @@ paths = [
   "RS tables/v06-rules/compose.toml",
   "RS tables/v06-rules/family.toml",
   "RS tables/v06-rules/geometry.toml",
+  "S tables/v06-rules/interval.toml",
   "RS tables/v06-rules/membership.toml",
   "RS tables/v06-rules/order.toml",
   "RS tables/v06-rules/probe.toml",
@@ -536,6 +542,7 @@ paths = [
   "RS tables/v07-rules/compose.toml",
   "RS tables/v07-rules/family.toml",
   "RS tables/v07-rules/geometry.toml",
+  "S tables/v07-rules/interval.toml",
   "RS tables/v07-rules/membership.toml",
   "RS tables/v07-rules/order.toml",
   "RS tables/v07-rules/probe.toml",
@@ -545,6 +552,7 @@ paths = [
   "RS tables/v08-rules/compose.toml",
   "RS tables/v08-rules/family.toml",
   "RS tables/v08-rules/geometry.toml",
+  "S tables/v08-rules/interval.toml",
   "RS tables/v08-rules/membership.toml",
   "RS tables/v08-rules/order.toml",
   "RS tables/v08-rules/probe.toml",
@@ -554,6 +562,7 @@ paths = [
   "S tables/verdict-x-rules/compose.toml",
   "S tables/verdict-x-rules/family.toml",
   "S tables/verdict-x-rules/geometry.toml",
+  "S tables/verdict-x-rules/interval.toml",
   "S tables/verdict-x-rules/membership.toml",
   "S tables/verdict-x-rules/order.toml",
   "S tables/verdict-x-rules/probe.toml",

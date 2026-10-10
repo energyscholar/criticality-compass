@@ -2,7 +2,7 @@
 # never typed). Each entry: kinds (R read, S stat, D directory listed) and a path (~data/ = the data root, ~toolset/ = the rest of the toolset root).
 schema = 1
 kind = "golden-reads"
-key = "e13a0ab067d83bd4019d8fc4c5f939697b41051b6abaf483459168c31cd30872"
+key = "f33c64d717414a821115daa7e7047dd2ab03666d4535c9f3fac132a7040ef641"
 paths = [
   "RS bin/cc",
   "R cc.toml",
@@ -26,6 +26,7 @@ paths = [
   "R cc/sign.py",
   "R cc/transducer.py",
   "RS cc/view.py",
+  "R checks.toml",
   "RS fixtures/data/x7a-bc.toml",
   "DS inputs",
   "S inputs/TEMPLATE.m.toml.in",
@@ -67,14 +68,25 @@ paths = [
   "S inputs/x8-ising-needle",
   "S inputs/x9c-potts",
   "S inputs/x9c-potts-2",
+  "DS instruments",
+  "R instruments/across.toml",
+  "R instruments/across_delta.toml",
   "RS instruments/along.toml",
+  "R instruments/fluct.toml",
   "RS instruments/needle.toml",
+  "R instruments/needle_chain.toml",
+  "R instruments/needle_o.toml",
+  "R instruments/stability.toml",
+  "R instruments/stability_delta.toml",
+  "R instruments/transform.toml",
+  "R instruments/two_start.toml",
   "RS results/x7a-bc@v01-rules.json",
   "S tables/v01-rules",
   "RS tables/v01-rules/codes.toml",
   "S tables/v01-rules/compose.toml",
   "RS tables/v01-rules/family.toml",
   "S tables/v01-rules/geometry.toml",
+  "S tables/v01-rules/interval.toml",
   "RS tables/v01-rules/membership.toml",
   "S tables/v01-rules/order.toml",
   "S tables/v01-rules/probe.toml",
