@@ -603,6 +603,13 @@ def cmd_mutate(args):
         shutil.rmtree(tmp, ignore_errors=True)
 
 
+def cmd_bench(a):   # plan 0932: the frozen benchmark suite as a manifest (cc/bench.py)
+    import bench
+    import schema
+    c = schema.Ctx(ROOT)
+    return bench.main(a, {"cc": ROOT, "data": c.data_root}, ROOT)
+
+
 def main(argv):
     global MODE
     advanced = "--advanced" in argv
@@ -621,7 +628,7 @@ def main(argv):
         print(help_text(advanced), end="")
         return 0
     table = {"show": lambda a: cmd_show(a, False), "explain": lambda a: cmd_show(a, True), "tabulate": cmd_tabulate,
-             "test": cmd_test, "run": cmd_run, "reverdict": cmd_reverdict, "family": cmd_family, "freeze": cmd_freeze, "check": cmd_check, "mutate": cmd_mutate,
+             "test": cmd_test, "run": cmd_run, "reverdict": cmd_reverdict, "family": cmd_family, "freeze": cmd_freeze, "check": cmd_check, "mutate": cmd_mutate, "bench": cmd_bench,
              "validate": lambda a: cmd_validate(a + (["--advanced"] if advanced else []))}
     if cmd in table:
         return table[cmd](rest)

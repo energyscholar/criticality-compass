@@ -1,0 +1,1222 @@
+# benchmark/ROWS.toml (plan 0932 P1) - the declared row list. Argus declaration 2026-10-09 07:54 PDT (hal-main/research/compass-0932-declarations-DRAFT.toml).
+# Rows are listed, never globbed: CC-side rows name each file; map sets are named by the producer's own manifest (listed_by).
+# Data-root-relative paths. Maps frozen in: M1 (nav2-bank/M1, chains 0-39) and M7 (data/nav-m7-grid, data/nav-m7-bank). M5/M6 enter by a later dated amendment; M2-M4 are not built.
+schema = 1
+roles = ["map", "input", "truth", "prediction"]
+
+[[row]]
+id = "case:ar1-null"
+role = "truth"
+root = "cc"
+path = "cases/ar1-null.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "case:at-self-dual-line"
+role = "truth"
+root = "cc"
+path = "cases/at-self-dual-line.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "case:bc-beyond-tricritical"
+role = "truth"
+root = "cc"
+path = "cases/bc-beyond-tricritical.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "case:bc-lambda-line"
+role = "truth"
+root = "cc"
+path = "cases/bc-lambda-line.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "case:bc-off-critical"
+role = "truth"
+root = "cc"
+path = "cases/bc-off-critical.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "case:bc-tricritical"
+role = "truth"
+root = "cc"
+path = "cases/bc-tricritical.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "case:clock6-critical-phase"
+role = "truth"
+root = "cc"
+path = "cases/clock6-critical-phase.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "case:clock6-kt-ends"
+role = "truth"
+root = "cc"
+path = "cases/clock6-kt-ends.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "case:coupled-ising-bilinear"
+role = "truth"
+root = "cc"
+path = "cases/coupled-ising-bilinear.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "case:ising-2d"
+role = "truth"
+root = "cc"
+path = "cases/ising-2d.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "case:ising-field-decoy"
+role = "truth"
+root = "cc"
+path = "cases/ising-field-decoy.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "case:ising-off-critical"
+role = "truth"
+root = "cc"
+path = "cases/ising-off-critical.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "case:nnn-ising-manifold"
+role = "truth"
+root = "cc"
+path = "cases/nnn-ising-manifold.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "case:potts-q10"
+role = "truth"
+root = "cc"
+path = "cases/potts-q10.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "case:potts-q3"
+role = "truth"
+root = "cc"
+path = "cases/potts-q3.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "case:potts-q5"
+role = "truth"
+root = "cc"
+path = "cases/potts-q5.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "case:potts-q6"
+role = "truth"
+root = "cc"
+path = "cases/potts-q6.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "case:potts-q7"
+role = "truth"
+root = "cc"
+path = "cases/potts-q7.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "case:potts-q8"
+role = "truth"
+root = "cc"
+path = "cases/potts-q8.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "case:xy-low-phase"
+role = "truth"
+root = "cc"
+path = "cases/xy-low-phase.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "case:xy-tkt"
+role = "truth"
+root = "cc"
+path = "cases/xy-tkt.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "expected:v01-rules"
+role = "prediction"
+root = "cc"
+path = "expected/v01-rules.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "expected:v02-rules"
+role = "prediction"
+root = "cc"
+path = "expected/v02-rules.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "expected:v03-rules"
+role = "prediction"
+root = "cc"
+path = "expected/v03-rules.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "expected:v04-rules"
+role = "prediction"
+root = "cc"
+path = "expected/v04-rules.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "expected:v05-rules"
+role = "prediction"
+root = "cc"
+path = "expected/v05-rules.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "expected:v06-rules"
+role = "prediction"
+root = "cc"
+path = "expected/v06-rules.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "expected:v07-rules"
+role = "prediction"
+root = "cc"
+path = "expected/v07-rules.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "expected:v08-rules"
+role = "prediction"
+root = "cc"
+path = "expected/v08-rules.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "expected:verdict-x-rules"
+role = "prediction"
+root = "cc"
+path = "expected/verdict-x-rules.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:b7-at-line/couplings.toml"
+role = "input"
+root = "cc"
+path = "inputs/b7-at-line/couplings.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:b7-at-line/m.toml"
+role = "input"
+root = "cc"
+path = "inputs/b7-at-line/m.toml"
+source = "CC FROZEN.json files[inputs/b7-at-line/m.toml]"
+
+[[row]]
+id = "input:b7-at-line/points.toml"
+role = "input"
+root = "cc"
+path = "inputs/b7-at-line/points.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:b7-at-line/transducer.toml"
+role = "input"
+root = "cc"
+path = "inputs/b7-at-line/transducer.toml"
+source = "CC FROZEN.json files[inputs/b7-at-line/transducer.toml]"
+
+[[row]]
+id = "input:b7-at-line-2/couplings.toml"
+role = "input"
+root = "cc"
+path = "inputs/b7-at-line-2/couplings.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:b7-at-line-2/m.toml"
+role = "input"
+root = "cc"
+path = "inputs/b7-at-line-2/m.toml"
+source = "CC FROZEN.json files[inputs/b7-at-line-2/m.toml]"
+
+[[row]]
+id = "input:b7-at-line-2/points.toml"
+role = "input"
+root = "cc"
+path = "inputs/b7-at-line-2/points.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:b7-at-line-2/transducer.toml"
+role = "input"
+root = "cc"
+path = "inputs/b7-at-line-2/transducer.toml"
+source = "CC FROZEN.json files[inputs/b7-at-line-2/transducer.toml]"
+
+[[row]]
+id = "input:b7-at-line-3/couplings.toml"
+role = "input"
+root = "cc"
+path = "inputs/b7-at-line-3/couplings.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:b7-at-line-3/m.toml"
+role = "input"
+root = "cc"
+path = "inputs/b7-at-line-3/m.toml"
+source = "CC FROZEN.json files[inputs/b7-at-line-3/m.toml]"
+
+[[row]]
+id = "input:b7-at-line-3/points.toml"
+role = "input"
+root = "cc"
+path = "inputs/b7-at-line-3/points.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:b7-at-line-3/transducer.toml"
+role = "input"
+root = "cc"
+path = "inputs/b7-at-line-3/transducer.toml"
+source = "CC FROZEN.json files[inputs/b7-at-line-3/transducer.toml]"
+
+[[row]]
+id = "input:b7-at-line-4/couplings.toml"
+role = "input"
+root = "cc"
+path = "inputs/b7-at-line-4/couplings.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:b7-at-line-4/m.toml"
+role = "input"
+root = "cc"
+path = "inputs/b7-at-line-4/m.toml"
+source = "CC FROZEN.json files[inputs/b7-at-line-4/m.toml]"
+
+[[row]]
+id = "input:b7-at-line-4/points.toml"
+role = "input"
+root = "cc"
+path = "inputs/b7-at-line-4/points.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:b7-at-line-4/transducer.toml"
+role = "input"
+root = "cc"
+path = "inputs/b7-at-line-4/transducer.toml"
+source = "CC FROZEN.json files[inputs/b7-at-line-4/transducer.toml]"
+
+[[row]]
+id = "input:b7-at-line-5/couplings.toml"
+role = "input"
+root = "cc"
+path = "inputs/b7-at-line-5/couplings.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:b7-at-line-5/m.toml"
+role = "input"
+root = "cc"
+path = "inputs/b7-at-line-5/m.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:b7-at-line-5/points.toml"
+role = "input"
+root = "cc"
+path = "inputs/b7-at-line-5/points.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:b7-at-line-5/transducer.toml"
+role = "input"
+root = "cc"
+path = "inputs/b7-at-line-5/transducer.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:c2-bc-two-start/couplings.toml"
+role = "input"
+root = "cc"
+path = "inputs/c2-bc-two-start/couplings.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:c2-bc-two-start/m.toml"
+role = "input"
+root = "cc"
+path = "inputs/c2-bc-two-start/m.toml"
+source = "CC FROZEN.json files[inputs/c2-bc-two-start/m.toml]"
+
+[[row]]
+id = "input:c2-bc-two-start/points.toml"
+role = "input"
+root = "cc"
+path = "inputs/c2-bc-two-start/points.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:c2-bc-two-start/transducer.toml"
+role = "input"
+root = "cc"
+path = "inputs/c2-bc-two-start/transducer.toml"
+source = "CC FROZEN.json files[inputs/c2-bc-two-start/transducer.toml]"
+
+[[row]]
+id = "input:k4-m1/couplings.toml"
+role = "input"
+root = "cc"
+path = "inputs/k4-m1/couplings.toml"
+source = "CC FROZEN.json files[inputs/k4-m1/couplings.toml]"
+
+[[row]]
+id = "input:k4-m1/m.toml"
+role = "input"
+root = "cc"
+path = "inputs/k4-m1/m.toml"
+source = "CC FROZEN.json files[inputs/k4-m1/m.toml]"
+
+[[row]]
+id = "input:k4-m1/points.toml"
+role = "input"
+root = "cc"
+path = "inputs/k4-m1/points.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:k4-m1/transducer.toml"
+role = "input"
+root = "cc"
+path = "inputs/k4-m1/transducer.toml"
+source = "CC FROZEN.json files[inputs/k4-m1/transducer.toml]"
+
+[[row]]
+id = "input:w1-potts/couplings.toml"
+role = "input"
+root = "cc"
+path = "inputs/w1-potts/couplings.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:w1-potts/m.toml"
+role = "input"
+root = "cc"
+path = "inputs/w1-potts/m.toml"
+source = "CC FROZEN.json files[inputs/w1-potts/m.toml]"
+
+[[row]]
+id = "input:w1-potts/points.toml"
+role = "input"
+root = "cc"
+path = "inputs/w1-potts/points.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:w1-potts/transducer.toml"
+role = "input"
+root = "cc"
+path = "inputs/w1-potts/transducer.toml"
+source = "CC FROZEN.json files[inputs/w1-potts/transducer.toml]"
+
+[[row]]
+id = "input:w2-potts/couplings.toml"
+role = "input"
+root = "cc"
+path = "inputs/w2-potts/couplings.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:w2-potts/m.toml"
+role = "input"
+root = "cc"
+path = "inputs/w2-potts/m.toml"
+source = "CC FROZEN.json files[inputs/w2-potts/m.toml]"
+
+[[row]]
+id = "input:w2-potts/points.toml"
+role = "input"
+root = "cc"
+path = "inputs/w2-potts/points.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:w2-potts/transducer.toml"
+role = "input"
+root = "cc"
+path = "inputs/w2-potts/transducer.toml"
+source = "CC FROZEN.json files[inputs/w2-potts/transducer.toml]"
+
+[[row]]
+id = "input:w2-potts-2/couplings.toml"
+role = "input"
+root = "cc"
+path = "inputs/w2-potts-2/couplings.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:w2-potts-2/m.toml"
+role = "input"
+root = "cc"
+path = "inputs/w2-potts-2/m.toml"
+source = "CC FROZEN.json files[inputs/w2-potts-2/m.toml]"
+
+[[row]]
+id = "input:w2-potts-2/points.toml"
+role = "input"
+root = "cc"
+path = "inputs/w2-potts-2/points.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:w2-potts-2/transducer.toml"
+role = "input"
+root = "cc"
+path = "inputs/w2-potts-2/transducer.toml"
+source = "CC FROZEN.json files[inputs/w2-potts-2/transducer.toml]"
+
+[[row]]
+id = "input:w3-potts/couplings.toml"
+role = "input"
+root = "cc"
+path = "inputs/w3-potts/couplings.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:w3-potts/m.toml"
+role = "input"
+root = "cc"
+path = "inputs/w3-potts/m.toml"
+source = "CC FROZEN.json files[inputs/w3-potts/m.toml]"
+
+[[row]]
+id = "input:w3-potts/points.toml"
+role = "input"
+root = "cc"
+path = "inputs/w3-potts/points.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:w3-potts/transducer.toml"
+role = "input"
+root = "cc"
+path = "inputs/w3-potts/transducer.toml"
+source = "CC FROZEN.json files[inputs/w3-potts/transducer.toml]"
+
+[[row]]
+id = "input:x2-xy-line/couplings.toml"
+role = "input"
+root = "cc"
+path = "inputs/x2-xy-line/couplings.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x2-xy-line/m.toml"
+role = "input"
+root = "cc"
+path = "inputs/x2-xy-line/m.toml"
+source = "CC FROZEN.json files[inputs/x2-xy-line/m.toml]"
+
+[[row]]
+id = "input:x2-xy-line/points.toml"
+role = "input"
+root = "cc"
+path = "inputs/x2-xy-line/points.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x2-xy-line/transducer.toml"
+role = "input"
+root = "cc"
+path = "inputs/x2-xy-line/transducer.toml"
+source = "CC FROZEN.json files[inputs/x2-xy-line/transducer.toml]"
+
+[[row]]
+id = "input:x2-xy-line-2/couplings.toml"
+role = "input"
+root = "cc"
+path = "inputs/x2-xy-line-2/couplings.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x2-xy-line-2/m.toml"
+role = "input"
+root = "cc"
+path = "inputs/x2-xy-line-2/m.toml"
+source = "CC FROZEN.json files[inputs/x2-xy-line-2/m.toml]"
+
+[[row]]
+id = "input:x2-xy-line-2/points.toml"
+role = "input"
+root = "cc"
+path = "inputs/x2-xy-line-2/points.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x2-xy-line-2/transducer.toml"
+role = "input"
+root = "cc"
+path = "inputs/x2-xy-line-2/transducer.toml"
+source = "CC FROZEN.json files[inputs/x2-xy-line-2/transducer.toml]"
+
+[[row]]
+id = "input:x2-xy-line-3/couplings.toml"
+role = "input"
+root = "cc"
+path = "inputs/x2-xy-line-3/couplings.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x2-xy-line-3/m.toml"
+role = "input"
+root = "cc"
+path = "inputs/x2-xy-line-3/m.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x2-xy-line-3/points.toml"
+role = "input"
+root = "cc"
+path = "inputs/x2-xy-line-3/points.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x2-xy-line-3/transducer.toml"
+role = "input"
+root = "cc"
+path = "inputs/x2-xy-line-3/transducer.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x2b-xy/couplings.toml"
+role = "input"
+root = "cc"
+path = "inputs/x2b-xy/couplings.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x2b-xy/m.toml"
+role = "input"
+root = "cc"
+path = "inputs/x2b-xy/m.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x2b-xy/points.toml"
+role = "input"
+root = "cc"
+path = "inputs/x2b-xy/points.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x2b-xy/transducer.toml"
+role = "input"
+root = "cc"
+path = "inputs/x2b-xy/transducer.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x2b-xy-2/couplings.toml"
+role = "input"
+root = "cc"
+path = "inputs/x2b-xy-2/couplings.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x2b-xy-2/m.toml"
+role = "input"
+root = "cc"
+path = "inputs/x2b-xy-2/m.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x2b-xy-2/points.toml"
+role = "input"
+root = "cc"
+path = "inputs/x2b-xy-2/points.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x2b-xy-2/transducer.toml"
+role = "input"
+root = "cc"
+path = "inputs/x2b-xy-2/transducer.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x2b-xy-3/couplings.toml"
+role = "input"
+root = "cc"
+path = "inputs/x2b-xy-3/couplings.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x2b-xy-3/m.toml"
+role = "input"
+root = "cc"
+path = "inputs/x2b-xy-3/m.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x2b-xy-3/points.toml"
+role = "input"
+root = "cc"
+path = "inputs/x2b-xy-3/points.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x2b-xy-3/transducer.toml"
+role = "input"
+root = "cc"
+path = "inputs/x2b-xy-3/transducer.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x2b-xy-4/couplings.toml"
+role = "input"
+root = "cc"
+path = "inputs/x2b-xy-4/couplings.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x2b-xy-4/m.toml"
+role = "input"
+root = "cc"
+path = "inputs/x2b-xy-4/m.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x2b-xy-4/points.toml"
+role = "input"
+root = "cc"
+path = "inputs/x2b-xy-4/points.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x2b-xy-4/transducer.toml"
+role = "input"
+root = "cc"
+path = "inputs/x2b-xy-4/transducer.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x3-clock6/couplings.toml"
+role = "input"
+root = "cc"
+path = "inputs/x3-clock6/couplings.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x3-clock6/m.toml"
+role = "input"
+root = "cc"
+path = "inputs/x3-clock6/m.toml"
+source = "CC FROZEN.json files[inputs/x3-clock6/m.toml]"
+
+[[row]]
+id = "input:x3-clock6/points.toml"
+role = "input"
+root = "cc"
+path = "inputs/x3-clock6/points.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x3-clock6/transducer.toml"
+role = "input"
+root = "cc"
+path = "inputs/x3-clock6/transducer.toml"
+source = "CC FROZEN.json files[inputs/x3-clock6/transducer.toml]"
+
+[[row]]
+id = "input:x3-clock6-2/couplings.toml"
+role = "input"
+root = "cc"
+path = "inputs/x3-clock6-2/couplings.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x3-clock6-2/m.toml"
+role = "input"
+root = "cc"
+path = "inputs/x3-clock6-2/m.toml"
+source = "CC FROZEN.json files[inputs/x3-clock6-2/m.toml]"
+
+[[row]]
+id = "input:x3-clock6-2/points.toml"
+role = "input"
+root = "cc"
+path = "inputs/x3-clock6-2/points.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x3-clock6-2/transducer.toml"
+role = "input"
+root = "cc"
+path = "inputs/x3-clock6-2/transducer.toml"
+source = "CC FROZEN.json files[inputs/x3-clock6-2/transducer.toml]"
+
+[[row]]
+id = "input:x3-clock6-3/couplings.toml"
+role = "input"
+root = "cc"
+path = "inputs/x3-clock6-3/couplings.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x3-clock6-3/m.toml"
+role = "input"
+root = "cc"
+path = "inputs/x3-clock6-3/m.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x3-clock6-3/points.toml"
+role = "input"
+root = "cc"
+path = "inputs/x3-clock6-3/points.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x3-clock6-3/transducer.toml"
+role = "input"
+root = "cc"
+path = "inputs/x3-clock6-3/transducer.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x4-ising-field/couplings.toml"
+role = "input"
+root = "cc"
+path = "inputs/x4-ising-field/couplings.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x4-ising-field/m.toml"
+role = "input"
+root = "cc"
+path = "inputs/x4-ising-field/m.toml"
+source = "CC FROZEN.json files[inputs/x4-ising-field/m.toml]"
+
+[[row]]
+id = "input:x4-ising-field/points.toml"
+role = "input"
+root = "cc"
+path = "inputs/x4-ising-field/points.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x4-ising-field/transducer.toml"
+role = "input"
+root = "cc"
+path = "inputs/x4-ising-field/transducer.toml"
+source = "CC FROZEN.json files[inputs/x4-ising-field/transducer.toml]"
+
+[[row]]
+id = "input:x4-ising-field-2/couplings.toml"
+role = "input"
+root = "cc"
+path = "inputs/x4-ising-field-2/couplings.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x4-ising-field-2/m.toml"
+role = "input"
+root = "cc"
+path = "inputs/x4-ising-field-2/m.toml"
+source = "CC FROZEN.json files[inputs/x4-ising-field-2/m.toml]"
+
+[[row]]
+id = "input:x4-ising-field-2/points.toml"
+role = "input"
+root = "cc"
+path = "inputs/x4-ising-field-2/points.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x4-ising-field-2/transducer.toml"
+role = "input"
+root = "cc"
+path = "inputs/x4-ising-field-2/transducer.toml"
+source = "CC FROZEN.json files[inputs/x4-ising-field-2/transducer.toml]"
+
+[[row]]
+id = "input:x4-ising-field-3/couplings.toml"
+role = "input"
+root = "cc"
+path = "inputs/x4-ising-field-3/couplings.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x4-ising-field-3/m.toml"
+role = "input"
+root = "cc"
+path = "inputs/x4-ising-field-3/m.toml"
+source = "CC FROZEN.json files[inputs/x4-ising-field-3/m.toml]"
+
+[[row]]
+id = "input:x4-ising-field-3/points.toml"
+role = "input"
+root = "cc"
+path = "inputs/x4-ising-field-3/points.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x4-ising-field-3/transducer.toml"
+role = "input"
+root = "cc"
+path = "inputs/x4-ising-field-3/transducer.toml"
+source = "CC FROZEN.json files[inputs/x4-ising-field-3/transducer.toml]"
+
+[[row]]
+id = "input:x4s-stack/couplings.toml"
+role = "input"
+root = "cc"
+path = "inputs/x4s-stack/couplings.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x4s-stack/m.toml"
+role = "input"
+root = "cc"
+path = "inputs/x4s-stack/m.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x4s-stack/points.toml"
+role = "input"
+root = "cc"
+path = "inputs/x4s-stack/points.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x4s-stack/transducer.toml"
+role = "input"
+root = "cc"
+path = "inputs/x4s-stack/transducer.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x5-bilayer/couplings.toml"
+role = "input"
+root = "cc"
+path = "inputs/x5-bilayer/couplings.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x5-bilayer/m.toml"
+role = "input"
+root = "cc"
+path = "inputs/x5-bilayer/m.toml"
+source = "CC FROZEN.json files[inputs/x5-bilayer/m.toml]"
+
+[[row]]
+id = "input:x5-bilayer/points.toml"
+role = "input"
+root = "cc"
+path = "inputs/x5-bilayer/points.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x5-bilayer/transducer.toml"
+role = "input"
+root = "cc"
+path = "inputs/x5-bilayer/transducer.toml"
+source = "CC FROZEN.json files[inputs/x5-bilayer/transducer.toml]"
+
+[[row]]
+id = "input:x5-bilayer-2/couplings.toml"
+role = "input"
+root = "cc"
+path = "inputs/x5-bilayer-2/couplings.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x5-bilayer-2/m.toml"
+role = "input"
+root = "cc"
+path = "inputs/x5-bilayer-2/m.toml"
+source = "CC FROZEN.json files[inputs/x5-bilayer-2/m.toml]"
+
+[[row]]
+id = "input:x5-bilayer-2/points.toml"
+role = "input"
+root = "cc"
+path = "inputs/x5-bilayer-2/points.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x5-bilayer-2/transducer.toml"
+role = "input"
+root = "cc"
+path = "inputs/x5-bilayer-2/transducer.toml"
+source = "CC FROZEN.json files[inputs/x5-bilayer-2/transducer.toml]"
+
+[[row]]
+id = "input:x5n-bilayer/couplings.toml"
+role = "input"
+root = "cc"
+path = "inputs/x5n-bilayer/couplings.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x5n-bilayer/m.toml"
+role = "input"
+root = "cc"
+path = "inputs/x5n-bilayer/m.toml"
+source = "CC FROZEN.json files[inputs/x5n-bilayer/m.toml]"
+
+[[row]]
+id = "input:x5n-bilayer/points.toml"
+role = "input"
+root = "cc"
+path = "inputs/x5n-bilayer/points.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x5n-bilayer/transducer.toml"
+role = "input"
+root = "cc"
+path = "inputs/x5n-bilayer/transducer.toml"
+source = "CC FROZEN.json files[inputs/x5n-bilayer/transducer.toml]"
+
+[[row]]
+id = "input:x5n-bilayer-2/couplings.toml"
+role = "input"
+root = "cc"
+path = "inputs/x5n-bilayer-2/couplings.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x5n-bilayer-2/m.toml"
+role = "input"
+root = "cc"
+path = "inputs/x5n-bilayer-2/m.toml"
+source = "CC FROZEN.json files[inputs/x5n-bilayer-2/m.toml]"
+
+[[row]]
+id = "input:x5n-bilayer-2/points.toml"
+role = "input"
+root = "cc"
+path = "inputs/x5n-bilayer-2/points.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x5n-bilayer-2/transducer.toml"
+role = "input"
+root = "cc"
+path = "inputs/x5n-bilayer-2/transducer.toml"
+source = "CC FROZEN.json files[inputs/x5n-bilayer-2/transducer.toml]"
+
+[[row]]
+id = "input:x5n-bilayer-3/couplings.toml"
+role = "input"
+root = "cc"
+path = "inputs/x5n-bilayer-3/couplings.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x5n-bilayer-3/m.toml"
+role = "input"
+root = "cc"
+path = "inputs/x5n-bilayer-3/m.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x5n-bilayer-3/points.toml"
+role = "input"
+root = "cc"
+path = "inputs/x5n-bilayer-3/points.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x5n-bilayer-3/transducer.toml"
+role = "input"
+root = "cc"
+path = "inputs/x5n-bilayer-3/transducer.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x7a-bc/couplings.toml"
+role = "input"
+root = "cc"
+path = "inputs/x7a-bc/couplings.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x7a-bc/m.toml"
+role = "input"
+root = "cc"
+path = "inputs/x7a-bc/m.toml"
+source = "CC FROZEN.json files[inputs/x7a-bc/m.toml]"
+
+[[row]]
+id = "input:x7a-bc/points.toml"
+role = "input"
+root = "cc"
+path = "inputs/x7a-bc/points.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x7a-bc/transducer.toml"
+role = "input"
+root = "cc"
+path = "inputs/x7a-bc/transducer.toml"
+source = "CC FROZEN.json files[inputs/x7a-bc/transducer.toml]"
+
+[[row]]
+id = "input:x7a-nnn/couplings.toml"
+role = "input"
+root = "cc"
+path = "inputs/x7a-nnn/couplings.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x7a-nnn/m.toml"
+role = "input"
+root = "cc"
+path = "inputs/x7a-nnn/m.toml"
+source = "CC FROZEN.json files[inputs/x7a-nnn/m.toml]"
+
+[[row]]
+id = "input:x7a-nnn/points.toml"
+role = "input"
+root = "cc"
+path = "inputs/x7a-nnn/points.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x7a-nnn/transducer.toml"
+role = "input"
+root = "cc"
+path = "inputs/x7a-nnn/transducer.toml"
+source = "CC FROZEN.json files[inputs/x7a-nnn/transducer.toml]"
+
+[[row]]
+id = "input:x8-ising-needle/couplings.toml"
+role = "input"
+root = "cc"
+path = "inputs/x8-ising-needle/couplings.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x8-ising-needle/m.toml"
+role = "input"
+root = "cc"
+path = "inputs/x8-ising-needle/m.toml"
+source = "CC FROZEN.json files[inputs/x8-ising-needle/m.toml]"
+
+[[row]]
+id = "input:x8-ising-needle/points.toml"
+role = "input"
+root = "cc"
+path = "inputs/x8-ising-needle/points.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x8-ising-needle/transducer.toml"
+role = "input"
+root = "cc"
+path = "inputs/x8-ising-needle/transducer.toml"
+source = "CC FROZEN.json files[inputs/x8-ising-needle/transducer.toml]"
+
+[[row]]
+id = "input:x9c-potts/couplings.toml"
+role = "input"
+root = "cc"
+path = "inputs/x9c-potts/couplings.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x9c-potts/m.toml"
+role = "input"
+root = "cc"
+path = "inputs/x9c-potts/m.toml"
+source = "CC FROZEN.json files[inputs/x9c-potts/m.toml]"
+
+[[row]]
+id = "input:x9c-potts/points.toml"
+role = "input"
+root = "cc"
+path = "inputs/x9c-potts/points.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x9c-potts/transducer.toml"
+role = "input"
+root = "cc"
+path = "inputs/x9c-potts/transducer.toml"
+source = "CC FROZEN.json files[inputs/x9c-potts/transducer.toml]"
+
+[[row]]
+id = "input:x9c-potts-2/couplings.toml"
+role = "input"
+root = "cc"
+path = "inputs/x9c-potts-2/couplings.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x9c-potts-2/m.toml"
+role = "input"
+root = "cc"
+path = "inputs/x9c-potts-2/m.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x9c-potts-2/points.toml"
+role = "input"
+root = "cc"
+path = "inputs/x9c-potts-2/points.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[row]]
+id = "input:x9c-potts-2/transducer.toml"
+role = "input"
+root = "cc"
+path = "inputs/x9c-potts-2/transducer.toml"
+source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
+
+[[set]]
+id = "M1-AT"
+role = "map"
+root = "data"
+path = "nav2-bank/M1"
+listed_by = "MANIFEST.tsv"
+extra = ["VERIFY-m40.txt"]
+source = "toolset data/nav2-bank/M1/MANIFEST.tsv (producer sha256 per file; chains 0-39, 19840 files) and VERIFY-m40.txt"
+
+[[set]]
+id = "M7-grid"
+role = "map"
+root = "data"
+path = "nav-m7-grid"
+listed_by = "MANIFEST.json"
+extra = []
+source = "toolset data/nav-m7-grid/MANIFEST.json (producer sha256 per file)"
+
+[[set]]
+id = "M7-bank"
+role = "map"
+root = "data"
+path = "nav-m7-bank"
+listed_by = "MANIFEST.json"
+extra = []
+source = "toolset data/nav-m7-bank/MANIFEST.json (producer sha256 per file)"
