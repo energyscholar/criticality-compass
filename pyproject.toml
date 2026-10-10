@@ -15,6 +15,7 @@ readme = "README.md"
 
 [project.optional-dependencies]
 kernel = ["criticality-compass-kernel"]  # the kernel_rs wheel, built from rust/ by maturin (`maturin build --release -m rust/Cargo.toml`); not on any index, so this extra is declared, not downloadable; README "The Rust kernel"
+test = ["scipy"]  # the test suite imports only numpy (runtime), the standard library and this repository; scipy is declared here for the test environment (queue S6.7). With the kernel: `pip install -e .[test,kernel]`
 
 [project.scripts]
 compass = "criticality_compass:main"   # never `cc`: it is the C compiler, and Rust links with it (seen red, memo section 2.3)

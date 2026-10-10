@@ -47,7 +47,7 @@ Other ways to install:
 
 ## The Rust kernel (optional)
 
-Measurement runs the Python `cc/kernel.py`, which is the reference. The Rust kernel (`kernel_rs`, the pinned `abr-kernel`) is used only by the tests `test_kernel_rs` and `test_kernel_rs_bitwise`, which check that it equals the Python one. It is the optional extra `kernel` (`pip install -e '.[kernel]'`), distribution `criticality-compass-kernel`, which is **not on any package index**: build the wheel yourself.
+Measurement runs the Python `cc/kernel.py`, which is the reference. The Rust kernel (`kernel_rs`, the pinned `abr-kernel`) is used only by the tests `test_kernel_rs` and `test_kernel_rs_bitwise`, which check that it equals the Python one. It is the optional extra `kernel` (`pip install -e '.[kernel]'`; the test environment is `pip install -e .[test,kernel]`), distribution `criticality-compass-kernel`, which is **not on any package index**: build the wheel yourself.
 
 ```
 $ pip install maturin
@@ -236,6 +236,8 @@ bin/cc check
 runs `validate`, every test and the scoreboard, and takes several minutes (about seven). In a fresh clone, run
 `git config core.hooksPath .githooks` once, so that a quicker version of the same check runs for you before
 every commit.
+
+The tests need the test extra, and two of them the kernel wheel: `pip install -e .[test,kernel]` (the kernel wheel is built by hand, see "The Rust kernel").
 
 ## Adding a case
 
