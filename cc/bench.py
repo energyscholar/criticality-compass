@@ -52,6 +52,8 @@ def load_rows(path):
 
 def _listed(root_dir, s):
     """File names (relative to the set's dir) that the producer's own manifest names."""
+    if "files" in s:   # the set names its files itself (inputs with no producer manifest); still explicit, never a glob
+        return list(s.get("extra", [])) + list(s["files"])
     lst = root_dir / s["path"] / s["listed_by"]
     if not lst.is_file():
         raise Refused(f"set '{s['id']}': the producer list {lst} is absent, so the rows cannot be named")
@@ -83,16 +85,28 @@ def set_identity(entries):
     return hashlib.sha256("".join(lines).encode()).hexdigest()
 
 
-def generate(rows_path, out_path, roots):
+def generate(rows_path, out_path, roots, extend=False):
+    """extend=True: the entries already in out_path are carried VERBATIM (not re-hashed: their bytes may live on another host); only rows whose id
+    is not yet in it are hashed. A carried entry must still be a declared row, so a row removed from ROWS.toml is refused, never silently dropped."""
     rows = load_rows(rows_path)
     planned = expand(rows, roots)
-    absent = [p for p in planned if not (roots[p[3]] / p[4]).is_file()]
+    old = load_manifest(out_path) if extend else {"entry": [], "set": []}
+    have = {e["id"]: e for e in old["entry"]}
+    gone = sorted(set(have) - {p[1] for p in planned})
+    if gone:
+        raise Refused(f"--extend: {len(gone)} manifest entries are no longer declared rows (first: {gone[0]}). Nothing written.")
+    absent = [p for p in planned if p[1] not in have and not (roots[p[3]] / p[4]).is_file()]
     if absent:
         raise Refused(f"{len(absent)} declared rows have no bytes under their root; first: " + ", ".join(f"{a[3]}:{a[4]}" for a in absent[:5]) + ". Nothing written.")
     entries, bysets = [], {}
     for sid, i, role, root, path, source in planned:
-        h, n = sha_of(roots[root] / path)
-        e = dict(id=i, role=role, root=root, path=path, sha256=h, bytes=n, source=source)
+        if i in have:
+            e = have[i]
+            if (e["role"], e["root"], e["path"], e["source"]) != (role, root, path, source):
+                raise Refused(f"--extend: declared row '{i}' differs from the carried entry in role/root/path/source. Nothing written.")
+        else:
+            h, n = sha_of(roots[root] / path)
+            e = dict(id=i, role=role, root=root, path=path, sha256=h, bytes=n, source=source)
         entries.append(e)
         if sid:
             bysets.setdefault(sid, []).append(e)
@@ -150,11 +164,11 @@ def verify(manifest_path, roots):
 
 def main(args, roots, repo):
     if not args or args[0] not in ("gen", "verify"):
-        print("usage: bin/cc [--data-root DIR] bench gen | verify\n  Next: bench gen builds benchmark/MANIFEST.toml from benchmark/ROWS.toml; bench verify re-hashes every entry")
+        print("usage: bin/cc [--data-root DIR] bench gen [--extend] | verify\n  Next: bench gen builds benchmark/MANIFEST.toml from benchmark/ROWS.toml; bench verify re-hashes every entry")
         return 1
     try:
         if args[0] == "gen":
-            n, s = generate(repo / "benchmark/ROWS.toml", repo / "benchmark/MANIFEST.toml", roots)
+            n, s = generate(repo / "benchmark/ROWS.toml", repo / "benchmark/MANIFEST.toml", roots, extend="--extend" in args[1:])
             print(f"wrote benchmark/MANIFEST.toml: {n} entries, {s} sets")
             return 0
         bad = verify(repo / "benchmark/MANIFEST.toml", roots)

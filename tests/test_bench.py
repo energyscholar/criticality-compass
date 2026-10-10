@@ -74,6 +74,38 @@ try:
 finally:
     shutil.rmtree(tmp, ignore_errors=True)
 
+# plan 0932 P2/E7: a set that names its files itself (files = [...]) and gen --extend (carry verbatim, hash only the new)
+tmp = Path(tempfile.mkdtemp())
+try:
+    cc, dr = tmp / "cc", tmp / "data"
+    (cc / "cases").mkdir(parents=True)
+    (dr / "inp").mkdir(parents=True)
+    (cc / "cases/x.toml").write_text("a = 1\n")
+    for nm in ("a.npz", "b.npz"):
+        (dr / "inp" / nm).write_bytes(nm.encode() * 50)
+    hdr = 'schema = 1\nroles = ["map", "input", "truth", "prediction"]\n'
+    row = '[[row]]\nid = "case:x"\nrole = "truth"\nroot = "cc"\npath = "cases/x.toml"\nsource = "t"\n'
+    setf = '[[set]]\nid = "I"\nrole = "input"\nroot = "data"\npath = "inp"\nfiles = ["a.npz", "b.npz"]\nextra = []\nsource = "t"\n'
+    rows, man, roots = tmp / "ROWS.toml", tmp / "MANIFEST.toml", {"cc": cc, "data": dr}
+    rows.write_text(hdr + row)
+    bench.generate(rows, man, roots)
+    rows.write_text(hdr + row + setf)
+    n, s = bench.generate(rows, man, roots, extend=True)
+    check("files-set: --extend adds the 2 named files to the 1 carried entry", (n, s) == (3, 1), f"{(n, s)}")
+    check("files-set verifies", bench.verify(man, roots) == [])
+    (dr / "inp/b.npz").unlink()
+    r = bench.verify(man, roots)
+    check("E7 RED: a data root missing one input file -> an ABSENT line naming it", len(r) == 1 and r[0].startswith("ABSENT") and "inp/b.npz" in r[0], str(r))
+    (dr / "inp/b.npz").write_bytes(b"b.npz" * 50)
+    (cc / "cases/x.toml").write_text("a = 2\n")    # the carried entry's bytes changed: --extend must NOT re-hash it
+    bench.generate(rows, man, roots, extend=True)
+    check("--extend: the changed carried file is still a MISMATCH", any(x.startswith("MISMATCH") and "case:x" in x for x in bench.verify(man, roots)))
+    rows.write_text(hdr + setf)   # case:x no longer declared
+    msg = refused(bench.generate, rows, man, roots, True)
+    check("--extend refuses when a carried entry is no longer a declared row", msg is not None and "case:x" in msg, str(msg))
+finally:
+    shutil.rmtree(tmp, ignore_errors=True)
+
 # identity: real CC-side rows vs FROZEN.json
 fz = json.load(open(ROOT / "FROZEN.json"))["files"]
 real = bench.load_rows(ROOT / "benchmark/ROWS.toml")

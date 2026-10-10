@@ -4,7 +4,7 @@ schema = 1
 roles = ["map", "input", "truth", "prediction"]
 fields = ["id", "role", "root", "path", "sha256", "bytes", "source"]
 recipe = "set identity = sha256 of the sorted lines \"<path>\\t<sha256>\\t<bytes>\\n\" of its entries (path as in the manifest)"
-rows_sha256 = "04980c8af23155ba5c0834d781f0ec005972aef46bbc5ec31d8e5efb52860ad5"
+rows_sha256 = "2b5eb8809eb60d67eaba0f8c53d52dcc8b2ebfe3cec98aaec0575dd9ea173861"
 
 [[set]]
 id = "M1-AT"
@@ -32,6 +32,24 @@ path = "nav-m7-bank"
 n = 497
 sha256 = "bccd594128bfdb11076a4d4fc9e5a9f3073499c8b7de0d19175145570bb03a1a"
 source = "toolset data/nav-m7-bank/MANIFEST.json (producer sha256 per file)"
+
+[[set]]
+id = "E7-inputs-k4m1"
+role = "input"
+root = "data"
+path = "k4m1"
+n = 102
+sha256 = "40b3a0f9d80d2a6ef7dfd56771789be967ed0bdefa58a23c80dd1dea93f567e3"
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[set]]
+id = "E7-inputs-real-f1"
+role = "input"
+root = "data"
+path = "real-f1/unz"
+n = 82
+sha256 = "0f8d9f53b3391d47f2168daab40a209b80fc256925b1ec8c3db8f09c7465f318"
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
 
 [[entry]]
 id = "case:ar1-null"
@@ -189086,3 +189104,1659 @@ path = "nav-m7-bank/h10.00-T1.200-L27.npz"
 sha256 = "25e0bc8f6ecb517b490e2be646749e64e00fefca85eddf86d8d3068db4d23e3d"
 bytes = 1539568
 source = "toolset data/nav-m7-bank/MANIFEST.json (producer sha256 per file)"
+
+[[entry]]
+id = "k4m1/T0.30-L243-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.30-L243-ordered.npz"
+sha256 = "9f4eb849c32b479d9271de52f9b064177125d1092a3976ca6d20d5ac020ad778"
+bytes = 2816974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.30-L243-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.30-L243-random.npz"
+sha256 = "c7482fad6c4129ca0442a5ab602ed943dd312fe389adfa88daf4540c7e73af7c"
+bytes = 17600974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.30-L27-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.30-L27-ordered.npz"
+sha256 = "f76933b116f76d407308967b4257c891bb019eaf4676c000abb5e56b079f4dfb"
+bytes = 2304974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.30-L27-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.30-L27-random.npz"
+sha256 = "94af061a2c83214d17527cc9f3228669ee90e673723e73a1d056bdf9afff04f7"
+bytes = 14400974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.30-L81-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.30-L81-ordered.npz"
+sha256 = "fe324cbd61624814fd84c840f8c474de6bfd297eff8b78e2a0344e7efc76a1dc"
+bytes = 2560974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.30-L81-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.30-L81-random.npz"
+sha256 = "193349c62fcc70439f10146fde971e18a62469c89c0ea0b499a8941683fa2058"
+bytes = 16000974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.35-L243-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.35-L243-ordered.npz"
+sha256 = "65846fec875818c584e50afccd1b2ef93d4e7640cf7e1f1ef0efe95b6d4cebab"
+bytes = 2816974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.35-L243-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.35-L243-random.npz"
+sha256 = "9cea779021215d1a7157c4963190877e94abd4d6507a4895984f484856640a99"
+bytes = 17600974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.35-L27-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.35-L27-ordered.npz"
+sha256 = "9dfe421563a572b5740ea3679d404b0eeb5d8db888e8638316b65424e7521a18"
+bytes = 2304974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.35-L27-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.35-L27-random.npz"
+sha256 = "0f0c1aed7c0faf2682982640c16b870cf97be7c5048f76c2ea7124ea5eebbab1"
+bytes = 14400974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.35-L81-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.35-L81-ordered.npz"
+sha256 = "f5e8d567585457b18cd164c06a65464fdfe8dfd6f58d4e0d4be1925bf65a2586"
+bytes = 2560974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.35-L81-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.35-L81-random.npz"
+sha256 = "5147cf50442bf7f6c94ece679fcfb61a823016c305e462441b6d0fa80dc07f71"
+bytes = 16000974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.40-L243-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.40-L243-ordered.npz"
+sha256 = "c7ba1ec0beffc680ccd55cc91d961740b2726472423a13f2581388a5a9bd3123"
+bytes = 2816974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.40-L243-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.40-L243-random.npz"
+sha256 = "eadbc240c873693c99649d7f823d2f8fdf649b875f14c7eadf1f58010f1c4701"
+bytes = 17600974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.40-L27-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.40-L27-ordered.npz"
+sha256 = "f56bfb314489fcf44e7f9c941653270aa0953d06747f22b2763b30d1eeac043c"
+bytes = 2304974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.40-L27-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.40-L27-random.npz"
+sha256 = "d24ba1b14cad8aa346ff84d58c2dd6457e6fded4f212b5259567ed1690db4789"
+bytes = 14400974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.40-L81-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.40-L81-ordered.npz"
+sha256 = "760e9e3bd47cc0bc0711e8b08e7c02a166f840b4bfbaf747f8bd39eb0a5dcdf8"
+bytes = 2560974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.40-L81-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.40-L81-random.npz"
+sha256 = "9ef822591120672de175141a35418b0896cbd3b8866e9c3f52b554e83abcaece"
+bytes = 16000974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.45-L243-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.45-L243-ordered.npz"
+sha256 = "eed415de5ba1846752fa494536134d5e480d26234c75e39dee0eb89f7bf5def7"
+bytes = 2816974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.45-L243-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.45-L243-random.npz"
+sha256 = "3bf2b29a21c7da9daa54e4051b1a582e9fef7426af0378169ccf79bc2d3fa96c"
+bytes = 17600974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.45-L27-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.45-L27-ordered.npz"
+sha256 = "7e357b0f6a46f612f1d25001bb06996fbac95c74626608a6b360af97397ab5df"
+bytes = 2304974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.45-L27-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.45-L27-random.npz"
+sha256 = "01989020890e1b97c94670ea14736ec7bd8ef5b2bed8a3018611f42fdc812f33"
+bytes = 14400974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.45-L81-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.45-L81-ordered.npz"
+sha256 = "89adff369c610a1b2fb84cbc74c1a5d9988a2668840119877370da0ce8abf9ae"
+bytes = 2560974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.45-L81-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.45-L81-random.npz"
+sha256 = "8bcc295e7d94fad8d6fdc1a28777159c9eaf114cc8f8e8d52b5f469de090e96d"
+bytes = 16000974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.50-L243-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.50-L243-ordered.npz"
+sha256 = "3202477ff206c2b318fe80bcdb07b03c065d363bb830b5e1c4bfbac31bc0b014"
+bytes = 2816974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.50-L243-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.50-L243-random.npz"
+sha256 = "a4eb06aa506b05ee2004779b6699fd74ec8690b4243ed66910cf8439e33c0a4b"
+bytes = 17600974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.50-L27-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.50-L27-ordered.npz"
+sha256 = "d93cc2516f1d96b647e606f987461f975ab4882585b7e5b6554d28d081f0b457"
+bytes = 2304974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.50-L27-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.50-L27-random.npz"
+sha256 = "e32bf0a846dabab67267d2eae7390e21a6ce63bfa05dd4f57e4bf77ea6db0baf"
+bytes = 14400974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.50-L81-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.50-L81-ordered.npz"
+sha256 = "a771562fbf06edc50414c5dfecc2d332440a330b753bc30ce538eb38c564af3a"
+bytes = 2560974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.50-L81-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.50-L81-random.npz"
+sha256 = "76d6e9a458782b21f98141efbf85d32bcd8f5fa57dfdf3cc9bdf423999fed681"
+bytes = 16000974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.55-L243-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.55-L243-ordered.npz"
+sha256 = "c96f0f0e666afc6d51a4e12db98c96a917bec761726287359379918d0218c673"
+bytes = 2816974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.55-L243-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.55-L243-random.npz"
+sha256 = "afe0cdd2ebf4054bb0854b3e06792dc58ad30549c9ffd481e2e14a26e7fdbb75"
+bytes = 17600974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.55-L27-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.55-L27-ordered.npz"
+sha256 = "eaba3f6147c812d6212aa9503a0fd54c38522286273bc42ab53e4eaa82486651"
+bytes = 2304974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.55-L27-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.55-L27-random.npz"
+sha256 = "ed1e76d1bcf7d52cdf121d783149c2e849a5fe1912386a5c5fed576f2764a7de"
+bytes = 14400974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.55-L81-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.55-L81-ordered.npz"
+sha256 = "53859844ee9a70ee3140f2b6d23f064ee720095b66631a1ee00fed3407ed536a"
+bytes = 2560974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.55-L81-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.55-L81-random.npz"
+sha256 = "8c53a5415a5c30d555ee14707865aa961d665b33429e38c1e15ff4da7f1ed277"
+bytes = 16000974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.60-L243-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.60-L243-ordered.npz"
+sha256 = "b416907748abe962f6c674ff7b1d83560b3db2cb2487dcb36b57579e0c6a98ae"
+bytes = 2816974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.60-L243-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.60-L243-random.npz"
+sha256 = "a5ded1749b52e1420472aedbf933b75b7a98ee0ccba561be7d4fffeca3e5c568"
+bytes = 17600974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.60-L27-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.60-L27-ordered.npz"
+sha256 = "214e88232207c718cbf3b5b22a57b69506c6cdafdcb8fb88084c798186badb96"
+bytes = 2304974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.60-L27-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.60-L27-random.npz"
+sha256 = "33a418013dc0c2b5b15bd001f1b39b62c14f2ce6302975eb75449a50b4655a15"
+bytes = 14400974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.60-L81-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.60-L81-ordered.npz"
+sha256 = "1fc5b8804321d2dabd3746ebabb4d07ea13c85a53bc06677274d89c7278fc005"
+bytes = 2560974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.60-L81-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.60-L81-random.npz"
+sha256 = "1c5451146c084f19a1eb96b867b461c2c891896aeb6df5f9b6301d8d567af4f1"
+bytes = 16000974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.65-L243-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.65-L243-ordered.npz"
+sha256 = "3a30797f6ef416ac125769a006a35b65e35d24e543d3068975da7ee21130aed2"
+bytes = 2816974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.65-L243-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.65-L243-random.npz"
+sha256 = "ce743bfb2ababcb833eecd85da3ec24012ed9d8bf463f8a5dd2f52249a01f44b"
+bytes = 17600974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.65-L27-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.65-L27-ordered.npz"
+sha256 = "0ba5fe92a1af75b0337807f7f51e4d8cb29cf196cc837c58f7e0f55ef1762826"
+bytes = 2304974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.65-L27-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.65-L27-random.npz"
+sha256 = "34f911b0af079e9dcdb078b199364305205212f74ed51fa56877521cd9c2f47f"
+bytes = 14400974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.65-L81-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.65-L81-ordered.npz"
+sha256 = "36b525728edf2fd87db0e0bcd9778d4e65faabe8dd7d16b5dc43bdb83f87d4b6"
+bytes = 2560974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.65-L81-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.65-L81-random.npz"
+sha256 = "f077bb0d7231aa9c7fe44788a462e0ad9fecd08c77ce3e6795d02ccb74dbd963"
+bytes = 16000974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.70-L243-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.70-L243-ordered.npz"
+sha256 = "b49e5a9ef7dda6604693a33c3384cf5794611b6d489c344b38dc83f490385dd7"
+bytes = 2816974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.70-L243-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.70-L243-random.npz"
+sha256 = "9d5036892ce773f419e8e0b7aaa59b1e0b2621b2fe0b2ae07bceed1528166e76"
+bytes = 17600974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.70-L27-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.70-L27-ordered.npz"
+sha256 = "d31c2c58062e335c96c0ac41c71736dfc9ca331723b18390beb93107b21ebbb1"
+bytes = 2304974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.70-L27-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.70-L27-random.npz"
+sha256 = "5c4ba5f772bc2701322632341cec3b213b9216cf721362b7536788f9926d561e"
+bytes = 14400974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.70-L81-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.70-L81-ordered.npz"
+sha256 = "0a3b5d137660df7f17f0055f7a8b9f4a078ad51553065b09b69e633a1e008c0a"
+bytes = 2560974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.70-L81-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.70-L81-random.npz"
+sha256 = "24e8319c79a46cc9c9888837c82763a5c214dea257094df018f4934d6d852bf7"
+bytes = 16000974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.75-L243-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.75-L243-ordered.npz"
+sha256 = "1dae109dbd09171ba5a82b279825cfe0fc554d4d6aecc07fbb1e18847069b2c0"
+bytes = 2816974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.75-L243-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.75-L243-random.npz"
+sha256 = "9048a37bbeb82cb2349e8b8b170b568d1a32d32192977f03a0c28f1ea727936d"
+bytes = 17600974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.75-L27-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.75-L27-ordered.npz"
+sha256 = "261f6df1e7652d99e2c77d7f80de2c419a05bafb669d68a420189371fe52fcd6"
+bytes = 2304974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.75-L27-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.75-L27-random.npz"
+sha256 = "ed54c4c1ee55d36fd73f8907b078529cb483dca01e5d1da3b02c32bcbe29c2d2"
+bytes = 14400974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.75-L81-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.75-L81-ordered.npz"
+sha256 = "2d019652a357f569c4b5719206e7c7c3b221918f82e889b6e0d1f80dec89872b"
+bytes = 2560974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.75-L81-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.75-L81-random.npz"
+sha256 = "57d798b89377f68a3967ccea7e582b89443a66e610d814e1e116bc9d1621dffc"
+bytes = 16000974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.80-L243-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.80-L243-ordered.npz"
+sha256 = "3a412e7b813adfd93549a1e9401549bc9315d53b8f250373b250db972e73f2e7"
+bytes = 2816974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.80-L243-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.80-L243-random.npz"
+sha256 = "8c2cb5e891a5b18f0751a99471ec6263ccef57a2990efcf0f6d79729f2f4dd95"
+bytes = 17600974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.80-L27-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.80-L27-ordered.npz"
+sha256 = "e6c38991766ddf8bc4079c88fb69d9d835fdb9cf7159ce21f45697313cb836cc"
+bytes = 2304974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.80-L27-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.80-L27-random.npz"
+sha256 = "49192ebd0c58a2cd6b22bce62dda2fcd26f1af0c65494524e5fcbcba4d66f3e2"
+bytes = 14400974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.80-L81-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.80-L81-ordered.npz"
+sha256 = "0d82e0a609678dede2ff62e0904e51d5cfe2f9ba54fb26655d3e553da9886a5f"
+bytes = 2560974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.80-L81-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.80-L81-random.npz"
+sha256 = "aa1f4df6e433be1db28aa4bbb54b659609f3f1664eecaf45c5d101ea7cf67134"
+bytes = 16000974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.85-L243-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.85-L243-ordered.npz"
+sha256 = "f3d37a5822eb5ff749b4a19f08a4828056629eb5f0a70f8feca619c2ed758468"
+bytes = 2816974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.85-L243-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.85-L243-random.npz"
+sha256 = "80dde08351b0efd2b103baea0e90a56dd42e89d6d7af1a2b72ee321a8131d754"
+bytes = 17600974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.85-L27-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.85-L27-ordered.npz"
+sha256 = "5df314f490b3de6e873a7365a5cd07f9db05bef9c60b69b0bbc0cc0674a20a94"
+bytes = 2304974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.85-L27-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.85-L27-random.npz"
+sha256 = "18953a866cd3aaca393aeb91c91f0e9b2595a1597530632f7f6d096af5708c8f"
+bytes = 14400974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.85-L81-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.85-L81-ordered.npz"
+sha256 = "7a66c2d0737a581adc04362b4ab82f1e0c9524e7c67316d289af3b95b4f54322"
+bytes = 2560974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.85-L81-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.85-L81-random.npz"
+sha256 = "21c25e408d632a4906bb53b7126c23137b123c1e39fdb6c0c9c4a95c5055b009"
+bytes = 16000974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.90-L243-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.90-L243-ordered.npz"
+sha256 = "2691c16464ed10948f78c078f3b5da9801eea2a4d82e7b23d9bf99009730009c"
+bytes = 2816974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.90-L243-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.90-L243-random.npz"
+sha256 = "ca8ba86dba3da27da7dd9fa684f5d609676e083a2298dd212c3b600c092a8b05"
+bytes = 17600974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.90-L27-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.90-L27-ordered.npz"
+sha256 = "4516d4e9d875ab53378db8a5c04dc618921f0cd327a3415a0a20a4417a920bc5"
+bytes = 2304974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.90-L27-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.90-L27-random.npz"
+sha256 = "e24d3b64fbe2aea20fd80316c23b9a88ad54e2ce96771e100f4645e80ae54351"
+bytes = 14400974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.90-L81-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.90-L81-ordered.npz"
+sha256 = "b3629cad5422f214b5a2f3d93d41ca9e22e6bcbbdc9eaeb46d824eb6e80e1db7"
+bytes = 2560974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.90-L81-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.90-L81-random.npz"
+sha256 = "3724510a7b71ea812118932fa8a3513e864800d806d0f5a8faffe28e51df2353"
+bytes = 16000974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.95-L243-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.95-L243-ordered.npz"
+sha256 = "586bd70459a43c5f6f474f88b1a3fcc97be0c8b13671e1dd1e465332657aecb0"
+bytes = 2816974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.95-L243-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.95-L243-random.npz"
+sha256 = "e4da6163a353e33eb8e03b8eb23f7e01c3434c7b0f9f2c31b19ddf659bbd3a9c"
+bytes = 17600974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.95-L27-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.95-L27-ordered.npz"
+sha256 = "5831b7abcadec427d836f19d75883b48a74880f5b5b7f9781068c66a6779612b"
+bytes = 2304974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.95-L27-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.95-L27-random.npz"
+sha256 = "1fa49a967e5b46352ea4ec9945382defcb82a36338b3fb7e2c80cd06851c3ba1"
+bytes = 14400974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.95-L81-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.95-L81-ordered.npz"
+sha256 = "69dd0b2b8b378908388f85394ea2a15dc6e9be156be1407bf651f3ee45040ec8"
+bytes = 2560974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T0.95-L81-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T0.95-L81-random.npz"
+sha256 = "1304b875b81435d79d3cac4ead136c2bd8a2d5eedb2a2de3009b462b5a29a9d3"
+bytes = 16000974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T1.00-L243-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T1.00-L243-ordered.npz"
+sha256 = "3f70ac54bd66d4f942972a96e5e96e04da0c935c8853528be2b664900aa068b9"
+bytes = 2816974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T1.00-L243-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T1.00-L243-random.npz"
+sha256 = "26b5f14c63c7d2724c70b66062cc8b9a448be5c648fe8c9ecbf28897a590795d"
+bytes = 17600974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T1.00-L27-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T1.00-L27-ordered.npz"
+sha256 = "1556d66036ab981b9542a3d7bf9bae9a1f922ae38be73d99b5e1cd619ea5148c"
+bytes = 2304974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T1.00-L27-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T1.00-L27-random.npz"
+sha256 = "7e6fd24c5e8b980514b40d1ef3900eebc49a2ed6ebe2dbfbffff89562cbdff4e"
+bytes = 14400974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T1.00-L81-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T1.00-L81-ordered.npz"
+sha256 = "7a291ce32646b3926d52a574192cfe60f5f12d89064f32206b5ad3e99bb35b40"
+bytes = 2560974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T1.00-L81-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T1.00-L81-random.npz"
+sha256 = "8e7ef51f20ed98758ded551b7ff15568c4458f9eb930d7209c2d99334299f51f"
+bytes = 16000974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T1.05-L243-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T1.05-L243-ordered.npz"
+sha256 = "d53ad6d9b4d98a5108332a29f489d87262fcbcc6ea74b1216e6f2229a17d4080"
+bytes = 2816974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T1.05-L243-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T1.05-L243-random.npz"
+sha256 = "22080af6db4d854d33ff67d482ee50ba58707b0687b6bf1adf375d1da8ef57ee"
+bytes = 17600974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T1.05-L27-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T1.05-L27-ordered.npz"
+sha256 = "b9c9a109d80abd6cd4d35250423e9b56de3dd1381e548a62e7ec884e20b0f058"
+bytes = 2304974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T1.05-L27-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T1.05-L27-random.npz"
+sha256 = "d2e50149988b98314a37b0b3fe068d9635227ca4fc1587f09607348783a98f74"
+bytes = 14400974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T1.05-L81-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T1.05-L81-ordered.npz"
+sha256 = "7939068802a7d673da3b2862121fced65d5249a7fb75071ba58bfeb6eb0b13d7"
+bytes = 2560974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T1.05-L81-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T1.05-L81-random.npz"
+sha256 = "6638fa51e187079d95eeea14a00233f0f7a35bf0ddb5e2fe767774f74408facc"
+bytes = 16000974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T1.10-L243-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T1.10-L243-ordered.npz"
+sha256 = "14fa0214299966b5e89a8fdd939e41083c7444bcb26572c25179ee5f35be1663"
+bytes = 2816974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T1.10-L243-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T1.10-L243-random.npz"
+sha256 = "4537510376123534b5777a4c8cf23248688dee5c0f531139044510786d3f46dd"
+bytes = 17600974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T1.10-L27-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T1.10-L27-ordered.npz"
+sha256 = "ec55d25fffcd16d07901c5b48c9dfaa02f47b88f89539f79a9e05a35bf000f6e"
+bytes = 2304974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T1.10-L27-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T1.10-L27-random.npz"
+sha256 = "91fad545c05133ce5417fa5605a24ce125b55d8e5c315cc0e51ad85eb5b1bbfc"
+bytes = 14400974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T1.10-L81-ordered.npz"
+role = "input"
+root = "data"
+path = "k4m1/T1.10-L81-ordered.npz"
+sha256 = "dfa0577e03154fd6444786994c2b091bfa5244b94a0b6f62ffaf074bc12b7498"
+bytes = 2560974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "k4m1/T1.10-L81-random.npz"
+role = "input"
+root = "data"
+path = "k4m1/T1.10-L81-random.npz"
+sha256 = "9815764b0f46f32c9fd483b539b6ac2b249d72b1d926f92aa22b54b82ca4877a"
+bytes = 16000974
+source = "toolset data/k4m1 - the 102 files named by results/k4-m1@v08-rules.json read{} (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/README_Cp_data.txt"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/README_Cp_data.txt"
+sha256 = "fa6b864521350a4cf26e32cf58be05c00a66b9519c341c8974de94d78dde22a2"
+bytes = 6354
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_0kbar_0T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_0kbar_0T.dat"
+sha256 = "e706f4e2897ab59e325189f93a0ce3e703f03f58d225b2de9ac5b4d84087b160"
+bytes = 5310
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_15kbar_0T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_15kbar_0T.dat"
+sha256 = "6e85e2f5ba3c286aec55330df54df2a2a80b2310ff0b584fb4fd7e915ff4abc3"
+bytes = 5843
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_16p5kbar_0T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_16p5kbar_0T.dat"
+sha256 = "5cf0144850e00e59ff80e9d2199b918ba24594c15a4388dcdc63c1361008534e"
+bytes = 3483
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_18p2kbar_0T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_18p2kbar_0T.dat"
+sha256 = "d808f1b6d6abdc324a85c20fd0b0e734b9f18848781a8abf3301cffb45dd864e"
+bytes = 1385
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_18p2kbar_2p5T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_18p2kbar_2p5T.dat"
+sha256 = "b382432508bd2db1596e635bab333459f3ae6682401a7877c5aaccf094fb36e1"
+bytes = 1355
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_18p2kbar_5T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_18p2kbar_5T.dat"
+sha256 = "4c09f20eedc352f269826b4bfae3bd2f02f07dcadde3d9cd124508cac7c8747a"
+bytes = 1862
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_18p2kbar_9T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_18p2kbar_9T.dat"
+sha256 = "b63ca0d3a4c65e6a66ea449f80ad10faf514ec51cd863c5243a005cde21815d2"
+bytes = 1470
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_20kbar_0T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_20kbar_0T.dat"
+sha256 = "85dd65639b1983d0daf56eb19a06e086de8a5bc5c6516a53115f77f87b229b32"
+bytes = 4164
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_20kbar_3T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_20kbar_3T.dat"
+sha256 = "892cd89b71c4c37c3199a0b2748b008f6c0f3646f09384384fd93bbb6b5c1ef7"
+bytes = 1983
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_20kbar_4T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_20kbar_4T.dat"
+sha256 = "5ca7751f9096e195d0dcca9afc2f1d555cffb6409ba146d7ed8d9c5946e1df89"
+bytes = 3378
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_20kbar_5p5T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_20kbar_5p5T.dat"
+sha256 = "e655231910b5339a6b3ac3f06c0f1d6b3d5086e0e3ebd9da528d83bef6b0d22a"
+bytes = 2102
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_20kbar_5p7T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_20kbar_5p7T.dat"
+sha256 = "c7350071725040527755b244a0c220d11afd8f05528a36581f146b06c091c474"
+bytes = 2616
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_20kbar_6T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_20kbar_6T.dat"
+sha256 = "ce0cd8ab3f9524cff4bed1e853f6a5880555ca4a4849358720a46e9b05bc4d98"
+bytes = 2400
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_20kbar_6p2T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_20kbar_6p2T.dat"
+sha256 = "5a2e1391f77025749e2ad5f3d6d6e9d2ce3e67481f9bbd4e530cfa6d2dfbf0fa"
+bytes = 1970
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_20kbar_6p5T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_20kbar_6p5T.dat"
+sha256 = "7f1df0eb0195b4e7e2258bc13acfc07c7d300923ff6393a05717838328209c4d"
+bytes = 1831
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_20kbar_6p9T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_20kbar_6p9T.dat"
+sha256 = "57186608ca6d5e50842d9b1c81215e3db9be0aac560f2b03552e2e59c01a7f78"
+bytes = 2125
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_20kbar_9T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_20kbar_9T.dat"
+sha256 = "0c90de08eaabd0db615c8e7a25b9ddfe2055f95eaa8283eccaca2430d2fc0ab2"
+bytes = 2065
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_22kbar_0T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_22kbar_0T.dat"
+sha256 = "a40c00e3b3720fb981a8b4a9438977994af3b3bbeda7b1a77e119f2ccb895b1c"
+bytes = 2638
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_22kbar_4p5T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_22kbar_4p5T.dat"
+sha256 = "bf16d4f50c58982d117f0a358cc0b129b7d3811fb9146183c5ab5f60c9265f30"
+bytes = 2108
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_22kbar_9T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_22kbar_9T.dat"
+sha256 = "a950d51267b110c2732910f05b3a8b58af90da32b33ccc52919d643f2924df4f"
+bytes = 2367
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_22p8kbar_0T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_22p8kbar_0T.dat"
+sha256 = "8f29a84f658cb902286ed9f7f943173dddcd7ff91a022ad2b3cc40bcdca51a09"
+bytes = 3742
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_22p8kbar_2T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_22p8kbar_2T.dat"
+sha256 = "a398338cde65233c03b7c126ece596a16e4debabb731910b1b83e5aa94e7f4ca"
+bytes = 3820
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_22p8kbar_3T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_22p8kbar_3T.dat"
+sha256 = "3820df721b6217bdcc0e71ae2eb4455ce1dd5b7cd0d7f86be61b5de8b6308f9c"
+bytes = 1273
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_22p8kbar_3p5T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_22p8kbar_3p5T.dat"
+sha256 = "7759d77b58cea22ba565a9d19daa6f49b4da54bc4aa9e8f21d3ef95c4cbbd1eb"
+bytes = 1751
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_22p8kbar_3p63T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_22p8kbar_3p63T.dat"
+sha256 = "cc1ede018dd33dd830019849e39ce5fd7aed8f92d075e6e5e3670357e83d5c4e"
+bytes = 1203
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_22p8kbar_3p75T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_22p8kbar_3p75T.dat"
+sha256 = "4e70c577efd8676bb26b53302accd825e7e3bd4f1faf1751caeec7be4510e145"
+bytes = 717
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_22p8kbar_4T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_22p8kbar_4T.dat"
+sha256 = "a2f1cb7748f7ca2f3b6360297e1a3887a3d742137d412e4a0cff461d68bbf744"
+bytes = 1044
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_22p8kbar_4p5T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_22p8kbar_4p5T.dat"
+sha256 = "287362de7e6bf10d534082473908b9fc7ae8e54440c87c0da0d2b12576bc16c6"
+bytes = 2043
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_22p8kbar_5p5T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_22p8kbar_5p5T.dat"
+sha256 = "2ba232afbc9d75b2b29f833fc82260ecc893430c4e8a1302ab8fd2d4da6c8420"
+bytes = 2663
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_22p8kbar_7T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_22p8kbar_7T.dat"
+sha256 = "781d36c1075532f8fc1645a0c43be1494906e0afa347727c1094a25404f5bcf9"
+bytes = 2617
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_22p8kbar_9T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_22p8kbar_9T.dat"
+sha256 = "b0a29bc3bdd7a6e1386f429abc2372d337856209ae322bb5c652a33bab97f8fe"
+bytes = 3196
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_26p5kbar_0T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_26p5kbar_0T.dat"
+sha256 = "37b05a998a9c0ff886a14abe1bd61cd5227c4f57c7d095c146e6eed3cffff6be"
+bytes = 3055
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_26p5kbar_1T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_26p5kbar_1T.dat"
+sha256 = "eb7c37b115bfb13827f77ece3e94df2ca807d8587f6436f19192d879f0f862b7"
+bytes = 2549
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_26p5kbar_2T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_26p5kbar_2T.dat"
+sha256 = "7a05d909eee38c112d5f1f7c939b992cb8f7475e55a8d650c428592a70adbb1c"
+bytes = 1888
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_26p5kbar_2p3T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_26p5kbar_2p3T.dat"
+sha256 = "56a1349e34ab9b8ab6fd259716ae32076f8c5c1e81271370c34ae1a2a170d230"
+bytes = 1867
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_26p5kbar_2p7T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_26p5kbar_2p7T.dat"
+sha256 = "77f435befa0a87eecb449bc129a6c1bfb1a71a9ebbd683ef7b6fd5aad1c9056f"
+bytes = 2126
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_26p5kbar_3T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_26p5kbar_3T.dat"
+sha256 = "f7383bf807dcdb116b6636ded0cec9a5e65b5e2418129d55c92e01230b5706f8"
+bytes = 2131
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_26p5kbar_4p5T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_26p5kbar_4p5T.dat"
+sha256 = "38116c3348011fcb1cb4aac67f684f95aed655ed8695a8d5559a4ac375d3da33"
+bytes = 1714
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_26p5kbar_6T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_26p5kbar_6T.dat"
+sha256 = "582d0ea473fd998cdbeac239fffe26b3c863f726615dc15d5743de4749d2427b"
+bytes = 3581
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_26p5kbar_7p5T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_26p5kbar_7p5T.dat"
+sha256 = "7200e565ce39410d0f7a02d79a32f0b482a6bdf3dd5f87db7d073dfd15e83aae"
+bytes = 3479
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_26p5kbar_9T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_26p5kbar_9T.dat"
+sha256 = "631ab82e3659e13b1b5dab34c34dc72ade581c34eba77cd1560b19755ee53e80"
+bytes = 3399
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_7kbar_0T.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/maintext/CoverT_7kbar_0T.dat"
+sha256 = "829044645ef319150fb10a1bf33e6ac28ba12af0bf41e0604a0a0946797d92c6"
+bytes = 710
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Cs_overT_T_scan_18p2kbar.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Cs_overT_T_scan_18p2kbar.dat"
+sha256 = "0fc1092725fd9061c9d75286cd23ed3fe127ed4084e582cc98c1de33a4332d76"
+bytes = 1427
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Cs_overT_f_scan_18p2kbar.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Cs_overT_f_scan_18p2kbar.dat"
+sha256 = "66f3814bdb7515d8b9e480f86b693e31defe3718724e4b5fba6e07902403f443"
+bytes = 727
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Vac_vs_f_18p2kbar_0p35K_TC2_Fit.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Vac_vs_f_18p2kbar_0p35K_TC2_Fit.dat"
+sha256 = "2c41309d5ce330e3ae81ef64923cd2616777f5bb555cfc257795910c2979563c"
+bytes = 388
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Vac_vs_f_18p2kbar_0p35K_TC2_Raw.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Vac_vs_f_18p2kbar_0p35K_TC2_Raw.dat"
+sha256 = "3b57d3ffbb798c8ca86211d61d96ae5b0523b4de3ff2e713aadfdb83fc26e147"
+bytes = 384
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Vac_vs_f_18p2kbar_13K_TC2_Fit.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Vac_vs_f_18p2kbar_13K_TC2_Fit.dat"
+sha256 = "69aac8881fc8c2355e692d459d3fdb88bf797440e4345d386e978c759c84201e"
+bytes = 406
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Vac_vs_f_18p2kbar_13K_TC2_Raw.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Vac_vs_f_18p2kbar_13K_TC2_Raw.dat"
+sha256 = "5d779e81d43c220479da5e40743d5debc8ab81c61112b35ca19ba5390a60afec"
+bytes = 400
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Vac_vs_f_18p2kbar_1K_TC2_Fit.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Vac_vs_f_18p2kbar_1K_TC2_Fit.dat"
+sha256 = "d131d68af334a088009ccdf59c30667fe5c2729c60d6bbef1a4b29e140b281fe"
+bytes = 385
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Vac_vs_f_18p2kbar_1K_TC2_Raw.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Vac_vs_f_18p2kbar_1K_TC2_Raw.dat"
+sha256 = "494bcdbf3fd3d4672bc3bc7c6923e28e7e661a24362606d3fece71ffc1a95cf9"
+bytes = 387
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Vac_vs_f_18p2kbar_20K_TC2_Fit.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Vac_vs_f_18p2kbar_20K_TC2_Fit.dat"
+sha256 = "534459727a832ec9a28a000e527641bb0116050f44df1960ffcbe7abcda3886f"
+bytes = 408
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Vac_vs_f_18p2kbar_20K_TC2_Raw.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Vac_vs_f_18p2kbar_20K_TC2_Raw.dat"
+sha256 = "82629553108b9400faa919b03b0097a85afbacb54f5ba43613c843fc0e74af92"
+bytes = 395
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Vac_vs_f_18p2kbar_2K_TC2_Fit.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Vac_vs_f_18p2kbar_2K_TC2_Fit.dat"
+sha256 = "d8b68bde1222dc640c48cc9838fec2e0246412ff76b56c7763ccdd4f32575a77"
+bytes = 405
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Vac_vs_f_18p2kbar_2K_TC2_Raw.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Vac_vs_f_18p2kbar_2K_TC2_Raw.dat"
+sha256 = "ecd1154f66ab5a25e5857bcaf77092d48d25d3538eeec2f7e0080678160230b2"
+bytes = 398
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Vac_vs_f_18p2kbar_3p9K_TC2_Fit.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Vac_vs_f_18p2kbar_3p9K_TC2_Fit.dat"
+sha256 = "82b713ee3b1ca94361da06deb08645ce25effeb9d48a746e2b04bc8588e8f587"
+bytes = 403
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Vac_vs_f_18p2kbar_3p9K_TC2_Raw.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Vac_vs_f_18p2kbar_3p9K_TC2_Raw.dat"
+sha256 = "678613a9f8fc4546f96f467c8fe0a5de6b7dc2c51ddf407f16473f9d1f9fd104"
+bytes = 407
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Vac_vs_f_18p2kbar_5p8K_TC2_Fit.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Vac_vs_f_18p2kbar_5p8K_TC2_Fit.dat"
+sha256 = "f102704b9e7ab22dee450643ba6722dba3dfc2674210f94347c29902b50b6d2d"
+bytes = 400
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Vac_vs_f_18p2kbar_5p8K_TC2_Raw.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Vac_vs_f_18p2kbar_5p8K_TC2_Raw.dat"
+sha256 = "4f3eb5a4ad073bcdfb9d7c0defb43d1ee9f28ab179343b3a1c9ce3181d60ac96"
+bytes = 402
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Vac_vs_f_20kbar_4p5K_TC1_Fit.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Vac_vs_f_20kbar_4p5K_TC1_Fit.dat"
+sha256 = "3ec4e0e7dc112ab37d4d9b5cab67e7d78ee8928ec17bd0898969aa3f3ac9635f"
+bytes = 397
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Vac_vs_f_20kbar_4p5K_TC1_Raw.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Vac_vs_f_20kbar_4p5K_TC1_Raw.dat"
+sha256 = "7749e6c8df23ae3ad9c74c07a331f4e9fddeac882a3d51ef75ff0dfb97b19bdd"
+bytes = 400
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Vac_vs_f_20kbar_4p5K_TC2_Fit.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Vac_vs_f_20kbar_4p5K_TC2_Fit.dat"
+sha256 = "cc44a54ad6010be0e400305061ed77aaa1e1db80c0efc76b54843ae904fc4af4"
+bytes = 384
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Vac_vs_f_20kbar_4p5K_TC2_Raw.dat"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/methods/Vac_vs_f_20kbar_4p5K_TC2_Raw.dat"
+sha256 = "a86a141291f97aa69528c06e52b0b1120f525527fe8551c8bf01e13822baa0d3"
+bytes = 385
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/scripts/Fig1.m"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/scripts/Fig1.m"
+sha256 = "f100e3d601c56f8bba84088d639453a201d3188bcbf87cc6cd629ccf0ad19b56"
+bytes = 5637
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/scripts/Fig2.m"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/scripts/Fig2.m"
+sha256 = "b09bd4eedb9421f8032167e2170bd4defa42004c0a49492461be45c1d6018ad8"
+bytes = 3190
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/scripts/Fig3.m"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/scripts/Fig3.m"
+sha256 = "03f9d95eeaab9d48dea2849cd68da85404fdd8632b39cb93d4759e4212448148"
+bytes = 2934
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/scripts/FigED1.opj"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/Cp_data/scripts/FigED1.opj"
+sha256 = "e2e379a9957643f43b6875e5b6d512a88e3cb58fb241f9eb42e0b3f7c60ef0cc"
+bytes = 692770
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/iPEPS/README_iPEPS.txt"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/iPEPS/README_iPEPS.txt"
+sha256 = "562f0fe3c0bf0c4c3390c8e132a10d048c2fbae9d2aa2fcb1df6b9b94015e849"
+bytes = 5487
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/iPEPS/maintext/CoverT_J_0p63-0p74_D20.txt"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/iPEPS/maintext/CoverT_J_0p63-0p74_D20.txt"
+sha256 = "d5f2cebeaa1e46f9b23201b4e01953c10599b735f24ffe01d8829f3dcedece7b"
+bytes = 17562
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/iPEPS/maintext/CoverT_J_0p686_hoverJD_0p00-0p20_D14.txt"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/iPEPS/maintext/CoverT_J_0p686_hoverJD_0p00-0p20_D14.txt"
+sha256 = "d90eded71ac01c98eb74f9ca3faa957c77188c7b7a3e6058d031abd6eaf7bef7"
+bytes = 2514
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/iPEPS/maintext/SdotS_J_0p63-0p74_D20.txt"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/iPEPS/maintext/SdotS_J_0p63-0p74_D20.txt"
+sha256 = "0b47b2d40d34920c89ef98046fb2c808e0a0221788f66940db06691aac603fea"
+bytes = 18875
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/iPEPS/maintext/SdotS_J_0p63-0p74_D20_constant.txt"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/iPEPS/maintext/SdotS_J_0p63-0p74_D20_constant.txt"
+sha256 = "756e6460cc2f755e2d86d39546abab5c97d1a5a2a49267cd45b81115f42f163e"
+bytes = 204
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/iPEPS/maintext/critical_parameters_convergence.txt"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/iPEPS/maintext/critical_parameters_convergence.txt"
+sha256 = "cc81541013a5343314ae0d731e5dc73b4715b42e30dcaa93851eeb5c3d7b036c"
+bytes = 585
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/iPEPS/maintext/xi_J_0p63-0p74_D20.txt"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/iPEPS/maintext/xi_J_0p63-0p74_D20.txt"
+sha256 = "9fcf7df391871b3ecf35d90475595aab78e20d71b7515ff5ea4ac278e7c9d46c"
+bytes = 18242
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/iPEPS/maintext/xi_J_0p63-0p74_D20_maximum.txt"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/iPEPS/maintext/xi_J_0p63-0p74_D20_maximum.txt"
+sha256 = "9fb3607c661226187ec2f89f1e0b73d3983c77051ceb247fd23a82b8c882badc"
+bytes = 317
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/iPEPS/methods/CoverT_IsingSquareLattice_D2.txt"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/iPEPS/methods/CoverT_IsingSquareLattice_D2.txt"
+sha256 = "f0c9c14fa45b4529fc0efc48450ffb03b683c799c99d63777621f06e15cb6636"
+bytes = 437847
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/iPEPS/methods/CoverT_IsingSquareLattice_D2_maximum.txt"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/iPEPS/methods/CoverT_IsingSquareLattice_D2_maximum.txt"
+sha256 = "666faf270316894395c73ea670311c8eddee4cb67043099aaf5f1df9327db983"
+bytes = 569
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/iPEPS/methods/CoverT_J_0p63-0p74_D20_maximum.txt"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/iPEPS/methods/CoverT_J_0p63-0p74_D20_maximum.txt"
+sha256 = "6a42383b3309355279df627ce4d8cf4428e88cd4fab43c9d03bf1a7fbe4581c3"
+bytes = 668
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/iPEPS/methods/CoverT_J_0p64-0p73_D10.txt"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/iPEPS/methods/CoverT_J_0p64-0p73_D10.txt"
+sha256 = "c98adb6c1cb6ca691d2870b0cfe67c07f36d8401b5af6a280b5d4279223227aa"
+bytes = 11435
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/iPEPS/methods/SdotS_J_0p64-0p73_D10.txt"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/iPEPS/methods/SdotS_J_0p64-0p73_D10.txt"
+sha256 = "62a7b9847930f6e855f0301318bc22212e4004f52a3dfc097873f200c244eab8"
+bytes = 11705
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/iPEPS/methods/xi_J_0p63-0p74_D8.txt"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/iPEPS/methods/xi_J_0p63-0p74_D8.txt"
+sha256 = "cc57a0d9d0debc6619ddd5df4e18511665fd9c7f527c6c069ddb93b45e2d1a22"
+bytes = 656
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
+
+[[entry]]
+id = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/iPEPS/methods/xi_J_0p64-0p73_D10.txt"
+role = "input"
+root = "data"
+path = "real-f1/unz/SCBO_Cp_iPEPS_dataPackage/iPEPS/methods/xi_J_0p64-0p73_D10.txt"
+sha256 = "664d5a0fb986f499c530b3246a88d8d333291b86f3c136b8cf456d84b763b0b8"
+bytes = 11299
+source = "toolset data/real-f1/unz - the deposited Cp package read by studies/F1-REPL (plan 0932 E7, toolset results/0932-E7.txt)"
