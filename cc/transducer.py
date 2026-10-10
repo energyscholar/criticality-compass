@@ -1,6 +1,9 @@
 """transducer.py - inputs/<id>/transducer.toml (plan 0883, Q0): the transducer (or the record), the per-locus reduction, the interval's role.
 Plumbing; outside the measurement closure. The schema is data (cc.toml [transducer], [alphabets] interval_method); nothing here reads a sentence."""
+import hashlib
+import os
 import re
+import subprocess
 from pathlib import Path
 from schema import at, sha
 
@@ -41,17 +44,54 @@ def chk_transducer(p, d, c, stem=None):
                         f'write role = "{cfg["interval_role"]}"')
 
 
+def _git(tools, *args):
+    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}   # a git hook exports GIT_DIR/GIT_INDEX_FILE: they would point -C at the hook's repo
+    r = subprocess.run(["git", "-C", str(tools), *args], capture_output=True, env=env)
+    return r.stdout if r.returncode == 0 else None
+
+
+def retrieve(tools, rel, want):
+    """(commit, bytes) of the toolset file `rel` whose sha256 is `want`, or None. A pin is a CONTENT hash, so it is checked against the
+    toolset's git HISTORY (any commit holding a blob of that path with that sha), never against a working tree that other projects change
+    (plan 0929, ruling D-0929-5). The bytes come from that commit; only a toolset with no such commit falls back to the working-tree file,
+    and then the commit is 'working-tree'. A sha found in no commit and not in the working tree gives None."""
+    log = _git(tools, "log", "--all", "--format=%H", "--", rel)
+    for c in (log or b"").decode().split():
+        blob = _git(tools, "show", f"{c}:{rel}")
+        if blob is not None and hashlib.sha256(blob).hexdigest() == want:
+            return c, blob
+    path = Path(tools) / rel
+    if log is None and path.is_file() and sha(path) == want:   # not a git toolset: the working tree is the only source there is
+        return "working-tree", path.read_bytes()
+    return None
+
+
+def supplied(update, tools):
+    """{path: {"sha256": ..., "commit": ...}} for every well-formed update entry whose pinned content is retrievable (for the result record)."""
+    out = {}
+    for e in update:
+        m = UPDATE.fullmatch(e) if isinstance(e, str) else None
+        got = retrieve(tools, m[1], m[2]) if m else None
+        if got:
+            out[m[1]] = {"sha256": m[2], "commit": got[0]}
+    return out
+
+
 def update_findings(p, update, tools):
-    """Each entry '<toolset path> sha256 <hex>' names a file that exists under the toolset root with exactly that sha256 (total: no entry is skipped)."""
+    """Each entry '<toolset path> sha256 <hex>' names content some commit of the toolset holds for that path (retrieve; D-0929-5). Total: no entry is skipped."""
     out = [at(p, "transducer.update", "must have at least one entry", 'write update = ["<toolset path> sha256 <64 hex>"]')] if not update else []
     for i, e in enumerate(update):
         m = UPDATE.fullmatch(e) if isinstance(e, str) else None
         if m is None:
             out.append(at(p, f"transducer.update[{i}]", f"'{e}' is not '<toolset-relative path> sha256 <64 hex>'", "write the path, the word sha256 and the 64 hex digits of sha256sum"))
             continue
-        path, want = Path(tools) / m[1], m[2]
-        if not path.is_file():
-            out.append(at(p, f"transducer.update[{i}]", f"{m[1]} does not exist under the toolset root", "name a frozen sampler file of the toolset"))
-        elif (got := sha(path)) != want:
-            out.append(at(p, f"transducer.update[{i}]", f"{m[1]} sha256 {want} differs from the toolset file's {got}", f"write {m[1]} sha256 {got}"))
+        rel, want = m[1], m[2]
+        if retrieve(tools, rel, want) is None:
+            head = _git(tools, "show", f"HEAD:{rel}")
+            if head is not None:   # the pinned content is in no commit; the newest committed content of that path is the pin to write
+                got = hashlib.sha256(head).hexdigest()
+                out.append(at(p, f"transducer.update[{i}]", f"{rel} sha256 {want} differs from the toolset file's {got}", f"write {rel} sha256 {got}"))
+            else:
+                out.append(at(p, f"transducer.update[{i}]", f"{rel} sha256 {want} is in no commit of the toolset's history, and {rel} is not committed there",
+                              f"name a committed sampler file of the toolset (git -C <toolset> log --all -- {rel})"))
     return out

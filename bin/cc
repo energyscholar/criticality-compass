@@ -326,9 +326,26 @@ def run_one(name, tables, dry, how=None):
     try:
         res, got = detect.run_keyed(name, tables, not dry)
         (how if how is not None else []).append(got)
+        if not dry:
+            stamp_pins(res)
         return None, res
     except ValueError as e:
         return str(e), None
+
+
+def stamp_pins(res):
+    """Record, in a result written now, which toolset commit supplied each pinned sampler file (transducer.update; plan 0929 D-0929-5).
+    Done here, not in cc/detect.py: detect.py is in the measurement closure, and a provenance field must not move measure_hash.
+    A frozen record is never touched."""
+    import transducer
+    path = ROOT / "results" / f"{res['run_id']}.json"
+    t = tomllib.loads((ROOT / "inputs" / res["input"] / "transducer.toml").read_text()).get("transducer", {})
+    import declare
+    pins = transducer.supplied(t.get("update", []), declare.Ctx(ROOT).data_root.parent)
+    frozen = json.loads((ROOT / "FROZEN.json").read_text())["files"]
+    if pins and path.is_file() and f"results/{res['run_id']}.json" not in frozen and res.get("pins") != pins:
+        res["pins"] = pins
+        path.write_text(json.dumps(res, indent=1) + "\n")
 
 
 def reverdict_one(name, new, old):

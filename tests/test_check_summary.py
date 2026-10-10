@@ -25,8 +25,8 @@ try:
     shutil.copytree(ROOT, scratch, ignore=shutil.ignore_patterns(".git", "__pycache__", "*.pyc"))
     ct = scratch / "checks.toml"
     ct.write_text(re.sub(r"(?s)\ntests = \[.*?\n\]\n", '\ntests = ["tests/test_scoreboard.py"]\n', ct.read_text(), count=1))
-    cc = scratch / "cc.toml"   # validate names every slow/exclusive test: the scratch lists only the one test it runs
-    cc.write_text(re.sub(r"(?m)^(slow|exclusive) = \[.*?\]", r"\1 = []", cc.read_text()))
+    cc = scratch / "cc.toml"   # validate names every slow/exclusive/needs_data/needs_rust test: the scratch lists only the one test it runs
+    cc.write_text(re.sub(r"(?m)^(slow|exclusive|needs_data|needs_rust) = \[.*?\]", r"\1 = []", cc.read_text()))
     ex = scratch / "expected" / "v01-rules.toml"
     text = ex.read_text()
     m = re.search(r'^(\s*"[^"]+" = )"([A-Z!+-]+)"', text, re.M)   # the first expected verdict of the set: change it
