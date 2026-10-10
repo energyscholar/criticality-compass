@@ -626,7 +626,7 @@ def main(argv):
         schema.DATA_ROOT_FLAG = argv[i + 1]
         argv = argv[:i] + argv[i + 2:]
     cmd, rest = (argv[0] if argv else "help"), argv[1:]
-    if cmd == "help":
+    if cmd in ("help", "--help", "-h"):
         print(help_text(advanced), end="")
         return 0
     table = {"show": lambda a: cmd_show(a, False), "explain": lambda a: cmd_show(a, True), "tabulate": cmd_tabulate,

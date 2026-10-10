@@ -1,4 +1,4 @@
-# Criticality Compass - packaging (plan 0929, ruling D-0929-1). The clone is the workspace: install it EDITABLE (`pip install -e .`).
+# Criticality Compass - packaging (plan 0929, ruling D-0929-1). Editable (`pip install -e .`) uses the clone as the workspace; a non-editable install carries a copy of it (setup.py, queue S6.6).
 # Nothing here is uploaded to a public index (queue S5.5: licence and name set; no PyPI upload, no public push).
 [build-system]
 requires = ["setuptools>=64"]
@@ -14,10 +14,11 @@ license = { text = "Apache-2.0" }   # LICENSE + NOTICE at the repository root (q
 readme = "README.md"
 
 [project.optional-dependencies]
-rust = ["criticality-compass-kernel"]  # PLACEHOLDER name of the kernel_rs wheel built from rust/ (maturin); unclaimed; D2.4
+kernel = ["criticality-compass-kernel"]  # the kernel_rs wheel, built from rust/ by maturin (`maturin build --release -m rust/Cargo.toml`); not on any index, so this extra is declared, not downloadable; README "The Rust kernel"
 
 [project.scripts]
 compass = "criticality_compass:main"   # never `cc`: it is the C compiler, and Rust links with it (seen red, memo section 2.3)
 
 [tool.setuptools]
-packages = ["criticality_compass"]     # the launcher only; cc/ stays a flat directory of the clone (bare module names collide with PyPI packages)
+packages = ["criticality_compass"]     # the launcher; setup.py adds criticality_compass/workspace/ (the clone's bin/ cc/ tables/ inputs/ ... as package data); cc/ stays a flat directory (bare module names collide with PyPI packages)
+include-package-data = false

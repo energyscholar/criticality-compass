@@ -1,0 +1,18 @@
+include cc.toml checks.toml FROZEN.json CLAIMS.md HOWTO.md TUTORIAL.md KERNEL-IN-CC.md SIGNATURE-TABLE.md LICENSE NOTICE README.md
+recursive-include bin *
+recursive-include cc *.py *.toml
+recursive-include tables *
+recursive-include inputs *
+recursive-include cases *
+recursive-include expected *
+recursive-include families *
+recursive-include fixtures *
+recursive-include instruments *
+recursive-include results *
+recursive-include benchmark *
+recursive-include docs *
+recursive-include tests *
+recursive-include rust *.toml *.rs *.lock
+prune results/reduced
+prune rust/target
+global-exclude __pycache__ *.pyc

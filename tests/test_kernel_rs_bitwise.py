@@ -12,7 +12,7 @@ sys.path[:0] = [str(ROOT / "cc")]
 try:
     import kernel_rs
 except ImportError:
-    print("FAIL kernel_rs is not installed.\n  Next: pip install the kernel_rs wheel (rust/ builds it with maturin; see the [rust] extra), then rerun")
+    print("FAIL kernel_rs is not installed.\n  Next: pip install the kernel_rs wheel (rust/ builds it with maturin; see README, 'The Rust kernel', and the [kernel] extra), then rerun")
     sys.exit(1)
 here = Path(kernel_rs.__file__).resolve()
 if ROOT in here.parents:

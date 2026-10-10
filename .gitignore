@@ -3,3 +3,6 @@ __pycache__/
 rust/target/
 results/reduced/
 *.egg-info/
+.venv/
+build/
+dist/

@@ -40,9 +40,32 @@ $ compass help
 
 You need Python >= 3.11 (3.12 is the version tested) and numpy, which `pip install -e .` brings. `compass` is the console script; it runs this clone's `bin/cc` in the venv's interpreter, and `bin/cc` starts every script and test with that same interpreter (`sys.executable`). Called directly, `bin/cc` runs under whichever `python3` your PATH gives it, so activate the venv first. Run everything below from the repository root.
 
+Other ways to install:
+
+- **A non-editable install** (`pip install .`, or a built wheel from `python3 -m build`) carries a copy of the workspace (`bin/`, `cc/`, `tables/`, `inputs/`, `cases/`, `results/`, ...) inside the package, so `compass validate`, `compass show` and `compass explain` work without a clone. Anything you write (`run`, `new`, `tables fork`) lands in that copy inside site-packages and is lost on reinstall; to author, use the editable install above. `compass --help` and `compass help` both print the help text; an unknown command exits non-zero.
+- Python 3.11 is the minimum and works; 3.12 is the version most tested.
+
+## The Rust kernel (optional)
+
+Measurement runs the Python `cc/kernel.py`, which is the reference. The Rust kernel (`kernel_rs`, the pinned `abr-kernel`) is used only by the tests `test_kernel_rs` and `test_kernel_rs_bitwise`, which check that it equals the Python one. It is the optional extra `kernel` (`pip install -e '.[kernel]'`), distribution `criticality-compass-kernel`, which is **not on any package index**: build the wheel yourself.
+
+```
+$ pip install maturin
+$ maturin build --release -m rust/Cargo.toml     # needs rustup/cargo on PATH
+$ pip install rust/target/wheels/criticality_compass_kernel-*.whl
+```
+
+The build needs a Rust toolchain (`cargo`; rustup puts it in `~/.cargo/bin`, which may not be on `PATH`) and **network access**: the crate pulls `metatron_kernel_v8` by git URL at a pinned revision from GitHub, so that repository must be reachable. Without the wheel the two kernel tests print `kernel_rs is not installed` with the steps above, and everything else is unaffected.
+
+The repository also holds a prebuilt `cc/_ext/kernel_rs.so` (SHA256 beside it). It is an **x86-64 Linux ELF only**; on macOS or ARM it will not import, and you build the wheel instead. A non-editable install does not carry it.
+
+## Benchmark data outside the repository
+
+`bin/cc bench verify` checks `benchmark/MANIFEST.toml` (hashes of every file the benchmark rows used). The files under `results/`, `inputs/` and the like are in the repository; the simulation outputs (for example the `nav-m7-bank` and `nav-m7-grid` `.npz` files) are not: they live in a data root outside it. Point CC at it with `bin/cc --data-root <dir> bench verify` (the declared name is in `cc.toml` `[data]`). Without that data, `bench verify` reports those rows as ABSENT and exits 1; that is expected for a clone and says nothing about the files that are present.
+
 ### 1. Ask for help
 
-(Plain `bin/cc` prints the same text.)
+(Plain `bin/cc`, `compass --help` and `compass -h` print the same text.)
 
 ```
 $ bin/cc help

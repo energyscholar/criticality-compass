@@ -13,12 +13,21 @@ def clone_of(here):
     return root if (root / "bin" / "cc").is_file() and (root / "cc.toml").is_file() else None
 
 
+def workspace_of(here):
+    """The workspace copy a non-editable install carries (setup.py), or None."""
+    w = Path(here).resolve().parent / "workspace"
+    return w if (w / "bin" / "cc").is_file() and (w / "cc.toml").is_file() else None
+
+
 def main(argv=None, here=__file__):
-    root = clone_of(here)
+    root = clone_of(here) or workspace_of(here)
     if root is None:
         print("REFUSED: this launcher is not inside a Criticality Compass clone (a non-editable install copies it into site-packages, where bin/cc and cc.toml are not).\n"
               "  Next: pip install -e <path to your clone>")
         return 1
     sys.argv = [str(root / "bin" / "cc"), *(sys.argv[1:] if argv is None else argv)]
-    runpy.run_path(sys.argv[0], run_name="__main__")   # bin/cc ends in sys.exit(main(...))
+    try:
+        runpy.run_path(sys.argv[0], run_name="__main__")   # bin/cc ends in sys.exit(main(...))
+    except SystemExit as e:
+        return e.code if isinstance(e.code, int) else (0 if e.code is None else 1)
     return 0
