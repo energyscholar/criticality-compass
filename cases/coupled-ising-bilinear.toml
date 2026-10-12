@@ -21,7 +21,7 @@ decoy_of = "none"
 pairs_with = ["ising-2d", "ising-off-critical"]
 breaker_verdict = ""
 blind_seal = "fixtures/X5-truth-2026-10-01.sha256"
-sources = ["~/software/scratch/compass-toolset/results/X5-score.txt"]
+sources = ["<toolset>/results/X5-score.txt"]
 status = "run"
 studies = ["X5", "X5b", "X5c"]
 

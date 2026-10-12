@@ -514,7 +514,7 @@ def cmd_tabulate(args):
 def freeze_files(rid, read, vectors):
     """The repo files to freeze for one result: itself, the vectors it names, what it read, and its table set."""
     tdir = f"tables/{rid.split('@')[1]}"
-    want = [f"results/{rid}.json", vectors] + [k for k in read if not k.startswith(("~", "tables/"))]
+    want = [f"results/{rid}.json", vectors] + [k for k in read if not k.startswith((config()["data"]["name"] + "/", "tables/"))]
     return tdir, want + [f"{tdir}/{q.name}" for q in sorted((ROOT / tdir).iterdir())]
 
 

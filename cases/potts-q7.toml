@@ -16,7 +16,7 @@ large RELEVANT exponent, not a critical one""",
 decoy_of = "WALKING"
 pairs_with = ["potts-q6", "potts-q5", "bc-beyond-tricritical"]
 sources = [
-  """~/software/has-anyone-looked/library/papers/walking/\
+  """<library>/walking/\
 iino2019-detecting-weakly-first-order-potts.md""",
 ]
 status = "in-signature-table"

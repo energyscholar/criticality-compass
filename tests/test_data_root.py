@@ -2,7 +2,7 @@
 (1) the precedence is a table (pure, no data);  (2) one locked input measured from the declared root and from a copy of its data files in a
 scratch root: byte-identical measure_hash, `read` map and verdict cells, and the header records WHO chose the root;  (3) `view.stale` finds a stored
 result's files at the moved root (and refuses when the moved root is empty);  (4) the comparison can fail: a root-sensitive hash is flagged.
-Data-dependent: needs cc.toml [data] root populated (cc.toml [check] needs_data)."""
+Data-dependent: needs CC_DATA_ROOT to name the populated data (cc.toml [check] needs_data); cc.toml [data] holds only the NAME (plan 0985)."""
 import hashlib
 import json
 import os
@@ -31,7 +31,7 @@ cfg = tomllib.loads((ROOT / "cc.toml").read_text())
 home = lambda s: os.path.expanduser(s)  # noqa: E731
 check("precedence: flag over env over cc.toml",
       schema.resolve_data_root(cfg, "/f", "/e") == (Path("/f"), "flag") and schema.resolve_data_root(cfg, None, "/e") == (Path("/e"), "env")
-      and schema.resolve_data_root(cfg, None, "") == (Path(home(cfg["data"]["root"])), "cc.toml"))
+      and schema.resolve_data_root(cfg, None, "") == (ROOT / "data", "default"))
 
 CHILD = """
 import json, sys
@@ -63,21 +63,24 @@ def same(a, b):
     return all(a[k] == b[k] for k in ("mh", "read", "sig"))
 
 
-declared = Path(home(cfg["data"]["root"]))
+if not os.environ.get("CC_DATA_ROOT"):
+    print("test_data_root: REFUSED: CC_DATA_ROOT names no data\n  Next: CC_DATA_ROOT=<populated data root> bin/cc test test_data_root")
+    sys.exit(1)
+declared = Path(home(os.environ["CC_DATA_ROOT"]))
 m = tomllib.loads((ROOT / "inputs" / INPUT / "m.toml").read_text())
 with tempfile.TemporaryDirectory() as t:
     moved = Path(t) / "elsewhere" / "data"
     for rel in {b["path"] for b in m["data"]["files"]}:
         (moved / rel).parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(declared / rel, moved / rel)
-    base, env_, flag_ = measure(), measure(str(moved)), measure(None, str(moved))
+    base, env_, flag_ = measure(str(declared)), measure(str(moved)), measure(str(declared), str(moved))
     both = measure(str(Path(t) / "empty"), str(moved))   # the flag wins over an env that points at nothing
-    check("measured from the declared root", "err" not in base, base.get("err", ""))
+    check("measured from the root CC_DATA_ROOT names", "err" not in base, base.get("err", ""))
     check("moved by CC_DATA_ROOT: measure_hash, read map and verdict cells are byte-identical", "err" not in env_ and same(base, env_), env_.get("err", ""))
     check("moved by the flag: the same", "err" not in flag_ and same(base, flag_), flag_.get("err", ""))
     check("the flag wins over the env", "err" not in both and same(base, both), both.get("err", ""))
-    check("the header records the source: cc.toml / env / flag",
-          (base.get("src"), env_.get("src"), flag_.get("src"), both.get("src")) == ("cc.toml", "env", "flag", "flag"), str((base.get("src"), env_.get("src"), flag_.get("src"))))
+    check("the header records the source: env / env / flag / flag",
+          (base.get("src"), env_.get("src"), flag_.get("src"), both.get("src")) == ("env", "env", "flag", "flag"), str((base.get("src"), env_.get("src"), flag_.get("src"))))
     check("a stored result's files are found at the moved root", env_.get("stale") is None and flag_.get("stale") is None, str(env_.get("stale")))
     empty = measure(str(Path(t) / "empty"))
     check("an empty moved root is not silently the declared one: nothing is measured from it, and a stored result is REFUSED as changed",

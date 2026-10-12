@@ -2,7 +2,6 @@
 import difflib
 import fnmatch
 import itertools
-import os
 import re
 import tomllib
 import zipfile
@@ -142,7 +141,7 @@ def _regex_ok(x):
 def chk_cc(p, d, c, stem=None):
     top = {k: dict for k in ("defaults", "data", "alphabets", "flags", "obtained_flag", "arrays", "basic", "check", "golden", "interval_binding")}
     out = header(p, d, "cc") + shape(p, d, top, {"formats": dict, "transducer": dict, "levels": dict, "interval_fields": dict, "conventional": dict,
-                                                 "report": dict, "step_labels": dict, "refusal_fields": dict, "projections": dict})
+                                                 "report": dict, "step_labels": dict, "refusal_fields": dict, "projections": dict, "sources": dict})
     if out:
         return out
     loc_ = d["data"].get("local", [])
@@ -239,8 +238,9 @@ def chk_case(p, d, c, stem=None):
                 f"status {d['status']} needs a non-empty studies list", "name the study sections")
     out += [at(p, "pairs_with", f"unknown case '{x}'", "name an existing case id")
             for x in d["pairs_with"] if x not in truths and x != d["id"]]
-    return out + [at(p, "sources", f"{s} does not exist", "fix the path")
-                  for s in d["sources"] if not Path(os.path.expanduser(s)).is_file()]
+    roots = c.cfg.get("sources", {}).get("roots", [])
+    return out + [at(p, "sources", f"{s} does not start with a declared source root ({', '.join(roots)}) and a path", "name the source as <root>/path (cc.toml [sources] roots)")
+                  for s in d["sources"] if not any(s.startswith(r + "/") and len(s) > len(r) + 1 for r in roots)]
 
 
 def chk_points(p, d, c, stem=None):

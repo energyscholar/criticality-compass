@@ -15,7 +15,7 @@ alone the needle reads off-window; the coexistence shows only as the two starts'
 decoy_of = "WALKING"
 pairs_with = ["potts-q7", "potts-q6", "bc-beyond-tricritical"]
 sources = [
-  """~/software/has-anyone-looked/library/papers/walking/\
+  """<library>/walking/\
 iino2019-detecting-weakly-first-order-potts.md""",
 ]
 status = "in-signature-table"

@@ -18,7 +18,7 @@ model would separate them; the geometry should not""",
 decoy_of = "none"
 pairs_with = ["xy-low-phase", "clock6-kt-ends", "at-self-dual-line"]
 sources = [
-  """~/software/has-anyone-looked/library/papers/defect-transitions/\
+  """<library>/defect-transitions/\
 tomita2002-pcc-xy-and-clock-models.md""",
 ]
 status = "in-signature-table"

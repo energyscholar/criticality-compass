@@ -4,7 +4,7 @@ schema = 1
 roles = ["map", "input", "truth", "prediction"]
 fields = ["id", "role", "root", "path", "sha256", "bytes", "source"]
 recipe = "set identity = sha256 of the sorted lines \"<path>\\t<sha256>\\t<bytes>\\n\" of its entries (path as in the manifest)"
-rows_sha256 = "2b5eb8809eb60d67eaba0f8c53d52dcc8b2ebfe3cec98aaec0575dd9ea173861"
+rows_sha256 = "4118201a67b7e0bef4d7d1696f72548007e1a19b7deb5072a92457ed340bd64d"
 
 [[set]]
 id = "M1-AT"
@@ -56,8 +56,8 @@ id = "case:ar1-null"
 role = "truth"
 root = "cc"
 path = "cases/ar1-null.toml"
-sha256 = "f9ac795bf5c55c1a52500db091e3db18744d45660cd5940a0ec6407ab462b273"
-bytes = 1212
+sha256 = "a40ce28bf8bbc9ec65a151caf35761f370654f488ce7a3c2286fff49da2edeb3"
+bytes = 1153
 source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
 
 [[entry]]
@@ -65,8 +65,8 @@ id = "case:at-self-dual-line"
 role = "truth"
 root = "cc"
 path = "cases/at-self-dual-line.toml"
-sha256 = "0c49b753f1f43041cd98b248c785dcd371c0823437077d13257ff3fa21f1fdec"
-bytes = 1943
+sha256 = "2c62bf95e59d5e4e0dd79aad20ce2a8f7cd24d76ff1d34c230154f0c38ea4370"
+bytes = 1816
 source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
 
 [[entry]]
@@ -74,8 +74,8 @@ id = "case:bc-beyond-tricritical"
 role = "truth"
 root = "cc"
 path = "cases/bc-beyond-tricritical.toml"
-sha256 = "93fbf3f5d694451609c5fb2a0b154edf3eb7f59b747d7216f4ba360d4262915d"
-bytes = 1368
+sha256 = "754d7acc5f5742ce55efadd6f82dfef2af69b6bd91ecacb2d8e4dd9549840ef4"
+bytes = 1343
 source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
 
 [[entry]]
@@ -83,8 +83,8 @@ id = "case:bc-lambda-line"
 role = "truth"
 root = "cc"
 path = "cases/bc-lambda-line.toml"
-sha256 = "3e5d88e0f30362b53b41199268c2096255b9e6558f7897170123f0ea5158739b"
-bytes = 1657
+sha256 = "bc66a95e8bd2d788ec3f099d0f4c85ac4e2ad4df43b846d72e5b210ece334cd1"
+bytes = 1632
 source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
 
 [[entry]]
@@ -101,8 +101,8 @@ id = "case:bc-tricritical"
 role = "truth"
 root = "cc"
 path = "cases/bc-tricritical.toml"
-sha256 = "1e1487289b90c88fbc1bfc159f0e47dbdb3f344c436c46fcf7f1feb1d96777af"
-bytes = 1386
+sha256 = "6575d316688d9b9d2c3c89f51f806775bd6fd803d9de3380967891280db945a5"
+bytes = 1361
 source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
 
 [[entry]]
@@ -110,8 +110,8 @@ id = "case:clock6-critical-phase"
 role = "truth"
 root = "cc"
 path = "cases/clock6-critical-phase.toml"
-sha256 = "144fb08ae70e3d2016b38e6e995208b7ad15f6bfe3660361559f6a7a2df8836c"
-bytes = 1351
+sha256 = "3b91742f19b2ace1be2c9e959c6ae765ed5073139476826de7dc8da7a27cac81"
+bytes = 1317
 source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
 
 [[entry]]
@@ -119,8 +119,8 @@ id = "case:clock6-kt-ends"
 role = "truth"
 root = "cc"
 path = "cases/clock6-kt-ends.toml"
-sha256 = "546692a76134aea51eac0e5448faa8abc5b8cab2e8f8840ccd8ffd788ea34423"
-bytes = 1540
+sha256 = "7b5c1497517c78d03b154134c4861a94a79739db1e2777199e5af6161eafa5cb"
+bytes = 1506
 source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
 
 [[entry]]
@@ -128,8 +128,8 @@ id = "case:coupled-ising-bilinear"
 role = "truth"
 root = "cc"
 path = "cases/coupled-ising-bilinear.toml"
-sha256 = "b2320017eeae77d04ac41481e8714fb56190183c99c4a5b83e9055e1687bb740"
-bytes = 1688
+sha256 = "8b28e6004de6d61998e60433c42c0c49ad32c49fa3f8e13f7fce14b4eb3e9af2"
+bytes = 1663
 source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
 
 [[entry]]
@@ -137,8 +137,8 @@ id = "case:ising-2d"
 role = "truth"
 root = "cc"
 path = "cases/ising-2d.toml"
-sha256 = "a2e6999261909721dff7efaac9360cec74f38ab8a3fa2c7cb50f6e00c834c492"
-bytes = 1397
+sha256 = "c1460674214bd4bfeb9dc8f2a1c0e9d3ea1aedc116e42706ecea7f9550705397"
+bytes = 1372
 source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
 
 [[entry]]
@@ -146,8 +146,8 @@ id = "case:ising-field-decoy"
 role = "truth"
 root = "cc"
 path = "cases/ising-field-decoy.toml"
-sha256 = "639e61a5eec8ea54cde3327a205bb2c86e3188412efd4f9fb0e9a69622774c04"
-bytes = 1817
+sha256 = "5dd077dc6c84fe829c7eb56780f35c800828fa86f1e8fc009c83251fbe39f705"
+bytes = 1792
 source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
 
 [[entry]]
@@ -173,8 +173,8 @@ id = "case:potts-q10"
 role = "truth"
 root = "cc"
 path = "cases/potts-q10.toml"
-sha256 = "31c26774f4291f21d6bf37d0f287f1a564d01c3ec1fff3d49933e8add6653cc9"
-bytes = 1219
+sha256 = "d97d92d1c078fe0d581f4514f35f96a0da15ee3e4b4045b2577d2c2d5190106b"
+bytes = 1185
 source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
 
 [[entry]]
@@ -182,8 +182,8 @@ id = "case:potts-q3"
 role = "truth"
 root = "cc"
 path = "cases/potts-q3.toml"
-sha256 = "4b7c44bddc983082eff81f8fa1541ae87b468d612984f1e947653955c1d13f37"
-bytes = 1044
+sha256 = "42ce79906a56055aaac3acc29e828c571a45e0be2be41bdb1e28411ee95115b0"
+bytes = 1019
 source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
 
 [[entry]]
@@ -191,8 +191,8 @@ id = "case:potts-q5"
 role = "truth"
 root = "cc"
 path = "cases/potts-q5.toml"
-sha256 = "2f14303462bed21fc1cba78413a6691ca7862306df725f4848d984a41021e4f0"
-bytes = 1543
+sha256 = "b83a6f1ffd516a5c3d4d9a2d694ffe57640625f380c99da760edf02a789f8362"
+bytes = 1450
 source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
 
 [[entry]]
@@ -200,8 +200,8 @@ id = "case:potts-q6"
 role = "truth"
 root = "cc"
 path = "cases/potts-q6.toml"
-sha256 = "88f1b25234ff53d551ba98da0df0baf834c65ca19c57624b69f8edad84b06180"
-bytes = 1237
+sha256 = "c1a2a58cb83003f039c60d34b533dc2276a8cfa7c269814eb03661044f217eac"
+bytes = 1178
 source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
 
 [[entry]]
@@ -209,8 +209,8 @@ id = "case:potts-q7"
 role = "truth"
 root = "cc"
 path = "cases/potts-q7.toml"
-sha256 = "320b67c4271f5743314ae0e20a5bd8bc1c1fddea739eed94b3f6139d0d7e626d"
-bytes = 1069
+sha256 = "b92df66d954aec09cb80afb09bbccfdd5b84277ca414295abef0f323d047ae7f"
+bytes = 1035
 source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
 
 [[entry]]
@@ -218,8 +218,8 @@ id = "case:potts-q8"
 role = "truth"
 root = "cc"
 path = "cases/potts-q8.toml"
-sha256 = "3423f72d2d98fdc241d8b90cc4a7ed374b0594d43e90bc2f0cf281df609264cc"
-bytes = 1216
+sha256 = "f696dcf85fc6ac076c77c13b66e7480c11ba1c51ac34c5a68616aa478538f5cc"
+bytes = 1182
 source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
 
 [[entry]]
@@ -227,8 +227,8 @@ id = "case:xy-low-phase"
 role = "truth"
 root = "cc"
 path = "cases/xy-low-phase.toml"
-sha256 = "34828367ca041601f59f888dc7958420feb825bea3713bf49e2fdc2bde0f7647"
-bytes = 1647
+sha256 = "a3541c2afae28f30ec955e18f7c7f3f3625b1fb09d11cc7b4721aec03f25ee3f"
+bytes = 1545
 source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
 
 [[entry]]
@@ -236,8 +236,8 @@ id = "case:xy-tkt"
 role = "truth"
 root = "cc"
 path = "cases/xy-tkt.toml"
-sha256 = "bf3719e32bfaa0ca046a4a78201c102023b93840929e6ad309df734dc54c32b0"
-bytes = 1754
+sha256 = "69618b3d1e18cad8354cf714f8b04af21a2187aeb5d5cc502230272c48a120f7"
+bytes = 1652
 source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
 
 [[entry]]

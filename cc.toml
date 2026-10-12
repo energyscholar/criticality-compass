@@ -7,8 +7,11 @@ tables = "v01-rules"          # the working table set (a directory under tables/
 mode = "basic"                  # basic | advanced; the flag --advanced overrides per command
 
 [data]
-root = "~/software/scratch/compass-toolset/data"   # read-only; every m.toml path is relative to it, except a path whose first directory is named in `local`
+name = "<data-root>"   # the NAME every stored data path starts with (a result's `read` map); never a location. Where the data IS on this machine: --data-root PATH, else CC_DATA_ROOT, else the clone's data/. Every m.toml path is relative to it, except a path whose first directory is named in `local`
 local = ["l8"]   # plan 0884 amendment 6 F1: data that lives IN this repo under data/ (CC0, redistributable; data/l8/ATTRIBUTION.md), so no gate reads outside the repo for it
+
+[sources]
+roots = ["<library>", "<toolset>"]   # a case's `sources` entry is a NAME <root>/path under one of these (a citation into the author's reading library or toolset); the entry's shape is checked, never a location on this machine
 
 [alphabets]
 class_truth = ["POINT", "LINE", "WALKING", "FIRST-ORDER", "MULTI", "BKT-END", "NOT"]

@@ -1,4 +1,5 @@
 """test_two_start_c2 - replay of the frozen C2 two-start screen (Blume-Capel, L = 81, 27 points)."""
+import os
 import re
 import sys
 from pathlib import Path
@@ -24,7 +25,7 @@ def check(name, ok, why=""):
 
 frozen = {}
 for d in ("2.0", "1.95", "1.9"):
-    text = (Path.home() / "software/scratch/compass-toolset/results" / f"C2-run-{d}.txt").read_text()
+    text = (Path(os.environ.get("CC_TOOLSET") or Path(os.environ["CC_DATA_ROOT"]).parent) / "results" / f"C2-run-{d}.txt").read_text()
     frozen.update({f"d{d}-K{m[0]}": float(m[1]) for m in re.findall(r"K ([\d.]+): .* D=([+-][\d.]+) ", text)})
 res = detect.run("c2-bc-two-start", "verdict-x-rules", write=False)
 rd = {r["unit"]["point"]: r for r in res["readings"] if r["instrument"] == "two_start"}

@@ -260,7 +260,7 @@ def read_hashes(m, input_id, tables, T, c):
     read[f"fixtures/data/{input_id}.toml"] = schema.sha(mf)
     pinned = tomllib.loads(mf.read_text())["files"]
     for b in m["data"]["files"]:
-        key = f"{c.cfg['data']['root']}/{b['path']}"
+        key = f"{c.cfg['data']['name']}/{b['path']}"
         if key not in read:
             read[key] = schema.sha(c.file(b["path"]))
             if pinned.get(b["path"]) != read[key]:

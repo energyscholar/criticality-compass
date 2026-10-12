@@ -18,7 +18,7 @@ crossover) may read LINE or NOT(ORD) at L <= 243""",
 decoy_of = "none"
 pairs_with = ["xy-tkt", "clock6-critical-phase"]
 sources = [
-  """~/software/has-anyone-looked/library/papers/defect-transitions/\
+  """<library>/defect-transitions/\
 tomita2002-pcc-xy-and-clock-models.md""",
 ]
 status = "in-signature-table"

@@ -18,11 +18,11 @@ is not coexistence (W3)""",
 decoy_of = "none"
 pairs_with = ["potts-q6", "potts-q7", "potts-q3"]
 sources = [
-  """~/software/hal-main/library/papers/conformal-finite-size/\
+  """<library>/conformal-finite-size/\
 gorbenkorychkovzan2018-walking-weak-first-order-transitions-and-complex-cfts-ii-potts-q-gt-4.md""",
-  """~/software/has-anyone-looked/library/papers/walking/\
+  """<library>/walking/\
 iino2019-detecting-weakly-first-order-potts.md""",
-  "~/software/has-anyone-looked/library/papers/walking/ma2019-shadow-complex-fixed-point-potts.md",
+  "<library>/walking/ma2019-shadow-complex-fixed-point-potts.md",
 ]
 status = "in-signature-table"
 studies = ["W1", "W2", "W3"]

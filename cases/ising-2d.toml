@@ -19,7 +19,7 @@ L_max are one declaration""",
 decoy_of = "none"
 pairs_with = ["ising-off-critical", "potts-q3", "at-self-dual-line"]
 sources = [
-  """~/software/hal-main/library/papers/binder-cumulant/\
+  """<library>/binder-cumulant/\
 kamieniarzblote1993-universal-ratio-of-magnetization-moments-in-two-dimensional-ising-models.md""",
 ]
 status = "in-signature-table"

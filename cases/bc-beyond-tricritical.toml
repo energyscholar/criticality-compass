@@ -19,7 +19,7 @@ trapping, see potts-q7)""",
 decoy_of = "LINE"
 pairs_with = ["bc-tricritical", "bc-lambda-line", "potts-q7"]
 sources = [
-  """~/software/hal-main/library/papers/multicritical/\
+  """<library>/multicritical/\
 zierenberg2017-scaling-universality-phase-diagram-2d-blume-capel.md""",
 ]
 status = "in-signature-table"

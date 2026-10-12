@@ -1,6 +1,7 @@
 """test_x5 - the X5 bilayer input (plan 0864 P5): under verdict-x-rules CC reproduces the toolset's frozen results/X5c.txt
 point for point (verdict, needle side and flow, response, stability, start screen), and the three NOT are the KNOWN FALSE
 NEGATIVES; under v01-rules g 0 and g 0.3 refuse as REFUSE-SLOW and g 0.1 stays NOT. The case carries the seal's sha256."""
+import os
 import re
 import sys
 from pathlib import Path
@@ -9,7 +10,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "cc" / "instruments")]
 import detect  # noqa: E402
 
-X5C = Path.home() / "software/scratch/compass-toolset/results/X5c.txt"
+X5C = Path(os.environ.get("CC_TOOLSET") or Path(os.environ["CC_DATA_ROOT"]).parent) / "results/X5c.txt"   # the study checkout: CC_TOOLSET, else the parent of CC_DATA_ROOT
 bad = []
 
 

@@ -51,17 +51,17 @@ DATA_ROOT_FLAG = None   # set once by bin/cc from the global option --data-root 
 
 
 def resolve_data_root(cfg, flag=None, env=None):
-    """(path, source) of the data root. The declaration is cc.toml [data] root; the physical location may be moved by CC_DATA_ROOT, and
-    that by --data-root. Precedence flag > env > cc.toml: a table in that order, the first one given wins, and the source is recorded."""
+    """(path, source) of the data root: WHERE the data is on this machine. cc.toml [data] name is only its NAME (the prefix of every stored path), never a location.
+    Precedence flag (--data-root PATH) > env (CC_DATA_ROOT) > the clone's own data/: a table in that order, the first one given wins, and the source is recorded."""
     env = os.environ.get("CC_DATA_ROOT") if env is None else env
-    given = [(src, v) for src, v in (("flag", flag), ("env", env), ("cc.toml", cfg["data"]["root"])) if v]
+    given = [(src, v) for src, v in (("flag", flag), ("env", env), ("default", str(ROOT / "data"))) if v]
     src, v = given[0]
     return Path(os.path.expanduser(v)), src
 
 
 class Ctx:
     """What the checks cross-reference: cc.toml, the registry, checks.toml, the data root (overridable).
-    The declared root string `cfg['data']['root']` stays the NAME of a data file in a result's `read` map (reuse compares it);
+    The declared name `cfg['data']['name']` is the prefix of a data file in a result's `read` map (reuse compares it);
     `data_root` is where that name is found on this machine, `data_root_source` says who chose it."""
 
     def __init__(self, root=ROOT, **over):
@@ -79,8 +79,8 @@ class Ctx:
 
     def physical(self, key):
         """Where the file a `read` key names is on this machine: the declared data root maps to the effective one."""
-        name = self.cfg["data"]["root"]
-        return self.file(key[len(name) + 1:]) if key.startswith(name + "/") else Path(key).expanduser() if key.startswith("~") else self.root / key
+        name = self.cfg["data"]["name"]
+        return self.file(key[len(name) + 1:]) if key.startswith(name + "/") else self.root / key
 
 
 def unit_blocks(m, inst):

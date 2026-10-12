@@ -18,11 +18,11 @@ power-law FSS mislocates it""",
 decoy_of = "none"
 pairs_with = ["xy-low-phase", "clock6-kt-ends", "potts-q5"]
 sources = [
-  """~/software/has-anyone-looked/library/papers/defect-transitions/\
+  """<library>/defect-transitions/\
 hasenbusch2005-2d-xy-kt-transition.md""",
-  """~/software/has-anyone-looked/library/papers/defect-transitions/\
+  """<library>/defect-transitions/\
 hasenbusch1994-roughening-rg-matching.md""",
-  """~/software/has-anyone-looked/library/papers/defect-transitions/\
+  """<library>/defect-transitions/\
 nelson1977-universal-jump-in-the-superfluid-density-of-two-dimensional-superfluids.md""",
 ]
 status = "in-signature-table"

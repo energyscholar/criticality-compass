@@ -13,7 +13,7 @@ traps = ["only simulated AT the exact K_c: no needle, a truth-placed point"]
 decoy_of = "none"
 pairs_with = ["ising-2d", "potts-q5"]
 sources = [
-  """~/software/hal-main/library/papers/conformal-finite-size/\
+  """<library>/conformal-finite-size/\
 gorbenkorychkovzan2018-walking-weak-first-order-transitions-and-complex-cfts-ii-potts-q-gt-4.md""",
 ]
 status = "in-signature-table"

@@ -65,7 +65,7 @@ ON THE TRANSFORM BASIS: x2b-xy-2 LINE at 0.5-0.85; family x2b-xy-2 BKT-END, end 
 blind score). The only cells that moved v06 -> v07 on 31 inputs: x2b-xy-2 across/geometry/verdict at 0.6-0.85. These LINE and BKT-END
 readings are transform-basis claims, not evidence (classification below); `x2b-xy-3@v08-rules` supersedes them.
 
-**v08-rules** - 2026-10-05, plan 0877 P2 (b51b121; spec `~/software/hal-main/plans/0877-v08-delta-basis-rules.md`). The frontier. Declared before any run
+**v08-rules** - 2026-10-05, plan 0877 P2 (b51b121). The frontier. Declared before any run
 (`expected/v08-rules.toml`, from the toolset's 0877-P0 table): a `stability_delta` instrument (stability on the Delta basis, `d = yD2 - yD1` per control pair,
 no transform, no TRANSFORMED cell in the alphabet); Bruce's ruling A (the across helpers read SLOW- and SLOW+ MARGINAL, not WEAK); D2 (a covariance
 across that is a null no longer blocks a live Delta reading); `family.toml` f1 reads `across_delta.y_last` per consecutive interior pair (the f1 plumbing branch,

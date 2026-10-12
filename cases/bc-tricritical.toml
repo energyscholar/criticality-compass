@@ -18,7 +18,7 @@ traps = [
 decoy_of = "none"
 pairs_with = ["bc-lambda-line", "bc-beyond-tricritical"]
 sources = [
-  """~/software/hal-main/library/papers/multicritical/\
+  """<library>/multicritical/\
 zierenberg2017-scaling-universality-phase-diagram-2d-blume-capel.md""",
 ]
 status = "in-signature-table"

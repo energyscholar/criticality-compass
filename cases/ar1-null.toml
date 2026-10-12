@@ -17,9 +17,9 @@ traps = [
 decoy_of = "none"
 pairs_with = []
 sources = [
-  """~/software/hal-main/library/papers/ews-foundations/\
+  """<library>/ews-foundations/\
 boettiger2012-quantifying-limits-to-detection-of-early-war.md""",
-  "~/software/has-anyone-looked/library/papers/statistics/lakens2017-equivalence-tests-primer.md",
+  "<library>/statistics/lakens2017-equivalence-tests-primer.md",
 ]
 status = "in-signature-table"
 studies = ["A3", "A8"]

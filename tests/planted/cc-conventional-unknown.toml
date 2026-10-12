@@ -7,7 +7,7 @@ tables = "verdict-x-rules"      # the working table set (a directory under table
 mode = "basic"                  # basic | advanced; the flag --advanced overrides per command
 
 [data]
-root = "~/software/scratch/compass-toolset/data"   # read-only; every m.toml path is relative to it
+name = "<data-root>"   # the name stored paths start with
 
 [alphabets]
 class_truth = ["POINT", "LINE", "WALKING", "FIRST-ORDER", "MULTI", "BKT-END", "NOT"]

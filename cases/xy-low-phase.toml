@@ -19,11 +19,11 @@ plurality maps do not apply""",
 decoy_of = "none"
 pairs_with = ["at-self-dual-line", "clock6-critical-phase", "xy-tkt"]
 sources = [
-  """~/software/has-anyone-looked/library/papers/defect-transitions/\
+  """<library>/defect-transitions/\
 hasenbusch2005-2d-xy-kt-transition.md""",
-  """~/software/has-anyone-looked/library/papers/defect-transitions/\
+  """<library>/defect-transitions/\
 nelson1977-universal-jump-in-the-superfluid-density-of-two-dimensional-superfluids.md""",
-  """~/software/has-anyone-looked/library/papers/defect-transitions/\
+  """<library>/defect-transitions/\
 kosterlitz1973-ordering-metastability-and-phase-transitions-in-2d.md""",
 ]
 status = "in-signature-table"

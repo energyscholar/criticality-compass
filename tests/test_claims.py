@@ -1,5 +1,5 @@
 """test_claims - plan 0932 P3: every evidence cell of CLAIMS.md resolves to an existing stored result with that sha256.
-Cells read `root:path@<64 hex>`; root cc = this repository, root toolset = $CC_TOOLSET or ~/software/scratch/compass-toolset.
+Cells read `root:path@<64 hex>`; root cc = this repository, root toolset = $CC_TOOLSET, else the parent of $CC_DATA_ROOT.
 A5: a planted row whose hash names no stored result fails (seen red below); a wrong path fails; a malformed cell fails; a table row with no cell fails.
 A toolset that is absent makes its cells UNCHECKED, printed loudly, never silently passed; CC_REQUIRE_TOOLSET=1 turns that into a failure."""
 import hashlib
@@ -15,7 +15,8 @@ STATUS = ("blind", "development", "provisional")
 
 
 def toolset_root():
-    return Path(os.environ.get("CC_TOOLSET") or Path.home() / "software/scratch/compass-toolset")
+    given = os.environ.get("CC_TOOLSET") or (str(Path(os.environ["CC_DATA_ROOT"]).parent) if os.environ.get("CC_DATA_ROOT") else "")
+    return Path(given or "/nonexistent-toolset")   # no toolset named: its cells are UNCHECKED, loudly
 
 
 def sha(p):

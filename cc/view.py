@@ -164,7 +164,7 @@ def show(res, join, mode, note="", tables_dir=None):
     out = [f"{res['input']}   rules: {res['tables']}   result: results/{res['run_id']}.json {note}".rstrip(),
            f"report: {cfg['report']['verdict']}"]   # plan 0893 R1: what every verdict below IS, once per result (cc.toml [report])
     if mode == "advanced":
-        files = [k for k in res["read"] if not k.startswith("~")]
+        files = [k for k in res["read"] if not k.startswith(cfg["data"]["name"] + "/")]
         out += [f"  interval: {iv['method']} " + cfg["interval_fields"][iv["method"]]["show"].format(**iv),
                 f"  code_commit: {res['code_commit']}",
                 *[f"  read {k} {identity(k, res['read'][k])}" for k in files],

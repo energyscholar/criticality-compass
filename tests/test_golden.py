@@ -29,7 +29,9 @@ ROOT = Path(__file__).resolve().parent.parent
 
 GOLD = ROOT / "tests" / "golden"
 TRACE = ROOT / "tests" / "trace"
-DATA = Path(os.path.expanduser(tomllib.loads((ROOT / "cc.toml").read_text())["data"]["root"]))
+sys.path[:0] = [str(ROOT / "cc")]
+import schema  # noqa: E402
+DATA = schema.resolve_data_root(tomllib.loads((ROOT / "cc.toml").read_text()))[0]   # where the data IS here: CC_DATA_ROOT, else the clone's data/
 TOOLSET = DATA.parent   # the toolset root: a transducer's `update` sha check reads the sampler files here (plan 0890 P3)
 REGOLDEN = os.environ.get("CC_REGOLDEN") == "1"
 VERBOSE = os.environ.get("CC_VERBOSE") == "1"

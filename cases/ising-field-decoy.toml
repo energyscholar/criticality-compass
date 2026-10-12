@@ -25,7 +25,7 @@ coexistence seen at L = 27 is finite size, not absence)""",
 decoy_of = "LINE"
 pairs_with = ["at-self-dual-line", "bc-beyond-tricritical", "potts-q7", "ising-2d"]
 sources = [
-  """~/software/hal-main/library/papers/binder-cumulant/\
+  """<library>/binder-cumulant/\
 kamieniarzblote1993-universal-ratio-of-magnetization-moments-in-two-dimensional-ising-models.md""",
 ]
 status = "in-signature-table"

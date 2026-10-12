@@ -1,4 +1,4 @@
-# benchmark/ROWS.toml (plan 0932 P1) - the declared row list. Argus declaration 2026-10-09 07:54 PDT (hal-main/research/compass-0932-declarations-DRAFT.toml).
+# benchmark/ROWS.toml (plan 0932 P1) - the declared row list. Declared 2026-10-09 07:54 PDT by the benchmark author.
 # Rows are listed, never globbed: CC-side rows name each file; map sets are named by the producer's own manifest (listed_by).
 # Data-root-relative paths. Maps frozen in: M1 (nav2-bank/M1, chains 0-39) and M7 (data/nav-m7-grid, data/nav-m7-bank). M5/M6 enter by a later dated amendment; M2-M4 are not built.
 schema = 1

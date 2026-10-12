@@ -21,13 +21,13 @@ EVALUATED 4/5): along needs two points both on the line""",
 decoy_of = "none"
 pairs_with = ["bc-lambda-line", "nnn-ising-manifold", "ising-2d"]
 sources = [
-  """~/software/has-anyone-looked/library/papers/critical-lines/\
+  """<library>/critical-lines/\
 wiseman1993-cluster-method-ashkin-teller.md""",
-  """~/software/has-anyone-looked/library/papers/critical-lines/\
+  """<library>/critical-lines/\
 salas1997-log-corrections-four-state-potts.md""",
-  """~/software/has-anyone-looked/library/papers/critical-lines/\
+  """<library>/critical-lines/\
 jin2012-ashkin-teller-pseudo-first-order.md""",
-  "~/software/hal-main/library/papers/critical-lines/ginsparg1988-applied-cft-c1-moduli.md",
+  "<library>/critical-lines/ginsparg1988-applied-cft-c1-moduli.md",
 ]
 status = "in-signature-table"
 studies = ["B1", "B2", "B4", "B5", "B6", "B7"]
