@@ -4,7 +4,7 @@
 maths = [
   "cc/kernel.py", "cc/sign.py", "cc/resample.py", "cc/project.py", "cc/readout.py",
   "cc/instruments/needle.py", "cc/instruments/across.py", "cc/instruments/stability.py",
-  "cc/instruments/two_start.py", "cc/instruments/along.py", "cc/instruments/fluct.py", "cc/instruments/needle_chain.py", "cc/instruments/across_delta.py", "cc/instruments/stability_delta.py", "cc/instruments/transform.py", "cc/fingerprint.py", "cc/reduce.py", "cc/gamma.py",
+  "cc/instruments/two_start.py", "cc/instruments/along.py", "cc/instruments/fluct.py", "cc/instruments/report.py", "cc/instruments/needle_chain.py", "cc/instruments/across_delta.py", "cc/instruments/stability_delta.py", "cc/instruments/transform.py", "cc/fingerprint.py", "cc/reduce.py", "cc/gamma.py",
 ]
 plumbing = ["bin/cc", "cc/admit.py", "cc/schema.py", "cc/declare.py", "cc/author.py", "cc/door.py", "cc/formats.py", "cc/detect.py", "cc/resources.py", "cc/view.py", "cc/score.py", "cc/reverdict.py", "cc/family.py", "cc/transducer.py", "tests/reference/verdict_x.py", "tests/trace/sitecustomize.py", "docs/gen-verdicts.py",
   ".githooks/pre-commit"]
@@ -23,7 +23,7 @@ tests = [
   "tests/test_run_all.py", "tests/test_pool.py", "tests/test_schedule.py", "tests/test_freeze_key.py", "tests/test_code_hash.py",
   "tests/test_across_delta.py", "tests/test_stability_delta.py", "tests/test_v08_tables.py", "tests/test_v08_result.py", "tests/test_delta_basis.py", "tests/test_transformed.py", "tests/test_end_note.py", "tests/test_v06_locks.py", "tests/test_classify.py", "tests/test_probe.py", "tests/test_chain.py", "tests/test_ends.py", "tests/test_reduce.py", "tests/test_stack_door.py", "tests/test_reuse.py", "tests/test_gamma.py", "tests/test_gamma_plan.py", "tests/test_gamma_twin.py",
   "tests/test_explain_pair.py", "tests/test_check_summary.py", "tests/test_conventional.py",
-  "tests/test_structure_gate.py", "tests/test_data_root.py", "tests/test_kernel_rs_bitwise.py", "tests/test_launcher.py", "tests/test_kernel_identity_key.py", "tests/test_pin_history.py", "tests/test_chains.py", "tests/test_chains_declare.py", "tests/test_v10_readable.py", "tests/test_island_table.py", "tests/test_occupied.py",   # plan 0929 (+ plan 0884 P2: island table, windows, occupied maths)
+  "tests/test_structure_gate.py", "tests/test_data_root.py", "tests/test_kernel_rs_bitwise.py", "tests/test_launcher.py", "tests/test_kernel_identity_key.py", "tests/test_pin_history.py", "tests/test_chains.py", "tests/test_chains_declare.py", "tests/test_v10_readable.py", "tests/test_island_table.py", "tests/test_occupied.py", "tests/test_report.py",   # plan 0929 (+ plan 0884 P2: island table, windows, occupied maths)
 ]
 
 [allow]

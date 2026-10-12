@@ -1023,9 +1023,9 @@ def chk_probe(p, d, c, stem=None):
 
 def scalar_keys(m, c):
     """The 0-d arrays (the sampler's parameters) the data files of an input hold, minus the size key: [] when none are stored."""
-    keys = set()
+    keys, readers = set(), formats.schemas(str(c.root)).get(m["data"]["format"], {}).get("readers", {})   # npz/npy formats name no reader: numpy reads them
     for path in sorted({c.data_root / b["path"] for b in m["data"]["files"]}):
-        h = shapes_of(c, path) if path.is_file() else ()
+        h = shapes_of(c, path) if path.is_file() and readers.get(path.suffix, "numpy") == "numpy" else ()   # plan 0884: only a file the numpy reader reads stores 0-d arrays; a table (.csv) stores none
         keys |= {k for k, shp in (h.items() if isinstance(h, dict) else []) if shp == ()}
     return sorted(keys - {SIZE_KEY})
 

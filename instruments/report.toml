@@ -1,0 +1,17 @@
+# instruments/report.toml - the relation-free REPORT instrument (plan 0884 amendment 4): per point, the declared sinks and the per-level mean of the observable of the declared
+# block states. It reads the [observable], [block_map] and [sinks] tables and needs NO relation (one window side has no size edge, Robin Q15/E382). Its outputs are REPORTS
+# (projection C, Robin E382), never coded and never read against an eps; its run passes the same chk_data interval floors as every instrument.
+schema = 1
+kind = "instrument"
+module = "report"                              # cc/instruments/report.py
+operators = []                                 # no operator acts: a report is a projection of the data, not a kernel reading
+unit = "point"
+reports = ["levels", "sinks"]                  # reported, never coded
+arrays = ["GL"]                                # the level stack of the declared block states, at the one declared size
+axes = ["point", "size"]
+relations = []
+sidecar = ["sinks", "observable", "block_map"]
+flags = []
+pipeline = ["stage:reduce", "stage:describe"]
+
+[columns]                                      # none: nothing is read against an eps
