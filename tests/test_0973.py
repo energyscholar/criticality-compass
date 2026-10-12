@@ -82,4 +82,13 @@ check("F2 all-pairs: control pairs in edge order, and the relation builds", door
 m["relations"]["mt"] = {"template": "matched", "axis": "size", "big": 27, "small": 9, "provenance": "Continuation"}
 check("F2 matched builds one pair (its own levels)", door.relations_for(m, "mt") is not None and door.control_pairs(m, "mt") == [(27, 9)])
 
+# ---- F5: codes_of indexes a total dict; NOT-MEASURED is written once, explicitly, for every source column of the set
+import schema  # noqa: E402
+for tn in ("v02-rules", "v08-rules", "v10-rules"):
+    T = detect.load_tables(tn)
+    direct = [n for n, c in schema.code_cols(T.codes).items() if isinstance(c["from"], str)]
+    got = detect.codes_of({}, T)
+    check(f"F5 {tn}: with no cells every direct column reads NOT-MEASURED (no KeyError)", all(got[n] == "NOT-MEASURED" for n in direct), {n: got[n] for n in direct})
+
+
 sys.exit(1 if bad else 0)

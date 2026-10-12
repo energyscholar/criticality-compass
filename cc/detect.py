@@ -164,6 +164,7 @@ def preferred(got, doors, prefer):
 def codes_of(cells, tables):
     """Every helper and signature column for one point; nulls pass through; a point-size source is combined."""
     cols, nulls = schema.code_cols(tables.codes), tables.codes["null_rank"]
+    cells = {**dict.fromkeys(used(tables), "NOT-MEASURED"), **cells}   # plan 0973 F5: a source column with no reading is NOT-MEASURED, written here as one explicit step; the lookup below is a plain index
     memo = {}
 
     def one(name, cell):
@@ -173,7 +174,7 @@ def codes_of(cells, tables):
         if name not in memo:
             c, src = cols[name], cols[name]["from"]
             if isinstance(src, str):
-                raw = cells.get(src, "NOT-MEASURED")
+                raw = cells[src]
                 if isinstance(raw, list):
                     got = [one(name, x) for x in raw]    # sizes ascend: a code in top_only counts only when the LARGEST size reads it (plan 0870)
                     got = preferred(got, cells.get(src + "@door", [None] * len(got)), c["combine"].get("prefer_door"))   # plan 0874: only the pairs on the preferred door value, when there is one
@@ -420,7 +421,7 @@ def reading_dict(row, unit, codes, direct, cols):
     n, col, ek, flags, per, src = row
     r0, point_size = per[0][1], len(per) > 1 or per[0][0] is not None
     per_size = [{"size": sz, "estimate": r.estimate, "lo": r.lo, "hi": r.hi, "cell": r.cell,
-                 "code": cols[direct[src]]["map"].get(r.cell, r.cell), **({"door": r.door} if r.door is not None else {})}
+                 "code": cols[direct[src]]["map"][r.cell], **({"door": r.door} if r.door is not None else {})}
                 for sz, r in per] if point_size else None
     full = None if point_size or r0.vector is None else f"{n}/{col}/{ukey(unit)}"
     return {"instrument": n, "column": col, "unit": unit, "eps_key": ek, "eps": r0.eps,
