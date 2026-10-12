@@ -264,6 +264,8 @@ door's former edge order (every family transcript byte-identical). The family ve
 REFUSE-*) is a **declared report**, a projection C over per-point sign cells, not a relational reading; the sign-cell rule
 stands unchanged. `bin/cc family` prints `=> family report` and the label `cc.toml [report] family` under it.
 
+**Under method `chains` (plan 0978).** The family layer reads an input of method `chains` through the same stored cells; only f1 reads a vector, and it reads the per-chain differences `d_k = y_k(j) - y_k(i)` of rows 1..m (row 0 is a copy of chain 0), whose order statistics `[d_(r), d_(m+1-r)]` are the interval of `median_k(d_k)`: an estimand that coincides with the difference of the two medians only when `d` is symmetric (declared, as T7-B). An end bracket localises to one grid interval; it carries no joint coverage over the cells it reads. Method `gamma` has no per-row difference vector, so f1 reads NOT-EVALUATED there (a row of the readout table, not an exception).
+
 **The per-point verdict path is a projection C as well (Robin, 2026-10-06, LOG E382).** The per-point sign cells the family
 reads are themselves sign cells of declared comparisons: the blocking-map comparison of independent sizes (the needle's
 matched levels, the size chains) and the two-start difference (pending Robin R1), each computed inside C, not A over a

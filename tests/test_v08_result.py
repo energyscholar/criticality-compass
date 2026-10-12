@@ -88,7 +88,7 @@ def planted(levels, null=None):
         dead = (a, b) == null
         pr.append({"instrument": "across_delta", "column": "y_last", "unit": {"pair": [a, b]}, "cell": "NOT-EVALUATED" if dead else "ZERO!", "vector_key": None if dead else vk})
     pts = [{"instrument": "across_delta", "column": "y_last", "unit": {"point": p}, "cell": None, "vector_key": None} for p in PTS]
-    return {"interval": {"resamples": RES, "level": 0.95}, "readings": pts, "pair_readings": pr}, z
+    return {"interval": {"method": "block", "resamples": RES, "level": 0.95}, "readings": pts, "pair_readings": pr}, z
 
 
 def f1(levels, null=None):

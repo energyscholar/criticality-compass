@@ -57,20 +57,6 @@ def refused(msg, nxt):
     return Refused(f"{msg}\n  Next: {nxt}")
 
 
-def family_refusal(root, fid):
-    """Plan 0937: cc/family.py reads an interval's resamples and level, which a chains interval does not have (m independent chains, no resamples); a family over such an input
-    is REFUSED here, typed and with its reason, before family.py is entered. None when the family's input is not chained (or the family does not exist: family.run says so)."""
-    p = Path(root) / "families" / f"{fid}.toml"
-    inp = tomllib.loads(p.read_text()).get("input") if p.is_file() else None
-    m = tomllib.loads((Path(root) / "inputs" / inp / "m.toml").read_text()) if inp and (Path(root) / "inputs" / inp / "m.toml").is_file() else None
-    method = m["interval"]["method"] if m else None
-    if method and tomllib.loads((Path(root) / "cc.toml").read_text())["interval_fields"][method].get("chained"):
-        return (f"REFUSED: family {fid} reads input {inp}, whose interval method is '{method}' ({m['interval']['m']} independent chains; no resamples, no level); "
-                f"the family reading is defined on a resampled interval only, so it is not evaluated here.\n  Next: read {inp} with bin/cc show {inp} --tables <v10-rules or later>, "
-                f"or point the family at an input of method block or iid")
-    return None
-
-
 @functools.lru_cache(maxsize=None)
 def instrument(name):
     d = tomllib.loads((ROOT / "instruments" / f"{name}.toml").read_text())

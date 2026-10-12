@@ -39,6 +39,27 @@ def bracket_of(fam, res, nulls):
     return b["table"][",".join([*over, mid])], [(*p, ",".join(e)) for p, e in zip(pairs, edges)]
 
 
+def _f1_resampled(d, iv, eps):
+    """Block and iid: the percentile interval of the resample rows (d[0] the estimate row) at the input's level."""
+    est, lo, hi, cell = readout.reading(d, iv["level"], eps)
+    return f"{est:+.3f} [{lo:+.3f}, {hi:+.3f}] {cell}", cell
+
+
+def _f1_chains(d, iv, eps):
+    """Plan 0978 R2: chain k's difference d_k = y_k(j) - y_k(i), rows 1..m (row 0 is a copy of chain 0 and is excluded by readout.chains): the order statistics
+    [d_(r), d_(m+1-r)] of m iid values, T18-B. The estimand is median_k(d_k) (R5), not the difference of the two medians."""
+    est, lo, hi, cell = readout.chains(d, iv["r"], eps)
+    return f"{est:+.3f} [{lo:+.3f}, {hi:+.3f}] {cell}", cell
+
+
+def _f1_gamma(d, iv, eps):
+    """Plan 0978 R3: the linearised rows of method gamma are not replicates, so no per-row difference vector exists: a declared null, not an exception."""
+    return "the linearised rows are not replicates: no per-row difference vector exists", "NOT-EVALUATED"
+
+
+F1_READOUT = {"block": _f1_resampled, "iid": _f1_resampled, "gamma": _f1_gamma, "chains": _f1_chains}   # [interval] method -> f1's readout of one pair-difference column (plan 0978 R3); total over cc.toml alphabets.interval_method (tests/test_0978.py)
+
+
 def f1_of(fam, decl, res, z, m, nulls):
     """(code, [(a, b, text, code)]) over the interior points; NOT-MEASURED unless the input declares the instrument."""
     f, (inst, _, col) = fam["f1"], fam["f1"]["reads"].partition(".")
@@ -47,18 +68,19 @@ def f1_of(fam, decl, res, z, m, nulls):
     pair = detect.instrument(inst)[0]["unit"] == "pair"   # plan 0877: a pair instrument is read at the consecutive interior pairs (control edges), one unit per pair
     rows = {"->".join(r["unit"]["pair"]) if pair else r["unit"]["point"]: r for r in res["pair_readings" if pair else "readings"] if (r["instrument"], r["column"]) == (inst, col)}
     pts = ["->".join(u) for u in zip(decl["interior"], decl["interior"][1:])] if pair else decl["interior"]
-    zero = np.zeros(res["interval"]["resamples"] + 1)
-    y = np.stack([z[rows[p]["vector_key"]] if rows[p]["vector_key"] else zero for p in pts], axis=1)   # [R+1, n]
+    zero = np.zeros(max([len(z[r["vector_key"]]) for r in rows.values() if r["vector_key"]] + [1]))   # plan 0978 R5: the placeholder has the stored vectors' row count, whatever the interval method
+    y = np.stack([z[rows[p]["vector_key"]] if rows[p]["vector_key"] else zero for p in pts], axis=1)   # [rows, n]
     ij = fingerprint.all_pairs(len(pts))
     pairs = [(pts[i], pts[j]) for i, j in ij]
     diff, out = fingerprint.pair_differences(y, ij), []
+    codes = {**{n: n for n in nulls}, **f["code"]}   # a null cell is its own code (as f2_of)
     for e, (a, c) in enumerate(pairs):
         nul = [rows[p]["cell"] for p in (a, c) if rows[p]["cell"] in nulls]
         if nul:
             out.append((a, c, "a point reads null", low(nul, f["rank"])))
             continue
-        est, lo, hi, cell = readout.reading(diff[:, e], res["interval"]["level"], m["eps"][f["eps"]])
-        out.append((a, c, f"{est:+.3f} [{lo:+.3f}, {hi:+.3f}] {cell}", f["code"][cell]))
+        text, cell = F1_READOUT[res["interval"]["method"]](diff[:, e], res["interval"], m["eps"][f["eps"]])
+        out.append((a, c, text, codes[cell]))
     return low([o[3] for o in out], f["rank"]), out
 
 

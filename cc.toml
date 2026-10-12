@@ -146,8 +146,8 @@ RELATION = "KERNEL"
 # [projections.<name>] (plans 0892/0893): what each declared projection C keeps and discards. validate requires both strings non-empty for
 # `family` and for every relation name whose step label is COMPARISON.
 [projections.family]
-keeps = "the interior sign-cell run; the ordered differences, inside C, of the stored per-point readings over it (the needle codes' ranks; across_delta.y_last per resample); the stored along cells"
-discards = "every point outside the run; every magnitude beyond its sign cell; every other column"
+keeps = "the interior sign-cell run; the ordered differences, inside C, of the stored per-point readings over it (the needle codes' ranks; across_delta.y_last per stored row: per resample under block and iid, per chain under chains, rows 1..m); the stored along cells"
+discards = "every point outside the run; every magnitude beyond its sign cell; every other column; joint coverage over the cells a family code reads"
 
 [projections.size]
 keeps = "the ordered difference, inside C, of per-locus observations of independent sizes through the declared blocking map (one blocking step relates L to L/3)"

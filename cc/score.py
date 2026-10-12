@@ -62,8 +62,7 @@ def family_ends(tset, inputs, tr, joins, root, findings):
     for f in sorted((Path(root) / "families").glob("*.toml")):
         decl = family.load_decl(root, f.stem)
         if decl and decl["input"] in inputs and (Path(root) / "tables" / tset / "family.toml").is_file():
-            msg, ran = detect.family_refusal(root, f.stem), None   # plan 0937: refused before family.py is entered
-            msg, ran = (msg, None) if msg else family.run(root, f.stem, tset)
+            msg, ran = family.run(root, f.stem, tset)
             findings += [msg] * (ran is None)
             got += [ran] * (ran is not None and "end_bracket" in ran[1])
     for decl, out, _ in got:

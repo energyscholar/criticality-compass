@@ -2,7 +2,7 @@
 A scratch copy of the repo gets x8-chains: the x8-ising-needle arrays cut into 10 chain files per cell (chain k = rows 160k..160k+159 of the real array), method chains m 10 r 2.
 (1) the clean scratch input validates with no finding; (2) 9 chains in one cell, r 3, and `chain` on a non-chains input are each REFUSED with their exact finding (seen red:
 with chain_cells emptied the 9-chain case is no longer refused, so the test can fail); (3) one run under v10-rules: every velocity reading's lo/hi are the (r)th and (m+1-r)th
-order statistics of the m per-chain readings (rows 1..m of its stored vector), the estimate is their median; (4) cc/family.py REFUSES (typed, with a reason) to read a chains interval."""
+order statistics of the m per-chain readings (rows 1..m of its stored vector), the estimate is their median; (4) plan 0978: a family over a chains input is READ (the 0937 refusal is deleted; tests/test_0978.py holds the family-layer tests)."""
 import json
 import os
 import shutil
@@ -115,14 +115,11 @@ try:
         ok &= len(v) == M + 1 and (r["lo"], r["hi"]) == (chains[1], chains[M - 2]) and r["estimate"] == float(np.median(chains))
     check("end to end: every reading's lo/hi are the 2nd and 9th order statistics of its 10 per-chain readings", ok, str(rd[:1])[:400])
     (repo / "families").mkdir(exist_ok=True)
-    (repo / "families" / "fx.toml").write_text('kind = "family-decl"\nid = "fx"\ninput = "x8-chains"\n')
-    import detect
-    got = detect.family_refusal(repo, "fx")
-    check("family over a chains input is REFUSED (typed, with its reason and a Next line)", bool(got) and got.startswith("REFUSED:") and "'chains'" in got and "Next:" in got, str(got))
+    (repo / "families" / "fx.toml").write_text('kind = "family-decl"\nid = "fx"\ninput = "x8-chains"\nschema = 1\ninterior = ["0.95", "0.98", "0.99", "1.00", "1.01", "1.02", "1.05"]\n')
+    # plan 0978 (declared edit of the plan 0937 assertions here): the gate `detect.family_refusal` is deleted, so a family over a chains input is READ, never refused
     cli = subprocess.run([sys.executable, str(repo / "bin" / "cc"), "family", "fx", "--tables", "v10-rules"], cwd=repo, env=env, capture_output=True, text=True)
-    check("bin/cc family prints that refusal and exits 1", cli.returncode == 1 and "REFUSED: family fx" in cli.stdout, (cli.stdout + cli.stderr)[-400:])
-    real = sorted((ROOT / "families").glob("*.toml"))[0].stem
-    check("seen red: a family over a resampled input is NOT refused", detect.family_refusal(ROOT, real) is None and detect.family_refusal(ROOT, "no-such-family") is None)
+    check("bin/cc family over a chains input is read, not refused (plan 0978)", cli.returncode == 0 and "family fx" in cli.stdout and "REFUSED" not in cli.stdout, (cli.stdout + cli.stderr)[-500:])
+    check("the family's f1 reads NOT-MEASURED there (x8-chains declares no across_delta): a null, not an error", "f1      NOT-MEASURED" in cli.stdout, cli.stdout[-500:])
 finally:
     shutil.rmtree(tmp, ignore_errors=True)
 print("test_chains_declare: " + ("FAILED" if bad else "all passed"))

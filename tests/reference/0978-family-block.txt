@@ -1,0 +1,1478 @@
+## b7-at-line-2 @ v01-rules
+family b7-at-line-2   rules: v01-rules   input: b7-at-line-2   interior: 0.0 0.07 0.14 0.21
+  bracket NOT-MEASURED
+    edge 0.0->0.07 NOT-MEASURED
+    edge 0.07->0.14 NOT-MEASURED
+    edge 0.14->0.21 NOT-MEASURED
+    edge 0.21->0.2747 NOT-MEASURED
+  f1      VARIES
+    0.0->0.07 y_last +0.064 [+0.019, +0.109] SLOW+  -> CONSTANT
+    0.0->0.14 y_last +0.166 [+0.112, +0.224] SLOW+  -> CONSTANT
+    0.07->0.14 y_last +0.102 [+0.054, +0.165] SLOW+  -> CONSTANT
+    0.0->0.21 y_last +0.322 [+0.233, +0.394] POS  -> VARIES
+    0.07->0.21 y_last +0.258 [+0.183, +0.325] POS  -> VARIES
+    0.14->0.21 y_last +0.156 [+0.074, +0.233] SLOW+  -> CONSTANT
+  f2      MARGINAL
+    0.0->0.07 along ZERO!  -> MARGINAL
+    0.07->0.14 along ZERO!  -> MARGINAL
+    0.14->0.21 along ZERO!  -> MARGINAL
+  => family report LINE   class LINE, family.toml line 55
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: B7 (SYNTHESIS-3): fingerprints 1 and 2 both resolved; X7a: POINT manifolds do not reach f2 MARGINAL
+## b7-at-line-2 @ v02-rules
+family b7-at-line-2   rules: v02-rules   input: b7-at-line-2   interior: 0.0 0.07 0.14 0.21
+  bracket NOT-MEASURED
+    edge 0.0->0.07 NOT-MEASURED
+    edge 0.07->0.14 NOT-MEASURED
+    edge 0.14->0.21 NOT-MEASURED
+    edge 0.21->0.2747 NOT-MEASURED
+  f1      VARIES
+    0.0->0.07 y_last +0.064 [+0.019, +0.109] SLOW+  -> CONSTANT
+    0.0->0.14 y_last +0.166 [+0.112, +0.224] SLOW+  -> CONSTANT
+    0.07->0.14 y_last +0.102 [+0.054, +0.165] SLOW+  -> CONSTANT
+    0.0->0.21 y_last +0.322 [+0.233, +0.394] POS  -> VARIES
+    0.07->0.21 y_last +0.258 [+0.183, +0.325] POS  -> VARIES
+    0.14->0.21 y_last +0.156 [+0.074, +0.233] SLOW+  -> CONSTANT
+  f2      MARGINAL
+    0.0->0.07 along ZERO!  -> MARGINAL
+    0.07->0.14 along ZERO!  -> MARGINAL
+    0.14->0.21 along ZERO!  -> MARGINAL
+  => family report LINE   class LINE, family.toml line 55
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: B7 (SYNTHESIS-3): fingerprints 1 and 2 both resolved; X7a: POINT manifolds do not reach f2 MARGINAL
+## b7-at-line-2 @ v03-rules
+family b7-at-line-2   rules: v03-rules   input: b7-at-line-2   interior: 0.0 0.07 0.14 0.21
+  bracket NOT-MEASURED
+    edge 0.0->0.07 NOT-MEASURED
+    edge 0.07->0.14 NOT-MEASURED
+    edge 0.14->0.21 NOT-MEASURED
+    edge 0.21->0.2747 NOT-MEASURED
+  f1      VARIES
+    0.0->0.07 y_last +0.064 [+0.019, +0.109] SLOW+  -> CONSTANT
+    0.0->0.14 y_last +0.166 [+0.112, +0.224] SLOW+  -> CONSTANT
+    0.07->0.14 y_last +0.102 [+0.054, +0.165] SLOW+  -> CONSTANT
+    0.0->0.21 y_last +0.322 [+0.233, +0.394] POS  -> VARIES
+    0.07->0.21 y_last +0.258 [+0.183, +0.325] POS  -> VARIES
+    0.14->0.21 y_last +0.156 [+0.074, +0.233] SLOW+  -> CONSTANT
+  f2      MARGINAL
+    0.0->0.07 along ZERO!  -> MARGINAL
+    0.07->0.14 along ZERO!  -> MARGINAL
+    0.14->0.21 along ZERO!  -> MARGINAL
+  => family report LINE   class LINE, family.toml line 55
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: B7 (SYNTHESIS-3): fingerprints 1 and 2 both resolved; X7a: POINT manifolds do not reach f2 MARGINAL
+## b7-at-line-2 @ v04-rules
+family b7-at-line-2   rules: v04-rules   input: b7-at-line-2   interior: 0.0 0.07 0.14 0.21
+  bracket NOT-MEASURED
+    edge 0.0->0.07 NOT-MEASURED
+    edge 0.07->0.14 NOT-MEASURED
+    edge 0.14->0.21 NOT-MEASURED
+    edge 0.21->0.2747 NOT-MEASURED
+  f1      VARIES
+    0.0->0.07 y_last +0.064 [+0.019, +0.109] SLOW+  -> CONSTANT
+    0.0->0.14 y_last +0.166 [+0.112, +0.224] SLOW+  -> CONSTANT
+    0.07->0.14 y_last +0.102 [+0.054, +0.165] SLOW+  -> CONSTANT
+    0.0->0.21 y_last +0.322 [+0.233, +0.394] POS  -> VARIES
+    0.07->0.21 y_last +0.258 [+0.183, +0.325] POS  -> VARIES
+    0.14->0.21 y_last +0.156 [+0.074, +0.233] SLOW+  -> CONSTANT
+  f2      MARGINAL
+    0.0->0.07 along ZERO!  -> MARGINAL
+    0.07->0.14 along ZERO!  -> MARGINAL
+    0.14->0.21 along ZERO!  -> MARGINAL
+  => family report LINE   class LINE, family.toml line 55
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: B7 (SYNTHESIS-3): fingerprints 1 and 2 both resolved; X7a: POINT manifolds do not reach f2 MARGINAL
+## b7-at-line-2 @ v05-rules
+family b7-at-line-2   rules: v05-rules   input: b7-at-line-2   interior: 0.0 0.07 0.14 0.21
+  bracket NOT-MEASURED
+    edge 0.0->0.07 NOT-MEASURED,NOT-MEASURED
+    edge 0.07->0.14 NOT-MEASURED,NOT-MEASURED
+    edge 0.14->0.21 NOT-MEASURED,NOT-MEASURED
+    edge 0.21->0.2747 NOT-MEASURED,NOT-MEASURED
+  f1      VARIES
+    0.0->0.07 y_last +0.064 [+0.019, +0.109] SLOW+  -> CONSTANT
+    0.0->0.14 y_last +0.166 [+0.112, +0.224] SLOW+  -> CONSTANT
+    0.07->0.14 y_last +0.102 [+0.054, +0.165] SLOW+  -> CONSTANT
+    0.0->0.21 y_last +0.322 [+0.233, +0.394] POS  -> VARIES
+    0.07->0.21 y_last +0.258 [+0.183, +0.325] POS  -> VARIES
+    0.14->0.21 y_last +0.156 [+0.074, +0.233] SLOW+  -> CONSTANT
+  f2      MARGINAL
+    0.0->0.07 along ZERO!  -> MARGINAL
+    0.07->0.14 along ZERO!  -> MARGINAL
+    0.14->0.21 along ZERO!  -> MARGINAL
+  points  NOT-LINE
+    0.0 geometry REFUSE-NEEDLE-UNMEASURED  -> NOT-LINE
+    0.07 geometry REFUSE-NEEDLE-UNMEASURED  -> NOT-LINE
+    0.14 geometry REFUSE-NEEDLE-UNMEASURED  -> NOT-LINE
+    0.21 geometry REFUSE-NEEDLE-UNMEASURED  -> NOT-LINE
+  lower   OPEN   boundary 0.0, beyond (none)
+    reads boundary_needle NOT-MEASURED, boundary_flow NOT-MEASURED, beyond_needles NONE, beyond_order NONE  -> family.toml side_row line 510
+    why: no point lies on this side of the declared interior
+  upper   NOT-MEASURED   boundary 0.21, beyond 0.2747
+    reads boundary_needle NOT-MEASURED, boundary_flow NOT-MEASURED, beyond_needles NOT-MEASURED, beyond_order UNRES  -> family.toml side_row line 525
+    why: honest null: the boundary needle or a needle beyond it was not measured or not evaluated (NOT-MEASURED reads first)
+  end     (none)
+  => family report LINE   class LINE, family.toml line 223
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: B7 (SYNTHESIS-3): fingerprints 1 and 2 both resolved; X7a: POINT manifolds do not reach f2 MARGINAL
+## b7-at-line-2 @ v06-rules
+family b7-at-line-2   rules: v06-rules   input: b7-at-line-2   interior: 0.0 0.07 0.14 0.21
+  bracket NOT-MEASURED
+    edge 0.0->0.07 NOT-MEASURED,NOT-MEASURED
+    edge 0.07->0.14 NOT-MEASURED,NOT-MEASURED
+    edge 0.14->0.21 NOT-MEASURED,NOT-MEASURED
+    edge 0.21->0.2747 NOT-MEASURED,NOT-MEASURED
+  f1      VARIES
+    0.0->0.07 y_last +0.064 [+0.019, +0.109] SLOW+  -> CONSTANT
+    0.0->0.14 y_last +0.166 [+0.112, +0.224] SLOW+  -> CONSTANT
+    0.07->0.14 y_last +0.102 [+0.054, +0.165] SLOW+  -> CONSTANT
+    0.0->0.21 y_last +0.322 [+0.233, +0.394] POS  -> VARIES
+    0.07->0.21 y_last +0.258 [+0.183, +0.325] POS  -> VARIES
+    0.14->0.21 y_last +0.156 [+0.074, +0.233] SLOW+  -> CONSTANT
+  f2      MARGINAL
+    0.0->0.07 along ZERO!  -> MARGINAL
+    0.07->0.14 along ZERO!  -> MARGINAL
+    0.14->0.21 along ZERO!  -> MARGINAL
+  points  NOT-LINE
+    0.0 geometry REFUSE-NEEDLE-UNMEASURED  -> NOT-LINE
+    0.07 geometry REFUSE-NEEDLE-UNMEASURED  -> NOT-LINE
+    0.14 geometry REFUSE-NEEDLE-UNMEASURED  -> NOT-LINE
+    0.21 geometry REFUSE-NEEDLE-UNMEASURED  -> NOT-LINE
+  lower   OPEN   boundary 0.0, beyond (none)
+    reads boundary_needle NOT-MEASURED, boundary_flow NOT-MEASURED, beyond_needles NONE, beyond_order NONE  -> family.toml side_row line 510
+    why: no point lies on this side of the declared interior
+  upper   NOT-MEASURED   boundary 0.21, beyond 0.2747
+    reads boundary_needle NOT-MEASURED, boundary_flow NOT-MEASURED, beyond_needles NOT-MEASURED, beyond_order UNRES  -> family.toml side_row line 525
+    why: honest null: the boundary needle or a needle beyond it was not measured or not evaluated (NOT-MEASURED reads first)
+  end     (none)
+  => family report LINE   class LINE, family.toml line 223
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: B7 (SYNTHESIS-3): fingerprints 1 and 2 both resolved; X7a: POINT manifolds do not reach f2 MARGINAL
+## b7-at-line-2 @ v07-rules
+family b7-at-line-2   rules: v07-rules   input: b7-at-line-2   interior: 0.0 0.07 0.14 0.21
+  bracket NOT-MEASURED
+    edge 0.0->0.07 NOT-MEASURED,NOT-MEASURED
+    edge 0.07->0.14 NOT-MEASURED,NOT-MEASURED
+    edge 0.14->0.21 NOT-MEASURED,NOT-MEASURED
+    edge 0.21->0.2747 NOT-MEASURED,NOT-MEASURED
+  f1      VARIES
+    0.0->0.07 y_last +0.064 [+0.019, +0.109] SLOW+  -> CONSTANT
+    0.0->0.14 y_last +0.166 [+0.112, +0.224] SLOW+  -> CONSTANT
+    0.07->0.14 y_last +0.102 [+0.054, +0.165] SLOW+  -> CONSTANT
+    0.0->0.21 y_last +0.322 [+0.233, +0.394] POS  -> VARIES
+    0.07->0.21 y_last +0.258 [+0.183, +0.325] POS  -> VARIES
+    0.14->0.21 y_last +0.156 [+0.074, +0.233] SLOW+  -> CONSTANT
+  f2      MARGINAL
+    0.0->0.07 along ZERO!  -> MARGINAL
+    0.07->0.14 along ZERO!  -> MARGINAL
+    0.14->0.21 along ZERO!  -> MARGINAL
+  points  NOT-LINE
+    0.0 geometry REFUSE-NEEDLE-UNMEASURED  -> NOT-LINE
+    0.07 geometry REFUSE-NEEDLE-UNMEASURED  -> NOT-LINE
+    0.14 geometry REFUSE-NEEDLE-UNMEASURED  -> NOT-LINE
+    0.21 geometry REFUSE-NEEDLE-UNMEASURED  -> NOT-LINE
+  lower   OPEN   boundary 0.0, beyond (none)
+    reads boundary_needle NOT-MEASURED, boundary_flow NOT-MEASURED, beyond_needles NONE, beyond_order NONE  -> family.toml side_row line 510
+    why: no point lies on this side of the declared interior
+  upper   NOT-MEASURED   boundary 0.21, beyond 0.2747
+    reads boundary_needle NOT-MEASURED, boundary_flow NOT-MEASURED, beyond_needles NOT-MEASURED, beyond_order UNRES  -> family.toml side_row line 525
+    why: honest null: the boundary needle or a needle beyond it was not measured or not evaluated (NOT-MEASURED reads first)
+  end     (none)
+  => family report LINE   class LINE, family.toml line 223
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: B7 (SYNTHESIS-3): fingerprints 1 and 2 both resolved; X7a: POINT manifolds do not reach f2 MARGINAL
+## b7-at-line-2 @ v08-rules
+no result for b7-at-line-2 under v08-rules yet.
+  Next: bin/cc run b7-at-line-2 --tables v08-rules
+## b7-at-line-2 @ v10-rules
+no result for b7-at-line-2 under v10-rules yet.
+  Next: bin/cc run b7-at-line-2 --tables v10-rules
+## k4-m1 @ v01-rules
+family k4-m1 reads NOT-EVALUATED: its family.toml has no [side] needle_code to read the needle codes through.
+  Next: bin/cc show k4-m1 --tables v01-rules (the needle column), then declare the points the family covers, or measure more points
+## k4-m1 @ v02-rules
+family k4-m1 reads NOT-EVALUATED: its family.toml has no [side] needle_code to read the needle codes through.
+  Next: bin/cc show k4-m1 --tables v02-rules (the needle column), then declare the points the family covers, or measure more points
+## k4-m1 @ v03-rules
+family k4-m1 reads NOT-EVALUATED: its family.toml has no [side] needle_code to read the needle codes through.
+  Next: bin/cc show k4-m1 --tables v03-rules (the needle column), then declare the points the family covers, or measure more points
+## k4-m1 @ v04-rules
+family k4-m1 reads NOT-EVALUATED: its family.toml has no [side] needle_code to read the needle codes through.
+  Next: bin/cc show k4-m1 --tables v04-rules (the needle column), then declare the points the family covers, or measure more points
+## k4-m1 @ v05-rules
+family k4-m1   rules: v05-rules   input: k4-m1   interior: 0.45 0.50 0.55 0.60 0.65 0.70 0.75 0.80 0.85 (rule mid-run-open)
+  bracket BRACKET-DOWN
+    edge 0.30->0.35 NO-DESCENT,NO-ASCENT
+    edge 0.35->0.40 DESCENT,NO-ASCENT
+    edge 0.40->0.45 NO-DESCENT,NO-ASCENT
+    edge 0.45->0.50 NO-DESCENT,NO-ASCENT
+    edge 0.50->0.55 NO-DESCENT,NO-ASCENT
+    edge 0.55->0.60 NO-DESCENT,NO-ASCENT
+    edge 0.60->0.65 NO-DESCENT,NO-ASCENT
+    edge 0.65->0.70 NO-DESCENT,NO-ASCENT
+    edge 0.70->0.75 NO-DESCENT,NO-ASCENT
+    edge 0.75->0.80 NO-DESCENT,NO-ASCENT
+    edge 0.80->0.85 NO-DESCENT,NO-ASCENT
+    edge 0.85->0.90 NO-DESCENT,NO-ASCENT
+    edge 0.90->0.95 DESCENT,NO-ASCENT
+    edge 0.95->1.00 NO-DESCENT,NO-ASCENT
+    edge 1.00->1.05 NO-DESCENT,NO-ASCENT
+    edge 1.05->1.10 NO-DESCENT,NO-ASCENT
+  f1      VARIES
+    0.45->0.50 y_last +0.145 [-0.078, +0.379] UNRES  -> UNRES
+    0.45->0.55 y_last -0.124 [-0.374, +0.118] UNRES  -> UNRES
+    0.50->0.55 y_last -0.270 [-0.543, -0.033] NEG  -> VARIES
+    0.45->0.60 y_last -0.078 [-0.303, +0.146] UNRES  -> UNRES
+    0.50->0.60 y_last -0.223 [-0.465, -0.012] NEG  -> VARIES
+    0.55->0.60 y_last +0.047 [-0.205, +0.337] UNRES  -> UNRES
+    0.45->0.65 y_last +0.007 [-0.218, +0.235] ZERO!  -> CONSTANT
+    0.50->0.65 y_last -0.138 [-0.377, +0.063] UNRES  -> UNRES
+    0.55->0.65 y_last +0.132 [-0.113, +0.386] UNRES  -> UNRES
+    0.60->0.65 y_last +0.085 [-0.135, +0.349] UNRES  -> UNRES
+    0.45->0.70 y_last -0.050 [-0.238, +0.156] ZERO!  -> CONSTANT
+    0.50->0.70 y_last -0.195 [-0.415, +0.013] UNRES  -> UNRES
+    0.55->0.70 y_last +0.074 [-0.154, +0.336] UNRES  -> UNRES
+    0.60->0.70 y_last +0.027 [-0.186, +0.258] UNRES  -> UNRES
+    0.65->0.70 y_last -0.057 [-0.257, +0.144] UNRES  -> UNRES
+    0.45->0.75 y_last -0.008 [-0.197, +0.203] ZERO!  -> CONSTANT
+    0.50->0.75 y_last -0.153 [-0.366, +0.043] UNRES  -> UNRES
+    0.55->0.75 y_last +0.116 [-0.108, +0.362] UNRES  -> UNRES
+    0.60->0.75 y_last +0.069 [-0.154, +0.302] UNRES  -> UNRES
+    0.65->0.75 y_last -0.016 [-0.214, +0.218] ZERO!  -> CONSTANT
+    0.70->0.75 y_last +0.042 [-0.134, +0.225] ZERO!  -> CONSTANT
+    0.45->0.80 y_last -0.082 [-0.276, +0.121] UNRES  -> UNRES
+    0.50->0.80 y_last -0.227 [-0.416, -0.037] NEG  -> VARIES
+    0.55->0.80 y_last +0.042 [-0.197, +0.273] UNRES  -> UNRES
+    0.60->0.80 y_last -0.005 [-0.229, +0.209] ZERO!  -> CONSTANT
+    0.65->0.80 y_last -0.090 [-0.304, +0.114] UNRES  -> UNRES
+    0.70->0.80 y_last -0.032 [-0.232, +0.167] ZERO!  -> CONSTANT
+    0.75->0.80 y_last -0.074 [-0.257, +0.122] UNRES  -> UNRES
+    0.45->0.85 y_last +0.042 [-0.151, +0.241] ZERO!  -> CONSTANT
+    0.50->0.85 y_last -0.104 [-0.301, +0.086] UNRES  -> UNRES
+    0.55->0.85 y_last +0.166 [-0.041, +0.408] UNRES  -> UNRES
+    0.60->0.85 y_last +0.119 [-0.072, +0.326] UNRES  -> UNRES
+    0.65->0.85 y_last +0.034 [-0.156, +0.221] ZERO!  -> CONSTANT
+    0.70->0.85 y_last +0.092 [-0.080, +0.259] UNRES  -> UNRES
+    0.75->0.85 y_last +0.050 [-0.116, +0.218] ZERO!  -> CONSTANT
+    0.80->0.85 y_last +0.124 [-0.035, +0.298] UNRES  -> UNRES
+  f2      WEAK
+    0.45->0.50 along ZERO!  -> MARGINAL
+    0.50->0.55 along SLOW-  -> WEAK
+    0.55->0.60 along ZERO!  -> MARGINAL
+    0.60->0.65 along ZERO!  -> MARGINAL
+    0.65->0.70 along SLOW+  -> WEAK
+    0.70->0.75 along SLOW+  -> WEAK
+    0.75->0.80 along SLOW+  -> WEAK
+    0.80->0.85 along SLOW+  -> WEAK
+  points  NOT-LINE
+    0.45 geometry LINE  -> LINE
+    0.50 geometry REFUSE-SLOW  -> NOT-LINE
+    0.55 geometry REFUSE-SLOW  -> NOT-LINE
+    0.60 geometry LINE  -> LINE
+    0.65 geometry REFUSE-SLOW  -> NOT-LINE
+    0.70 geometry LINE  -> LINE
+    0.75 geometry LINE  -> LINE
+    0.80 geometry LINE  -> LINE
+    0.85 geometry REFUSE-SLOW  -> NOT-LINE
+  lower   END-BKT-CANDIDATE   boundary 0.40, beyond 0.35 0.30
+    reads boundary_needle MID, boundary_flow SLOW, beyond_needles SINK, beyond_order INDEP  -> family.toml side_row line 560
+    why: plan 0871 E2: the boundary is MID (flow stopped, slow or unresolved: at T_KT the flow is marginal-slow), every point beyond it is a sink (sink-agnostic: a clock's lower end exits to ORD) and the starts AGREE there (OFF-WINDOW, two_start INDEP): the end of a line, a BKT candidate. A sweep that steps off its manifold reads the same (review 3.2.2)
+  upper   END-BKT-CANDIDATE   boundary 0.90, beyond 0.95 1.00 1.05 1.10
+    reads boundary_needle MID, boundary_flow SLOW, beyond_needles SINK, beyond_order INDEP  -> family.toml side_row line 560
+    why: plan 0871 E2: the boundary is MID (flow stopped, slow or unresolved: at T_KT the flow is marginal-slow), every point beyond it is a sink (sink-agnostic: a clock's lower end exits to ORD) and the starts AGREE there (OFF-WINDOW, two_start INDEP): the end of a line, a BKT candidate. A sweep that steps off its manifold reads the same (review 3.2.2)
+  end     0.40 (bracket 0.40 .. 0.35), 0.90 (bracket 0.90 .. 0.95)
+    0.40: end of a LINE run (lower side, END-BKT-CANDIDATE)
+    0.90: end of a LINE run (upper side, END-BKT-CANDIDATE)
+  => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 488
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: 0863: no positive row yet
+## k4-m1 @ v06-rules
+family k4-m1   rules: v06-rules   input: k4-m1   interior: 0.45 0.50 0.55 0.60 0.65 0.70 0.75 0.80 0.85 (rule mid-run-open)
+  bracket BRACKET-DOWN
+    edge 0.30->0.35 NO-DESCENT,NO-ASCENT
+    edge 0.35->0.40 DESCENT,NO-ASCENT
+    edge 0.40->0.45 NO-DESCENT,NO-ASCENT
+    edge 0.45->0.50 NO-DESCENT,NO-ASCENT
+    edge 0.50->0.55 NO-DESCENT,NO-ASCENT
+    edge 0.55->0.60 NO-DESCENT,NO-ASCENT
+    edge 0.60->0.65 NO-DESCENT,NO-ASCENT
+    edge 0.65->0.70 NO-DESCENT,NO-ASCENT
+    edge 0.70->0.75 NO-DESCENT,NO-ASCENT
+    edge 0.75->0.80 NO-DESCENT,NO-ASCENT
+    edge 0.80->0.85 NO-DESCENT,NO-ASCENT
+    edge 0.85->0.90 NO-DESCENT,NO-ASCENT
+    edge 0.90->0.95 DESCENT,NO-ASCENT
+    edge 0.95->1.00 NO-DESCENT,NO-ASCENT
+    edge 1.00->1.05 NO-DESCENT,NO-ASCENT
+    edge 1.05->1.10 NO-DESCENT,NO-ASCENT
+  f1      VARIES
+    0.45->0.50 y_last +0.145 [-0.078, +0.379] UNRES  -> UNRES
+    0.45->0.55 y_last -0.124 [-0.374, +0.118] UNRES  -> UNRES
+    0.50->0.55 y_last -0.270 [-0.543, -0.033] NEG  -> VARIES
+    0.45->0.60 y_last -0.078 [-0.303, +0.146] UNRES  -> UNRES
+    0.50->0.60 y_last -0.223 [-0.465, -0.012] NEG  -> VARIES
+    0.55->0.60 y_last +0.047 [-0.205, +0.337] UNRES  -> UNRES
+    0.45->0.65 y_last +0.007 [-0.218, +0.235] ZERO!  -> CONSTANT
+    0.50->0.65 y_last -0.138 [-0.377, +0.063] UNRES  -> UNRES
+    0.55->0.65 y_last +0.132 [-0.113, +0.386] UNRES  -> UNRES
+    0.60->0.65 y_last +0.085 [-0.135, +0.349] UNRES  -> UNRES
+    0.45->0.70 y_last -0.050 [-0.238, +0.156] ZERO!  -> CONSTANT
+    0.50->0.70 y_last -0.195 [-0.415, +0.013] UNRES  -> UNRES
+    0.55->0.70 y_last +0.074 [-0.154, +0.336] UNRES  -> UNRES
+    0.60->0.70 y_last +0.027 [-0.186, +0.258] UNRES  -> UNRES
+    0.65->0.70 y_last -0.057 [-0.257, +0.144] UNRES  -> UNRES
+    0.45->0.75 y_last -0.008 [-0.197, +0.203] ZERO!  -> CONSTANT
+    0.50->0.75 y_last -0.153 [-0.366, +0.043] UNRES  -> UNRES
+    0.55->0.75 y_last +0.116 [-0.108, +0.362] UNRES  -> UNRES
+    0.60->0.75 y_last +0.069 [-0.154, +0.302] UNRES  -> UNRES
+    0.65->0.75 y_last -0.016 [-0.214, +0.218] ZERO!  -> CONSTANT
+    0.70->0.75 y_last +0.042 [-0.134, +0.225] ZERO!  -> CONSTANT
+    0.45->0.80 y_last -0.082 [-0.276, +0.121] UNRES  -> UNRES
+    0.50->0.80 y_last -0.227 [-0.416, -0.037] NEG  -> VARIES
+    0.55->0.80 y_last +0.042 [-0.197, +0.273] UNRES  -> UNRES
+    0.60->0.80 y_last -0.005 [-0.229, +0.209] ZERO!  -> CONSTANT
+    0.65->0.80 y_last -0.090 [-0.304, +0.114] UNRES  -> UNRES
+    0.70->0.80 y_last -0.032 [-0.232, +0.167] ZERO!  -> CONSTANT
+    0.75->0.80 y_last -0.074 [-0.257, +0.122] UNRES  -> UNRES
+    0.45->0.85 y_last +0.042 [-0.151, +0.241] ZERO!  -> CONSTANT
+    0.50->0.85 y_last -0.104 [-0.301, +0.086] UNRES  -> UNRES
+    0.55->0.85 y_last +0.166 [-0.041, +0.408] UNRES  -> UNRES
+    0.60->0.85 y_last +0.119 [-0.072, +0.326] UNRES  -> UNRES
+    0.65->0.85 y_last +0.034 [-0.156, +0.221] ZERO!  -> CONSTANT
+    0.70->0.85 y_last +0.092 [-0.080, +0.259] UNRES  -> UNRES
+    0.75->0.85 y_last +0.050 [-0.116, +0.218] ZERO!  -> CONSTANT
+    0.80->0.85 y_last +0.124 [-0.035, +0.298] UNRES  -> UNRES
+  f2      WEAK
+    0.45->0.50 along ZERO!  -> MARGINAL
+    0.50->0.55 along SLOW-  -> WEAK
+    0.55->0.60 along ZERO!  -> MARGINAL
+    0.60->0.65 along ZERO!  -> MARGINAL
+    0.65->0.70 along SLOW+  -> WEAK
+    0.70->0.75 along SLOW+  -> WEAK
+    0.75->0.80 along SLOW+  -> WEAK
+    0.80->0.85 along SLOW+  -> WEAK
+  points  NOT-LINE
+    0.45 geometry REFUSE-SLOW  -> NOT-LINE
+    0.50 geometry REFUSE-SLOW  -> NOT-LINE
+    0.55 geometry REFUSE-SLOW  -> NOT-LINE
+    0.60 geometry REFUSE-SLOW  -> NOT-LINE
+    0.65 geometry REFUSE-SLOW  -> NOT-LINE
+    0.70 geometry LINE  -> LINE
+    0.75 geometry LINE  -> LINE
+    0.80 geometry REFUSE-SLOW  -> NOT-LINE
+    0.85 geometry REFUSE-SLOW  -> NOT-LINE
+  lower   END-BKT-CANDIDATE   boundary 0.40, beyond 0.35 0.30
+    reads boundary_needle MID, boundary_flow SLOW, beyond_needles SINK, beyond_order INDEP  -> family.toml side_row line 560
+    why: plan 0871 E2: the boundary is MID (flow stopped, slow or unresolved: at T_KT the flow is marginal-slow), every point beyond it is a sink (sink-agnostic: a clock's lower end exits to ORD) and the starts AGREE there (OFF-WINDOW, two_start INDEP): the end of a line, a BKT candidate. A sweep that steps off its manifold reads the same (review 3.2.2)
+  upper   END-BKT-CANDIDATE   boundary 0.90, beyond 0.95 1.00 1.05 1.10
+    reads boundary_needle MID, boundary_flow SLOW, beyond_needles SINK, beyond_order INDEP  -> family.toml side_row line 560
+    why: plan 0871 E2: the boundary is MID (flow stopped, slow or unresolved: at T_KT the flow is marginal-slow), every point beyond it is a sink (sink-agnostic: a clock's lower end exits to ORD) and the starts AGREE there (OFF-WINDOW, two_start INDEP): the end of a line, a BKT candidate. A sweep that steps off its manifold reads the same (review 3.2.2)
+  end     0.40 (bracket 0.40 .. 0.35), 0.90 (bracket 0.90 .. 0.95)
+    0.40: end of a LINE run (lower side, END-BKT-CANDIDATE)
+    0.90: end of a LINE run (upper side, END-BKT-CANDIDATE)
+  => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 488
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: 0863: no positive row yet
+## k4-m1 @ v07-rules
+family k4-m1   rules: v07-rules   input: k4-m1   interior: 0.45 0.50 0.55 0.60 0.65 0.70 0.75 0.80 0.85 (rule mid-run-open)
+  bracket BRACKET-DOWN
+    edge 0.30->0.35 NO-DESCENT,NO-ASCENT
+    edge 0.35->0.40 DESCENT,NO-ASCENT
+    edge 0.40->0.45 NO-DESCENT,NO-ASCENT
+    edge 0.45->0.50 NO-DESCENT,NO-ASCENT
+    edge 0.50->0.55 NO-DESCENT,NO-ASCENT
+    edge 0.55->0.60 NO-DESCENT,NO-ASCENT
+    edge 0.60->0.65 NO-DESCENT,NO-ASCENT
+    edge 0.65->0.70 NO-DESCENT,NO-ASCENT
+    edge 0.70->0.75 NO-DESCENT,NO-ASCENT
+    edge 0.75->0.80 NO-DESCENT,NO-ASCENT
+    edge 0.80->0.85 NO-DESCENT,NO-ASCENT
+    edge 0.85->0.90 NO-DESCENT,NO-ASCENT
+    edge 0.90->0.95 DESCENT,NO-ASCENT
+    edge 0.95->1.00 NO-DESCENT,NO-ASCENT
+    edge 1.00->1.05 NO-DESCENT,NO-ASCENT
+    edge 1.05->1.10 NO-DESCENT,NO-ASCENT
+  f1      VARIES
+    0.45->0.50 y_last +0.145 [-0.078, +0.379] UNRES  -> UNRES
+    0.45->0.55 y_last -0.124 [-0.374, +0.118] UNRES  -> UNRES
+    0.50->0.55 y_last -0.270 [-0.543, -0.033] NEG  -> VARIES
+    0.45->0.60 y_last -0.078 [-0.303, +0.146] UNRES  -> UNRES
+    0.50->0.60 y_last -0.223 [-0.465, -0.012] NEG  -> VARIES
+    0.55->0.60 y_last +0.047 [-0.205, +0.337] UNRES  -> UNRES
+    0.45->0.65 y_last +0.007 [-0.218, +0.235] ZERO!  -> CONSTANT
+    0.50->0.65 y_last -0.138 [-0.377, +0.063] UNRES  -> UNRES
+    0.55->0.65 y_last +0.132 [-0.113, +0.386] UNRES  -> UNRES
+    0.60->0.65 y_last +0.085 [-0.135, +0.349] UNRES  -> UNRES
+    0.45->0.70 y_last -0.050 [-0.238, +0.156] ZERO!  -> CONSTANT
+    0.50->0.70 y_last -0.195 [-0.415, +0.013] UNRES  -> UNRES
+    0.55->0.70 y_last +0.074 [-0.154, +0.336] UNRES  -> UNRES
+    0.60->0.70 y_last +0.027 [-0.186, +0.258] UNRES  -> UNRES
+    0.65->0.70 y_last -0.057 [-0.257, +0.144] UNRES  -> UNRES
+    0.45->0.75 y_last -0.008 [-0.197, +0.203] ZERO!  -> CONSTANT
+    0.50->0.75 y_last -0.153 [-0.366, +0.043] UNRES  -> UNRES
+    0.55->0.75 y_last +0.116 [-0.108, +0.362] UNRES  -> UNRES
+    0.60->0.75 y_last +0.069 [-0.154, +0.302] UNRES  -> UNRES
+    0.65->0.75 y_last -0.016 [-0.214, +0.218] ZERO!  -> CONSTANT
+    0.70->0.75 y_last +0.042 [-0.134, +0.225] ZERO!  -> CONSTANT
+    0.45->0.80 y_last -0.082 [-0.276, +0.121] UNRES  -> UNRES
+    0.50->0.80 y_last -0.227 [-0.416, -0.037] NEG  -> VARIES
+    0.55->0.80 y_last +0.042 [-0.197, +0.273] UNRES  -> UNRES
+    0.60->0.80 y_last -0.005 [-0.229, +0.209] ZERO!  -> CONSTANT
+    0.65->0.80 y_last -0.090 [-0.304, +0.114] UNRES  -> UNRES
+    0.70->0.80 y_last -0.032 [-0.232, +0.167] ZERO!  -> CONSTANT
+    0.75->0.80 y_last -0.074 [-0.257, +0.122] UNRES  -> UNRES
+    0.45->0.85 y_last +0.042 [-0.151, +0.241] ZERO!  -> CONSTANT
+    0.50->0.85 y_last -0.104 [-0.301, +0.086] UNRES  -> UNRES
+    0.55->0.85 y_last +0.166 [-0.041, +0.408] UNRES  -> UNRES
+    0.60->0.85 y_last +0.119 [-0.072, +0.326] UNRES  -> UNRES
+    0.65->0.85 y_last +0.034 [-0.156, +0.221] ZERO!  -> CONSTANT
+    0.70->0.85 y_last +0.092 [-0.080, +0.259] UNRES  -> UNRES
+    0.75->0.85 y_last +0.050 [-0.116, +0.218] ZERO!  -> CONSTANT
+    0.80->0.85 y_last +0.124 [-0.035, +0.298] UNRES  -> UNRES
+  f2      WEAK
+    0.45->0.50 along ZERO!  -> MARGINAL
+    0.50->0.55 along SLOW-  -> WEAK
+    0.55->0.60 along ZERO!  -> MARGINAL
+    0.60->0.65 along ZERO!  -> MARGINAL
+    0.65->0.70 along SLOW+  -> WEAK
+    0.70->0.75 along SLOW+  -> WEAK
+    0.75->0.80 along SLOW+  -> WEAK
+    0.80->0.85 along SLOW+  -> WEAK
+  points  NOT-LINE
+    0.45 geometry REFUSE-SLOW  -> NOT-LINE
+    0.50 geometry REFUSE-SLOW  -> NOT-LINE
+    0.55 geometry REFUSE-SLOW  -> NOT-LINE
+    0.60 geometry REFUSE-SLOW  -> NOT-LINE
+    0.65 geometry REFUSE-SLOW  -> NOT-LINE
+    0.70 geometry LINE  -> LINE
+    0.75 geometry LINE  -> LINE
+    0.80 geometry REFUSE-SLOW  -> NOT-LINE
+    0.85 geometry REFUSE-SLOW  -> NOT-LINE
+  lower   END-BKT-CANDIDATE   boundary 0.40, beyond 0.35 0.30
+    reads boundary_needle MID, boundary_flow SLOW, beyond_needles SINK, beyond_order INDEP  -> family.toml side_row line 560
+    why: plan 0871 E2: the boundary is MID (flow stopped, slow or unresolved: at T_KT the flow is marginal-slow), every point beyond it is a sink (sink-agnostic: a clock's lower end exits to ORD) and the starts AGREE there (OFF-WINDOW, two_start INDEP): the end of a line, a BKT candidate. A sweep that steps off its manifold reads the same (review 3.2.2)
+  upper   END-BKT-CANDIDATE   boundary 0.90, beyond 0.95 1.00 1.05 1.10
+    reads boundary_needle MID, boundary_flow SLOW, beyond_needles SINK, beyond_order INDEP  -> family.toml side_row line 560
+    why: plan 0871 E2: the boundary is MID (flow stopped, slow or unresolved: at T_KT the flow is marginal-slow), every point beyond it is a sink (sink-agnostic: a clock's lower end exits to ORD) and the starts AGREE there (OFF-WINDOW, two_start INDEP): the end of a line, a BKT candidate. A sweep that steps off its manifold reads the same (review 3.2.2)
+  end     0.40 (bracket 0.40 .. 0.35), 0.90 (bracket 0.90 .. 0.95)
+    0.40: end of a LINE run (lower side, END-BKT-CANDIDATE)
+    0.90: end of a LINE run (upper side, END-BKT-CANDIDATE)
+  => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 488
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: 0863: no positive row yet
+## k4-m1 @ v08-rules
+family k4-m1   rules: v08-rules   input: k4-m1   interior: 0.45 0.50 0.55 0.60 0.65 0.70 0.75 0.80 0.85 (rule mid-run-open)
+  bracket BRACKET-DOWN
+    edge 0.30->0.35 NO-DESCENT,NO-ASCENT
+    edge 0.35->0.40 DESCENT,NO-ASCENT
+    edge 0.40->0.45 NO-DESCENT,NO-ASCENT
+    edge 0.45->0.50 NO-DESCENT,NO-ASCENT
+    edge 0.50->0.55 NO-DESCENT,NO-ASCENT
+    edge 0.55->0.60 NO-DESCENT,NO-ASCENT
+    edge 0.60->0.65 NO-DESCENT,NO-ASCENT
+    edge 0.65->0.70 NO-DESCENT,NO-ASCENT
+    edge 0.70->0.75 NO-DESCENT,NO-ASCENT
+    edge 0.75->0.80 NO-DESCENT,NO-ASCENT
+    edge 0.80->0.85 NO-DESCENT,NO-ASCENT
+    edge 0.85->0.90 NO-DESCENT,NO-ASCENT
+    edge 0.90->0.95 DESCENT,NO-ASCENT
+    edge 0.95->1.00 NO-DESCENT,NO-ASCENT
+    edge 1.00->1.05 NO-DESCENT,NO-ASCENT
+    edge 1.05->1.10 NO-DESCENT,NO-ASCENT
+  f1      CONSTANT
+    0.45->0.50->0.50->0.55 y_last +0.004 [-0.044, +0.044] ZERO!  -> CONSTANT
+    0.45->0.50->0.55->0.60 y_last +0.000 [-0.028, +0.031] ZERO!  -> CONSTANT
+    0.50->0.55->0.55->0.60 y_last -0.003 [-0.044, +0.037] ZERO!  -> CONSTANT
+    0.45->0.50->0.60->0.65 y_last +0.025 [-0.009, +0.060] ZERO!  -> CONSTANT
+    0.50->0.55->0.60->0.65 y_last +0.022 [-0.010, +0.058] ZERO!  -> CONSTANT
+    0.55->0.60->0.60->0.65 y_last +0.025 [-0.015, +0.066] ZERO!  -> CONSTANT
+    0.45->0.50->0.65->0.70 y_last +0.049 [+0.020, +0.079] SLOW+  -> CONSTANT
+    0.50->0.55->0.65->0.70 y_last +0.045 [+0.010, +0.082] SLOW+  -> CONSTANT
+    0.55->0.60->0.65->0.70 y_last +0.048 [+0.015, +0.083] SLOW+  -> CONSTANT
+    0.60->0.65->0.65->0.70 y_last +0.024 [-0.022, +0.069] ZERO!  -> CONSTANT
+    0.45->0.50->0.70->0.75 y_last +0.040 [+0.005, +0.070] SLOW+  -> CONSTANT
+    0.50->0.55->0.70->0.75 y_last +0.037 [+0.004, +0.073] SLOW+  -> CONSTANT
+    0.55->0.60->0.70->0.75 y_last +0.040 [+0.009, +0.070] SLOW+  -> CONSTANT
+    0.60->0.65->0.70->0.75 y_last +0.015 [-0.019, +0.042] ZERO!  -> CONSTANT
+    0.65->0.70->0.70->0.75 y_last -0.009 [-0.053, +0.032] ZERO!  -> CONSTANT
+    0.45->0.50->0.75->0.80 y_last +0.034 [+0.005, +0.062] SLOW+  -> CONSTANT
+    0.50->0.55->0.75->0.80 y_last +0.031 [-0.003, +0.070] ZERO!  -> CONSTANT
+    0.55->0.60->0.75->0.80 y_last +0.034 [+0.003, +0.065] SLOW+  -> CONSTANT
+    0.60->0.65->0.75->0.80 y_last +0.009 [-0.024, +0.046] ZERO!  -> CONSTANT
+    0.65->0.70->0.75->0.80 y_last -0.014 [-0.045, +0.017] ZERO!  -> CONSTANT
+    0.70->0.75->0.75->0.80 y_last -0.006 [-0.042, +0.036] ZERO!  -> CONSTANT
+    0.45->0.50->0.80->0.85 y_last +0.084 [+0.058, +0.112] SLOW+  -> CONSTANT
+    0.50->0.55->0.80->0.85 y_last +0.080 [+0.051, +0.111] SLOW+  -> CONSTANT
+    0.55->0.60->0.80->0.85 y_last +0.083 [+0.053, +0.117] SLOW+  -> CONSTANT
+    0.60->0.65->0.80->0.85 y_last +0.058 [+0.029, +0.087] SLOW+  -> CONSTANT
+    0.65->0.70->0.80->0.85 y_last +0.035 [+0.004, +0.067] SLOW+  -> CONSTANT
+    0.70->0.75->0.80->0.85 y_last +0.043 [+0.013, +0.078] SLOW+  -> CONSTANT
+    0.75->0.80->0.80->0.85 y_last +0.049 [+0.014, +0.084] SLOW+  -> CONSTANT
+  f2      WEAK
+    0.45->0.50 along ZERO!  -> MARGINAL
+    0.50->0.55 along SLOW-  -> WEAK
+    0.55->0.60 along ZERO!  -> MARGINAL
+    0.60->0.65 along ZERO!  -> MARGINAL
+    0.65->0.70 along SLOW+  -> WEAK
+    0.70->0.75 along SLOW+  -> WEAK
+    0.75->0.80 along SLOW+  -> WEAK
+    0.80->0.85 along SLOW+  -> WEAK
+  points  NOT-LINE
+    0.45 geometry REFUSE-SLOW  -> NOT-LINE
+    0.50 geometry LINE  -> LINE
+    0.55 geometry LINE  -> LINE
+    0.60 geometry LINE  -> LINE
+    0.65 geometry LINE  -> LINE
+    0.70 geometry LINE  -> LINE
+    0.75 geometry LINE  -> LINE
+    0.80 geometry LINE  -> LINE
+    0.85 geometry LINE  -> LINE
+  lower   END-BKT-CANDIDATE   boundary 0.40, beyond 0.35 0.30
+    reads boundary_needle MID, boundary_flow SLOW, beyond_needles SINK, beyond_order INDEP  -> family.toml side_row line 561
+    why: plan 0871 E2: the boundary is MID (flow stopped, slow or unresolved: at T_KT the flow is marginal-slow), every point beyond it is a sink (sink-agnostic: a clock's lower end exits to ORD) and the starts AGREE there (OFF-WINDOW, two_start INDEP): the end of a line, a BKT candidate. A sweep that steps off its manifold reads the same (review 3.2.2)
+  upper   END-BKT-CANDIDATE   boundary 0.90, beyond 0.95 1.00 1.05 1.10
+    reads boundary_needle MID, boundary_flow SLOW, beyond_needles SINK, beyond_order INDEP  -> family.toml side_row line 561
+    why: plan 0871 E2: the boundary is MID (flow stopped, slow or unresolved: at T_KT the flow is marginal-slow), every point beyond it is a sink (sink-agnostic: a clock's lower end exits to ORD) and the starts AGREE there (OFF-WINDOW, two_start INDEP): the end of a line, a BKT candidate. A sweep that steps off its manifold reads the same (review 3.2.2)
+  end     0.40 (bracket 0.40 .. 0.35), 0.90 (bracket 0.90 .. 0.95)
+    0.40: end of a LINE run (lower side, END-BKT-CANDIDATE)
+    0.90: end of a LINE run (upper side, END-BKT-CANDIDATE)
+  => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 409
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: 0863: no positive row yet (0862 X7b/X2-X4 decide)
+## k4-m1 @ v10-rules
+no result for k4-m1 under v10-rules yet.
+  Next: bin/cc run k4-m1 --tables v10-rules
+## l8-tetris-600-g @ v01-rules
+no result for l8-tetris-600-g under v01-rules yet.
+  Next: bin/cc run l8-tetris-600-g --tables v01-rules
+## l8-tetris-600-g @ v02-rules
+no result for l8-tetris-600-g under v02-rules yet.
+  Next: bin/cc run l8-tetris-600-g --tables v02-rules
+## l8-tetris-600-g @ v03-rules
+no result for l8-tetris-600-g under v03-rules yet.
+  Next: bin/cc run l8-tetris-600-g --tables v03-rules
+## l8-tetris-600-g @ v04-rules
+no result for l8-tetris-600-g under v04-rules yet.
+  Next: bin/cc run l8-tetris-600-g --tables v04-rules
+## l8-tetris-600-g @ v05-rules
+no result for l8-tetris-600-g under v05-rules yet.
+  Next: bin/cc run l8-tetris-600-g --tables v05-rules
+## l8-tetris-600-g @ v06-rules
+no result for l8-tetris-600-g under v06-rules yet.
+  Next: bin/cc run l8-tetris-600-g --tables v06-rules
+## l8-tetris-600-g @ v07-rules
+no result for l8-tetris-600-g under v07-rules yet.
+  Next: bin/cc run l8-tetris-600-g --tables v07-rules
+## l8-tetris-600-g @ v08-rules
+no result for l8-tetris-600-g under v08-rules yet.
+  Next: bin/cc run l8-tetris-600-g --tables v08-rules
+## l8-tetris-600-g @ v10-rules
+no result for l8-tetris-600-g under v10-rules yet.
+  Next: bin/cc run l8-tetris-600-g --tables v10-rules
+## l8-tetris-600 @ v01-rules
+no result for l8-tetris-600 under v01-rules yet.
+  Next: bin/cc run l8-tetris-600 --tables v01-rules
+## l8-tetris-600 @ v02-rules
+no result for l8-tetris-600 under v02-rules yet.
+  Next: bin/cc run l8-tetris-600 --tables v02-rules
+## l8-tetris-600 @ v03-rules
+no result for l8-tetris-600 under v03-rules yet.
+  Next: bin/cc run l8-tetris-600 --tables v03-rules
+## l8-tetris-600 @ v04-rules
+no result for l8-tetris-600 under v04-rules yet.
+  Next: bin/cc run l8-tetris-600 --tables v04-rules
+## l8-tetris-600 @ v05-rules
+no result for l8-tetris-600 under v05-rules yet.
+  Next: bin/cc run l8-tetris-600 --tables v05-rules
+## l8-tetris-600 @ v06-rules
+no result for l8-tetris-600 under v06-rules yet.
+  Next: bin/cc run l8-tetris-600 --tables v06-rules
+## l8-tetris-600 @ v07-rules
+no result for l8-tetris-600 under v07-rules yet.
+  Next: bin/cc run l8-tetris-600 --tables v07-rules
+## l8-tetris-600 @ v08-rules
+no result for l8-tetris-600 under v08-rules yet.
+  Next: bin/cc run l8-tetris-600 --tables v08-rules
+## l8-tetris-600 @ v10-rules
+no result for l8-tetris-600 under v10-rules yet.
+  Next: bin/cc run l8-tetris-600 --tables v10-rules
+## x2b-xy-2 @ v01-rules
+no result for x2b-xy-2 under v01-rules yet.
+  Next: bin/cc run x2b-xy-2 --tables v01-rules
+## x2b-xy-2 @ v02-rules
+no result for x2b-xy-2 under v02-rules yet.
+  Next: bin/cc run x2b-xy-2 --tables v02-rules
+## x2b-xy-2 @ v03-rules
+no result for x2b-xy-2 under v03-rules yet.
+  Next: bin/cc run x2b-xy-2 --tables v03-rules
+## x2b-xy-2 @ v04-rules
+no result for x2b-xy-2 under v04-rules yet.
+  Next: bin/cc run x2b-xy-2 --tables v04-rules
+## x2b-xy-2 @ v05-rules
+no result for x2b-xy-2 under v05-rules yet.
+  Next: bin/cc run x2b-xy-2 --tables v05-rules
+## x2b-xy-2 @ v06-rules
+family x2b-xy-2   rules: v06-rules   input: x2b-xy-2   interior: 0.5 0.6 0.7 0.8 0.85
+  bracket BRACKET-DOWN
+    edge 0.5->0.6 NO-DESCENT,NO-ASCENT
+    edge 0.6->0.7 NO-DESCENT,NO-ASCENT
+    edge 0.7->0.8 NO-DESCENT,NO-ASCENT
+    edge 0.8->0.85 NO-DESCENT,NO-ASCENT
+    edge 0.85->0.89294 NO-DESCENT,NO-ASCENT
+    edge 0.89294->0.95 DESCENT,NO-ASCENT
+    edge 0.95->1.0 NO-DESCENT,NO-ASCENT
+    edge 1.0->1.1 NO-DESCENT,NO-ASCENT
+  f1      UNRES
+    0.5->0.6 y_last +0.130 [-0.042, +0.290] UNRES  -> UNRES
+    0.5->0.7 y_last +0.024 [-0.146, +0.178] ZERO!  -> CONSTANT
+    0.6->0.7 y_last -0.106 [-0.253, +0.041] UNRES  -> UNRES
+    0.5->0.8 y_last +0.056 [-0.087, +0.221] ZERO!  -> CONSTANT
+    0.6->0.8 y_last -0.074 [-0.201, +0.055] ZERO!  -> CONSTANT
+    0.7->0.8 y_last +0.032 [-0.095, +0.160] ZERO!  -> CONSTANT
+    0.5->0.85 y_last +0.113 [-0.058, +0.270] UNRES  -> UNRES
+    0.6->0.85 y_last -0.017 [-0.158, +0.136] ZERO!  -> CONSTANT
+    0.7->0.85 y_last +0.089 [-0.061, +0.226] ZERO!  -> CONSTANT
+    0.8->0.85 y_last +0.057 [-0.076, +0.198] ZERO!  -> CONSTANT
+  f2      WEAK
+    0.5->0.6 along SLOW-  -> WEAK
+    0.6->0.7 along SLOW-  -> WEAK
+    0.7->0.8 along SLOW-  -> WEAK
+    0.8->0.85 along ZERO!  -> MARGINAL
+  points  NOT-LINE
+    0.5 geometry LINE  -> LINE
+    0.6 geometry REFUSE-UNRES  -> NOT-LINE
+    0.7 geometry REFUSE-WEAK  -> NOT-LINE
+    0.8 geometry REFUSE-UNRES  -> NOT-LINE
+    0.85 geometry REFUSE-UNRES  -> NOT-LINE
+  lower   OPEN   boundary 0.5, beyond (none)
+    reads boundary_needle MID, boundary_flow STOPPED, beyond_needles NONE, beyond_order NONE  -> family.toml side_row line 510
+    why: no point lies on this side of the declared interior
+  upper   END-BKT-CANDIDATE   boundary 0.89294, beyond 0.95 1.0 1.1
+    reads boundary_needle MID, boundary_flow STOPPED, beyond_needles SINK, beyond_order INDEP  -> family.toml side_row line 560
+    why: plan 0871 E2: the boundary is MID (flow stopped, slow or unresolved: at T_KT the flow is marginal-slow), every point beyond it is a sink (sink-agnostic: a clock's lower end exits to ORD) and the starts AGREE there (OFF-WINDOW, two_start INDEP): the end of a line, a BKT candidate. A sweep that steps off its manifold reads the same (review 3.2.2)
+  end     0.89294 (bracket 0.89294 .. 0.95)
+    0.89294: end of a LINE run (upper side, END-BKT-CANDIDATE)
+  => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 448
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: 0863: no positive row yet (0862 X7b/X2-X4 decide)
+## x2b-xy-2 @ v07-rules
+family x2b-xy-2   rules: v07-rules   input: x2b-xy-2   interior: 0.5 0.6 0.7 0.8 0.85
+  bracket BRACKET-DOWN
+    edge 0.5->0.6 NO-DESCENT,NO-ASCENT
+    edge 0.6->0.7 NO-DESCENT,NO-ASCENT
+    edge 0.7->0.8 NO-DESCENT,NO-ASCENT
+    edge 0.8->0.85 NO-DESCENT,NO-ASCENT
+    edge 0.85->0.89294 NO-DESCENT,NO-ASCENT
+    edge 0.89294->0.95 DESCENT,NO-ASCENT
+    edge 0.95->1.0 NO-DESCENT,NO-ASCENT
+    edge 1.0->1.1 NO-DESCENT,NO-ASCENT
+  f1      UNRES
+    0.5->0.6 y_last +0.130 [-0.042, +0.290] UNRES  -> UNRES
+    0.5->0.7 y_last +0.024 [-0.146, +0.178] ZERO!  -> CONSTANT
+    0.6->0.7 y_last -0.106 [-0.253, +0.041] UNRES  -> UNRES
+    0.5->0.8 y_last +0.056 [-0.087, +0.221] ZERO!  -> CONSTANT
+    0.6->0.8 y_last -0.074 [-0.201, +0.055] ZERO!  -> CONSTANT
+    0.7->0.8 y_last +0.032 [-0.095, +0.160] ZERO!  -> CONSTANT
+    0.5->0.85 y_last +0.113 [-0.058, +0.270] UNRES  -> UNRES
+    0.6->0.85 y_last -0.017 [-0.158, +0.136] ZERO!  -> CONSTANT
+    0.7->0.85 y_last +0.089 [-0.061, +0.226] ZERO!  -> CONSTANT
+    0.8->0.85 y_last +0.057 [-0.076, +0.198] ZERO!  -> CONSTANT
+  f2      WEAK
+    0.5->0.6 along SLOW-  -> WEAK
+    0.6->0.7 along SLOW-  -> WEAK
+    0.7->0.8 along SLOW-  -> WEAK
+    0.8->0.85 along ZERO!  -> MARGINAL
+  points  LINE
+    0.5 geometry LINE  -> LINE
+    0.6 geometry LINE  -> LINE
+    0.7 geometry LINE  -> LINE
+    0.8 geometry LINE  -> LINE
+    0.85 geometry LINE  -> LINE
+  lower   OPEN   boundary 0.5, beyond (none)
+    reads boundary_needle MID, boundary_flow STOPPED, beyond_needles NONE, beyond_order NONE  -> family.toml side_row line 510
+    why: no point lies on this side of the declared interior
+  upper   END-BKT-CANDIDATE   boundary 0.89294, beyond 0.95 1.0 1.1
+    reads boundary_needle MID, boundary_flow STOPPED, beyond_needles SINK, beyond_order INDEP  -> family.toml side_row line 560
+    why: plan 0871 E2: the boundary is MID (flow stopped, slow or unresolved: at T_KT the flow is marginal-slow), every point beyond it is a sink (sink-agnostic: a clock's lower end exits to ORD) and the starts AGREE there (OFF-WINDOW, two_start INDEP): the end of a line, a BKT candidate. A sweep that steps off its manifold reads the same (review 3.2.2)
+  end     0.89294 (bracket 0.89294 .. 0.95)
+    0.89294: end of a LINE run (upper side, END-BKT-CANDIDATE)
+  => family report BKT-END   class BKT-END, family.toml line 183
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: plan 0871 E2: the interior reads LINE (every interior point reads per-point LINE after the probe, or the LINE row's own f1 VARIES and f2 MARGINAL) and a side of it reads END-BKT-CANDIDATE: a LINE run meets a sink run whose starts agree. CAVEAT (review 0870 3.2.2): a sweep that steps OFF its manifold reads exactly this; the family cannot tell the line ended from the sweep left the line, only the declaration and the blind decoy (K4/K5) can. Next: read lower, upper and end_bracket (bin/cc family) before believing it
+## x2b-xy-2 @ v08-rules
+no result for x2b-xy-2 under v08-rules yet.
+  Next: bin/cc run x2b-xy-2 --tables v08-rules
+## x2b-xy-2 @ v10-rules
+no result for x2b-xy-2 under v10-rules yet.
+  Next: bin/cc run x2b-xy-2 --tables v10-rules
+## x2b-xy-3 @ v01-rules
+no result for x2b-xy-3 under v01-rules yet.
+  Next: bin/cc run x2b-xy-3 --tables v01-rules
+## x2b-xy-3 @ v02-rules
+no result for x2b-xy-3 under v02-rules yet.
+  Next: bin/cc run x2b-xy-3 --tables v02-rules
+## x2b-xy-3 @ v03-rules
+no result for x2b-xy-3 under v03-rules yet.
+  Next: bin/cc run x2b-xy-3 --tables v03-rules
+## x2b-xy-3 @ v04-rules
+no result for x2b-xy-3 under v04-rules yet.
+  Next: bin/cc run x2b-xy-3 --tables v04-rules
+## x2b-xy-3 @ v05-rules
+no result for x2b-xy-3 under v05-rules yet.
+  Next: bin/cc run x2b-xy-3 --tables v05-rules
+## x2b-xy-3 @ v06-rules
+no result for x2b-xy-3 under v06-rules yet.
+  Next: bin/cc run x2b-xy-3 --tables v06-rules
+## x2b-xy-3 @ v07-rules
+no result for x2b-xy-3 under v07-rules yet.
+  Next: bin/cc run x2b-xy-3 --tables v07-rules
+## x2b-xy-3 @ v08-rules
+family x2b-xy-3   rules: v08-rules   input: x2b-xy-3   interior: 0.5 0.6 0.7 0.8 0.85
+  bracket BRACKET-DOWN
+    edge 0.5->0.6 NO-DESCENT,NO-ASCENT
+    edge 0.6->0.7 NO-DESCENT,NO-ASCENT
+    edge 0.7->0.8 NO-DESCENT,NO-ASCENT
+    edge 0.8->0.85 NO-DESCENT,NO-ASCENT
+    edge 0.85->0.89294 NO-DESCENT,NO-ASCENT
+    edge 0.89294->0.95 DESCENT,NO-ASCENT
+    edge 0.95->1.0 NO-DESCENT,NO-ASCENT
+    edge 1.0->1.1 NO-DESCENT,NO-ASCENT
+  f1      CONSTANT
+    0.5->0.6->0.6->0.7 y_last -0.011 [-0.026, +0.002] ZERO!  -> CONSTANT
+    0.5->0.6->0.7->0.8 y_last -0.003 [-0.015, +0.009] ZERO!  -> CONSTANT
+    0.6->0.7->0.7->0.8 y_last +0.008 [-0.005, +0.023] ZERO!  -> CONSTANT
+    0.5->0.6->0.8->0.85 y_last +0.020 [-0.003, +0.041] ZERO!  -> CONSTANT
+    0.6->0.7->0.8->0.85 y_last +0.031 [+0.009, +0.054] SLOW+  -> CONSTANT
+    0.7->0.8->0.8->0.85 y_last +0.023 [-0.004, +0.049] ZERO!  -> CONSTANT
+  f2      WEAK
+    0.5->0.6 along SLOW-  -> WEAK
+    0.6->0.7 along SLOW-  -> WEAK
+    0.7->0.8 along SLOW-  -> WEAK
+    0.8->0.85 along ZERO!  -> MARGINAL
+  points  LINE
+    0.5 geometry LINE  -> LINE
+    0.6 geometry LINE  -> LINE
+    0.7 geometry LINE  -> LINE
+    0.8 geometry LINE  -> LINE
+    0.85 geometry LINE  -> LINE
+  lower   OPEN   boundary 0.5, beyond (none)
+    reads boundary_needle MID, boundary_flow STOPPED, beyond_needles NONE, beyond_order NONE  -> family.toml side_row line 511
+    why: no point lies on this side of the declared interior
+  upper   END-BKT-CANDIDATE   boundary 0.89294, beyond 0.95 1.0 1.1
+    reads boundary_needle MID, boundary_flow STOPPED, beyond_needles SINK, beyond_order INDEP  -> family.toml side_row line 561
+    why: plan 0871 E2: the boundary is MID (flow stopped, slow or unresolved: at T_KT the flow is marginal-slow), every point beyond it is a sink (sink-agnostic: a clock's lower end exits to ORD) and the starts AGREE there (OFF-WINDOW, two_start INDEP): the end of a line, a BKT candidate. A sweep that steps off its manifold reads the same (review 3.2.2)
+  end     0.89294 (bracket 0.89294 .. 0.95)
+    0.89294: end of a LINE run (upper side, END-BKT-CANDIDATE)
+  => family report BKT-END   class BKT-END, family.toml line 184
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: plan 0871 E2: the interior reads LINE (every interior point reads per-point LINE after the probe, or the LINE row's own f1 VARIES and f2 MARGINAL) and a side of it reads END-BKT-CANDIDATE: a LINE run meets a sink run whose starts agree. CAVEAT (review 0870 3.2.2): a sweep that steps OFF its manifold reads exactly this; the family cannot tell the line ended from the sweep left the line, only the declaration and the blind decoy (K4/K5) can. Next: read lower, upper and end_bracket (bin/cc family) before believing it
+## x2b-xy-3 @ v10-rules
+no result for x2b-xy-3 under v10-rules yet.
+  Next: bin/cc run x2b-xy-3 --tables v10-rules
+## x2b-xy @ v01-rules
+no result for x2b-xy under v01-rules yet.
+  Next: bin/cc run x2b-xy --tables v01-rules
+## x2b-xy @ v02-rules
+no result for x2b-xy under v02-rules yet.
+  Next: bin/cc run x2b-xy --tables v02-rules
+## x2b-xy @ v03-rules
+no result for x2b-xy under v03-rules yet.
+  Next: bin/cc run x2b-xy --tables v03-rules
+## x2b-xy @ v04-rules
+no result for x2b-xy under v04-rules yet.
+  Next: bin/cc run x2b-xy --tables v04-rules
+## x2b-xy @ v05-rules
+family x2b-xy   rules: v05-rules   input: x2b-xy   interior: 0.5 0.6 0.7 0.8 0.85
+  bracket BRACKET-DOWN
+    edge 0.5->0.6 NO-DESCENT,NO-ASCENT
+    edge 0.6->0.7 NO-DESCENT,NO-ASCENT
+    edge 0.7->0.8 NO-DESCENT,NO-ASCENT
+    edge 0.8->0.85 NO-DESCENT,NO-ASCENT
+    edge 0.85->0.89294 NO-DESCENT,NO-ASCENT
+    edge 0.89294->0.95 DESCENT,NO-ASCENT
+    edge 0.95->1.0 NO-DESCENT,NO-ASCENT
+    edge 1.0->1.1 NO-DESCENT,NO-ASCENT
+  f1      UNRES
+    0.5->0.6 y_last +0.130 [-0.042, +0.290] UNRES  -> UNRES
+    0.5->0.7 y_last +0.024 [-0.146, +0.178] ZERO!  -> CONSTANT
+    0.6->0.7 y_last -0.106 [-0.253, +0.041] UNRES  -> UNRES
+    0.5->0.8 y_last +0.056 [-0.087, +0.221] ZERO!  -> CONSTANT
+    0.6->0.8 y_last -0.074 [-0.201, +0.055] ZERO!  -> CONSTANT
+    0.7->0.8 y_last +0.032 [-0.095, +0.160] ZERO!  -> CONSTANT
+    0.5->0.85 y_last +0.113 [-0.058, +0.270] UNRES  -> UNRES
+    0.6->0.85 y_last -0.017 [-0.158, +0.136] ZERO!  -> CONSTANT
+    0.7->0.85 y_last +0.089 [-0.061, +0.226] ZERO!  -> CONSTANT
+    0.8->0.85 y_last +0.057 [-0.076, +0.198] ZERO!  -> CONSTANT
+  f2      WEAK
+    0.5->0.6 along SLOW-  -> WEAK
+    0.6->0.7 along SLOW-  -> WEAK
+    0.7->0.8 along SLOW-  -> WEAK
+    0.8->0.85 along ZERO!  -> MARGINAL
+  points  NOT-LINE
+    0.5 geometry LINE  -> LINE
+    0.6 geometry WALKING  -> NOT-LINE
+    0.7 geometry LINE  -> LINE
+    0.8 geometry LINE  -> LINE
+    0.85 geometry LINE  -> LINE
+  lower   OPEN   boundary 0.5, beyond (none)
+    reads boundary_needle MID, boundary_flow STOPPED, beyond_needles NONE, beyond_order NONE  -> family.toml side_row line 510
+    why: no point lies on this side of the declared interior
+  upper   END-BKT-CANDIDATE   boundary 0.89294, beyond 0.95 1.0 1.1
+    reads boundary_needle MID, boundary_flow STOPPED, beyond_needles SINK, beyond_order INDEP  -> family.toml side_row line 560
+    why: plan 0871 E2: the boundary is MID (flow stopped, slow or unresolved: at T_KT the flow is marginal-slow), every point beyond it is a sink (sink-agnostic: a clock's lower end exits to ORD) and the starts AGREE there (OFF-WINDOW, two_start INDEP): the end of a line, a BKT candidate. A sweep that steps off its manifold reads the same (review 3.2.2)
+  end     0.89294 (bracket 0.89294 .. 0.95)
+    0.89294: end of a LINE run (upper side, END-BKT-CANDIDATE)
+  => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 448
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: 0863: no positive row yet (0862 X7b/X2-X4 decide)
+## x2b-xy @ v06-rules
+family x2b-xy   rules: v06-rules   input: x2b-xy   interior: 0.5 0.6 0.7 0.8 0.85
+  bracket BRACKET-DOWN
+    edge 0.5->0.6 NO-DESCENT,NO-ASCENT
+    edge 0.6->0.7 NO-DESCENT,NO-ASCENT
+    edge 0.7->0.8 NO-DESCENT,NO-ASCENT
+    edge 0.8->0.85 NO-DESCENT,NO-ASCENT
+    edge 0.85->0.89294 NO-DESCENT,NO-ASCENT
+    edge 0.89294->0.95 DESCENT,NO-ASCENT
+    edge 0.95->1.0 NO-DESCENT,NO-ASCENT
+    edge 1.0->1.1 NO-DESCENT,NO-ASCENT
+  f1      UNRES
+    0.5->0.6 y_last +0.130 [-0.042, +0.290] UNRES  -> UNRES
+    0.5->0.7 y_last +0.024 [-0.146, +0.178] ZERO!  -> CONSTANT
+    0.6->0.7 y_last -0.106 [-0.253, +0.041] UNRES  -> UNRES
+    0.5->0.8 y_last +0.056 [-0.087, +0.221] ZERO!  -> CONSTANT
+    0.6->0.8 y_last -0.074 [-0.201, +0.055] ZERO!  -> CONSTANT
+    0.7->0.8 y_last +0.032 [-0.095, +0.160] ZERO!  -> CONSTANT
+    0.5->0.85 y_last +0.113 [-0.058, +0.270] UNRES  -> UNRES
+    0.6->0.85 y_last -0.017 [-0.158, +0.136] ZERO!  -> CONSTANT
+    0.7->0.85 y_last +0.089 [-0.061, +0.226] ZERO!  -> CONSTANT
+    0.8->0.85 y_last +0.057 [-0.076, +0.198] ZERO!  -> CONSTANT
+  f2      WEAK
+    0.5->0.6 along SLOW-  -> WEAK
+    0.6->0.7 along SLOW-  -> WEAK
+    0.7->0.8 along SLOW-  -> WEAK
+    0.8->0.85 along ZERO!  -> MARGINAL
+  points  LINE
+    0.5 geometry LINE  -> LINE
+    0.6 geometry LINE  -> LINE
+    0.7 geometry LINE  -> LINE
+    0.8 geometry LINE  -> LINE
+    0.85 geometry LINE  -> LINE
+  lower   OPEN   boundary 0.5, beyond (none)
+    reads boundary_needle MID, boundary_flow STOPPED, beyond_needles NONE, beyond_order NONE  -> family.toml side_row line 510
+    why: no point lies on this side of the declared interior
+  upper   END-BKT-CANDIDATE   boundary 0.89294, beyond 0.95 1.0 1.1
+    reads boundary_needle MID, boundary_flow STOPPED, beyond_needles SINK, beyond_order INDEP  -> family.toml side_row line 560
+    why: plan 0871 E2: the boundary is MID (flow stopped, slow or unresolved: at T_KT the flow is marginal-slow), every point beyond it is a sink (sink-agnostic: a clock's lower end exits to ORD) and the starts AGREE there (OFF-WINDOW, two_start INDEP): the end of a line, a BKT candidate. A sweep that steps off its manifold reads the same (review 3.2.2)
+  end     0.89294 (bracket 0.89294 .. 0.95)
+    0.89294: end of a LINE run (upper side, END-BKT-CANDIDATE)
+  => family report BKT-END   class BKT-END, family.toml line 183
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: plan 0871 E2: the interior reads LINE (every interior point reads per-point LINE after the probe, or the LINE row's own f1 VARIES and f2 MARGINAL) and a side of it reads END-BKT-CANDIDATE: a LINE run meets a sink run whose starts agree. CAVEAT (review 0870 3.2.2): a sweep that steps OFF its manifold reads exactly this; the family cannot tell the line ended from the sweep left the line, only the declaration and the blind decoy (K4/K5) can. Next: read lower, upper and end_bracket (bin/cc family) before believing it
+## x2b-xy @ v07-rules
+family x2b-xy   rules: v07-rules   input: x2b-xy   interior: 0.5 0.6 0.7 0.8 0.85
+  bracket BRACKET-DOWN
+    edge 0.5->0.6 NO-DESCENT,NO-ASCENT
+    edge 0.6->0.7 NO-DESCENT,NO-ASCENT
+    edge 0.7->0.8 NO-DESCENT,NO-ASCENT
+    edge 0.8->0.85 NO-DESCENT,NO-ASCENT
+    edge 0.85->0.89294 NO-DESCENT,NO-ASCENT
+    edge 0.89294->0.95 DESCENT,NO-ASCENT
+    edge 0.95->1.0 NO-DESCENT,NO-ASCENT
+    edge 1.0->1.1 NO-DESCENT,NO-ASCENT
+  f1      UNRES
+    0.5->0.6 y_last +0.130 [-0.042, +0.290] UNRES  -> UNRES
+    0.5->0.7 y_last +0.024 [-0.146, +0.178] ZERO!  -> CONSTANT
+    0.6->0.7 y_last -0.106 [-0.253, +0.041] UNRES  -> UNRES
+    0.5->0.8 y_last +0.056 [-0.087, +0.221] ZERO!  -> CONSTANT
+    0.6->0.8 y_last -0.074 [-0.201, +0.055] ZERO!  -> CONSTANT
+    0.7->0.8 y_last +0.032 [-0.095, +0.160] ZERO!  -> CONSTANT
+    0.5->0.85 y_last +0.113 [-0.058, +0.270] UNRES  -> UNRES
+    0.6->0.85 y_last -0.017 [-0.158, +0.136] ZERO!  -> CONSTANT
+    0.7->0.85 y_last +0.089 [-0.061, +0.226] ZERO!  -> CONSTANT
+    0.8->0.85 y_last +0.057 [-0.076, +0.198] ZERO!  -> CONSTANT
+  f2      WEAK
+    0.5->0.6 along SLOW-  -> WEAK
+    0.6->0.7 along SLOW-  -> WEAK
+    0.7->0.8 along SLOW-  -> WEAK
+    0.8->0.85 along ZERO!  -> MARGINAL
+  points  LINE
+    0.5 geometry LINE  -> LINE
+    0.6 geometry LINE  -> LINE
+    0.7 geometry LINE  -> LINE
+    0.8 geometry LINE  -> LINE
+    0.85 geometry LINE  -> LINE
+  lower   OPEN   boundary 0.5, beyond (none)
+    reads boundary_needle MID, boundary_flow STOPPED, beyond_needles NONE, beyond_order NONE  -> family.toml side_row line 510
+    why: no point lies on this side of the declared interior
+  upper   END-BKT-CANDIDATE   boundary 0.89294, beyond 0.95 1.0 1.1
+    reads boundary_needle MID, boundary_flow STOPPED, beyond_needles SINK, beyond_order INDEP  -> family.toml side_row line 560
+    why: plan 0871 E2: the boundary is MID (flow stopped, slow or unresolved: at T_KT the flow is marginal-slow), every point beyond it is a sink (sink-agnostic: a clock's lower end exits to ORD) and the starts AGREE there (OFF-WINDOW, two_start INDEP): the end of a line, a BKT candidate. A sweep that steps off its manifold reads the same (review 3.2.2)
+  end     0.89294 (bracket 0.89294 .. 0.95)
+    0.89294: end of a LINE run (upper side, END-BKT-CANDIDATE)
+  => family report BKT-END   class BKT-END, family.toml line 183
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: plan 0871 E2: the interior reads LINE (every interior point reads per-point LINE after the probe, or the LINE row's own f1 VARIES and f2 MARGINAL) and a side of it reads END-BKT-CANDIDATE: a LINE run meets a sink run whose starts agree. CAVEAT (review 0870 3.2.2): a sweep that steps OFF its manifold reads exactly this; the family cannot tell the line ended from the sweep left the line, only the declaration and the blind decoy (K4/K5) can. Next: read lower, upper and end_bracket (bin/cc family) before believing it
+## x2b-xy @ v08-rules
+no result for x2b-xy under v08-rules yet.
+  Next: bin/cc run x2b-xy --tables v08-rules
+## x2b-xy @ v10-rules
+no result for x2b-xy under v10-rules yet.
+  Next: bin/cc run x2b-xy --tables v10-rules
+## x5n-g @ v01-rules
+no result for x5n-bilayer-3 under v01-rules yet.
+  Next: bin/cc run x5n-bilayer-3 --tables v01-rules
+## x5n-g @ v02-rules
+no result for x5n-bilayer-3 under v02-rules yet.
+  Next: bin/cc run x5n-bilayer-3 --tables v02-rules
+## x5n-g @ v03-rules
+no result for x5n-bilayer-3 under v03-rules yet.
+  Next: bin/cc run x5n-bilayer-3 --tables v03-rules
+## x5n-g @ v04-rules
+family x5n-g   rules: v04-rules   input: x5n-bilayer-3   interior: 0.0 0.1 0.3
+  bracket BRACKET
+    edge 0.0->0.1 NO-DESCENT
+    edge 0.1->0.3 NO-DESCENT
+  f1      CONSTANT
+    0.0->0.1 y_last +0.030 [-0.050, +0.086] ZERO!  -> CONSTANT
+    0.0->0.3 y_last +0.021 [-0.066, +0.091] ZERO!  -> CONSTANT
+    0.1->0.3 y_last -0.009 [-0.067, +0.059] ZERO!  -> CONSTANT
+  f2      IRRELEVANT
+    0.0->0.1 along SIG-  -> IRRELEVANT
+    0.1->0.3 along NEG  -> IRRELEVANT
+  => family report POINT-MANIFOLD   class POINT, family.toml line 75
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: plan 0870 P3: the exponent is constant along the navigated chain (f1) and every neighbouring pair has a difference that GROWS SLOWER than the size (f2 IRRELEVANT): the members are one point class, a manifold of points. The members' own per-point verdicts are not lifted (x5n: REFUSE-PROBE-INCOMPLETE); the family is the reading that carries the class. The first reading ever of this row (X7a's pairs were all off the manifold, E44/E46); x5n over g is its test
+## x5n-g @ v05-rules
+family x5n-g   rules: v05-rules   input: x5n-bilayer-3   interior: 0.0 0.1 0.3
+  bracket BRACKET-FLAT
+    edge 0.0->0.1 NO-DESCENT,NO-ASCENT
+    edge 0.1->0.3 NO-DESCENT,NO-ASCENT
+  f1      CONSTANT
+    0.0->0.1 y_last +0.030 [-0.050, +0.086] ZERO!  -> CONSTANT
+    0.0->0.3 y_last +0.021 [-0.066, +0.091] ZERO!  -> CONSTANT
+    0.1->0.3 y_last -0.009 [-0.067, +0.059] ZERO!  -> CONSTANT
+  f2      IRRELEVANT
+    0.0->0.1 along SIG-  -> IRRELEVANT
+    0.1->0.3 along NEG  -> IRRELEVANT
+  points  NOT-LINE
+    0.0 geometry REFUSE-PROBE-INCOMPLETE  -> NOT-LINE
+    0.1 geometry REFUSE-PROBE-INCOMPLETE  -> NOT-LINE
+    0.3 geometry REFUSE-PROBE-INCOMPLETE  -> NOT-LINE
+  lower   OPEN   boundary 0.0, beyond (none)
+    reads boundary_needle MID, boundary_flow STOPPED, beyond_needles NONE, beyond_order NONE  -> family.toml side_row line 510
+    why: no point lies on this side of the declared interior
+  upper   OPEN   boundary 0.3, beyond (none)
+    reads boundary_needle MID, boundary_flow STOPPED, beyond_needles NONE, beyond_order NONE  -> family.toml side_row line 510
+    why: no point lies on this side of the declared interior
+  end     (none)
+  => family report POINT-MANIFOLD   class POINT, family.toml line 273
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: plan 0870 P3: the exponent is constant along the navigated chain (f1) and every neighbouring pair has a difference that GROWS SLOWER than the size (f2 IRRELEVANT): the members are one point class, a manifold of points. The members' own per-point verdicts are not lifted (x5n: REFUSE-PROBE-INCOMPLETE); the family is the reading that carries the class. The first reading ever of this row (X7a's pairs were all off the manifold, E44/E46); x5n over g is its test
+## x5n-g @ v06-rules
+family x5n-g   rules: v06-rules   input: x5n-bilayer-3   interior: 0.0 0.1 0.3
+  bracket BRACKET-FLAT
+    edge 0.0->0.1 NO-DESCENT,NO-ASCENT
+    edge 0.1->0.3 NO-DESCENT,NO-ASCENT
+  f1      CONSTANT
+    0.0->0.1 y_last +0.030 [-0.050, +0.086] ZERO!  -> CONSTANT
+    0.0->0.3 y_last +0.021 [-0.066, +0.091] ZERO!  -> CONSTANT
+    0.1->0.3 y_last -0.009 [-0.067, +0.059] ZERO!  -> CONSTANT
+  f2      IRRELEVANT
+    0.0->0.1 along SIG-  -> IRRELEVANT
+    0.1->0.3 along NEG  -> IRRELEVANT
+  points  NOT-LINE
+    0.0 geometry REFUSE-PROBE-INCOMPLETE  -> NOT-LINE
+    0.1 geometry REFUSE-PROBE-INCOMPLETE  -> NOT-LINE
+    0.3 geometry REFUSE-PROBE-INCOMPLETE  -> NOT-LINE
+  lower   OPEN   boundary 0.0, beyond (none)
+    reads boundary_needle MID, boundary_flow STOPPED, beyond_needles NONE, beyond_order NONE  -> family.toml side_row line 510
+    why: no point lies on this side of the declared interior
+  upper   OPEN   boundary 0.3, beyond (none)
+    reads boundary_needle MID, boundary_flow STOPPED, beyond_needles NONE, beyond_order NONE  -> family.toml side_row line 510
+    why: no point lies on this side of the declared interior
+  end     (none)
+  => family report POINT-MANIFOLD   class POINT, family.toml line 273
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: plan 0870 P3: the exponent is constant along the navigated chain (f1) and every neighbouring pair has a difference that GROWS SLOWER than the size (f2 IRRELEVANT): the members are one point class, a manifold of points. The members' own per-point verdicts are not lifted (x5n: REFUSE-PROBE-INCOMPLETE); the family is the reading that carries the class. The first reading ever of this row (X7a's pairs were all off the manifold, E44/E46); x5n over g is its test
+## x5n-g @ v07-rules
+family x5n-g   rules: v07-rules   input: x5n-bilayer-3   interior: 0.0 0.1 0.3
+  bracket BRACKET-FLAT
+    edge 0.0->0.1 NO-DESCENT,NO-ASCENT
+    edge 0.1->0.3 NO-DESCENT,NO-ASCENT
+  f1      CONSTANT
+    0.0->0.1 y_last +0.030 [-0.050, +0.086] ZERO!  -> CONSTANT
+    0.0->0.3 y_last +0.021 [-0.066, +0.091] ZERO!  -> CONSTANT
+    0.1->0.3 y_last -0.009 [-0.067, +0.059] ZERO!  -> CONSTANT
+  f2      IRRELEVANT
+    0.0->0.1 along SIG-  -> IRRELEVANT
+    0.1->0.3 along NEG  -> IRRELEVANT
+  points  NOT-LINE
+    0.0 geometry REFUSE-PROBE-INCOMPLETE  -> NOT-LINE
+    0.1 geometry REFUSE-PROBE-INCOMPLETE  -> NOT-LINE
+    0.3 geometry REFUSE-PROBE-INCOMPLETE  -> NOT-LINE
+  lower   OPEN   boundary 0.0, beyond (none)
+    reads boundary_needle MID, boundary_flow STOPPED, beyond_needles NONE, beyond_order NONE  -> family.toml side_row line 510
+    why: no point lies on this side of the declared interior
+  upper   OPEN   boundary 0.3, beyond (none)
+    reads boundary_needle MID, boundary_flow STOPPED, beyond_needles NONE, beyond_order NONE  -> family.toml side_row line 510
+    why: no point lies on this side of the declared interior
+  end     (none)
+  => family report POINT-MANIFOLD   class POINT, family.toml line 273
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: plan 0870 P3: the exponent is constant along the navigated chain (f1) and every neighbouring pair has a difference that GROWS SLOWER than the size (f2 IRRELEVANT): the members are one point class, a manifold of points. The members' own per-point verdicts are not lifted (x5n: REFUSE-PROBE-INCOMPLETE); the family is the reading that carries the class. The first reading ever of this row (X7a's pairs were all off the manifold, E44/E46); x5n over g is its test
+## x5n-g @ v08-rules
+no result for x5n-bilayer-3 under v08-rules yet.
+  Next: bin/cc run x5n-bilayer-3 --tables v08-rules
+## x5n-g @ v10-rules
+no result for x5n-bilayer-3 under v10-rules yet.
+  Next: bin/cc run x5n-bilayer-3 --tables v10-rules
+## x7a-bc-lambda @ v01-rules
+family x7a-bc-lambda   rules: v01-rules   input: x7a-bc   interior: 0.0 1.0 1.5 1.8 1.9 1.95
+  bracket NON-MONOTONE
+    edge 0.0->1.0 DESCENT
+    edge 1.0->1.5 NO-DESCENT
+    edge 1.5->1.8 NO-DESCENT
+    edge 1.8->1.9 NO-DESCENT
+    edge 1.9->1.95 DESCENT
+  f1      NOT-MEASURED
+  f2      REFUSE-OFF-MANIFOLD
+    0.0->1.0 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+    1.0->1.5 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+    1.5->1.8 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+    1.8->1.9 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+    1.9->1.95 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+  => family report REFUSE-OFF-MANIFOLD   class REFUSE, family.toml line 60
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: X7a: a member point off the manifold at L 243 (it also explains a non-monotone bracket, so it is read first by partition)
+## x7a-bc-lambda @ v02-rules
+family x7a-bc-lambda   rules: v02-rules   input: x7a-bc   interior: 0.0 1.0 1.5 1.8 1.9 1.95
+  bracket NON-MONOTONE
+    edge 0.0->1.0 DESCENT
+    edge 1.0->1.5 NO-DESCENT
+    edge 1.5->1.8 NO-DESCENT
+    edge 1.8->1.9 NO-DESCENT
+    edge 1.9->1.95 DESCENT
+  f1      NOT-MEASURED
+  f2      REFUSE-OFF-MANIFOLD
+    0.0->1.0 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+    1.0->1.5 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+    1.5->1.8 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+    1.8->1.9 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+    1.9->1.95 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+  => family report REFUSE-OFF-MANIFOLD   class REFUSE, family.toml line 60
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: X7a: a member point off the manifold at L 243 (it also explains a non-monotone bracket, so it is read first by partition)
+## x7a-bc-lambda @ v03-rules
+family x7a-bc-lambda   rules: v03-rules   input: x7a-bc   interior: 0.0 1.0 1.5 1.8 1.9 1.95
+  bracket NON-MONOTONE
+    edge 0.0->1.0 DESCENT
+    edge 1.0->1.5 NO-DESCENT
+    edge 1.5->1.8 NO-DESCENT
+    edge 1.8->1.9 NO-DESCENT
+    edge 1.9->1.95 DESCENT
+  f1      NOT-MEASURED
+  f2      REFUSE-OFF-MANIFOLD
+    0.0->1.0 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+    1.0->1.5 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+    1.5->1.8 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+    1.8->1.9 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+    1.9->1.95 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+  => family report REFUSE-OFF-MANIFOLD   class REFUSE, family.toml line 60
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: X7a: a member point off the manifold at L 243 (it also explains a non-monotone bracket, so it is read first by partition)
+## x7a-bc-lambda @ v04-rules
+family x7a-bc-lambda   rules: v04-rules   input: x7a-bc   interior: 0.0 1.0 1.5 1.8 1.9 1.95
+  bracket NON-MONOTONE
+    edge 0.0->1.0 DESCENT
+    edge 1.0->1.5 NO-DESCENT
+    edge 1.5->1.8 NO-DESCENT
+    edge 1.8->1.9 NO-DESCENT
+    edge 1.9->1.95 DESCENT
+  f1      NOT-MEASURED
+  f2      REFUSE-OFF-MANIFOLD
+    0.0->1.0 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+    1.0->1.5 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+    1.5->1.8 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+    1.8->1.9 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+    1.9->1.95 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+  => family report REFUSE-OFF-MANIFOLD   class REFUSE, family.toml line 60
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: X7a: a member point off the manifold at L 243 (it also explains a non-monotone bracket, so it is read first by partition)
+## x7a-bc-lambda @ v05-rules
+family x7a-bc-lambda   rules: v05-rules   input: x7a-bc   interior: 0.0 1.0 1.5 1.8 1.9 1.95
+  bracket NON-MONOTONE
+    edge 0.0->1.0 DESCENT,NO-ASCENT
+    edge 1.0->1.5 NO-DESCENT,NO-ASCENT
+    edge 1.5->1.8 NO-DESCENT,ASCENT
+    edge 1.8->1.9 NO-DESCENT,ASCENT
+    edge 1.9->1.95 DESCENT,NO-ASCENT
+  f1      NOT-MEASURED
+  f2      REFUSE-OFF-MANIFOLD
+    0.0->1.0 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+    1.0->1.5 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+    1.5->1.8 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+    1.8->1.9 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+    1.9->1.95 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+  points  NOT-LINE
+    0.0 geometry NOT  -> NOT-LINE
+    1.0 geometry NOT  -> NOT-LINE
+    1.5 geometry NOT  -> NOT-LINE
+    1.8 geometry REFUSE-FLOW  -> NOT-LINE
+    1.9 geometry NOT  -> NOT-LINE
+    1.95 geometry REFUSE-FLOW  -> NOT-LINE
+  lower   OPEN   boundary 0.0, beyond (none)
+    reads boundary_needle ORD, boundary_flow FLOWING, beyond_needles NONE, beyond_order NONE  -> family.toml side_row line 510
+    why: no point lies on this side of the declared interior
+  upper   OPEN   boundary 1.95, beyond (none)
+    reads boundary_needle MID, boundary_flow UNRES, beyond_needles NONE, beyond_order NONE  -> family.toml side_row line 510
+    why: no point lies on this side of the declared interior
+  end     (none)
+  => family report REFUSE-OFF-MANIFOLD   class REFUSE, family.toml line 178
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: plan 0871 G6: a member point off the manifold at L 243 is a fact about the chain; no row may override it, whatever the points and sides read (this row precedes the LINE and BKT-END rows by partition: they exclude it). It also explains a non-monotone bracket (X7a)
+## x7a-bc-lambda @ v06-rules
+family x7a-bc-lambda   rules: v06-rules   input: x7a-bc   interior: 0.0 1.0 1.5 1.8 1.9 1.95
+  bracket NON-MONOTONE
+    edge 0.0->1.0 DESCENT,NO-ASCENT
+    edge 1.0->1.5 NO-DESCENT,NO-ASCENT
+    edge 1.5->1.8 NO-DESCENT,ASCENT
+    edge 1.8->1.9 NO-DESCENT,ASCENT
+    edge 1.9->1.95 DESCENT,NO-ASCENT
+  f1      NOT-MEASURED
+  f2      REFUSE-OFF-MANIFOLD
+    0.0->1.0 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+    1.0->1.5 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+    1.5->1.8 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+    1.8->1.9 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+    1.9->1.95 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+  points  NOT-LINE
+    0.0 geometry NOT  -> NOT-LINE
+    1.0 geometry NOT  -> NOT-LINE
+    1.5 geometry NOT  -> NOT-LINE
+    1.8 geometry REFUSE-FLOW  -> NOT-LINE
+    1.9 geometry NOT  -> NOT-LINE
+    1.95 geometry REFUSE-FLOW  -> NOT-LINE
+  lower   OPEN   boundary 0.0, beyond (none)
+    reads boundary_needle ORD, boundary_flow FLOWING, beyond_needles NONE, beyond_order NONE  -> family.toml side_row line 510
+    why: no point lies on this side of the declared interior
+  upper   OPEN   boundary 1.95, beyond (none)
+    reads boundary_needle MID, boundary_flow UNRES, beyond_needles NONE, beyond_order NONE  -> family.toml side_row line 510
+    why: no point lies on this side of the declared interior
+  end     (none)
+  => family report REFUSE-OFF-MANIFOLD   class REFUSE, family.toml line 178
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: plan 0871 G6: a member point off the manifold at L 243 is a fact about the chain; no row may override it, whatever the points and sides read (this row precedes the LINE and BKT-END rows by partition: they exclude it). It also explains a non-monotone bracket (X7a)
+## x7a-bc-lambda @ v07-rules
+family x7a-bc-lambda   rules: v07-rules   input: x7a-bc   interior: 0.0 1.0 1.5 1.8 1.9 1.95
+  bracket NON-MONOTONE
+    edge 0.0->1.0 DESCENT,NO-ASCENT
+    edge 1.0->1.5 NO-DESCENT,NO-ASCENT
+    edge 1.5->1.8 NO-DESCENT,ASCENT
+    edge 1.8->1.9 NO-DESCENT,ASCENT
+    edge 1.9->1.95 DESCENT,NO-ASCENT
+  f1      NOT-MEASURED
+  f2      REFUSE-OFF-MANIFOLD
+    0.0->1.0 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+    1.0->1.5 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+    1.5->1.8 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+    1.8->1.9 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+    1.9->1.95 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
+  points  NOT-LINE
+    0.0 geometry NOT  -> NOT-LINE
+    1.0 geometry NOT  -> NOT-LINE
+    1.5 geometry NOT  -> NOT-LINE
+    1.8 geometry REFUSE-FLOW  -> NOT-LINE
+    1.9 geometry NOT  -> NOT-LINE
+    1.95 geometry REFUSE-FLOW  -> NOT-LINE
+  lower   OPEN   boundary 0.0, beyond (none)
+    reads boundary_needle ORD, boundary_flow FLOWING, beyond_needles NONE, beyond_order NONE  -> family.toml side_row line 510
+    why: no point lies on this side of the declared interior
+  upper   OPEN   boundary 1.95, beyond (none)
+    reads boundary_needle MID, boundary_flow UNRES, beyond_needles NONE, beyond_order NONE  -> family.toml side_row line 510
+    why: no point lies on this side of the declared interior
+  end     (none)
+  => family report REFUSE-OFF-MANIFOLD   class REFUSE, family.toml line 178
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: plan 0871 G6: a member point off the manifold at L 243 is a fact about the chain; no row may override it, whatever the points and sides read (this row precedes the LINE and BKT-END rows by partition: they exclude it). It also explains a non-monotone bracket (X7a)
+## x7a-bc-lambda @ v08-rules
+no result for x7a-bc under v08-rules yet.
+  Next: bin/cc run x7a-bc --tables v08-rules
+## x7a-bc-lambda @ v10-rules
+no result for x7a-bc under v10-rules yet.
+  Next: bin/cc run x7a-bc --tables v10-rules
+## x7a-nnn-manifold @ v01-rules
+family x7a-nnn-manifold   rules: v01-rules   input: x7a-nnn   interior: k2-0.0 k2-0.1
+  bracket BRACKET
+    edge k2-0.0->k2-0.1 NO-DESCENT
+  f1      NOT-MEASURED
+  f2      NOT-EVALUATED
+    k2-0.0->k2-0.1 along NOT-EVALUATED  -> NOT-EVALUATED
+  => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 75
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: 0863: no positive row yet (0862 X7b/X2-X4 decide)
+## x7a-nnn-manifold @ v02-rules
+family x7a-nnn-manifold   rules: v02-rules   input: x7a-nnn   interior: k2-0.0 k2-0.1
+  bracket BRACKET
+    edge k2-0.0->k2-0.1 NO-DESCENT
+  f1      NOT-MEASURED
+  f2      NOT-EVALUATED
+    k2-0.0->k2-0.1 along NOT-EVALUATED  -> NOT-EVALUATED
+  => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 75
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: 0863: no positive row yet (0862 X7b/X2-X4 decide)
+## x7a-nnn-manifold @ v03-rules
+family x7a-nnn-manifold   rules: v03-rules   input: x7a-nnn   interior: k2-0.0 k2-0.1
+  bracket BRACKET
+    edge k2-0.0->k2-0.1 NO-DESCENT
+  f1      NOT-MEASURED
+  f2      NOT-EVALUATED
+    k2-0.0->k2-0.1 along NOT-EVALUATED  -> NOT-EVALUATED
+  => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 75
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: 0863: no positive row yet (0862 X7b/X2-X4 decide)
+## x7a-nnn-manifold @ v04-rules
+family x7a-nnn-manifold   rules: v04-rules   input: x7a-nnn   interior: k2-0.0 k2-0.1
+  bracket BRACKET
+    edge k2-0.0->k2-0.1 NO-DESCENT
+  f1      NOT-MEASURED
+  f2      NOT-EVALUATED
+    k2-0.0->k2-0.1 along NOT-EVALUATED  -> NOT-EVALUATED
+  => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 95
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: 0863: no positive row yet (0862 X7b/X2-X4 decide)
+## x7a-nnn-manifold @ v05-rules
+family x7a-nnn-manifold   rules: v05-rules   input: x7a-nnn   interior: k2-0.0 k2-0.1
+  bracket BRACKET-FLAT
+    edge k2-0.0->k2-0.1 NO-DESCENT,NO-ASCENT
+  f1      NOT-MEASURED
+  f2      NOT-EVALUATED
+    k2-0.0->k2-0.1 along NOT-EVALUATED  -> NOT-EVALUATED
+  points  NOT-LINE
+    k2-0.0 geometry REFUSE-FLOW  -> NOT-LINE
+    k2-0.1 geometry REFUSE-FLOW  -> NOT-LINE
+  lower   OPEN   boundary k2-0.0, beyond (none)
+    reads boundary_needle MID, boundary_flow UNRES, beyond_needles NONE, beyond_order NONE  -> family.toml side_row line 510
+    why: no point lies on this side of the declared interior
+  upper   OPEN   boundary k2-0.1, beyond (none)
+    reads boundary_needle MID, boundary_flow UNRES, beyond_needles NONE, beyond_order NONE  -> family.toml side_row line 510
+    why: no point lies on this side of the declared interior
+  end     (none)
+  => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 433
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: 0863: no positive row yet (0862 X7b/X2-X4 decide)
+## x7a-nnn-manifold @ v06-rules
+family x7a-nnn-manifold   rules: v06-rules   input: x7a-nnn   interior: k2-0.0 k2-0.1
+  bracket BRACKET-FLAT
+    edge k2-0.0->k2-0.1 NO-DESCENT,NO-ASCENT
+  f1      NOT-MEASURED
+  f2      NOT-EVALUATED
+    k2-0.0->k2-0.1 along NOT-EVALUATED  -> NOT-EVALUATED
+  points  NOT-LINE
+    k2-0.0 geometry REFUSE-FLOW  -> NOT-LINE
+    k2-0.1 geometry REFUSE-FLOW  -> NOT-LINE
+  lower   OPEN   boundary k2-0.0, beyond (none)
+    reads boundary_needle MID, boundary_flow UNRES, beyond_needles NONE, beyond_order NONE  -> family.toml side_row line 510
+    why: no point lies on this side of the declared interior
+  upper   OPEN   boundary k2-0.1, beyond (none)
+    reads boundary_needle MID, boundary_flow UNRES, beyond_needles NONE, beyond_order NONE  -> family.toml side_row line 510
+    why: no point lies on this side of the declared interior
+  end     (none)
+  => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 433
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: 0863: no positive row yet (0862 X7b/X2-X4 decide)
+## x7a-nnn-manifold @ v07-rules
+family x7a-nnn-manifold   rules: v07-rules   input: x7a-nnn   interior: k2-0.0 k2-0.1
+  bracket BRACKET-FLAT
+    edge k2-0.0->k2-0.1 NO-DESCENT,NO-ASCENT
+  f1      NOT-MEASURED
+  f2      NOT-EVALUATED
+    k2-0.0->k2-0.1 along NOT-EVALUATED  -> NOT-EVALUATED
+  points  NOT-LINE
+    k2-0.0 geometry REFUSE-FLOW  -> NOT-LINE
+    k2-0.1 geometry REFUSE-FLOW  -> NOT-LINE
+  lower   OPEN   boundary k2-0.0, beyond (none)
+    reads boundary_needle MID, boundary_flow UNRES, beyond_needles NONE, beyond_order NONE  -> family.toml side_row line 510
+    why: no point lies on this side of the declared interior
+  upper   OPEN   boundary k2-0.1, beyond (none)
+    reads boundary_needle MID, boundary_flow UNRES, beyond_needles NONE, beyond_order NONE  -> family.toml side_row line 510
+    why: no point lies on this side of the declared interior
+  end     (none)
+  => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 433
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: 0863: no positive row yet (0862 X7b/X2-X4 decide)
+## x7a-nnn-manifold @ v08-rules
+no result for x7a-nnn under v08-rules yet.
+  Next: bin/cc run x7a-nnn --tables v08-rules
+## x7a-nnn-manifold @ v10-rules
+no result for x7a-nnn under v10-rules yet.
+  Next: bin/cc run x7a-nnn --tables v10-rules
+## x8-ising-compass @ v01-rules
+family x8-ising-compass   rules: v01-rules   input: x8-ising-needle   interior: 0.90 0.95 0.98 0.99 1.00 1.01 1.02 1.05 1.10
+  bracket BRACKET
+    edge 0.90->0.95 NO-DESCENT
+    edge 0.95->0.98 NO-DESCENT
+    edge 0.98->0.99 NO-DESCENT
+    edge 0.99->1.00 NO-DESCENT
+    edge 1.00->1.01 NO-DESCENT
+    edge 1.01->1.02 NO-DESCENT
+    edge 1.02->1.05 NO-DESCENT
+    edge 1.05->1.10 NO-DESCENT
+  f1      NOT-MEASURED
+  f2      NOT-MEASURED
+  => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 75
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: 0863: no positive row yet (0862 X7b/X2-X4 decide)
+## x8-ising-compass @ v02-rules
+family x8-ising-compass   rules: v02-rules   input: x8-ising-needle   interior: 0.90 0.95 0.98 0.99 1.00 1.01 1.02 1.05 1.10
+  bracket BRACKET
+    edge 0.90->0.95 NO-DESCENT
+    edge 0.95->0.98 NO-DESCENT
+    edge 0.98->0.99 NO-DESCENT
+    edge 0.99->1.00 NO-DESCENT
+    edge 1.00->1.01 NO-DESCENT
+    edge 1.01->1.02 NO-DESCENT
+    edge 1.02->1.05 NO-DESCENT
+    edge 1.05->1.10 NO-DESCENT
+  f1      NOT-MEASURED
+  f2      NOT-MEASURED
+  => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 75
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: 0863: no positive row yet (0862 X7b/X2-X4 decide)
+## x8-ising-compass @ v03-rules
+family x8-ising-compass   rules: v03-rules   input: x8-ising-needle   interior: 0.90 0.95 0.98 0.99 1.00 1.01 1.02 1.05 1.10
+  bracket BRACKET
+    edge 0.90->0.95 NO-DESCENT
+    edge 0.95->0.98 NO-DESCENT
+    edge 0.98->0.99 NO-DESCENT
+    edge 0.99->1.00 NO-DESCENT
+    edge 1.00->1.01 NO-DESCENT
+    edge 1.01->1.02 NO-DESCENT
+    edge 1.02->1.05 NO-DESCENT
+    edge 1.05->1.10 NO-DESCENT
+  f1      NOT-MEASURED
+  f2      NOT-MEASURED
+  => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 75
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: 0863: no positive row yet (0862 X7b/X2-X4 decide)
+## x8-ising-compass @ v04-rules
+family x8-ising-compass   rules: v04-rules   input: x8-ising-needle   interior: 0.90 0.95 0.98 0.99 1.00 1.01 1.02 1.05 1.10
+  bracket BRACKET
+    edge 0.90->0.95 NO-DESCENT
+    edge 0.95->0.98 NO-DESCENT
+    edge 0.98->0.99 NO-DESCENT
+    edge 0.99->1.00 NO-DESCENT
+    edge 1.00->1.01 NO-DESCENT
+    edge 1.01->1.02 NO-DESCENT
+    edge 1.02->1.05 NO-DESCENT
+    edge 1.05->1.10 NO-DESCENT
+  f1      NOT-MEASURED
+  f2      NOT-MEASURED
+  => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 95
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: 0863: no positive row yet (0862 X7b/X2-X4 decide)
+## x8-ising-compass @ v05-rules
+family x8-ising-compass   rules: v05-rules   input: x8-ising-needle   interior: 0.90 0.95 0.98 0.99 1.00 1.01 1.02 1.05 1.10
+  bracket BRACKET-UP
+    edge 0.90->0.95 NO-DESCENT,NO-ASCENT
+    edge 0.95->0.98 NO-DESCENT,NO-ASCENT
+    edge 0.98->0.99 NO-DESCENT,NO-ASCENT
+    edge 0.99->1.00 NO-DESCENT,ASCENT
+    edge 1.00->1.01 NO-DESCENT,ASCENT
+    edge 1.01->1.02 NO-DESCENT,NO-ASCENT
+    edge 1.02->1.05 NO-DESCENT,NO-ASCENT
+    edge 1.05->1.10 NO-DESCENT,NO-ASCENT
+  f1      NOT-MEASURED
+  f2      NOT-MEASURED
+  points  NOT-LINE
+    0.90 geometry NOT  -> NOT-LINE
+    0.95 geometry NOT  -> NOT-LINE
+    0.98 geometry NOT  -> NOT-LINE
+    0.99 geometry NOT  -> NOT-LINE
+    1.00 geometry REFUSE-FLOW  -> NOT-LINE
+    1.01 geometry NOT  -> NOT-LINE
+    1.02 geometry NOT  -> NOT-LINE
+    1.05 geometry NOT  -> NOT-LINE
+    1.10 geometry NOT  -> NOT-LINE
+  lower   OPEN   boundary 0.90, beyond (none)
+    reads boundary_needle DIS, boundary_flow FLOWING, beyond_needles NONE, beyond_order NONE  -> family.toml side_row line 510
+    why: no point lies on this side of the declared interior
+  upper   OPEN   boundary 1.10, beyond (none)
+    reads boundary_needle ORD, boundary_flow SLOW, beyond_needles NONE, beyond_order NONE  -> family.toml side_row line 510
+    why: no point lies on this side of the declared interior
+  end     (none)
+  => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 433
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: 0863: no positive row yet (0862 X7b/X2-X4 decide)
+## x8-ising-compass @ v06-rules
+family x8-ising-compass   rules: v06-rules   input: x8-ising-needle   interior: 0.90 0.95 0.98 0.99 1.00 1.01 1.02 1.05 1.10
+  bracket BRACKET-UP
+    edge 0.90->0.95 NO-DESCENT,NO-ASCENT
+    edge 0.95->0.98 NO-DESCENT,NO-ASCENT
+    edge 0.98->0.99 NO-DESCENT,NO-ASCENT
+    edge 0.99->1.00 NO-DESCENT,ASCENT
+    edge 1.00->1.01 NO-DESCENT,ASCENT
+    edge 1.01->1.02 NO-DESCENT,NO-ASCENT
+    edge 1.02->1.05 NO-DESCENT,NO-ASCENT
+    edge 1.05->1.10 NO-DESCENT,NO-ASCENT
+  f1      NOT-MEASURED
+  f2      NOT-MEASURED
+  points  NOT-LINE
+    0.90 geometry NOT  -> NOT-LINE
+    0.95 geometry NOT  -> NOT-LINE
+    0.98 geometry NOT  -> NOT-LINE
+    0.99 geometry NOT  -> NOT-LINE
+    1.00 geometry REFUSE-FLOW  -> NOT-LINE
+    1.01 geometry NOT  -> NOT-LINE
+    1.02 geometry NOT  -> NOT-LINE
+    1.05 geometry NOT  -> NOT-LINE
+    1.10 geometry NOT  -> NOT-LINE
+  lower   OPEN   boundary 0.90, beyond (none)
+    reads boundary_needle DIS, boundary_flow FLOWING, beyond_needles NONE, beyond_order NONE  -> family.toml side_row line 510
+    why: no point lies on this side of the declared interior
+  upper   OPEN   boundary 1.10, beyond (none)
+    reads boundary_needle ORD, boundary_flow SLOW, beyond_needles NONE, beyond_order NONE  -> family.toml side_row line 510
+    why: no point lies on this side of the declared interior
+  end     (none)
+  => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 433
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: 0863: no positive row yet (0862 X7b/X2-X4 decide)
+## x8-ising-compass @ v07-rules
+family x8-ising-compass   rules: v07-rules   input: x8-ising-needle   interior: 0.90 0.95 0.98 0.99 1.00 1.01 1.02 1.05 1.10
+  bracket BRACKET-UP
+    edge 0.90->0.95 NO-DESCENT,NO-ASCENT
+    edge 0.95->0.98 NO-DESCENT,NO-ASCENT
+    edge 0.98->0.99 NO-DESCENT,NO-ASCENT
+    edge 0.99->1.00 NO-DESCENT,ASCENT
+    edge 1.00->1.01 NO-DESCENT,ASCENT
+    edge 1.01->1.02 NO-DESCENT,NO-ASCENT
+    edge 1.02->1.05 NO-DESCENT,NO-ASCENT
+    edge 1.05->1.10 NO-DESCENT,NO-ASCENT
+  f1      NOT-MEASURED
+  f2      NOT-MEASURED
+  points  NOT-LINE
+    0.90 geometry NOT  -> NOT-LINE
+    0.95 geometry NOT  -> NOT-LINE
+    0.98 geometry NOT  -> NOT-LINE
+    0.99 geometry NOT  -> NOT-LINE
+    1.00 geometry REFUSE-FLOW  -> NOT-LINE
+    1.01 geometry NOT  -> NOT-LINE
+    1.02 geometry NOT  -> NOT-LINE
+    1.05 geometry NOT  -> NOT-LINE
+    1.10 geometry NOT  -> NOT-LINE
+  lower   OPEN   boundary 0.90, beyond (none)
+    reads boundary_needle DIS, boundary_flow FLOWING, beyond_needles NONE, beyond_order NONE  -> family.toml side_row line 510
+    why: no point lies on this side of the declared interior
+  upper   OPEN   boundary 1.10, beyond (none)
+    reads boundary_needle ORD, boundary_flow SLOW, beyond_needles NONE, beyond_order NONE  -> family.toml side_row line 510
+    why: no point lies on this side of the declared interior
+  end     (none)
+  => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 433
+     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     why: 0863: no positive row yet (0862 X7b/X2-X4 decide)
+## x8-ising-compass @ v08-rules
+no result for x8-ising-needle under v08-rules yet.
+  Next: bin/cc run x8-ising-needle --tables v08-rules
+## x8-ising-compass @ v10-rules
+no result for x8-ising-needle under v10-rules yet.
+  Next: bin/cc run x8-ising-needle --tables v10-rules

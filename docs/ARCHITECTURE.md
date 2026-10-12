@@ -80,7 +80,7 @@ transducer file), `resources.py` 36, `author.py` 363 (authoring).
    `validate` proves compose(geometry, order) equals the verdict on every row. Here geometry line 73 LINE, probe
    line 12 (stands), order line 72 CONTINUOUS (witness: fluct VANISHES), compose line 36 -> LINE.
 13. **FAMILY** - `family.py` reads the stored result, never re-measures: `bracket` (A over
-    needle-rank codes along the points), `f1` (all-pairs A over `across.y_last` per resample), `f2` (`along` cells),
+    needle-rank codes along the points), `f1` (all-pairs A over `across.y_last` per resample; per chain, rows 1..m, under method `chains`, plan 0978), `f2` (`along` cells),
     `points`, `lower`/`upper` (the side table) -> one lookup in `family.toml`. `bin/cc family x2b-xy-2 --tables v07-rules`.
 
 A pair instrument (`along`, `across_delta`, `stability_delta`) runs after the point instruments: its membership door (where the set
