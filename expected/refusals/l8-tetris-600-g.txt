@@ -1,0 +1,10 @@
+inputs/l8-tetris-600-g/m.toml:data.files[3].arrays.GL: tetris057#_tetrisspin_clustering_total.csv line 187: moment 0.0 is not one of [-1, 1]
+  Next: fix the file: a table is refused, never repaired
+inputs/l8-tetris-600-g/m.toml:data.files[8].arrays.GL: tetris067#_tetrisspin_clustering_total.csv line 690: moment 0.0 is not one of [-1, 1]
+  Next: fix the file: a table is refused, never repaired
+inputs/l8-tetris-600-g/m.toml:data.files[10].arrays.GL: tetris071#_tetrisspin_clustering_total.csv line 208: moment 0.0 is not one of [-1, 1]
+  Next: fix the file: a table is refused, never repaired
+inputs/l8-tetris-600-g/m.toml:data.files[11].arrays.GL: tetris073#_tetrisspin_clustering_total.csv line 407: moment 0.0 is not one of [-1, 1]
+  Next: fix the file: a table is refused, never repaired
+inputs/l8-tetris-600-g/m.toml:interval.tau_declared: 17 of 17 declared arrays hold fewer than k_gamma * tau_declared = 64 * 135 = 8640 samples (the shortest: l8/600_nm/tetris051#_tetrisspin_clustering_total.csv key csv, n 64)
+  Next: the record is shorter than its own correlation time allows: use a longer record, or correct tau_declared = 135 (and its tau_source) if it is wrong; the floor is n >= k_gamma * tau_declared with k_gamma = 64 (cc.toml [interval_fields.gamma]), so this record admits tau_declared <= 1

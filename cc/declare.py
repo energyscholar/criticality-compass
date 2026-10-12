@@ -494,13 +494,81 @@ def geometry_reports(root, input_id=None):
     return out
 
 
+def chk_expect(p, d, c):
+    """plan 0884 amendment 5: [expect] outcome = "refused", sentences = "expected/refusals/<id>.txt" - a declared PREDICTION of the refusal. The sentences file is frozen
+    text taken from CC's own output; validate scores the input's refusals against it (score_expected). Absent [expect], an input is expected to be accepted."""
+    if "expect" not in d:
+        return []
+    e = d["expect"]
+    out = shape(p, e, {"outcome": str, "sentences": str}, pre="expect.")
+    if out:
+        return out
+    want = f"expected/refusals/{d.get('id')}.txt"
+    out += when(e["outcome"] != "refused", p, "expect.outcome", f"'{e['outcome']}' is not an expected outcome", 'write outcome = "refused" (an input expected to be accepted declares no [expect])')
+    out += when(e["sentences"] != want, p, "expect.sentences", f"must name {want}, found {e['sentences']}", f'write sentences = "{want}"')
+    return out + when(e["sentences"] == want and not (c.root / want).is_file(), p, "expect.sentences", f"{want} does not exist",
+                      "write it from CC's own refusal output: bin/cc validate --input <id> --tables v08-rules, the lines of this input without the report: and validate: lines")
+
+
+def sentences_of(text):
+    """The refusal sentences of a frozen file: a sentence is its first line plus its indented continuation lines."""
+    out = []
+    for ln in text.splitlines():
+        if ln.startswith("  ") and out:
+            out[-1] += "\n" + ln
+        elif ln.strip():
+            out.append(ln)
+    return out
+
+
+def score_expected(root, found, input_id=None):
+    """plan 0884 amendment 5: a refusal is a declared reading, so the gate scores it. For every input with [expect], compare the findings located under inputs/<id>/ with the sentences of its
+    frozen file (only that input's, when validate was scoped to one: the others were not checked, so they cannot be scored). An exact match (as a multiset) removes those findings and prints ONE line. Anything else leaves every finding standing and adds a finding for each: an ACCEPTED input
+    declared refused, a missing sentence, a sentence that is not in the file (an extra refusal, or changed wording shows as one of each). Returns (findings, lines)."""
+    root, lines = Path(root).resolve(), []
+    found = list(found)
+    for mp in sorted((root / "inputs").glob("*/m.toml")):
+        iid, e = mp.parent.name, (load(mp, root)[0] or {}).get("expect")
+        if input_id and iid != input_id:
+            continue
+        pre = f"inputs/{iid}/"
+        if not isinstance(e, dict) or any(f.loc.startswith(pre + "m.toml:expect") for f in found):
+            continue   # no expectation, or a malformed one: its own findings stand and nothing is absorbed
+        got = [f for f in found if f.loc.startswith(pre)]
+        want, here = sentences_of((root / e["sentences"]).read_text()), f"inputs/{iid}/m.toml"
+        if not got:
+            found.append(at(here, "expect.outcome", f"declared refused but the input was ACCEPTED (validate found nothing to refuse; {len(want)} sentences were expected)",
+                            "an input that should be refused must be refused: this is a gate that did not fire - find why before changing the declaration"))
+            continue
+        extra, left = [], list(want)   # each produced sentence cancels one expected sentence; what is left of either side is a discrepancy
+        for s in map(fmt, got):
+            if s in left:
+                left.remove(s)
+            else:
+                extra.append(s)
+        if not extra and not left:
+            found = [f for f in found if f not in got]
+            lines.append(f"{iid}: refused as declared ({len(got)} sentences)")
+            continue
+        found += [at(here, "expect.sentences", f"a refusal that is not in {e['sentences']}: {s.splitlines()[0]}", "an extra or reworded refusal is a finding: read it, then amend the frozen file only by a dated plan amendment") for s in extra]
+        found += [at(here, "expect.sentences", f"a declared refusal that did not occur: {s.splitlines()[0]}", "a missing or reworded refusal is a finding: read it, then amend the frozen file only by a dated plan amendment") for s in left]
+    return found, lines
+
+
+def validate_scored(root=ROOT, input_id=None, tables=None):
+    """validate, then the declared refusals scored (score_expected): (findings, n, lines). `run` and the tables commands keep the raw validate: a declared refusal still refuses a run."""
+    found, n = validate(root, input_id, tables)
+    found, lines = score_expected(root, found, input_id)
+    return found, n, lines
+
+
 def chk_input(p, d, c, stem=None):
     todo = list(todos(p, d))
     if [t for t in todo if not t.loc.split(":", 1)[1].startswith("obtained")]:
         return todo   # a template still full of TODOs: report them, nothing else
     req = {"id": str, "instruments": list, "obtained": dict, "axes": dict, "interval": dict, "eps": dict,
            "kernel": dict, "data": dict}
-    out = header(p, d, "input") + shape(p, d, req, {k: dict for k in SIDECARS + ("relations", "windows")})
+    out = header(p, d, "input") + shape(p, d, req, {k: dict for k in SIDECARS + ("relations", "windows", "expect")})
     out += id_check(p, "id", d.get("id"), stem, "its directory")
     out += [at(p, "instruments", f"'{i}' is not in the instrument registry", f"use one of: {' '.join(c.reg)}")
             for i in d.get("instruments", []) if i not in c.reg]
@@ -528,7 +596,7 @@ def chk_input(p, d, c, stem=None):
         out += when(not want and name in d, p, name, "table present but no declared instrument uses it",
                     f"delete [{name}], or declare the instrument")
         out += shape(p, d[name], SIDECAR_SHAPE[name], SIDECAR_OPT.get(name), pre=f"{name}.") if name in d else []
-    out += limited(p, d, c) + chk_windows(p, d, c)
+    out += limited(p, d, c) + chk_windows(p, d, c) + chk_expect(p, d, c)
     out += when("two_start" in d and isinstance(d["two_start"].get("unit_scale"), dict)
                 and sorted(d["two_start"]["unit_scale"]) != sorted(map(str, sz)), p, "two_start.unit_scale",
                 f"must declare a unit scale for every size {list(map(str, sz))}", "add the missing sizes, or remove the extra ones")

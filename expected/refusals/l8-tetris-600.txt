@@ -1,0 +1,10 @@
+inputs/l8-tetris-600/m.toml:data.files[3].arrays.GL: tetris057#_tetrisspin_clustering_total.csv line 187: moment 0.0 is not one of [-1, 1]
+  Next: fix the file: a table is refused, never repaired
+inputs/l8-tetris-600/m.toml:data.files[8].arrays.GL: tetris067#_tetrisspin_clustering_total.csv line 690: moment 0.0 is not one of [-1, 1]
+  Next: fix the file: a table is refused, never repaired
+inputs/l8-tetris-600/m.toml:data.files[10].arrays.GL: tetris071#_tetrisspin_clustering_total.csv line 208: moment 0.0 is not one of [-1, 1]
+  Next: fix the file: a table is refused, never repaired
+inputs/l8-tetris-600/m.toml:data.files[11].arrays.GL: tetris073#_tetrisspin_clustering_total.csv line 407: moment 0.0 is not one of [-1, 1]
+  Next: fix the file: a table is refused, never repaired
+inputs/l8-tetris-600/m.toml:interval.min_blocks: 17 of 17 declared arrays hold fewer than min_blocks = 30 blocks of b = 405 (the shortest: l8/600_nm/tetris051#_tetrisspin_clustering_total.csv key csv, n 64 // b 405 = 0)
+  Next: declare method = "gamma" (window_s, window_max, door_z, level; cc.toml [interval_fields.gamma]), or keep method = "block" with b <= 2 (n 64 // min_blocks 30): b must also be >= k*tau for the record's integrated autocorrelation time tau, so this record admits k*tau <= 2

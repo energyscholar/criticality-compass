@@ -222,3 +222,7 @@ size = 27
 start = "asgrown"
 path = "l8/600_nm/tetris091#_tetrisspin_clustering_total.csv"
 arrays.GL = { key = "csv" }
+
+[expect]
+outcome = "refused"
+sentences = "expected/refusals/l8-tetris-600-g.txt"
