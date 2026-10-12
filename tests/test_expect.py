@@ -139,7 +139,7 @@ try:
 
     def declare(text, blocks, where=repo):
         (where / "inputs" / "planted" / "m.toml").write_text(text + files(blocks))
-        pins = "".join(f'"planted/{b[1]}" = "{hashlib.sha256((data / "planted" / b[1]).read_bytes()).hexdigest()}"\n' for b in sorted(set(blocks), key=lambda x: x[1]) if (data / "planted" / b[1]).is_file())
+        pins = "".join(f'"planted/{b[1]}" = "{hashlib.sha256((data / "planted" / b[1]).read_bytes()).hexdigest() if (data / "planted" / b[1]).is_file() else "0" * 64}"\n' for b in sorted(set(blocks), key=lambda x: x[1]))
         (where / "fixtures" / "data").mkdir(parents=True, exist_ok=True)
         (where / "fixtures" / "data" / "planted.toml").write_text('schema = 1\nkind = "data-manifest"\ninput = "planted"\n\n[files]\n' + pins)
 
@@ -236,3 +236,4 @@ try:
 finally:
     shutil.rmtree(tmp, ignore_errors=True)
 print("test_expect: " + ("FAILED" if bad else "all passed"))
+sys.exit(1 if bad else 0)   # plan 0884 amendment 6: the runner reads the exit code; a FAILED line with exit 0 was a gate nobody read
