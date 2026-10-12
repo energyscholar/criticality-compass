@@ -84,7 +84,7 @@ def logdoor(shift):
     arrs = {"G": [ga, gb + shift]}
     lin = door.linearise([g[:, None] for g in arrs["G"]], 0.001)
     rows = np.array([[m[1][0] - m[0][0]] for m in door.linearise_plan(lin)])   # Delta = mean(b) - mean(a), [rows, 1]
-    c = door.Ctx(level=0.95, eps={}, rel={}, quantity="Delta", interval=IV, lin=lin)
+    c = door.Ctx(level=0.95, eps={}, rel={}, quantity="Delta", interval=IV, lin=lin, method="gamma")
     return door.logcoord(rows, c), door.gamma_stat(lin, rows[:, 0], IV).se
 
 

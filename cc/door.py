@@ -30,6 +30,7 @@ class Ctx:
     level: float
     eps: dict
     rel: dict
+    method: str = None               # the input's [interval] method (plan 0973 F1): the key of detect.READOUT and door.SIGN_DOOR
     log_ratio: object = None
     log_span: float = None
     top: int = None
@@ -109,7 +110,7 @@ def context(m, inst, size=None):
         unit_rel=unit_rel, component_shape=(ROW_COUNT[m["interval"]["method"]](m["interval"]), len(sizes)) if pair else None,   # method gamma: the row count is known once the unit's primaries are (measure replaces it)
         interval=m["interval"],
         pair_shape=(len(sizes), 2) if pair else None, n_size=len(sizes), quantity=inst.get("quantity", "Delta" if pair else "R"),
-        level=COVERAGE[m["interval"]["method"]](m["interval"]), rank=m["interval"].get("r"), eps={c: m["eps"][e] for c, e in inst["columns"].items()}, rel=rel,
+        method=m["interval"]["method"], level=COVERAGE[m["interval"]["method"]](m["interval"]), rank=m["interval"].get("r"), eps={c: m["eps"][e] for c, e in inst["columns"].items()}, rel=rel,
         log_ratio=np.log(np.array(sizes[1:], float) / np.array(sizes[:-1], float)),
         log_span=float(np.log(sizes[-1] / sizes[0])), top=k - 1, top_steps=k - 2,
         coarsest=nb - 2, big_final=nb - 1,
@@ -162,16 +163,17 @@ def load_blocks(m, data_root, locate=None):
     return out
 
 
+INDICES = {"block": lambda n, iv, rng: resample.block_indices(n, iv["b"], rng), "iid": lambda n, iv, rng: resample.iid_indices(n, rng)}
+"""Resampling method -> one block's index set (plan 0973 F3): a method that resamples is a key here, and any other (gamma, chains, a fifth) is a KeyError, never an iid plan."""
+
+
 def resample_plan(m, ns):
     """Row 0 is the identity; rows 1..R draw one index set per block (data.files order) from ONE generator."""
     iv = m["interval"]
     yield [np.arange(n) for n in ns]
     rng = np.random.default_rng(iv["seed"])
     for _ in range(iv["resamples"]):
-        if iv["method"] == "block":
-            yield [resample.block_indices(n, iv["b"], rng) for n in ns]
-        else:
-            yield [resample.iid_indices(n, rng) for n in ns]
+        yield [INDICES[iv["method"]](n, iv, rng) for n in ns]
 
 
 @dataclass(frozen=True)
@@ -245,6 +247,25 @@ def nodefield(x, ctx):
     return admit.nodefield(x) if np.isfinite(x).all() else Null("NOT-EVALUATED", "non-finite value")
 
 
+def sign_resampled(x, s, ctx):
+    """Block, iid and chains rows: the sign must be the estimate's on every row."""
+    return None if (np.sign(x) == s).all() else Null("NOT-EVALUATED", f"sign of {ctx.quantity} not constant across the point estimate and every resample")
+
+
+def sign_gamma(x, s, ctx):
+    """Method gamma: |v| > door_z * SE_Gamma for every component (plan 0878)."""
+    q = ctx.quantity
+    stats = [gamma_stat(ctx.lin, x[:, k], ctx.interval) for k in range(x.shape[1])]
+    if None in stats:
+        return Null("NOT-EVALUATED", f"no window: the autocorrelation of {q} is not summable at this N (window_max {ctx.interval['window_max']})")
+    if not all(abs(x[0, k]) > ctx.interval["door_z"] * st.se for k, st in enumerate(stats)):
+        return Null("NOT-EVALUATED", f"|{q}| <= door_z * SE ({ctx.interval['door_z']:g} Gamma-method SE): the sign of {q} is not resolved at this N")
+    return None
+
+
+SIGN_DOOR = {"block": sign_resampled, "iid": sign_resampled, "gamma": sign_gamma, "chains": sign_resampled}   # [interval] method -> its sign door; total over cc.toml alphabets.interval_method (tests/test_0973.py)
+
+
 def logcoord(x, ctx):
     """ln(s v) when the logged quantity (R, or Delta from a delta stage) keeps one non-zero sign s over the
     estimate and every resample, else a refusal. Under method gamma the rows are the estimate and its linearisation rows (not resamples), and the
@@ -253,14 +274,9 @@ def logcoord(x, ctx):
     s = np.sign(x[0])
     if (s == 0).any():
         return Null("NOT-EVALUATED", f"{q} = 0")
-    if ctx.lin is not None:
-        stats = [gamma_stat(ctx.lin, x[:, k], ctx.interval) for k in range(x.shape[1])]
-        if None in stats:
-            return Null("NOT-EVALUATED", f"no window: the autocorrelation of {q} is not summable at this N (window_max {ctx.interval['window_max']})")
-        if not all(abs(x[0, k]) > ctx.interval["door_z"] * st.se for k, st in enumerate(stats)):
-            return Null("NOT-EVALUATED", f"|{q}| <= door_z * SE ({ctx.interval['door_z']:g} Gamma-method SE): the sign of {q} is not resolved at this N")
-    elif not (np.sign(x) == s).all():
-        return Null("NOT-EVALUATED", f"sign of {q} not constant across the point estimate and every resample")
+    refusal = SIGN_DOOR[ctx.method](x, s, ctx)   # plan 0973 F1: the method names the door (a total table), not the None-ness of a field
+    if refusal is not None:
+        return refusal
     return nodefield(project.logcoord(x, s), ctx)
 
 

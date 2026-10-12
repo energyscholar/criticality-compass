@@ -5,8 +5,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "cc" / "instruments")]
+import tomllib  # noqa: E402
+import numpy as np  # noqa: E402
 import declare  # noqa: E402
 import detect  # noqa: E402
+import door  # noqa: E402
 
 bad = []
 
@@ -42,5 +45,26 @@ try:
     check("F8 a declared refusal is still text with its Next line", got[1] is None and "planted refusal" in got[0] and "Next: nothing" in got[0], got)
 finally:
     detect.run_keyed = real
+
+# ---- F1 + F3
+alpha = set(tomllib.loads((ROOT / "cc.toml").read_text())["alphabets"]["interval_method"])
+check("F1 READOUT, SIGN_DOOR and ROWS are total over alphabets.interval_method", set(detect.READOUT) == set(door.SIGN_DOOR) == set(detect.ROWS) == alpha, (set(detect.READOUT), alpha))
+fifth = door.Ctx(level=0.95, eps={"c": 1.0}, rel={}, method="fifth", rank=1)
+for what, call in (("readout", lambda: detect.READOUT[fifth.method]), ("sign door", lambda: door.SIGN_DOOR[fifth.method])):
+    try:
+        call()
+        check(f"F1 a fifth method has no {what} (KeyError at declaration)", False, "resolved")
+    except KeyError:
+        check(f"F1 a fifth method has no {what} (KeyError at declaration)", True)
+for meth in sorted(alpha):   # every declared method's Ctx resolves to ONE readout, with no None-ness in the choice
+    check(f"F1 method {meth}: Ctx.method is the key", door.Ctx(level=0.95, eps={}, rel={}, method=meth).method == meth)
+check("F3 INDICES is the resampling methods only (block, iid)", set(door.INDICES) == {"block", "iid"}, set(door.INDICES))
+try:
+    list(door.resample_plan({"interval": {"method": "jackknife", "seed": 1, "resamples": 2}}, [5]))
+    check("F3 a method past validate is a KeyError, not an iid plan", False, "ran")
+except KeyError:
+    check("F3 a method past validate is a KeyError, not an iid plan", True)
+plan = list(door.resample_plan({"interval": {"method": "iid", "seed": 1, "resamples": 2}}, [5]))
+check("F3 an iid plan: identity row then R draws", len(plan) == 3 and (plan[0][0] == np.arange(5)).all())
 
 sys.exit(1 if bad else 0)

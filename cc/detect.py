@@ -105,19 +105,33 @@ def context_for(input_id, instrument_name, point, size=None):
     return door.context(load_input(input_id), instrument(instrument_name)[0], size)
 
 
-def read_vector(instrument_name, column, v, ctx):
-    """The readout of one resampled column: estimate, interval and sign cell against its declared eps."""
-    eps_key, v = instrument(instrument_name)[0]["columns"][column], np.asarray(v, float)
-    if ctx.lin is None:
-        est, lo, hi, cell = {False: lambda: readout.reading(v, ctx.level, ctx.eps[column]),
-                             True: lambda: readout.chains(v, ctx.rank, ctx.eps[column])}[ctx.rank is not None]()   # method chains (plan 0937): order statistics of the m chain rows
-        return Reading(float(est), float(lo), float(hi), cell, eps_key, ctx.eps[column], None, v)
+def read_resampled(v, ctx, column, eps_key):
+    """Block and iid: the interval is the percentile interval of the resampled rows against the declared eps."""
+    est, lo, hi, cell = readout.reading(v, ctx.level, ctx.eps[column])
+    return Reading(float(est), float(lo), float(hi), cell, eps_key, ctx.eps[column], None, v)
+
+
+def read_chains(v, ctx, column, eps_key):
+    """Method chains (plan 0937): order statistics of the m chain rows."""
+    est, lo, hi, cell = readout.chains(v, ctx.rank, ctx.eps[column])
+    return Reading(float(est), float(lo), float(hi), cell, eps_key, ctx.eps[column], None, v)
+
+
+def read_gamma(v, ctx, column, eps_key):
     st = door.gamma_stat(ctx.lin, v, ctx.interval)   # method gamma (plan 0878): the interval is est +- z SE_Gamma, a projection that places the sign cell
     if st is None:
         return Reading(None, None, None, "NOT-EVALUATED", eps_key, ctx.eps[column],
                        f"no window: the autocorrelation of {column} is not summable at this N (window_max {ctx.interval['window_max']})", v)
     est, lo, hi, cell = readout.reading_se(v[0], st.se, door.z_of(ctx.level), ctx.eps[column])
     return Reading(float(est), float(lo), float(hi), cell, eps_key, ctx.eps[column], None, v, None, st.window)
+
+
+READOUT = {"block": read_resampled, "iid": read_resampled, "gamma": read_gamma, "chains": read_chains}   # [interval] method -> its readout (plan 0973 F1); total over cc.toml alphabets.interval_method (tests/test_0973.py)
+
+
+def read_vector(instrument_name, column, v, ctx):
+    """The readout of one resampled column: estimate, interval and sign cell against its declared eps."""
+    return READOUT[ctx.method](np.asarray(v, float), ctx, column, instrument(instrument_name)[0]["columns"][column])
 
 
 def after(name, x, ctx):
@@ -354,7 +368,7 @@ def measure(m, c, reg, T):
         if reg[u[0]][0].get("requires"):
             inst, ctx = reg[u[0]][0], uctx[u]
             mem = door.member_for(inst, T.membership, u[0], u[1], codes)
-            ratio = (None if ctx.lin is not None and mem["door"] == "TRANSFORMED" else   # method gamma: a TRANSFORMED pair needs the joint linearisation with the needle drift (door.basis refuses it)
+            ratio = (None if ctx.method == "gamma" and mem["door"] == "TRANSFORMED" else   # method gamma: a TRANSFORMED pair needs the joint linearisation with the needle drift (door.basis refuses it)
                      door.ratio_of(mem["door"], lambda pt: first[("needle_chain", pt, None)][0]["drift"].vector, u[1],
                                    lambda: nc.log_ratio[nc.top], ctx.component_shape[0])) if "door:basis" in inst["pipeline"] else None
             first[u] = after(u[0], np.stack(v), dataclasses.replace(ctx, member=mem, ratio=ratio))
