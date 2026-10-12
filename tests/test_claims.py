@@ -66,7 +66,7 @@ check("every evidence cell of CLAIMS.md resolves to a stored result with that sh
 check("CLAIMS.md has evidence cells at all", n + len(unchecked) >= 10, f"{n + len(unchecked)}")
 rows = [ln for ln in text.splitlines() if ln.startswith("| ") and not ln.startswith("| class")]
 check("the table covers all three statuses", {r.split("|")[2].strip() for r in rows} == set(STATUS), str({r.split('|')[2].strip() for r in rows}))
-for lim in ("Detector intervals under-cover", "located, not identified", "T15 is synthetic-only", "no real-data confirmatory test", "row K4 -0.10"):
+for lim in ("Detector intervals under-cover", "located, not identified", "T15 is synthetic-only", "no real-data confirmatory test", "row K4 -0.10", "development readings only", "are false positives"):
     check(f"known limit present: {lim}", lim.lower() in text.lower())
 if unchecked:
     print(f"UNCHECKED: {len(unchecked)} toolset cells (no toolset at {roots['toolset']}); set CC_TOOLSET")
