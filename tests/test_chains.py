@@ -51,7 +51,7 @@ check("v10-rules reads only chains; v08-rules the resampling methods", schema.in
 try:
     detect.run_keyed("w2-potts-2", "v10-rules", False)
     check("A3 a block input under v10-rules is refused", False, "ran")
-except ValueError as e:
+except detect.Refused as e:
     check("A3 a block input under v10-rules is refused (loader, with a Next line)", "Next:" in str(e) and "chains" in str(e), str(e))
 res = json.loads(next(ROOT.joinpath("results").glob("w2-potts-2@v0*.json")).read_text())
 check("A3 a block result is not re-verdicted under v10-rules", (reverdict.reverdict_refusal(res, "v10-rules") or "").startswith("REFUSED"))

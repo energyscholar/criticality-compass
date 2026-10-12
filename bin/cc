@@ -331,7 +331,7 @@ def run_one(name, tables, dry, how=None):
         if not dry:
             stamp_pins(res)
         return None, res
-    except ValueError as e:
+    except detect.Refused as e:   # plan 0973 F8: only a declared refusal is text; a ValueError from a defect propagates
         return str(e), None
 
 

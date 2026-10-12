@@ -11,7 +11,7 @@ plumbing = ["bin/cc", "cc/admit.py", "cc/schema.py", "cc/declare.py", "cc/author
 benchmark = []
 methods = ["cc/detect.py"]
 tests = [
-  "tests/test_closure.py",
+  "tests/test_closure.py", "tests/test_0973.py",
   "tests/test_budget.py",
   "tests/test_kernel.py", "tests/test_sign.py", "tests/test_resample.py", "tests/test_kernel_rs.py",
   "tests/test_declare.py", "tests/test_transducer.py", "tests/test_tables_cli.py",

@@ -49,8 +49,12 @@ class Tables:
     interval_methods: tuple = ()                                 # plan 0937: the [interval] methods this set reads (schema.interval_methods)
 
 
+class Refused(Exception):
+    """A declared refusal (plan 0973 F8): the one type bin/cc run_one reports as text. Any other exception is a defect and propagates."""
+
+
 def refused(msg, nxt):
-    return ValueError(f"{msg}\n  Next: {nxt}")
+    return Refused(f"{msg}\n  Next: {nxt}")
 
 
 def family_refusal(root, fid):
