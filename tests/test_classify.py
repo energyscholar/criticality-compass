@@ -35,6 +35,10 @@ check("an inserted report line is (f) (plans 0892/0893 R4 i)", kinds("show-b7.ba
 check("an explain step label word is (g) (R4 ii)", kinds("explain-x4.basic.txt", "  3 RELATION  size: chain\n", "  3 COMPARISON size: chain\n"), ["g", "g"])
 check("the same label change outside an explain transcript is (e)", kinds("show-b7.basic.txt", "  3 RELATION  size: chain\n", "  3 COMPARISON size: chain\n"), ["e", "e"])
 check("the family => line and its label line are (h) (R4 iii)", kinds("family-b7-2.basic.txt", "  => family verdict LINE\n", "  => family report LINE\n     report: declared report — x\n"), ["h", "h", "h"])
+check("a 'refused as declared' line is (i) (plan 0884 amendment 6 F6)", kinds("validate-l8.basic.txt", "validate: clean\n", "l8-tetris-600: refused as declared (5 sentences)\nvalidate: clean\n"), ["i"])
+check("a reworded 'refused as declared' line is (e) (the class matches the exact line only)", kinds("validate-l8.basic.txt", "validate: clean\n", "l8-tetris-600: refused as declared (five)\nvalidate: clean\n"), ["e"])
+seen_red = {k: v for k, v in classes.items() if k != "i"}
+check("SEEN RED: without class (i) the same line is (e) OTHER", [k for k, _ in declare.classify_changes(seen_red, "validate-l8.basic.txt", "validate: clean\n", "l8-tetris-600: refused as declared (5 sentences)\nvalidate: clean\n")], ["e"])
 check("an unchanged transcript has no changed line", kinds("show-b7.basic.txt", show, show), [])
 print("test_classify: " + ("FAILED" if bad else "all passed"))
 sys.exit(1 if bad else 0)

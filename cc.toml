@@ -205,6 +205,9 @@ match = ['^[-+]\s+code_(commit|hash): ']
 [golden.classes.d]    # the frozen flag
 files = ["*.txt"]
 match = ['\((not frozen|frozen)\)$']
+[golden.classes.i]    # plan 0884 amendment 6 F6 (stated, not silent): the line validate prints for an input whose [expect] refusals matched their frozen sentence file exactly
+files = ["*.txt"]
+match = ['^[-+]\S+: refused as declared \(\d+ sentences\)$']
 [golden.classes.f]    # plans 0892/0893 R4 (i): the report line inserted under a result header
 files = ["*.txt"]
 match = ['^\+report: declared report — ']
