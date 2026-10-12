@@ -73,10 +73,14 @@ class Ctx:
                                                  else resolve_data_root(self.cfg, DATA_ROOT_FLAG))
         self.alpha = self.cfg["alphabets"]
 
+    def file(self, path):
+        """Where the data file a [[data.files]] `path` names is: under the repo's data/ when its first directory is declared in cc.toml [data] local, else under the data root."""
+        return self.root / "data" / path if path.split("/")[0] in self.cfg["data"].get("local", []) else self.data_root / path
+
     def physical(self, key):
         """Where the file a `read` key names is on this machine: the declared data root maps to the effective one."""
         name = self.cfg["data"]["root"]
-        return self.data_root / key[len(name) + 1:] if key.startswith(name + "/") else Path(key).expanduser() if key.startswith("~") else self.root / key
+        return self.file(key[len(name) + 1:]) if key.startswith(name + "/") else Path(key).expanduser() if key.startswith("~") else self.root / key
 
 
 def unit_blocks(m, inst):

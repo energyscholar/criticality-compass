@@ -148,12 +148,12 @@ def memo(cache, key, make):
     return cache[key]
 
 
-def load_blocks(m, data_root):
+def load_blocks(m, data_root, locate=None):
     """[(block key, {array name: ndarray})] in data.files order (the key is (point, size, start), and (point, size, start, chain) under method chains), each array cut to its declared level. In a stack format (cc.toml
     [formats.*]) the arrays of a kind it `reduces` are computed from the raw stack by the declared reduction (once per file and key)."""
     cache, out, sch = {}, [], formats.schemas(str(schema.ROOT)).get(m["data"]["format"], {"reduces": ()})
     for b in m["data"]["files"]:
-        path, arrs = str(Path(data_root) / b["path"]), {}
+        path, arrs = str((locate or (lambda x: Path(data_root) / x))(b["path"])), {}
         for name, a in b["arrays"].items():
             z = memo(cache, (path, a["key"], "GL"), lambda: reduced(m, path, a["key"])) if name in sch["reduces"] else memo(cache, path, lambda: np.load(path))
             v = z if isinstance(z, np.ndarray) else z[a["key"]]

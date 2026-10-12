@@ -222,7 +222,7 @@ def trace(m, res, r, sz):
     """Steps 1-4 of one instrument unit: the data, what reduce computed at row 0, the declared comparisons and relations, the operator."""
     inst, mod = detect.instrument(r["instrument"])
     pt, ctx = r["unit"]["point"], detect.context_for(res["input"], r["instrument"], r["unit"]["point"], sz)
-    blocks = dict(door.load_blocks(m, declare.Ctx(ROOT).data_root))
+    blocks = dict(door.load_blocks(m, (cx := declare.Ctx(ROOT)).data_root, cx.file))
     keys = door.unit_keys(m, inst, pt, sz)
     files = [b for b in m["data"]["files"] if (b["point"], b["size"], b["start"]) in keys]
     arrays = {a: [blocks[k][a] for k in keys] for a in inst["arrays"]}

@@ -257,7 +257,7 @@ def read_hashes(m, input_id, tables, T, c):
     for b in m["data"]["files"]:
         key = f"{c.cfg['data']['root']}/{b['path']}"
         if key not in read:
-            read[key] = schema.sha(c.data_root / b["path"])
+            read[key] = schema.sha(c.file(b["path"]))
             if pinned.get(b["path"]) != read[key]:
                 raise refused(f"fixtures/data/{input_id}.toml: {b['path']} changed since it was pinned",
                               f"if intended, make a new input: bin/cc new input {input_id}-2 --like {input_id}, "
@@ -337,7 +337,7 @@ def measure(m, c, reg, T):
     then its door and stage steps and readout. Two passes after the rows: instruments with empty `requires`
     first and coded, then the dependents, whose membership door reads those codes.
     Returns {(instrument, unit, size): (readings, reports)}."""
-    blocks = door.load_blocks(m, c.data_root)
+    blocks = door.load_blocks(m, c.data_root, c.file)
     pos = {k: i for i, (k, _) in enumerate(blocks)}
     units = [(n, u, sz) for n in m["instruments"] for u, sz in door.unit_labels(m, reg[n][0])]
     ctxs = {(n, sz): door.context(m, reg[n][0], sz) for n, _, sz in units}

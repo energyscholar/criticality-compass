@@ -7,7 +7,8 @@ tables = "v01-rules"          # the working table set (a directory under tables/
 mode = "basic"                  # basic | advanced; the flag --advanced overrides per command
 
 [data]
-root = "~/software/scratch/compass-toolset/data"   # read-only; every m.toml path is relative to it
+root = "~/software/scratch/compass-toolset/data"   # read-only; every m.toml path is relative to it, except a path whose first directory is named in `local`
+local = ["l8"]   # plan 0884 amendment 6 F1: data that lives IN this repo under data/ (CC0, redistributable; data/l8/ATTRIBUTION.md), so no gate reads outside the repo for it
 
 [alphabets]
 class_truth = ["POINT", "LINE", "WALKING", "FIRST-ORDER", "MULTI", "BKT-END", "NOT"]

@@ -145,6 +145,9 @@ def chk_cc(p, d, c, stem=None):
                                                  "report": dict, "step_labels": dict, "projections": dict})
     if out:
         return out
+    loc_ = d["data"].get("local", [])
+    out += [at(p, "data.local", f"'{x}' is not a directory under data/ (data.local names the first directory of the paths that live in this repo)", f"commit data/{x}/ with an ATTRIBUTION.md, or delete the name")
+            for x in (loc_ if isinstance(loc_, list) else [loc_]) if not (isinstance(x, str) and (Path(c.root) / "data" / x / "ATTRIBUTION.md").is_file())]
     out += when("interval_method" not in d["alphabets"], p, "alphabets.interval_method", "missing", 'write interval_method = ["block", "iid"]')
     methods, fields_ = d["alphabets"].get("interval_method", []), d.get("interval_fields", {})   # plan 0878: every method of the alphabet has its fields table, and no table names a method outside it
     out += [at(p, f"interval_fields.{k}", "no [interval_fields] table for this method of alphabets.interval_method" if k in methods else "not a method of alphabets.interval_method",
@@ -376,7 +379,7 @@ def chk_data(p, m, c):
         out += inalpha(p, loc + ".point", key[0], ax["point"]) + inalpha(p, loc + ".size", key[1], ax["size"])
         out += inalpha(p, loc + ".start", key[2], ax["starts"])
         blocks.setdefault(key, []).append(b["arrays"])
-        fp = c.data_root / b["path"]
+        fp = c.file(b["path"])
         if not fp.is_file():
             out.append(at(p, loc + ".path", f"{b['path']} does not exist under the data root",
                           "fix the path, or put the file there"))
@@ -482,7 +485,7 @@ def geometry_reports(root, input_id=None):
         if "windows" not in m or (input_id and m.get("id") != input_id):
             continue
         for b in m["data"]["files"]:
-            fp = c.data_root / b["path"]
+            fp = c.file(b["path"])
             try:
                 s = formats.read(m["data"]["format"], fp, next(iter(b["arrays"].values()))["key"], str(root), m["windows"])
             except (OSError, ValueError) as e:
@@ -658,7 +661,7 @@ def chk_manifest(p, d, c, stem=None):
     return out + [at(p, "", f"{x} changed since it was pinned",
                      f"if intended, make a new input: bin/cc new input {iid}-2 --like {iid}, "
                      f"then bin/cc data add {iid}-2")
-                  for x, h in d["files"].items() if (c.data_root / x).is_file() and sha(c.data_root / x) != h]
+                  for x, h in d["files"].items() if c.file(x).is_file() and sha(c.file(x)) != h]
 
 
 def chk_instrument(p, d, c, stem=None):
@@ -1092,7 +1095,7 @@ def chk_probe(p, d, c, stem=None):
 def scalar_keys(m, c):
     """The 0-d arrays (the sampler's parameters) the data files of an input hold, minus the size key: [] when none are stored."""
     keys, readers = set(), formats.schemas(str(c.root)).get(m["data"]["format"], {}).get("readers", {})   # npz/npy formats name no reader: numpy reads them
-    for path in sorted({c.data_root / b["path"] for b in m["data"]["files"]}):
+    for path in sorted({c.file(b["path"]) for b in m["data"]["files"]}):
         h = shapes_of(c, path) if path.is_file() and readers.get(path.suffix, "numpy") == "numpy" else ()   # plan 0884: only a file the numpy reader reads stores 0-d arrays; a table (.csv) stores none
         keys |= {k for k, shp in (h.items() if isinstance(h, dict) else []) if shp == ()}
     return sorted(keys - {SIZE_KEY})

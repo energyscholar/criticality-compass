@@ -260,12 +260,12 @@ def data_add(root, iid):
         return refuse(f"fixtures/data/{iid}.toml already exists.",
                       "delete it first if it is unfrozen and you mean to re-pin")
     paths = list(dict.fromkeys(b["path"] for b in m["data"]["files"]))
-    gone = [x for x in paths if not (c.data_root / x).is_file()]
+    gone = [x for x in paths if not c.file(x).is_file()]
     if gone:
         return refuse(f"inputs/{iid}/m.toml: {len(gone)} data files do not exist under the data root, "
                       f"first: {gone[0]}", f"fix the paths in [[data.files]], then bin/cc data add {iid}")
     head = f"# fixtures/data/{iid}.toml - written by bin/cc data add: sha256 of every data file\n"
-    pins = {x: declare.sha(c.data_root / x) for x in paths}
+    pins = {x: declare.sha(c.file(x)) for x in paths}
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(text_of(head, {"schema": 1, "kind": "data-manifest", "input": iid, "files": pins}))
     print(f"pinned {len(paths)} files in fixtures/data/{iid}.toml\n  Next: bin/cc validate")
