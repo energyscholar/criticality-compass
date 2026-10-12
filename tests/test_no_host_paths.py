@@ -1,4 +1,4 @@
-"""test_no_host_paths - plan 0985 phase 1 breaker: no tracked text file names a home directory, a user's tree, or one of the author's machines.
+"""test_no_host_paths - plan 0985 phase 1 breaker: no tracked text file names a home directory, a user's tree, or one of the author's machines (phase 2: or a private person; NOTICE keeps its copyright holder line).
 The writer emits data paths relative to the declared data root (`<data-root>/...`, cc.toml [data] name), so an absolute path cannot be stored;
 this test walks every tracked file and fails on one. A planted line must be seen to fail (breaker below)."""
 import re
@@ -11,7 +11,8 @@ ROOT = Path(__file__).resolve().parent.parent
 PATTERNS = [re.compile(p) for p in (
     "/ho" + "me/", "/Us" + "ers/", "~/soft" + "ware", r"(?i)\bpen" + r"guin\b", r"(?i)\bji" + r"ll\b", r"(?i)\bporch" + r"light\b",
     "hal-" + "main", "has-anyone-" + "looked", "aura" + "sys",
-    r"(?<![\w-])soft" + r"ware/(scratch|criticality)", r"structure-" + "checks")]   # Path.home() / "<tree>/..." spells no "~"
+    r"(?<![\w-])soft" + r"ware/(scratch|criticality)", r"structure-" + "checks",
+    r"\bRo" + r"bin\b", r"\bBr" + r"uce\b(?! Stephenson)", r"\bBR" + r"UCE\b")]   # Path.home() / "<tree>/..." spells no "~"
 
 
 def hits(text):

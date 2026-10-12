@@ -28,7 +28,7 @@ def check(name, ok, why=""):
 T8, T7 = detect.load_tables("v08-rules"), detect.load_tables("v07-rules")
 FILES = ("codes", "compose", "family", "geometry", "membership", "order", "probe", "verdict")
 
-# --- v07-rules is untouched: the sha256 of each of its files as they were at plan 0877's start (05f9832); plan 0985 moved the pins of codes and verdict ONCE: the only change is "Bruce's R2" -> "Origin declaration R2" in a comment and a description
+# --- v07-rules is untouched: the sha256 of each of its files as they were at plan 0877's start (05f9832); plan 0985 moved the pins of codes and verdict ONCE: the only change is the wording of one comment and one description (a private ruling named by its person is named by its role)
 V07 = {"codes": "c082b98285b41763ba0c1739abc847074e94c21dcf9f932420164977249b9370", "compose": "3c1b72137520285fe5bc96a76db9fc695d7ac3d552a619d7b9bccb8640a59957",
        "family": "90fb7bdef4fd6d6287ec62411e85a5e2dcf58855e2fb19318683d2b1e5248d10", "geometry": "70fb209010b59e1077458c98657e3e88e7edba6f72dc81bf7fe690575b1d60f5",
        "membership": "662350091b555b3d88494406f751a3dd1c164e60486f3f5d86b096b7c7f75f6e", "order": "ab789dc52e449c1e46ce382630894247d40d0b199ddd7724a872519f1eaf5978",
