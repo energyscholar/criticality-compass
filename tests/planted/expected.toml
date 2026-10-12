@@ -48,7 +48,7 @@ text = "tests/planted/points-missing-point.toml:points.\"5\": point is not joine
 [[plant]]
 file = "input-unknown-instrument.toml"
 fix = ["instruments = [\"two_start\", \"nosuch\"]", "instruments = [\"two_start\"]"]
-text = "tests/planted/input-unknown-instrument.toml:instruments: 'nosuch' is not in the instrument registry\n  Next: use one of: across across_delta along fluct needle needle_chain needle_o stability stability_delta transform two_start"
+text = "tests/planted/input-unknown-instrument.toml:instruments: 'nosuch' is not in the instrument registry\n  Next: use one of: across across_delta along fluct needle needle_chain needle_o report stability stability_delta transform two_start"
 
 [[plant]]
 file = "input-eps-missing.toml"
@@ -148,7 +148,7 @@ text = "tests/planted/cc-replay-missing.toml:check.replay: missing required fiel
 [[plant]]
 file = "cc-conventional-unknown.toml"
 fix = ["nonesuch = ", "transform = "]
-text = "tests/planted/cc-conventional-unknown.toml:conventional.nonesuch: not an instrument of the registry\n  Next: use one of: across across_delta along fluct needle needle_chain needle_o stability stability_delta transform two_start"
+text = "tests/planted/cc-conventional-unknown.toml:conventional.nonesuch: not an instrument of the registry\n  Next: use one of: across across_delta along fluct needle needle_chain needle_o report stability stability_delta transform two_start"
 
 [[plant]]
 file = "instrument-ok.toml"
