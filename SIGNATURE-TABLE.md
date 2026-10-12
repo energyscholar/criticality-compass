@@ -3,7 +3,7 @@
 Written by `bin/cc tabulate`. Truth is joined here only (cc/score.py); no result file holds it.
 
 ## Rules: v01-rules
-report: declared report — a projection C over sign cells of declared comparisons (the blocking-map comparison of independent sizes; the two-start difference), not a relational reading (an external verifier, 2026-10-06, LOG E382)
+report: declared report — a projection C over sign cells of declared comparisons (the blocking-map comparison of independent sizes; the two-start difference), not a relational reading (an external verifier, 2026-10-06)
 
 | run | point | case | truth | sizes | sink | needle | flow | across | stability | two_start | verdict | class |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -113,7 +113,7 @@ Verdict class against truth: 11 agree, 47 refused, 8 disagree, 30 no truth
 - `sink=NEITHER, needle=DIS, flow=FLOWING, across=NOT-MEASURED, stability=NOT-MEASURED, two_start=NOT-MEASURED`: NOT (x8-ising-needle:0.90, x8-ising-needle:0.95, x8-ising-needle:0.98, x8-ising-needle:0.99) vs POINT (x7a-bc:1.0, x7a-bc:1.5)
 
 ## Rules: v02-rules
-report: declared report — a projection C over sign cells of declared comparisons (the blocking-map comparison of independent sizes; the two-start difference), not a relational reading (an external verifier, 2026-10-06, LOG E382)
+report: declared report — a projection C over sign cells of declared comparisons (the blocking-map comparison of independent sizes; the two-start difference), not a relational reading (an external verifier, 2026-10-06)
 
 | run | point | case | truth | sizes | sink | needle | flow | across | stability | two_start | verdict | class | geometry | order |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -263,7 +263,7 @@ Geometry against class_truth (order_truth not FIRST-ORDER): 11 agree, 66 refused
 - `sink=NEITHER, needle=DIS, flow=FLOWING, across=NOT-MEASURED, stability=NOT-MEASURED, two_start=NOT-MEASURED`: NOT (x8-ising-needle:0.90, x8-ising-needle:0.95, x8-ising-needle:0.98, x8-ising-needle:0.99) vs POINT (x7a-bc:1.0, x7a-bc:1.5)
 
 ## Rules: v03-rules
-report: declared report — a projection C over sign cells of declared comparisons (the blocking-map comparison of independent sizes; the two-start difference), not a relational reading (an external verifier, 2026-10-06, LOG E382)
+report: declared report — a projection C over sign cells of declared comparisons (the blocking-map comparison of independent sizes; the two-start difference), not a relational reading (an external verifier, 2026-10-06)
 
 | run | point | case | truth | sizes | sink | needle | needle_pair | flow | across | stability | two_start | verdict | class | geometry | order |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -427,7 +427,7 @@ Geometry against class_truth (order_truth not FIRST-ORDER): 14 agree, 70 refused
 - `sink=NEITHER, needle=DIS, needle_pair=NOT-MEASURED, flow=FLOWING, across=NOT-MEASURED, stability=NOT-MEASURED, two_start=NOT-MEASURED`: NOT (x8-ising-needle:0.90, x8-ising-needle:0.95, x8-ising-needle:0.98, x8-ising-needle:0.99) vs POINT (x7a-bc:1.0, x7a-bc:1.5)
 
 ## Rules: v04-rules
-report: declared report — a projection C over sign cells of declared comparisons (the blocking-map comparison of independent sizes; the two-start difference), not a relational reading (an external verifier, 2026-10-06, LOG E382)
+report: declared report — a projection C over sign cells of declared comparisons (the blocking-map comparison of independent sizes; the two-start difference), not a relational reading (an external verifier, 2026-10-06)
 
 | run | point | case | truth | sizes | sink | needle | needle_pair | drift_code | flow | across | stability | two_start | probe | verdict | class | geometry | order |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -618,7 +618,7 @@ Geometry against class_truth (order_truth not FIRST-ORDER): 8 agree, 95 refused,
 - `sink=NEITHER, needle=DIS, needle_pair=NOT-MEASURED, drift_code=NOT-MEASURED, flow=FLOWING, across=NOT-MEASURED, stability=NOT-MEASURED, two_start=NOT-MEASURED, probe=NOT-MEASURED`: NOT (x8-ising-needle:0.90, x8-ising-needle:0.95, x8-ising-needle:0.98, x8-ising-needle:0.99) vs POINT (x7a-bc:1.0, x7a-bc:1.5)
 
 ## Rules: v05-rules
-report: declared report — a projection C over sign cells of declared comparisons (the blocking-map comparison of independent sizes; the two-start difference), not a relational reading (an external verifier, 2026-10-06, LOG E382)
+report: declared report — a projection C over sign cells of declared comparisons (the blocking-map comparison of independent sizes; the two-start difference), not a relational reading (an external verifier, 2026-10-06)
 
 | run | point | case | truth | sizes | sink | needle | needle_pair | drift_code | flow | across | stability | two_start | probe | verdict | class | geometry | order |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -826,7 +826,7 @@ report: declared report — a projection C over per-point sign cells, not a rela
 Family end against truth: 0 agree, 1 refused, 0 disagree   (report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06))
 
 ## Rules: v06-rules
-report: declared report — a projection C over sign cells of declared comparisons (the blocking-map comparison of independent sizes; the two-start difference), not a relational reading (an external verifier, 2026-10-06, LOG E382)
+report: declared report — a projection C over sign cells of declared comparisons (the blocking-map comparison of independent sizes; the two-start difference), not a relational reading (an external verifier, 2026-10-06)
 
 | run | point | case | truth | sizes | sink | needle | needle_pair | drift_code | flow | across | stability | two_start | probe | verdict | class | geometry | order |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -1045,7 +1045,7 @@ report: declared report — a projection C over per-point sign cells, not a rela
 Family end against truth: 1 agree, 1 refused, 0 disagree   (report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06))
 
 ## Rules: v07-rules
-report: declared report — a projection C over sign cells of declared comparisons (the blocking-map comparison of independent sizes; the two-start difference), not a relational reading (an external verifier, 2026-10-06, LOG E382)
+report: declared report — a projection C over sign cells of declared comparisons (the blocking-map comparison of independent sizes; the two-start difference), not a relational reading (an external verifier, 2026-10-06)
 
 | run | point | case | truth | sizes | sink | needle | needle_pair | drift_code | flow | across | stability | two_start | probe | verdict | class | geometry | order |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -1264,7 +1264,7 @@ report: declared report — a projection C over per-point sign cells, not a rela
 Family end against truth: 2 agree, 0 refused, 0 disagree   (report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06))
 
 ## Rules: v08-rules
-report: declared report — a projection C over sign cells of declared comparisons (the blocking-map comparison of independent sizes; the two-start difference), not a relational reading (an external verifier, 2026-10-06, LOG E382)
+report: declared report — a projection C over sign cells of declared comparisons (the blocking-map comparison of independent sizes; the two-start difference), not a relational reading (an external verifier, 2026-10-06)
 
 | run | point | case | truth | sizes | sink | needle | needle_pair | drift_code | flow | across | stability | two_start | probe | verdict | class | geometry | order |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -1321,7 +1321,7 @@ report: declared report — a projection C over per-point sign cells, not a rela
 Family end against truth: 1 agree, 0 refused, 0 disagree   (report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06))
 
 ## Rules: verdict-x-rules
-report: declared report — a projection C over sign cells of declared comparisons (the blocking-map comparison of independent sizes; the two-start difference), not a relational reading (an external verifier, 2026-10-06, LOG E382)
+report: declared report — a projection C over sign cells of declared comparisons (the blocking-map comparison of independent sizes; the two-start difference), not a relational reading (an external verifier, 2026-10-06)
 
 | run | point | case | truth | sizes | sink | needle | flow | across | stability | two_start | verdict | class |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|

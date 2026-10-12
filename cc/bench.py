@@ -1,6 +1,6 @@
 """bench.py - the frozen benchmark suite as a manifest (plan 0932 P1).
 
-benchmark/ROWS.toml  (Argus's declared row list: single files + sets listed by a producer's own manifest; the role alphabet)
+benchmark/ROWS.toml  (the declared row list: single files + sets listed by a producer's own manifest; the role alphabet)
         --gen-->   benchmark/MANIFEST.toml  (one entry per file: id, role, root, path, sha256, bytes, source; + one identity per set)
         --verify-> one line per absence / mismatch; exit != 0 on any.
 

@@ -214,7 +214,7 @@ measures nothing:
 $ bin/cc reverdict w2-potts --tables rv
 reverdict w2-potts@v01-rules -> results/w2-potts@rv.json (no instrument was run)
 w2-potts   rules: rv   result: results/w2-potts@rv.json (not frozen)
-report: declared report — a projection C over sign cells of declared comparisons (the blocking-map comparison of independent sizes; the two-start difference), not a relational reading (an external verifier, 2026-10-06, LOG E382)
+report: declared report — a projection C over sign cells of declared comparisons (the blocking-map comparison of independent sizes; the two-start difference), not a relational reading (an external verifier, 2026-10-06)
 …
 point 5   case potts-q5
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
@@ -690,7 +690,7 @@ validate: clean
 | tier | command | when |
 |---|---|---|
 | fast | `bin/cc check --fast` | the pre-commit hook runs it (about 25 s, budget 30 s); it skips the tests listed in `cc.toml [check].slow` |
-| full | `bin/cc check` | the end of every Generator phase, and the Auditor's gate: `validate`, EVERY test script and the scoreboard |
+| full | `bin/cc check` | the end of every work phase, and the independent reviewer's gate: `validate`, EVERY test script and the scoreboard |
 
 Nothing is dropped by a list. `detect.run` is content-keyed: a result stored under the same input and table set whose `read` hashes
 and `measure_hash` equal this run's IS the result (nothing is measured or re-written); a measured result under another set whose key
@@ -775,7 +775,7 @@ For this edit it prints `RED   test_breakers`, with the two breakers it breaks n
 
 **1. Probe completeness.** A per-point instrument probes one direction: `across` reads the response to the declared conjugate.
 If the system has a second coupling that nothing probes, "relevant and stopped" on the probed direction is consistent with a
-point and with a line alike (the AT line of E151 read POINT twice for this reason). `inputs/<id>/couplings.toml` declares the
+point and with a line alike (an earlier AT line read POINT twice for this reason). `inputs/<id>/couplings.toml` declares the
 sampler's couplings from the Hamiltonian, and which of them `across` probes:
 
 ```

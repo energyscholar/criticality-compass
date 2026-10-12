@@ -1221,7 +1221,7 @@ listed_by = "MANIFEST.json"
 extra = []
 source = "toolset data/nav-m7-bank/MANIFEST.json (producer sha256 per file)"
 
-# plan 0932 P3 / Argus ruling (E7): the inputs of the clean-clone run (LOG E602). Explicit names (files = [...]), never a glob; each name is a file the stored
+# plan 0932 P3 / independent-review ruling (E7): the inputs of the clean-clone run. Explicit names (files = [...]), never a glob; each name is a file the stored
 # k4-m1@v08-rules result's read{} names (k4m1) or a file of the deposited Cp package (real-f1/unz, read by studies/F1-REPL).
 [[set]]
 id = "E7-inputs-k4m1"

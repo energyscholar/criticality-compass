@@ -122,7 +122,7 @@ statistic that v0 has no instrument for; verdict-x-rules cannot reach FIRST-ORDE
 date = "2026-10-02"
 points = ["x5-bilayer:*"]
 why = """DECLARED BEFORE THE FIRST RUN of x5-bilayer (plan 0864 P5). NOT at all three points, and CC must equal the toolset's \
-results/X5c.txt (3 of 3). Each is a KNOWN FALSE NEGATIVE (X5-score; toolset LOG E59–E62): the truth is POINT at every g \
+results/X5c.txt (3 of 3). Each is a KNOWN FALSE NEGATIVE (X5-score): the truth is POINT at every g \
 (two decoupled Ising points at g = 0, the Ising class at g 0.1 and 0.3). A navigated critical point re-read at the same K \
 and N reads the needle at NEG or POS inside the margin, which this set maps to FLOWING, so the verdict is NOT. Locked as \
 today's behaviour, not as the right answer; the repair is the v01-rules set (Q1 c')"""
@@ -130,4 +130,4 @@ today's behaviour, not as the right answer; the repair is the v01-rules set (Q1 
 [[change]]
 date = "2026-10-02"
 points = ["x5n-bilayer:*"]
-why = """DECLARED BEFORE THE REAL RUN of x5n-bilayer (plan 0865 S3). 0865 confirmed stop: X5 3/3 (toolset results/X5n.txt, LOG E114): POINT at all three g (needle MID, flow STOPPED, across RELEVANT, stability STABLE, two_start INDEP), the verdict read on the very data the stop was confirmed on (N 32000, block 1600). The truth is POINT (coupled-ising-bilinear, class POINT); the lock is CC's expected verdict, not truth. A different verdict is a finding, never an edit of this file. (A --dry run was seen before this file was written: it reads POINT at every g under all three sets, as the toolset does.)"""
+why = """DECLARED BEFORE THE REAL RUN of x5n-bilayer (plan 0865 S3). 0865 confirmed stop: X5 3/3 (toolset results/X5n.txt): POINT at all three g (needle MID, flow STOPPED, across RELEVANT, stability STABLE, two_start INDEP), the verdict read on the very data the stop was confirmed on (N 32000, block 1600). The truth is POINT (coupled-ising-bilinear, class POINT); the lock is CC's expected verdict, not truth. A different verdict is a finding, never an edit of this file. (A --dry run was seen before this file was written: it reads POINT at every g under all three sets, as the toolset does.)"""

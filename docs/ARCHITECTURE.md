@@ -55,7 +55,7 @@ transducer file), `resources.py` 36, `author.py` 363 (authoring).
    level means: `0.8006, 0.8769, 0.8883, 0.892 | 0.8007, 0.8772, 0.8905`.
 3. **COMPARISON / RELATION** (the label is `cc.toml [step_labels]`, by relation name) - `door.relations_for` -> `admit.declare`:
    nodes and directed edges from one of four templates (`chain`, `matched`, `pair`, `matched-chain`), declared before data;
-   `m.toml` still writes provenance `Coupling`, which a comparison does not claim (an external verifier, 2026-10-06, LOG E382). Here
+   `m.toml` still writes provenance `Coupling`, which a comparison does not claim (an external verifier, 2026-10-06). Here
    `matched: (243,L1)->(81,L0) (243,L2)->(81,L1) (243,L3)->(81,L2)`.
 4. **C** (or **C+KERNEL** where a control edge is read) - `kernel.A`: `A(x)[e] = x[source] - x[target]` on every declared edge
    (`B` only for `along`); over a comparison it is the same arithmetic computed as a C comparison, until plan 0893 P2 moves it out of

@@ -1,5 +1,5 @@
-# expected/predictions/v10-rules-k4m1.toml - plan 0937 AMENDMENT 2026-10-11 item 2, ARGUS-FILL 6 for k4-m1: one verdict-flip prediction per point,
-# written 2026-10-11 17:22 PDT BEFORE any v10 run of k4-m1 exists (git order is the proof). Generator (Opus) for Argus.
+# expected/predictions/v10-rules-k4m1.toml - plan 0937 AMENDMENT 2026-10-11 item 2, FILL 6 for k4-m1: one verdict-flip prediction per point,
+# written 2026-10-11 17:22 PDT BEFORE any v10 run of k4-m1 exists (git order is the proof). Written for the independent review.
 # PATH: not expected/v10-rules-k4m1.toml - tests/test_scoreboard.py globs expected/*.toml, needs tables == file stem and a [verdicts] table,
 #       and detect.load_tables("v10-rules-k4m1") raises (no such set) => bin/cc check would go red. This subdirectory is not globbed.
 #

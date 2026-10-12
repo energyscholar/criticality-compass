@@ -4,7 +4,7 @@ schema = 1
 roles = ["map", "input", "truth", "prediction"]
 fields = ["id", "role", "root", "path", "sha256", "bytes", "source"]
 recipe = "set identity = sha256 of the sorted lines \"<path>\\t<sha256>\\t<bytes>\\n\" of its entries (path as in the manifest)"
-rows_sha256 = "4118201a67b7e0bef4d7d1696f72548007e1a19b7deb5072a92457ed340bd64d"
+rows_sha256 = "b50db13ead385a122aeed453900ef1c19eb4566e843b44abbd1b9a20e1895846"
 
 [[set]]
 id = "M1-AT"
@@ -128,8 +128,8 @@ id = "case:coupled-ising-bilinear"
 role = "truth"
 root = "cc"
 path = "cases/coupled-ising-bilinear.toml"
-sha256 = "8b28e6004de6d61998e60433c42c0c49ad32c49fa3f8e13f7fce14b4eb3e9af2"
-bytes = 1663
+sha256 = "3adbe1a3f0f10205554a18d1133e0be5d9fb2b5bef893d2fe1ebb4c0e988ee83"
+bytes = 1642
 source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
 
 [[entry]]
@@ -245,8 +245,8 @@ id = "expected:v01-rules"
 role = "prediction"
 root = "cc"
 path = "expected/v01-rules.toml"
-sha256 = "ab72cf0c2b090c5c6a762898dd21508dcc75d40945e3e4b3ffade7ab26458a8a"
-bytes = 9493
+sha256 = "f55df3b5f693faa0f6c6d5484143a37a208cf5beebf4536a2d8eaa402643a674"
+bytes = 9483
 source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
 
 [[entry]]
@@ -254,8 +254,8 @@ id = "expected:v02-rules"
 role = "prediction"
 root = "cc"
 path = "expected/v02-rules.toml"
-sha256 = "7a8b271511f6ed6443bc4fd9701ea5d3f769021dd0af1e3f42504162f17241be"
-bytes = 15186
+sha256 = "65323ab1157623ad68bead06c6153c1b6199e5eeb4fa6965f6cf53adfe20d433"
+bytes = 15150
 source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
 
 [[entry]]
@@ -263,8 +263,8 @@ id = "expected:v03-rules"
 role = "prediction"
 root = "cc"
 path = "expected/v03-rules.toml"
-sha256 = "cf8ca238fce66197a1b25c28264bd6e5908c036d6358e48364f69eed2b77767b"
-bytes = 16934
+sha256 = "7c0248251010124f804da2e87cb984322e26b2a8da930912d7095f2b33f8f4cf"
+bytes = 16947
 source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
 
 [[entry]]
@@ -272,8 +272,8 @@ id = "expected:v04-rules"
 role = "prediction"
 root = "cc"
 path = "expected/v04-rules.toml"
-sha256 = "506c82b83db6c500ff1713497180120109dc01bff2a87056eab6c41562e8aa34"
-bytes = 27256
+sha256 = "129f2e2b6e48c495b019c51add5cea61978472132a5b42050b55a96b4e33ad91"
+bytes = 27269
 source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
 
 [[entry]]
@@ -281,8 +281,8 @@ id = "expected:v05-rules"
 role = "prediction"
 root = "cc"
 path = "expected/v05-rules.toml"
-sha256 = "fbbf161be24fdf0e312a4ec503d8b28be7f9c4d405abcd0319d0f7c638992ead"
-bytes = 39712
+sha256 = "8674577ec6fd3cd14dbe1d9b95a9518dae07db9731aafad920bcab38f7cef6bc"
+bytes = 39725
 source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
 
 [[entry]]
@@ -290,8 +290,8 @@ id = "expected:v06-rules"
 role = "prediction"
 root = "cc"
 path = "expected/v06-rules.toml"
-sha256 = "7e7b7eccd9206ff7a056a3bd53d13a61d3fd33051107941b50d9a3c32b11cb76"
-bytes = 45453
+sha256 = "c1693be7228c0028ed31c38eaa6551e1b4e514fb36a787b6b76d2cd4bb6c7a32"
+bytes = 45466
 source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
 
 [[entry]]
@@ -299,8 +299,8 @@ id = "expected:v07-rules"
 role = "prediction"
 root = "cc"
 path = "expected/v07-rules.toml"
-sha256 = "82475b8c61689684c0141b51d748fb73c7a29bd0ed9cf274ea43232a3f0a7ba8"
-bytes = 48201
+sha256 = "99fa66dc924afeeb2054903ad6874f31c84e11d1de696e57eedf645fb53be979"
+bytes = 48214
 source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
 
 [[entry]]
@@ -317,8 +317,8 @@ id = "expected:verdict-x-rules"
 role = "prediction"
 root = "cc"
 path = "expected/verdict-x-rules.toml"
-sha256 = "56d1d3d2fabe4951f0b1c91163607429e13c350d584eb3430dd74f6da4484b57"
-bytes = 5819
+sha256 = "5566948fb0860b85fd347618035ad851442c97db3cce51d0b8515052dccb48a9"
+bytes = 5786
 source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
 
 [[entry]]
@@ -857,8 +857,8 @@ id = "input:x2b-xy/transducer.toml"
 role = "input"
 root = "cc"
 path = "inputs/x2b-xy/transducer.toml"
-sha256 = "40a7805efa05e0e85fd89a66e4f647707b48ccc32340aa270714fb0f94d3d2ad"
-bytes = 1445
+sha256 = "1aad46d1200a3201ae20067f1da4bb5ecb20eabb619a00e9d6b1fd5210453367"
+bytes = 1435
 source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
 
 [[entry]]
@@ -893,8 +893,8 @@ id = "input:x2b-xy-2/transducer.toml"
 role = "input"
 root = "cc"
 path = "inputs/x2b-xy-2/transducer.toml"
-sha256 = "d78f89e710f4c84b22cee54d0553017548e850ac6fb1cea4540f8df75ac68ce5"
-bytes = 1433
+sha256 = "f674443c0343f6cadbc57f6385c676b2d7ebc7c3a305ba463f7baa3dfc5f4774"
+bytes = 1423
 source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
 
 [[entry]]
@@ -929,8 +929,8 @@ id = "input:x2b-xy-3/transducer.toml"
 role = "input"
 root = "cc"
 path = "inputs/x2b-xy-3/transducer.toml"
-sha256 = "25557f1ff89276386dd32dc0034f1f62be2dcd89a075d896a181c75415b775ee"
-bytes = 1411
+sha256 = "a7cc02a6cfb3423b2e8560c92b191543a2285e19c36a474e5dd6db2c2460716c"
+bytes = 1401
 source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
 
 [[entry]]

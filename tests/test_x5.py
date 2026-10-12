@@ -31,7 +31,7 @@ check("CC reproduces X5c's verdicts (3 of 3)", [s["verdict"] for s in x] == want
 check("CC reproduces X5c's needle side and flow, response, stability and start screen",
       [(s["needle"], s["flow"]) for s in x] == [tuple(q) for q in side] and [s["across"] for s in x] == [r[0] for r in resp]
       and [s["stability"] for s in x] == [r[1] for r in resp] and [s["two_start"] for s in x] == start, str(x))
-check("the three NOT are the known false negatives: the lock says why", "KNOWN FALSE NEGATIVE (X5-score; toolset LOG E59–E62)"
+check("the three NOT are the known false negatives: the lock says why", "KNOWN FALSE NEGATIVE (X5-score)"
       in (ROOT / "expected" / "verdict-x-rules.toml").read_text())
 v = [s["verdict"] for s in detect.run("x5-bilayer", "v01-rules", write=False)["signature"]]
 check("under v01-rules g 0 and g 0.3 are REFUSE-SLOW and g 0.1 is NOT", v == ["REFUSE-SLOW", "NOT", "REFUSE-SLOW"], str(v))

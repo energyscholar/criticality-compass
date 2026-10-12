@@ -1,6 +1,6 @@
 # instruments/report.toml - the relation-free REPORT instrument (plan 0884 amendment 4): per point, the declared sinks and the per-level mean of the observable of the declared
-# block states. It reads the [observable], [block_map] and [sinks] tables and needs NO relation (one window side has no size edge, an external verifier (ruling Q15/E382)). Its outputs are REPORTS
-# (projection C, an external verifier (E382)), never coded and never read against an eps; its run passes the same chk_data interval floors as every instrument.
+# block states. It reads the [observable], [block_map] and [sinks] tables and needs NO relation (one window side has no size edge, an external verifier (ruling Q15)). Its outputs are REPORTS
+# (projection C, an external verifier), never coded and never read against an eps; its run passes the same chk_data interval floors as every instrument.
 schema = 1
 kind = "instrument"
 module = "report"                              # cc/instruments/report.py

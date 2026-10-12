@@ -1,7 +1,7 @@
 $ bin/cc run b7-at-line --tables scratch
 run b7-at-line@scratch -> results/b7-at-line@scratch.json
 b7-at-line   rules: scratch   result: results/b7-at-line@scratch.json (not frozen)
-report: declared report — a projection C over sign cells of declared comparisons (the blocking-map comparison of independent sizes; the two-start difference), not a relational reading (an external verifier, 2026-10-06, LOG E382)
+report: declared report — a projection C over sign cells of declared comparisons (the blocking-map comparison of independent sizes; the two-start difference), not a relational reading (an external verifier, 2026-10-06)
 point 0.0   case at-self-dual-line
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
   needle     BLANK (NOT-MEASURED: needle is not declared on this input)

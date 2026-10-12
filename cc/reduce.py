@@ -54,7 +54,7 @@ def levels_mean(f, count):
 
 def majority_occupied3(s):
     """s: (..., L, L) of {-1, 0, +1}, 0 = a vacant site OR a tie -> (..., L/3, L/3): per 3x3 cell the sign of the sum over its OCCUPIED sites. A vacant site adds nothing; a tie
-    (sum 0, an all-vacant cell included) is block state 0, deterministic (plan 0884; Origin declaration E318). On an array without zeros it is block3, bit for bit."""
+    (sum 0, an all-vacant cell included) is block state 0, deterministic (plan 0884; an Origin declaration). On an array without zeros it is block3, bit for bit."""
     return block3(s)
 
 

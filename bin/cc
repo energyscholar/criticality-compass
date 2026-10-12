@@ -162,7 +162,7 @@ def report_classes(gold, before):
         else:
             (gold / name).unlink()
     print(f"classify: STOP: {len(other)} changed lines are class (e) OTHER; the regolden was undone.\n"
-          "  Next: report them to the Auditor; do not commit")
+          "  Next: report them to the independent reviewer; do not commit")
     return 1
 
 

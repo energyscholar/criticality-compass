@@ -21,4 +21,4 @@ discards = "the shape of the resampled distribution"
 
 [provenance_note]
 declared_after = ["x2b-xy-3@v08-rules"]
-note = "driver studies/X2b/simulate.py and data/x2b are NOT in the toolset FROZEN.json; pinned by fixtures/data/<id>.toml and by the toolset git (history from 2026-10-05, LOG E291)"
+note = "driver studies/X2b/simulate.py and data/x2b are NOT in the toolset FROZEN.json; pinned by fixtures/data/<id>.toml and by the toolset git (history from 2026-10-05)"

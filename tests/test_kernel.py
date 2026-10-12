@@ -1,5 +1,5 @@
 """test_kernel.py - the kernel reference against HAND-COMPUTED values, and the door's refusals. Each test was seen to
-fail on a deliberately wrong expectation before being trusted (see LOG E1)."""
+fail on a deliberately wrong expectation before being trusted."""
 import sys
 import numpy as np
 sys.path.insert(0, __file__.rsplit("/", 2)[0] + "/cc")

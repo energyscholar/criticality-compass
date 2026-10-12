@@ -521,7 +521,7 @@ a finding about the data, not a thing to repair"""
 [[change]]
 date = "2026-10-03"
 points = ["x9c-potts:*"]
-why = """DECLARED BEFORE THE RUN of x9c-potts (plan 0867 P3), transcribing the toolset's frozen results/X9c.txt (scored by the Auditor from the \
+why = """DECLARED BEFORE THE RUN of x9c-potts (plan 0867 P3), transcribing the toolset's frozen results/X9c.txt (scored by the independent reviewer from the \
 same 36 npz): needle_pair q3/q4 SAME-WINDOW, q5/q6 HALF-PINNED, q8/q10 PINNED-BETWEEN-PHASES; two_start q3/q4 INDEP, q5/q6/q8/q10 COEXIST; \
 v03-rules verdict q8, q10, q6 FIRST-ORDER and q5 NOT (q3, q4: a refusal or a POINT-family cell, never FIRST-ORDER; their verdict lock is \
 written after the run and says so). q5's two_start rests on one marginal size cell (L81 POS +0.0066); CC's own resample stream may move it, \

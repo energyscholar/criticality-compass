@@ -1,6 +1,6 @@
 $ bin/cc show x2-xy-line
 x2-xy-line   rules: v01-rules   result: results/x2-xy-line@v01-rules.json (frozen)
-report: declared report — a projection C over sign cells of declared comparisons (the blocking-map comparison of independent sizes; the two-start difference), not a relational reading (an external verifier, 2026-10-06, LOG E382)
+report: declared report — a projection C over sign cells of declared comparisons (the blocking-map comparison of independent sizes; the two-start difference), not a relational reading (an external verifier, 2026-10-06)
 point 0.5   case xy-low-phase
   sink       d_ord 0.07124 [0.07094, 0.07154] SIG+ d_dis 0.9288 [0.9285, 0.9291] SIG+ -> NEITHER
   needle     velocity 0.0008027 [0.0003857, 0.001277] SLOW+ d_ord 0.07124 [0.07094, 0.07154] SIG+ d_dis 0.9288 [0.9285, 0.9291] SIG+ -> MID

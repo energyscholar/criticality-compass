@@ -205,7 +205,7 @@
   "tables/v08-rules/verdict.toml": "e6e30905f816c246c6919ce8831dccc558e59aa1d24e27333ad34ad1e1b1e2c1",
   "tables/verdict-x-rules/codes.toml": "d43f06815275e379c54fda75e619e158741b313697c9f870c10efb2812d8ee19",
   "tables/verdict-x-rules/verdict.toml": "64a671e0046e2853e8dafebe23d05fa138ceb2d0810b09d79c24989e977b05a9",
-  "tests/test_kernel.py": "2ddd838e6d9c815e005aef7be2b28d9658773d21d4b3a3d6374b3dc17efc17cb",
+  "tests/test_kernel.py": "837a0603d516956d6b458e62d28611fdc57c5a45eb003142929019f8e1d41b97",
   "tests/test_kernel_rs.py": "d6a092e3d42e99d14a0abf35d2c10c9d3b2a507e6a12a6fbfe5148ee3ff86358",
   "tests/test_resample.py": "26bb5a26192f1e3aa52d3daf0e8115a7fba5284cd5ad6ce69a72c7cb521ac93b",
   "tests/test_sign.py": "7b44204826603ddb37436d5bbe5e877d6a922cbc47c4f2742ec9fe95bc5394e5"

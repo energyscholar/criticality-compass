@@ -11,7 +11,7 @@ enough). Read it when you want to know what a number means, or before you touch 
 - A **declared relation** is a set of nodes and directed edges, each edge with its provenance, declared before any
   data are touched; the kernel refuses a relation with a cycle. On the current inputs the one candidate is the
   `control` edge between two neighbouring points (`along`, `across_delta`, `stability_delta`), pending an external verifier (ruling R2).
-- A **declared comparison** (an external verifier, 2026-10-06, LOG E382) is a set of ordered differences between values observed
+- A **declared comparison** (an external verifier, 2026-10-06) is a set of ordered differences between values observed
   independently, each through its own M, that the analysis supplies: the blocking-map comparison of independent
   sizes (`size`, `matched`, `chain`: one blocking step relates L to L/3) and the two-start difference (`start`,
   pending an external verifier (ruling R1)). It is not a kernel relation and claims no provenance (not Coupling, not Continuation, not
@@ -23,7 +23,7 @@ enough). Read it when you want to know what a number means, or before you touch 
 - **A** is the kernel's one operator that takes a NodeField to an EdgeField: for each declared edge,
   `A(x)[edge] = x[source] - x[target]`, the difference of the two node values. The size-direction differences are
   the same arithmetic computed as a C comparison, not a relational reading ("A over that size edge as the needle:
-  NOT ADMISSIBLE", E382): the code still calls `kernel.A` for them until plan 0893 P2 moves them out, and step 4 of
+  NOT ADMISSIBLE"): the code still calls `kernel.A` for them until plan 0893 P2 moves them out, and step 4 of
   `explain` prints `C` (or `C+KERNEL` where a control edge is also read) to say what the number is. Where CC wants a
   NodeField again it declares a projection and says what the projection keeps and discards.
 - **B** (accumulation along continuation) and **R** (circulation) are unused as kernel operators on any current
@@ -42,7 +42,7 @@ sampler (the frozen toolset file and its sha256), and says that one recorded con
 recorded sequence is not a process sequence. The per-locus mean is a declared bounded reduction before A, with what it keeps
 (the typical value of the observable at the locus) and what it discards (the configuration-to-configuration variation and the
 order of the configurations) stated in that file. The bootstrap interval is a projection C: it places the reading's sign cell
-against its declared margin, and is never an operator input (an external verifier, toolset LOG E307). The same holds for the Gamma-method interval: its window W and integrated autocorrelation time are statistics of the projection C and feed the sign cell only (gamma is declared but NOT yet used on real inputs; plan 0878 recorded a one-cell disagreement with the bootstrap twin, pending a numbered explanation).
+against its declared margin, and is never an operator input (an external verifier). The same holds for the Gamma-method interval: its window W and integrated autocorrelation time are statistics of the projection C and feed the sign cell only (gamma is declared but NOT yet used on real inputs; plan 0878 recorded a one-cell disagreement with the bootstrap twin, pending a numbered explanation).
 
 ## The comparisons and relations, in ASCII
 
@@ -266,7 +266,7 @@ stands unchanged. `bin/cc family` prints `=> family report` and the label `cc.to
 
 **Under method `chains` (plan 0978).** The family layer reads an input of method `chains` through the same stored cells; only f1 reads a vector, and it reads the per-chain differences `d_k = y_k(j) - y_k(i)` of rows 1..m (row 0 is a copy of chain 0), whose order statistics `[d_(r), d_(m+1-r)]` are the interval of `median_k(d_k)`: an estimand that coincides with the difference of the two medians only when `d` is symmetric (declared, as T7-B). An end bracket localises to one grid interval; it carries no joint coverage over the cells it reads. Method `gamma` has no per-row difference vector, so f1 reads NOT-EVALUATED there (a row of the readout table, not an exception).
 
-**The per-point verdict path is a projection C as well (an external verifier, 2026-10-06, LOG E382).** The per-point sign cells the family
+**The per-point verdict path is a projection C as well (an external verifier, 2026-10-06).** The per-point sign cells the family
 reads are themselves sign cells of declared comparisons: the blocking-map comparison of independent sizes (the needle's
 matched levels, the size chains) and the two-start difference (pending an external verifier (ruling R1)), each computed inside C, not A over a
 kernel relation. The per-point verdict is a **declared report** too; `show` prints the label `cc.toml [report] verdict` once
@@ -294,7 +294,7 @@ These are rulings about what CC may claim and what it does not implement. The Q0
 - **Q1 - reweighting.** Reweighting the configurations is outside the relational treatment. The navigator never acts on a reweighted quantity as a reading, and nothing in CC implements it.
 - **Q3 - the transform.** There is no observation at infinite size; the shared-omega assumption of the finite-size transform is an undeclared prior. The `transform` output is an independent conventional estimate — not a Compass reading; no verdict row in any set after v07 may read it. The v06/v07 claims that rest on a TRANSFORMED basis (`x2b-xy-2@v06-rules` and `@v07-rules`: LINE, BKT-END) are transform basis — not relationally admissible; superseded by `x2b-xy-3@v08-rules`.
 - **Q19 - the family layer (2026-10-06).** Not admissible as a second relational pass; admissible as a declared projection C over per-point sign cells. The family verdict is a declared report (above, "The family fingerprints").
-- **E382 - the needle (2026-10-06).** The L and L/3 observations are each admissible through their own M; "L -> L/3 as a Kernel edge: NOT ADMISSIBLE"; "A over that size edge as the needle: NOT ADMISSIBLE"; the declared blocking-map comparison is admissible in a downstream projection C. The needle is restated as a C comparison; no provenance class is added and Coupling is not broadened. The per-point verdict is a declared report (above).
+- **The needle (2026-10-06).** The L and L/3 observations are each admissible through their own M; "L -> L/3 as a Kernel edge: NOT ADMISSIBLE"; "A over that size edge as the needle: NOT ADMISSIBLE"; the declared blocking-map comparison is admissible in a downstream projection C. The needle is restated as a C comparison; no provenance class is added and Coupling is not broadened. The per-point verdict is a declared report (above).
 - **Q4 - the star.** A single edge is the Primary kernel, Delta to Sigma. A radial chain is A, then B, then R, with `rho_base` and `chi_0` declared (plan 0885).
 - **Q5 - stacks.** Simulated stacks are Phase 1 only; real movies are Phase 2 eligible.
 - **The principle.** Universal operators are not a universal model of systems. Every input's M is a complete Origin declaration: what was measured, by what, what a node keeps and discards. Plan 0884 is the first real one.

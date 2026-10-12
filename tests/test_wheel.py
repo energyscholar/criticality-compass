@@ -49,7 +49,12 @@ with tempfile.TemporaryDirectory() as t:
         check("no platform binary (cc/_ext/*.so) is in the wheel", not [n for n in have if n.endswith(".so")])
         pats = [re.compile(p) for p in ("/ho" + "me/", "/Us" + "ers/", "~/soft" + "ware", r"(?i)\bpen" + r"guin\b", r"(?i)\bji" + r"ll\b", r"(?i)\bporch" + r"light\b", "hal-" + "main", "has-anyone-" + "looked", "aura" + "sys", "structure-" + "checks",
                                                   r"\bRo" + r"bin\b", r"\bBr" + r"uce\b(?! Stephenson)")]
+        # plan 0985 phase 4: the author's process vocabulary (roles, the review agent, review relays, private log entries) is not user-facing text. Data files keep plan numbers.
+        vocab = [re.compile(p) for p in (r"(?i)\bar" + r"gus\b", r"\bAudi" + r"tor\b", r"\bGene" + r"rator\b", r"GPT" + r"-6", r"(?i)\brel" + r"ay \d", r"\bLOG " + r"E\d+", r"\bE\d{3}\b(?<!E731)")]
         hit = [n for n in names if not n.endswith((".npz", ".so")) for ln in z.read(W + n).decode("utf-8", "replace").splitlines() for p in pats if p.search(ln)]
         check("no file of the wheel names a home directory, one of the author's machines or trees, or a private person", not hit, str(sorted(set(hit))[:4]))
+        user_facing = [n for n in names if n.endswith((".md", ".html", ".py")) or n in ("bin/cc", "cc.toml")]   # help text, docs, CLAIMS, code strings
+        vhit = [n for n in user_facing for ln in z.read(W + n).decode("utf-8", "replace").splitlines() for p in vocab if p.search(ln)]
+        check("no user-facing file of the wheel (help, docs, CLAIMS, code) uses the process vocabulary", not vhit, str(sorted(set(vhit))[:6]))
 print("test_wheel: " + ("FAILED " + "; ".join(bad) if bad else "ok"))
 sys.exit(1 if bad else 0)

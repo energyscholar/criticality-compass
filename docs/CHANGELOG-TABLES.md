@@ -98,10 +98,10 @@ verdict words are unchanged. Plan 0892 P2 (2026-10-08) landed: `cc/fingerprint.p
 imports no kernel, admit or door; every family transcript is byte-identical, and `bin/cc family` prints `=> family report` with the label
 `cc.toml [report] family`.
 
-## The per-point verdict path is a projection C (an external verifier, 2026-10-06, LOG E382; plan 0893 P1, 2026-10-08)
+## The per-point verdict path is a projection C (an external verifier, 2026-10-06; plan 0893 P1, 2026-10-08)
 
 Every table header (`codes.toml`, `verdict.toml`, `family.toml`) that calls a size chain, the matched levels or the two-start pair a "relation",
-or its difference "A", is superseded by an external verifier's ruling of 2026-10-06 (LOG E382): the L and L/3 observations are independent, each through its
+or its difference "A", is superseded by an external verifier's ruling of 2026-10-06: the L and L/3 observations are independent, each through its
 own M; the blocking-map comparison between them is admissible in a downstream projection C, and "A over that size edge as the needle" is not.
 These are declared **comparisons**; the per-point verdict is a **declared report** (`cc.toml [report] verdict`, printed once under every
 `show` header and in each `## Rules:` section of SIGNATURE-TABLE.md). The tables are unchanged (hash-pinned), the verdict words are

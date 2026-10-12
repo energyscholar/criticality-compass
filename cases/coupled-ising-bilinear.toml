@@ -13,7 +13,7 @@ sampler = "bilayer"
 traps = [
   """a navigated K sits at the needle's MID by construction (A2), but an independent re-reading at the same K and N \\
 can read NEG or POS inside the margin: a pipeline that maps that to FLOWING says NOT at a true critical point \\
-(the X5 false negatives, toolset LOG E59-E62)""",
+(the X5 false negatives)""",
   """K_c(g) is not known to the analyst: the point is the navigated K, so it is on the manifold only to the \\
 resolution of the navigation""",
 ]
