@@ -1,0 +1,6 @@
+# inputs/l8-tetris-600-g/couplings.toml (plan 0884 P2) - the record's declared coupling names; no sampler, no Hamiltonian, and the report instrument probes none.
+schema = 1
+kind = "couplings"
+id = "l8-tetris-600-g"
+names = ["T", "a"]
+probes = []

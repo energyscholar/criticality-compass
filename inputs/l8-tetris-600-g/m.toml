@@ -1,0 +1,224 @@
+# inputs/l8-tetris-600/m.toml (plan 0884 P2) - the 600 nm tetris artificial-spin-ice array (Dryad 10.5061/dryad.rbnzs7hcs, CC0): XMCD-PEEM island moments +-1 on the island grid,
+# 64 frames per file, 6 s apart; the cool-down series 220 -> 180 K, one file per T by the declared rule (the first file per T in acquisition order whose logbook notes cell is empty);
+# the second file per T and the flagged file 088 are EXCLUDED by declaration; one preparation; no energy column; one window side (flag W), no size relation; read by the relation-free
+# `report` instrument (plan 0884 amendment 4); the Gamma-method twin (plan 0878) - reads what the record admits; class UNVERIFIED - no case joined
+schema = 1
+kind = "input"
+id = "l8-tetris-600-g"
+instruments = ["report"]
+
+[obtained]
+"220" = "observed"
+"218" = "observed"
+"216" = "observed"
+"214" = "observed"
+"212" = "observed"
+"210" = "observed"
+"208" = "observed"
+"206" = "observed"
+"204" = "observed"
+"202" = "observed"
+"200" = "observed"
+"198" = "observed"
+"196" = "observed"
+"194" = "observed"
+"192" = "observed"
+"190" = "observed"
+"188" = "observed"
+"186" = "observed"
+"184" = "observed"
+"182" = "observed"
+"180" = "observed"
+
+[axes]
+point = ["220", "218", "216", "214", "212", "210", "208", "206", "204", "202", "200", "198", "196", "194", "192", "190", "188", "186", "184", "182", "180"]
+size = [27]
+starts = ["asgrown"]
+main_start = "asgrown"
+
+[observable]
+name = "g1-occupied"
+definition = "open-pair nearest-neighbour correlation of the block states over pairs whose both sites are occupied, every level down to final size 9"
+levels = [2]
+final_size = 9
+level_floor = 0
+
+[block_map]
+name = "majority-occupied3"
+factor = 3
+keeps = "the sign of the local majority over occupied islands"
+discards = "the magnitude; the vacancy pattern (the tetris motif leaves ~60-66 % of 3x3 cells with an EVEN island count, whose ties read block state 0 - a lattice artefact accepted by declaration); the frame order (Phase 1)"
+limited = "none"
+
+[windows]
+side = 27
+origin = "extent-min"
+discards = "the islands outside the one 27x27 window at the file's (min row, min col)"
+
+[sinks]
+ordered = 1.0
+disordered = 0.0
+
+[interval]
+method = "gamma"
+level = 0.95
+window_s = 1.5
+window_max = 400
+door_z = 3.0
+tau_declared = 135
+tau_source = "[0884-tau] (compass-toolset m.toml): the max over the 21 selected files of tau_T = ceil((N+2)/(2(F+1))) from each file's own flip count, F pooled flips between consecutive frames over all islands, N = islands x 63; it UNDER-states tau at the slowest T (64 frames, Laplace term) and reads independent memoryless islands"
+
+[eps]
+
+[kernel]
+uses = []
+
+[data]
+format = "island-table-v1"
+
+[[data.files]]
+point = "220"
+size = 27
+start = "asgrown"
+path = "l8/600_nm/tetris051#_tetrisspin_clustering_total.csv"
+arrays.GL = { key = "csv" }
+
+[[data.files]]
+point = "218"
+size = 27
+start = "asgrown"
+path = "l8/600_nm/tetris053#_tetrisspin_clustering_total.csv"
+arrays.GL = { key = "csv" }
+
+[[data.files]]
+point = "216"
+size = 27
+start = "asgrown"
+path = "l8/600_nm/tetris055#_tetrisspin_clustering_total.csv"
+arrays.GL = { key = "csv" }
+
+[[data.files]]
+point = "214"
+size = 27
+start = "asgrown"
+path = "l8/600_nm/tetris057#_tetrisspin_clustering_total.csv"
+arrays.GL = { key = "csv" }
+
+[[data.files]]
+point = "212"
+size = 27
+start = "asgrown"
+path = "l8/600_nm/tetris059#_tetrisspin_clustering_total.csv"
+arrays.GL = { key = "csv" }
+
+[[data.files]]
+point = "210"
+size = 27
+start = "asgrown"
+path = "l8/600_nm/tetris061#_tetrisspin_clustering_total.csv"
+arrays.GL = { key = "csv" }
+
+[[data.files]]
+point = "208"
+size = 27
+start = "asgrown"
+path = "l8/600_nm/tetris063#_tetrisspin_clustering_total.csv"
+arrays.GL = { key = "csv" }
+
+[[data.files]]
+point = "206"
+size = 27
+start = "asgrown"
+path = "l8/600_nm/tetris065#_tetrisspin_clustering_total.csv"
+arrays.GL = { key = "csv" }
+
+[[data.files]]
+point = "204"
+size = 27
+start = "asgrown"
+path = "l8/600_nm/tetris067#_tetrisspin_clustering_total.csv"
+arrays.GL = { key = "csv" }
+
+[[data.files]]
+point = "202"
+size = 27
+start = "asgrown"
+path = "l8/600_nm/tetris069#_tetrisspin_clustering_total.csv"
+arrays.GL = { key = "csv" }
+
+[[data.files]]
+point = "200"
+size = 27
+start = "asgrown"
+path = "l8/600_nm/tetris071#_tetrisspin_clustering_total.csv"
+arrays.GL = { key = "csv" }
+
+[[data.files]]
+point = "198"
+size = 27
+start = "asgrown"
+path = "l8/600_nm/tetris073#_tetrisspin_clustering_total.csv"
+arrays.GL = { key = "csv" }
+
+[[data.files]]
+point = "196"
+size = 27
+start = "asgrown"
+path = "l8/600_nm/tetris075#_tetrisspin_clustering_total.csv"
+arrays.GL = { key = "csv" }
+
+[[data.files]]
+point = "194"
+size = 27
+start = "asgrown"
+path = "l8/600_nm/tetris077#_tetrisspin_clustering_total.csv"
+arrays.GL = { key = "csv" }
+
+[[data.files]]
+point = "192"
+size = 27
+start = "asgrown"
+path = "l8/600_nm/tetris079#_tetrisspin_clustering_total.csv"
+arrays.GL = { key = "csv" }
+
+[[data.files]]
+point = "190"
+size = 27
+start = "asgrown"
+path = "l8/600_nm/tetris081#_tetrisspin_clustering_total.csv"
+arrays.GL = { key = "csv" }
+
+[[data.files]]
+point = "188"
+size = 27
+start = "asgrown"
+path = "l8/600_nm/tetris083#_tetrisspin_clustering_total.csv"
+arrays.GL = { key = "csv" }
+
+[[data.files]]
+point = "186"
+size = 27
+start = "asgrown"
+path = "l8/600_nm/tetris085#_tetrisspin_clustering_total.csv"
+arrays.GL = { key = "csv" }
+
+[[data.files]]
+point = "184"
+size = 27
+start = "asgrown"
+path = "l8/600_nm/tetris087#_tetrisspin_clustering_total.csv"
+arrays.GL = { key = "csv" }
+
+[[data.files]]
+point = "182"
+size = 27
+start = "asgrown"
+path = "l8/600_nm/tetris089#_tetrisspin_clustering_total.csv"
+arrays.GL = { key = "csv" }
+
+[[data.files]]
+point = "180"
+size = 27
+start = "asgrown"
+path = "l8/600_nm/tetris091#_tetrisspin_clustering_total.csv"
+arrays.GL = { key = "csv" }

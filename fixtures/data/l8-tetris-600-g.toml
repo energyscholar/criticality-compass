@@ -1,0 +1,27 @@
+# fixtures/data/l8-tetris-600-g.toml - written by bin/cc data add: sha256 of every data file
+schema = 1
+kind = "data-manifest"
+input = "l8-tetris-600-g"
+
+[files]
+"l8/600_nm/tetris051#_tetrisspin_clustering_total.csv" = "3dcc8e03d3aa696da52a5422e3943e438dee2f8a53b1587d3a4f2e287886c5eb"
+"l8/600_nm/tetris053#_tetrisspin_clustering_total.csv" = "527a334d3fe324ad291a51d2eb177fc629e95bf713503a371578d150639befb8"
+"l8/600_nm/tetris055#_tetrisspin_clustering_total.csv" = "1be380ec8a7c0b7247a400e74ed39fefcd24e4d69e0a2eb0326dfa83afc87e9b"
+"l8/600_nm/tetris057#_tetrisspin_clustering_total.csv" = "ebd669ca420cc5db0693f76e187bd62240d9f45677b15572871c2ecf8773050f"
+"l8/600_nm/tetris059#_tetrisspin_clustering_total.csv" = "ecda2396826ded6de1bf13d106657faa9cc3db10bffe7aa284db4c834aa548e2"
+"l8/600_nm/tetris061#_tetrisspin_clustering_total.csv" = "ebc3caa3e48f9f3472d9c365c810b138488c032adc0f8e7627bb57dc9d3b119a"
+"l8/600_nm/tetris063#_tetrisspin_clustering_total.csv" = "cf28c9d07f3818a4f8f181c2d95cc8f17c630fb2e2591886577722ca087bafd7"
+"l8/600_nm/tetris065#_tetrisspin_clustering_total.csv" = "3372654cddfa9917f04fa6e678bb6d6aaebf0225f4429af029d7a4fc1651b93b"
+"l8/600_nm/tetris067#_tetrisspin_clustering_total.csv" = "fbb93571d31fb7dd5ea37b36501356d8783b172023e460cf099356c1467ce099"
+"l8/600_nm/tetris069#_tetrisspin_clustering_total.csv" = "f817dd7d4cceefdb0c252d409ea30a324aadabb07ece0296f377cc67902d3a69"
+"l8/600_nm/tetris071#_tetrisspin_clustering_total.csv" = "89aeae33761be5620a390c07eef7b71dc124b7c2f7371e528090f34a3d8b082b"
+"l8/600_nm/tetris073#_tetrisspin_clustering_total.csv" = "9d9882468ef47d84aadc7d6f255faa279e38337fd1edd71abed34cdea1387a0e"
+"l8/600_nm/tetris075#_tetrisspin_clustering_total.csv" = "2157e6041da47d5d2a13bd091ef0aa72b05eb36513ccab58de0d64e2a0b8a730"
+"l8/600_nm/tetris077#_tetrisspin_clustering_total.csv" = "9ab0e092e78f9f4a36d56d0164a9828257cf3d152312a436ed0a070b116083b6"
+"l8/600_nm/tetris079#_tetrisspin_clustering_total.csv" = "16e9195b1b9af233044b5250c1d88436dafb8f436120e8c5297a3fe7c5628f2d"
+"l8/600_nm/tetris081#_tetrisspin_clustering_total.csv" = "6d27892417a15de90dbba5a40cc36c63c817d5909b237dc3d7fd921a4db4cdd1"
+"l8/600_nm/tetris083#_tetrisspin_clustering_total.csv" = "7ef82def6d4895a7087ca7ce42dea81eb0f6873729263663a0fd5d1e61b343e2"
+"l8/600_nm/tetris085#_tetrisspin_clustering_total.csv" = "15b46187f2bf20df8ef13d63a9aebc617352a49aa917836d4ee945f69326d772"
+"l8/600_nm/tetris087#_tetrisspin_clustering_total.csv" = "9f770596e406de62d688349023dd92e5810cf7d5432be594ec7363835be141d9"
+"l8/600_nm/tetris089#_tetrisspin_clustering_total.csv" = "fac9302cae212da94e492269750bf05d1b0ae5af5282571d8099478ecc5e2aed"
+"l8/600_nm/tetris091#_tetrisspin_clustering_total.csv" = "27aab917329439b0e0f0bc4943dbc2320b1ab5f3b1530867f993f6ad020f5ff2"
