@@ -4,7 +4,7 @@ Every verdict word a table set can emit, with the rows (file:line) that emit it 
 Line numbers are those of the [[row]] / [[side_row]] headers, the same numbers `bin/cc explain` prints."""
 import sys, tomllib
 from pathlib import Path
-root = Path(sys.argv[1] if len(sys.argv) > 1 else Path.home() / "software/criticality-compass")
+root = Path(sys.argv[1] if len(sys.argv) > 1 else Path(__file__).resolve().parent.parent)
 name = sys.argv[2] if len(sys.argv) > 2 else "v07-rules"
 width = int(sys.argv[3]) if len(sys.argv) > 3 else 150
 mode = sys.argv[4] if len(sys.argv) > 4 else "full"      # full: every section prints when + why; compact: only the per-point partition prints `when`

@@ -10,7 +10,8 @@ ROOT = Path(__file__).resolve().parent.parent
 # built from parts so this file does not match itself
 PATTERNS = [re.compile(p) for p in (
     "/ho" + "me/", "/Us" + "ers/", "~/soft" + "ware", r"(?i)\bpen" + r"guin\b", r"(?i)\bji" + r"ll\b", r"(?i)\bporch" + r"light\b",
-    "hal-" + "main", "has-anyone-" + "looked", "aura" + "sys")]
+    "hal-" + "main", "has-anyone-" + "looked", "aura" + "sys",
+    r"(?<![\w-])soft" + r"ware/(scratch|criticality)", r"structure-" + "checks")]   # Path.home() / "<tree>/..." spells no "~"
 
 
 def hits(text):

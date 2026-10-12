@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "cc" / "instruments")]
 VERBOSE = False
 MODE = "basic"
-TOOLS = Path(os.environ.get("CC_STRUCTURE_CHECKS") or Path.home() / "software/scratch/structure-checks")   # the structure checker (checks.py, freeze.py); CC_STRUCTURE_CHECKS moves it (plan 0929)
+TOOLS = Path(os.environ["CC_STRUCTURE_CHECKS"]) if os.environ.get("CC_STRUCTURE_CHECKS") else None   # NAMED by CC_STRUCTURE_CHECKS, never a default location (plan 0985); the structure checker (checks.py, freeze.py); CC_STRUCTURE_CHECKS moves it (plan 0929)
 ADVANCED = [
     ("show <input>", "every reading of an input, and each point's verdict (a declared report: cc.toml [report] verdict)"),
     ("explain <input> <point>", "the whole chain for one point: data -> verdict (a declared report: cc.toml [report] verdict)"),
@@ -281,6 +281,9 @@ def structure_gate():
     """Run checks.py (the hook cannot see subprocesses). Returns the refusal text, or None when the checker SAID clean.
     The checker's last line is `-- N finding(s)`: a verdict exists only when that line is there and the exit code agrees with N.
     Anything else (no checker, a crash, no trailer) is a REFUSAL, never 'clean' (plan 0929 blocker b: an empty output is not a zero)."""
+    if TOOLS is None:
+        return ("REFUSED: no structure checker is named, so no run can be shown to obey the structure rules.\n"
+                "  Next: set CC_STRUCTURE_CHECKS to the directory that holds checks.py")
     tool = TOOLS / "checks.py"
     if not tool.is_file():
         return (f"REFUSED: the structure checker {tool} is not there, so no run can be shown to obey the structure rules.\n"
@@ -560,6 +563,9 @@ def cmd_freeze(args):
             return 1
         tdir, want = freeze_files(rid, read, res["vectors"])
         new = [w for w in want if w not in frozen["files"]]
+        if TOOLS is None:
+            print("REFUSED: no structure checker is named, so nothing can be frozen.\n  Next: set CC_STRUCTURE_CHECKS to the directory that holds freeze.py")
+            return 1
         freeze = [sys.executable, str(TOOLS / "freeze.py"), str(ROOT)]
         subprocess.run(freeze + ["files", *new], check=True, capture_output=True)
         if tdir not in frozen["dirs"]:

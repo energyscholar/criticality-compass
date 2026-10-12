@@ -40,6 +40,8 @@ $ compass help
 
 You need Python >= 3.11 (3.12 is the version tested) and numpy, which `pip install -e .` brings. `compass` is the console script; it runs this clone's `bin/cc` in the venv's interpreter, and `bin/cc` starts every script and test with that same interpreter (`sys.executable`). Called directly, `bin/cc` runs under whichever `python3` your PATH gives it, so activate the venv first. Run everything below from the repository root.
 
+Two places are never defaults, because a default would be one person's machine: **the data** (the simulation outputs live outside the repository; name them with `--data-root PATH` or `CC_DATA_ROOT=PATH`, else CC looks only in the clone's `data/`, which holds the redistributable l8 files) and **the structure checker** that `run`, `check` and `freeze` call (`CC_STRUCTURE_CHECKS=<directory that holds checks.py>`; without it those commands REFUSE and say so). Every stored data path starts with the name `<data-root>` (cc.toml `[data] name`), which is a name, never a location.
+
 Other ways to install:
 
 - **A non-editable install** (`pip install .`, or a built wheel from `python3 -m build`) carries a copy of the workspace (`bin/`, `cc/`, `tables/`, `inputs/`, `cases/`, `results/`, ...) inside the package, so `compass validate`, `compass show` and `compass explain` work without a clone. Anything you write (`run`, `new`, `tables fork`) lands in that copy inside site-packages and is lost on reinstall; to author, use the editable install above. `compass --help` and `compass help` both print the help text; an unknown command exits non-zero.
