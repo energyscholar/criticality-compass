@@ -68,6 +68,13 @@ rows = [ln for ln in text.splitlines() if ln.startswith("| ") and not ln.startsw
 check("the table covers all three statuses", {r.split("|")[2].strip() for r in rows} == set(STATUS), str({r.split('|')[2].strip() for r in rows}))
 for lim in ("Detector intervals under-cover", "located, not identified", "T15 is synthetic-only", "no real-data confirmatory test", "row K4 -0.10", "development readings only", "are false positives"):
     check(f"known limit present: {lim}", lim.lower() in text.lower())
+# plan 1012b: tonight's results are in, and the stale statements are gone
+low = text.lower()
+for stale in ("no input has yet been read under v10", "no real-input verdict under v10 yet", "27 contracts are drafted"):
+    check(f"stale statement absent: {stale}", stale not in low)
+for need in ("TAX-T6B-REAL-1.txt", "TAX-T7B-v4.txt", "NAV2-MAPS-N2-M5.txt", "NAV-M5-BAND-M160.txt", "0978-k4m1.txt", "0978-at-m1-rerun.txt", "L8-first-reading.txt"):
+    check(f"CLAIMS cites {need}", need in text)
+
 if unchecked:
     print(f"UNCHECKED: {len(unchecked)} toolset cells (no toolset at {roots['toolset']}); set CC_TOOLSET")
     check("toolset present when required (CC_REQUIRE_TOOLSET=1)", os.environ.get("CC_REQUIRE_TOOLSET") != "1", "toolset absent")
