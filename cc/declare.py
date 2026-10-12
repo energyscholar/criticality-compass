@@ -142,7 +142,7 @@ def _regex_ok(x):
 def chk_cc(p, d, c, stem=None):
     top = {k: dict for k in ("defaults", "data", "alphabets", "flags", "obtained_flag", "arrays", "basic", "check", "golden", "interval_binding")}
     out = header(p, d, "cc") + shape(p, d, top, {"formats": dict, "transducer": dict, "levels": dict, "interval_fields": dict, "conventional": dict,
-                                                 "report": dict, "step_labels": dict, "projections": dict})
+                                                 "report": dict, "step_labels": dict, "refusal_fields": dict, "projections": dict})
     if out:
         return out
     loc_ = d["data"].get("local", [])
@@ -194,6 +194,9 @@ def chk_cc(p, d, c, stem=None):
     out += shape(p, d["check"], {"fast_budget_s": int, "slow": list, "memory_gb": (int, float), "exclusive": list, "replay": str}, {"needs_data": list, "needs_rust": list}, pre="check.")   # plan 0881 P2.9: replay is required (it was optional only because a planted file predated it)
     out += when("replay" not in d["alphabets"], p, "alphabets.replay", "missing", 'write replay = ["locked", "all"]')
     out += inalpha(p, "check.replay", d["check"]["replay"], d["alphabets"].get("replay", [])) if "replay" in d["check"] else []   # plan 0886: which inputs test_run_all replays
+    out += [at(p, f"refusal_fields.{k}", "must be a regex string (the field a refusal of this kind is reported at)", "write a pattern like '^interval\\.min_blocks$'")
+            for k, v in sorted(d.get("refusal_fields", {}).items()) if not (isinstance(v, str) and _regex_ok(v))]
+    out += when(not d.get("refusal_fields"), p, "refusal_fields", "missing: [expect] absorbs only the kinds this table names", "write [refusal_fields] with one pattern per refusal kind")
     classes = d["golden"].get("classes", {})
     out += [at(p, f"golden.classes.{k}", "must have files and match, each a list of strings", "write files = [...] and match = [...]")
             for k, v in sorted(classes.items())
@@ -529,7 +532,7 @@ def score_expected(root, found, input_id=None):
     frozen file (only that input's, when validate was scoped to one: the others were not checked, so they cannot be scored). An exact match (as a multiset) removes those findings and prints ONE line. Anything else leaves every finding standing and adds a finding for each: an ACCEPTED input
     declared refused, a missing sentence, a sentence that is not in the file (an extra refusal, or changed wording shows as one of each). Returns (findings, lines)."""
     root, lines = Path(root).resolve(), []
-    found = list(found)
+    found, refusal_fields = list(found), list(tomllib.loads((root / "cc.toml").read_text())["refusal_fields"].values())
     for mp in sorted((root / "inputs").glob("*/m.toml")):
         iid, e = mp.parent.name, (load(mp, root)[0] or {}).get("expect")
         if input_id and iid != input_id:
@@ -537,7 +540,7 @@ def score_expected(root, found, input_id=None):
         pre = f"inputs/{iid}/"
         if not isinstance(e, dict) or any(f.loc.startswith(pre + "m.toml:expect") for f in found):
             continue   # no expectation, or a malformed one: its own findings stand and nothing is absorbed
-        got = [f for f in found if f.loc.startswith(pre)]
+        got = [f for f in found if f.loc.startswith(pre + "m.toml:") and any(re.search(r, f.loc.split(":", 1)[1]) for r in refusal_fields)]   # only the refusal kinds of cc.toml [refusal_fields]
         want, here = sentences_of((root / e["sentences"]).read_text()), f"inputs/{iid}/m.toml"
         if not got:
             found.append(at(here, "expect.outcome", f"declared refused but the input was ACCEPTED (validate found nothing to refuse; {len(want)} sentences were expected)",

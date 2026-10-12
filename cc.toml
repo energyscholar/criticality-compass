@@ -185,6 +185,13 @@ needs_rust = ["test_kernel_rs", "test_kernel_rs_bitwise"]   # plan 0929: these i
 fast_budget_s = 30              # elapsed time is printed against it; over budget WARNS, never fails
 slow = ["test_v10_readable", "test_chains_declare", "test_w2", "test_detect_verdicts", "test_breakers_red", "test_view", "test_golden", "test_along", "test_axes", "test_tables_cli", "test_tabulate", "test_needle_o_start", "test_run_all", "test_declare", "test_freeze_key", "test_code_hash", "test_chain", "test_across_delta", "test_end_note", "test_delta_basis", "test_reduce", "test_stack_door", "test_reuse", "test_probe", "test_transducer", "test_gamma_twin", "test_explain_pair", "test_check_summary", "test_conventional", "test_data_root", "test_report", "test_expect"]   # each phase appends its > 5 s tests
 
+# plan 0884 amendment 6 F2: the REFUSAL kinds an input's [expect] may absorb, as a total table of the field (the part of a finding's location after "m.toml:") each kind is reported at.
+# Anything else under inputs/<id>/ (a missing file, a schema defect, a misspelt field) is a defect, not a refusal: it stays a finding whatever the sentence file says.
+[refusal_fields]
+reader = '^data\.files\[\d+\]\.arrays\.[^.]+$'   # a table the reader refuses (a moment the format does not admit)
+block_floor = '^interval\.min_blocks$'   # an interval floor (block): n // b < min_blocks
+gamma_floor = '^interval\.tau_declared$'   # an interval floor (gamma): k_gamma * tau_declared > n
+
 [golden.classes.a]    # help text or a new command
 files = ["help.*.txt", "new-*.txt"]
 match = ['^[-+]\s+bin/cc ', '^[-+]wrote ', '^[-+]  Next: ']

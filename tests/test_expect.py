@@ -139,7 +139,7 @@ try:
 
     def declare(text, blocks, where=repo):
         (where / "inputs" / "planted" / "m.toml").write_text(text + files(blocks))
-        pins = "".join(f'"planted/{b[1]}" = "{hashlib.sha256((data / "planted" / b[1]).read_bytes()).hexdigest()}"\n' for b in sorted(set(blocks), key=lambda x: x[1]))
+        pins = "".join(f'"planted/{b[1]}" = "{hashlib.sha256((data / "planted" / b[1]).read_bytes()).hexdigest()}"\n' for b in sorted(set(blocks), key=lambda x: x[1]) if (data / "planted" / b[1]).is_file())
         (where / "fixtures" / "data").mkdir(parents=True, exist_ok=True)
         (where / "fixtures" / "data" / "planted.toml").write_text('schema = 1\nkind = "data-manifest"\ninput = "planted"\n\n[files]\n' + pins)
 
@@ -187,13 +187,39 @@ try:
     rc, o = validate()
     check("a malformed [expect] (outcome 'accepted'): a finding, and nothing is declared refused", rc == 1 and "'accepted' is not an expected outcome" in o and "refused as declared" not in o, o[:600])
 
+    # (9) amendment 6 F2: a NON-refusal defect listed in the sentence file is still a finding (a missing data file is not a refusal kind of cc.toml [refusal_fields])
+    LMISS = [("ord", "ord-64.csv", ""), ("rnd", "no-such-file.csv", "")]
+    SENT.write_text("")
+    declare(HEAD + BLOCK + TAIL, LMISS)
+    rc, o = validate()
+    own = [ln for ln in o.splitlines() if ln.startswith("inputs/planted/")]
+    nxt = [x for x in o.splitlines() if x.startswith("  Next")]
+    SENT.write_text("".join(ln + "\n" + nx + "\n" for ln, nx in zip(own, nxt)))   # CC's own output INCLUDING the missing-file sentence
+    miss_ok = any("does not exist under the data root" in ln for ln in own)
+    declare(HEAD + BLOCK + EXPECT + TAIL, LMISS)
+    rc, o = validate()
+    check("a non-refusal defect (missing data file) LISTED in the sentence file is still a finding, validate red", miss_ok and rc == 1 and "does not exist under the data root" in o and "refused as declared" not in o, o[:800])
+    SENT.write_text(good)
+    declare(HEAD + BLOCK + EXPECT + TAIL, LMISS)
+    mut9 = tmp / "mut9"
+    shutil.copytree(repo, mut9)
+    declare(HEAD + BLOCK + EXPECT + TAIL, LMISS, mut9)
+    (mut9 / "expected" / "refusals" / "planted.txt").write_text("".join(ln + "\n" + nx + "\n" for ln, nx in zip(own, nxt)))
+    p9 = mut9 / "cc" / "declare.py"
+    t9 = p9.read_text()
+    old9 = 'got = [f for f in found if f.loc.startswith(pre + "m.toml:") and any(re.search(r, f.loc.split(":", 1)[1]) for r in refusal_fields)]'
+    assert old9 in t9
+    p9.write_text(t9.replace(old9, "got = [f for f in found if f.loc.startswith(pre)]"))
+    rc, o = validate(mut9)
+    check("seen red: the old absorber (any finding under inputs/<id>/) swallows the missing-file defect and goes GREEN - the breaker can fail", rc == 0 and "refused as declared" in o, o[:600])
+
     # SEEN RED: a mutant that ignores [expect]
     mut = tmp / "mut"
     shutil.copytree(repo, mut)
     declare(HEAD + BLOCK + EXPECT + TAIL, L64, mut)
     p = mut / "cc" / "declare.py"
     t = p.read_text()
-    old = '    root, lines = Path(root).resolve(), []\n    found = list(found)\n'
+    old = '    root, lines = Path(root).resolve(), []\n    found, refusal_fields = list(found), list(tomllib.loads((root / "cc.toml").read_text())["refusal_fields"].values())\n'
     assert old in t
     p.write_text(t.replace(old, old + "    return found, lines\n"))
     rc, o = validate(mut)
