@@ -1,0 +1,27 @@
+# inputs/l8-tetris-600/points.toml (plan 0884 P2) - the point -> case JOIN; never frozen.
+schema = 1
+kind = "points"
+input = "l8-tetris-600"
+
+[points]
+"220" = "none"
+"218" = "none"
+"216" = "none"
+"214" = "none"
+"212" = "none"
+"210" = "none"
+"208" = "none"
+"206" = "none"
+"204" = "none"
+"202" = "none"
+"200" = "none"
+"198" = "none"
+"196" = "none"
+"194" = "none"
+"192" = "none"
+"190" = "none"
+"188" = "none"
+"186" = "none"
+"184" = "none"
+"182" = "none"
+"180" = "none"

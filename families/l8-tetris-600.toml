@@ -1,0 +1,6 @@
+# families/l8-tetris-600.toml (plan 0884 P2) - the L8 temperature chain; interior by the declared rule (plan 0879), never a hand list
+schema = 1
+kind = "family-decl"
+id = "l8-tetris-600"
+input = "l8-tetris-600"
+interior = "mid-run-open"
