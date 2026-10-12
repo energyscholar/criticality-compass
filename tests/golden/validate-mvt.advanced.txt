@@ -1,6 +1,8 @@
 $ bin/cc validate --mvt --advanced
 
-checked: 21 case, 1 cc, 10 codes, 8 compose, 35 couplings, 35 data-manifest, 9 family, 9 family-decl, 8 geometry, 35 input, 12 instrument, 1 interval-binding, 9 membership, 8 order, 35 points, 6 probe, 35 transducer, 10 verdict
+l8-tetris-600: refused as declared (5 sentences)
+l8-tetris-600-g: refused as declared (5 sentences)
+checked: 21 case, 1 cc, 10 codes, 8 compose, 37 couplings, 37 data-manifest, 9 family, 11 family-decl, 8 geometry, 37 input, 12 instrument, 1 interval-binding, 9 membership, 8 order, 37 points, 6 probe, 2 record, 35 transducer, 10 verdict
 validate: clean
 -- MVT gate (report only; no status is changed)
   PASS  1 POINT: >= 2 in-table cases with different mechanisms :: 4 case(s) ['bc-lambda-line', 'ising-2d', 'nnn-ising-manifold', 'potts-q3'], 4 distinct mechanism(s)

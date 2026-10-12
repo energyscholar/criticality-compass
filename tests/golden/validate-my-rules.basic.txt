@@ -1,4 +1,6 @@
 $ bin/cc validate
 
+l8-tetris-600: refused as declared (5 sentences)
+l8-tetris-600-g: refused as declared (5 sentences)
 validate: clean
 exit 0

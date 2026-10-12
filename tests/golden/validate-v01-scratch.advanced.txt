@@ -1,5 +1,7 @@
 $ bin/cc validate --advanced
 
-checked: 21 case, 1 cc, 11 codes, 8 compose, 35 couplings, 35 data-manifest, 10 family, 9 family-decl, 8 geometry, 35 input, 12 instrument, 1 interval-binding, 10 membership, 8 order, 35 points, 6 probe, 35 transducer, 11 verdict
+l8-tetris-600: refused as declared (5 sentences)
+l8-tetris-600-g: refused as declared (5 sentences)
+checked: 21 case, 1 cc, 11 codes, 8 compose, 37 couplings, 37 data-manifest, 10 family, 11 family-decl, 8 geometry, 37 input, 12 instrument, 1 interval-binding, 10 membership, 8 order, 37 points, 6 probe, 2 record, 35 transducer, 11 verdict
 validate: clean
 exit 0

@@ -1,5 +1,7 @@
 $ bin/cc validate --mvt
 
+l8-tetris-600: refused as declared (5 sentences)
+l8-tetris-600-g: refused as declared (5 sentences)
 validate: clean
 -- MVT gate (report only; no status is changed)
   PASS  1 POINT: >= 2 in-table cases with different mechanisms :: 4 case(s) ['bc-lambda-line', 'ising-2d', 'nnn-ising-manifold', 'potts-q3'], 4 distinct mechanism(s)

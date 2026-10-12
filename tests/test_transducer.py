@@ -27,7 +27,7 @@ with tempfile.TemporaryDirectory() as t:
     shutil.copytree(ROOT, base, ignore=shutil.ignore_patterns(".git", "__pycache__", "results", "rust", "tests"))
     victim = "x2b-xy-2"
     (base / "inputs" / victim / "transducer.toml").unlink()
-    got = [declare.fmt(f) for f in declare.validate(base)[0]]
+    got = [declare.fmt(f) for f in declare.validate_scored(base)[0]]
     want = (f"inputs/{victim}/transducer.toml: missing\n  Next: copy inputs/TEMPLATE.transducer.toml.in to inputs/{victim}/transducer.toml and fill every TODO")
     check("validate with one transducer file deleted returns exactly that finding", got == [want], f"got {got}")
     scoped = [declare.fmt(f) for f in declare.validate(base, victim)[0]]

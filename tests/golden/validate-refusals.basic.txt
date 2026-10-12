@@ -27,5 +27,7 @@ tables/golden-bad/verdict.toml: 252 uncovered cells in 1 patterns
   when.flow = ["SLOW"]
   when.two_start = ["INDEP"]
   Next: add a [[row]] with one of these when-lines, or widen a neighbouring row
+l8-tetris-600: refused as declared (5 sentences)
+l8-tetris-600-g: refused as declared (5 sentences)
 validate: 12 findings
 exit 1

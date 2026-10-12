@@ -50,7 +50,7 @@ clean = (("input-ok.toml", {}), ("manifest-ok.toml", {"input": "input-ok.toml"})
 for name, over in clean:
     check(f"planted base {name} is clean", found(P / name, over) == [], str(found(P / name, over)))
 
-repo = declare.validate(ROOT)[0]
+repo = declare.validate_scored(ROOT)[0]   # plan 0884 amendment 5: the gate view - a declared refusal is scored, not a finding
 check("the repo validates clean", repo == [], "\n".join(map(declare.fmt, repo)))
 codes = tomllib.loads((ROOT / "tables/verdict-x-rules/codes.toml").read_text())
 dom = declare.doms(codes, declare.Ctx(ROOT).alpha["nulls"])
