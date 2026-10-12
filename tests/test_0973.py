@@ -67,4 +67,19 @@ except KeyError:
 plan = list(door.resample_plan({"interval": {"method": "iid", "seed": 1, "resamples": 2}}, [5]))
 check("F3 an iid plan: identity row then R draws", len(plan) == 3 and (plan[0][0] == np.arange(5)).all())
 
+# ---- F2
+check("F2 declare.TEMPLATES is door.TEMPLATES's field shapes (one table)", declare.TEMPLATES == {k: v[0] for k, v in door.TEMPLATES.items()})
+m = {"axes": {"point": ["a", "b", "c"], "size": [27, 9, 3]}, "observable": {"levels": [4, 3, 2]},
+     "relations": {"ring": {"template": "ring", "axis": "point", "big": 27, "small": 9, "pairs": [["a", "b"]], "provenance": "Continuation"}}}
+for fn in (door.relations_for, door.control_pairs):
+    try:
+        fn(m, "ring")
+        check(f"F2 an undeclared template ('ring') is refused by the table in {fn.__name__}", False, "built a relation")
+    except KeyError:
+        check(f"F2 an undeclared template ('ring') is refused by the table in {fn.__name__}", True)
+m["relations"]["ap"] = {"template": "all-pairs", "axis": "point", "provenance": "Coupling"}   # all-pairs is declared in no locked input: its arm was untested
+check("F2 all-pairs: control pairs in edge order, and the relation builds", door.control_pairs(m, "ap") == [("a", "b"), ("a", "c"), ("b", "c")] and door.relations_for(m, "ap") is not None)
+m["relations"]["mt"] = {"template": "matched", "axis": "size", "big": 27, "small": 9, "provenance": "Continuation"}
+check("F2 matched builds one pair (its own levels)", door.relations_for(m, "mt") is not None and door.control_pairs(m, "mt") == [(27, 9)])
+
 sys.exit(1 if bad else 0)

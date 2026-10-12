@@ -9,6 +9,7 @@ import zipfile
 from dataclasses import dataclass, fields as dc_fields
 from pathlib import Path
 import numpy as np
+import door
 import formats
 import readout
 import reduce
@@ -24,8 +25,7 @@ RESERVED = {"door", "declare", "author", "detect", "view", "score", "admit"}
 DECLARED = {"probe": ("COMPLETE", "INCOMPLETE", "UNKNOWN")}   # code columns read from an input's declaration (couplings.toml), never from data
 SIZE_KEY = "L"                 # the one scalar a data file holds that is the lattice size, not a coupling
 SIDECARS = ("observable", "block_map", "conjugate", "sinks", "two_start")
-TEMPLATES = {"chain": {"axis": str}, "pair": {"axis": str, "pairs": list}, "all-pairs": {"axis": str},
-             "matched": {"axis": str, "big": int, "small": int}, "matched-chain": {"axis": str, "pairs": list}}
+TEMPLATES = {k: v[0] for k, v in door.TEMPLATES.items()}   # plan 0973 F2: the field shapes of the one table in cc/door.py
 SECTION_HINT = {"obtained.": "write one of: truth | navigated | observed (cc.toml alphabets.obtained)",
                 "points.": 'write a case id from cases/ (see bin/cc help), or "none"'}
 HINT = {"family": "a short description of the model", "mechanism": "one sentence on what drives the transition",

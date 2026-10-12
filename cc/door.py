@@ -53,31 +53,48 @@ class Ctx:
     rank: int = None                 # method chains (plan 0937): r of the order statistics [v_(r), v_(m+1-r)] of the m chain rows; None under every other method
 
 
+def _chain(m, r):
+    n = len(m["axes"][r["axis"]])
+    return n, [(i + 1, i) for i in range(n - 1)]
+
+
+def _pair(m, r):
+    return 2 * len(r["pairs"]), [(2 * k + 1, 2 * k) for k in range(len(r["pairs"]))]
+
+
+def _all_pairs(m, r):
+    n = len(m["axes"][r["axis"]])
+    return n, [(j, i) for j in range(1, n) for i in range(j)]
+
+
+def _matched(m, r, prs):
+    """Pairs [big, small] laid end to end, each with its own nodes (one pair for `matched`)."""
+    lv, ax = m["observable"]["levels"], m["axes"]
+    nbs = [lv[ax["size"].index(b)] for b, _ in prs]
+    offs = [0, *itertools.accumulate(2 * nb - 1 for nb in nbs)]
+    return offs[-1], [(o + k, o + nb + k - 1) for o, nb in zip(offs, nbs) for k in range(1, nb)]
+
+
+TEMPLATES = {   # plan 0973 F2: template -> (its declared fields, its (n, edges), its control pairs); the one table relations_for, control_pairs and declare.chk_relations read
+    "chain": ({"axis": str}, _chain, lambda m, r: list(zip(m["axes"][r["axis"]], m["axes"][r["axis"]][1:]))),
+    "pair": ({"axis": str, "pairs": list}, _pair, lambda m, r: [tuple(p) for p in r["pairs"]]),
+    "all-pairs": ({"axis": str}, _all_pairs, lambda m, r: [(m["axes"][r["axis"]][i], m["axes"][r["axis"]][j]) for j in range(1, len(m["axes"][r["axis"]])) for i in range(j)]),
+    "matched": ({"axis": str, "big": int, "small": int}, lambda m, r: _matched(m, r, [[r["big"], r["small"]]]), lambda m, r: [(r["big"], r["small"])]),
+    "matched-chain": ({"axis": str, "pairs": list}, lambda m, r: _matched(m, r, r["pairs"]), lambda m, r: [tuple(p) for p in r["pairs"]]),
+}
+
+
 def relations_for(m, name):
-    """The declared relation `name`, built through admit.declare (acyclic, one provenance per edge)."""
-    r, ax = m["relations"][name], m["axes"]
-    if r["template"] == "chain":
-        n, edges = len(ax[r["axis"]]), [(i + 1, i) for i in range(len(ax[r["axis"]]) - 1)]
-    elif r["template"] == "pair":
-        n, edges = 2 * len(r["pairs"]), [(2 * k + 1, 2 * k) for k in range(len(r["pairs"]))]
-    elif r["template"] == "all-pairs":
-        n, edges = len(ax[r["axis"]]), [(j, i) for j in range(1, len(ax[r["axis"]])) for i in range(j)]
-    else:   # matched: one pair (big, small); matched-chain: pairs laid end to end, each with its own nodes
-        lv, prs = m["observable"]["levels"], r["pairs"] if r["template"] == "matched-chain" else [[r["big"], r["small"]]]
-        nbs = [lv[ax["size"].index(b)] for b, _ in prs]
-        offs = [0, *itertools.accumulate(2 * nb - 1 for nb in nbs)]
-        n, edges = offs[-1], [(o + k, o + nb + k - 1) for o, nb in zip(offs, nbs) for k in range(1, nb)]
+    """The declared relation `name`, built through admit.declare (acyclic, one provenance per edge); an undeclared template is a KeyError."""
+    r = m["relations"][name]
+    n, edges = TEMPLATES[r["template"]][1](m, r)
     return admit.declare(n, edges, [Provenance(r["provenance"])] * len(edges))
 
 
 def control_pairs(m, name="control"):
     """The (a, b) point labels of every edge of the declared control relation, in its edge order (A = x[b] - x[a])."""
-    r, ax = m["relations"][name], m["axes"]
-    if r["template"] == "chain":
-        return list(zip(ax[r["axis"]], ax[r["axis"]][1:]))
-    if r["template"] == "all-pairs":
-        return [(ax[r["axis"]][i], ax[r["axis"]][j]) for j in range(1, len(ax[r["axis"]])) for i in range(j)]
-    return [tuple(p) for p in r["pairs"]]
+    r = m["relations"][name]
+    return TEMPLATES[r["template"]][2](m, r)
 
 
 def unit_labels(m, inst):
