@@ -195,7 +195,7 @@ def resample_plan(m, ns):
 
 @dataclass(frozen=True)
 class GammaStat:
-    """The Gamma-method's statistics of ONE reading: its SE, the window W and tau_int. A statistic of the interval projection C (plan 0878; Robin Q0):
+    """The Gamma-method's statistics of ONE reading: its SE, the window W and tau_int. A statistic of the interval projection C (plan 0878; an external verifier (ruling Q0)):
     it places the reading's sign cell and is never an operator input. It is a TYPE of its own, so no door can build a NodeField from it."""
     se: float
     window: int

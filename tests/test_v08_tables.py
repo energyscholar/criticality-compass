@@ -1,4 +1,4 @@
-"""test_v08_tables - plan 0877 T2/T3/T6: the rulebook v08-rules (stability on the Delta basis, no transform; Bruce's ruling A on across_dlt; the dead-secondary rule D2).
+"""test_v08_tables - plan 0877 T2/T3/T6: the rulebook v08-rules (stability on the Delta basis, no transform; Origin declaration A on across_dlt; the dead-secondary rule D2).
 Cells are read through the set's own functions. A planted CONVERGING chain is measured through detect.measure with the REAL instruments under v08-rules: every pair reads RAW
 (the transform did not leak into the Delta basis), the raw exponent of the difference is read, ruling A reads its sub-eps residual MARGINAL. tables/v07-rules is byte-identical."""
 import hashlib
@@ -28,11 +28,11 @@ def check(name, ok, why=""):
 T8, T7 = detect.load_tables("v08-rules"), detect.load_tables("v07-rules")
 FILES = ("codes", "compose", "family", "geometry", "membership", "order", "probe", "verdict")
 
-# --- v07-rules is untouched: the sha256 of each of its files as they were at plan 0877's start (05f9832)
-V07 = {"codes": "b1233435d4f73a5b3853ab248338f4c82a1ee580fd03380a14973384087e2595", "compose": "3c1b72137520285fe5bc96a76db9fc695d7ac3d552a619d7b9bccb8640a59957",
+# --- v07-rules is untouched: the sha256 of each of its files as they were at plan 0877's start (05f9832); plan 0985 moved the pins of codes and verdict ONCE: the only change is "Bruce's R2" -> "Origin declaration R2" in a comment and a description
+V07 = {"codes": "c082b98285b41763ba0c1739abc847074e94c21dcf9f932420164977249b9370", "compose": "3c1b72137520285fe5bc96a76db9fc695d7ac3d552a619d7b9bccb8640a59957",
        "family": "90fb7bdef4fd6d6287ec62411e85a5e2dcf58855e2fb19318683d2b1e5248d10", "geometry": "70fb209010b59e1077458c98657e3e88e7edba6f72dc81bf7fe690575b1d60f5",
        "membership": "662350091b555b3d88494406f751a3dd1c164e60486f3f5d86b096b7c7f75f6e", "order": "ab789dc52e449c1e46ce382630894247d40d0b199ddd7724a872519f1eaf5978",
-       "probe": "38a288f312a29c0a4abe3b0f93a9294d5a0e4e96cabe6b6e930bc1a1e1f6b076", "verdict": "9e6911b9bcbd913d1597361f38c099562925cf91eadee4bed561f71bda43d2df"}
+       "probe": "38a288f312a29c0a4abe3b0f93a9294d5a0e4e96cabe6b6e930bc1a1e1f6b076", "verdict": "fb661107f34393ab1b4ed8cbbce4f13587d6fca2b9e8db4ce3e488bebadb0572"}
 got = {n: hashlib.sha256((ROOT / "tables" / "v07-rules" / f"{n}.toml").read_bytes()).hexdigest() for n in FILES}
 check("tables/v07-rules is byte-identical to its state at the start of plan 0877 (sha256 of all eight files)", got == V07, str({n: g for n, g in got.items() if g != V07[n]}))
 

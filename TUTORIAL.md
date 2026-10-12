@@ -10,7 +10,7 @@ Read `README.md` first for the words.
 ```
 $ bin/cc show w2-potts
 w2-potts   rules: v01-rules   result: results/w2-potts@v01-rules.json (frozen)
-report: declared report — a projection C over sign cells of declared comparisons (the blocking-map comparison of independent sizes; the two-start difference), not a relational reading (Robin, 2026-10-06, LOG E382)
+report: declared report — a projection C over sign cells of declared comparisons (the blocking-map comparison of independent sizes; the two-start difference), not a relational reading (an external verifier, 2026-10-06, LOG E382)
 …
 point 5   case potts-q5
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
@@ -52,7 +52,7 @@ here, the covariance of the observable with the energy, which grows as a power o
 ```
 
 The comparison says which numbers are compared: 243 with 81 and 81 with 27, one blocking step apart (a declared
-comparison, inside a projection C; Robin, 2026-10-06, LOG E382). The step takes the
+comparison, inside a projection C; an external verifier, 2026-10-06, LOG E382). The step takes the
 difference along each connection (a difference of logarithms, divided by the log of the size ratio), giving
 one growth exponent per step: 1.598 from 27 to 81 and 1.679 from 81 to 243. `across` reports the last one,
 1.679.
@@ -257,7 +257,7 @@ family b7-at-line-2   rules: v01-rules   input: b7-at-line-2   interior: 0.0 0.0
     0.07->0.14 along ZERO!  -> MARGINAL
     0.14->0.21 along ZERO!  -> MARGINAL
   => family report LINE   class LINE, family.toml line 55
-     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
      why: B7 (SYNTHESIS-3): fingerprints 1 and 2 both resolved; X7a: POINT manifolds do not reach f2 MARGINAL
 ```
 

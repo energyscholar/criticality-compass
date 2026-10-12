@@ -1,4 +1,4 @@
-# tables/v08-rules/codes.toml (= v07-rules + plan 0877: stability on the DELTA basis, no transform; Bruce's ruling A on across_dlt; the dead-secondary rule D2 on across)
+# tables/v08-rules/codes.toml (= v07-rules + plan 0877: stability on the DELTA basis, no transform; Origin declaration A on across_dlt; the dead-secondary rule D2 on across)
 # tables/v07-rules/codes.toml (= v06-rules + plan 0874: across_dlt combines only the TRANSFORMED touching pairs when there are any)
 # tables/v06-rules/codes.toml (= v05-rules + plan 0872: F2 across_cov / across_dlt behind the signature column across; F1 stability_raw + drift_code -> stability with TRANSFORMED; the y_inf helper)
 # tables/v04-rules/codes.toml (= v03-rules + the declared probe column, plan 0870 P1) - sign cell -> code, one map per column (data; total).
@@ -199,7 +199,7 @@ alphabet = ["SAME-WINDOW", "PINNED-BETWEEN-PHASES", "SAME-SINK", "HALF-PINNED", 
 "ORD,DIS" = "CROSSED"
 
 [columns.signature.drift_code]                 # plan 0870 P2: how the needle's drift decays down the size chain (omega_eff - 1, needle_chain.drift, read against [eps] drift)
-from = "needle_chain.drift"                    # the VISIBLE FLAG of Bruce's R2: kept in every result, listed in verdict.toml `ignores`, read only by `flow`
+from = "needle_chain.drift"                    # the VISIBLE FLAG of Origin declaration R2: kept in every result, listed in verdict.toml `ignores`, read only by `flow`
 alphabet = ["CONVERGING", "MARGINAL-DRIFT", "PERSISTENT", "UNRES"]
 
 [columns.signature.drift_code.map]
@@ -273,7 +273,7 @@ combine.rank = [
 [columns.helper.across_dlt.map]
 "SIG-" = "IRRELEVANT"
 "NEG" = "IRRELEVANT"
-"SLOW-" = "MARGINAL"                           # plan 0877, Bruce's ruling A (2026-10-05): a resolved sub-eps residual reads MARGINAL, as the stability map reads it STABLE
+"SLOW-" = "MARGINAL"                           # plan 0877, Origin declaration A (2026-10-05): a resolved sub-eps residual reads MARGINAL, as the stability map reads it STABLE
 "ZERO!" = "MARGINAL"
 "SLOW+" = "MARGINAL"                           # ruling A (the same cell)
 "POS" = "RELEVANT"
@@ -340,7 +340,7 @@ alphabet = ["RELEVANT", "MARGINAL", "WEAK", "IRRELEVANT", "UNRES"]
 
 # plan 0877: stability on the Delta basis. `stability_raw` (the covariance stability, plan 0872) stays declared as a helper for v01-v07 re-verdicts and is read by no signature column;
 # the signature column `stability` reads stability_delta.d directly, one cell per control pair touching the point, combined as across_dlt is: every pair must agree to resolve.
-# NO TRANSFORMED cell: the exponent of the difference is read raw (the finite-size residual is a resolved sub-eps change, which the maps read STABLE / MARGINAL: Bruce's ruling A).
+# NO TRANSFORMED cell: the exponent of the difference is read raw (the finite-size residual is a resolved sub-eps change, which the maps read STABLE / MARGINAL: Origin declaration A).
 [columns.helper.stability_raw]                 # W2 stability (verdict_x STAB_CODE)
 from = "stability.d"
 alphabet = ["STABLE", "CROSSING", "OFF", "UNRES"]

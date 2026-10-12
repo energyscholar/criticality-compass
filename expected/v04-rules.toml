@@ -545,7 +545,7 @@ that the v04-rules re-verdict of its geometry at 0.0 and 0.07 is a declared chan
 [[change]]
 date = "2026-10-03"
 points = ["x5n-bilayer:0.0", "x5n-bilayer:0.1", "x5n-bilayer:0.3", "x5n-bilayer-2:0.0", "x5n-bilayer-2:0.1", "x5n-bilayer-2:0.3"]
-why = """DECLARED BEFORE ANY v04-rules RUN (plan 0870 P-1, R1 adopted by Bruce 2026-10-03): the six x5n verdict cells move POINT -> \
+why = """DECLARED BEFORE ANY v04-rules RUN (plan 0870 P-1, R1 adopted by the Origin 2026-10-03): the six x5n verdict cells move POINT -> \
 REFUSE-PROBE-INCOMPLETE and the geometry axis with them. x5n couples K and g; the per-point instruments probe K only (across.probes), so \
 'relevant and stopped' on one probed direction is consistent with a POINT and with a LINE alike (the AT misses of E151). Order CONTINUOUS, fluct \
 VANISHES and needle_pair are unchanged. The positive class is to be re-earned by the family over g (plan 0870 P3: x5n-bilayer-3, families/x5n-g.toml), \

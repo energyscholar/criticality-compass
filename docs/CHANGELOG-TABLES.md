@@ -67,7 +67,7 @@ readings are transform-basis claims, not evidence (classification below); `x2b-x
 
 **v08-rules** - 2026-10-05, plan 0877 P2 (b51b121). The frontier. Declared before any run
 (`expected/v08-rules.toml`, from the toolset's 0877-P0 table): a `stability_delta` instrument (stability on the Delta basis, `d = yD2 - yD1` per control pair,
-no transform, no TRANSFORMED cell in the alphabet); Bruce's ruling A (the across helpers read SLOW- and SLOW+ MARGINAL, not WEAK); D2 (a covariance
+no transform, no TRANSFORMED cell in the alphabet); Origin declaration A (the across helpers read SLOW- and SLOW+ MARGINAL, not WEAK); D2 (a covariance
 across that is a null no longer blocks a live Delta reading); `family.toml` f1 reads `across_delta.y_last` per consecutive interior pair (the f1 plumbing branch,
 test seen RED). The F1 row (RELEVANT + TRANSFORMED = REFUSE-UNRES) is gone: its cells return to the POINT row. v08 applies only to inputs that declare
 `stability_delta` (every other input's stability reads NOT-MEASURED under v08 by construction; no scoreboard is claimed for them). What the record says:
@@ -77,36 +77,36 @@ BKT-END, end 0.89294, bracket [0.89294, 0.95] (`bin/cc family x2b-xy-3 --tables 
 The cell is not a stable reading: plan 0889 records that a sign cell whose deciding endpoint lies inside its interval method's own resample noise is not a stable
 reading (x2b-xy-3@v08, stability_delta.d 0.85->0.89294: 6 of 11 bootstrap seeds read ZERO!); Gamma is the deterministic centre. No stored result changes.
 
-## Classification of the transform-basis claims (Robin Q3, 2026-10-05; plan 0881 P2.4)
+## Classification of the transform-basis claims (an external verifier (ruling Q3), 2026-10-05; plan 0881 P2.4)
 
-Robin's ruling: the transform has no observation at infinite size, and the shared-omega assumption is an undeclared prior. So, in the record:
+An external verifier's ruling: the transform has no observation at infinite size, and the shared-omega assumption is an undeclared prior. So, in the record:
 
 - `x2b-xy-2@v06-rules` and `x2b-xy-2@v07-rules`: LINE (per point, on TRANSFORMED stability) and BKT-END (the family, via `across_delta` TRANSFORMED pairs) are
-  **transform basis — not relationally admissible (Robin Q3, 2026-10-05); superseded by `x2b-xy-3@v08-rules`.**
+  **transform basis — not relationally admissible (an external verifier (ruling Q3), 2026-10-05); superseded by `x2b-xy-3@v08-rules`.**
 - What stands: what was run and recorded. The result files, `expected/v06-rules.toml`, `expected/v07-rules.toml` and the v06/v07 table directories are unchanged
   (hash-pinned: the record must show what was). The classification lives here and in `results/README.md`, never in a result or a table.
 - The `transform` instrument's `y_inf` is an **independent conventional estimate — not a Compass reading**. It stays printed (with that label), and no verdict row in
   any set reads it; none in any set after v07 may.
 - A superseded set is still frozen where it can be (see below).
 
-## The family layer is a projection C (Robin Q19, 2026-10-06; plan 0892)
+## The family layer is a projection C (an external verifier (ruling Q19), 2026-10-06; plan 0892)
 
-Every `tables/*/family.toml` header says "the differences are maths (cc/fingerprint.py, by A)". That sentence is superseded by Robin Q19
+Every `tables/*/family.toml` header says "the differences are maths (cc/fingerprint.py, by A)". That sentence is superseded by an external verifier (ruling Q19)
 (2026-10-06): since plan 0892 the bracket and f1 differences are computed inside C (a declared projection over per-point sign cells), not by A
 over a declared relation, and the family verdict is a declared report. The tables are unchanged (hash-pinned by every stored result); the
 verdict words are unchanged. Plan 0892 P2 (2026-10-08) landed: `cc/fingerprint.py` computes the same differences over index pairs and
 imports no kernel, admit or door; every family transcript is byte-identical, and `bin/cc family` prints `=> family report` with the label
 `cc.toml [report] family`.
 
-## The per-point verdict path is a projection C (Robin, 2026-10-06, LOG E382; plan 0893 P1, 2026-10-08)
+## The per-point verdict path is a projection C (an external verifier, 2026-10-06, LOG E382; plan 0893 P1, 2026-10-08)
 
 Every table header (`codes.toml`, `verdict.toml`, `family.toml`) that calls a size chain, the matched levels or the two-start pair a "relation",
-or its difference "A", is superseded by Robin's ruling of 2026-10-06 (LOG E382): the L and L/3 observations are independent, each through its
+or its difference "A", is superseded by an external verifier's ruling of 2026-10-06 (LOG E382): the L and L/3 observations are independent, each through its
 own M; the blocking-map comparison between them is admissible in a downstream projection C, and "A over that size edge as the needle" is not.
 These are declared **comparisons**; the per-point verdict is a **declared report** (`cc.toml [report] verdict`, printed once under every
 `show` header and in each `## Rules:` section of SIGNATURE-TABLE.md). The tables are unchanged (hash-pinned), the verdict words are
 unchanged, and no number moves; the code still computes these differences with `kernel.A` until plan 0893 P2. The start comparison is pending
-Robin R1 and the control edge (a relation) pending R2.
+An external verifier (ruling R1) and the control edge (a relation) pending R2.
 
 ## Cross-cutting notes
 

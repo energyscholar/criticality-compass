@@ -10,11 +10,11 @@ enough). Read it when you want to know what a number means, or before you touch 
   number each, or the two starts with one number each.
 - A **declared relation** is a set of nodes and directed edges, each edge with its provenance, declared before any
   data are touched; the kernel refuses a relation with a cycle. On the current inputs the one candidate is the
-  `control` edge between two neighbouring points (`along`, `across_delta`, `stability_delta`), pending Robin R2.
-- A **declared comparison** (Robin, 2026-10-06, LOG E382) is a set of ordered differences between values observed
+  `control` edge between two neighbouring points (`along`, `across_delta`, `stability_delta`), pending an external verifier (ruling R2).
+- A **declared comparison** (an external verifier, 2026-10-06, LOG E382) is a set of ordered differences between values observed
   independently, each through its own M, that the analysis supplies: the blocking-map comparison of independent
   sizes (`size`, `matched`, `chain`: one blocking step relates L to L/3) and the two-start difference (`start`,
-  pending Robin R1). It is not a kernel relation and claims no provenance (not Coupling, not Continuation, not
+  pending an external verifier (ruling R1)). It is not a kernel relation and claims no provenance (not Coupling, not Continuation, not
   Persistence); it is admissible in a downstream projection C. `m.toml` still declares both in its `[relations.*]`
   tables, from a closed set of templates, until plan 0893 P2. In `explain`, step 3 prints each by its name as
   COMPARISON or RELATION (`cc.toml [step_labels]`), and `cc.toml [projections.<name>]` says what each comparison
@@ -42,7 +42,7 @@ sampler (the frozen toolset file and its sha256), and says that one recorded con
 recorded sequence is not a process sequence. The per-locus mean is a declared bounded reduction before A, with what it keeps
 (the typical value of the observable at the locus) and what it discards (the configuration-to-configuration variation and the
 order of the configurations) stated in that file. The bootstrap interval is a projection C: it places the reading's sign cell
-against its declared margin, and is never an operator input (Robin, toolset LOG E307). The same holds for the Gamma-method interval: its window W and integrated autocorrelation time are statistics of the projection C and feed the sign cell only (gamma is declared but NOT yet used on real inputs; plan 0878 recorded a one-cell disagreement with the bootstrap twin, pending a numbered explanation).
+against its declared margin, and is never an operator input (an external verifier, toolset LOG E307). The same holds for the Gamma-method interval: its window W and integrated autocorrelation time are statistics of the projection C and feed the sign cell only (gamma is declared but NOT yet used on real inputs; plan 0878 recorded a one-cell disagreement with the bootstrap twin, pending a numbered explanation).
 
 ## The comparisons and relations, in ASCII
 
@@ -50,7 +50,7 @@ An arrow points from an edge's source to its target. The difference is source va
 
 ```
 size comparison (chain)      27 <- 81 <- 243            edges: 81 -> 27, 243 -> 81
-start comparison (pair)      random <- ordered          edge:  ordered -> random      (pending Robin R1)
+start comparison (pair)      random <- ordered          edge:  ordered -> random      (pending an external verifier (ruling R1))
 matched comparison (big 243, small 81)
 
    big 243:    L0   L1   L2   L3
@@ -59,7 +59,7 @@ matched comparison (big 243, small 81)
 ```
 
 The matched comparison pairs a big and a small system at the same block-lattice size, one blocking step apart
-(the blocking map). One relation is declared for `along` and the delta instruments (pending Robin R2), and the
+(the blocking map). One relation is declared for `along` and the delta instruments (pending an external verifier (ruling R2)), and the
 families take their differences inside C over index pairs of the same two shapes:
 
 ```
@@ -196,7 +196,7 @@ CC has 11 instrument modules: the nine the verdict path reads (needle, across, s
   `across` is then ONE declared choice per input: `across_dlt` when the input declares `across_delta`, else the
   covariance `across_cov`; a declared delta that is NOT-EVALUATED reads UNRES, never the covariance.
 - **Means:** two points on the same line keep a difference that neither grows nor shrinks with size beyond eps:
-  MARGINAL. Above: RELEVANT (they sit on different fixed points). On a pair read on the TRANSFORMED basis (v07), the reading is the transform's limit rather than the exponent at L 243: a transform-basis claim, not relationally admissible (Robin Q3, 2026-10-05; see Rulings below), superseded by the Delta-basis sets (v08).
+  MARGINAL. Above: RELEVANT (they sit on different fixed points). On a pair read on the TRANSFORMED basis (v07), the reading is the transform's limit rather than the exponent at L 243: a transform-basis claim, not relationally admissible (an external verifier (ruling Q3), 2026-10-05; see Rulings below), superseded by the Delta-basis sets (v08).
 - **A number:** pair `0.7->0.8`: `Delta` is `-0.02660, -0.02436, -0.02412` at 27, 81, 243 (sign constant, `s = -1`);
   `ln|Delta| = -3.627, -3.715, -3.725`; `yD1 = -0.0802`, `yD2 = -0.00913` (report `y_steps`). Both endpoints read
   CONVERGING (drift 0.8515 and 0.8781), so the door is TRANSFORMED and `r = (0.1308 + 0.1270) / 2 = 0.1289` (report
@@ -225,7 +225,7 @@ CC has 11 instrument modules: the nine the verdict path reads (needle, across, s
   decays by the factor `r` per blocking step. `r` is the ONE point's own ratio (across_delta uses the mean of two
   endpoints). Helper code `y_inf_code` (RELEVANT .. IRRELEVANT, eps `y`), flag H (uses the conjugate);
   NOT-EVALUATED where `R` or `v` changes sign or the correction does not decay.
-- **Means:** an independent conventional estimate — not a Compass reading (Robin Q3, 2026-10-05: there is no observation at infinite size, and the shared-omega assumption is an undeclared prior). It is what a conventional finite-size extrapolation would give if the needle's correction were the whole finite-size effect. No verdict row in any set reads it, and none in any set after v07 may; plan 0877 keeps it report-only in v08.
+- **Means:** an independent conventional estimate — not a Compass reading (an external verifier (ruling Q3), 2026-10-05: there is no observation at infinite size, and the shared-omega assumption is an undeclared prior). It is what a conventional finite-size extrapolation would give if the needle's correction were the whole finite-size effect. No verdict row in any set reads it, and none in any set after v07 may; plan 0877 keeps it report-only in v08.
   `stability` TRANSFORMED is the related, row-read fact:
   `d = y2 - y1` inside eps on a CONVERGING point.
 - **A number:** T 0.7: `R = 0.1146, 0.107, 0.1026` at 27, 81, 243; `y_steps [-0.06243, -0.03832]` so `y1 = -0.06243`,
@@ -254,7 +254,7 @@ Where a point reads a null (`NOT-MEASURED`, `NOT-EVALUATED`), the edges and pair
 null is plumbing around the maths, and only ranked codes reach the differences. The family verdict is one lookup in a
 partition of the three columns (`family.toml`), validated total and disjoint, with no priority chain.
 
-**The family layer is a projection C (Robin Q19, 2026-10-06).** The bracket and f1 differences are computed inside C, as
+**The family layer is a projection C (an external verifier (ruling Q19), 2026-10-06).** The bracket and f1 differences are computed inside C, as
 ordered differences of the stored per-point readings over the interior run (`y(j) - y(i)` for the `across_delta.y_last`
 vectors, `rank(i+1) - rank(i)` for the needle codes); they are not A over a declared relation, and the family layer is not a
 second relational pass. This supersedes the former sentence "Its three columns are built with the same operators" and the
@@ -266,9 +266,9 @@ stands unchanged. `bin/cc family` prints `=> family report` and the label `cc.to
 
 **Under method `chains` (plan 0978).** The family layer reads an input of method `chains` through the same stored cells; only f1 reads a vector, and it reads the per-chain differences `d_k = y_k(j) - y_k(i)` of rows 1..m (row 0 is a copy of chain 0), whose order statistics `[d_(r), d_(m+1-r)]` are the interval of `median_k(d_k)`: an estimand that coincides with the difference of the two medians only when `d` is symmetric (declared, as T7-B). An end bracket localises to one grid interval; it carries no joint coverage over the cells it reads. Method `gamma` has no per-row difference vector, so f1 reads NOT-EVALUATED there (a row of the readout table, not an exception).
 
-**The per-point verdict path is a projection C as well (Robin, 2026-10-06, LOG E382).** The per-point sign cells the family
+**The per-point verdict path is a projection C as well (an external verifier, 2026-10-06, LOG E382).** The per-point sign cells the family
 reads are themselves sign cells of declared comparisons: the blocking-map comparison of independent sizes (the needle's
-matched levels, the size chains) and the two-start difference (pending Robin R1), each computed inside C, not A over a
+matched levels, the size chains) and the two-start difference (pending an external verifier (ruling R1)), each computed inside C, not A over a
 kernel relation. The per-point verdict is a **declared report** too; `show` prints the label `cc.toml [report] verdict` once
 under each result header, and `explain` labels steps 3 and 4 COMPARISON and C. Both labels are one table, `cc.toml [report]`;
 the verdict words and the tables are unchanged. The code that computes the per-point differences still calls `kernel.A`
@@ -287,7 +287,7 @@ factorisation is a refactor and nothing else: `bin/cc tabulate --diff v01-rules 
 it buys is that a coexisting point still has a geometry, and a non-coexisting point still has an order, without a side
 table. No operator is involved: both axes are lookups in tables, so this section changes no kernel declaration.
 
-## What the rulings bound (Robin, 2026-10-05)
+## What the rulings bound (an external verifier, 2026-10-05)
 
 These are rulings about what CC may claim and what it does not implement. The Q0 ruling is the transducer paragraph under "Kernel V8 on one page".
 

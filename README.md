@@ -14,8 +14,8 @@ explains what the instruments compute.
 
 1. **input**: a directory `inputs/<id>/` holding `m.toml` (what was measured and how: Kernel V8's M) and `points.toml`.
 2. **point**: one labelled place in parameter space, e.g. `"0.07"` or `"d2.0-K1.0"`, with a list of sizes.
-3. **instrument**: one measurement (needle, across, stability, two_start, along, fluct). It takes ordered differences over a declared comparison (the size chains, the matched block levels, the two starts), inside a projection C; `along` also reads one edge of the declared control relation (Robin, 2026-10-06, LOG E382).
-4. **comparison / relation**: declared nodes and directed edges. A comparison (a size chain, a start pair, matched levels) relates independently observed values through the declared blocking map and claims no provenance; a relation (the control edge between neighbouring points, pending Robin R2) is a kernel declaration. The difference along each edge is source minus target (the kernel's A arithmetic); `explain` labels step 3 COMPARISON or RELATION.
+3. **instrument**: one measurement (needle, across, stability, two_start, along, fluct). It takes ordered differences over a declared comparison (the size chains, the matched block levels, the two starts), inside a projection C; `along` also reads one edge of the declared control relation (an external verifier, 2026-10-06, LOG E382).
+4. **comparison / relation**: declared nodes and directed edges. A comparison (a size chain, a start pair, matched levels) relates independently observed values through the declared blocking map and claims no provenance; a relation (the control edge between neighbouring points, pending an external verifier (ruling R2)) is a kernel declaration. The difference along each edge is source minus target (the kernel's A arithmetic); `explain` labels step 3 COMPARISON or RELATION.
 5. **reading**: an estimate plus its resampled interval, and its **sign cell**: where the interval sits among the cuts -eps, 0, +eps (SIG+, POS, SLOW+, ZERO!, SLOW-, NEG, SIG-, UNRES).
 6. **code**: a sign cell translated by `codes.toml` into words, e.g. SIG+ becomes RELEVANT.
 7. **signature row**: the six codes of one point: needle, sink, flow, across, stability, two_start.
@@ -92,7 +92,7 @@ start: bin/cc show b7-at-line
 ```
 $ bin/cc show b7-at-line
 b7-at-line   rules: v01-rules   result: results/b7-at-line@v01-rules.json (frozen)
-report: declared report — a projection C over sign cells of declared comparisons (the blocking-map comparison of independent sizes; the two-start difference), not a relational reading (Robin, 2026-10-06, LOG E382)
+report: declared report — a projection C over sign cells of declared comparisons (the blocking-map comparison of independent sizes; the two-start difference), not a relational reading (an external verifier, 2026-10-06, LOG E382)
 point 0.0   case at-self-dual-line
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
   needle     BLANK (NOT-MEASURED: needle is not declared on this input)
@@ -178,7 +178,7 @@ If a row were wrong, each finding would end with a `Next:` line saying what to d
 $ bin/cc run w2-potts --tables my-rules --dry
 run w2-potts@my-rules
 w2-potts   rules: my-rules   result: results/w2-potts@my-rules.json (dry: nothing written)
-report: declared report — a projection C over sign cells of declared comparisons (the blocking-map comparison of independent sizes; the two-start difference), not a relational reading (Robin, 2026-10-06, LOG E382)
+report: declared report — a projection C over sign cells of declared comparisons (the blocking-map comparison of independent sizes; the two-start difference), not a relational reading (an external verifier, 2026-10-06, LOG E382)
 …
 point 5   case potts-q5
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)

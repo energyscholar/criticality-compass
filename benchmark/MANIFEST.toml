@@ -272,8 +272,8 @@ id = "expected:v04-rules"
 role = "prediction"
 root = "cc"
 path = "expected/v04-rules.toml"
-sha256 = "40289af1551b6adf96b66d42f41a23419a4cfc3754e71de230766e83c6601ae4"
-bytes = 27251
+sha256 = "506c82b83db6c500ff1713497180120109dc01bff2a87056eab6c41562e8aa34"
+bytes = 27256
 source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
 
 [[entry]]
@@ -281,8 +281,8 @@ id = "expected:v05-rules"
 role = "prediction"
 root = "cc"
 path = "expected/v05-rules.toml"
-sha256 = "b899374d68cffc45149aa4d18de98ca462cb271af59e59404c67fdf7ac8f7583"
-bytes = 39707
+sha256 = "fbbf161be24fdf0e312a4ec503d8b28be7f9c4d405abcd0319d0f7c638992ead"
+bytes = 39712
 source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
 
 [[entry]]
@@ -290,8 +290,8 @@ id = "expected:v06-rules"
 role = "prediction"
 root = "cc"
 path = "expected/v06-rules.toml"
-sha256 = "5ba0b911a454bf65a88edffa7a999a4ba65337d0630ccfa68ebed9a5fa8842ae"
-bytes = 45448
+sha256 = "7e7b7eccd9206ff7a056a3bd53d13a61d3fd33051107941b50d9a3c32b11cb76"
+bytes = 45453
 source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
 
 [[entry]]
@@ -299,8 +299,8 @@ id = "expected:v07-rules"
 role = "prediction"
 root = "cc"
 path = "expected/v07-rules.toml"
-sha256 = "9d9ec6d8ab1ec649760d7c567c60615f5d78d1c7f73a9125fc7a21cad4c14e21"
-bytes = 48196
+sha256 = "82475b8c61689684c0141b51d748fb73c7a29bd0ed9cf274ea43232a3f0a7ba8"
+bytes = 48201
 source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
 
 [[entry]]
@@ -308,8 +308,8 @@ id = "expected:v08-rules"
 role = "prediction"
 root = "cc"
 path = "expected/v08-rules.toml"
-sha256 = "54d23945392341f6dfe38bae6673da18cf24ac07a1c640330608fea5dee17273"
-bytes = 4262
+sha256 = "d7375a8f114501f2fb2ab44cb391387e2e59c54e28574e668c1d179f134e8630"
+bytes = 4270
 source = "CC checkout at plan-0932 base 40e6078 (path not in FROZEN.json)"
 
 [[entry]]

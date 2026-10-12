@@ -17,7 +17,7 @@
   "seed": 62
  },
  "read": {
-  "results/k4-m1@v08-rules.json": "5c596d6883f4681cea8c43bc201f19765e389df7bb5c03fcdaf78da0695a4e85",
+  "results/k4-m1@v08-rules.json": "5771618222a3f6de93137155dff449853b3fd7560dfe0523cb43484faf8eb9a2",
   "inputs/k4-m1/m.toml": "6e44b453b25834c4ffddf462390ed4e2abe0a93d8bac1887539bf3edee53b94f",
   "inputs/k4-m1/transducer.toml": "43cfe4b696078d34c188cacfeef2ffdc0f8f8e82a0fa7adaba596a273edba87f",
   "instruments/needle.toml": "03c8e390df85cdcef367ecba33043ebf9e0445c30f27fa626242a87387fb3ef0",
@@ -133,8 +133,8 @@
   "<data-root>/k4m1/T1.10-L243-random.npz": "4537510376123534b5777a4c8cf23248688dee5c0f531139044510786d3f46dd",
   "<data-root>/k4m1/T1.10-L243-ordered.npz": "14fa0214299966b5e89a8fdd939e41083c7444bcb26572c25179ee5f35be1663",
   "inputs/k4-m1/couplings.toml": "8108afc9ed388a4b1fcf8fbda95e2d12afc9ac4a3c52737bad76b9ac1384c375",
-  "tables/v06-rules/codes.toml": "141ab2de7663057c675d54ff27e6597ad187d3774050849b3b155e181dee3c77",
-  "tables/v06-rules/verdict.toml": "9e6911b9bcbd913d1597361f38c099562925cf91eadee4bed561f71bda43d2df",
+  "tables/v06-rules/codes.toml": "5f86b4f0025bbdf74368e5c348d14b5947291f39f9cd1367cfe47b026716e9d6",
+  "tables/v06-rules/verdict.toml": "fb661107f34393ab1b4ed8cbbce4f13587d6fca2b9e8db4ce3e488bebadb0572",
   "tables/v06-rules/geometry.toml": "70fb209010b59e1077458c98657e3e88e7edba6f72dc81bf7fe690575b1d60f5",
   "tables/v06-rules/probe.toml": "38a288f312a29c0a4abe3b0f93a9294d5a0e4e96cabe6b6e930bc1a1e1f6b076",
   "tables/v06-rules/order.toml": "ab789dc52e449c1e46ce382630894247d40d0b199ddd7724a872519f1eaf5978",

@@ -10,7 +10,7 @@ CC is a batch instrument. You give it finite snapshots of a system at declared p
 three lattice sizes, plus a declaration (`inputs/<id>/m.toml`, the kernel's M) of exactly what was measured and
 how. It reduces the snapshots to a few numbers per point, takes **directed differences** of those numbers over
 **declared comparisons** (size chains, matched block levels, a start pair: independent observations related through the
-declared blocking map, inside a projection C) and one declared relation (neighbouring points, pending Robin R2), reads each difference
+declared blocking map, inside a projection C) and one declared relation (neighbouring points, pending an external verifier (ruling R2)), reads each difference
 with a resampled interval against a declared margin, turns the interval's position into a word, and looks the words
 up in a rulebook that is plain TOML data. Per point the answer is POINT, LINE, WALKING, FIRST-ORDER, NOT or a named
 refusal; a family of points can also read BKT-END or POINT-MANIFOLD. "Not measured" and "not evaluated" are values
@@ -55,7 +55,7 @@ transducer file), `resources.py` 36, `author.py` 363 (authoring).
    level means: `0.8006, 0.8769, 0.8883, 0.892 | 0.8007, 0.8772, 0.8905`.
 3. **COMPARISON / RELATION** (the label is `cc.toml [step_labels]`, by relation name) - `door.relations_for` -> `admit.declare`:
    nodes and directed edges from one of four templates (`chain`, `matched`, `pair`, `matched-chain`), declared before data;
-   `m.toml` still writes provenance `Coupling`, which a comparison does not claim (Robin, 2026-10-06, LOG E382). Here
+   `m.toml` still writes provenance `Coupling`, which a comparison does not claim (an external verifier, 2026-10-06, LOG E382). Here
    `matched: (243,L1)->(81,L0) (243,L2)->(81,L1) (243,L3)->(81,L2)`.
 4. **C** (or **C+KERNEL** where a control edge is read) - `kernel.A`: `A(x)[e] = x[source] - x[target]` on every declared edge
    (`B` only for `along`); over a comparison it is the same arithmetic computed as a C comparison, until plan 0893 P2 moves it out of
@@ -71,7 +71,7 @@ transducer file), `resources.py` 36, `author.py` 363 (authoring).
    through every map; a point-size or pair column is combined by its declared `combine` (rank, `agree`, `top_only`,
    `prefer_door`); `probe` comes from `couplings.toml`, never from data. Here `flow_top SLOW` and
    `drift_code CONVERGING` -> `flow = STOPPED (codes.toml line 226)`; `across_cov MARGINAL` and `across_dlt MARGINAL`
-   -> `across = MARGINAL (line 297)`; `stability_raw STABLE` x CONVERGING -> `TRANSFORMED (line 363)` (a v07 transform-basis reading: Robin Q3, 2026-10-05, ruled it not relationally admissible; `v08-rules` reads stability on the Delta basis with no TRANSFORMED cell); `two_start`
+   -> `across = MARGINAL (line 297)`; `stability_raw STABLE` x CONVERGING -> `TRANSFORMED (line 363)` (a v07 transform-basis reading: an external verifier (ruling Q3), 2026-10-05, ruled it not relationally admissible; `v08-rules` reads stability on the Delta basis with no TRANSFORMED cell); `two_start`
    INDEP at L27/81/243 -> INDEP; `probe COMPLETE`.
 8. **VERDICT** - `detect.verdict_of`: exactly one `[[row]]` of `verdict.toml` contains the signature row (`validate`
    proves the rows disjoint and total, so file order is irrelevant). Here `verdict.toml line 161 => LINE`, why
@@ -87,7 +87,7 @@ A pair instrument (`along`, `across_delta`, `stability_delta`) runs after the po
 declares one) reads the two endpoints' codes (`membership.toml`); the pair runs or reads the door value. `explain <input> 'a->b'` prints
 one section per instrument that reads the pair, each from its own stored vectors (plan 0881 P2.1).
 
-The `transform` instrument is an **independent conventional estimate — not a Compass reading** (Robin Q3, 2026-10-05: there is no observation
+The `transform` instrument is an **independent conventional estimate — not a Compass reading** (an external verifier (ruling Q3), 2026-10-05: there is no observation
 at infinite size; the shared-omega assumption is an undeclared prior). Its `y_inf` is stored and printed with that label (`cc.toml [conventional]`),
 and no verdict row in any set reads it; none in any set after v07 may.
 

@@ -196,7 +196,7 @@ alphabet = ["SAME-WINDOW", "PINNED-BETWEEN-PHASES", "SAME-SINK", "HALF-PINNED", 
 "ORD,DIS" = "CROSSED"
 
 [columns.signature.drift_code]                 # plan 0870 P2: how the needle's drift decays down the size chain (omega_eff - 1, needle_chain.drift, read against [eps] drift)
-from = "needle_chain.drift"                    # the VISIBLE FLAG of Bruce's R2: kept in every result, listed in verdict.toml `ignores`, read only by `flow`
+from = "needle_chain.drift"                    # the VISIBLE FLAG of Origin declaration R2: kept in every result, listed in verdict.toml `ignores`, read only by `flow`
 alphabet = ["CONVERGING", "MARGINAL-DRIFT", "PERSISTENT", "UNRES"]
 
 [columns.signature.drift_code.map]

@@ -17,6 +17,6 @@ family b7-at-line-2   rules: v01-rules   input: b7-at-line-2   interior: 0.0 0.0
     0.07->0.14 along ZERO!  -> MARGINAL
     0.14->0.21 along ZERO!  -> MARGINAL
   => family report LINE   class LINE, family.toml line 55
-     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
      why: B7 (SYNTHESIS-3): fingerprints 1 and 2 both resolved; X7a: POINT manifolds do not reach f2 MARGINAL
 exit 0

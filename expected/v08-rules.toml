@@ -1,7 +1,7 @@
 # expected/v08-rules.toml - the SCOREBOARD LOCK for v08-rules (plan 0877), DECLARED BEFORE ANY v08-rules RUN. Committed in P2 as expected/v08-rules.declared and renamed to .toml
 # once the run exists (the scoreboard tests read every expected/*.toml against stored results). Transcribed from the toolset's results/0877-P0.txt (the ruling-A table; NOT results/OBS2.txt,
 # the pre-ruling original) and m.toml [0877-P0] with its two addenda (P0-d, P0-e); the D2 column, which at 600k equals the v08-D column (no covariance across is a null there).
-# v08-rules = v07-rules + stability on the Delta basis (instrument stability_delta, no TRANSFORMED) + Bruce's ruling A (across_dlt maps SLOW- / SLOW+ to MARGINAL) + D2 (nullable = "either")
+# v08-rules = v07-rules + stability on the Delta basis (instrument stability_delta, no TRANSFORMED) + Origin declaration A (across_dlt maps SLOW- / SLOW+ to MARGINAL) + D2 (nullable = "either")
 # + f1 on the Delta basis (family.toml f1 reads across_delta.y_last, per consecutive interior pair). v08 applies ONLY to inputs that declare stability_delta: x2b-xy-3 is the one
 # input locked here (every other input's stability reads NOT-MEASURED under v08 by construction: no scoreboard is claimed for them, and none is run).
 # It is NOT truth: agreement with class_truth / order_truth is reported by bin/cc tabulate (cc/score.py), never here.
@@ -69,7 +69,7 @@ end_bracket = [[["0.89294", "0.95"]]]
 date = "2026-10-05"
 points = ["x2b-xy-3:*", "x2b-xy-3"]
 why = """DECLARED BEFORE ANY v08-rules RUN (plan 0877 P2): v08-rules = v07-rules + stability on the Delta basis (the new instrument stability_delta, d_D = yD2 - yD1 per control pair, \
-no transform, no TRANSFORMED cell) + Bruce's ruling A of 2026-10-05 (across_dlt's map reads SLOW- and SLOW+ MARGINAL, not WEAK) + D2 (a covariance across that is a null no longer blocks a live Delta reading) + \
+no transform, no TRANSFORMED cell) + Origin declaration A of 2026-10-05 (across_dlt's map reads SLOW- and SLOW+ MARGINAL, not WEAK) + D2 (a covariance across that is a null no longer blocks a live Delta reading) + \
 f1 on the Delta basis. The NEW input x2b-xy-3 (= x2b-xy-2 + stability_delta, the same 54 pinned files) and its family are the only things locked: no existing input is read under v08 (none declares \
 stability_delta: its stability would read NOT-MEASURED by construction), and every v01-v07 cell, expected/v0?-rules.toml, results/*@v0?-rules.* and tables/v07-rules must not move. The cells are the 0877-P0 table \
 (toolset results/0877-P0.txt, ruling-A table) and m.toml [0877-P0] P0-d / P0-e; a reading that differs is a finding, reported, never adjusted"""

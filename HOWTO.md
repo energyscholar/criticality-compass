@@ -214,7 +214,7 @@ measures nothing:
 $ bin/cc reverdict w2-potts --tables rv
 reverdict w2-potts@v01-rules -> results/w2-potts@rv.json (no instrument was run)
 w2-potts   rules: rv   result: results/w2-potts@rv.json (not frozen)
-report: declared report — a projection C over sign cells of declared comparisons (the blocking-map comparison of independent sizes; the two-start difference), not a relational reading (Robin, 2026-10-06, LOG E382)
+report: declared report — a projection C over sign cells of declared comparisons (the blocking-map comparison of independent sizes; the two-start difference), not a relational reading (an external verifier, 2026-10-06, LOG E382)
 …
 point 5   case potts-q5
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
@@ -350,7 +350,7 @@ wrote families/b7-demo.toml
   points. `validate` checks the partition is total and disjoint. How an `along` cell becomes an f2 code (ZERO! is
   MARGINAL, SLOW+ is WEAK, and so on) is the `code` map in `[f2]`; the f1 map is `[f1] code`; neither lives in `codes.toml`.
 
-`bin/cc family <id> [--tables SET]` prints the family report from the stored result (plan 0892, Robin Q19, 2026-10-06: the family
+`bin/cc family <id> [--tables SET]` prints the family report from the stored result (plan 0892, an external verifier (ruling Q19), 2026-10-06: the family
 layer is a declared projection C over per-point sign cells, not a relational reading; the verdict words and the tables do not
 change). It re-measures nothing, and
 refuses with a Next line if the set has no `family.toml` or the input has no result under the set. A family
@@ -373,7 +373,7 @@ family x7a-bc-lambda   rules: v01-rules   input: x7a-bc   interior: 0.0 1.0 1.5 
     1.8->1.9 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
     1.9->1.95 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
   => family report REFUSE-OFF-MANIFOLD   class REFUSE, family.toml line 60
-     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
      why: X7a: a member point off the manifold at L 243 (it also explains a non-monotone bracket, so it is read first by partition)
 ```
 
@@ -465,7 +465,7 @@ family x2b-xy   rules: v05-rules   input: x2b-xy   interior: 0.5 0.6 0.7 0.8 0.8
     why: plan 0871 E2: the boundary is MID (flow stopped, slow or unresolved: at T_KT the flow is marginal-slow), every point beyond it is a sink (sink-agnostic: a clock's lower end exits to ORD) and the starts AGREE there (OFF-WINDOW, two_start INDEP): the end of a line, a BKT candidate. A sweep that steps off its manifold reads the same (review 3.2.2)
   end     0.89294 (bracket 0.89294 .. 0.95)
   => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 448
-     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
      why: 0863: no positive row yet (0862 X7b/X2-X4 decide)
 ```
 
@@ -511,7 +511,7 @@ T-ordered input by adding `across_delta` to `instruments` and the coupling line 
 **TRANSFORMED stability (F1).** `stability` is a total table over (`stability_raw`, `drift_code`): on a point whose needle drift is CONVERGING (a measured pre-asymptotic small pair), a raw STABLE
 or CROSSING reads TRANSFORMED; OFF and UNRES stay; every other drift keeps today's reading, so a real walking (CROSSING off a CONVERGING point) is still WALKING. `geometry.toml` accepts
 TRANSFORMED wherever a line accepted STABLE; a RELEVANT exponent on a TRANSFORMED point refuses (REFUSE-UNRES: not certified as a point, with its Next line). The declared transform
-`y_inf = (y2 - r y1)/(1 - r)` (r = the needle's own v2/v1) is the `transform` instrument: an **independent conventional estimate — not a Compass reading** (Robin Q3, 2026-10-05: there is no observation at infinite size, and the shared-omega assumption is an undeclared prior). The column stays printed as the record, and `show` and `explain` print its `y_inf` with that label (one string, `cc.toml [conventional]`; it was never printed before, the old sentence saying `y_inf_code` was visible in `show` was wrong). No verdict row in any set reads it, and none in any set after v07 may; it is NOT-EVALUATED where the correction does not decay. The TRANSFORMED stability and TRANSFORMED across_delta pairs of v06/v07 are transform-basis claims, classified in `docs/CHANGELOG-TABLES.md` and `results/README.md`.
+`y_inf = (y2 - r y1)/(1 - r)` (r = the needle's own v2/v1) is the `transform` instrument: an **independent conventional estimate — not a Compass reading** (an external verifier (ruling Q3), 2026-10-05: there is no observation at infinite size, and the shared-omega assumption is an undeclared prior). The column stays printed as the record, and `show` and `explain` print its `y_inf` with that label (one string, `cc.toml [conventional]`; it was never printed before, the old sentence saying `y_inf_code` was visible in `show` was wrong). No verdict row in any set reads it, and none in any set after v07 may; it is NOT-EVALUATED where the correction does not decay. The TRANSFORMED stability and TRANSFORMED across_delta pairs of v06/v07 are transform-basis claims, classified in `docs/CHANGELOG-TABLES.md` and `results/README.md`.
 
 **The end note (F3).** A family names each end point (`ends`: point, side, END-kind). `bin/cc show` and `explain` of that point print `end of a LINE run (family <id>, END-<kind>)` beside its per-point
 reading (read from the stored family; nothing for a dry run, a set without family sides, or a point that ends nothing). No verdict changes.
@@ -817,7 +817,7 @@ the velocity decays down the chain. It is read against `[eps] drift = 0.5`, decl
 CONVERGING (omega_eff above 1: the correction dies), MARGINAL-DRIFT (within eps of 1), PERSISTENT (below 1: a genuine slow flow, log
 corrections included) or UNRES. The derived `flow` is a total table over (flow of the top pair, drift_code): **a SLOW flow whose drift
 CONVERGES reads STOPPED, and every other cell is the top pair's flow.** `drift_code` stays in every result and in `ignores` of
-`verdict.toml`: it is the visible flag of Bruce's R2, read by no verdict row. An input with one size pair reads drift NOT-MEASURED, and
+`verdict.toml`: it is the visible flag of Origin declaration R2, read by no verdict row. An input with one size pair reads drift NOT-MEASURED, and
 its flow is the top pair's, as under v03-rules.
 
 ```
@@ -857,7 +857,7 @@ family x5n-g   rules: v04-rules   input: x5n-bilayer-3   interior: 0.0 0.1 0.3
     0.0->0.1 along SIG-  -> IRRELEVANT
     0.1->0.3 along NEG  -> IRRELEVANT
   => family report POINT-MANIFOLD   class POINT, family.toml line 75
-     report: declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)
+     report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
      why: plan 0870 P3: …
 ```
 

@@ -125,12 +125,12 @@ GL = 2                          # the observable's full level stack [N, levels]
 E = 1                           # the conjugate (energy) per snapshot
 Q = 1                           # the two-start order parameter per snapshot
 
-[conventional]                  # plan 0881 P2.3 (Robin Q3, 2026-10-05): an instrument whose output show/explain print WITH this label and no verdict row after v07 may read: no observation exists at infinite size, and the shared-omega assumption is an undeclared prior
+[conventional]                  # plan 0881 P2.3 (an external verifier (ruling Q3), 2026-10-05): an instrument whose output show/explain print WITH this label and no verdict row after v07 may read: no observation exists at infinite size, and the shared-omega assumption is an undeclared prior
 transform = "independent conventional estimate — not a Compass reading"
 
-[report]                        # plans 0892/0893 (Robin Q19, 2026-10-06; LOG E382): what a printed verdict IS. show prints `verdict` once under each result header; family.show prints `family` under its `=>` line; SIGNATURE-TABLE.md prints both
-family = "declared report — a projection C over per-point sign cells, not a relational reading (Robin Q19, 2026-10-06)"
-verdict = "declared report — a projection C over sign cells of declared comparisons (the blocking-map comparison of independent sizes; the two-start difference), not a relational reading (Robin, 2026-10-06, LOG E382)"
+[report]                        # plans 0892/0893 (an external verifier (ruling Q19), 2026-10-06; LOG E382): what a printed verdict IS. show prints `verdict` once under each result header; family.show prints `family` under its `=>` line; SIGNATURE-TABLE.md prints both
+family = "declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)"
+verdict = "declared report — a projection C over sign cells of declared comparisons (the blocking-map comparison of independent sizes; the two-start difference), not a relational reading (an external verifier, 2026-10-06, LOG E382)"
 
 # [step_labels] (plan 0893 P1): the word `explain` prints at step 3 for each relation NAME an instrument declares; step 4 prints the distinct
 # [step_labels.operator] words of the instrument's relations, in declared order, joined by "+". validate: every relation name of instruments/*.toml has an entry,
@@ -139,8 +139,8 @@ verdict = "declared report — a projection C over sign cells of declared compar
 size = "COMPARISON"
 matched = "COMPARISON"
 chain = "COMPARISON"
-start = "COMPARISON"            # pending Robin R1
-control = "RELATION"            # pending Robin R2
+start = "COMPARISON"            # pending an external verifier (ruling R1)
+control = "RELATION"            # pending an external verifier (ruling R2)
 
 [step_labels.operator]
 COMPARISON = "C"
@@ -165,7 +165,7 @@ keeps = "the ordered differences, inside C, along the declared matched-chain of 
 discards = "every provenance claim: the comparison is analysis-supplied, not Coupling, not Continuation, not Persistence"
 
 [projections.start]
-keeps = "the difference, inside C, of the two declared starts' observations at one point (pending Robin R1)"
+keeps = "the difference, inside C, of the two declared starts' observations at one point (pending an external verifier (ruling R1))"
 discards = "every provenance claim: the comparison is analysis-supplied, not Coupling, not Continuation, not Persistence"
 
 [basic]                         # BASIC is a DECLARED PROJECTION of the full result

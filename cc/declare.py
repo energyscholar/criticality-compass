@@ -462,7 +462,7 @@ def limited(p, d, c):
 
 
 def chk_windows(p, d, c):
-    """plan 0884 amendment 1 (Robin Q15/E382): [windows] cuts every stack of the input to ONE side at a declared origin (flag W). The input then has exactly that one size, and no size
+    """plan 0884 amendment 1 (an external verifier (ruling Q15/E382)): [windows] cuts every stack of the input to ONE side at a declared origin (flag W). The input then has exactly that one size, and no size
     relation exists on it: sub-windows of one field are a declared projection, never a Coupling."""
     w = d.get("windows")
     if w is None:
@@ -474,7 +474,7 @@ def chk_windows(p, d, c):
     out += inalpha(p, "windows.origin", w["origin"], c.alpha.get("window_origin", ()))
     out += when(not formats.schemas(str(c.root)).get(fm, {}).get("reduces"), p, "windows", f"data.format '{fm}' is not a stack format, so there is nothing to cut", "delete [windows]")
     out += when(d["axes"]["size"] != [w["side"]], p, "axes.size", f"a windowed input has the one size [windows].side = {w['side']}, not {d['axes']['size']}", f"write size = [{w['side']}]")
-    return out + [at(p, f"relations.{r}", "a windowed input has one window side, so no size relation exists (Robin Q15, E382)", f"delete [relations.{r}]")
+    return out + [at(p, f"relations.{r}", "a windowed input has one window side, so no size relation exists (an external verifier (ruling Q15), E382)", f"delete [relations.{r}]")
                   for r in ("size", "matched") if r in d.get("relations", {})]
 
 

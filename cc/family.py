@@ -28,7 +28,7 @@ def bracket_of(fam, res, nulls):
     One code per declared edge axis (descent; plan 0871 E1 adds ascent), each combined over the edges, then one total table."""
     b, labels = fam["bracket"], [s["point"] for s in res["signature"]]
     codes = [s[b["reads"]] for s in res["signature"]]
-    ij = fingerprint.chain_pairs(len(labels))   # plan 0892: the differences are computed inside C, over index pairs (Robin Q19)
+    ij = fingerprint.chain_pairs(len(labels))   # plan 0892: the differences are computed inside C, over index pairs (an external verifier (ruling Q19))
     pairs = [(labels[i], labels[j]) for i, j in ij]
     steps = fingerprint.code_steps([b["rank"].get(c, 0) for c in codes], ij)   # a null point's rank is a placeholder
     ends = [[c for c in codes[k:k + 2] if c in nulls] for k in range(len(steps))]   # the null endpoints of each edge
@@ -251,5 +251,5 @@ def show(decl, out, tables):
     lines += [f"  end     {', '.join(f'{q} (bracket {a} .. {z})' for q, (a, z) in zip(out[k], out['end_bracket'])) or '(none)'}" for k in ("end_point",) if k in out]
     lines += [f"    {e['point']}: end of a LINE run ({e['side']} side, {e['kind']})" for e in out.get("ends", [])]
     return lines + [f"  => family report {out['verdict']}   class {out['class']}, family.toml line {out['line']}",
-                    f"     report: {view.config()['report']['family']}",   # plan 0892 (Robin Q19): the declared label, cc.toml [report] family
+                    f"     report: {view.config()['report']['family']}",   # plan 0892 (an external verifier (ruling Q19)): the declared label, cc.toml [report] family
                     f"     why: {out['why']}"]

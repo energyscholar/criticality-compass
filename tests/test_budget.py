@@ -1,4 +1,4 @@
-"""test_budget - the plumbing line budget (plan 0863 appendix 13; plan 0870 P-1: Bruce Q7 as corrected 2026-10-03).
+"""test_budget - the plumbing line budget (plan 0863 appendix 13; plan 0870 P-1: Origin declaration Q7 as corrected 2026-10-03).
 Counts non-blank lines of every plumbing file in checks.toml, minus the verbatim copies; CAP = 5000. Tests are
 printed, never capped. Raising CAP is the Auditor's planned edit, never the Generator's."""
 import tomllib

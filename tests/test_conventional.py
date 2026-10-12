@@ -1,5 +1,5 @@
 """test_conventional - the transform instrument's y_inf is printed WITH its declared label in show and explain, in both modes (plan 0881 P2.3,
-Robin Q3): "independent conventional estimate - not a Compass reading", one string in cc.toml [conventional]. The column stays printed
+an external verifier (ruling Q3)): "independent conventional estimate - not a Compass reading", one string in cc.toml [conventional]. The column stays printed
 (the record); nothing prints it unlabelled; a result with no transform reading prints no such line."""
 import subprocess
 import sys

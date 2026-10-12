@@ -1,4 +1,4 @@
-"""fingerprint.py - the family fingerprints as maths inside the declared projection C (plan 0892, Robin Q19): consecutive and all-pairs
+"""fingerprint.py - the family fingerprints as maths inside the declared projection C (plan 0892, an external verifier (ruling Q19)): consecutive and all-pairs
 differences of stored per-point readings over index pairs. Not a relational pass: no kernel operator, no declared relation, no door (maths)."""
 import numpy as np
 import sign
