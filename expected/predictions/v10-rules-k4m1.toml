@@ -1,0 +1,54 @@
+# expected/predictions/v10-rules-k4m1.toml - plan 0937 AMENDMENT 2026-10-11 item 2, ARGUS-FILL 6 for k4-m1: one verdict-flip prediction per point,
+# written 2026-10-11 17:22 PDT BEFORE any v10 run of k4-m1 exists (git order is the proof). Generator (Opus) for Argus.
+# PATH: not expected/v10-rules-k4m1.toml - tests/test_scoreboard.py globs expected/*.toml, needs tables == file stem and a [verdicts] table,
+#       and detect.load_tables("v10-rules-k4m1") raises (no such set) => bin/cc check would go red. This subdirectory is not globbed.
+#
+# INPUTS (the only ones): results/k4-m1@v08-rules.json (sha256 36a2d2fc01a7596d..., block b 400, R 400) at release-1-0 7f8842f;
+#   toolset m.toml @39cb497 [0937] m 10 r 2 and [0937.diff] prediction_basis; tables/v08-rules (v10-rules = v08-rules + interval.toml only, diff -rq).
+#   Calibration read: toolset results/0937-P4-diff-t2a.txt (8/59 verdicts moved in batch A, both directions, mostly via needle.velocity / across cells).
+#
+# PREDICTION RULE (fixed before it was applied; applied once, mechanically, no tuning):
+#   For every v08 reading entry with a finite [lo, hi] (point readings and each pair/size entry): s = (hi - lo) / 3.45, the chain-reading sd implied
+#   by [0937.diff] (block width ~ 2 x 1.96 x 0.88 sd). Model the v10 interval as [c - 1.0015 s, c + 1.0015 s] (E[X_(9) - X_(2)] = 2.003 sd at m 10,
+#   r 2) with centre c ~ N(est, (1.067 s)^2) (old est = one chain; new centre = median of 10 chains, var factor 1 + 0.138). New cell = cc/sign.cell
+#   against that reading's eps; entries without a finite interval keep their v08 cell; entries drawn independently. New verdict = CC's own
+#   detect.verdict_of(signature_from_cells(...)) on tables v08-rules. 4000 draws per point, numpy default_rng(937006).
+#   FLIP PREDICTED iff P(new verdict != v08 verdict) > 0.5; direction = the modal new verdict.
+# KNOWN WEAKNESS: s comes from the block interval, which UNDER-covers (0930 ARM M 0.79-0.94; batch A x2 pt 0.6 showed a block interval far too
+#   narrow) => chain spread is likely underestimated, so P(flip) here is a lower bound; independence across cells ignores shared chains.
+#
+# RESULT: 17 points, 1 flip predicted (0.40 REFUSE-SLOW -> NOT, refuse -> confident), 16 no flip. Two further points carry a small P (0.45, 0.90).
+
+schema = 1
+kind = "prediction"
+input = "k4-m1"
+old_tables = "v08-rules"
+new_tables = "v10-rules"
+rule = "flip iff P(verdict moves) > 0.5 under the s = width/3.45, half-width 1.0015 s, centre N(est, (1.067 s)^2) model above"
+
+[flip."k4-m1"]
+"0.30" = { flip = false, old = "NOT", new = "NOT", p_flip = 0.000, why = "needle ORD (d_ord ZERO! at [0,0]) and every pair cell far from a cut: off the window stays" }
+"0.35" = { flip = false, old = "NOT", new = "NOT", p_flip = 0.000, why = "d_ord SLOW+ 0.00039 vs eps 0.02: needle stays ORD, off the window stays" }
+"0.40" = { flip = true, old = "REFUSE-SLOW", new = "NOT", p_flip = 0.550, direction = "refuse -> confident (REFUSE-SLOW -> NOT)", why = "needle.velocity POS [0.00975, 0.01079], est 0.01034 = eps 0.01 + 1.1 s: the 0.58x interval (half-width 1.0 s) clears eps, SIG+ (flow FLOWING, needle MID->ORD) in 55 % of draws" }
+"0.45" = { flip = false, old = "REFUSE-SLOW", new = "REFUSE-SLOW", p_flip = 0.004, why = "across stays UNRES: pair 0.40->0.45 SIG+ [0.2500, 0.2757] sits on the eps 0.25 cut but SIG+/POS both read RELEVANT; LINE only if that pair falls inside eps (0.4 %)" }
+"0.50" = { flip = false, old = "LINE", new = "LINE", p_flip = 0.000, why = "pair cells SLOW-/ZERO! (across MARGINAL, stability STABLE) and velocity SLOW- all well inside eps: narrowing keeps them" }
+"0.55" = { flip = false, old = "LINE", new = "LINE", p_flip = 0.000, why = "pair cells ZERO!/SLOW-, velocity SLOW- -0.00122 vs eps 0.01: nothing near a verdict cut" }
+"0.60" = { flip = false, old = "LINE", new = "LINE", p_flip = 0.000, why = "pair cells SLOW-/ZERO!, velocity SLOW- -0.00075: nothing near a verdict cut" }
+"0.65" = { flip = false, old = "LINE", new = "LINE", p_flip = 0.000, why = "all pair cells ZERO!, velocity SLOW-: nothing near a verdict cut" }
+"0.70" = { flip = false, old = "LINE", new = "LINE", p_flip = 0.000, why = "all pair cells ZERO!, velocity SLOW-: nothing near a verdict cut" }
+"0.75" = { flip = false, old = "LINE", new = "LINE", p_flip = 0.000, why = "pair cells ZERO!/SLOW-, velocity SLOW- -0.0015: nothing near a verdict cut" }
+"0.80" = { flip = false, old = "LINE", new = "LINE", p_flip = 0.000, why = "pair cells ZERO!/SLOW+/SLOW-, velocity SLOW- -0.0017: nothing near a verdict cut" }
+"0.85" = { flip = false, old = "LINE", new = "LINE", p_flip = 0.000, why = "across pairs SLOW+/SLOW+ stay MARGINAL, velocity SLOW- -0.0034: nothing near a verdict cut" }
+"0.90" = { flip = false, old = "REFUSE-SLOW", new = "REFUSE-SLOW", p_flip = 0.002, why = "velocity SLOW- [-0.00995, -0.00898] est -0.00943 is 2 s inside the cut: SIG- (flow FLOWING -> NOT) only 0.2 %; across pair 0.90->0.95 SIG+ keeps UNRES" }
+"0.95" = { flip = false, old = "NOT", new = "NOT", p_flip = 0.000, why = "velocity SIG- -0.051 (5 eps), needle DIS: off the window stays" }
+"1.00" = { flip = false, old = "NOT", new = "NOT", p_flip = 0.000, why = "velocity SIG- -0.185, needle DIS: off the window stays" }
+"1.05" = { flip = false, old = "NOT", new = "NOT", p_flip = 0.000, why = "velocity SIG- -0.203, needle DIS: off the window stays" }
+"1.10" = { flip = false, old = "NOT", new = "NOT", p_flip = 0.000, why = "velocity SIG- -0.181, needle DIS: off the window stays" }
+
+[counts]
+points = 17
+flips_predicted = 1
+refuse_to_confident = 1      # 0.40 REFUSE-SLOW -> NOT
+confident_to_refuse = 0
+refuse_to_refuse = 0
+no_flip = 16
