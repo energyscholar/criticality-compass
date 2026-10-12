@@ -11,6 +11,7 @@ from pathlib import Path
 import numpy as np
 import formats
 import readout
+import reduce
 from transducer import chk_transducer
 from schema import ROOT, F, at, rel, _parsed, parse, load, row_lines, Ctx, unit_blocks, _SHA_ONCE, hashing_once, _sha, sha, MEASURE_SEEDED, import_closure, measure_hash, code_hash, code_cols, declared_cols  # noqa: F401  (moved by plan 0886; re-exported: the call sites keep `declare.<name>`)
 
@@ -175,7 +176,7 @@ def chk_cc(p, d, c, stem=None):
         if out:
             return out
     for n, v in {n: v for n, v in d.get("formats", {}).items() if isinstance(v, dict)}.items():   # a stack format's schema is data (plan 0873)
-        out += inalpha(p, f"formats.{n}", n, d["alphabets"]["formats"]) + shape(p, v, {"reduces": list, "dims": int, "dtypes": list, "readers": dict}, {"pip": dict}, pre=f"formats.{n}.")
+        out += inalpha(p, f"formats.{n}", n, d["alphabets"]["formats"]) + shape(p, v, {"reduces": list, "dims": int, "dtypes": list, "readers": dict}, {"pip": dict, "vacant": int, "values": list}, pre=f"formats.{n}.")
         out += [at(p, f"formats.{n}.readers", f"'{x}' is not a reader this code has", f"use one of: {' '.join(formats.READ)}")
                 for x in (v["readers"].values() if isinstance(v.get("readers"), dict) else []) if x not in formats.READ]
     b, keeps, discards = d["basic"], set(d["basic"].get("keeps", [])), set(d["basic"].get("discards", []))
@@ -454,13 +455,52 @@ def limited(p, d, c):
         "set [observable] level_floor = 1: the finest level carries the cell or instrument scale, not the system")
 
 
+def chk_windows(p, d, c):
+    """plan 0884 amendment 1 (Robin Q15/E382): [windows] cuts every stack of the input to ONE side at a declared origin (flag W). The input then has exactly that one size, and no size
+    relation exists on it: sub-windows of one field are a declared projection, never a Coupling."""
+    w = d.get("windows")
+    if w is None:
+        return []
+    out = shape(p, w, {"side": int, "origin": str, "discards": str}, pre="windows.")
+    if out:
+        return out
+    fm = d.get("data", {}).get("format")
+    out += inalpha(p, "windows.origin", w["origin"], c.alpha.get("window_origin", ()))
+    out += when(not formats.schemas(str(c.root)).get(fm, {}).get("reduces"), p, "windows", f"data.format '{fm}' is not a stack format, so there is nothing to cut", "delete [windows]")
+    out += when(d["axes"]["size"] != [w["side"]], p, "axes.size", f"a windowed input has the one size [windows].side = {w['side']}, not {d['axes']['size']}", f"write size = [{w['side']}]")
+    return out + [at(p, f"relations.{r}", "a windowed input has one window side, so no size relation exists (Robin Q15, E382)", f"delete [relations.{r}]")
+                  for r in ("size", "matched") if r in d.get("relations", {})]
+
+
+def geometry_reports(root, input_id=None):
+    """plan 0884 P2.7 (L8-d): one line per declared file of every windowed stack input: the count of 3x3 cells of the window holding an EVEN number of listed sites. A declared report,
+    not a verdict; it reads which sites are listed, never a moment. A file that cannot be read is named, never skipped (its refusal is a finding)."""
+    root, out = Path(root).resolve(), []
+    c = Ctx(root)
+    for mp in sorted((root / "inputs").glob("*/m.toml")):
+        m = load(mp, root)[0] or {}
+        if "windows" not in m or (input_id and m.get("id") != input_id):
+            continue
+        for b in m["data"]["files"]:
+            fp = c.data_root / b["path"]
+            try:
+                s = formats.read(m["data"]["format"], fp, next(iter(b["arrays"].values()))["key"], str(root), m["windows"])
+            except (OSError, ValueError) as e:
+                out.append(f"report: {m['id']} point {b['point']} {b['path']}: not readable ({e})")
+                continue
+            ev, n = reduce.even_cells(s[0] != 0, m["block_map"]["factor"])
+            out.append(f"report: {m['id']} point {b['point']} {Path(b['path']).name}: window {m['windows']['side']} x {m['windows']['side']} at {m['windows']['origin']}: "
+                       f"{ev} of {n} {m['block_map']['factor']}x{m['block_map']['factor']} cells hold an EVEN number of listed sites ({ev / n:.3f}); a declared report, not a verdict")
+    return out
+
+
 def chk_input(p, d, c, stem=None):
     todo = list(todos(p, d))
     if [t for t in todo if not t.loc.split(":", 1)[1].startswith("obtained")]:
         return todo   # a template still full of TODOs: report them, nothing else
     req = {"id": str, "instruments": list, "obtained": dict, "axes": dict, "interval": dict, "eps": dict,
            "kernel": dict, "data": dict}
-    out = header(p, d, "input") + shape(p, d, req, {k: dict for k in SIDECARS + ("relations",)})
+    out = header(p, d, "input") + shape(p, d, req, {k: dict for k in SIDECARS + ("relations", "windows")})
     out += id_check(p, "id", d.get("id"), stem, "its directory")
     out += [at(p, "instruments", f"'{i}' is not in the instrument registry", f"use one of: {' '.join(c.reg)}")
             for i in d.get("instruments", []) if i not in c.reg]
@@ -488,7 +528,7 @@ def chk_input(p, d, c, stem=None):
         out += when(not want and name in d, p, name, "table present but no declared instrument uses it",
                     f"delete [{name}], or declare the instrument")
         out += shape(p, d[name], SIDECAR_SHAPE[name], SIDECAR_OPT.get(name), pre=f"{name}.") if name in d else []
-    out += limited(p, d, c)
+    out += limited(p, d, c) + chk_windows(p, d, c)
     out += when("two_start" in d and isinstance(d["two_start"].get("unit_scale"), dict)
                 and sorted(d["two_start"]["unit_scale"]) != sorted(map(str, sz)), p, "two_start.unit_scale",
                 f"must declare a unit scale for every size {list(map(str, sz))}", "add the missing sizes, or remove the extra ones")

@@ -15,7 +15,8 @@ order_truth = ["CONTINUOUS", "FIRST-ORDER", "NONE"]   # a case's true order of t
 status = ["declared", "sampler-tested", "run", "in-signature-table"]    # ordered
 obtained = ["truth", "navigated", "observed"]   # how a point was obtained (m.toml [obtained])
 interior_rule = ["mid-run-open"]   # a family's `interior` as a declared rule (plan 0879): the MID run of the needle codes, open at a sink side
-formats = ["npz-v1", "npy-v1", "snapshots-v1", "image-stack-v1"]
+formats = ["npz-v1", "npy-v1", "snapshots-v1", "image-stack-v1", "island-table-v1"]
+window_origin = ["extent-min"]   # [windows] origin of an input (plan 0884): the window starts at the file's own minimum row and column; cc/windows.py ORIGINS holds one offset per name (a total table)
 limited = ["none", "assigned", "resolution-limited"]   # [block_map] limited: what the finest level is (plan 0873): a value that is not a measured site
 replay = ["locked", "all"]   # [check] replay (plan 0886): `locked` replays the inputs expected/<set>.toml names; `all` replays every input on disk
 interval_method = ["block", "iid", "gamma", "chains"]   # [interval] method of an input's m.toml (plan 0883: was a tuple in declare.py; plan 0878 adds "gamma"); each has a [interval_fields.<method>] table below
@@ -84,6 +85,16 @@ reduces = ["G", "GL"]
 dims = 3
 dtypes = ["uint8"]
 readers = { ".npy" = "numpy", ".tif" = "tifffile", ".tiff" = "tifffile" }
+
+# plan 0884: a table of islands, one row per island: row, col, then one +-1 moment per frame; (row, col) is the island's grid index and a site that is not listed is VACANT.
+# The reader builds s[frames, H, W] with H, W the file's own extents; `values` are the only moments a row may hold, `vacant` fills every unlisted site.
+[formats.island-table-v1]
+reduces = ["G", "GL"]
+dims = 3
+dtypes = ["int8"]
+readers = { ".csv" = "csv" }
+vacant = 0
+values = [-1, 1]
 
 # The transducer file inputs/<id>/transducer.toml (plan 0883; Q0): the sentences it must carry are DATA here, compared by equality.
 [transducer]

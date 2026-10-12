@@ -129,13 +129,13 @@ def reduced(m, path, key):
     """GL [N, levels]: a raw stack reduced through the input's declared [block_map] and [observable] (cc/reduce.py), cached under
     results/reduced/<input>/<sha>.npz; the name is the sha of (the raw file's sha, the code hash, the key, the map, the level count)."""
     root, bm, ob, fmt = schema.ROOT, m["block_map"], m["observable"], m["data"]["format"]
-    n = formats.levels_for(formats.shape_of(fmt, path, key, str(root))[1], ob["final_size"], bm["factor"])
+    n = formats.levels_for(formats.shape_of(fmt, path, key, str(root), m.get("windows"))[1], ob["final_size"], bm["factor"])
     if n is None:
         raise ValueError(f"{path}: L is not final_size * factor^k (bin/cc validate says so, with a Next line)")
-    name = hashlib.sha256("\0".join([schema.sha(path), schema.code_hash(root), key, bm["name"], str(n)]).encode()).hexdigest()
+    name = hashlib.sha256("\0".join([schema.sha(path), schema.code_hash(root), key, bm["name"], str(n), *[f"{k}={v}" for k, v in m.get("windows", {}).items()]]).encode()).hexdigest()   # plan 0884: a windowed input caches under its window too
     f = root / "results" / "reduced" / m["id"] / f"{name}.npz"
     if not f.is_file():
-        gl = np.array([reduce.snapshot(x, bm["name"], n) for x in formats.read(fmt, path, key, str(root))])
+        gl = np.array([reduce.snapshot(x, bm["name"], n) for x in formats.read(fmt, path, key, str(root), m.get("windows"))])
         f.parent.mkdir(parents=True, exist_ok=True)
         np.savez(f.with_suffix(".part.npz"), GL=gl)
         os.replace(f.with_suffix(".part.npz"), f)

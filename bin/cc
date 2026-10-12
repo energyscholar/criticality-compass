@@ -160,6 +160,8 @@ def cmd_validate(args):
     import declare
     found, n = declare.validate(ROOT, opt(args, "--input"), opt(args, "--tables"))
     print("\n".join(declare.fmt(f) for f in found))
+    for line in declare.geometry_reports(ROOT, opt(args, "--input")):
+        print(line)
     if "--advanced" in args:
         print("checked: " + ", ".join(f"{v} {k}" for k, v in sorted(n.items())))
     print(f"validate: {len(found)} findings" if found else "validate: clean")
