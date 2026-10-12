@@ -342,7 +342,12 @@ def rows_linearised(m, reg, blocks, pos, units, ctxs):
     for n, u, sz in units:
         inst, ctx = reg[n][0], ctxs[(n, sz)]
         arrays = {a: [blocks[pos[k]][1][a] for k in door.unit_keys(m, inst, u, sz)] for a in inst["arrays"]}
-        lin = door.linearise(reg[n][1].series(arrays, ctx), door.diff_step())
+        ser = reg[n][1].series(arrays, ctx)
+        flat = door.constant_primaries(ser)
+        if flat:   # plan 0973 F4: a primary with no variance is a degenerate declared array, refused here (never patched inside the linearisation)
+            raise refused(f"{n} unit {u}{'' if sz is None else f' size {sz}'}: primary {flat[0][1]} of file {flat[0][0]} has no variance over its {len(ser[flat[0][0]])} snapshots ({len(flat)} such primaries): "
+                          f"the Gamma-method has no fluctuation to propagate", "declare an array that varies, or read this input under a resampling interval method (block or iid)")
+        lin = door.linearise(ser, door.diff_step())
         acc[(n, u, sz)] = [reg[n][1].from_means(ms, ctx) for ms in door.linearise_plan(lin)]
         uctx[(n, u, sz)] = dataclasses.replace(ctx, lin=lin, component_shape=None if ctx.component_shape is None else (len(acc[(n, u, sz)]), ctx.n_size))
     return acc, uctx

@@ -212,15 +212,19 @@ class Lin:
     off: tuple
 
 
+def constant_primaries(ser):
+    """[(file index, primary index)] of every primary series with no variance (plan 0973 F4): such a series has no fluctuation to propagate, so a unit that has one is
+    refused at the door (detect.rows_linearised) and `linearise` receives only primaries with sd > 0."""
+    return [(i, q) for i, s in enumerate(ser) for q, sd in enumerate(s.std(axis=0)) if not sd > 0]
+
+
 def linearise(ser, step):
-    """The Lin of a unit from its per-file primary series. h = step * SE_naive, SE_naive = sd/sqrt(n) of each primary (step: cc.toml [interval_fields.gamma] diff_step,
-    small enough that a nonlinear stage such as ln stays in its linear range); a primary with no variance has no fluctuation to propagate, so its displacement is
-    any positive step (sqrt(eps) of its scale), never zero."""
+    """The Lin of a unit from its per-file primary series, every primary with sd > 0 (constant_primaries is empty). h = step * SE_naive, SE_naive = sd/sqrt(n) of each
+    primary (step: cc.toml [interval_fields.gamma] diff_step, small enough that a nonlinear stage such as ln stays in its linear range)."""
     mean = tuple(s.mean(axis=0) for s in ser)
     h = step * np.concatenate([s.std(axis=0) / np.sqrt(len(s)) for s in ser])
-    scale = np.concatenate([1 + np.abs(m) for m in mean])
     off = tuple(itertools.accumulate((s.shape[1] for s in ser), initial=0))[:-1]
-    return Lin(tuple(ser), mean, np.where(h > 0, h, np.sqrt(np.finfo(float).eps) * scale), off)
+    return Lin(tuple(ser), mean, h, off)
 
 
 def linearise_plan(lin):

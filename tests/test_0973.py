@@ -91,4 +91,20 @@ for tn in ("v02-rules", "v08-rules", "v10-rules"):
     check(f"F5 {tn}: with no cells every direct column reads NOT-MEASURED (no KeyError)", all(got[n] == "NOT-MEASURED" for n in direct), {n: got[n] for n in direct})
 
 
+# ---- F4: a primary with no variance is refused at the door; linearise holds only sd > 0 primaries
+good = np.arange(12.0).reshape(6, 2) ** 1.5
+flat = np.hstack([good[:, :1], np.full((6, 1), 3.0)])
+check("F4 constant_primaries names the (file, primary) with no variance", door.constant_primaries([good, flat]) == [(1, 1)], door.constant_primaries([good, flat]))
+check("F4 linearise on sd>0 primaries has h > 0 everywhere", bool((door.linearise([good], 0.001).h > 0).all()))
+class Mod:
+    series = staticmethod(lambda arrays, ctx: [flat])
+real_keys, door.unit_keys = door.unit_keys, lambda m, inst, u, sz: [0]
+try:
+    detect.rows_linearised({}, {"n": ({"arrays": ["G"]}, Mod)}, [(0, {"G": None})], {0: 0}, [("n", "a", None)], {("n", None): door.Ctx(level=0.95, eps={}, rel={}, method="gamma")})
+    check("F4 a unit with a constant primary is refused at the door (a typed refusal with a Next line)", False, "ran")
+except detect.Refused as e:
+    check("F4 a unit with a constant primary is refused at the door (a typed refusal with a Next line)", "has no variance" in str(e) and "Next:" in str(e), str(e))
+finally:
+    door.unit_keys = real_keys
+
 sys.exit(1 if bad else 0)
