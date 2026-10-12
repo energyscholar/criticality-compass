@@ -103,8 +103,18 @@ def run_tests(names, skip=()):
     return [done[t.stem] for t in picked], missing, allt   # the printed order is the checks.toml order, as before
 
 
+def tests_absent():
+    """The refusal text when a test checks.toml names is not on disk (a wheel carries only the tests the freeze gate names), else None."""
+    gone = [t for t in tomllib.loads((ROOT / "checks.toml").read_text())["roles"]["tests"] if not (ROOT / t).is_file()]
+    return (f"REFUSED: {len(gone)} of the tests checks.toml names are not in this workspace (first: {gone[0]}); an installed wheel carries only the tests a run needs.\n"
+            "  Next: run the tests from a clone: git clone <repository> && pip install -e <clone>") if gone else None
+
+
 def cmd_test(names):
     global VERBOSE
+    if (gone := tests_absent()):
+        print(gone)
+        return 1
     regold = "--regolden" in names
     os.environ["CC_REGOLDEN"] = "1" if regold else ""
     VERBOSE = "-v" in names or regold
@@ -216,6 +226,9 @@ def cmd_baseline():
 
 def cmd_check(args):
     import declare
+    if (gone := tests_absent()):
+        print(gone)
+        return 1
     if "--regolden" in args:
         print("check never regoldens.\n  Next: bin/cc test --regolden test_golden")
         return 1

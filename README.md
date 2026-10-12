@@ -44,7 +44,7 @@ Two places are never defaults, because a default would be one person's machine: 
 
 Other ways to install:
 
-- **A non-editable install** (`pip install .`, or a built wheel from `python3 -m build`) carries a copy of the workspace (`bin/`, `cc/`, `tables/`, `inputs/`, `cases/`, `results/`, ...) inside the package, so `compass validate`, `compass show` and `compass explain` work without a clone. Anything you write (`run`, `new`, `tables fork`) lands in that copy inside site-packages and is lost on reinstall; to author, use the editable install above. `compass --help` and `compass help` both print the help text; an unknown command exits non-zero.
+- **A non-editable install** (`pip install .`, or a built wheel from `python3 -m build`) carries a copy of the workspace (`bin/`, `cc/`, `tables/`, `inputs/`, `cases/`, `results/`, `data/`, `docs/`, `benchmark/`, ...) inside the package, so `compass validate`, `compass show`, `compass explain` and `compass tabulate` work without a clone (given the data root and the structure checker above). Of `tests/` it carries only the files `FROZEN.json` names, which the structure gate needs; `compass check` and `compass test` REFUSE there and say to use a clone. Anything you write (`run`, `new`, `tables fork`) lands in that copy inside site-packages and is lost on reinstall; to author, use the editable install above. `compass --help` and `compass help` both print the help text; an unknown command exits non-zero.
 - Python 3.11 is the minimum and works; 3.12 is the version most tested.
 
 ## The Rust kernel (optional)

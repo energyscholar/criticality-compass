@@ -7,6 +7,7 @@ recursive-include cases *
 recursive-include expected *
 recursive-include families *
 recursive-include fixtures *
+recursive-include data *
 recursive-include instruments *
 recursive-include results *
 recursive-include benchmark *

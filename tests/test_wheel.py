@@ -6,6 +6,7 @@ tests are the clone's. No file of the wheel names a home directory, a user's tre
 Builds a wheel (python -m pip wheel --no-deps --no-build-isolation) into a scratch directory; needs setuptools."""
 import json
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -25,10 +26,12 @@ def check(name, ok, why=""):
 
 with tempfile.TemporaryDirectory() as t:
     src = Path(t) / "src"
-    subprocess.run(["git", "-C", str(ROOT), "worktree", "list"], capture_output=True)   # (a clone or a worktree: both are read through git archive)
-    arc = subprocess.run(["git", "-C", str(ROOT), "archive", "--format=tar", "HEAD"], capture_output=True, check=True).stdout
     src.mkdir()
-    subprocess.run(["tar", "-x", "-C", str(src)], input=arc, check=True)
+    names = [n for n in subprocess.run(["git", "-C", str(ROOT), "ls-files", "-z"], capture_output=True, check=True).stdout.decode().split("\0") if n]
+    for n in names:   # the tracked files as they are in the working tree (a hook runs before the commit exists)
+        if (ROOT / n).is_file():
+            (src / n).parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(ROOT / n, src / n)
     r = subprocess.run([sys.executable, "-m", "pip", "wheel", "--no-deps", "--no-build-isolation", "-q", "-w", str(Path(t) / "dist"), str(src)], capture_output=True, text=True)
     wheels = sorted((Path(t) / "dist").glob("*.whl"))
     check("a wheel builds", r.returncode == 0 and len(wheels) == 1, r.stderr[-300:])
