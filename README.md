@@ -10,6 +10,8 @@ You do not need to read any code to use it. Start with the first hour below. `TU
 from data to verdict, `HOWTO.md` covers the weekly loop and the advanced commands, and `KERNEL-IN-CC.md`
 explains what the instruments compute.
 
+Licences: the code is Apache-2.0 (`LICENSE`, `NOTICE`); the data in `benchmark/` and `results/` are CC BY 4.0 (`DATA-LICENSE`).
+
 ## Glossary (14 terms)
 
 1. **input**: a directory `inputs/<id>/` holding `m.toml` (what was measured and how: Kernel V8's M) and `points.toml`.

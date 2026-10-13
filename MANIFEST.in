@@ -1,4 +1,4 @@
-include cc.toml checks.toml FROZEN.json CLAIMS.md HOWTO.md TUTORIAL.md KERNEL-IN-CC.md SIGNATURE-TABLE.md LICENSE NOTICE README.md
+include cc.toml checks.toml FROZEN.json CLAIMS.md HOWTO.md TUTORIAL.md KERNEL-IN-CC.md SIGNATURE-TABLE.md LICENSE NOTICE DATA-LICENSE README.md
 recursive-include bin *
 recursive-include cc *.py *.toml
 recursive-include tables *
