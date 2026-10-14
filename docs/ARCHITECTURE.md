@@ -76,7 +76,9 @@ transducer file), `resources.py` 36, `author.py` 363 (authoring).
    pins `tools/rust_samplers/src/lib.rs` at sha256 `ecc68f72...` (the source of the 2026-10-07 K4 build, `.so` `9a582823...`), while the chains the v10
    read used were written by a different build (`.so` `ec7e2fb6...`, the build behind the other Rust families). `ecc68f72...` is the baseline-commit version
    of that file (toolset commit `ea5bda5`); the current file is `19aecceb...` and the kernel source `discrete.rs` is unchanged between the two. The k4-m1 v10
-   record is kept as it was read.
+   record is kept as it was read. The `.so` `ec7e2fb619c947efdd92c7b6843066aff7a3458f56c7bf66d5962ffc1a648794` is not tied to a source sha: the chains' headers record the
+   `.so` sha256 only, never the `lib.rs` it was built from. `19aecceb...` (unchanged since 2026-10-09, before any of these chains) is the only candidate, but no build was
+   repeated to confirm it, so the source behind these k4-m1 chains is a candidate and not a proof.
 6. **SIGN** - `sign.sign(lo, hi, eps)`: the position of both interval ends among the cuts `-eps, 0, +eps` is one of 8
    cells SIG-, NEG, SLOW-, ZERO!, SLOW+, POS, SIG+, UNRES (UNRES = straddles 0 and a margin edge); eps from
    `m.toml [eps]` via the instrument's `[columns]`. Here `eps step 0.01: bL 2, bU 2 -> SLOW+`.
