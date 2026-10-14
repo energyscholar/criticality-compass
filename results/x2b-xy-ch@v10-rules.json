@@ -19,7 +19,7 @@
  },
  "read": {
   "inputs/x2b-xy-ch/m.toml": "d881594efd9dce283e770751def803b70bec588b7506943cc8b474201b875f83",
-  "inputs/x2b-xy-ch/transducer.toml": "37e861adc518f9083f17121c5810fbb8989ef627737011bae442e70f9ba6d4e1",
+  "inputs/x2b-xy-ch/transducer.toml": "6de44f328cb460f116d2581c825690521912920765676eb7768d494bc9b67d89",
   "instruments/needle.toml": "03c8e390df85cdcef367ecba33043ebf9e0445c30f27fa626242a87387fb3ef0",
   "instruments/across.toml": "8f6803e8af6cd80d4f7bb69b1be8148cf5eb8742892caf5f3f8392f38b3c0944",
   "instruments/stability.toml": "2fc7bb21b58a2d6eceab15ca62424aadedd309eb1f9dd6125bdee57d52588170",
