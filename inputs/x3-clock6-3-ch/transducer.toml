@@ -1,0 +1,24 @@
+# inputs/x3-clock6-3-ch/transducer.toml - the transducer file (plan 0883, Q0): the sampler, what the per-locus mean keeps and discards, the interval's role.
+schema = 1
+kind = "transducer"
+id = "x3-clock6-3-ch"
+
+[transducer]
+model = "2D 6-state clock, embedded-Ising reflection on the 6 clock axes"
+update = ["tools/rust_samplers/src/lib.rs sha256 19aecceb656f0903e56ff699e893ee241a3a231beb3a9a45033dbb43b2720715", "tools/rust_samplers/src/discrete.rs sha256 82a68d5b20c12c6bc6868b530f774ecfe8bb5a71dd17cf072f30b84cd035a965", "tools/lattice_clock.py sha256 009b7f1e391739aaafcecd372eea2066b8d1f02203c6f25ffdd46755c985fb17", "tools/scale3.py sha256 3c90f12e00646113999aa4d591781e9f8105e70ee4bb0f9bc6434795410e66e4", "tools/scale_xy.py sha256 d520fd2d5ddd2bd0c40c3f0c6de2a6aac8dfd8f407c0df1e56381cb8faf464c7"]
+inputs = "chains: tools/0937_gen2.py (sha256 f8756f3d37d42569ebe67469017aba05fa283da14dd91138030e880be4be418b) + tools/0937_gen.py (sha256 e63e012793cea5351bc8c217fb9b1a5f213d34178a82136804ce2db4b5b269e2, rng_of/FAMILIES) and data/cc-chains-0937/MANIFEST-t2.tsv (sha256 7050c69a92e840479872a33cc7568dbcf6b3d7c5cc1022ae06784bee533f7b08); m.toml [0937.chains] (root_0937C, spawn keys); points, sizes, starts, N, burn, skip = the parent's: m.toml [X3] · studies/X3/simulate.py"
+output = "one configuration per recorded sweep; each configuration is one observation; the recorded sequence is NOT a process sequence (Phase 1 only)"
+
+[reduction]
+name = "per-locus mean of the declared observable over the declared configurations"
+keeps = "the typical value of the observable at the locus (one point, one size, one start)"
+discards = "the configuration-to-configuration variation and the order of the configurations"
+
+[interval]
+role = "projection C: places the reading's sign cell against its declared margin; never an operator input"
+keeps = "the position of the interval ends among the cuts -eps, 0, +eps"
+discards = "the shape of the resampled distribution"
+
+[provenance_note]
+declared_after = []
+note = "the 420 chain files of this input were produced by: Rust discrete_sweeps_rs kind 0 (states) + numpy observables (the sampler string recorded in each chain's .rec.json header and in the chain manifest row); compiled module rust_samplers.so sha256 ec7e2fb619c947efdd92c7b6843066aff7a3458f56c7bf66d5962ffc1a648794 (rec.json rust_so_sha256), states from the Rust kernel, observables from the numpy reducers; the parent's transducer pinned tools/lattice_clock.py (replaced here by the producers listed in update); data is not in git, pinned by fixtures/data/x3-clock6-3-ch.toml; plan 0937 amendment 9"

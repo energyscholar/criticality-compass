@@ -1,0 +1,24 @@
+# inputs/x5n-bilayer-3-ch/transducer.toml - the transducer file (plan 0883, Q0): the sampler, what the per-locus mean keeps and discards, the interval's role.
+schema = 1
+kind = "transducer"
+id = "x5n-bilayer-3-ch"
+
+[transducer]
+model = "as x5-bilayer; points navigated (flag N)"
+update = ["tools/lattice_bilayer2_e.py sha256 534d252399be05e61de4902e4ec6df543e526f8dce58cad436f325fd774cfc2a", "tools/sw_graph.py sha256 53d666833726440c9f4df4605ca55682eb78de769410fa7bf91398a9abec939a", "tools/scale.py sha256 1dff330d804d067e26f8c6c7dbe86739f0ee75635e5d1661f163d01bcf908f2b", "tools/flow.py sha256 5f5b225a2cbc49bf2eef8c2168a2059620476c304fe71524eb687b12e1b9cae7"]
+inputs = "chains: tools/0937_gen2.py (sha256 f8756f3d37d42569ebe67469017aba05fa283da14dd91138030e880be4be418b) + tools/0937_gen.py (sha256 e63e012793cea5351bc8c217fb9b1a5f213d34178a82136804ce2db4b5b269e2, rng_of/FAMILIES) and data/cc-chains-0937/MANIFEST-t2.tsv (sha256 7050c69a92e840479872a33cc7568dbcf6b3d7c5cc1022ae06784bee533f7b08); m.toml [0937.chains] (root_0937C, spawn keys); points, sizes, starts, N, burn, skip = the parent's: m.toml [X5n] · studies/X5/navigate3.py → the frozen studies/X5/simulate.py"
+output = "one configuration per recorded sweep; each configuration is one observation; the recorded sequence is NOT a process sequence (Phase 1 only)"
+
+[reduction]
+name = "per-locus mean of the declared observable over the declared configurations"
+keeps = "the typical value of the observable at the locus (one point, one size, one start)"
+discards = "the configuration-to-configuration variation and the order of the configurations"
+
+[interval]
+role = "projection C: places the reading's sign cell against its declared margin; never an operator input"
+keeps = "the position of the interval ends among the cuts -eps, 0, +eps"
+discards = "the shape of the resampled distribution"
+
+[provenance_note]
+declared_after = []
+note = "the 180 chain files of this input were produced by: tools/lattice_bilayer2_e.py (Tier E exact) (the sampler string recorded in each chain's .rec.json header and in the chain manifest row); the parent's transducer pinned tools/lattice_bilayer2.py (replaced here by the producers listed in update); data is not in git, pinned by fixtures/data/x5n-bilayer-3-ch.toml; plan 0937 amendment 9"

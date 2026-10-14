@@ -1,0 +1,8 @@
+# inputs/x4-ising-field-ch/couplings.toml (plan 0870 P1) - the sampler's free parameters, declared from the Hamiltonian (never from the answer),
+# and which of them the per-point instruments probe. Ising in a field: K and the field h; across probes K (beta), E is h-even.
+# validate checks `names` against the scalars the data files store (minus the size key L) and `probes` against names.
+schema = 1
+kind = "couplings"
+id = "x4-ising-field-ch"
+names = ["K", "h"]
+probes = ["K"]

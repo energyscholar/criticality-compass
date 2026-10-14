@@ -1,0 +1,19 @@
+schema = 1
+kind = "transducer"
+id = "k4-m1-ch"
+[transducer]
+model = "2D 8-state clock model on the square lattice, H = -sum cos(theta_i - theta_j), theta = 2 pi k / 8, k in [0, 8), periodic SIMULATED lattice (the periodicity is the sampler's, not a declared relation)"
+update = ["tools/lattice_clock.py sha256 009b7f1e391739aaafcecd372eea2066b8d1f02203c6f25ffdd46755c985fb17", "tools/rust_samplers/src/lib.rs sha256 ecc68f72b5c8a455f3dbcf74ab049c4fc5e8d84a70ce22fbe450e5a3e1216752"]
+inputs = "toolset m.toml [K4] and studies/K4/simulate.py: T in {0.30, ..., 1.10} step 0.05 (17 points), L in {27, 81, 243}, random start N 200000 and ordered start (all k = 0) N 32000 at every T, skip 2, burn 1000, seeds 11000 + 10 (T index) + (L index) [+500 ordered]; the study applied the plurality3 block map (tools/scale3.py, own rng stream seed + 50) and g1_xy per level before storing G"
+output = "one configuration per recorded sweep; each configuration is one observation; the recorded sequence is NOT a process sequence (Phase 1 only)"
+[reduction]
+name = "per-locus mean of the declared observable over the declared configurations"
+keeps = "the typical value of the observable at the locus (one point, one size, one start)"
+discards = "the configuration-to-configuration variation and the order of the configurations"
+[interval]
+role = "projection C: places the reading's sign cell against its declared margin; never an operator input"
+keeps = "the position of the interval ends among the cuts -eps, 0, +eps"
+discards = "the shape of the resampled distribution"
+[provenance_note]
+declared_after = []
+note = "declared from birth (plan 0883); points.toml joins no case until results/K4-score.txt exists in the toolset"

@@ -1,0 +1,11 @@
+# inputs/x2-xy-line-ch/points.toml - the point -> case JOIN (taxonomy; never frozen)
+schema = 1
+kind = "points"
+input = "x2-xy-line-ch"
+
+[points]
+"0.5" = "xy-low-phase"
+"0.6" = "xy-low-phase"
+"0.7" = "xy-low-phase"
+"0.89294" = "xy-tkt"
+"1.1" = "none"

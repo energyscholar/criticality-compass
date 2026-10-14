@@ -1,0 +1,16 @@
+# inputs/x8-ising-needle-ch/points.toml - the point -> case JOIN (taxonomy; NEVER frozen;
+# read only by tabulate and the full validate)
+schema = 1
+kind = "points"
+input = "x8-ising-needle-ch"
+
+[points]
+"0.90" = "ising-off-critical"
+"0.95" = "ising-off-critical"
+"0.98" = "ising-off-critical"
+"0.99" = "ising-off-critical"
+"1.00" = "ising-2d"
+"1.01" = "ising-off-critical"
+"1.02" = "ising-off-critical"
+"1.05" = "ising-off-critical"
+"1.10" = "ising-off-critical"

@@ -1,0 +1,9 @@
+# inputs/x5n-bilayer-ch/points.toml - the point -> case JOIN (taxonomy; never frozen)
+schema = 1
+kind = "points"
+input = "x5n-bilayer-ch"
+
+[points]
+"0.0" = "coupled-ising-bilinear"
+"0.1" = "coupled-ising-bilinear"
+"0.3" = "coupled-ising-bilinear"

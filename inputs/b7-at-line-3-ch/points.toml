@@ -1,0 +1,11 @@
+# inputs/b7-at-line-3-ch/points.toml - the point -> case JOIN (taxonomy; never frozen)
+schema = 1
+kind = "points"
+input = "b7-at-line-3-ch"
+
+[points]
+"0.0" = "at-self-dual-line"
+"0.07" = "at-self-dual-line"
+"0.14" = "at-self-dual-line"
+"0.21" = "at-self-dual-line"
+"0.2747" = "at-self-dual-line"

@@ -1,0 +1,24 @@
+# inputs/x2-xy-line-3-ch/transducer.toml - the transducer file (plan 0883, Q0): the sampler, what the per-locus mean keeps and discards, the interval's role.
+schema = 1
+kind = "transducer"
+id = "x2-xy-line-3-ch"
+
+[transducer]
+model = "2D XY, embedded-Ising all-clusters update, periodic SIMULATED lattice"
+update = ["tools/lattice_xy_e.py sha256 575763e76289832719b5cddae3dc6fe51b2fe591f67450c8247b8516d3271580", "tools/sw_graph.py sha256 53d666833726440c9f4df4605ca55682eb78de769410fa7bf91398a9abec939a", "tools/lattice_xy.py sha256 7fd3f80a26232340dbf92ac4baae657b388d344434326d872a99bd616520a70d", "tools/scale_xy.py sha256 d520fd2d5ddd2bd0c40c3f0c6de2a6aac8dfd8f407c0df1e56381cb8faf464c7"]
+inputs = "chains: tools/0937_gen2.py (sha256 f8756f3d37d42569ebe67469017aba05fa283da14dd91138030e880be4be418b) + tools/0937_gen.py (sha256 e63e012793cea5351bc8c217fb9b1a5f213d34178a82136804ce2db4b5b269e2, rng_of/FAMILIES) and data/cc-chains-0937/MANIFEST-t2.tsv (sha256 7050c69a92e840479872a33cc7568dbcf6b3d7c5cc1022ae06784bee533f7b08); m.toml [0937.chains] (root_0937C, spawn keys); points, sizes, starts, N, burn, skip = the parent's: m.toml [X2] · studies/X2/simulate.py"
+output = "one configuration per recorded sweep; each configuration is one observation; the recorded sequence is NOT a process sequence (Phase 1 only)"
+
+[reduction]
+name = "per-locus mean of the declared observable over the declared configurations"
+keeps = "the typical value of the observable at the locus (one point, one size, one start)"
+discards = "the configuration-to-configuration variation and the order of the configurations"
+
+[interval]
+role = "projection C: places the reading's sign cell against its declared margin; never an operator input"
+keeps = "the position of the interval ends among the cuts -eps, 0, +eps"
+discards = "the shape of the resampled distribution"
+
+[provenance_note]
+declared_after = []
+note = "the 300 chain files of this input were produced by: tools/lattice_xy_e.py (Tier E exact, byte-identical to lattice_xy.py) (the sampler string recorded in each chain's .rec.json header and in the chain manifest row); the parent's transducer pinned tools/lattice_xy.py (replaced here by the producers listed in update); data is not in git, pinned by fixtures/data/x2-xy-line-3-ch.toml; plan 0937 amendment 9"

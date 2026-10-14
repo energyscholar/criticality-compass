@@ -1,0 +1,24 @@
+# inputs/x2b-xy-3-ch/transducer.toml - the transducer file (plan 0883, Q0): the sampler, what the per-locus mean keeps and discards, the interval's role.
+schema = 1
+kind = "transducer"
+id = "x2b-xy-3-ch"
+
+[transducer]
+model = "2D XY as [X2], finer grid, both starts"
+update = ["tools/rust_samplers/src/lib.rs sha256 19aecceb656f0903e56ff699e893ee241a3a231beb3a9a45033dbb43b2720715", "tools/lattice_xy.py sha256 7fd3f80a26232340dbf92ac4baae657b388d344434326d872a99bd616520a70d", "tools/scale_xy.py sha256 d520fd2d5ddd2bd0c40c3f0c6de2a6aac8dfd8f407c0df1e56381cb8faf464c7"]
+inputs = "tools/0937_gen_x2b_rs.py (sha256 6891d74a1c2a8df7b29b9c4f0453104196b4eff151f694dff35fd8b2de352321) and data/manifests/x2b-rs-MANIFEST.tsv (sha256 d5aca7ea0d45f8afb0059acb76d0c0f15b10a813660e9c8feca41f274f17e606) for the chains; m.toml [0937-X2B-RUST-REPIN]; N, burn, skip, points, sizes, starts = the parent's (studies/X2b/simulate.py sha256 b0090e0d5310f4ef95ebe712e8764a3afad94c9235b7e05887fc45df2d502024)"
+output = "one configuration per recorded sweep; each configuration is one observation; the recorded sequence is NOT a process sequence (Phase 1 only)"
+
+[reduction]
+name = "per-locus mean of the declared observable over the declared configurations"
+keeps = "the typical value of the observable at the locus (one point, one size, one start)"
+discards = "the configuration-to-configuration variation and the order of the configurations"
+
+[interval]
+role = "projection C: places the reading's sign cell against its declared margin; never an operator input"
+keeps = "the position of the interval ends among the cuts -eps, 0, +eps"
+discards = "the shape of the resampled distribution"
+
+[provenance_note]
+declared_after = []
+note = "chains generated 2026-10-11..13 on Porchlight by the Rust XY kernel (states) + the numpy reducer (observables) per m.toml [0937-X2B-RUST-REPIN]; compiled module rust_samplers.so sha256 ec7e2fb619c947efdd92c7b6843066aff7a3458f56c7bf66d5962ffc1a648794; per chain: u64 = SeedSequence(entropy=int(root_0937C), spawn_key=(7, point_index, size_index, start_index, chain)).generate_state(1, uint64)[0]; Generator(PCG64(u64)); start angles = rng.uniform; burn = one xy_sweeps_rs call; each snapshot = one xy_sweeps_rs call of skip sweeps; each call's seed = rng.integers(0, 2**62) (x2b_call_stream, ARGUS RULED 2026-10-11); the parent's Python chain (tools/lattice_xy.py as sampler) is NOT among these; data is not in git, pinned by fixtures/data/x2b-xy-3-ch.toml"

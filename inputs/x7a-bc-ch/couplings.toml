@@ -1,0 +1,8 @@
+# inputs/x7a-bc-ch/couplings.toml (plan 0870 P1) - the sampler's free parameters, declared from the Hamiltonian (never from the answer),
+# and which of them the per-point instruments probe. Blume-Capel sweep: K and delta; the input declares no across.
+# validate checks `names` against the scalars the data files store (minus the size key L) and `probes` against names.
+schema = 1
+kind = "couplings"
+id = "x7a-bc-ch"
+names = ["K", "delta"]
+probes = []

@@ -1,0 +1,24 @@
+# inputs/x4s-stack-ch/transducer.toml - the transducer file (plan 0883, Q0): the sampler, what the per-locus mean keeps and discards, the interval's role.
+schema = 1
+kind = "transducer"
+id = "x4s-stack-ch"
+
+[transducer]
+model = "as [X4] at (0.46, 0), raw snapshots S[N, L, L] saved"
+update = ["tools/lattice_field.py sha256 4162eb36e9e8f34fec82461e319beebd8bb2099bd533df5ef4a5859584cbb465", "tools/scale.py sha256 1dff330d804d067e26f8c6c7dbe86739f0ee75635e5d1661f163d01bcf908f2b", "tools/flow.py sha256 5f5b225a2cbc49bf2eef8c2168a2059620476c304fe71524eb687b12e1b9cae7"]
+inputs = "chains: tools/0937_gen.py (sha256 e63e012793cea5351bc8c217fb9b1a5f213d34178a82136804ce2db4b5b269e2) and data/cc-chains-0937/MANIFEST.tsv (sha256 b74a41516567da7a5df839db0dce3d4149cb8e51cfd9ab404b2f68ad77446d5b); m.toml [0937.chains] (root_0937C, spawn keys); points, sizes, starts, N, burn, skip = the parent's: m.toml [X4s] · studies/X4s/simulate.py (sha256 d83c2636cce05ab1ef2f4c4172fe94aa9b20621fdfda73aebffb1aee5467fdbb)"
+output = "one configuration per recorded sweep; each configuration is one observation; the recorded sequence is NOT a process sequence (Phase 1 only)"
+
+[reduction]
+name = "per-locus mean of the declared observable over the declared configurations"
+keeps = "the typical value of the observable at the locus (one point, one size, one start)"
+discards = "the configuration-to-configuration variation and the order of the configurations"
+
+[interval]
+role = "projection C: places the reading's sign cell against its declared margin; never an operator input"
+keeps = "the position of the interval ends among the cuts -eps, 0, +eps"
+discards = "the shape of the resampled distribution"
+
+[provenance_note]
+declared_after = []
+note = "the 30 chain files of this input were produced by: tools/lattice_field.py (frozen python heat bath, exact) (the sampler string recorded in each chain's .rec.json header and in the chain manifest row); the parent's transducer pinned tools/lattice_field.py (replaced here by the producers listed in update); data is not in git, pinned by fixtures/data/x4s-stack-ch.toml; plan 0937 amendment 9 | parent note: driver and data/x4s NOT in FROZEN.json (pinned by CC); output is the RAW snapshot stack — CC applies the declared [block_map] itself (cc/reduce.py)"

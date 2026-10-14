@@ -1,0 +1,1417 @@
+{
+ "schema": 1,
+ "kind": "result",
+ "run_id": "x5-bilayer-2-ch@v10-rules",
+ "input": "x5-bilayer-2-ch",
+ "tables": "v10-rules",
+ "derived_from": null,
+ "code_commit": "none",
+ "code_hash": "7abd3323d09dd6c797dfdfca2139bbe14a1efa09c5aa51541958d0ad02c9a9fc",
+ "measure_hash": "13fcddddc1cf8ea8301d66d4478c1898448a983d40057b7319f322f2d67e47c5",
+ "data_root_source": "env",
+ "peak_rss_mb": 242.7,
+ "interval": {
+  "method": "chains",
+  "m": 10,
+  "r": 2,
+  "alpha": 0.021484375,
+  "chain_root": "root_0937C"
+ },
+ "read": {
+  "inputs/x5-bilayer-2-ch/m.toml": "16c228cd3374e28eb1c600f68f6a7c1d7cf7ffdaff98bb4e98954d4eaa228f99",
+  "inputs/x5-bilayer-2-ch/transducer.toml": "59ad1da1c0fb93770c16e64e3c6c9b8f2554f7f983165ab8ef08948c24e9159e",
+  "instruments/needle.toml": "03c8e390df85cdcef367ecba33043ebf9e0445c30f27fa626242a87387fb3ef0",
+  "instruments/across.toml": "8f6803e8af6cd80d4f7bb69b1be8148cf5eb8742892caf5f3f8392f38b3c0944",
+  "instruments/stability.toml": "2fc7bb21b58a2d6eceab15ca62424aadedd309eb1f9dd6125bdee57d52588170",
+  "instruments/two_start.toml": "30503b8a483a80faa442f419d04edc10a9498b56fb24c68554fa643c8679fa38",
+  "instruments/fluct.toml": "b9eee16fe05f430f982509db3d583201aa396e4d0470c0180a67439748cee423",
+  "tables/v10-rules/codes.toml": "a045e84792c673a48208a6294e40123de0be7d7849ffbe8472fe1fd03a88ac2a",
+  "tables/v10-rules/verdict.toml": "46cf560d114b251e4605e20b7f01962ab7899d2d4731651ed1ea62921794bbe6",
+  "tables/v10-rules/geometry.toml": "573216ddc8df5b005874486cf5c42f2cc0fe8281aa0762de922262ac9a4693ed",
+  "tables/v10-rules/probe.toml": "38a288f312a29c0a4abe3b0f93a9294d5a0e4e96cabe6b6e930bc1a1e1f6b076",
+  "tables/v10-rules/order.toml": "ab789dc52e449c1e46ce382630894247d40d0b199ddd7724a872519f1eaf5978",
+  "tables/v10-rules/compose.toml": "3c1b72137520285fe5bc96a76db9fc695d7ac3d552a619d7b9bccb8640a59957",
+  "tables/v10-rules/interval.toml": "37891d7a26bb5194d67759642e00734a10cbb79564d0af9cac621b1cf743fcc3",
+  "fixtures/data/x5-bilayer-2-ch.toml": "ae05f948773c3724868e8f47ae3cfdbe7915a160434db63c2e386f91b24b00bd",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L27_s0_c0.npz": "df208880bacdf20984436bc69abdcdc0a63f96fadd64de812902b02c36e4cdb8",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L27_s0_c1.npz": "5880eaa2d84145330f8d039f9a4ba0f3a779b1fa0837b761a511a3e88dbcecbb",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L27_s0_c2.npz": "0ecf9b771e15e8e2982c3325443ff8c868d5f739674e952cbaffbcaccab413a4",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L27_s0_c3.npz": "648be89fb3024dbdb3d753d3a879834bc19e646b459bdc00f7d74da8ce8e7276",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L27_s0_c4.npz": "08b9b5c1742ec0c273507e7844469e6869cefe9a6cbc76f4501ca98df3392558",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L27_s0_c5.npz": "1c9112bd90a85bda1075474edd34e7e07b7bbbdeb604ed517934a7f65c1779f8",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L27_s0_c6.npz": "55d70ea51e426857a9150e560d7a2584699a8f844285e5c26e40408ff6400c38",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L27_s0_c7.npz": "6d07d8c106c493fda717943a70ba246b630302cfdf3727a56980d92cc7d479d0",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L27_s0_c8.npz": "83cea4e8f723a684a8fb91d423920dba5b0448e8b347e73a1fd51d9d027055d5",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L27_s0_c9.npz": "c98059467cb64e8e3b3dd03f4657f237242eea5faa3a2d9317a24e050a4bf6d6",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L27_s1_c0.npz": "172d1a5049df47cc47a91bfe7188ad1db40a5dd9188f6971e739db81b4b78f0b",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L27_s1_c1.npz": "65c72320d207fb5244a1360a6bd56eabe6b0918a2e1fbf2ad3f864b8837fae29",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L27_s1_c2.npz": "872fc0da68474a93f709cff6a85a2029af80528cb0dd59e88b043684dde107d7",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L27_s1_c3.npz": "e7b2fad89fe1ac817e35083e2f02c789bc795a30766c6ab632694a28b5aa087d",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L27_s1_c4.npz": "b097d197f7c292cb549f130a4a4bff5b7f83c9921ba3d2b8ae9e1c8fdec0e4f6",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L27_s1_c5.npz": "b568584adc371359597189262ffafae611e0753018e2563a26412e62d17de120",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L27_s1_c6.npz": "04a334980df38da4fec4486b036ed93d397c205fb7318c467389e78151e9fffb",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L27_s1_c7.npz": "6b28adf68dd91b278e4e81e90aac8c32c50135a55c65bce3b90ea423b1fab686",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L27_s1_c8.npz": "044969eb014cfc0db0e8336f0be735ce599074000a53dae2ee009c0460a5f5fb",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L27_s1_c9.npz": "f9e581b0b014926da505e1764c0842dc9e58c521b37d173cdd8a8c9501497f8a",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L81_s0_c0.npz": "01446a636d9e2ddf005a265b7bae023df3d46186fb05b8b99019839f69de82ec",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L81_s0_c1.npz": "6e2b857d1bd6314696a77a37683e6884024a8915d8e290cd73ab826c858b68fb",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L81_s0_c2.npz": "8e460ed51a58caf90864ee9d7fd7f3d864e299da66ee13de55dfd497faa706b5",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L81_s0_c3.npz": "6fc8df8437a7172642fbde944a06f0f7ee3d9090e6e91c1f82642c6c30a82b2a",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L81_s0_c4.npz": "7a48d15dd7837bcc689eaa7b00c510ff0f47b83c56eed08dc416a5d3637e9c9e",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L81_s0_c5.npz": "a7bf86a20a734c15b49d846012f0f57ffcbd4ef0e5354eca62ad9dda7c648a28",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L81_s0_c6.npz": "caecdfa8f63c6d9d76e959b79ef33c60cf6d49a83f1f149f7233e9639b35aba1",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L81_s0_c7.npz": "f10c71b3678de7d06ddf28356b684cb063652e99d316df904030a58321af9800",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L81_s0_c8.npz": "bdf13cb7711db09553e99c43f9e5b5771b215d031c26e500673c575e2b710ab6",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L81_s0_c9.npz": "0445ab319ed4d312c5cc35464ee92178cdb09cf7ac763358fd08bbf3745d7602",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L81_s1_c0.npz": "91928f64df2662507e8702cd2ae994006f242c3fa6c509bf59bc21b5d3a8d9b8",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L81_s1_c1.npz": "6e4a7b466a8fe87aaae994fd8774e94876e3b063d8d67bbc7c4decfd2f9c77a6",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L81_s1_c2.npz": "45061d2c929e94666b04f32efdc6c11591905022e01a86ab16baacdfbf12f6cc",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L81_s1_c3.npz": "202775a79d777c4a367ed0bf82a44ccf240db93ad542bc23d9a08f0cd3152feb",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L81_s1_c4.npz": "010eca5268388260e2cd448dfb290f66e37fa4c567b2e611e04da2118ad26d4e",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L81_s1_c5.npz": "325f4dfa0cf019a9565bab2e09d67b7561f44ac849f56dd5c96048782ec28db0",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L81_s1_c6.npz": "bfbea107a2844231cc93dcb4a6891c1331bfddcb8b6780d430a5b7b61b951052",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L81_s1_c7.npz": "ae72768b819d437fceb7ebd0a8981af4fa6558644bedb8b2be19880d2d0ac3c8",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L81_s1_c8.npz": "af6c6cbc3a2be53c4309ced78ec1d713bf8ee772a700b0b8c171f671c7cbb4ab",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L81_s1_c9.npz": "7ebaa84a00a17ab33f0ae742a159bf5bed6e7cdc69fe8b8025b312b9ad30c46e",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L243_s0_c0.npz": "f4169019a40fed5cc8b216db883f9cfa146746fbbba6a38e59e4744b352b1fe3",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L243_s0_c1.npz": "6372f986dc8c9df0339678395a00ea93524d7da1dfbae68b280405cdf2f4d9de",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L243_s0_c2.npz": "040a2bca8919c139d359e248b982d9a792d43176f2332b0e3259aec4beb9b8d3",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L243_s0_c3.npz": "e5516991f8745e2a1494d8a186d3d9c1c6315e93ae47598b28f37dd34e23e3d3",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L243_s0_c4.npz": "2e7f48db10f6ad3a47993e910af2c09b645c790f76da51812cb4dafa3b8e46d2",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L243_s0_c5.npz": "f6d1cebc4f571ed0c7370a5d0ecdfa95a623a971eb1bd0b33210b9df475f744e",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L243_s0_c6.npz": "4aec4ec11815a3148f27df46b40d2ee48793722a4db8898439c4f87130f6c705",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L243_s0_c7.npz": "5455ff7c73666f1d1063be87c338d5da226cfeaefa34042e172944961abba509",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L243_s0_c8.npz": "f477c7856a3f3b587438a70501a38cae798b92a0d07beda51afe25ce95a8f773",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L243_s0_c9.npz": "a60be9e47c391c82efa6c2c4249c1afebe440899ec128c1bba7f40d70569406b",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L243_s1_c0.npz": "395750a6a7b8d284603c4d6dd6b9860d5d70e57401960c05856ec9839b336f97",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L243_s1_c1.npz": "01470b8efa3d0f40cc06e81ebae32bee41682495410b4f7a8c0ac192925d10d3",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L243_s1_c2.npz": "39a3f85ccb4124700e137821c64f2f993e72fcfc42003a50e5510fa443ab8438",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L243_s1_c3.npz": "ddf6522fa6e151c37c006a0de886240367aa96cb64ece494611cd5039ddafb89",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L243_s1_c4.npz": "e53a8eb16a91c6605f1afc0a5febeebe5597da439e816b040f682e8a82363b69",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L243_s1_c5.npz": "5bc2d6c96ebd21dd15f8318b3d78ef32e3c7773ae9ff3271b0eedfc4f61dfdb1",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L243_s1_c6.npz": "110abfd5f53a7cd5ff404abd1721ea362eaf67755903a0f6a58d879790529c52",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L243_s1_c7.npz": "321ff19f850c55ad8df0ef29b5f4856876faf9d7598e944ee14aa3ba4adad004",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L243_s1_c8.npz": "865e42be3deb75e59b63b2b7c73cf7f5e3d28a2c2d206b60e4cdb4814a1c0a8b",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p0_L243_s1_c9.npz": "c325b8d5313c7e759535dac3cc9b1e8e77775b2b63288989f89b7f8f98962367",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L27_s0_c0.npz": "ab516b2a623d257d91f17b24cfa209c75019c1bd62d59e750084c455093df9b2",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L27_s0_c1.npz": "fe577c9f306c00401cb1e1fd6a9c769f21d89cd3f07b2c98fd7c70e0f6f44f21",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L27_s0_c2.npz": "0377b386ae195e4d9fe85090f9840d49e2cf1e14a54370485e313d40bcf7c346",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L27_s0_c3.npz": "bc05b46e70b45a9d25cf0e9c57ab0e7908b710c10b12794ccb2b5ac9c91f096b",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L27_s0_c4.npz": "9302f58a4a43e751cf671772b4d7a8ea2b9d5c9c9d86b30faf36e54acbc9834f",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L27_s0_c5.npz": "ebdb7e414bedd46c02464b7aa344f5fbec98484f1c14a7d615507a8aaf4bc600",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L27_s0_c6.npz": "5afdee0b2ea4c633236f82770aea3c48c7dac49700bd1ce8613c42a4ac286260",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L27_s0_c7.npz": "e1347d344bc981ff9f2fb2cc739a6f3f371b4ee9305172ea266bf675f490a987",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L27_s0_c8.npz": "a5d69771493c03fa39ca2dc76b249abfaed280b9e42931c9141c179b3a2b34c1",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L27_s0_c9.npz": "fa66db5dec4924eb4ecbf8b843e1d363ad867ffaf72968175a5dc1bab22076e3",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L27_s1_c0.npz": "c117aac36e7b556647a434b7771c1d198ed182387ef62fc498cde711da96cdc0",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L27_s1_c1.npz": "cd9124dd0ce1cf633f766f7ade7926656fb59473040032d2c29e4eaf5c73124e",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L27_s1_c2.npz": "8175cb8f2a9a4c0f5f030b312246e463bd5e99d06717abb9c307151ff156581f",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L27_s1_c3.npz": "fecabbe75115f596fb09db6b9480e214d425a5f043a34cf0544e00f33dd7159a",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L27_s1_c4.npz": "62eb2a7bd76e8f201de445c1d76c3f06d5b39ba57a2118a6a1c62bb1352eadea",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L27_s1_c5.npz": "8d6bdd7240472e76e4581754f978ae4232a569637dbda483ee526820bff1da38",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L27_s1_c6.npz": "07e3041db64da013a480d2a03dcf08513667ca97dcb22f78fd9869dd45a10364",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L27_s1_c7.npz": "fb2b1cd84c751886be165e4af19a84baf78c99c7537dfc1dc6e20cf0a29a7497",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L27_s1_c8.npz": "d9e3bf7ec9ee89bb887bad181674ac4e5c385051e93407f552f5225ccf7eeb9e",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L27_s1_c9.npz": "f700decc4d4faa187a68451cc7d522bd24a25c8065cce281bbaf3f5c765ddbf2",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L81_s0_c0.npz": "feb69b7c74e508fd1af9660da6b3dd8f923cbc062a74f09b1b765f5f210e8157",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L81_s0_c1.npz": "5bba414fca0e66b07c8c1c7536caa4e28e5069c56f7359992ab2018db0f2546d",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L81_s0_c2.npz": "e926642c4b894e63bd72e15e063cb6d01cc4a0242eb80c59b6679a6bc6deee6b",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L81_s0_c3.npz": "100ad3707573cb2bd62da2b1009698fb9eae81919da0d51ce7eea74e608b657f",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L81_s0_c4.npz": "95e9069fb1e5b32c7c9e7d52682bbf51ea776dc350666ae629ab5344dcb26ad0",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L81_s0_c5.npz": "a2fa1146732ee8f14a385e1136073361a25398b92d86e1007c29a12b54fdc77d",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L81_s0_c6.npz": "d7b66e4b64b1e1e09320cc4e072a0651e474614fd43991479a7cd8674e1c7852",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L81_s0_c7.npz": "02777e35445d7a42b9a644ee95466445e5d422bbc91fbde598c9498277f9ced3",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L81_s0_c8.npz": "a1322f5d167cd1e149b53c71842f9889b3eddddb8da3ad3ec057c3253fbc3f5c",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L81_s0_c9.npz": "f4cf9bbc01f4472cc5205350317f61621c4b44558e5ae2820c32287c3c4c766a",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L81_s1_c0.npz": "9b5b7b54f1eee6970079dce091e1aeaffc680bf200d22108960636ff25c5218c",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L81_s1_c1.npz": "b5e1f98bf9e3c7068ae234f8ca7403966a3e43e9806c300d529403343a0c7211",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L81_s1_c2.npz": "43894740dd8a7f8d0e2b6caa7b6c3f95e333d4717083eabea17a798c132ff1f9",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L81_s1_c3.npz": "4b82d3f31f0183b54738216e12c4b55d14e6ce1171569037deaf334391a80253",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L81_s1_c4.npz": "22923534869fb9a6b050a81ed6eca674ed7d3f276b5d865f2f41c6167c0ce6d7",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L81_s1_c5.npz": "44e4ce33b138d0b536134a3de9f532d84f7e23c109c30a42e4c564890a80a3cf",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L81_s1_c6.npz": "8c0a29e2789538e58affdc8557403a947fcbc727dc72e8108d9f9aa4f259d7b9",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L81_s1_c7.npz": "31643c436b0b30d537bd24e755aab7e1d02c0bb5e8e86f3a335a23a95e2814d2",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L81_s1_c8.npz": "1e7424c6b50dc7a215be4f8f281aa3c7bcc6c4b0bbc2b9aa3b176ce837bef99b",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L81_s1_c9.npz": "30149053e65d78bcb4843b558e9d03f8650900b00f023440e164b70e59edcf55",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L243_s0_c0.npz": "874d1b9a2d6f6ce5a45f8e4c78b9ae67c77dc002172d621b93fd0852a7d43d5f",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L243_s0_c1.npz": "e2061059a9c39b9ff155840b79a3801d012c13ca4ebcaeeb368ae80b80db389a",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L243_s0_c2.npz": "f52efdb872bf56d618c5328ec8737bc2b9343c1f40f31d83cd8e252b29ea0f0c",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L243_s0_c3.npz": "763f7e0ef1b7295055e71962ffb7385c7f6bd2f8a88a51e3e7fdb00d30097633",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L243_s0_c4.npz": "54645eec5dbc35813994a72a6e8bc27ce81439ee54e9897a94537a5c16befe75",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L243_s0_c5.npz": "346a814f837812b6988867f4a2f4f748609b491118142295ac1177b109a58fc1",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L243_s0_c6.npz": "93e104f4c9899f32371663edee80c9016698ede9dcf069cbc671548bcc40612b",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L243_s0_c7.npz": "007ddfe10f828b3119d767616d415919b43cca51d8591fef91348945f9258cfe",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L243_s0_c8.npz": "50675be1cafdd17fa17f8b2c45d804f80f8f2d7c411cfb47f07df6dd0efa3298",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L243_s0_c9.npz": "4607110c523d4b2b927610abe567691420c55d49ea81de633c0b4fdb4b0e11e6",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L243_s1_c0.npz": "09a9556682bcb92e950c5daf5e73040e2c7d7ac3d7c993e8e5049274953fed89",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L243_s1_c1.npz": "59b1434b4b8e33a379e5e5b7015a9a8b43c63f44bf6eecc82e0abd6e7cf6bccc",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L243_s1_c2.npz": "5c13a78b968843a8131b47b4dd7975c190353815d53c72346587e9694b8bc39c",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L243_s1_c3.npz": "650c84ca9e4df718779a95228984b3fba109d7de3d820489e546a725a87acd12",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L243_s1_c4.npz": "15287a11925dbc6f4a446acc39a6995798e39809941c77dfc52c6718f51a0d73",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L243_s1_c5.npz": "ee6f4a1e259bea3589419f6125ecaa8e1c233195b5e435dcecbf7a5142d86ea3",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L243_s1_c6.npz": "804b03ecef26af6c71881433490dbba5f52a4cefe07364e2530e9a3417fdff6a",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L243_s1_c7.npz": "4250c4ab1c3dfba68190f256f07035be6c92df99265c76f2d548fec27f699e33",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L243_s1_c8.npz": "2388291659b879171b903dc6cfca74c7f9fe3932c2ffa48fd4a267fed1bd7069",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p1_L243_s1_c9.npz": "59c40f699db51cca5db5e14f30eefc1217e02944390913651f516ad74a80ef57",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L27_s0_c0.npz": "7a73f17f630bba88e29bbee8b26e9c5f8700ea6c0d3ffb1d6772af90867f713e",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L27_s0_c1.npz": "3758ab5e51e0057ba5d9e1cf2f8eb67c27fa75c6468519b8aaf6de0a02ead4a1",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L27_s0_c2.npz": "58c7d82971402e98f16ababf24838ea1ebf9de18af2a49b91f70bbaabf65fb69",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L27_s0_c3.npz": "1901809174c0c961b0b68937bbc5a0438b466dbccc4ebbd7838bcc8a382d5df8",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L27_s0_c4.npz": "93f2f4f669d6214ad42ca082343babeaf88efe6877057918edf2a48a64f2b6c6",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L27_s0_c5.npz": "f1aae2cc07fe017c4a56f2bb0da1eff600686ca71d4c16446e13440539d3c82e",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L27_s0_c6.npz": "4d909fde362eabcc0b25e4cfa69086708853e7168f313b460b1e76ccd218b201",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L27_s0_c7.npz": "614b2d99373b7f457daca29546e610eee3ed4a5bd69552dce9b370075c5da653",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L27_s0_c8.npz": "a243c7805b0038d61a12fabb4186410aefa0c6da46ff462cad19ecf1901e8401",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L27_s0_c9.npz": "6b377c7c60d14029352f59871ae3c96247ce4b7f47ac2313fbcd874b0aac7cba",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L27_s1_c0.npz": "efb0692a876036b237eb1b739fbf2a9ce3b7ca65290a0ea33392bf3a70967cf1",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L27_s1_c1.npz": "064e03f94af67cb562789c5d1e242e451a0350cb1292fcab2a6f6b5ebc3a0888",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L27_s1_c2.npz": "e3619f5f097bc207163776038a67c240c1b3b6f96d02bc793db5d612e71d5e82",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L27_s1_c3.npz": "71f7020ddd8d2e2642f8da81efb32dcae05fcc4af7f24490368cfd8125229dfa",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L27_s1_c4.npz": "bd7340c8d62bbc972e1d27304f2fe949a2e8fb2e2ddcd3d1ba2134660b009f0b",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L27_s1_c5.npz": "6e390e836033deabb62fc70a893d6c5ad949c2e6fcc607320377965e0604de4a",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L27_s1_c6.npz": "e0427f01f092df55775b3437eea681516619eff4aba49f60a0e35e35f55e9b2c",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L27_s1_c7.npz": "ddffb4b932be1f58f865bb6ba8d2c1f5f26341b92b4f85653f2b2ba2a41fd027",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L27_s1_c8.npz": "080155ce7c3247df67daf324b26ad9756ab6135fb1776576edabac38b0b6a326",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L27_s1_c9.npz": "0e9d46756bb400aeecc6930e0d7d1a39f5e7c4f25a9ed56be96cf43df7a80b5f",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L81_s0_c0.npz": "77a7e0d30b03c6c8f0c0dcbc49e0c2044cd7a9155dc8408e9bfdadddbe794609",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L81_s0_c1.npz": "4f8453c1bd8566f043110f7bac599e3352fa1e8928a91c32829c60e3a6512856",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L81_s0_c2.npz": "bca34b348d5cf6123dc7ba0a4287778f56d4300297d9551c8acb934d886fde59",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L81_s0_c3.npz": "0481650d22be2bf200a0020172713e8aaa6ba406d9e1abd44c48684bb200d034",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L81_s0_c4.npz": "a9186800bdb4a5aee6623366aa52b691d1a822f6c6e713ff21f5848c206fd82e",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L81_s0_c5.npz": "c137c700696232b21819c8ebca3ee6dfbc996bf46faa35f36b7c0e62bbfb55fb",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L81_s0_c6.npz": "67afcbda83f8728f506d6f247ae47a6b35fdf7ed7f0716149dd722c914e032be",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L81_s0_c7.npz": "9287b8d77d28cc3d99e019c4868ad60297ddb6b58f2e9d383836a9478b9cbf4b",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L81_s0_c8.npz": "4d33c09c8313cf5ad919e6e042635436dbb154fc94703d538c093cbbc593afbd",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L81_s0_c9.npz": "b377ce1778a1d4cdec5c63d98a2cb5abd921d13e8d07f8b6398b0db9dd2ee9b6",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L81_s1_c0.npz": "7f72d8eab47a38cad1d4f4a129134ed8addee79778889073fddc08903a19a532",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L81_s1_c1.npz": "d6d5dca067519b35c6d0193d618716bb15f7ae7c15afef1b6266af4585ad7428",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L81_s1_c2.npz": "f9d6b58329cab818ef607c1f95d978ba8f432d622dca18b7a0d6d69cda9bc05e",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L81_s1_c3.npz": "688b9f2b21295f82fb1efc6079c9a3bbd2f2e28eed6d1b1227a6384e1aec13c1",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L81_s1_c4.npz": "d5b2587c0fd8a9eca3867d37ea74dd2e6ce09878938e01815beb9e8d2211d53c",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L81_s1_c5.npz": "434a741c481dccf4258786e52fa6e482d0dace405bc77d4880865caa8d3d17b1",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L81_s1_c6.npz": "392bfaffc65b6d80a2f7081cfa4b00f34e5cb2bd1d6dfbb17648bc75a570aba9",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L81_s1_c7.npz": "956daad5c8f88142b2e9a2068f780412ac86a823c84f9a0c7bcb9a28e5706aab",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L81_s1_c8.npz": "9e4b4a1023e96289d1668925b352b28829452d6d11380c323a150f841beac168",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L81_s1_c9.npz": "16b54219235a25183bbe1a453d0ea025777bf7d326b2bcf76f619f234586fe3f",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L243_s0_c0.npz": "0fcd90be167d79574c73988c529a6712767f082f280d4e3567b94087ae6bfe04",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L243_s0_c1.npz": "7e62b19774ba422a4c3021397003a4140ea80781b5e4013931c1f737dad3bb74",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L243_s0_c2.npz": "33ec0c32bf14cb8b5c6e8f16a545d37139a29e4977f42c01c5b3ebece4961f90",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L243_s0_c3.npz": "97b6857d179f87292d4317c3bc6840c11f88b7df6a4e29bed6fed241c16b25a6",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L243_s0_c4.npz": "99c8e91f4d1da03d6ecf808bfafd0d7cee50920023de4ff9f86aa128226b4d62",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L243_s0_c5.npz": "3548a21d8df9b348294eddd614e487cf815d37a5d001f202fd0db24e6dddeda8",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L243_s0_c6.npz": "27d9555c4ef936feb18ccad0ceb4fb30f6ddd0d7847e09926d0c963893b370ec",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L243_s0_c7.npz": "479593be7ba89d257de2dd89d72e92545b8c938844488dd0494b73266cf675d2",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L243_s0_c8.npz": "852e150f51a29b2394b15dae9bdbdfa340e39aba7668a72beaf06e4c52fda7cd",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L243_s0_c9.npz": "fed8dad6273562b79c81387222207400a90b4f4b08025425fdfdccb1989edd37",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L243_s1_c0.npz": "3e206bd17be0f2cbbdfba58ea5f526d68b3a32c31e77cab592b0c6b201ed4629",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L243_s1_c1.npz": "e74071ae8b02ab5831598e4b50f6c5166049493537e1aa2b2422d97f2b163aca",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L243_s1_c2.npz": "a73060fb541dc7e44c653beedd8ecf1cb32d489c1d1552a5ed99e9293eef05b8",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L243_s1_c3.npz": "5a561e487bf175d7b47eebea9aefc67df5c4eeb2918b07d55ab5a8039c0b192b",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L243_s1_c4.npz": "f4f328ace82a3f1919d6495f92d15f5a4f198ec1b6b3c054720e364cc9ab56de",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L243_s1_c5.npz": "f404e5eae9e7173b790c441821d3867379e273d088c0b7d85bbd4b6a86b2619b",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L243_s1_c6.npz": "efc9ad3f3010652e4554a89ffe59ad13bd7f8d41ebc0bdfec18a9886919d0218",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L243_s1_c7.npz": "dad09d6efd77e86c5bab5bd96cb6d2287a7b70e6c0f04d86ca5429826a70b438",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L243_s1_c8.npz": "e9eca1d5d1acfb1d4dff574e380f55f774fbf34464e62174f76d83c262e5a83e",
+  "~/software/scratch/compass-toolset/data/cc-chains-0937/x5/p2_L243_s1_c9.npz": "185b66410ceba6fa9a0cdc3518f515f1ebdd1ee7bf1c7402f97555930935cc5b",
+  "inputs/x5-bilayer-2-ch/couplings.toml": "12c317ad6f31fb54ca1e71e8326e3df1bdf826e9850270455896deca851fa017"
+ },
+ "vectors": "results/x5-bilayer-2-ch@v10-rules.npz",
+ "readings": [
+  {
+   "instrument": "across",
+   "column": "y_last",
+   "unit": {
+    "point": "0.0"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": 1.0350447617989804,
+   "lo": 0.9734150228738355,
+   "hi": 1.0821055441112633,
+   "cell": "SIG+",
+   "code": "RELEVANT",
+   "per_size": null,
+   "flags": [
+    "H",
+    "N"
+   ],
+   "reason": null,
+   "vector_key": "across/y_last/point=0.0"
+  },
+  {
+   "instrument": "across_delta",
+   "column": "y_last",
+   "unit": {
+    "point": "0.0"
+   },
+   "eps_key": "y",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "across_delta is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "fluct",
+   "column": "y_last",
+   "unit": {
+    "point": "0.0"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -1.794392714942254,
+   "lo": -1.8447781766348335,
+   "hi": -1.7620142877246672,
+   "cell": "SIG-",
+   "code": "VANISHES",
+   "per_size": null,
+   "flags": [
+    "H",
+    "N"
+   ],
+   "reason": null,
+   "vector_key": "fluct/y_last/point=0.0"
+  },
+  {
+   "instrument": "needle",
+   "column": "velocity",
+   "unit": {
+    "point": "0.0"
+   },
+   "eps_key": "step",
+   "eps": 0.01,
+   "estimate": -0.005865451388887888,
+   "lo": -0.009000000000005004,
+   "hi": -0.002027777777775075,
+   "cell": "SLOW-",
+   "code": "SLOW",
+   "per_size": null,
+   "flags": [
+    "N"
+   ],
+   "reason": null,
+   "vector_key": "needle/velocity/point=0.0"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_ord",
+   "unit": {
+    "point": "0.0"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.24450434027778545,
+   "lo": 0.240104166666676,
+   "hi": 0.24665798611111778,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "N"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_ord/point=0.0"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_dis",
+   "unit": {
+    "point": "0.0"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.7554956597222146,
+   "lo": 0.7533420138888822,
+   "hi": 0.759895833333324,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "N"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_dis/point=0.0"
+  },
+  {
+   "instrument": "needle_chain",
+   "column": "drift",
+   "unit": {
+    "point": "0.0"
+   },
+   "eps_key": "drift",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_chain is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "needle_o",
+   "column": "velocity",
+   "unit": {
+    "point": "0.0"
+   },
+   "eps_key": "step",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "needle_o",
+   "column": "d_ord",
+   "unit": {
+    "point": "0.0"
+   },
+   "eps_key": "sink",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "needle_o",
+   "column": "d_dis",
+   "unit": {
+    "point": "0.0"
+   },
+   "eps_key": "sink",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "stability",
+   "column": "d",
+   "unit": {
+    "point": "0.0"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": 0.05356123175480387,
+   "lo": -0.1014415623340531,
+   "hi": 0.15412482976896402,
+   "cell": "ZERO!",
+   "code": "STABLE",
+   "per_size": null,
+   "flags": [
+    "H",
+    "N"
+   ],
+   "reason": null,
+   "vector_key": "stability/d/point=0.0"
+  },
+  {
+   "instrument": "stability_delta",
+   "column": "d",
+   "unit": {
+    "point": "0.0"
+   },
+   "eps_key": "y",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "stability_delta is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "transform",
+   "column": "y_inf",
+   "unit": {
+    "point": "0.0"
+   },
+   "eps_key": "y",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "transform is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "two_start",
+   "column": "D",
+   "unit": {
+    "point": "0.0"
+   },
+   "eps_key": "two_start",
+   "eps": 0.01,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": null,
+   "code": "INDEP",
+   "per_size": [
+    {
+     "size": 27,
+     "estimate": -0.00041203703703701633,
+     "lo": -0.0016678669410151725,
+     "hi": 0.0016556927297668445,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    },
+    {
+     "size": 81,
+     "estimate": 0.000228147386069244,
+     "lo": -0.0006017375400092506,
+     "hi": 0.0005091449474163845,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    },
+    {
+     "size": 243,
+     "estimate": 9.333456112720073e-05,
+     "lo": -0.00012589120899597628,
+     "hi": 0.0002540030313806785,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    }
+   ],
+   "flags": [
+    "N"
+   ],
+   "reason": null,
+   "vector_key": null
+  },
+  {
+   "instrument": "across",
+   "column": "y_last",
+   "unit": {
+    "point": "0.1"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": 1.057926164326323,
+   "lo": 0.9825498814323632,
+   "hi": 1.0857255029272255,
+   "cell": "SIG+",
+   "code": "RELEVANT",
+   "per_size": null,
+   "flags": [
+    "H",
+    "N"
+   ],
+   "reason": null,
+   "vector_key": "across/y_last/point=0.1"
+  },
+  {
+   "instrument": "across_delta",
+   "column": "y_last",
+   "unit": {
+    "point": "0.1"
+   },
+   "eps_key": "y",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "across_delta is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "fluct",
+   "column": "y_last",
+   "unit": {
+    "point": "0.1"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -1.7912149989991195,
+   "lo": -1.8453616363170642,
+   "hi": -1.753265420872815,
+   "cell": "SIG-",
+   "code": "VANISHES",
+   "per_size": null,
+   "flags": [
+    "H",
+    "N"
+   ],
+   "reason": null,
+   "vector_key": "fluct/y_last/point=0.1"
+  },
+  {
+   "instrument": "needle",
+   "column": "velocity",
+   "unit": {
+    "point": "0.1"
+   },
+   "eps_key": "step",
+   "eps": 0.01,
+   "estimate": 0.004881944444444175,
+   "lo": -0.00012152777778007273,
+   "hi": 0.01330208333333327,
+   "cell": "UNRES",
+   "code": "UNRES",
+   "per_size": null,
+   "flags": [
+    "N"
+   ],
+   "reason": null,
+   "vector_key": "needle/velocity/point=0.1"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_ord",
+   "unit": {
+    "point": "0.1"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.26958767361111724,
+   "lo": 0.2637951388888916,
+   "hi": 0.27461631944444964,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "N"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_ord/point=0.1"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_dis",
+   "unit": {
+    "point": "0.1"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.7304123263888828,
+   "lo": 0.7253836805555504,
+   "hi": 0.7362048611111084,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "N"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_dis/point=0.1"
+  },
+  {
+   "instrument": "needle_chain",
+   "column": "drift",
+   "unit": {
+    "point": "0.1"
+   },
+   "eps_key": "drift",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_chain is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "needle_o",
+   "column": "velocity",
+   "unit": {
+    "point": "0.1"
+   },
+   "eps_key": "step",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "needle_o",
+   "column": "d_ord",
+   "unit": {
+    "point": "0.1"
+   },
+   "eps_key": "sink",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "needle_o",
+   "column": "d_dis",
+   "unit": {
+    "point": "0.1"
+   },
+   "eps_key": "sink",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "stability",
+   "column": "d",
+   "unit": {
+    "point": "0.1"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": 0.001175380604202414,
+   "lo": -0.0740668766918342,
+   "hi": 0.07864123657143474,
+   "cell": "ZERO!",
+   "code": "STABLE",
+   "per_size": null,
+   "flags": [
+    "H",
+    "N"
+   ],
+   "reason": null,
+   "vector_key": "stability/d/point=0.1"
+  },
+  {
+   "instrument": "stability_delta",
+   "column": "d",
+   "unit": {
+    "point": "0.1"
+   },
+   "eps_key": "y",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "stability_delta is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "transform",
+   "column": "y_inf",
+   "unit": {
+    "point": "0.1"
+   },
+   "eps_key": "y",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "transform is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "two_start",
+   "column": "D",
+   "unit": {
+    "point": "0.1"
+   },
+   "eps_key": "two_start",
+   "eps": 0.01,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": null,
+   "code": "INDEP",
+   "per_size": [
+    {
+     "size": 27,
+     "estimate": 9.713648834014377e-05,
+     "lo": -0.0011277434842248413,
+     "hi": 0.0013779149519890233,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    },
+    {
+     "size": 81,
+     "estimate": 0.00020442767870748613,
+     "lo": -0.0007177259564090654,
+     "hi": 0.0009399100746837474,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    },
+    {
+     "size": 243,
+     "estimate": -5.025698995753114e-05,
+     "lo": -0.00022541025250211177,
+     "hi": 0.00035998916154378335,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    }
+   ],
+   "flags": [
+    "N"
+   ],
+   "reason": null,
+   "vector_key": null
+  },
+  {
+   "instrument": "across",
+   "column": "y_last",
+   "unit": {
+    "point": "0.3"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": 0.997228902386893,
+   "lo": 0.9637371392229048,
+   "hi": 1.0145465176214883,
+   "cell": "SIG+",
+   "code": "RELEVANT",
+   "per_size": null,
+   "flags": [
+    "H",
+    "N"
+   ],
+   "reason": null,
+   "vector_key": "across/y_last/point=0.3"
+  },
+  {
+   "instrument": "across_delta",
+   "column": "y_last",
+   "unit": {
+    "point": "0.3"
+   },
+   "eps_key": "y",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "across_delta is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "fluct",
+   "column": "y_last",
+   "unit": {
+    "point": "0.3"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -1.8152926921198411,
+   "lo": -1.856168696864796,
+   "hi": -1.7868013169300836,
+   "cell": "SIG-",
+   "code": "VANISHES",
+   "per_size": null,
+   "flags": [
+    "H",
+    "N"
+   ],
+   "reason": null,
+   "vector_key": "fluct/y_last/point=0.3"
+  },
+  {
+   "instrument": "needle",
+   "column": "velocity",
+   "unit": {
+    "point": "0.3"
+   },
+   "eps_key": "step",
+   "eps": 0.01,
+   "estimate": 0.005684027777780765,
+   "lo": -0.000140625000003336,
+   "hi": 0.01072222222222019,
+   "cell": "UNRES",
+   "code": "UNRES",
+   "per_size": null,
+   "flags": [
+    "N"
+   ],
+   "reason": null,
+   "vector_key": "needle/velocity/point=0.3"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_ord",
+   "unit": {
+    "point": "0.3"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.23955468750000397,
+   "lo": 0.23750173611111514,
+   "hi": 0.243741319444452,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "N"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_ord/point=0.3"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_dis",
+   "unit": {
+    "point": "0.3"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.760445312499996,
+   "lo": 0.756258680555548,
+   "hi": 0.7624982638888849,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "N"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_dis/point=0.3"
+  },
+  {
+   "instrument": "needle_chain",
+   "column": "drift",
+   "unit": {
+    "point": "0.3"
+   },
+   "eps_key": "drift",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_chain is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "needle_o",
+   "column": "velocity",
+   "unit": {
+    "point": "0.3"
+   },
+   "eps_key": "step",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "needle_o",
+   "column": "d_ord",
+   "unit": {
+    "point": "0.3"
+   },
+   "eps_key": "sink",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "needle_o",
+   "column": "d_dis",
+   "unit": {
+    "point": "0.3"
+   },
+   "eps_key": "sink",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "stability",
+   "column": "d",
+   "unit": {
+    "point": "0.3"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": 0.004180991522962196,
+   "lo": -0.06913891523593518,
+   "hi": 0.03249610205741971,
+   "cell": "ZERO!",
+   "code": "STABLE",
+   "per_size": null,
+   "flags": [
+    "H",
+    "N"
+   ],
+   "reason": null,
+   "vector_key": "stability/d/point=0.3"
+  },
+  {
+   "instrument": "stability_delta",
+   "column": "d",
+   "unit": {
+    "point": "0.3"
+   },
+   "eps_key": "y",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "stability_delta is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "transform",
+   "column": "y_inf",
+   "unit": {
+    "point": "0.3"
+   },
+   "eps_key": "y",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "transform is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "two_start",
+   "column": "D",
+   "unit": {
+    "point": "0.3"
+   },
+   "eps_key": "two_start",
+   "eps": 0.01,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": null,
+   "code": "INDEP",
+   "per_size": [
+    {
+     "size": 27,
+     "estimate": -0.00041186556927297335,
+     "lo": -0.002726337448559768,
+     "hi": 0.00026217421124830054,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    },
+    {
+     "size": 81,
+     "estimate": -0.00010130887059894844,
+     "lo": -0.0012889041304678939,
+     "hi": 0.001343164151806131,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    },
+    {
+     "size": 243,
+     "estimate": -8.333227489037975e-05,
+     "lo": -0.0003448110890955647,
+     "hi": 0.00016874544869516228,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    }
+   ],
+   "flags": [
+    "N"
+   ],
+   "reason": null,
+   "vector_key": null
+  }
+ ],
+ "pair_readings": [],
+ "reports": [
+  {
+   "instrument": "across",
+   "name": "y_steps",
+   "unit": {
+    "point": "0.0"
+   },
+   "estimate": [
+    0.9735538489255668,
+    0.985181098372935
+   ],
+   "vector_key": "across/y_steps/point=0.0"
+  },
+  {
+   "instrument": "fluct",
+   "name": "y_steps",
+   "unit": {
+    "point": "0.0"
+   },
+   "estimate": [
+    -1.7559087899767252,
+    -1.8133490606482132
+   ],
+   "vector_key": "fluct/y_steps/point=0.0"
+  },
+  {
+   "instrument": "needle",
+   "name": "v_all",
+   "unit": {
+    "point": "0.0"
+   },
+   "estimate": [
+    0.016551215277778697,
+    0.0018646723646720265,
+    -0.002027777777775075
+   ],
+   "vector_key": "needle/v_all/point=0.0"
+  },
+  {
+   "instrument": "needle",
+   "name": "g_final",
+   "unit": {
+    "point": "0.0"
+   },
+   "estimate": 0.7578923611111058,
+   "vector_key": "needle/g_final/point=0.0"
+  },
+  {
+   "instrument": "across",
+   "name": "y_steps",
+   "unit": {
+    "point": "0.1"
+   },
+   "estimate": [
+    1.079608640275779,
+    1.0625056859390287
+   ],
+   "vector_key": "across/y_steps/point=0.1"
+  },
+  {
+   "instrument": "fluct",
+   "name": "y_steps",
+   "unit": {
+    "point": "0.1"
+   },
+   "estimate": [
+    -1.7261728483635213,
+    -1.7786341813394715
+   ],
+   "vector_key": "fluct/y_steps/point=0.1"
+  },
+  {
+   "instrument": "needle",
+   "name": "v_all",
+   "unit": {
+    "point": "0.1"
+   },
+   "estimate": [
+    0.026276697530863813,
+    0.0633710826210816,
+    0.0018454861111087961
+   ],
+   "vector_key": "needle/v_all/point=0.1"
+  },
+  {
+   "instrument": "needle",
+   "name": "g_final",
+   "unit": {
+    "point": "0.1"
+   },
+   "estimate": 0.7326458333333274,
+   "vector_key": "needle/g_final/point=0.1"
+  },
+  {
+   "instrument": "across",
+   "name": "y_steps",
+   "unit": {
+    "point": "0.3"
+   },
+   "estimate": [
+    0.9544698234622533,
+    1.0088225502015153
+   ],
+   "vector_key": "across/y_steps/point=0.3"
+  },
+  {
+   "instrument": "fluct",
+   "name": "y_steps",
+   "unit": {
+    "point": "0.3"
+   },
+   "estimate": [
+    -1.796124010757588,
+    -1.8137214472660224
+   ],
+   "vector_key": "fluct/y_steps/point=0.3"
+  },
+  {
+   "instrument": "needle",
+   "name": "v_all",
+   "unit": {
+    "point": "0.3"
+   },
+   "estimate": [
+    0.08288128858024801,
+    0.04019818376068429,
+    -0.000140625000003336
+   ],
+   "vector_key": "needle/v_all/point=0.3"
+  },
+  {
+   "instrument": "needle",
+   "name": "g_final",
+   "unit": {
+    "point": "0.3"
+   },
+   "estimate": 0.7558836805555497,
+   "vector_key": "needle/g_final/point=0.3"
+  }
+ ],
+ "signature_columns": [
+  "sink",
+  "needle",
+  "needle_pair",
+  "drift_code",
+  "flow",
+  "across",
+  "stability",
+  "two_start",
+  "probe"
+ ],
+ "signature": [
+  {
+   "point": "0.0",
+   "obtained": "navigated",
+   "sink": "NEITHER",
+   "needle": "MID",
+   "needle_pair": "NOT-MEASURED",
+   "drift_code": "NOT-MEASURED",
+   "flow": "SLOW",
+   "across": "RELEVANT",
+   "stability": "NOT-MEASURED",
+   "two_start": "INDEP",
+   "probe": "INCOMPLETE",
+   "flags": {
+    "sink": [
+     "N"
+    ],
+    "needle": [
+     "N"
+    ],
+    "needle_pair": [
+     "N"
+    ],
+    "flow": [
+     "N"
+    ],
+    "across": [
+     "H",
+     "N"
+    ],
+    "two_start": [
+     "N"
+    ]
+   },
+   "verdict": "REFUSE-SLOW",
+   "verdict_class": "REFUSE",
+   "row_line": 93,
+   "why": "verdict_x STAGE3: slow flow (Q2, 2026-10-02: only across MARGINAL with stable stability leaves this row)",
+   "geometry": "REFUSE-SLOW",
+   "order": "CONTINUOUS",
+   "axis_lines": {
+    "geometry": 32,
+    "probe": 23,
+    "order": 72,
+    "compose": 36
+   }
+  },
+  {
+   "point": "0.1",
+   "obtained": "navigated",
+   "sink": "NEITHER",
+   "needle": "MID",
+   "needle_pair": "NOT-MEASURED",
+   "drift_code": "NOT-MEASURED",
+   "flow": "UNRES",
+   "across": "RELEVANT",
+   "stability": "NOT-MEASURED",
+   "two_start": "INDEP",
+   "probe": "INCOMPLETE",
+   "flags": {
+    "sink": [
+     "N"
+    ],
+    "needle": [
+     "N"
+    ],
+    "needle_pair": [
+     "N"
+    ],
+    "flow": [
+     "N"
+    ],
+    "across": [
+     "H",
+     "N"
+    ],
+    "two_start": [
+     "N"
+    ]
+   },
+   "verdict": "REFUSE-FLOW",
+   "verdict_class": "REFUSE",
+   "row_line": 117,
+   "why": "verdict_x STAGE3: flow unresolved",
+   "geometry": "REFUSE-FLOW",
+   "order": "CONTINUOUS",
+   "axis_lines": {
+    "geometry": 53,
+    "probe": 23,
+    "order": 72,
+    "compose": 36
+   }
+  },
+  {
+   "point": "0.3",
+   "obtained": "navigated",
+   "sink": "NEITHER",
+   "needle": "MID",
+   "needle_pair": "NOT-MEASURED",
+   "drift_code": "NOT-MEASURED",
+   "flow": "UNRES",
+   "across": "RELEVANT",
+   "stability": "NOT-MEASURED",
+   "two_start": "INDEP",
+   "probe": "INCOMPLETE",
+   "flags": {
+    "sink": [
+     "N"
+    ],
+    "needle": [
+     "N"
+    ],
+    "needle_pair": [
+     "N"
+    ],
+    "flow": [
+     "N"
+    ],
+    "across": [
+     "H",
+     "N"
+    ],
+    "two_start": [
+     "N"
+    ]
+   },
+   "verdict": "REFUSE-FLOW",
+   "verdict_class": "REFUSE",
+   "row_line": 117,
+   "why": "verdict_x STAGE3: flow unresolved",
+   "geometry": "REFUSE-FLOW",
+   "order": "CONTINUOUS",
+   "axis_lines": {
+    "geometry": 53,
+    "probe": 23,
+    "order": 72,
+    "compose": 36
+   }
+  }
+ ],
+ "pairs": [],
+ "declared": {
+  "probe": "INCOMPLETE"
+ },
+ "pins": {
+  "tools/lattice_bilayer2_e.py": {
+   "sha256": "534d252399be05e61de4902e4ec6df543e526f8dce58cad436f325fd774cfc2a",
+   "commit": "working-tree"
+  },
+  "tools/sw_graph.py": {
+   "sha256": "53d666833726440c9f4df4605ca55682eb78de769410fa7bf91398a9abec939a",
+   "commit": "working-tree"
+  },
+  "tools/scale.py": {
+   "sha256": "1dff330d804d067e26f8c6c7dbe86739f0ee75635e5d1661f163d01bcf908f2b",
+   "commit": "working-tree"
+  },
+  "tools/flow.py": {
+   "sha256": "5f5b225a2cbc49bf2eef8c2168a2059620476c304fe71524eb687b12e1b9cae7",
+   "commit": "working-tree"
+  }
+ }
+}

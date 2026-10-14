@@ -1,0 +1,24 @@
+# inputs/w1-potts-ch/transducer.toml - the transducer file (plan 0883, Q0): the sampler, what the per-locus mean keeps and discards, the interval's role.
+schema = 1
+kind = "transducer"
+id = "w1-potts-ch"
+
+[transducer]
+model = "q-state Potts at exact K_c (decimation block map applied by the study)"
+update = ["tools/lattice_potts.py sha256 217107466df633194f8a53e0ee226e58e9498b5364885f09220551b859a10985", "tools/scale2.py sha256 e77d600a68db2162b36c4df065ec4e8524fdd1bcb9d02ebad84a8af6252ef022", "tools/flow3.py sha256 7922608ddabd2ef7d0a1977a9103309241b800af5d87dead16139f1495869d67"]
+inputs = "chains: tools/0937_gen.py (sha256 e63e012793cea5351bc8c217fb9b1a5f213d34178a82136804ce2db4b5b269e2) and data/cc-chains-0937/MANIFEST.tsv (sha256 b74a41516567da7a5df839db0dce3d4149cb8e51cfd9ab404b2f68ad77446d5b); m.toml [0937.chains] (root_0937C, spawn keys); points, sizes, starts, N, burn, skip = the parent's: m.toml [W1] · studies/W1/simulate.py"
+output = "one configuration per recorded sweep; each configuration is one observation; the recorded sequence is NOT a process sequence (Phase 1 only)"
+
+[reduction]
+name = "per-locus mean of the declared observable over the declared configurations"
+keeps = "the typical value of the observable at the locus (one point, one size, one start)"
+discards = "the configuration-to-configuration variation and the order of the configurations"
+
+[interval]
+role = "projection C: places the reading's sign cell against its declared margin; never an operator input"
+keeps = "the position of the interval ends among the cuts -eps, 0, +eps"
+discards = "the shape of the resampled distribution"
+
+[provenance_note]
+declared_after = []
+note = "the 300 chain files of this input were produced by: tools/lattice_potts.py (frozen python, exact) (the sampler string recorded in each chain's .rec.json header and in the chain manifest row); the parent's transducer pinned tools/lattice_potts.py (replaced here by the producers listed in update); data is not in git, pinned by fixtures/data/w1-potts-ch.toml; plan 0937 amendment 9"

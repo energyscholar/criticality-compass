@@ -1,0 +1,8 @@
+# inputs/x9c-potts-ch/couplings.toml (plan 0870 P1) - the sampler's free parameters, declared from the Hamiltonian (never from the answer),
+# and which of them the per-point instruments probe. Potts: the nearest-neighbour coupling K (q is the point label); across probes K.
+# validate checks `names` against the scalars the data files store (minus the size key L) and `probes` against names.
+schema = 1
+kind = "couplings"
+id = "x9c-potts-ch"
+names = ["K"]
+probes = ["K"]

@@ -1,0 +1,5236 @@
+# THIS IS CC's m.toml (Kernel V8's M for ONE input: what was measured and how).
+# It is NOT the toolset's m.toml (scratch/compass-toolset/m.toml, the study log).
+# inputs/x2b-xy/m.toml - like x2-xy-line-3 (the X2b data: nine T, dense near T_KT, both starts; plan 0871 P4) plus the along instrument on a control chain over T
+schema = 1
+kind = "input"
+id = "x2b-xy-ch"
+instruments = ["needle", "across", "stability", "two_start", "fluct", "along", "needle_chain"]
+
+[obtained]
+"0.5" = "truth"
+"0.6" = "truth"
+"0.7" = "truth"
+"0.8" = "truth"
+"0.85" = "truth"
+"0.89294" = "truth"
+"0.95" = "truth"
+"1.0" = "truth"
+"1.1" = "truth"
+
+[axes]
+point = ["0.5", "0.6", "0.7", "0.8", "0.85", "0.89294", "0.95", "1.0", "1.1"]
+size = [27, 81, 243]
+starts = ["random", "ordered"]
+main_start = "random"
+
+[observable]
+name = "g1_xy of the sum-and-normalise block lattice"
+definition = """open-pair nearest-neighbour correlation s_i . s_j of the block unit vectors, \
+every level down to final size 9 (matched across sizes)"""
+levels = [2, 3, 4]
+final_size = 9
+
+[block_map]
+name = "sum-and-normalise3"
+factor = 3
+keeps = "the direction of each 3x3 block's net moment (a unit vector)"
+discards = "the magnitude of the block's moment and the arrangement inside the block"
+
+[relations.size]
+template = "chain"
+axis = "size"
+provenance = "Coupling"
+direction_from = "the declared blocking map: one more blocking step relates L to L/3"
+
+[relations.matched]
+template = "matched"
+axis = "size"
+big = 243
+small = 81
+provenance = "Coupling"
+direction_from = "one extra declared blocking step at equal block-lattice size ([P2] relations)"
+
+[relations.start]
+template = "pair"
+axis = "starts"
+pairs = [["random", "ordered"]]
+provenance = "Coupling"
+direction_from = "two runs at the same point differing only in the declared initial state"
+
+[relations.control]
+template = "chain"
+axis = "point"
+provenance = "Coupling"
+direction_from = "the declared order of the points: T increasing, 0.5 -> 1.1 (the one control, the temperature, moves ALONG the line)"
+
+[relations.chain]
+template = "matched-chain"
+axis = "size"
+pairs = [[243, 81], [81, 27]]
+provenance = "Coupling"
+direction_from = "one extra declared blocking step at equal block-lattice size, taken at both neighbouring size pairs; the second pair's velocity is the first pair's predecessor in the size chain"
+
+[sinks]
+ordered = 1.0
+disordered = 0.0
+
+[interval]
+method = "chains"
+m = 10
+r = 2
+alpha = 0.021484375
+chain_root = "root_0937C"
+
+[eps]
+step = 0.01
+sink = 0.02
+y = 0.25
+two_start = 0.01
+drift = 0.5
+
+[conjugate]
+observable = "E"
+conjugate_to = "beta (inverse temperature)"
+hamiltonian_knowledge = true
+
+[two_start]
+observable = "Q"
+definition = """E = sum of nn bond energies per snapshot (O column 0) / the declared bond \
+count 2 L^2"""
+unit_scale = { "27" = 1458, "81" = 13122, "243" = 118098 }
+
+[kernel]
+uses = ["A", "B"]
+
+[data]
+format = "npz-v1"
+
+[[data.files]]
+point = "0.5"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L27_s0_c0.npz"
+chain = 0
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.5"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L27_s0_c1.npz"
+chain = 1
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.5"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L27_s0_c2.npz"
+chain = 2
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.5"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L27_s0_c3.npz"
+chain = 3
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.5"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L27_s0_c4.npz"
+chain = 4
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.5"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L27_s0_c5.npz"
+chain = 5
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.5"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L27_s0_c6.npz"
+chain = 6
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.5"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L27_s0_c7.npz"
+chain = 7
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.5"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L27_s0_c8.npz"
+chain = 8
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.5"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L27_s0_c9.npz"
+chain = 9
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.5"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L27_s1_c0.npz"
+chain = 0
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.5"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L27_s1_c1.npz"
+chain = 1
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.5"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L27_s1_c2.npz"
+chain = 2
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.5"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L27_s1_c3.npz"
+chain = 3
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.5"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L27_s1_c4.npz"
+chain = 4
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.5"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L27_s1_c5.npz"
+chain = 5
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.5"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L27_s1_c6.npz"
+chain = 6
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.5"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L27_s1_c7.npz"
+chain = 7
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.5"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L27_s1_c8.npz"
+chain = 8
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.5"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L27_s1_c9.npz"
+chain = 9
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.6"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L27_s0_c0.npz"
+chain = 0
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.6"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L27_s0_c1.npz"
+chain = 1
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.6"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L27_s0_c2.npz"
+chain = 2
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.6"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L27_s0_c3.npz"
+chain = 3
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.6"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L27_s0_c4.npz"
+chain = 4
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.6"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L27_s0_c5.npz"
+chain = 5
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.6"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L27_s0_c6.npz"
+chain = 6
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.6"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L27_s0_c7.npz"
+chain = 7
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.6"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L27_s0_c8.npz"
+chain = 8
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.6"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L27_s0_c9.npz"
+chain = 9
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.6"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L27_s1_c0.npz"
+chain = 0
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.6"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L27_s1_c1.npz"
+chain = 1
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.6"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L27_s1_c2.npz"
+chain = 2
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.6"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L27_s1_c3.npz"
+chain = 3
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.6"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L27_s1_c4.npz"
+chain = 4
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.6"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L27_s1_c5.npz"
+chain = 5
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.6"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L27_s1_c6.npz"
+chain = 6
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.6"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L27_s1_c7.npz"
+chain = 7
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.6"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L27_s1_c8.npz"
+chain = 8
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.6"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L27_s1_c9.npz"
+chain = 9
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.7"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L27_s0_c0.npz"
+chain = 0
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.7"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L27_s0_c1.npz"
+chain = 1
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.7"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L27_s0_c2.npz"
+chain = 2
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.7"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L27_s0_c3.npz"
+chain = 3
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.7"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L27_s0_c4.npz"
+chain = 4
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.7"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L27_s0_c5.npz"
+chain = 5
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.7"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L27_s0_c6.npz"
+chain = 6
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.7"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L27_s0_c7.npz"
+chain = 7
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.7"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L27_s0_c8.npz"
+chain = 8
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.7"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L27_s0_c9.npz"
+chain = 9
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.7"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L27_s1_c0.npz"
+chain = 0
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.7"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L27_s1_c1.npz"
+chain = 1
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.7"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L27_s1_c2.npz"
+chain = 2
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.7"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L27_s1_c3.npz"
+chain = 3
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.7"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L27_s1_c4.npz"
+chain = 4
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.7"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L27_s1_c5.npz"
+chain = 5
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.7"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L27_s1_c6.npz"
+chain = 6
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.7"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L27_s1_c7.npz"
+chain = 7
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.7"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L27_s1_c8.npz"
+chain = 8
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.7"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L27_s1_c9.npz"
+chain = 9
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.8"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L27_s0_c0.npz"
+chain = 0
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.8"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L27_s0_c1.npz"
+chain = 1
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.8"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L27_s0_c2.npz"
+chain = 2
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.8"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L27_s0_c3.npz"
+chain = 3
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.8"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L27_s0_c4.npz"
+chain = 4
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.8"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L27_s0_c5.npz"
+chain = 5
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.8"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L27_s0_c6.npz"
+chain = 6
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.8"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L27_s0_c7.npz"
+chain = 7
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.8"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L27_s0_c8.npz"
+chain = 8
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.8"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L27_s0_c9.npz"
+chain = 9
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.8"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L27_s1_c0.npz"
+chain = 0
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.8"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L27_s1_c1.npz"
+chain = 1
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.8"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L27_s1_c2.npz"
+chain = 2
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.8"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L27_s1_c3.npz"
+chain = 3
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.8"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L27_s1_c4.npz"
+chain = 4
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.8"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L27_s1_c5.npz"
+chain = 5
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.8"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L27_s1_c6.npz"
+chain = 6
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.8"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L27_s1_c7.npz"
+chain = 7
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.8"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L27_s1_c8.npz"
+chain = 8
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.8"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L27_s1_c9.npz"
+chain = 9
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.85"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L27_s0_c0.npz"
+chain = 0
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.85"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L27_s0_c1.npz"
+chain = 1
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.85"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L27_s0_c2.npz"
+chain = 2
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.85"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L27_s0_c3.npz"
+chain = 3
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.85"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L27_s0_c4.npz"
+chain = 4
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.85"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L27_s0_c5.npz"
+chain = 5
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.85"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L27_s0_c6.npz"
+chain = 6
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.85"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L27_s0_c7.npz"
+chain = 7
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.85"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L27_s0_c8.npz"
+chain = 8
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.85"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L27_s0_c9.npz"
+chain = 9
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.85"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L27_s1_c0.npz"
+chain = 0
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.85"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L27_s1_c1.npz"
+chain = 1
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.85"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L27_s1_c2.npz"
+chain = 2
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.85"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L27_s1_c3.npz"
+chain = 3
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.85"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L27_s1_c4.npz"
+chain = 4
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.85"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L27_s1_c5.npz"
+chain = 5
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.85"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L27_s1_c6.npz"
+chain = 6
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.85"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L27_s1_c7.npz"
+chain = 7
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.85"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L27_s1_c8.npz"
+chain = 8
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.85"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L27_s1_c9.npz"
+chain = 9
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.89294"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L27_s0_c0.npz"
+chain = 0
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.89294"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L27_s0_c1.npz"
+chain = 1
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.89294"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L27_s0_c2.npz"
+chain = 2
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.89294"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L27_s0_c3.npz"
+chain = 3
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.89294"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L27_s0_c4.npz"
+chain = 4
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.89294"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L27_s0_c5.npz"
+chain = 5
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.89294"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L27_s0_c6.npz"
+chain = 6
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.89294"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L27_s0_c7.npz"
+chain = 7
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.89294"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L27_s0_c8.npz"
+chain = 8
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.89294"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L27_s0_c9.npz"
+chain = 9
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.89294"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L27_s1_c0.npz"
+chain = 0
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.89294"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L27_s1_c1.npz"
+chain = 1
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.89294"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L27_s1_c2.npz"
+chain = 2
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.89294"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L27_s1_c3.npz"
+chain = 3
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.89294"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L27_s1_c4.npz"
+chain = 4
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.89294"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L27_s1_c5.npz"
+chain = 5
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.89294"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L27_s1_c6.npz"
+chain = 6
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.89294"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L27_s1_c7.npz"
+chain = 7
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.89294"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L27_s1_c8.npz"
+chain = 8
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.89294"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L27_s1_c9.npz"
+chain = 9
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.95"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L27_s0_c0.npz"
+chain = 0
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.95"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L27_s0_c1.npz"
+chain = 1
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.95"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L27_s0_c2.npz"
+chain = 2
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.95"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L27_s0_c3.npz"
+chain = 3
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.95"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L27_s0_c4.npz"
+chain = 4
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.95"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L27_s0_c5.npz"
+chain = 5
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.95"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L27_s0_c6.npz"
+chain = 6
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.95"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L27_s0_c7.npz"
+chain = 7
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.95"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L27_s0_c8.npz"
+chain = 8
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.95"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L27_s0_c9.npz"
+chain = 9
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.95"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L27_s1_c0.npz"
+chain = 0
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.95"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L27_s1_c1.npz"
+chain = 1
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.95"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L27_s1_c2.npz"
+chain = 2
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.95"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L27_s1_c3.npz"
+chain = 3
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.95"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L27_s1_c4.npz"
+chain = 4
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.95"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L27_s1_c5.npz"
+chain = 5
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.95"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L27_s1_c6.npz"
+chain = 6
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.95"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L27_s1_c7.npz"
+chain = 7
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.95"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L27_s1_c8.npz"
+chain = 8
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.95"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L27_s1_c9.npz"
+chain = 9
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.0"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L27_s0_c0.npz"
+chain = 0
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.0"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L27_s0_c1.npz"
+chain = 1
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.0"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L27_s0_c2.npz"
+chain = 2
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.0"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L27_s0_c3.npz"
+chain = 3
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.0"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L27_s0_c4.npz"
+chain = 4
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.0"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L27_s0_c5.npz"
+chain = 5
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.0"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L27_s0_c6.npz"
+chain = 6
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.0"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L27_s0_c7.npz"
+chain = 7
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.0"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L27_s0_c8.npz"
+chain = 8
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.0"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L27_s0_c9.npz"
+chain = 9
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.0"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L27_s1_c0.npz"
+chain = 0
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.0"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L27_s1_c1.npz"
+chain = 1
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.0"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L27_s1_c2.npz"
+chain = 2
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.0"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L27_s1_c3.npz"
+chain = 3
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.0"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L27_s1_c4.npz"
+chain = 4
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.0"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L27_s1_c5.npz"
+chain = 5
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.0"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L27_s1_c6.npz"
+chain = 6
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.0"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L27_s1_c7.npz"
+chain = 7
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.0"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L27_s1_c8.npz"
+chain = 8
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.0"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L27_s1_c9.npz"
+chain = 9
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.1"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L27_s0_c0.npz"
+chain = 0
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.1"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L27_s0_c1.npz"
+chain = 1
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.1"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L27_s0_c2.npz"
+chain = 2
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.1"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L27_s0_c3.npz"
+chain = 3
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.1"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L27_s0_c4.npz"
+chain = 4
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.1"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L27_s0_c5.npz"
+chain = 5
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.1"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L27_s0_c6.npz"
+chain = 6
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.1"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L27_s0_c7.npz"
+chain = 7
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.1"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L27_s0_c8.npz"
+chain = 8
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.1"
+size = 27
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L27_s0_c9.npz"
+chain = 9
+arrays.G = { key = "G", level = 1 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.1"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L27_s1_c0.npz"
+chain = 0
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.1"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L27_s1_c1.npz"
+chain = 1
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.1"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L27_s1_c2.npz"
+chain = 2
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.1"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L27_s1_c3.npz"
+chain = 3
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.1"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L27_s1_c4.npz"
+chain = 4
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.1"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L27_s1_c5.npz"
+chain = 5
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.1"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L27_s1_c6.npz"
+chain = 6
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.1"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L27_s1_c7.npz"
+chain = 7
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.1"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L27_s1_c8.npz"
+chain = 8
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.1"
+size = 27
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L27_s1_c9.npz"
+chain = 9
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.5"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L81_s0_c0.npz"
+chain = 0
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.5"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L81_s0_c1.npz"
+chain = 1
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.5"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L81_s0_c2.npz"
+chain = 2
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.5"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L81_s0_c3.npz"
+chain = 3
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.5"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L81_s0_c4.npz"
+chain = 4
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.5"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L81_s0_c5.npz"
+chain = 5
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.5"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L81_s0_c6.npz"
+chain = 6
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.5"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L81_s0_c7.npz"
+chain = 7
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.5"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L81_s0_c8.npz"
+chain = 8
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.5"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L81_s0_c9.npz"
+chain = 9
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.5"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L81_s1_c0.npz"
+chain = 0
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.5"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L81_s1_c1.npz"
+chain = 1
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.5"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L81_s1_c2.npz"
+chain = 2
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.5"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L81_s1_c3.npz"
+chain = 3
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.5"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L81_s1_c4.npz"
+chain = 4
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.5"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L81_s1_c5.npz"
+chain = 5
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.5"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L81_s1_c6.npz"
+chain = 6
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.5"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L81_s1_c7.npz"
+chain = 7
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.5"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L81_s1_c8.npz"
+chain = 8
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.5"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L81_s1_c9.npz"
+chain = 9
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.6"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L81_s0_c0.npz"
+chain = 0
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.6"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L81_s0_c1.npz"
+chain = 1
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.6"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L81_s0_c2.npz"
+chain = 2
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.6"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L81_s0_c3.npz"
+chain = 3
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.6"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L81_s0_c4.npz"
+chain = 4
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.6"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L81_s0_c5.npz"
+chain = 5
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.6"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L81_s0_c6.npz"
+chain = 6
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.6"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L81_s0_c7.npz"
+chain = 7
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.6"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L81_s0_c8.npz"
+chain = 8
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.6"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L81_s0_c9.npz"
+chain = 9
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.6"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L81_s1_c0.npz"
+chain = 0
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.6"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L81_s1_c1.npz"
+chain = 1
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.6"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L81_s1_c2.npz"
+chain = 2
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.6"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L81_s1_c3.npz"
+chain = 3
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.6"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L81_s1_c4.npz"
+chain = 4
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.6"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L81_s1_c5.npz"
+chain = 5
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.6"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L81_s1_c6.npz"
+chain = 6
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.6"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L81_s1_c7.npz"
+chain = 7
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.6"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L81_s1_c8.npz"
+chain = 8
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.6"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L81_s1_c9.npz"
+chain = 9
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.7"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L81_s0_c0.npz"
+chain = 0
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.7"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L81_s0_c1.npz"
+chain = 1
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.7"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L81_s0_c2.npz"
+chain = 2
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.7"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L81_s0_c3.npz"
+chain = 3
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.7"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L81_s0_c4.npz"
+chain = 4
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.7"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L81_s0_c5.npz"
+chain = 5
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.7"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L81_s0_c6.npz"
+chain = 6
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.7"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L81_s0_c7.npz"
+chain = 7
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.7"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L81_s0_c8.npz"
+chain = 8
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.7"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L81_s0_c9.npz"
+chain = 9
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.7"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L81_s1_c0.npz"
+chain = 0
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.7"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L81_s1_c1.npz"
+chain = 1
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.7"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L81_s1_c2.npz"
+chain = 2
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.7"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L81_s1_c3.npz"
+chain = 3
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.7"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L81_s1_c4.npz"
+chain = 4
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.7"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L81_s1_c5.npz"
+chain = 5
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.7"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L81_s1_c6.npz"
+chain = 6
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.7"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L81_s1_c7.npz"
+chain = 7
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.7"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L81_s1_c8.npz"
+chain = 8
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.7"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L81_s1_c9.npz"
+chain = 9
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.8"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L81_s0_c0.npz"
+chain = 0
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.8"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L81_s0_c1.npz"
+chain = 1
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.8"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L81_s0_c2.npz"
+chain = 2
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.8"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L81_s0_c3.npz"
+chain = 3
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.8"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L81_s0_c4.npz"
+chain = 4
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.8"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L81_s0_c5.npz"
+chain = 5
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.8"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L81_s0_c6.npz"
+chain = 6
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.8"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L81_s0_c7.npz"
+chain = 7
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.8"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L81_s0_c8.npz"
+chain = 8
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.8"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L81_s0_c9.npz"
+chain = 9
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.8"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L81_s1_c0.npz"
+chain = 0
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.8"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L81_s1_c1.npz"
+chain = 1
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.8"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L81_s1_c2.npz"
+chain = 2
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.8"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L81_s1_c3.npz"
+chain = 3
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.8"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L81_s1_c4.npz"
+chain = 4
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.8"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L81_s1_c5.npz"
+chain = 5
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.8"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L81_s1_c6.npz"
+chain = 6
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.8"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L81_s1_c7.npz"
+chain = 7
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.8"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L81_s1_c8.npz"
+chain = 8
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.8"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L81_s1_c9.npz"
+chain = 9
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.85"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L81_s0_c0.npz"
+chain = 0
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.85"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L81_s0_c1.npz"
+chain = 1
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.85"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L81_s0_c2.npz"
+chain = 2
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.85"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L81_s0_c3.npz"
+chain = 3
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.85"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L81_s0_c4.npz"
+chain = 4
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.85"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L81_s0_c5.npz"
+chain = 5
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.85"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L81_s0_c6.npz"
+chain = 6
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.85"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L81_s0_c7.npz"
+chain = 7
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.85"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L81_s0_c8.npz"
+chain = 8
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.85"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L81_s0_c9.npz"
+chain = 9
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.85"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L81_s1_c0.npz"
+chain = 0
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.85"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L81_s1_c1.npz"
+chain = 1
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.85"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L81_s1_c2.npz"
+chain = 2
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.85"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L81_s1_c3.npz"
+chain = 3
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.85"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L81_s1_c4.npz"
+chain = 4
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.85"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L81_s1_c5.npz"
+chain = 5
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.85"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L81_s1_c6.npz"
+chain = 6
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.85"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L81_s1_c7.npz"
+chain = 7
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.85"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L81_s1_c8.npz"
+chain = 8
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.85"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L81_s1_c9.npz"
+chain = 9
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.89294"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L81_s0_c0.npz"
+chain = 0
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.89294"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L81_s0_c1.npz"
+chain = 1
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.89294"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L81_s0_c2.npz"
+chain = 2
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.89294"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L81_s0_c3.npz"
+chain = 3
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.89294"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L81_s0_c4.npz"
+chain = 4
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.89294"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L81_s0_c5.npz"
+chain = 5
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.89294"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L81_s0_c6.npz"
+chain = 6
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.89294"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L81_s0_c7.npz"
+chain = 7
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.89294"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L81_s0_c8.npz"
+chain = 8
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.89294"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L81_s0_c9.npz"
+chain = 9
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.89294"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L81_s1_c0.npz"
+chain = 0
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.89294"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L81_s1_c1.npz"
+chain = 1
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.89294"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L81_s1_c2.npz"
+chain = 2
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.89294"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L81_s1_c3.npz"
+chain = 3
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.89294"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L81_s1_c4.npz"
+chain = 4
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.89294"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L81_s1_c5.npz"
+chain = 5
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.89294"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L81_s1_c6.npz"
+chain = 6
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.89294"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L81_s1_c7.npz"
+chain = 7
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.89294"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L81_s1_c8.npz"
+chain = 8
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.89294"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L81_s1_c9.npz"
+chain = 9
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.95"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L81_s0_c0.npz"
+chain = 0
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.95"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L81_s0_c1.npz"
+chain = 1
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.95"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L81_s0_c2.npz"
+chain = 2
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.95"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L81_s0_c3.npz"
+chain = 3
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.95"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L81_s0_c4.npz"
+chain = 4
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.95"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L81_s0_c5.npz"
+chain = 5
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.95"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L81_s0_c6.npz"
+chain = 6
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.95"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L81_s0_c7.npz"
+chain = 7
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.95"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L81_s0_c8.npz"
+chain = 8
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.95"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L81_s0_c9.npz"
+chain = 9
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.95"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L81_s1_c0.npz"
+chain = 0
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.95"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L81_s1_c1.npz"
+chain = 1
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.95"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L81_s1_c2.npz"
+chain = 2
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.95"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L81_s1_c3.npz"
+chain = 3
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.95"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L81_s1_c4.npz"
+chain = 4
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.95"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L81_s1_c5.npz"
+chain = 5
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.95"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L81_s1_c6.npz"
+chain = 6
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.95"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L81_s1_c7.npz"
+chain = 7
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.95"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L81_s1_c8.npz"
+chain = 8
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.95"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L81_s1_c9.npz"
+chain = 9
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.0"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L81_s0_c0.npz"
+chain = 0
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.0"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L81_s0_c1.npz"
+chain = 1
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.0"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L81_s0_c2.npz"
+chain = 2
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.0"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L81_s0_c3.npz"
+chain = 3
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.0"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L81_s0_c4.npz"
+chain = 4
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.0"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L81_s0_c5.npz"
+chain = 5
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.0"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L81_s0_c6.npz"
+chain = 6
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.0"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L81_s0_c7.npz"
+chain = 7
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.0"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L81_s0_c8.npz"
+chain = 8
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.0"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L81_s0_c9.npz"
+chain = 9
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.0"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L81_s1_c0.npz"
+chain = 0
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.0"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L81_s1_c1.npz"
+chain = 1
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.0"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L81_s1_c2.npz"
+chain = 2
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.0"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L81_s1_c3.npz"
+chain = 3
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.0"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L81_s1_c4.npz"
+chain = 4
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.0"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L81_s1_c5.npz"
+chain = 5
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.0"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L81_s1_c6.npz"
+chain = 6
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.0"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L81_s1_c7.npz"
+chain = 7
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.0"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L81_s1_c8.npz"
+chain = 8
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.0"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L81_s1_c9.npz"
+chain = 9
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.1"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L81_s0_c0.npz"
+chain = 0
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.1"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L81_s0_c1.npz"
+chain = 1
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.1"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L81_s0_c2.npz"
+chain = 2
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.1"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L81_s0_c3.npz"
+chain = 3
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.1"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L81_s0_c4.npz"
+chain = 4
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.1"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L81_s0_c5.npz"
+chain = 5
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.1"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L81_s0_c6.npz"
+chain = 6
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.1"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L81_s0_c7.npz"
+chain = 7
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.1"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L81_s0_c8.npz"
+chain = 8
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.1"
+size = 81
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L81_s0_c9.npz"
+chain = 9
+arrays.G = { key = "G", level = 2 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.1"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L81_s1_c0.npz"
+chain = 0
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.1"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L81_s1_c1.npz"
+chain = 1
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.1"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L81_s1_c2.npz"
+chain = 2
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.1"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L81_s1_c3.npz"
+chain = 3
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.1"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L81_s1_c4.npz"
+chain = 4
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.1"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L81_s1_c5.npz"
+chain = 5
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.1"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L81_s1_c6.npz"
+chain = 6
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.1"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L81_s1_c7.npz"
+chain = 7
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.1"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L81_s1_c8.npz"
+chain = 8
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.1"
+size = 81
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L81_s1_c9.npz"
+chain = 9
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.5"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L243_s0_c0.npz"
+chain = 0
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.5"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L243_s0_c1.npz"
+chain = 1
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.5"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L243_s0_c2.npz"
+chain = 2
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.5"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L243_s0_c3.npz"
+chain = 3
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.5"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L243_s0_c4.npz"
+chain = 4
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.5"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L243_s0_c5.npz"
+chain = 5
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.5"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L243_s0_c6.npz"
+chain = 6
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.5"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L243_s0_c7.npz"
+chain = 7
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.5"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L243_s0_c8.npz"
+chain = 8
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.5"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L243_s0_c9.npz"
+chain = 9
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.5"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L243_s1_c0.npz"
+chain = 0
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.5"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L243_s1_c1.npz"
+chain = 1
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.5"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L243_s1_c2.npz"
+chain = 2
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.5"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L243_s1_c3.npz"
+chain = 3
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.5"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L243_s1_c4.npz"
+chain = 4
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.5"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L243_s1_c5.npz"
+chain = 5
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.5"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L243_s1_c6.npz"
+chain = 6
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.5"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L243_s1_c7.npz"
+chain = 7
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.5"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L243_s1_c8.npz"
+chain = 8
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.5"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p0_L243_s1_c9.npz"
+chain = 9
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.6"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L243_s0_c0.npz"
+chain = 0
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.6"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L243_s0_c1.npz"
+chain = 1
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.6"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L243_s0_c2.npz"
+chain = 2
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.6"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L243_s0_c3.npz"
+chain = 3
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.6"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L243_s0_c4.npz"
+chain = 4
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.6"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L243_s0_c5.npz"
+chain = 5
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.6"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L243_s0_c6.npz"
+chain = 6
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.6"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L243_s0_c7.npz"
+chain = 7
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.6"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L243_s0_c8.npz"
+chain = 8
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.6"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L243_s0_c9.npz"
+chain = 9
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.6"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L243_s1_c0.npz"
+chain = 0
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.6"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L243_s1_c1.npz"
+chain = 1
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.6"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L243_s1_c2.npz"
+chain = 2
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.6"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L243_s1_c3.npz"
+chain = 3
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.6"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L243_s1_c4.npz"
+chain = 4
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.6"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L243_s1_c5.npz"
+chain = 5
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.6"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L243_s1_c6.npz"
+chain = 6
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.6"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L243_s1_c7.npz"
+chain = 7
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.6"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L243_s1_c8.npz"
+chain = 8
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.6"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p1_L243_s1_c9.npz"
+chain = 9
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.7"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L243_s0_c0.npz"
+chain = 0
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.7"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L243_s0_c1.npz"
+chain = 1
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.7"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L243_s0_c2.npz"
+chain = 2
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.7"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L243_s0_c3.npz"
+chain = 3
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.7"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L243_s0_c4.npz"
+chain = 4
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.7"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L243_s0_c5.npz"
+chain = 5
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.7"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L243_s0_c6.npz"
+chain = 6
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.7"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L243_s0_c7.npz"
+chain = 7
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.7"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L243_s0_c8.npz"
+chain = 8
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.7"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L243_s0_c9.npz"
+chain = 9
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.7"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L243_s1_c0.npz"
+chain = 0
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.7"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L243_s1_c1.npz"
+chain = 1
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.7"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L243_s1_c2.npz"
+chain = 2
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.7"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L243_s1_c3.npz"
+chain = 3
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.7"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L243_s1_c4.npz"
+chain = 4
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.7"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L243_s1_c5.npz"
+chain = 5
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.7"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L243_s1_c6.npz"
+chain = 6
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.7"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L243_s1_c7.npz"
+chain = 7
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.7"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L243_s1_c8.npz"
+chain = 8
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.7"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p2_L243_s1_c9.npz"
+chain = 9
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.8"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L243_s0_c0.npz"
+chain = 0
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.8"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L243_s0_c1.npz"
+chain = 1
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.8"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L243_s0_c2.npz"
+chain = 2
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.8"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L243_s0_c3.npz"
+chain = 3
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.8"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L243_s0_c4.npz"
+chain = 4
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.8"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L243_s0_c5.npz"
+chain = 5
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.8"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L243_s0_c6.npz"
+chain = 6
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.8"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L243_s0_c7.npz"
+chain = 7
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.8"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L243_s0_c8.npz"
+chain = 8
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.8"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L243_s0_c9.npz"
+chain = 9
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.8"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L243_s1_c0.npz"
+chain = 0
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.8"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L243_s1_c1.npz"
+chain = 1
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.8"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L243_s1_c2.npz"
+chain = 2
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.8"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L243_s1_c3.npz"
+chain = 3
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.8"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L243_s1_c4.npz"
+chain = 4
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.8"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L243_s1_c5.npz"
+chain = 5
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.8"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L243_s1_c6.npz"
+chain = 6
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.8"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L243_s1_c7.npz"
+chain = 7
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.8"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L243_s1_c8.npz"
+chain = 8
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.8"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p3_L243_s1_c9.npz"
+chain = 9
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.85"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L243_s0_c0.npz"
+chain = 0
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.85"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L243_s0_c1.npz"
+chain = 1
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.85"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L243_s0_c2.npz"
+chain = 2
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.85"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L243_s0_c3.npz"
+chain = 3
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.85"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L243_s0_c4.npz"
+chain = 4
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.85"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L243_s0_c5.npz"
+chain = 5
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.85"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L243_s0_c6.npz"
+chain = 6
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.85"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L243_s0_c7.npz"
+chain = 7
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.85"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L243_s0_c8.npz"
+chain = 8
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.85"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L243_s0_c9.npz"
+chain = 9
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.85"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L243_s1_c0.npz"
+chain = 0
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.85"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L243_s1_c1.npz"
+chain = 1
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.85"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L243_s1_c2.npz"
+chain = 2
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.85"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L243_s1_c3.npz"
+chain = 3
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.85"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L243_s1_c4.npz"
+chain = 4
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.85"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L243_s1_c5.npz"
+chain = 5
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.85"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L243_s1_c6.npz"
+chain = 6
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.85"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L243_s1_c7.npz"
+chain = 7
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.85"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L243_s1_c8.npz"
+chain = 8
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.85"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p4_L243_s1_c9.npz"
+chain = 9
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.89294"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L243_s0_c0.npz"
+chain = 0
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.89294"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L243_s0_c1.npz"
+chain = 1
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.89294"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L243_s0_c2.npz"
+chain = 2
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.89294"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L243_s0_c3.npz"
+chain = 3
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.89294"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L243_s0_c4.npz"
+chain = 4
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.89294"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L243_s0_c5.npz"
+chain = 5
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.89294"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L243_s0_c6.npz"
+chain = 6
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.89294"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L243_s0_c7.npz"
+chain = 7
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.89294"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L243_s0_c8.npz"
+chain = 8
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.89294"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L243_s0_c9.npz"
+chain = 9
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.89294"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L243_s1_c0.npz"
+chain = 0
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.89294"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L243_s1_c1.npz"
+chain = 1
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.89294"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L243_s1_c2.npz"
+chain = 2
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.89294"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L243_s1_c3.npz"
+chain = 3
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.89294"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L243_s1_c4.npz"
+chain = 4
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.89294"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L243_s1_c5.npz"
+chain = 5
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.89294"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L243_s1_c6.npz"
+chain = 6
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.89294"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L243_s1_c7.npz"
+chain = 7
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.89294"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L243_s1_c8.npz"
+chain = 8
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.89294"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p5_L243_s1_c9.npz"
+chain = 9
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.95"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L243_s0_c0.npz"
+chain = 0
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.95"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L243_s0_c1.npz"
+chain = 1
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.95"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L243_s0_c2.npz"
+chain = 2
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.95"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L243_s0_c3.npz"
+chain = 3
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.95"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L243_s0_c4.npz"
+chain = 4
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.95"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L243_s0_c5.npz"
+chain = 5
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.95"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L243_s0_c6.npz"
+chain = 6
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.95"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L243_s0_c7.npz"
+chain = 7
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.95"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L243_s0_c8.npz"
+chain = 8
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.95"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L243_s0_c9.npz"
+chain = 9
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "0.95"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L243_s1_c0.npz"
+chain = 0
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.95"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L243_s1_c1.npz"
+chain = 1
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.95"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L243_s1_c2.npz"
+chain = 2
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.95"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L243_s1_c3.npz"
+chain = 3
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.95"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L243_s1_c4.npz"
+chain = 4
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.95"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L243_s1_c5.npz"
+chain = 5
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.95"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L243_s1_c6.npz"
+chain = 6
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.95"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L243_s1_c7.npz"
+chain = 7
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.95"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L243_s1_c8.npz"
+chain = 8
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "0.95"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p6_L243_s1_c9.npz"
+chain = 9
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.0"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L243_s0_c0.npz"
+chain = 0
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.0"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L243_s0_c1.npz"
+chain = 1
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.0"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L243_s0_c2.npz"
+chain = 2
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.0"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L243_s0_c3.npz"
+chain = 3
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.0"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L243_s0_c4.npz"
+chain = 4
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.0"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L243_s0_c5.npz"
+chain = 5
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.0"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L243_s0_c6.npz"
+chain = 6
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.0"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L243_s0_c7.npz"
+chain = 7
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.0"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L243_s0_c8.npz"
+chain = 8
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.0"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L243_s0_c9.npz"
+chain = 9
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.0"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L243_s1_c0.npz"
+chain = 0
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.0"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L243_s1_c1.npz"
+chain = 1
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.0"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L243_s1_c2.npz"
+chain = 2
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.0"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L243_s1_c3.npz"
+chain = 3
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.0"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L243_s1_c4.npz"
+chain = 4
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.0"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L243_s1_c5.npz"
+chain = 5
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.0"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L243_s1_c6.npz"
+chain = 6
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.0"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L243_s1_c7.npz"
+chain = 7
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.0"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L243_s1_c8.npz"
+chain = 8
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.0"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p7_L243_s1_c9.npz"
+chain = 9
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.1"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L243_s0_c0.npz"
+chain = 0
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.1"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L243_s0_c1.npz"
+chain = 1
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.1"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L243_s0_c2.npz"
+chain = 2
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.1"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L243_s0_c3.npz"
+chain = 3
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.1"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L243_s0_c4.npz"
+chain = 4
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.1"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L243_s0_c5.npz"
+chain = 5
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.1"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L243_s0_c6.npz"
+chain = 6
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.1"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L243_s0_c7.npz"
+chain = 7
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.1"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L243_s0_c8.npz"
+chain = 8
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.1"
+size = 243
+start = "random"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L243_s0_c9.npz"
+chain = 9
+arrays.G = { key = "G", level = 3 }
+arrays.E = { key = "O", level = 0 }
+arrays.Q = { key = "O", level = 0 }
+arrays.GL = { key = "G" }
+
+[[data.files]]
+point = "1.1"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L243_s1_c0.npz"
+chain = 0
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.1"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L243_s1_c1.npz"
+chain = 1
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.1"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L243_s1_c2.npz"
+chain = 2
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.1"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L243_s1_c3.npz"
+chain = 3
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.1"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L243_s1_c4.npz"
+chain = 4
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.1"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L243_s1_c5.npz"
+chain = 5
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.1"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L243_s1_c6.npz"
+chain = 6
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.1"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L243_s1_c7.npz"
+chain = 7
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.1"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L243_s1_c8.npz"
+chain = 8
+arrays.Q = { key = "O", level = 0 }
+
+[[data.files]]
+point = "1.1"
+size = 243
+start = "ordered"
+path = "cc-chains-0937/x2b-rs/x2b/p8_L243_s1_c9.npz"
+chain = 9
+arrays.Q = { key = "O", level = 0 }

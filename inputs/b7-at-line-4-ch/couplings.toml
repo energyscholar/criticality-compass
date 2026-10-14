@@ -1,0 +1,8 @@
+# inputs/b7-at-line-4-ch/couplings.toml (plan 0870 P1) - the sampler's free parameters, declared from the Hamiltonian (never from the answer),
+# and which of them the per-point instruments probe. b7: the 2-spin coupling K and the 4-spin coupling L4; across probes K (conjugate_to of the input).
+# validate checks `names` against the scalars the data files store (minus the size key L) and `probes` against names.
+schema = 1
+kind = "couplings"
+id = "b7-at-line-4-ch"
+names = ["K", "L4"]
+probes = ["K"]

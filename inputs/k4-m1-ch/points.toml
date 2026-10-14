@@ -1,0 +1,23 @@
+# inputs/k4-m1-ch/points.toml - the point -> case JOIN (taxonomy; never frozen)
+schema = 1
+kind = "points"
+input = "k4-m1-ch"
+
+[points]
+"0.30" = "none"
+"0.35" = "none"
+"0.40" = "none"
+"0.45" = "none"
+"0.50" = "none"
+"0.55" = "none"
+"0.60" = "none"
+"0.65" = "none"
+"0.70" = "none"
+"0.75" = "none"
+"0.80" = "none"
+"0.85" = "none"
+"0.90" = "none"
+"0.95" = "none"
+"1.00" = "none"
+"1.05" = "none"
+"1.10" = "none"

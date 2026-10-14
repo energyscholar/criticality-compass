@@ -1,0 +1,5380 @@
+{
+ "schema": 1,
+ "kind": "result",
+ "run_id": "x2b-xy-2-ch@v10-rules",
+ "input": "x2b-xy-2-ch",
+ "tables": "v10-rules",
+ "derived_from": null,
+ "code_commit": "none",
+ "code_hash": "f07f2f97a4223b7fc4fd661537d4efcf181ecf2c5268b6b98ae7c5cb7c80de83",
+ "measure_hash": "8a151d51494d19181ccad5912b7b753dea643be3b1a0690205db7c73ab03a8db",
+ "data_root_source": "env",
+ "peak_rss_mb": 5060.0,
+ "interval": {
+  "method": "chains",
+  "m": 10,
+  "r": 2,
+  "alpha": 0.021484375,
+  "chain_root": "root_0937C"
+ },
+ "read": {
+  "inputs/x2b-xy-2-ch/m.toml": "7a074a25d543378ca0184afd57ef4437e5c5123be2c13db6360b80ec2d737d8b",
+  "inputs/x2b-xy-2-ch/transducer.toml": "68c5a5b195d799e58a30c15c0560c1944800f97b3996a705d39362fb5337e548",
+  "instruments/needle.toml": "03c8e390df85cdcef367ecba33043ebf9e0445c30f27fa626242a87387fb3ef0",
+  "instruments/across.toml": "8f6803e8af6cd80d4f7bb69b1be8148cf5eb8742892caf5f3f8392f38b3c0944",
+  "instruments/stability.toml": "2fc7bb21b58a2d6eceab15ca62424aadedd309eb1f9dd6125bdee57d52588170",
+  "instruments/two_start.toml": "30503b8a483a80faa442f419d04edc10a9498b56fb24c68554fa643c8679fa38",
+  "instruments/fluct.toml": "b9eee16fe05f430f982509db3d583201aa396e4d0470c0180a67439748cee423",
+  "instruments/along.toml": "f3fd87ddb9aa9a2786e3a0110340106e673670e305642a1e4bf30b1a8b2b4ef6",
+  "instruments/needle_chain.toml": "9afa93faecb17bb5f69b0c129004b318541fbd360e9009225fa5f8dc066c5acf",
+  "instruments/across_delta.toml": "1690f69061d15ca6bca3b15008e2edbe373280bc00acb36f78107fcd8e3ace23",
+  "instruments/transform.toml": "c797772a9afba3a680751094f7f40c4a9f6664e728f7fb542fd3caf7498802a3",
+  "tables/v10-rules/codes.toml": "19c124d51152cf6cbf0d8a9eea11eea692dd15e6f0966cb430ceb8939cf29a96",
+  "tables/v10-rules/verdict.toml": "e6e30905f816c246c6919ce8831dccc558e59aa1d24e27333ad34ad1e1b1e2c1",
+  "tables/v10-rules/geometry.toml": "573216ddc8df5b005874486cf5c42f2cc0fe8281aa0762de922262ac9a4693ed",
+  "tables/v10-rules/probe.toml": "38a288f312a29c0a4abe3b0f93a9294d5a0e4e96cabe6b6e930bc1a1e1f6b076",
+  "tables/v10-rules/order.toml": "ab789dc52e449c1e46ce382630894247d40d0b199ddd7724a872519f1eaf5978",
+  "tables/v10-rules/compose.toml": "3c1b72137520285fe5bc96a76db9fc695d7ac3d552a619d7b9bccb8640a59957",
+  "tables/v10-rules/interval.toml": "37891d7a26bb5194d67759642e00734a10cbb79564d0af9cac621b1cf743fcc3",
+  "tables/v10-rules/membership.toml": "c8d69c090d4430d338cbb0292fec79ec6cf414220a88d94a53e68334676a1820",
+  "fixtures/data/x2b-xy-2-ch.toml": "99ca9f258d8bb7b8741e712a0951ffeec57cbbe044f2c9e50911a9afa03c4403",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L27_s0_c0.npz": "1742cec2f595b9ada37e206e7291463544e92130662f088aba993e8f600fe527",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L27_s0_c1.npz": "b2ef23704d06598fc3498a8d8c2388073102a5c712d0fb0f1eaf73074e309465",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L27_s0_c2.npz": "9b533804d9d5a8f614109d80e4b44f432e3d463e17969fb58365ce2bdbc39634",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L27_s0_c3.npz": "ee9c34e40aa3a0cc73b7f359ee0c18cbf248dd051895624c450ef7a331ded115",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L27_s0_c4.npz": "9ef19308674cf5c5110c74f747dca03f5e5736f1f3920e909b37f71905d9bc8d",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L27_s0_c5.npz": "751cd46de11719c614a3e14d9b81d235be84ef535801d33e4d38bc4948cedb1e",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L27_s0_c6.npz": "eed424835e91ad3aacb7f5bc217c78b3dd0db460a4f9e33cefcc9051c56428ec",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L27_s0_c7.npz": "59541b6b5e3bfd0a8917398eeb7817e183acc61f6c6bd3167c3962d8c28764ae",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L27_s0_c8.npz": "a8a2f2ff780569fdbca3ece0d30d433ef4d6fca6b7eb3231011c0fa06e810afe",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L27_s0_c9.npz": "d4238456fa7107208f436e9c880111f2f5d7a817dec056bc85cfb270e539d765",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L27_s1_c0.npz": "3f445dc2f0dd33bfc9e86af8a0ae4ad1b57f21febfa6b5bb84daddd966374165",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L27_s1_c1.npz": "59ced7df65577777e02c4e5f24fd5a52cf1ab60320288030a8eed174576358c3",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L27_s1_c2.npz": "ccb6a9d59ae584276e34d2efa2a740b641647c123be627c1f1abf856c75a702e",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L27_s1_c3.npz": "4e0917aa86778d6502d3fe3b1879b163f1879f97964f127d507d8eed356fab4e",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L27_s1_c4.npz": "a688f7352f63eb173caf0382fbf21f3e9441d6edffb516d3cecdd6fd57c70082",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L27_s1_c5.npz": "bea6fa752f897436fbc0ff867f09c16c94e255f4e3aa09c0a2752b440b36d6fa",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L27_s1_c6.npz": "3c82eab05a3b5a1728ed86e442989ec9bd1872a7fe115e8c0ffd10523b1624be",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L27_s1_c7.npz": "aabd7842f59db8307d91823bf99f83d040ee3ae22926a3694e5fcae5a4c2439a",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L27_s1_c8.npz": "6bac5a0eaff77debe2599477393975366567f9dd549cd0a953bd5f6e55b90d53",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L27_s1_c9.npz": "b81de38005191cd98b2113e4501551138a6a595629597c816bd6bfe7414e0d2e",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L27_s0_c0.npz": "c8536399d3272c7ba30d1b1f3f39f1eda563b24b07d28bb6cceac716981ea74e",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L27_s0_c1.npz": "513c95feb57e179fc175a68d1f4c56c536177a106c8dba9dfdda8d0ddf5f94de",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L27_s0_c2.npz": "19f9055587d1a718f9782076ecc6c6da62c1408a723995e7067f842f2487e424",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L27_s0_c3.npz": "5b6e3de42d26b0c1375ccc3d3743fa9e7c30458d8d0b0a8e4a05a48c88a2c48f",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L27_s0_c4.npz": "ee8af328125388e846b5b5c0e59c04b3d5add50c5e95aa087e3d9446778d1202",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L27_s0_c5.npz": "27c11342b9f12482ad6dca301f4d66d773c8867f443bacd37228281e987d3ccf",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L27_s0_c6.npz": "49ee5ad09b0af4e589164f6716a1e663f407a7be6d1115379fdc9655234ec4d0",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L27_s0_c7.npz": "062a7e511b1136638da12d13e8664d2978ed098f46429652433376a24b9ea8d7",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L27_s0_c8.npz": "8e41f19d7eaf352673b78e0c0fdd4da1b10510b5b453796fa0d1bc975c9ef19e",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L27_s0_c9.npz": "46a6c86a8924a23459d8f82cc776fafbbf99d52fdbe7313bae02f2b950e50cd7",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L27_s1_c0.npz": "39cabe5d56626d91799adbbf075c2d85021d0673dddeb8613f83cd5a740f6141",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L27_s1_c1.npz": "8cd96f0b47fb8fc84a59f19e51a2962a9f582f6f5f4ab96a55f3b8598faf630a",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L27_s1_c2.npz": "3ff4cef61fe225df88685c8de4c96d2b40263782a5ff5ff067559d53ae6555dd",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L27_s1_c3.npz": "b88dc47b5834003bee00adf42a0391bc0cdcb12e6444d1c2eacc35427baaa8eb",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L27_s1_c4.npz": "a04ca2cc117a034ec2a9162773feb1e9d08cbcede7bf05733a8fde730c50185e",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L27_s1_c5.npz": "a10cfbca5ee98efb80006cf696b3d87d4136f443aa47425b1fee0c539e52bd50",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L27_s1_c6.npz": "15be435b9ca56d33adbc1f8c7659ed565c5c7a7d09ce9e89c84458b628f3f490",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L27_s1_c7.npz": "f547250c90b61f11bd702e870321e108d8f042c7498255fdb44b0caf96b5dfab",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L27_s1_c8.npz": "62abf00cffface554019aab2cface4163d3ac6836b1ad20d2d2c1872edc2991c",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L27_s1_c9.npz": "d95347379e7bd08c270726e8d75ba083d765c1270b75be5bb73817d91db00292",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L27_s0_c0.npz": "7110ecdbb406ee25a7fa3bf35ba8bc8ff0392203ab0f701ccfadd9f1e5100f78",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L27_s0_c1.npz": "9fea92ba4ca9b76ea5c36b8f29ea5222a07a153a9abece54afe0bc92e65db1b0",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L27_s0_c2.npz": "38a3dc05131fcfe1177c141fd09d1ff028329ceabbb745bbde442374415bc6a5",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L27_s0_c3.npz": "b4896eab5a00ba6ac7e897bc9bdd498686fd0f1bcd1a7006765d10413d01ac12",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L27_s0_c4.npz": "1558b18ab5ee17c2456c53e59c38f384b2e2dd0b59a66be94002f9eedd5e061c",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L27_s0_c5.npz": "b9cb91b3938c90869a7882fa956d224e0ac175be5da4618c7e828061eecfb709",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L27_s0_c6.npz": "62188390b754f3a55f4586474ede16e6f73a3ba46e3e9bc28cae14e0d770a696",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L27_s0_c7.npz": "86cd642a202949d91557ac30c680e3398117dba5007622d85b87766ccf80c435",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L27_s0_c8.npz": "b0932f166314c600f74edeb3c32fe8d825464ff8dcc219d3a218421079a537c9",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L27_s0_c9.npz": "f1f5170762c2ef0bda245206f9665c6929929d6afc9f0c1c7e5883d369691949",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L27_s1_c0.npz": "00d1ca7e4724a39a675cef864683b9aae0f60e54d6d96a4560fee2c9271d8051",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L27_s1_c1.npz": "b8e5b2bc99b696fe833f0bd691ef2fa4d6d10c3ea5887cc364fd50a95ffbd828",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L27_s1_c2.npz": "79a950518f5e7f0c429d59a0c94ca3b440a273e99ee9c0ede814ad5f1fe02aa3",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L27_s1_c3.npz": "0d2fd27da09ce20ccdf3cd7b3d4aea3aa9d2005eae21a77076c931e4ce311c66",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L27_s1_c4.npz": "19367153a20e775a719f00988afdc1556baed64cb6efaa86e62dcb55907513b5",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L27_s1_c5.npz": "680a281eccbf6d50e22332e953d4486bf1e08af2d040cf6641320e82c9f87bf0",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L27_s1_c6.npz": "faf1a33771a639b8b7bdf8a4beb86915e4a1e70c754e31fee9badee9dcc919e4",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L27_s1_c7.npz": "e3adfeabcdfd7b1b7abb2ecca12cbf2e50f095d629697855fac004133e5b123f",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L27_s1_c8.npz": "cc1f676cecc4df707f7f1d18c950dc47c5816e459da30a8875ce799a5f212fa5",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L27_s1_c9.npz": "85f4c0ef55052eae159ae14c76ada68488408690490f1f610d1d01030e9ff559",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L27_s0_c0.npz": "a37e005e6ca25d8fbdb76691d779f552ddc196560ff2dbe65de862741f022fa2",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L27_s0_c1.npz": "889c50483b2b2d53f6ebc2b7e0c97a64fd80d6f477b3afb4d86eb2807cde9283",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L27_s0_c2.npz": "735f75a89d502a5eb11dc32d429b82a6124b58ff551a0b0950948d4472dc4a61",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L27_s0_c3.npz": "be2a9a5dc10ef4c99cfefe47e2774ee80019bf1af109b2b6936874c4c7b5e909",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L27_s0_c4.npz": "93e4bcff0eeb2a46e4bddc8c60fa3625ac06516b34344a5b1954ccb6f6747324",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L27_s0_c5.npz": "fc451639f0b8f08b786f69699e0d2b304bf55d8f4892d9695bbf0ee23b4228ba",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L27_s0_c6.npz": "2ad228943f110b8f54ca8cf40cf2dfabc0b42f043db7dd6c133e6c8448221254",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L27_s0_c7.npz": "197304cb7dbaebeca2a54e2dc8b716309fa13357cd1fd9104b83415af1a4549c",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L27_s0_c8.npz": "703307c00651e697be317f17824bf4780892cd13d33dd7cabbc9fb290d3e2ad3",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L27_s0_c9.npz": "3c710d73520527c22d32862f6480760b011f29bd75d2c368ccc0be6f840ca5f1",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L27_s1_c0.npz": "24975ecef59aeca1cc5d337271193cbdb66242cbb6fdb6f3bd55a20dac9e4688",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L27_s1_c1.npz": "fa85b15f7c52fe2ebafce1caa88222bf9b68e372348e3f2c9f69f47cc2ef310b",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L27_s1_c2.npz": "e760fce9071e688d3507cc274a0645d8d80584e84b55091c81ed4261127693d3",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L27_s1_c3.npz": "f788e344a30bef9059817e0882901ab523603ac38ddc80b52915342ba30af037",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L27_s1_c4.npz": "293511f593a592dcb831cd6471b08952f40dbef1d14c97561cdf9d05e3ed809f",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L27_s1_c5.npz": "5644119dad936f2993382efbfb662f5e9a22e83d6d7a2c6d7d6cdebdda3fa5cf",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L27_s1_c6.npz": "d03a2246e3ceddaefdd0588b5d4473857d173e2ecee785d8fd6ea74fc25635d1",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L27_s1_c7.npz": "78a98adbaac9dc98fdd0a5c5f5ec831fe08df7e8a2d3a2d0059f541106f34162",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L27_s1_c8.npz": "8ed01fce7efb40261ca55234de3959c42351ad12b3f650fe123b3c4ebea77d6f",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L27_s1_c9.npz": "c3592f4f9cca3e94d94c8246b3e457edf0f93cd51eed870bddb676ab608fb0d6",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L27_s0_c0.npz": "686b4abd036172d0f2fece4c94a86f5e9addb3fc99e928a7374256b6d1f6a9d4",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L27_s0_c1.npz": "82d19d7df0e8fc1dba79a016dd1031651d4c7ec29f80ec190cf843be9202b697",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L27_s0_c2.npz": "92a7bd858e6feeb9a86dd62388aabb04e3ed38fce9c5eedd98936ba5df381daf",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L27_s0_c3.npz": "352996331e103f0f9eb61e9b5b6bf7f3bb93c98ad19b31f26c6c1894ed4c26a7",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L27_s0_c4.npz": "990ff6183aceb804f11ebbe21ac861b57671af9e55a9ee72e3b266bf8f70b0ab",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L27_s0_c5.npz": "02786d025cd3364bfbc596985779cf162fa545564665d994289a5f8d78cdb98d",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L27_s0_c6.npz": "8fb59683bab1559a854fb085971978043abfcc624104f05ae1de7897e862f7a1",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L27_s0_c7.npz": "eb2a436006987bb3690754b07ba96c47732c29f57123e8791e038bf080f1fb39",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L27_s0_c8.npz": "8042d11681e5fa7088f5505bd7a8f5ee54332179f4e5b6a8a12baa4b1e0426f0",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L27_s0_c9.npz": "3d1b7239ae7412476d2b44672710f3529ff32bb7e0c841acaa8e6b25109ab119",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L27_s1_c0.npz": "a6f020445d41091cb260258fa0fa79f4870f2327caf579f331129fd1be21af80",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L27_s1_c1.npz": "572e9c0aa6f65e9342916b0bf4e3505432e6a5cace97d78e5b5712dbc3680356",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L27_s1_c2.npz": "528a84c8fec69b5d377ce0aabc38605c67154117bcceb5910460e63b8efabded",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L27_s1_c3.npz": "a202063cdeb7f4d03140d182a8f82eb75be380ffb037717bf568acf27ff84c06",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L27_s1_c4.npz": "3a634c588fc306ccc1e8cc59f53f0016bd4730ba14fcbddc8d66d7925d8c752c",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L27_s1_c5.npz": "a17cdf1b6b5e25a07b329b67b655f282f87ddc7285679b9fbd998826f972f9b1",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L27_s1_c6.npz": "c0105186f1ff6ff062008f14b5f08960908f2844fd049fad5dbdc075675ae4b3",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L27_s1_c7.npz": "a3428a1d058710003743cb892f741aa51b0e3f2c7bfff6e7c2f106235b3725f2",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L27_s1_c8.npz": "1dbfed90130289f26034209e5cb5e4840bfae8039cd47388204a00896a14129c",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L27_s1_c9.npz": "bef52bc60f50b5022ee5ef99e6f21d06810d32163f31dde6edbf4d7caed2d0a4",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L27_s0_c0.npz": "5577970d422aa1f948fed801e4cdec10a8eb38ed3226d84e49ea47194dbc0692",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L27_s0_c1.npz": "8f133dcdad6ab7d007a006fdfc228015c0348a195346a80bfb82cfb5eb99183e",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L27_s0_c2.npz": "90c3838a0c2743b4eef1ccc8e6b42f0a69fcbc05b488f7247192e0553ddb1234",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L27_s0_c3.npz": "c120af1a8b288cac8becb2650d732d3c50f212ff4d92ecaa0d2b62c3825c8a9f",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L27_s0_c4.npz": "b00af1d77d0733fa718318388cafabcdcdc01dab4cb9f4ad347f817a8358ce1f",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L27_s0_c5.npz": "b1244c896e535ad51fda219c92454ef91367d2932f36ed384ceed80f51457431",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L27_s0_c6.npz": "3e5e15878f944e4f5d339519882c671013d7fb89b731a1bc7af25376df21b24c",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L27_s0_c7.npz": "72f5520eb9da90fe7f25ab97b1f93c33ede51cb45dec5f4c95d22e78a6c74eb3",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L27_s0_c8.npz": "6e6f630568547a5a76ee2a3f8f897e8d5df62b5270583f20349abdb1c8d77006",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L27_s0_c9.npz": "a87da697dc1bb5ec40ef2e5a50657ef7f8333f3f73ff2af9758be79ffa7ab535",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L27_s1_c0.npz": "d572d61a5b2bcaa822842bed06c2bd6c25570c15aa4d567e92fd73f842f1fd24",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L27_s1_c1.npz": "45435b14719da212451e4f0af360c0a67851edc4d81ef4c3ac9915e03664c008",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L27_s1_c2.npz": "15873f901c471a4c8a26ef3da551b22346cdb08a15d77b450ef399d4aee9b429",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L27_s1_c3.npz": "9b19b56fab23c50d16230058425d5e6ad76611a3d221d15b69cbf1fdda9e27bd",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L27_s1_c4.npz": "5ba81467cfae6eff7901217229e6f809a04224c5dc70e72b56fa07322d6f99e5",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L27_s1_c5.npz": "3e21848c2019b84ffc14e8a319ad335a16b1f2f970a12d7157521e6aa119c431",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L27_s1_c6.npz": "41ab640832b13128f67c1cb328ebc2020bc14572915cc44e5f1a4a616f93b0b1",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L27_s1_c7.npz": "5b56bf72aa8d57a754aa4628afc889ef0166e864ee22ec562318c20d6d73e298",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L27_s1_c8.npz": "0fca8543d93aa9d50a9d3894d8644ed275891db80cd19c0adc02321ed02d89a1",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L27_s1_c9.npz": "12d7e74e7437d6834c59be23c8ccf17253639423054ee7f893ad8d247318a71c",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L27_s0_c0.npz": "37e1fef1f3b42610d9fc47f6142110b8c4b8c89f1019e915a537f6b97605ccd6",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L27_s0_c1.npz": "fb911b048a96e7934a6e713a636f6623d8d2d302f842df99ab31b1f0c9fdf71f",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L27_s0_c2.npz": "f628a93ee5066826fa236f089489e2a895d6adfdd3b2455f014a9cbc00f6d249",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L27_s0_c3.npz": "774334383a3b9dcdfa696c17062b4e723dfcd0ce01ce4a1ed280b4dce9f2e97c",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L27_s0_c4.npz": "de1b58f95a141037bc304b30de05f176eb3e12c7bd0136e36d8cd14354a2ecfb",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L27_s0_c5.npz": "a255c6a888b5c52a50b101fb85458f9adc9a0756554bc4f2e0ec4af9ff89ab9f",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L27_s0_c6.npz": "9d48c715f6117744b210c33425dc7af3b40ca70361d7cb61d01b64a54c7b0511",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L27_s0_c7.npz": "0632500ff2bc5fa7e7e8a2de34b24ef40439cd0b3c52c6c077b3b243dec9863c",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L27_s0_c8.npz": "ac370687de6e8ba337d3af9f131ae8c3e861ffdfcd167dcebcab37113194d2ec",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L27_s0_c9.npz": "fd7d4939d53d8441a4935275142eb6bfe0840d1e57a299e37200dec6e0b2df68",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L27_s1_c0.npz": "30deebe3929d0b33b6e7a635efa317713e2625c92f63ec9d88e93032b826f51a",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L27_s1_c1.npz": "f4b9eda0106206da4dc77394d7d334b05a75bbc7e38e76f8200b9c99727a2eeb",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L27_s1_c2.npz": "808b35218432ddc1eac31407918382e6674a79ad4886c32a59b4fd793100f0bf",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L27_s1_c3.npz": "8389548d8e9419caa440b0a8de2f9feaa923ec6eb7ed4c4466368a44cca44497",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L27_s1_c4.npz": "6a6417eb07c8ed25cb520b5afd489449f7450d5d2f66bd1b1685b1304624b0d4",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L27_s1_c5.npz": "06ab5d1a2f91aa902acb67e6a5e0d183df9702d247a72193c83bfe7c54068b30",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L27_s1_c6.npz": "09469c0ecae94e70778982ba2a55bcd1fe97fd05e382b7ea8c3bde0d1ced5e2c",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L27_s1_c7.npz": "534992bd73514a308ac3e67df4b7a795ab0d2691b5fcdc2f58caa8dffda401c6",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L27_s1_c8.npz": "bcca292d9fbec99ecb63c9376de341b35f7991463c320b529a88ce3cb69ce8c3",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L27_s1_c9.npz": "04d7d1821e58658241e2f4f90d9415c3cec6d7a8867f6aab7b1dce9a9f71aa22",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L27_s0_c0.npz": "8e2c0dce8099cc4c43e49f9e360d8dc3f6fe67b035960ab39b26af87d2a02db9",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L27_s0_c1.npz": "0d7b8ccb4193780378f4d34c1c912dcad8c57672ce49074efa54495dd2e3a20b",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L27_s0_c2.npz": "5adb7e0f3d2f8f2a47e9c653a0c0912c54dd6baad72837312bc687685e73f7bc",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L27_s0_c3.npz": "682a14774dee500e85a2ce89a7a8d70ba298727d33523c00a4e062cf8aae6b52",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L27_s0_c4.npz": "30a6b8e457ef4bca1109e3c0652c558d6304eac09f7f71f8ca483772f597894f",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L27_s0_c5.npz": "e4162514f128d61cb20baf49dab030fe63e8e5b70e16984e8bd400e61b95a574",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L27_s0_c6.npz": "05bcbb2a349f4ff18192edbe4494629b9a7a7008d6eee61de0e589affb08998d",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L27_s0_c7.npz": "ba53ac5c3d329b71f85e739f2eb7ada8e01f4efb2b2b5c7b50272902464c2a22",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L27_s0_c8.npz": "b4447b0a236f4d1e1b6345034e3b9071b6a8856eef126a54428959d2b3f6e1f2",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L27_s0_c9.npz": "fe00f7265a4d040d813cecc612646e64be40f965eb1ce83a2be0754ef036f641",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L27_s1_c0.npz": "eb53891bb322c1775418628b0611c70041398408c420f2367f26b59919d0dfef",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L27_s1_c1.npz": "310985b5a77bc95cbb521572446ddefc64184c273888af690756fbb5b193e7b1",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L27_s1_c2.npz": "ffba7ec33a86765fe29cd921bb143d96ae4f5b963cf83f19ab1fe8c6f7f7c70a",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L27_s1_c3.npz": "80daec928de6b24c3fddf66058f09c72017dfcfe6efe69c1548c5bfbfc35c8e5",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L27_s1_c4.npz": "a3fe22a1089dbd53054b93b8c5d5143c7f4d3828770afa20bda0b95095630e71",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L27_s1_c5.npz": "321b87f4f91150f64524846b99bd397608d720f9257acf6e6d04ad44f6cd126c",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L27_s1_c6.npz": "74f3267013a58df7723137055830d2cab73b9e755b02163e4b6cb750698e32f3",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L27_s1_c7.npz": "9f051744c7b00faa1e6a37065698df265bfb41dd26815aeb107536dab567f7d8",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L27_s1_c8.npz": "3c969f43d8031a7037851d639a42906fcd3269a685ea739d2d544365aff8ef8f",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L27_s1_c9.npz": "7cbe460f50624788fa05c02fa4c5137e5a8ddaa3298a690f47b5b9f0aa0d7189",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L27_s0_c0.npz": "eaf078dd817f3c9f13d1d16bffbb82b062abc3ef5e4db815975396a2f9ac3a73",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L27_s0_c1.npz": "2a11a9e154f4e2ddeb0092a9dc532ab11158d4addcc583cac6b52e6b3f083911",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L27_s0_c2.npz": "8e318ff9af26fbda212529d4a245bece7bd0a60d1292a6fc61e6f9cf5c4a66fb",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L27_s0_c3.npz": "37445fdfdcbd74cd7c317cabefd6825d677726769470aef9bdffedb27370b545",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L27_s0_c4.npz": "61eceb384be12ed2ebd3e5da7ad3195bde4e51ba4f478c7fa1cf030b5d47f054",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L27_s0_c5.npz": "251bdf106b494079545e90754057f2f7cd9884b61a1bc89c9b97efa5a4119372",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L27_s0_c6.npz": "2098e561482285db5b45c845645229e7d6a1914f52e31dbd9629e93dfac8ccd2",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L27_s0_c7.npz": "e6cfb531fe1bf892d6446899eac7cb0448bd3cee43e0ee64aa36eece2e7ba786",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L27_s0_c8.npz": "ddd375892e3f2e08ab3dfc2e3356dda84a5d91409854fb1a6c1aa3be94092790",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L27_s0_c9.npz": "f618c36eef5f26f5d69aabca40978440f3d70a77e021af930e9bf9004c7410a7",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L27_s1_c0.npz": "b95614e7bb2003cb99aa45c123a82762fb7dd6c97627794b668252f20174175d",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L27_s1_c1.npz": "da1f344454240f45e1e346c87bbca6b201ca7542d61ace0cb8301bfe6569e357",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L27_s1_c2.npz": "7049622e70dadd659085dce4f7fe6c029919966e86052e1b4adc243f03de3da1",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L27_s1_c3.npz": "ec4ad3b1893dc696f5862a8742a3cd1e58a25848b2d59b0c52ce14bee291c2ff",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L27_s1_c4.npz": "362645f4a56092b8c5fc776b813a644f5c7fc66248c694132ccf6e201198eee2",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L27_s1_c5.npz": "b1f07edd1c02722f08c6d7203128f064fb9523b49b3d018ccad6674d4479b8c1",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L27_s1_c6.npz": "6a846c876c3353ca1bb5046a56506e1192a66584e986690711d64613cb1e8fa3",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L27_s1_c7.npz": "46bc632606a542071a955e82248b0f245459dad6c2dfb4c6ae7a730df64627c9",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L27_s1_c8.npz": "85dfac724d239d58cbecb9f7a0ac9e3742dfc4a334faa3ab5b638cd0865433d6",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L27_s1_c9.npz": "17ceb4a62639f881aca85a6d4648087b7fa56777c263ec66872608ecb1f1ec2f",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L81_s0_c0.npz": "4896748dfe0445880872cb0e5df8f95a821109b1f3cc6a4bf3ac9ad301343802",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L81_s0_c1.npz": "845577b1815f5cc18adbae0d193a80f0d76db779c30a9591cd0284b4b7fa7eb5",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L81_s0_c2.npz": "166244127eff6127af6716d4d592d8b8400cc5741e6e766ba4188a7ea1cea9bb",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L81_s0_c3.npz": "3bb24aa0c8d753bb34a9a28c724f23a861323cc3614d6ca520087bde25827da5",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L81_s0_c4.npz": "cb329f469a6dda2bcfdfc39cb5bd980902dc349aeaa79ba90f516d87af48f3aa",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L81_s0_c5.npz": "1da09ff3de6799835689bf06d29f2291934e37e377fd1fccfe28772429b36a85",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L81_s0_c6.npz": "6f905416ac373f8c74de30850a4ef281f3424f5ef870c32c69bc468d4074aba9",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L81_s0_c7.npz": "8fef333942c75f7d2fcaf242e8d2b334b23b2cb182cf5a4c39e74a722af26905",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L81_s0_c8.npz": "b233b43bf6d86268f64dd83a18a33ced0841aec2848f542b18cd59c338f06cba",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L81_s0_c9.npz": "12c5c0caf7c92df0e1da701a3b33d6ad73d75effc5dcd3dc0ef4b05bb9c5f273",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L81_s1_c0.npz": "5dedbe568f72450cda5c36c6fdef6b05910e0f3ad8f7f7dcfbcd79d533f4036b",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L81_s1_c1.npz": "548d59565f50c6c1ca02a18c609794bdb4db579a1e83b335209d820cea906efc",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L81_s1_c2.npz": "3b5e12ab3bd807e569ff1de2b0bc8af232063158cd0287637a5f82db35148f1e",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L81_s1_c3.npz": "0693f92d70334654a9477540e035bfba14d00e1d3532ad0a549441653930fce2",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L81_s1_c4.npz": "83eb06e6d880be6e9d22a400db5d93fcce6eea71f21f74e50248f8dca215387f",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L81_s1_c5.npz": "70bb5ba1d43d0ba403f220bcba5b29093e3ca3f94b47038dd452ffc92cac0956",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L81_s1_c6.npz": "dd6311e83daea1b4d0add54880fdb030636ca0806f734998345cbc784e72793f",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L81_s1_c7.npz": "8c72d1ba5734e283fa4553fad2ef2e13866e88fe4f3093cd10267e1886a95882",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L81_s1_c8.npz": "128677f4ca55a3432d1e4f3da0bfddd06e1307dc49dedde32981f9445c0ca235",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L81_s1_c9.npz": "0d4752d8548f759a1bb3632b7d78b5dd35c3d7e8bc2dd8b039e13797e80ae67f",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L81_s0_c0.npz": "e07f1903f148f46b763fff1a7f7c6f89071fdc6f5e20b49484fbc6ae3cfc82ca",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L81_s0_c1.npz": "9f0a3a9e08ccd741213f9882cd4457a6e34cf08a0c52d40b9a77c1b568f8f3a2",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L81_s0_c2.npz": "50f831b00cc9593226185538f9c9c88a4078163e654054cd9e3148e41576f109",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L81_s0_c3.npz": "d768a56072d4589319712299047bf93a4519a54ff473a8516e3a02306da77948",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L81_s0_c4.npz": "6332ad18828348a06403d93b974a84698293a63caf25feda347ef827b738e679",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L81_s0_c5.npz": "d8745eb8f3311b316527b4f0e023c587e25fb30ce301cceb665c131a3a9c5c68",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L81_s0_c6.npz": "e54cc5bc1a12124b6d116e7f7b415a1027a12f7fded4cde75fa2f0774930cc22",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L81_s0_c7.npz": "a3fc484ed1786b9c8d0ce8b3140f9ca72be121e5876721442fd0831a6b9a3997",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L81_s0_c8.npz": "51b771498775e8556017ec02232a12c0819d6f4234a3008c241f37b65193909c",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L81_s0_c9.npz": "9f8c0297b9c74225aa107b8a5635b11da75cb355cf386a236dabc750b255ab55",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L81_s1_c0.npz": "8f05cabe3184e9608ba5f3cf029824d173746dfef7fe3bde03ff57844c35f360",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L81_s1_c1.npz": "f1b3e97e609ea9df5a84816b1f971a276542f0790233cd1e5bb4573c066233e1",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L81_s1_c2.npz": "e0774e33f58af618290804ff11658b9456fcc21784b17819cade693bae790543",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L81_s1_c3.npz": "8234aa51d8250a6fa42e4bebc9c509db2b15259008a099ace5d4fb523a5058cf",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L81_s1_c4.npz": "e6bea7910021654e983b6e9a3c317e86d6a645c2bb64cc7e7ffd04595c0d1fdb",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L81_s1_c5.npz": "46e8e27a36bb86019ada1714a2faa26abb7abb965e9320b4747e669cfb1c050a",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L81_s1_c6.npz": "91fda651583c99aead34070b0817e6a6b5c216fb09dddb0b932cb8966022700d",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L81_s1_c7.npz": "4591ac16070341afffc02173654557db3bd69730704bdef52b010942becc2c7e",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L81_s1_c8.npz": "37973aac5f46732830b1fb776c18f334d5c5285b17d3ae2ac38b514522dcd348",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L81_s1_c9.npz": "4b32fb919696c77c124036bd687b81f6ed93bbb624316be828468bdfa1f1a85c",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L81_s0_c0.npz": "c3db9fa6b378e417c01afb34212bbe44d2f4b57f4f4dd9ee34cad564caa66bf2",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L81_s0_c1.npz": "c64f62ff20c2f81f7f8bd70276fc24512c19054ba78e0376472b2d49ea6e1a7c",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L81_s0_c2.npz": "76e6be0855f76e742a41e9ebe9cad00783a0eaee9295c6e5f65fbc87f21a582c",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L81_s0_c3.npz": "2959560dada861ba5d50844aec750c39212b2151277fc401af4770474e931b10",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L81_s0_c4.npz": "0bd998c17fbd1c9e79826069a29b8cf51ea5594c0b655e6699c13870bf5cbf6a",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L81_s0_c5.npz": "0bd08c32617ca5c92ab73512aaf0908857b15df3df58a1756e9854e2f18a9a1f",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L81_s0_c6.npz": "12e0f916edbfb51062a7f1be73246f5e9ea69413ba8fe120c94c8352cb54ff38",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L81_s0_c7.npz": "1133bb8b134da8db72f6e132f3a1237596295e1d0f7a4a506bf03a9260caa129",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L81_s0_c8.npz": "8409e55a3633104bce0a9fed881f0bf7d7a9c4a7242f754664b1f6408b1ac8f7",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L81_s0_c9.npz": "9ebc9e1f8a8924dec0564ccd216822886eb4ef852e56b6919b78d76ccb7dfcde",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L81_s1_c0.npz": "973a6f21ff0e4b40aab24c7fd8549dbc9a64aa0235052bab9082c50a8af67b37",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L81_s1_c1.npz": "d684c675e6bbd55748f9f03128741811a153b77d3bbe561a3c6e3f4f8fbde4aa",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L81_s1_c2.npz": "90fd6ed220a4abb3e5226c18fe8650010a2749237bdf2492997b988fddf85a20",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L81_s1_c3.npz": "8f5c830ced1ff1c72bc86e2ab4c636e2d1405e52cdd4b059e34dd7e4ed799acc",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L81_s1_c4.npz": "6b0d4f200b8d87093b1418447eaec133a4c8552b4bdefb144cc114de48172111",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L81_s1_c5.npz": "6e3db02c3a6a36d17624dfbdcbdf8396e7d34ecf4be762e21ad0656dd8e2193a",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L81_s1_c6.npz": "ad4ca7c29bfdd934b7855b3d150b6e9b37107d5704a192a08f5edb5c7b134391",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L81_s1_c7.npz": "ae767069c64e1b83ed01717cfe6a7ff97838c38d5c14551b2244131b1b601855",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L81_s1_c8.npz": "d73d208f8e20f815d927af44258512a95c33ba684ad5b16fbec7fb1597db05de",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L81_s1_c9.npz": "c061ff842a5ff90fee2bedff70d2cc2225fec5503d382626827b56ab9b8b4028",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L81_s0_c0.npz": "7578264850bfba6f795ff33be4cb07867416ab9abee0ee9ffe753d982daf657e",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L81_s0_c1.npz": "1ccc0bedf81421dd0a59e700b8ee241e217f6709ae0006093a36253c7ce9a348",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L81_s0_c2.npz": "1b50c8987b10d9c097a8b32c1fc571376f5c09f6a29168d39892a973507dfffc",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L81_s0_c3.npz": "470c12a75c7d6834ea1cb2d111f279951c4269d43729027dace24bb60fdd4af8",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L81_s0_c4.npz": "54f390bbbffc2953b80e10483d84a070aa817d708f4f77e00746cc200ba2fdac",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L81_s0_c5.npz": "1135ef64c8212e4b596bd717b96f744bdb37515e56c3a256171ea80c232a9a48",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L81_s0_c6.npz": "66d3d3d203d97ab5ee5d2327b1f533de4344fdfd5dfed0eaad83f09ad1973dcb",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L81_s0_c7.npz": "fe994e65898621ce8c7c4f8b2de52b008d0644bbcd297cbb2b162871bdb7fa7c",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L81_s0_c8.npz": "078a6a7980ee60420a5b076aac1688ff159c501583670abc847f7e4e5f6103e6",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L81_s0_c9.npz": "ae7491aba2fcae07aa1ebcfed58c492a537b77622e1901b91fd1b6e000aae0f7",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L81_s1_c0.npz": "fe994a3528e610448397ae0cc10563709d5ae08d90c9b4be12a384085b8f7d6a",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L81_s1_c1.npz": "e812b142e3cbafb626f4bc465fc32c9729fb03c2bf64b5e4cd4e1c3ebf6d5473",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L81_s1_c2.npz": "cb5fc42fc8476465142d12a8577e0bdae216e132393e78bcaf971c4348dd6642",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L81_s1_c3.npz": "ddb3104f399cdc8fec028347e8b128d2d39102142abd90ae87672c348df1d188",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L81_s1_c4.npz": "a999972b50a449f6d7102034b1cce1d88c6c86b31b9a9c8d3c91b784e70014ff",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L81_s1_c5.npz": "8adee10e91a07e2e004fc1298565c054b1a86e5435c7f24fcb9adf83f06b44a3",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L81_s1_c6.npz": "317e86dd9a392779a4eb85b6bb1c94f75d5909eb8fb7a066f75acf1caedd523d",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L81_s1_c7.npz": "f9aa2eaf94825a8a0eacecb9213b4577ce725fbeaef195f47f6ac5b6f7ccb39e",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L81_s1_c8.npz": "48c96df134af6643f37e7795270ff094af8fc82f345282aec91ff87ec4890493",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L81_s1_c9.npz": "5cb447b4bacbedcd55305ccbcf8ca77aed116f00d9275e51e8a2d9e23a86f255",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L81_s0_c0.npz": "4fbbd4cf71068331ed8cade1c50c5f0846566e89c753f975ebbdb6ffb1750d8f",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L81_s0_c1.npz": "2ee5f1bb56cb3286ce73d2ad33a26501aeff07d72b974e0cc7c308789ef74995",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L81_s0_c2.npz": "24a5e46c8b0fe7ff5da3bec17121ac93546ee9d0e1cc72090185845c8aad78ee",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L81_s0_c3.npz": "295bef5618e2d962b1b9037a7377b5ee98b4e3f06c8b385bfbd1aa569ab24dc9",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L81_s0_c4.npz": "4d5ee1bf76754e438803cfa3627afa23901261ae96ea3a8532723cc227788d77",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L81_s0_c5.npz": "368344e20e8e1575966db964686cc0607420b9ad98f99d5a7df468e2b4d79d0b",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L81_s0_c6.npz": "afa443ed24c0a1cb08d5de2cee20cdedbd2670fd89213969eca72a3fd927465d",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L81_s0_c7.npz": "2dd171ea2aa9fbccb9cc4b464e1aaca5b8ade56dd32220c38a43f52999fccaa4",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L81_s0_c8.npz": "f79974182129d27fad4cc6c859ee8e5a92435511b435178df20625d6142c06c3",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L81_s0_c9.npz": "e95ca99480596827a11f2cfd22b5f1ab48fee805dfd0c4492cc8e68f85b2cab0",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L81_s1_c0.npz": "1b42aa315396a2713c4a2b34872ee3b21fe997e034318e8388e1fd83884afba7",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L81_s1_c1.npz": "7d37062184712be720803636f5e2bcce77a24cc2ddc16645ae2b6e6334585de8",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L81_s1_c2.npz": "dc3d26b7571644a7017b820298b0c1e93279b9d6df89b685162cc4ea69826586",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L81_s1_c3.npz": "ee84eb37a21377980499d9cd691fe0be8dac2bda1cb1e5f187a25641c1545478",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L81_s1_c4.npz": "a145da6236ee5df02489919aa50bb90fffbd6011cc855ce9cc66c4aff6cf4046",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L81_s1_c5.npz": "ddd7a00f6244702ee3d3f39a4fc41087ab76c735ff6d73c163a84f925b2a9369",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L81_s1_c6.npz": "dfc089456395ea8f8cdf18b120d6069d67871673d6c10bda8a734a4d7088bcc4",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L81_s1_c7.npz": "1f0323fd2274ff58105ffa253e59f241f6bee95cb2183ffadb222e1aa05562ee",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L81_s1_c8.npz": "0e2b6737b6ff2a990f4ca34eaf75396dcc51dfca189f491cb3ea46ad99fff5e9",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L81_s1_c9.npz": "cda28137dcc53ec8b732c987022ba45fcc4a594f681cf8ec36956578ef1785a8",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L81_s0_c0.npz": "10a9f86910fb8d8940ab8f3861bb7f7c424939da05e073d0813cc717086189c9",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L81_s0_c1.npz": "ca614e256927e53fe8000c7c79258bffd40b38a68be8761523d2c18d093723e2",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L81_s0_c2.npz": "e8cca1226b94af127d87175ac062097d47d88ed0a2c1ca1cebf5dfe9bc1b9d57",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L81_s0_c3.npz": "93ccb888e20aead903343c65685c50df1803a5c87c3cf8568468cd77d50d24e7",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L81_s0_c4.npz": "3b5f395dd3a91fdac12194801797b94cacdecbd62ea6d09dc23dbc6157ea15f8",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L81_s0_c5.npz": "45afb3714ccf6919ef0cc3f84f6a619e8dfeb3473d9720547d4c41a63c7c2286",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L81_s0_c6.npz": "ad2e56623d9c387b0a44da317f2e94695b929095772ad51a1b5c5cecceff29d2",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L81_s0_c7.npz": "7290ce200cb26cc165eedfd5979871c975844f6fb3a8be88d2ada05bdd0a024d",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L81_s0_c8.npz": "718b81c6f71580dec8b2f88477bad111544846a51f418616833392cf5095cc96",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L81_s0_c9.npz": "c5b8c959139085dfb153cf90063e478de36e0d549e26a3d883f0ea37102b4a9d",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L81_s1_c0.npz": "d017b6c14e2837c2cc003bdd0b739ba61922bce10a70a3badb5d74160b5987aa",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L81_s1_c1.npz": "e981fbcceca4447d08f55567796cba9cc14aed6f63fb870e4f51a356be552729",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L81_s1_c2.npz": "f2bb3f296ed3d52db4a27dd7c3f2e5f7fc7015645cd11778e2e1dc1e43e17a73",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L81_s1_c3.npz": "b49a3b1658d6e8aa0ec32c29d9ce6449aff6cf9d2b7b658a5e888f5c739a4c31",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L81_s1_c4.npz": "957ca5866c0c65db4c0bae9339107dd7fc029b1c4ae7498025fdf7320cecfdba",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L81_s1_c5.npz": "de455883d2e300fca8035b0f0bbfe50ad5b2325f778985c0ddaf216f13fa9310",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L81_s1_c6.npz": "7b0299f28ad80b322f86bd711d21008c192bd09c3229aa826f5170a1aa0c51eb",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L81_s1_c7.npz": "300a1e6e900086b0192dee7a97ea6832f63e09ddc12792fa32a61c6547648d48",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L81_s1_c8.npz": "f2ed2feed5d2cc40719163a7377efd68aa466dd56f16781441d81cd6e2f5d8b5",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L81_s1_c9.npz": "49e582c8a0d6f2a809208bd60606f20994d495810d8d53d846355ecdfc6e16d2",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L81_s0_c0.npz": "edb08a5ca1408a27203f729d0e897d31249cb6a7af3e221f9cc62912ff32706b",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L81_s0_c1.npz": "e72db0c1162659bfcd12dba72203c7c8b5647d783e741ea4cf4dd7b01209795f",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L81_s0_c2.npz": "dd9dbd4ef1f1fe9402cc84e1cfdb6afe7ed612b9fa9eb5cefcb5a22f7403e477",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L81_s0_c3.npz": "3ca0129dae220429f0bcfa7af75b10a924da32123a9e86d6e7d8c1f10d026c82",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L81_s0_c4.npz": "a67f8f6c869962fdb0449940ec9dc6f4b8832fe1f21d31c56f3a1b7172f4c98e",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L81_s0_c5.npz": "c68560ff1c2a05b4b5e5c5374e27e63ce3f8fb9cdf38eb0dceead50fe173340f",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L81_s0_c6.npz": "0c29749abb42ee157c077c7f29c02bdaf46d920783d54ce28f8a6317f9a68265",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L81_s0_c7.npz": "bd5101fcbf46b6803b87cb990c1c2cf7648c70573a46616c677d33e6007b80f4",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L81_s0_c8.npz": "448e8a1332fce49db0e7afc6b7259163aa345208b18f9b529e2b0a921655d11d",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L81_s0_c9.npz": "22bc9d257d374208c7f174f67130f1e64ef30a9eb3737db08ac532e3d7a9fb7c",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L81_s1_c0.npz": "94993257147da3f9b108be48849b8cc720b5de3371c130787b5e68908083a6e4",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L81_s1_c1.npz": "a62698f8410bde70ecbc394d1b35a19fa3a44cad601ef711aaa17d323f3bce98",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L81_s1_c2.npz": "b1b94218d045a6a3cf491954fda785806bbc269622429618ac4e4f0d105dd5b4",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L81_s1_c3.npz": "80c3aab10745b081c76d4bd50f6c1f2462f39ec29a0ef593dfc2dde8e344e27f",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L81_s1_c4.npz": "585c2412089c324aa5945bd21dab3d67dccf7f3874cd1236391a1434cec3c422",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L81_s1_c5.npz": "3effaf63b05d2abf2e5b56b6941125bfed5ca38542d09e01df0a48e33f2984ae",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L81_s1_c6.npz": "16b4d05a71fe18df84e9543dc91b5c0a1497a354c22c8f49f1a2d49d055e2f5d",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L81_s1_c7.npz": "c8e301bbf1462a6bab7fcd9fab259fc0cdcbd6392dcb27c5d6df66d152b373ec",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L81_s1_c8.npz": "59b5ee71cd8e769d1fb95b323f7bc85ed123e2e58a8f87193f86ceb7b31514c3",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L81_s1_c9.npz": "c49b92a22a13e3b03faae2d3aa13113ff9c8233bf347c71d7febf6223c8cf5e5",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L81_s0_c0.npz": "cfbddff443ac613462fd076014cafcb0b847b93d1f9af67e7be21bcf88b436af",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L81_s0_c1.npz": "e6bf8e5232392c450bf808b23b195d4173c90c5bdc222663ef5b29aa0e864c4a",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L81_s0_c2.npz": "20987b1ca6110fef0c771b6ee65422ef93891b4f5dce33229d462f1e0c223107",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L81_s0_c3.npz": "c037a4bbaad0d67e7c37bc74717ea4e5a91d169d0e793ed49a72f3d4e4195972",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L81_s0_c4.npz": "2377c84aea649eee1a3cd7f0e99e156990894474887bdac38801f5e76d1c85d6",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L81_s0_c5.npz": "c16838ce43721717e25b67e5ce02819bd3c99ace9e5a33cc84a9210cde16f98b",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L81_s0_c6.npz": "fc1da625e5be2b8ceb20dd048c448816a9d3e61be40d66ddd7fa0724b849b4eb",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L81_s0_c7.npz": "0bccde49e49c2d917b9144ee142201838f64a0c9a7b4e5d591981f8dd6881e0e",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L81_s0_c8.npz": "090e429bdf88263d94ec3894aea3606edcbebc8cf2f8e77d5cb7c7bc0e959d90",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L81_s0_c9.npz": "b384a233df00e7145746879dff8870436dbdc16d5bb4679a3c28b1e3293b0ae7",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L81_s1_c0.npz": "ef4bb659c0e02dc2e886f4c39cc4d537cf10f40144217b2419af6dbbb0a60cf9",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L81_s1_c1.npz": "c561f9bc43580a8d2db70651f5114bbac0a2862b99a884b56cbbce6330653222",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L81_s1_c2.npz": "153eec88056b0896d0c999198554f98ab0fef8f4639fb6b14b8c615c6f6c01f7",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L81_s1_c3.npz": "1f160c81fc6942dc65bb52b46931687a7c2513be28971235b5a631d5e945f1e0",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L81_s1_c4.npz": "5b56519b3bd88d0c67b4268df93ca03b737f9f5a8a2f307a8354c24826d132d8",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L81_s1_c5.npz": "ffac8392b061560a5ab652472c78e516f9cce7bca7756585e8aa966cbfd2366e",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L81_s1_c6.npz": "2e2d1309f60e07c306b548002321da236e0dd903717ce354c2463152ce1348b8",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L81_s1_c7.npz": "34842cb8e9619666832c46c52ceaae8eefcbbbdac14cd034c9e3ff1b9001d4ee",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L81_s1_c8.npz": "3993ae6c13011bd70885a794473cfe38c2f6241696e804d3c8711c3f254a69b1",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L81_s1_c9.npz": "940cd4262f71f9d47c6455f24f196e8df403203983bd0fcc7bb8740fc504a4da",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L81_s0_c0.npz": "b475682169a0f4fa74b86c1460d70e2c2ae486a9d7cf95f7fe89819c1e1ca01f",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L81_s0_c1.npz": "4aa5fc3cfff7a55656599c9517a6ae4e282c780c69064d99b872f5576e16f2dc",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L81_s0_c2.npz": "4493ebaed47e47e7ce55fe46576f24e40a93dcd5a003e432a424aaef018919fc",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L81_s0_c3.npz": "10e636c2972a2497468e07cfcba0359b7bfcd0b177949149e903a21009d22d08",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L81_s0_c4.npz": "c40940bddf02e4ab8908a649b101da6fc7cd42c3be949b62412e117a14dca23a",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L81_s0_c5.npz": "57441a9a34a9430b31d169c546dbe697edaa86b94f029dc618c6a48c8490b329",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L81_s0_c6.npz": "7b3295dc32e9d4885cff528618787f943d74554d71136228b50f73a6a3d8872c",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L81_s0_c7.npz": "397f1c4f5bc309c98d8417a290caba1bbc82cbf47179241c8093a7d872e9f51c",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L81_s0_c8.npz": "5a7b99ab6c75d354af03df5dd38ab19055885fd32770542817ddcf158c75ffde",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L81_s0_c9.npz": "705288b99b5617aca0005c9d5092d2916e28ed5551bcb55a2dd3375e0728e8b4",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L81_s1_c0.npz": "9e5da4a1affa3634449be5485178de9d9398d696baf41490d0a9fca2a8ecbfa5",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L81_s1_c1.npz": "4c120e4b4b703ad6786828949cca69b847b594b7c6c9a5945b79b2e021fac545",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L81_s1_c2.npz": "62462b469db5bb3fcaf6da85b7d03b59bb76ecba86876773f63f2d829ebcfd81",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L81_s1_c3.npz": "a3d5bf855e75be3345aa9a7f64ca6541712634b46125447c8061853df4594758",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L81_s1_c4.npz": "94689f94776d917f7a47043f7d4bf1ebe03855edbae5165e041ca06aa3659c51",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L81_s1_c5.npz": "95bb06b72168ec02b1af7b241bcb3e72f80eb77319b2fbb3b69750bf36dab23f",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L81_s1_c6.npz": "6b056610335527d8cdb9972ed0bf87fec10592b253ff97af76dec25b1a0c935f",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L81_s1_c7.npz": "e09c7b24b6beda4d0d92e083c12869e9f89366e47e34bf7a59da17db7d5bdddd",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L81_s1_c8.npz": "6f2306bf3064de2c1110511056bb10bf275849ffdad09febad2ecb09b56e0f28",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L81_s1_c9.npz": "af55a27967fc29135bde9dc0233ebbfc521b6a8b437577c84f1135876ba8fadf",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L243_s0_c0.npz": "29857060d8b3df9750ddb1466060350c5d5af91afeb4ce5cf8baed35fec01a42",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L243_s0_c1.npz": "a3f0dab4e99f6110137762b5d5dba2f505129ba54d83177b7695dab63c07edd9",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L243_s0_c2.npz": "6754886c1a569cef7bdfb76ad2d588e1e6a36bd6cf91f5729e78027ffd44f874",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L243_s0_c3.npz": "6db557c689f4cfae7f604cce266517a4b844b45e1326b208cc8d7e7ba60a9b22",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L243_s0_c4.npz": "bda8e68f87d1577a147905063427236e08d8249954da2bdb73befc4677cf1fe5",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L243_s0_c5.npz": "a30373c228eb8bb19f1c2cdfb306ae6790889915a4954fdb945c8457773c28d9",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L243_s0_c6.npz": "f809254b6ca1bb7fd90e32034154e496688df79ab59ec3f4c556fd6737983962",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L243_s0_c7.npz": "91504536c2908a3306b94219433745135ef8695bfbd6daf2efc1f982e7065a67",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L243_s0_c8.npz": "f61da0f6e352580abc914916d4b724d2c274858ca7c615ec2101ac672d043bac",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L243_s0_c9.npz": "a453f04bccf9ffbef7e23fd7c388444a38fb93df999675fb7221c4d0445d36d8",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L243_s1_c0.npz": "60ebfc9f8f2c740c5b703ecf708e9d1832d6b8e60088b7cff9a2ea326b73a4c6",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L243_s1_c1.npz": "c2e1ba0f56a89f41836d90f2596431598900609401610a4296909c643473d982",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L243_s1_c2.npz": "7faf74c766f5f0aecc8032bc0703633329d40f821916ee1d8ddb9055a008df9d",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L243_s1_c3.npz": "86e22d5c673170071de64dc113e1f1da537dc8311a47117f4b36f880f58b4913",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L243_s1_c4.npz": "8b8e3d8129f962d3ff754614be61de8a0334be5f817555f08d95281dd3ea490a",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L243_s1_c5.npz": "ec5a87b37636c7d5d18448e0d9b7a9b87e050225380cd9c2e59d898c9fe11a57",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L243_s1_c6.npz": "2cc85ca0bd924959b329eee78f4efa4c8161b7855d89fd7a3c1eb4784c3809a2",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L243_s1_c7.npz": "e4b23280d26820afd39b08d8abee61de7f65728d0a4680762df5acb72e8e47e0",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L243_s1_c8.npz": "87f644f4fdf7c0999ec369a326818c5822126757cef5ad9bf7dd186b01adb316",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p0_L243_s1_c9.npz": "747baacbe47ba4d523688aba7aa257eae91e9212be9eb61390f950d4f963b571",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L243_s0_c0.npz": "79d561e2081b8f605d7af7a1687b044f1e4b43b12f46e2827ac35f9c3b4e204e",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L243_s0_c1.npz": "6bac80e4b9c82057ad98403a2a39cfc3b8b514483d194f7fdffa8ef27456bb14",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L243_s0_c2.npz": "b13c6ddaa7adcfec30ed4e60081e04dfb75f5bcd9d1540a6c5153f4329041b76",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L243_s0_c3.npz": "a005598deacb8e5f86764da981bc9563903561105e94a26c8593ffc761ff6f4d",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L243_s0_c4.npz": "2a5cd8e3022d294eaa06e70ab4dac4cc85228e4b7a5665d18880bf9d26766e61",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L243_s0_c5.npz": "6cec4faa617377d663accb11073b1ec74f655ecee5a661e84d96026f6e15d267",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L243_s0_c6.npz": "42fcd35dbdb97ad22bd5817889b60baad8a6ad51188086906a962fa503a0a6d9",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L243_s0_c7.npz": "682130b7e42bcb8c53accc46b4dcf69150df3097958ccae0883f4171937eec2c",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L243_s0_c8.npz": "b0b173a463f21e962847337c679589123a09c98abc1efd52ca9e7d127fd44988",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L243_s0_c9.npz": "aaeeb5c889b25f96fa680b291f324d26907770b7cb77391d5855ffa6f7359faf",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L243_s1_c0.npz": "fa2f9f6b266b3c0739498f71413934365bd3b1fbf43e2c9e49e9a94b6315f40e",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L243_s1_c1.npz": "78406979bec472d873b56e2dbaef7cdca0fc4d8dbac02694389b336bdb4569a1",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L243_s1_c2.npz": "99e430389c12f42cf43cc51d53badd36b7c94e57672b7527912040fe99ff4ca8",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L243_s1_c3.npz": "3187972248ebf46a3a91eee5bea081035115f93efb676d3cf0fd6744ac68af64",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L243_s1_c4.npz": "35780b52745f695c888a89bedaccd50d805b079143bcdc194b4d356e63119f1a",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L243_s1_c5.npz": "11f8a736681ce38ed9b493bfac483e5a7aa7504902fa8c01afbde731eed6a745",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L243_s1_c6.npz": "69fa7ff14870cc3b1baa2f89228004ca542e951c3c55ef2a5246b6736fa5ecac",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L243_s1_c7.npz": "4c6e35f6491a2a5767410b96f771a5b2ab0c6e643b60b2066eb659aaafc532a3",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L243_s1_c8.npz": "b21c06c3aa0c6ba12f3e974975364d44a04af74c5dbec550780664b156de40b2",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p1_L243_s1_c9.npz": "a1e19c10d737ae74dfd8e6818bf81b7ddf9ff9112aa690e314a5919481a56742",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L243_s0_c0.npz": "866d6c9f1cf460afe0706a251a77629779ffa6b15523d892eaee085e4d9414d9",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L243_s0_c1.npz": "6b2c782400e4e915b0a764f2ce31c19eb68f8dfeb1e16f360eef087576c763d9",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L243_s0_c2.npz": "8243601f73fe5dba60ea18c90790d7791fc2a7e3142d165a9fb9eec44030baac",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L243_s0_c3.npz": "e1a148ff7256309701ec8287431b2ae04eea6a634396c94bbe9133c5dd06aebc",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L243_s0_c4.npz": "f9bbdc9400cbdc0f6c3ec9dbedef6f15ba7929381df4dfd36079c8891df60971",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L243_s0_c5.npz": "50facaa41a793464e210fd4f9d186c539d5d2610e4d2369d1d973861d3fc1c43",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L243_s0_c6.npz": "45bc9fdf2102d2ff264bd28e162cea24c7d6f391c930970aa92d3b771c70632a",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L243_s0_c7.npz": "1382d5eda0aa59c9b6a009609fa4d42f14d69fb168a3cc872b8b4c0d1f22e587",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L243_s0_c8.npz": "40af0735539e70031f1c78c6e0dc0ec790245cc5b221646ec204252316156316",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L243_s0_c9.npz": "c488496f4fc70ea4807ab386da669d6c1bf1922c8de0e285166b45176cdbd024",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L243_s1_c0.npz": "0f90138957462430cd8c69c94eeaff6c851e10490e344b909992b1c08da4049f",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L243_s1_c1.npz": "7b1d812c39546da264ae2a166f100c1c36ef217f3ea8ebfabf0ef8af13517f40",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L243_s1_c2.npz": "9ddd9816769a14145ecb67d0227246ca3a14a92c8c2c3a75c2e426ef8128ced1",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L243_s1_c3.npz": "033f53139b50cdb7c1f8a4b318803a3e17052e76a999b0975c9eadf1bba9c76e",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L243_s1_c4.npz": "27c75c2541831398abfd9a947d180fc0de95f57a9ab579edf6a0c95e2e98858f",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L243_s1_c5.npz": "a15d601f4bc68f4e28ed36fbf6b24fb5e3cbe115bc006f109f02fc1f79984960",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L243_s1_c6.npz": "593e88dddffd4f1a186d7a02a1cb018f6556d773373c60de51c5d521f7c91d4d",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L243_s1_c7.npz": "4bc71e2b8210008931c90254a13096affb23b59818d2de5d9802aa961b8fdc39",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L243_s1_c8.npz": "a1ea0151dfb7f1c30015d3de84dc8cc76bc5d8e3671879fd2515ec9dab19499e",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p2_L243_s1_c9.npz": "354cef6042d7196182e843e6a81d51c7313e566711353121c099e83728bb0e5a",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L243_s0_c0.npz": "fcbd1c7eeb9f4bb886445164239b0348d83a568118214c577cfc0b7ca9711d78",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L243_s0_c1.npz": "b30448651c5080b03c8bd099ed89178fb63fe35d35c2db7fce6cad4a67f16af4",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L243_s0_c2.npz": "176927d42571953bf2adcc1db35f0f8ac9ace4287c40b83dd4d0b97c6528e22e",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L243_s0_c3.npz": "5d160fb8b50671e5ec4286189ea7fbac858a3ad99a7c1bc49e57bc6518d16e6c",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L243_s0_c4.npz": "519d9d4acae6ba63d457c7e943f72aaedd8c967d5a1b3cba88c4c6396443c8b1",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L243_s0_c5.npz": "1e482e4486dfa08351cccd85d4742982e56d218ce15c8f04ba7fb8d797c67dd9",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L243_s0_c6.npz": "35c6e567f454d82631b5f5ea92cf816a70d933ce3d7e39ae7428e73c99318b68",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L243_s0_c7.npz": "51cbc0e5f3e52a2d85f2b5f5e36d770d5f7d8d9728868bcfff3404f00dc17ffa",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L243_s0_c8.npz": "cfe60c26abfbf8585a758afecb9ad5628bbd7fead1f87e63d2f48863b1791e2d",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L243_s0_c9.npz": "e725b979003b3122510a44971e3272952aec202ebf4775202e97b54730d06b46",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L243_s1_c0.npz": "6efcab84dcce2a1a32d25df92d7464f1754266c322291047028d8d2437a0325f",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L243_s1_c1.npz": "fb10d11e328e8f5e6f48e7cedaad35258c26f65241acef9d4c740c813d656ddc",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L243_s1_c2.npz": "522b88fb11960835d0d601974c999d29c63c8064cf08107b96681f135fffe828",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L243_s1_c3.npz": "54553a256e30867449bdefe70f466e4d6bd69cbc147149c98a5ab14f7cf6894a",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L243_s1_c4.npz": "b9667f3c9464e8a3e081ba7795433cac272ec0353ecb69f30705720fe4bd32a9",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L243_s1_c5.npz": "4cf6de5941278ca1d2bbd7af526e6a00e36a6bab35fb5a43791ea7cf985ac10c",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L243_s1_c6.npz": "fb65143bdd7caf91167d202be055ada254f0b21394b3f5ef33daa0c470d3de78",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L243_s1_c7.npz": "39d2dbe88a04ac6607c009ff370944dac0fac08832eff77ab08f12764ec683d9",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L243_s1_c8.npz": "109d25dfe4c1fb07899bb1e58ee532b6b9b229150b2c4fd64cdf15d5bb722fae",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p3_L243_s1_c9.npz": "31e6eb9107eb1fe4fc3e09bcfe06c2fb2d283a373b2640698eee0f27a4a7e1b3",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L243_s0_c0.npz": "18a984ba99655722349652ff0cc4ee215e34fadb71afb16d64eab995cacbb730",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L243_s0_c1.npz": "fed39b8d58b8815aed5a16ced1cdea5fbcaadf309bbdeed2e03a39426f2e4871",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L243_s0_c2.npz": "1df6bcc51d45de6114317e3419abd41263c83536d9239b5d8235457b2cf0f43a",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L243_s0_c3.npz": "e7a597b3acd2133309b0b4a621bb136ba8093eaca88434bbad6936b2dbe764bd",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L243_s0_c4.npz": "15b7484b65d4328ebd63462508d950865c9c40e0113b8a5d58507b2b32470a11",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L243_s0_c5.npz": "6c5cb67811900ca603ef679887780ea6cea9927725a7429f291765cbe676b6e6",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L243_s0_c6.npz": "e81b009b8d5821e989b2597d679831ae40846b0a409f85709dcd147141476302",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L243_s0_c7.npz": "c1dadcb45b03d98453b64860c9ffb20f2d6d2cd593cbf7a8fff7f2d656941b62",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L243_s0_c8.npz": "a2327fe77938204d861e4ac5c799b40b57c01cdb7b74c232bb0df68a7a17639e",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L243_s0_c9.npz": "6a7d5139212cf95846597576387be2d8721dab2bab69e90977cc7b7178a527d6",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L243_s1_c0.npz": "0bddc1f7303d5da79d2f9ff8f18b63f148288ebd82a0dfd6e683dae9b58284d9",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L243_s1_c1.npz": "fd17047aae5f111a84197ca4511662ead9d54f8d1b21326376a4862c756536a0",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L243_s1_c2.npz": "cf033f43622299a96a10162e48dca466d0aaa9a28e81afab7e34e3d1769db4c1",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L243_s1_c3.npz": "15c1525376800a17cfcb51062c4cdaf6aba7b411bf90ac112580f0dde74916b7",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L243_s1_c4.npz": "af145ce9aba42a547d1fd76130e38fa78f8ce6ceb16f9612c2b07ba30aef665f",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L243_s1_c5.npz": "b6e015ab79af7a27e3f315a77d8b94970e67b5d90aca73c2ecc9b0ff407e3f01",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L243_s1_c6.npz": "c7cea76775044341e030a0f64886f5551692133a720578bc085b426d279e4255",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L243_s1_c7.npz": "a5bde4d529dbb08c0ae461790953a29b769c8d5eba45889420fea15b4b20967e",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L243_s1_c8.npz": "4af916941a801868904bb254b2295281fdfc5d75bc07d769342a6f005d8687d3",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p4_L243_s1_c9.npz": "8b207af3d1a865aa4c9f84510e092c303103ba9befdb0faab405475f708bc241",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L243_s0_c0.npz": "d04d5fc7ae89556af40a7fc5edcf8e367e161536280361e3fa4325e1affefdf4",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L243_s0_c1.npz": "6cca00018160da735e8c7a5ddb7a25aa9c4e84294f6c3994737ba0920c17f50f",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L243_s0_c2.npz": "d45576182bb1718dcc79b9cc350b0595951499112b289fd5c1027616371dd951",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L243_s0_c3.npz": "04b6235444083ddac86f4642a6978c6e52f02c5a4ef062b93758d8321572132e",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L243_s0_c4.npz": "bbb7d092b2467764fc4cfc50f0cd91f62bec7ec1f1dfb674e500b81bb2ab42fc",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L243_s0_c5.npz": "7756450c39c7e5f28fde857af8585011c9d24e38252b51b7bde47fd6488303fb",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L243_s0_c6.npz": "23bc0b03dd754a2ed418fd8c5d296db9e1160813ba682029eb022047ee004d76",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L243_s0_c7.npz": "9a094a9412bcc85c4aed4c473c39f9534685b45a58e98883dd559eeecd7c62bb",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L243_s0_c8.npz": "6a989352e3843241a58e5cf374843947ce27195d20679995f268f6415e8e6428",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L243_s0_c9.npz": "90dd6b854fa557f0e4604d935406214256f69bab743e920775b4488d20be0cd4",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L243_s1_c0.npz": "7c33a845c4182d5a519658679e9bd6536966104d124dbb52dbe3be06c80365ac",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L243_s1_c1.npz": "1a29c751b364cf34c8bdc27bfc69130e2c9e323ef0bdfee33f8eed23ab5d417f",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L243_s1_c2.npz": "d7035dd8514ce041f1d34e14f9ada8cfe7e60485453903b5e510d9526707e138",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L243_s1_c3.npz": "5e5c84a85bd4c2a7a8b39005e86b27822ae515a9f8a44c622ad6800ca8d85a37",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L243_s1_c4.npz": "d4a8ee6405eac519621767fc412abc1c9cd41a42d431a0635d85d952c240981b",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L243_s1_c5.npz": "9f7634b21cd461a9d5d5f70998c5350d90b669708c79062492f91f16627c74c0",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L243_s1_c6.npz": "4cc231de7929becbb475e418c86d1a1301e7c3aef2fa751f6dabe1ea789f7c76",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L243_s1_c7.npz": "0f720ea75636eba77b157336c84d8285b2f72817d0d961c0a62bfa03960618d6",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L243_s1_c8.npz": "4b05e7614ea34b7b4b5bdf795ecd61be3d19f9cb9185801b25841a95390b770f",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p5_L243_s1_c9.npz": "bd017ba83b8bff21351f7b6276121df5db819923b7820111bc51a7381289df02",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L243_s0_c0.npz": "992eaa4fda838dc5c010731a9206ac65416bc6a2887e902553b023a5df296be4",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L243_s0_c1.npz": "7beb433040f8ea17abae898aa023896308a6dc63d0a9ee733bf6016848f5a363",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L243_s0_c2.npz": "09a0937e2478e49cd26e1ea97eacbb136978c50a89908aa8c85da3b30346fc4d",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L243_s0_c3.npz": "23d3654bfa1d85ae558de20be5145bd0cb7a1117515c1c1b397861d95764f923",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L243_s0_c4.npz": "9fca23a5392426581fc5465c3875a1c235575082ea05b9738747259402a583ba",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L243_s0_c5.npz": "60536445d426827ab1037fca836b1db9a586867881ebd3b989c1de40c6bb3a37",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L243_s0_c6.npz": "d421374f5e8825f3b2c5039e84292a97e647878c4a8904108f3963ef84d4d019",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L243_s0_c7.npz": "9ea569cb593c8665959467223df87f8820ae244f6ce93b4b9a65f01fbb0b23e2",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L243_s0_c8.npz": "3d53ccb6f287ea5eb05173dff2276b4a9d9a23bfcb957c145ffc720a4217745d",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L243_s0_c9.npz": "b5d044d663dc32640c97c02fc59e6969afe9803bbdfcfa1f533fd41224a7cd5c",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L243_s1_c0.npz": "886fba0c72972d892939fb3203ff95f3cb1874a3734222cfaf0a7ab89017c15b",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L243_s1_c1.npz": "36e5a885b053ff34a7ca042af7421eac84bc52af943b3e352ab47df8a204caab",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L243_s1_c2.npz": "35a0bc712d842d3e6dcd49e6d975fed29f5ebff4544f1407085205f77db3a763",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L243_s1_c3.npz": "3328858e34690425075778df00637feb885d7d647e2dcece5aefbd54d454c171",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L243_s1_c4.npz": "79e3a4f23758aa46f33d3e0023b50e9237bcf6f3a18b63bd19192d99698ecefe",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L243_s1_c5.npz": "ffa6260da2ed35385367c4e5c4a1a0f13c69a41ffd5a156c466e07a4896b55f1",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L243_s1_c6.npz": "1b19ab62ac525ed39a8f588efb6d67d87cefe875a8ab228f4f6f9b478090dd6b",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L243_s1_c7.npz": "c270f124a42d53b96ce072c71aea1ec09c00a785912c009a200a6f4391a0ff04",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L243_s1_c8.npz": "9dedecdf6b48a52318e36132a4acf32231455f93652a3a0cb7ddd6d2486e9089",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p6_L243_s1_c9.npz": "56e9f35388ae2a8217fc39206d509e0fb109a95cdc5b8b907ba8d20ae826c8e5",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L243_s0_c0.npz": "01100e759c0c447d0b89eff770b7544d15516122b0f7a83b99b81c77fe420978",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L243_s0_c1.npz": "336577d45378e199bf9f6c49c1d8de954147d0c618a7318ddab4ff44a59540af",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L243_s0_c2.npz": "786a72a60a0aed7f38647f1abf706084590b3c24b2172dd97d9f5e1b53112594",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L243_s0_c3.npz": "b170912bdf6133d0a925cfc2a0a84022ca96c4a8c9e78d72f298d7d293e41d91",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L243_s0_c4.npz": "77375759ce86996af0e9f78c888ddfcd71f11460311b1ce72137319fa0c2920b",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L243_s0_c5.npz": "c6c57f927dfc37877ca0ee3150aa69a8a0967afaf43e928d9c6b0fbd0b83b6b5",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L243_s0_c6.npz": "53d77ff8edc46b21e7a3f900f2075b289ed2fe02d3e20c40441a44a219650834",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L243_s0_c7.npz": "6bce826227aa1e7ba94dabc2a26f8cf42582e40136f8392ba2410a5df503801a",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L243_s0_c8.npz": "fc63ef073bd99c2b67ac3fd68d374b184b9037ad3b1a532dad4a111d2a2de47b",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L243_s0_c9.npz": "c3c2e87f683763926ee99f71388b4018f3bb54af275c8f9e03999d89bfbce33d",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L243_s1_c0.npz": "7a8280214a4067a523d63dbfa32e6f7388807454c825b96d2e9b1f9428ba2243",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L243_s1_c1.npz": "403344e57e1160791b58ae73f418423088f314ee58c5e77bce6012d67a131706",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L243_s1_c2.npz": "4586c02d98d0882e9f9139d34344fa47f56363893e5d3f0e6876018455c4b32f",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L243_s1_c3.npz": "a9c2a57d9658544a1d79bb5a5aed9e56ed059c16498b51c7ce9e23e26150690d",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L243_s1_c4.npz": "148e7243397a6198283e980a1a7c4d9090ff799a8874d780d607e5a800cc4338",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L243_s1_c5.npz": "3d353892b6f4465ba48d6827b8d30fe7d3853f60879c734c0328cceeaded5f94",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L243_s1_c6.npz": "53a495dd693671cd9f9a1279bc0a536ae4d9052989859465972b02dcb8f95b14",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L243_s1_c7.npz": "fc4689688d0ea72b388a50989fc29717d4cd52817e24d899730b3ea8fe4ca5bc",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L243_s1_c8.npz": "35dec2c7527c9dccdbcfadc781f5d0a0e060e6922e1c646f25b4e3bd6910dce2",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p7_L243_s1_c9.npz": "092d01fc52b34786ced9c1d6980389a72ca3a1db6350896b3bd6a6b5b68fdbd2",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L243_s0_c0.npz": "af18e84e749b16c30bc714af196c8b476d70781ebeb5395d9fc9b0cbf772a92d",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L243_s0_c1.npz": "76b1ce32da1531f1d82d0d43b7daca7d2f7882cc97aee694188d18946b96e28e",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L243_s0_c2.npz": "39a658828de197454fad0401bd413601871a96aa1dc24c555993356f98d8b36c",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L243_s0_c3.npz": "b1a714fbda49f634db2009babd4d19c72a91aa3e05fa9a36f0fa0159316e2ccd",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L243_s0_c4.npz": "abe0650c3c4ad06b076c1dbc54bf1c984a630d561d7d6e3fe267dbc4b81cd971",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L243_s0_c5.npz": "1aca54de90c434f9aac64d23f1577c8860193651f278e2dcaf2cacffaa3257da",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L243_s0_c6.npz": "cb7ad32aa1a626f8f37d1fe8f038f697687428bf37d39c5c54d56dacb752d81a",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L243_s0_c7.npz": "acae4635d84b046138b340ac3fd0fdb3e18ae95d0ecfb73828a0e722effdc533",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L243_s0_c8.npz": "92d31e2b1ca16b10efe53cf55daa66bfb87c8eeba4d1e3a8b93c7a30269d6d7f",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L243_s0_c9.npz": "4d8a741b97af037f6a04e32302fd511a3983b3da668342533fad1e9c9865e49e",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L243_s1_c0.npz": "7c433f558f308d08d19808eaf3b5794e4620f8a20b878bd7782eedabb4df41bb",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L243_s1_c1.npz": "9ef020364baa4dab96f74a7bea3525f505ff3f902a70aecb48c62b8f18502d04",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L243_s1_c2.npz": "438a85c7d92f6459e808a7a4bea3b3142aa449fc41ca8684a97e5c092f9e21ef",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L243_s1_c3.npz": "e65599c90230f8f70f8990d797a5211ae003df212586effa809ed0ba7f10f962",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L243_s1_c4.npz": "5c015df20a5a8924a6b39acfe05cececdb7bec99ac8ca3e7f88eb80b107f2675",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L243_s1_c5.npz": "4d42e2980554211cd3c4ac3b8f6d24222947a4bc96ba3a9bb5cf725888e776b6",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L243_s1_c6.npz": "c797e75f52be60fba177856b4455bc9432c1db1b73da9fee19a5fc8d263d985c",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L243_s1_c7.npz": "20ac55c877bb787560ea288f938582e789f7e016f7f72e57df0a8bf78d5980cf",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L243_s1_c8.npz": "6777171ae3543e64f2acc32d5db8fde15d3bd5db002bff93af77f69c5efacb3c",
+  "<data-root>/cc-chains-0937/x2b-rs/x2b/p8_L243_s1_c9.npz": "d1eaf4d065d378696fd1028bffa8fb53f573519244552a528f580f6bca2b4620",
+  "inputs/x2b-xy-2-ch/couplings.toml": "fe60b0f7f5882e656e59a378b6a109c37f5ccb7a08b6e56f4332b0ae347c84be"
+ },
+ "vectors": "results/x2b-xy-2-ch@v10-rules.npz",
+ "readings": [
+  {
+   "instrument": "across",
+   "column": "y_last",
+   "unit": {
+    "point": "0.5"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": 0.0032412017377782074,
+   "lo": -0.055453604833585204,
+   "hi": 0.0664935758299278,
+   "cell": "ZERO!",
+   "code": "MARGINAL",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "across/y_last/point=0.5"
+  },
+  {
+   "instrument": "across_delta",
+   "column": "y_last",
+   "unit": {
+    "point": "0.5"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": null,
+   "code": "MARGINAL",
+   "per_size": [
+    {
+     "size": "0.5->0.6",
+     "estimate": -0.010666751636419404,
+     "lo": -0.013522906038409957,
+     "hi": -0.005979579212467721,
+     "cell": "SLOW-",
+     "code": "MARGINAL",
+     "door": "RAW"
+    }
+   ],
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": null
+  },
+  {
+   "instrument": "fluct",
+   "column": "y_last",
+   "unit": {
+    "point": "0.5"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -1.9977291949638927,
+   "lo": -2.0052611541119245,
+   "hi": -1.9901221708467294,
+   "cell": "SIG-",
+   "code": "VANISHES",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "fluct/y_last/point=0.5"
+  },
+  {
+   "instrument": "needle",
+   "column": "velocity",
+   "unit": {
+    "point": "0.5"
+   },
+   "eps_key": "step",
+   "eps": 0.01,
+   "estimate": 0.0008929054670959724,
+   "lo": 0.0007922777027681294,
+   "hi": 0.0009625605426677453,
+   "cell": "SLOW+",
+   "code": "SLOW",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/velocity/point=0.5"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_ord",
+   "unit": {
+    "point": "0.5"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.07129351195007405,
+   "lo": 0.07126239521570255,
+   "hi": 0.07135757682451083,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_ord/point=0.5"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_dis",
+   "unit": {
+    "point": "0.5"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.928706488049926,
+   "lo": 0.9286424231754892,
+   "hi": 0.9287376047842975,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_dis/point=0.5"
+  },
+  {
+   "instrument": "needle_chain",
+   "column": "drift",
+   "unit": {
+    "point": "0.5"
+   },
+   "eps_key": "drift",
+   "eps": 0.5,
+   "estimate": 0.9184657658231857,
+   "lo": 0.854221888522942,
+   "hi": 1.0328164219359883,
+   "cell": "SIG+",
+   "code": "CONVERGING",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle_chain/drift/point=0.5"
+  },
+  {
+   "instrument": "needle_o",
+   "column": "velocity",
+   "unit": {
+    "point": "0.5"
+   },
+   "eps_key": "step",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "needle_o",
+   "column": "d_ord",
+   "unit": {
+    "point": "0.5"
+   },
+   "eps_key": "sink",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "needle_o",
+   "column": "d_dis",
+   "unit": {
+    "point": "0.5"
+   },
+   "eps_key": "sink",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "stability",
+   "column": "d",
+   "unit": {
+    "point": "0.5"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": 0.08284470907565605,
+   "lo": 0.0032805066964270366,
+   "hi": 0.15241879789020377,
+   "cell": "SLOW+",
+   "code": "STABLE",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "stability/d/point=0.5"
+  },
+  {
+   "instrument": "stability_delta",
+   "column": "d",
+   "unit": {
+    "point": "0.5"
+   },
+   "eps_key": "y",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "stability_delta is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "transform",
+   "column": "y_inf",
+   "unit": {
+    "point": "0.5"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": 0.014115249601325264,
+   "lo": -0.05495045603774411,
+   "hi": 0.08935142622267597,
+   "cell": "ZERO!",
+   "code": "MARGINAL",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "transform/y_inf/point=0.5"
+  },
+  {
+   "instrument": "two_start",
+   "column": "D",
+   "unit": {
+    "point": "0.5"
+   },
+   "eps_key": "two_start",
+   "eps": 0.01,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": null,
+   "code": "INDEP",
+   "per_size": [
+    {
+     "size": 27,
+     "estimate": 4.394687629327709e-05,
+     "lo": -1.3291524408098887e-05,
+     "hi": 0.00012109677877836234,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    },
+    {
+     "size": 81,
+     "estimate": -1.0664175380037388e-05,
+     "lo": -2.339880553969831e-05,
+     "hi": 5.709794164554527e-05,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    },
+    {
+     "size": 243,
+     "estimate": -1.1117704585117405e-05,
+     "lo": -1.5070058674515607e-05,
+     "hi": 1.491026331024159e-05,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    }
+   ],
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": null
+  },
+  {
+   "instrument": "across",
+   "column": "y_last",
+   "unit": {
+    "point": "0.6"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -0.03805994634741586,
+   "lo": -0.08203720812089318,
+   "hi": 0.04064915665498602,
+   "cell": "ZERO!",
+   "code": "MARGINAL",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "across/y_last/point=0.6"
+  },
+  {
+   "instrument": "across_delta",
+   "column": "y_last",
+   "unit": {
+    "point": "0.6"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": null,
+   "code": "MARGINAL",
+   "per_size": [
+    {
+     "size": "0.5->0.6",
+     "estimate": -0.010666751636419404,
+     "lo": -0.013522906038409957,
+     "hi": -0.005979579212467721,
+     "cell": "SLOW-",
+     "code": "MARGINAL",
+     "door": "RAW"
+    },
+    {
+     "size": "0.6->0.7",
+     "estimate": -0.011321526193361301,
+     "lo": -0.014813984319414237,
+     "hi": -0.006494065038000382,
+     "cell": "SLOW-",
+     "code": "MARGINAL",
+     "door": "RAW"
+    }
+   ],
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": null
+  },
+  {
+   "instrument": "fluct",
+   "column": "y_last",
+   "unit": {
+    "point": "0.6"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -2.000251563682566,
+   "lo": -2.0027757870520646,
+   "hi": -1.996300534481383,
+   "cell": "SIG-",
+   "code": "VANISHES",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "fluct/y_last/point=0.6"
+  },
+  {
+   "instrument": "needle",
+   "column": "velocity",
+   "unit": {
+    "point": "0.6"
+   },
+   "eps_key": "step",
+   "eps": 0.01,
+   "estimate": 0.001067989377775802,
+   "lo": 0.001010885215639079,
+   "hi": 0.0011484081281117886,
+   "cell": "SLOW+",
+   "code": "SLOW",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/velocity/point=0.6"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_ord",
+   "unit": {
+    "point": "0.6"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.08863103687613627,
+   "lo": 0.08857208572182496,
+   "hi": 0.08867617413096751,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_ord/point=0.6"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_dis",
+   "unit": {
+    "point": "0.6"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.9113689631238637,
+   "lo": 0.9113238258690325,
+   "hi": 0.911427914278175,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_dis/point=0.6"
+  },
+  {
+   "instrument": "needle_chain",
+   "column": "drift",
+   "unit": {
+    "point": "0.6"
+   },
+   "eps_key": "drift",
+   "eps": 0.5,
+   "estimate": 0.9443929984540477,
+   "lo": 0.8902550167337038,
+   "hi": 1.0050388509428907,
+   "cell": "SIG+",
+   "code": "CONVERGING",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle_chain/drift/point=0.6"
+  },
+  {
+   "instrument": "needle_o",
+   "column": "velocity",
+   "unit": {
+    "point": "0.6"
+   },
+   "eps_key": "step",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "needle_o",
+   "column": "d_ord",
+   "unit": {
+    "point": "0.6"
+   },
+   "eps_key": "sink",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "needle_o",
+   "column": "d_dis",
+   "unit": {
+    "point": "0.6"
+   },
+   "eps_key": "sink",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "stability",
+   "column": "d",
+   "unit": {
+    "point": "0.6"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": 0.03473685792938666,
+   "lo": -0.014617857999429273,
+   "hi": 0.13213103526534273,
+   "cell": "ZERO!",
+   "code": "STABLE",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "stability/d/point=0.6"
+  },
+  {
+   "instrument": "stability_delta",
+   "column": "d",
+   "unit": {
+    "point": "0.6"
+   },
+   "eps_key": "y",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "stability_delta is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "transform",
+   "column": "y_inf",
+   "unit": {
+    "point": "0.6"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -0.03354243359223291,
+   "lo": -0.08502603607826556,
+   "hi": 0.06102536924608945,
+   "cell": "ZERO!",
+   "code": "MARGINAL",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "transform/y_inf/point=0.6"
+  },
+  {
+   "instrument": "two_start",
+   "column": "D",
+   "unit": {
+    "point": "0.6"
+   },
+   "eps_key": "two_start",
+   "eps": 0.01,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": null,
+   "code": "INDEP",
+   "per_size": [
+    {
+     "size": 27,
+     "estimate": 1.8967167098760118e-05,
+     "lo": -0.00017048233654470835,
+     "hi": 9.533525551486122e-05,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    },
+    {
+     "size": 81,
+     "estimate": 3.3618834909432405e-05,
+     "lo": 6.580243328002666e-08,
+     "hi": 8.19163305152415e-05,
+     "cell": "SLOW+",
+     "code": "INDEP"
+    },
+    {
+     "size": 243,
+     "estimate": 2.0937246778540697e-06,
+     "lo": -7.097326943705795e-06,
+     "hi": 1.892477619003241e-05,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    }
+   ],
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": null
+  },
+  {
+   "instrument": "across",
+   "column": "y_last",
+   "unit": {
+    "point": "0.7"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": 0.0035774543098180743,
+   "lo": -0.04778713421131432,
+   "hi": 0.052879949782294176,
+   "cell": "ZERO!",
+   "code": "MARGINAL",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "across/y_last/point=0.7"
+  },
+  {
+   "instrument": "across_delta",
+   "column": "y_last",
+   "unit": {
+    "point": "0.7"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": null,
+   "code": "MARGINAL",
+   "per_size": [
+    {
+     "size": "0.6->0.7",
+     "estimate": -0.011321526193361301,
+     "lo": -0.014813984319414237,
+     "hi": -0.006494065038000382,
+     "cell": "SLOW-",
+     "code": "MARGINAL",
+     "door": "RAW"
+    },
+    {
+     "size": "0.7->0.8",
+     "estimate": -0.015461993861669751,
+     "lo": -0.017929049627990287,
+     "hi": -0.012185073548169481,
+     "cell": "SLOW-",
+     "code": "MARGINAL",
+     "door": "RAW"
+    }
+   ],
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": null
+  },
+  {
+   "instrument": "fluct",
+   "column": "y_last",
+   "unit": {
+    "point": "0.7"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -1.9970438876014098,
+   "lo": -2.0027021635023727,
+   "hi": -1.994001653921456,
+   "cell": "SIG-",
+   "code": "VANISHES",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "fluct/y_last/point=0.7"
+  },
+  {
+   "instrument": "needle",
+   "column": "velocity",
+   "unit": {
+    "point": "0.7"
+   },
+   "eps_key": "step",
+   "eps": 0.01,
+   "estimate": 0.0013055580318462323,
+   "lo": 0.0012314054146309594,
+   "hi": 0.0013716486616611734,
+   "cell": "SLOW+",
+   "code": "SLOW",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/velocity/point=0.7"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_ord",
+   "unit": {
+    "point": "0.7"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.10817284865299143,
+   "lo": 0.10812089297846539,
+   "hi": 0.10821127457878843,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_ord/point=0.7"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_dis",
+   "unit": {
+    "point": "0.7"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.8918271513470086,
+   "lo": 0.8917887254212116,
+   "hi": 0.8918791070215346,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_dis/point=0.7"
+  },
+  {
+   "instrument": "needle_chain",
+   "column": "drift",
+   "unit": {
+    "point": "0.7"
+   },
+   "eps_key": "drift",
+   "eps": 0.5,
+   "estimate": 0.9414517859995171,
+   "lo": 0.9011299305436915,
+   "hi": 0.9990643187481398,
+   "cell": "SIG+",
+   "code": "CONVERGING",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle_chain/drift/point=0.7"
+  },
+  {
+   "instrument": "needle_o",
+   "column": "velocity",
+   "unit": {
+    "point": "0.7"
+   },
+   "eps_key": "step",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "needle_o",
+   "column": "d_ord",
+   "unit": {
+    "point": "0.7"
+   },
+   "eps_key": "sink",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "needle_o",
+   "column": "d_dis",
+   "unit": {
+    "point": "0.7"
+   },
+   "eps_key": "sink",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "stability",
+   "column": "d",
+   "unit": {
+    "point": "0.7"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": 0.08272957568018843,
+   "lo": 0.03893784019388433,
+   "hi": 0.13686679833420023,
+   "cell": "SLOW+",
+   "code": "STABLE",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "stability/d/point=0.7"
+  },
+  {
+   "instrument": "stability_delta",
+   "column": "d",
+   "unit": {
+    "point": "0.7"
+   },
+   "eps_key": "y",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "stability_delta is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "transform",
+   "column": "y_inf",
+   "unit": {
+    "point": "0.7"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": 0.01748469928573418,
+   "lo": -0.04265557629047738,
+   "hi": 0.07230803408343517,
+   "cell": "ZERO!",
+   "code": "MARGINAL",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "transform/y_inf/point=0.7"
+  },
+  {
+   "instrument": "two_start",
+   "column": "D",
+   "unit": {
+    "point": "0.7"
+   },
+   "eps_key": "two_start",
+   "eps": 0.01,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": null,
+   "code": "INDEP",
+   "per_size": [
+    {
+     "size": 27,
+     "estimate": 4.545726039700826e-05,
+     "lo": -5.7302339915632494e-05,
+     "hi": 0.00017127661824567486,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    },
+    {
+     "size": 81,
+     "estimate": 4.045945855496447e-05,
+     "lo": -4.711739426366268e-05,
+     "hi": 6.66417817057896e-05,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    },
+    {
+     "size": 243,
+     "estimate": 4.007686603635374e-06,
+     "lo": -1.8036553005917888e-05,
+     "hi": 2.913114566460706e-05,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    }
+   ],
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": null
+  },
+  {
+   "instrument": "across",
+   "column": "y_last",
+   "unit": {
+    "point": "0.8"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -0.02523003275181005,
+   "lo": -0.07600681857693363,
+   "hi": 0.02051159006296649,
+   "cell": "ZERO!",
+   "code": "MARGINAL",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "across/y_last/point=0.8"
+  },
+  {
+   "instrument": "across_delta",
+   "column": "y_last",
+   "unit": {
+    "point": "0.8"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": null,
+   "code": "MARGINAL",
+   "per_size": [
+    {
+     "size": "0.7->0.8",
+     "estimate": -0.015461993861669751,
+     "lo": -0.017929049627990287,
+     "hi": -0.012185073548169481,
+     "cell": "SLOW-",
+     "code": "MARGINAL",
+     "door": "RAW"
+    },
+    {
+     "size": "0.8->0.85",
+     "estimate": -0.007202652651695639,
+     "lo": -0.01799852110591704,
+     "hi": -0.0014741345711178284,
+     "cell": "SLOW-",
+     "code": "MARGINAL",
+     "door": "RAW"
+    }
+   ],
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": null
+  },
+  {
+   "instrument": "fluct",
+   "column": "y_last",
+   "unit": {
+    "point": "0.8"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -2.002459303279127,
+   "lo": -2.008511413778341,
+   "hi": -1.9939297542977226,
+   "cell": "SIG-",
+   "code": "VANISHES",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "fluct/y_last/point=0.8"
+  },
+  {
+   "instrument": "needle",
+   "column": "velocity",
+   "unit": {
+    "point": "0.8"
+   },
+   "eps_key": "step",
+   "eps": 0.01,
+   "estimate": 0.0017329929924864151,
+   "lo": 0.0016145592896033012,
+   "hi": 0.00179530886539514,
+   "cell": "SLOW+",
+   "code": "SLOW",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/velocity/point=0.8"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_ord",
+   "unit": {
+    "point": "0.8"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.13222926418620096,
+   "lo": 0.13218074396180834,
+   "hi": 0.1323141302921348,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_ord/point=0.8"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_dis",
+   "unit": {
+    "point": "0.8"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.867770735813799,
+   "lo": 0.8676858697078652,
+   "hi": 0.8678192560381917,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_dis/point=0.8"
+  },
+  {
+   "instrument": "needle_chain",
+   "column": "drift",
+   "unit": {
+    "point": "0.8"
+   },
+   "eps_key": "drift",
+   "eps": 0.5,
+   "estimate": 0.8543855920861776,
+   "lo": 0.8146256315739031,
+   "hi": 0.9208894297396495,
+   "cell": "SIG+",
+   "code": "CONVERGING",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle_chain/drift/point=0.8"
+  },
+  {
+   "instrument": "needle_o",
+   "column": "velocity",
+   "unit": {
+    "point": "0.8"
+   },
+   "eps_key": "step",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "needle_o",
+   "column": "d_ord",
+   "unit": {
+    "point": "0.8"
+   },
+   "eps_key": "sink",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "needle_o",
+   "column": "d_dis",
+   "unit": {
+    "point": "0.8"
+   },
+   "eps_key": "sink",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "stability",
+   "column": "d",
+   "unit": {
+    "point": "0.8"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": 0.031192064106921477,
+   "lo": -0.01968420943199628,
+   "hi": 0.09460047393894863,
+   "cell": "ZERO!",
+   "code": "STABLE",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "stability/d/point=0.8"
+  },
+  {
+   "instrument": "stability_delta",
+   "column": "d",
+   "unit": {
+    "point": "0.8"
+   },
+   "eps_key": "y",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "stability_delta is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "transform",
+   "column": "y_inf",
+   "unit": {
+    "point": "0.8"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -0.020523654838051755,
+   "lo": -0.07872157445576876,
+   "hi": 0.036563694131542875,
+   "cell": "ZERO!",
+   "code": "MARGINAL",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "transform/y_inf/point=0.8"
+  },
+  {
+   "instrument": "two_start",
+   "column": "D",
+   "unit": {
+    "point": "0.8"
+   },
+   "eps_key": "two_start",
+   "eps": 0.01,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": null,
+   "code": "INDEP",
+   "per_size": [
+    {
+     "size": 27,
+     "estimate": 4.359772435291731e-06,
+     "lo": -0.0002151245270569646,
+     "hi": 0.0002240335230068169,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    },
+    {
+     "size": 81,
+     "estimate": -5.1421586271027664e-05,
+     "lo": -8.169477526631663e-05,
+     "hi": 4.665125071023901e-05,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    },
+    {
+     "size": 243,
+     "estimate": 1.305378972527027e-05,
+     "lo": -1.9655365734339014e-05,
+     "hi": 2.9521833061263436e-05,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    }
+   ],
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": null
+  },
+  {
+   "instrument": "across",
+   "column": "y_last",
+   "unit": {
+    "point": "0.85"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -0.010891616579034136,
+   "lo": -0.04750207457143056,
+   "hi": 0.07273413080710593,
+   "cell": "ZERO!",
+   "code": "MARGINAL",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "across/y_last/point=0.85"
+  },
+  {
+   "instrument": "across_delta",
+   "column": "y_last",
+   "unit": {
+    "point": "0.85"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": null,
+   "code": "MARGINAL",
+   "per_size": [
+    {
+     "size": "0.8->0.85",
+     "estimate": -0.007202652651695639,
+     "lo": -0.01799852110591704,
+     "hi": -0.0014741345711178284,
+     "cell": "SLOW-",
+     "code": "MARGINAL",
+     "door": "RAW"
+    },
+    {
+     "size": "0.85->0.89294",
+     "estimate": 0.07896587116272043,
+     "lo": 0.07168736238682803,
+     "hi": 0.08671586630559244,
+     "cell": "SLOW+",
+     "code": "MARGINAL",
+     "door": "RAW"
+    }
+   ],
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": null
+  },
+  {
+   "instrument": "fluct",
+   "column": "y_last",
+   "unit": {
+    "point": "0.85"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -1.9988447265874283,
+   "lo": -2.0149183016932932,
+   "hi": -1.9933582009644861,
+   "cell": "SIG-",
+   "code": "VANISHES",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "fluct/y_last/point=0.85"
+  },
+  {
+   "instrument": "needle",
+   "column": "velocity",
+   "unit": {
+    "point": "0.85"
+   },
+   "eps_key": "step",
+   "eps": 0.01,
+   "estimate": 0.0019066606914509565,
+   "lo": 0.0017370509472284246,
+   "hi": 0.001998422952289025,
+   "cell": "SLOW+",
+   "code": "SLOW",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/velocity/point=0.85"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_ord",
+   "unit": {
+    "point": "0.85"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.14864926675813117,
+   "lo": 0.14859197756873432,
+   "hi": 0.14871768351591585,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_ord/point=0.85"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_dis",
+   "unit": {
+    "point": "0.85"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.8513507332418688,
+   "lo": 0.8512823164840841,
+   "hi": 0.8514080224312657,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_dis/point=0.85"
+  },
+  {
+   "instrument": "needle_chain",
+   "column": "drift",
+   "unit": {
+    "point": "0.85"
+   },
+   "eps_key": "drift",
+   "eps": 0.5,
+   "estimate": 0.8154953179015217,
+   "lo": 0.7767167097473546,
+   "hi": 0.8874366270409499,
+   "cell": "SIG+",
+   "code": "CONVERGING",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle_chain/drift/point=0.85"
+  },
+  {
+   "instrument": "needle_o",
+   "column": "velocity",
+   "unit": {
+    "point": "0.85"
+   },
+   "eps_key": "step",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "needle_o",
+   "column": "d_ord",
+   "unit": {
+    "point": "0.85"
+   },
+   "eps_key": "sink",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "needle_o",
+   "column": "d_dis",
+   "unit": {
+    "point": "0.85"
+   },
+   "eps_key": "sink",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "stability",
+   "column": "d",
+   "unit": {
+    "point": "0.85"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -0.020966900815359207,
+   "lo": -0.09167451444034622,
+   "hi": 0.07356372808684865,
+   "cell": "ZERO!",
+   "code": "STABLE",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "stability/d/point=0.85"
+  },
+  {
+   "instrument": "stability_delta",
+   "column": "d",
+   "unit": {
+    "point": "0.85"
+   },
+   "eps_key": "y",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "stability_delta is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "transform",
+   "column": "y_inf",
+   "unit": {
+    "point": "0.85"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -0.013982640619950196,
+   "lo": -0.060686782061225214,
+   "hi": 0.08261628519913707,
+   "cell": "ZERO!",
+   "code": "MARGINAL",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "transform/y_inf/point=0.85"
+  },
+  {
+   "instrument": "two_start",
+   "column": "D",
+   "unit": {
+    "point": "0.85"
+   },
+   "eps_key": "two_start",
+   "eps": 0.01,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": null,
+   "code": "INDEP",
+   "per_size": [
+    {
+     "size": 27,
+     "estimate": 2.896478687830495e-05,
+     "lo": -0.00029929617396762254,
+     "hi": 0.0002558013682978366,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    },
+    {
+     "size": 81,
+     "estimate": -5.280930485057622e-05,
+     "lo": -0.00011064195811993915,
+     "hi": 0.00011487108366770027,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    },
+    {
+     "size": 243,
+     "estimate": 9.035101628973585e-06,
+     "lo": -1.6665422286066267e-05,
+     "hi": 2.0375033421005107e-05,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    }
+   ],
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": null
+  },
+  {
+   "instrument": "across",
+   "column": "y_last",
+   "unit": {
+    "point": "0.89294"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": 0.159336391613088,
+   "lo": 0.10905592071544108,
+   "hi": 0.18616957362954017,
+   "cell": "SLOW+",
+   "code": "WEAK",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "across/y_last/point=0.89294"
+  },
+  {
+   "instrument": "across_delta",
+   "column": "y_last",
+   "unit": {
+    "point": "0.89294"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": null,
+   "code": "UNRES",
+   "per_size": [
+    {
+     "size": "0.85->0.89294",
+     "estimate": 0.07896587116272043,
+     "lo": 0.07168736238682803,
+     "hi": 0.08671586630559244,
+     "cell": "SLOW+",
+     "code": "MARGINAL",
+     "door": "RAW"
+    },
+    {
+     "size": "0.89294->0.95",
+     "estimate": 0.5226753921835152,
+     "lo": 0.515427174489166,
+     "hi": 0.5311964056790213,
+     "cell": "SIG+",
+     "code": "RELEVANT",
+     "door": "RAW"
+    }
+   ],
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": null
+  },
+  {
+   "instrument": "fluct",
+   "column": "y_last",
+   "unit": {
+    "point": "0.89294"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -1.9988923177698688,
+   "lo": -2.0057822146527995,
+   "hi": -1.9848952362915067,
+   "cell": "SIG-",
+   "code": "VANISHES",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "fluct/y_last/point=0.89294"
+  },
+  {
+   "instrument": "needle",
+   "column": "velocity",
+   "unit": {
+    "point": "0.89294"
+   },
+   "eps_key": "step",
+   "eps": 0.01,
+   "estimate": 4.19548824676097e-05,
+   "lo": -5.2156620363175143e-05,
+   "hi": 0.00022064750238459663,
+   "cell": "ZERO!",
+   "code": "STOPPED",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/velocity/point=0.89294"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_ord",
+   "unit": {
+    "point": "0.89294"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.1706672362019283,
+   "lo": 0.17049485769488548,
+   "hi": 0.17079541234843565,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_ord/point=0.89294"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_dis",
+   "unit": {
+    "point": "0.89294"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.8293327637980716,
+   "lo": 0.8292045876515644,
+   "hi": 0.8295051423051145,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_dis/point=0.89294"
+  },
+  {
+   "instrument": "needle_chain",
+   "column": "drift",
+   "unit": {
+    "point": "0.89294"
+   },
+   "eps_key": "drift",
+   "eps": 0.5,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-EVALUATED",
+   "code": "NOT-EVALUATED",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": "sign of velocity not constant across the point estimate and every resample",
+   "vector_key": null
+  },
+  {
+   "instrument": "needle_o",
+   "column": "velocity",
+   "unit": {
+    "point": "0.89294"
+   },
+   "eps_key": "step",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "needle_o",
+   "column": "d_ord",
+   "unit": {
+    "point": "0.89294"
+   },
+   "eps_key": "sink",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "needle_o",
+   "column": "d_dis",
+   "unit": {
+    "point": "0.89294"
+   },
+   "eps_key": "sink",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "stability",
+   "column": "d",
+   "unit": {
+    "point": "0.89294"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -0.021475658036243614,
+   "lo": -0.07156045198407898,
+   "hi": 0.03164356934444004,
+   "cell": "ZERO!",
+   "code": "STABLE",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "stability/d/point=0.89294"
+  },
+  {
+   "instrument": "stability_delta",
+   "column": "d",
+   "unit": {
+    "point": "0.89294"
+   },
+   "eps_key": "y",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "stability_delta is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "transform",
+   "column": "y_inf",
+   "unit": {
+    "point": "0.89294"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-EVALUATED",
+   "code": "NOT-EVALUATED",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": "sign of R not constant across the point estimate and every resample",
+   "vector_key": null
+  },
+  {
+   "instrument": "two_start",
+   "column": "D",
+   "unit": {
+    "point": "0.89294"
+   },
+   "eps_key": "two_start",
+   "eps": 0.01,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": null,
+   "code": "INDEP",
+   "per_size": [
+    {
+     "size": 27,
+     "estimate": -0.00017964134289849554,
+     "lo": -0.00033000240069169795,
+     "hi": 0.00020395397921013636,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    },
+    {
+     "size": 81,
+     "estimate": 5.028114940852646e-06,
+     "lo": -5.133710328375507e-05,
+     "hi": 5.372345060439265e-05,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    },
+    {
+     "size": 243,
+     "estimate": 1.1474038752568028e-05,
+     "lo": -4.133755800417305e-05,
+     "hi": 1.6348174111779912e-05,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    }
+   ],
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": null
+  },
+  {
+   "instrument": "across",
+   "column": "y_last",
+   "unit": {
+    "point": "0.95"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": 0.8628269141757304,
+   "lo": 0.8220905829956975,
+   "hi": 0.8944743448136455,
+   "cell": "SIG+",
+   "code": "RELEVANT",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "across/y_last/point=0.95"
+  },
+  {
+   "instrument": "across_delta",
+   "column": "y_last",
+   "unit": {
+    "point": "0.95"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": null,
+   "code": "RELEVANT",
+   "per_size": [
+    {
+     "size": "0.89294->0.95",
+     "estimate": 0.5226753921835152,
+     "lo": 0.515427174489166,
+     "hi": 0.5311964056790213,
+     "cell": "SIG+",
+     "code": "RELEVANT",
+     "door": "RAW"
+    },
+    {
+     "size": "0.95->1.0",
+     "estimate": 0.7824053772092587,
+     "lo": 0.7803408345006447,
+     "hi": 0.7894612636879225,
+     "cell": "SIG+",
+     "code": "RELEVANT",
+     "door": "RAW"
+    }
+   ],
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": null
+  },
+  {
+   "instrument": "fluct",
+   "column": "y_last",
+   "unit": {
+    "point": "0.95"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -1.975994903405204,
+   "lo": -1.9871162751278504,
+   "hi": -1.967253708054055,
+   "cell": "SIG-",
+   "code": "VANISHES",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "fluct/y_last/point=0.95"
+  },
+  {
+   "instrument": "needle",
+   "column": "velocity",
+   "unit": {
+    "point": "0.95"
+   },
+   "eps_key": "step",
+   "eps": 0.01,
+   "estimate": -0.04058584918422353,
+   "lo": -0.04100870618913666,
+   "hi": -0.040308401691117934,
+   "cell": "SIG-",
+   "code": "FLOWING",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/velocity/point=0.95"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_ord",
+   "unit": {
+    "point": "0.95"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.26386971655768404,
+   "lo": 0.2636124781960111,
+   "hi": 0.2642510643887155,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_ord/point=0.95"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_dis",
+   "unit": {
+    "point": "0.95"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.736130283442316,
+   "lo": 0.7357489356112845,
+   "hi": 0.7363875218039889,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_dis/point=0.95"
+  },
+  {
+   "instrument": "needle_chain",
+   "column": "drift",
+   "unit": {
+    "point": "0.95"
+   },
+   "eps_key": "drift",
+   "eps": 0.5,
+   "estimate": -2.8024028290679963,
+   "lo": -2.93563550934134,
+   "hi": -2.756642075541299,
+   "cell": "SIG-",
+   "code": "PERSISTENT",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle_chain/drift/point=0.95"
+  },
+  {
+   "instrument": "needle_o",
+   "column": "velocity",
+   "unit": {
+    "point": "0.95"
+   },
+   "eps_key": "step",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "needle_o",
+   "column": "d_ord",
+   "unit": {
+    "point": "0.95"
+   },
+   "eps_key": "sink",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "needle_o",
+   "column": "d_dis",
+   "unit": {
+    "point": "0.95"
+   },
+   "eps_key": "sink",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "stability",
+   "column": "d",
+   "unit": {
+    "point": "0.95"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": 0.26141848843908094,
+   "lo": 0.20601784064590134,
+   "hi": 0.3305223783153429,
+   "cell": "POS",
+   "code": "CROSSING",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "stability/d/point=0.95"
+  },
+  {
+   "instrument": "stability_delta",
+   "column": "d",
+   "unit": {
+    "point": "0.95"
+   },
+   "eps_key": "y",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "stability_delta is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "transform",
+   "column": "y_inf",
+   "unit": {
+    "point": "0.95"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-EVALUATED",
+   "code": "NOT-EVALUATED",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": "the needle's correction does not decay (r >= 1) at the estimate or a resample: y_inf is undefined",
+   "vector_key": null
+  },
+  {
+   "instrument": "two_start",
+   "column": "D",
+   "unit": {
+    "point": "0.95"
+   },
+   "eps_key": "two_start",
+   "eps": 0.01,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": null,
+   "code": "INDEP",
+   "per_size": [
+    {
+     "size": 27,
+     "estimate": -0.00019198262856823245,
+     "lo": -0.0003745245147283027,
+     "hi": 0.00017334868156404504,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    },
+    {
+     "size": 81,
+     "estimate": 5.855632295576063e-05,
+     "lo": -2.9202346933265844e-05,
+     "hi": 9.044005321778847e-05,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    },
+    {
+     "size": 243,
+     "estimate": -2.395661362120105e-06,
+     "lo": -2.520327029931213e-05,
+     "hi": 1.8052244620703206e-05,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    }
+   ],
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": null
+  },
+  {
+   "instrument": "across",
+   "column": "y_last",
+   "unit": {
+    "point": "1.0"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": 0.41971073163486194,
+   "lo": 0.40749350973824733,
+   "hi": 0.42746324434529404,
+   "cell": "SIG+",
+   "code": "RELEVANT",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "across/y_last/point=1.0"
+  },
+  {
+   "instrument": "across_delta",
+   "column": "y_last",
+   "unit": {
+    "point": "1.0"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": null,
+   "code": "UNRES",
+   "per_size": [
+    {
+     "size": "0.95->1.0",
+     "estimate": 0.7824053772092587,
+     "lo": 0.7803408345006447,
+     "hi": 0.7894612636879225,
+     "cell": "SIG+",
+     "code": "RELEVANT",
+     "door": "RAW"
+    },
+    {
+     "size": "1.0->1.1",
+     "estimate": 0.06235333218099778,
+     "lo": 0.06096273249117645,
+     "hi": 0.06421528128657025,
+     "cell": "SLOW+",
+     "code": "MARGINAL",
+     "door": "RAW"
+    }
+   ],
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": null
+  },
+  {
+   "instrument": "fluct",
+   "column": "y_last",
+   "unit": {
+    "point": "1.0"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -2.016268295096755,
+   "lo": -2.028153582777331,
+   "hi": -2.010760817498868,
+   "cell": "SIG-",
+   "code": "VANISHES",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "fluct/y_last/point=1.0"
+  },
+  {
+   "instrument": "needle",
+   "column": "velocity",
+   "unit": {
+    "point": "1.0"
+   },
+   "eps_key": "step",
+   "eps": 0.01,
+   "estimate": -0.20234035801210945,
+   "lo": -0.20321912379885676,
+   "hi": -0.20197834724705627,
+   "cell": "SIG-",
+   "code": "FLOWING",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/velocity/point=1.0"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_ord",
+   "unit": {
+    "point": "1.0"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.5441292730025139,
+   "lo": 0.5437717660341177,
+   "hi": 0.5445971223631099,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_ord/point=1.0"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_dis",
+   "unit": {
+    "point": "1.0"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.4558707269974861,
+   "lo": 0.4554028776368902,
+   "hi": 0.45622823396588236,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_dis/point=1.0"
+  },
+  {
+   "instrument": "needle_chain",
+   "column": "drift",
+   "unit": {
+    "point": "1.0"
+   },
+   "eps_key": "drift",
+   "eps": 0.5,
+   "estimate": -1.8799679901123079,
+   "lo": -1.8896455975096544,
+   "hi": -1.8760016808401825,
+   "cell": "SIG-",
+   "code": "PERSISTENT",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle_chain/drift/point=1.0"
+  },
+  {
+   "instrument": "needle_o",
+   "column": "velocity",
+   "unit": {
+    "point": "1.0"
+   },
+   "eps_key": "step",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "needle_o",
+   "column": "d_ord",
+   "unit": {
+    "point": "1.0"
+   },
+   "eps_key": "sink",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "needle_o",
+   "column": "d_dis",
+   "unit": {
+    "point": "1.0"
+   },
+   "eps_key": "sink",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "stability",
+   "column": "d",
+   "unit": {
+    "point": "1.0"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -0.5442568889640841,
+   "lo": -0.5685713416497076,
+   "hi": -0.506843678533949,
+   "cell": "SIG-",
+   "code": "OFF",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "stability/d/point=1.0"
+  },
+  {
+   "instrument": "stability_delta",
+   "column": "d",
+   "unit": {
+    "point": "1.0"
+   },
+   "eps_key": "y",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "stability_delta is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "transform",
+   "column": "y_inf",
+   "unit": {
+    "point": "1.0"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-EVALUATED",
+   "code": "NOT-EVALUATED",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": "the needle's correction does not decay (r >= 1) at the estimate or a resample: y_inf is undefined",
+   "vector_key": null
+  },
+  {
+   "instrument": "two_start",
+   "column": "D",
+   "unit": {
+    "point": "1.0"
+   },
+   "eps_key": "two_start",
+   "eps": 0.01,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": null,
+   "code": "INDEP",
+   "per_size": [
+    {
+     "size": 27,
+     "estimate": -3.8501047369632335e-05,
+     "lo": -0.0003905545382264508,
+     "hi": 0.00029750552868135216,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    },
+    {
+     "size": 81,
+     "estimate": -1.9147129159124976e-05,
+     "lo": -0.0001252853968121137,
+     "hi": 8.126846571776536e-05,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    },
+    {
+     "size": 243,
+     "estimate": 1.25641011700095e-05,
+     "lo": -4.442581772423626e-05,
+     "hi": 5.633835054974501e-05,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    }
+   ],
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": null
+  },
+  {
+   "instrument": "across",
+   "column": "y_last",
+   "unit": {
+    "point": "1.1"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -0.29475815504566094,
+   "lo": -0.314265116305506,
+   "hi": -0.2719289880219528,
+   "cell": "SIG-",
+   "code": "IRRELEVANT",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "across/y_last/point=1.1"
+  },
+  {
+   "instrument": "across_delta",
+   "column": "y_last",
+   "unit": {
+    "point": "1.1"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": null,
+   "code": "MARGINAL",
+   "per_size": [
+    {
+     "size": "1.0->1.1",
+     "estimate": 0.06235333218099778,
+     "lo": 0.06096273249117645,
+     "hi": 0.06421528128657025,
+     "cell": "SLOW+",
+     "code": "MARGINAL",
+     "door": "RAW"
+    }
+   ],
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": null
+  },
+  {
+   "instrument": "fluct",
+   "column": "y_last",
+   "unit": {
+    "point": "1.1"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -1.9988857846666193,
+   "lo": -2.0059514046578557,
+   "hi": -1.9946419785439933,
+   "cell": "SIG-",
+   "code": "VANISHES",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "fluct/y_last/point=1.1"
+  },
+  {
+   "instrument": "needle",
+   "column": "velocity",
+   "unit": {
+    "point": "1.1"
+   },
+   "eps_key": "step",
+   "eps": 0.01,
+   "estimate": -0.22283344088235246,
+   "lo": -0.2232530262337555,
+   "hi": -0.2222671792908104,
+   "cell": "SIG-",
+   "code": "FLOWING",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/velocity/point=1.1"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_ord",
+   "unit": {
+    "point": "1.1"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.8493360575911179,
+   "lo": 0.8491537712438334,
+   "hi": 0.8496869994489412,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_ord/point=1.1"
+  },
+  {
+   "instrument": "needle",
+   "column": "d_dis",
+   "unit": {
+    "point": "1.1"
+   },
+   "eps_key": "sink",
+   "eps": 0.02,
+   "estimate": 0.15066394240888212,
+   "lo": 0.15031300055105878,
+   "hi": 0.15084622875616657,
+   "cell": "SIG+",
+   "code": "NOT-AT",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle/d_dis/point=1.1"
+  },
+  {
+   "instrument": "needle_chain",
+   "column": "drift",
+   "unit": {
+    "point": "1.1"
+   },
+   "eps_key": "drift",
+   "eps": 0.5,
+   "estimate": -1.0601505942163776,
+   "lo": -1.062357587309731,
+   "hi": -1.0526333214531431,
+   "cell": "SIG-",
+   "code": "PERSISTENT",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "needle_chain/drift/point=1.1"
+  },
+  {
+   "instrument": "needle_o",
+   "column": "velocity",
+   "unit": {
+    "point": "1.1"
+   },
+   "eps_key": "step",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "needle_o",
+   "column": "d_ord",
+   "unit": {
+    "point": "1.1"
+   },
+   "eps_key": "sink",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "needle_o",
+   "column": "d_dis",
+   "unit": {
+    "point": "1.1"
+   },
+   "eps_key": "sink",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "needle_o is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "stability",
+   "column": "d",
+   "unit": {
+    "point": "1.1"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -0.48445689573750716,
+   "lo": -0.5172237964775369,
+   "hi": -0.46853549342273987,
+   "cell": "SIG-",
+   "code": "OFF",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "stability/d/point=1.1"
+  },
+  {
+   "instrument": "stability_delta",
+   "column": "d",
+   "unit": {
+    "point": "1.1"
+   },
+   "eps_key": "y",
+   "eps": null,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-MEASURED",
+   "code": "NOT-MEASURED",
+   "per_size": null,
+   "flags": [],
+   "reason": "stability_delta is not declared on this input",
+   "vector_key": null
+  },
+  {
+   "instrument": "transform",
+   "column": "y_inf",
+   "unit": {
+    "point": "1.1"
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "NOT-EVALUATED",
+   "code": "NOT-EVALUATED",
+   "per_size": null,
+   "flags": [
+    "H",
+    "T"
+   ],
+   "reason": "the needle's correction does not decay (r >= 1) at the estimate or a resample: y_inf is undefined",
+   "vector_key": null
+  },
+  {
+   "instrument": "two_start",
+   "column": "D",
+   "unit": {
+    "point": "1.1"
+   },
+   "eps_key": "two_start",
+   "eps": 0.01,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": null,
+   "code": "INDEP",
+   "per_size": [
+    {
+     "size": 27,
+     "estimate": -0.00017225818401894744,
+     "lo": -0.0003125261644664201,
+     "hi": 4.302244264220434e-05,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    },
+    {
+     "size": 81,
+     "estimate": 6.899745255489753e-05,
+     "lo": 2.7431468296867934e-06,
+     "hi": 0.00021596316075012112,
+     "cell": "SLOW+",
+     "code": "INDEP"
+    },
+    {
+     "size": 243,
+     "estimate": -1.6420230458669138e-07,
+     "lo": -3.072195859965543e-05,
+     "hi": 5.098964092542513e-05,
+     "cell": "ZERO!",
+     "code": "INDEP"
+    }
+   ],
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": null
+  }
+ ],
+ "pair_readings": [
+  {
+   "instrument": "across_delta",
+   "column": "y_last",
+   "unit": {
+    "pair": [
+     "0.5",
+     "0.6"
+    ]
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -0.010666751636419404,
+   "lo": -0.013522906038409957,
+   "hi": -0.005979579212467721,
+   "cell": "SLOW-",
+   "code": "SLOW-",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "across_delta/y_last/pair=0.5->0.6"
+  },
+  {
+   "instrument": "across_delta",
+   "column": "y_last",
+   "unit": {
+    "pair": [
+     "0.6",
+     "0.7"
+    ]
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -0.011321526193361301,
+   "lo": -0.014813984319414237,
+   "hi": -0.006494065038000382,
+   "cell": "SLOW-",
+   "code": "SLOW-",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "across_delta/y_last/pair=0.6->0.7"
+  },
+  {
+   "instrument": "across_delta",
+   "column": "y_last",
+   "unit": {
+    "pair": [
+     "0.7",
+     "0.8"
+    ]
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -0.015461993861669751,
+   "lo": -0.017929049627990287,
+   "hi": -0.012185073548169481,
+   "cell": "SLOW-",
+   "code": "SLOW-",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "across_delta/y_last/pair=0.7->0.8"
+  },
+  {
+   "instrument": "across_delta",
+   "column": "y_last",
+   "unit": {
+    "pair": [
+     "0.8",
+     "0.85"
+    ]
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -0.007202652651695639,
+   "lo": -0.01799852110591704,
+   "hi": -0.0014741345711178284,
+   "cell": "SLOW-",
+   "code": "SLOW-",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "across_delta/y_last/pair=0.8->0.85"
+  },
+  {
+   "instrument": "across_delta",
+   "column": "y_last",
+   "unit": {
+    "pair": [
+     "0.85",
+     "0.89294"
+    ]
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": 0.07896587116272043,
+   "lo": 0.07168736238682803,
+   "hi": 0.08671586630559244,
+   "cell": "SLOW+",
+   "code": "SLOW+",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "across_delta/y_last/pair=0.85->0.89294"
+  },
+  {
+   "instrument": "across_delta",
+   "column": "y_last",
+   "unit": {
+    "pair": [
+     "0.89294",
+     "0.95"
+    ]
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": 0.5226753921835152,
+   "lo": 0.515427174489166,
+   "hi": 0.5311964056790213,
+   "cell": "SIG+",
+   "code": "SIG+",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "across_delta/y_last/pair=0.89294->0.95"
+  },
+  {
+   "instrument": "across_delta",
+   "column": "y_last",
+   "unit": {
+    "pair": [
+     "0.95",
+     "1.0"
+    ]
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": 0.7824053772092587,
+   "lo": 0.7803408345006447,
+   "hi": 0.7894612636879225,
+   "cell": "SIG+",
+   "code": "SIG+",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "across_delta/y_last/pair=0.95->1.0"
+  },
+  {
+   "instrument": "across_delta",
+   "column": "y_last",
+   "unit": {
+    "pair": [
+     "1.0",
+     "1.1"
+    ]
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": 0.06235333218099778,
+   "lo": 0.06096273249117645,
+   "hi": 0.06421528128657025,
+   "cell": "SLOW+",
+   "code": "SLOW+",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "across_delta/y_last/pair=1.0->1.1"
+  },
+  {
+   "instrument": "along",
+   "column": "y_along",
+   "unit": {
+    "pair": [
+     "0.5",
+     "0.6"
+    ]
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -0.048077578260235884,
+   "lo": -0.05030720793851772,
+   "hi": -0.04565102560652777,
+   "cell": "SLOW-",
+   "code": "SLOW-",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "along/y_along/pair=0.5->0.6"
+  },
+  {
+   "instrument": "along",
+   "column": "y_along",
+   "unit": {
+    "pair": [
+     "0.6",
+     "0.7"
+    ]
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -0.04743281024533343,
+   "lo": -0.04985255812272055,
+   "hi": -0.04585330725298847,
+   "cell": "SLOW-",
+   "code": "SLOW-",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "along/y_along/pair=0.6->0.7"
+  },
+  {
+   "instrument": "along",
+   "column": "y_along",
+   "unit": {
+    "pair": [
+     "0.7",
+     "0.8"
+    ]
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -0.046854623274057476,
+   "lo": -0.048304371559474826,
+   "hi": -0.045044349601910214,
+   "cell": "SLOW-",
+   "code": "SLOW-",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "along/y_along/pair=0.7->0.8"
+  },
+  {
+   "instrument": "along",
+   "column": "y_along",
+   "unit": {
+    "pair": [
+     "0.8",
+     "0.85"
+    ]
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": -0.01963142255734048,
+   "lo": -0.029788804843682737,
+   "hi": -0.017158288399695857,
+   "cell": "SLOW-",
+   "code": "SLOW-",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "along/y_along/pair=0.8->0.85"
+  },
+  {
+   "instrument": "along",
+   "column": "y_along",
+   "unit": {
+    "pair": [
+     "0.85",
+     "0.89294"
+    ]
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": 0.07965102287369924,
+   "lo": 0.07603659990962505,
+   "hi": 0.08334465102279093,
+   "cell": "SLOW+",
+   "code": "SLOW+",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": null,
+   "vector_key": "along/y_along/pair=0.85->0.89294"
+  },
+  {
+   "instrument": "along",
+   "column": "y_along",
+   "unit": {
+    "pair": [
+     "0.89294",
+     "0.95"
+    ]
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "REFUSE-OFF-MANIFOLD",
+   "code": "REFUSE-OFF-MANIFOLD",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": "off-manifold: [0.95] read [DIS] (membership.toml [along] reads needle)",
+   "vector_key": null
+  },
+  {
+   "instrument": "along",
+   "column": "y_along",
+   "unit": {
+    "pair": [
+     "0.95",
+     "1.0"
+    ]
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "REFUSE-OFF-MANIFOLD",
+   "code": "REFUSE-OFF-MANIFOLD",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": "off-manifold: [0.95, 1.0] read [DIS, DIS] (membership.toml [along] reads needle)",
+   "vector_key": null
+  },
+  {
+   "instrument": "along",
+   "column": "y_along",
+   "unit": {
+    "pair": [
+     "1.0",
+     "1.1"
+    ]
+   },
+   "eps_key": "y",
+   "eps": 0.25,
+   "estimate": null,
+   "lo": null,
+   "hi": null,
+   "cell": "REFUSE-OFF-MANIFOLD",
+   "code": "REFUSE-OFF-MANIFOLD",
+   "per_size": null,
+   "flags": [
+    "T"
+   ],
+   "reason": "off-manifold: [1.0, 1.1] read [DIS, DIS] (membership.toml [along] reads needle)",
+   "vector_key": null
+  }
+ ],
+ "reports": [
+  {
+   "instrument": "across",
+   "name": "y_steps",
+   "unit": {
+    "point": "0.5"
+   },
+   "estimate": [
+    -0.0852508808830385,
+    -0.12483976595563383
+   ],
+   "vector_key": "across/y_steps/point=0.5"
+  },
+  {
+   "instrument": "fluct",
+   "name": "y_steps",
+   "unit": {
+    "point": "0.5"
+   },
+   "estimate": [
+    -2.0009544418498435,
+    -1.9943346637626598
+   ],
+   "vector_key": "fluct/y_steps/point=0.5"
+  },
+  {
+   "instrument": "needle",
+   "name": "v_all",
+   "unit": {
+    "point": "0.5"
+   },
+   "estimate": [
+    0.05401795149423705,
+    0.007412234903412918,
+    0.0007922777027681294
+   ],
+   "vector_key": "needle/v_all/point=0.5"
+  },
+  {
+   "instrument": "needle",
+   "name": "g_final",
+   "unit": {
+    "point": "0.5"
+   },
+   "estimate": 0.9286424231754892,
+   "vector_key": "needle/g_final/point=0.5"
+  },
+  {
+   "instrument": "needle_chain",
+   "name": "velocity_prev",
+   "unit": {
+    "point": "0.5"
+   },
+   "estimate": 0.007392262077570821,
+   "vector_key": "needle_chain/velocity_prev/point=0.5"
+  },
+  {
+   "instrument": "across",
+   "name": "y_steps",
+   "unit": {
+    "point": "0.6"
+   },
+   "estimate": [
+    -0.09134347007778806,
+    -0.03756261385550915
+   ],
+   "vector_key": "across/y_steps/point=0.6"
+  },
+  {
+   "instrument": "fluct",
+   "name": "y_steps",
+   "unit": {
+    "point": "0.6"
+   },
+   "estimate": [
+    -2.00250317213799,
+    -1.99811590260107
+   ],
+   "vector_key": "fluct/y_steps/point=0.6"
+  },
+  {
+   "instrument": "needle",
+   "name": "v_all",
+   "unit": {
+    "point": "0.6"
+   },
+   "estimate": [
+    0.06518616924599974,
+    0.009139878628789067,
+    0.001042952201259939
+   ],
+   "vector_key": "needle/v_all/point=0.6"
+  },
+  {
+   "instrument": "needle",
+   "name": "g_final",
+   "unit": {
+    "point": "0.6"
+   },
+   "estimate": 0.9113238258690325,
+   "vector_key": "needle/g_final/point=0.6"
+  },
+  {
+   "instrument": "needle_chain",
+   "name": "velocity_prev",
+   "unit": {
+    "point": "0.6"
+   },
+   "estimate": 0.009165730105431091,
+   "vector_key": "needle_chain/velocity_prev/point=0.6"
+  },
+  {
+   "instrument": "across",
+   "name": "y_steps",
+   "unit": {
+    "point": "0.7"
+   },
+   "estimate": [
+    -0.09627291542759481,
+    0.0012297539964665199
+   ],
+   "vector_key": "across/y_steps/point=0.7"
+  },
+  {
+   "instrument": "fluct",
+   "name": "y_steps",
+   "unit": {
+    "point": "0.7"
+   },
+   "estimate": [
+    -1.996592558041577,
+    -1.9950778842096315
+   ],
+   "vector_key": "fluct/y_steps/point=0.7"
+  },
+  {
+   "instrument": "needle",
+   "name": "v_all",
+   "unit": {
+    "point": "0.7"
+   },
+   "estimate": [
+    0.07627681947910947,
+    0.011106621782681514,
+    0.0012726743682978103
+   ],
+   "vector_key": "needle/v_all/point=0.7"
+  },
+  {
+   "instrument": "needle",
+   "name": "g_final",
+   "unit": {
+    "point": "0.7"
+   },
+   "estimate": 0.8918362045207264,
+   "vector_key": "needle/g_final/point=0.7"
+  },
+  {
+   "instrument": "needle_chain",
+   "name": "velocity_prev",
+   "unit": {
+    "point": "0.7"
+   },
+   "estimate": 0.01107667354042463,
+   "vector_key": "needle_chain/velocity_prev/point=0.7"
+  },
+  {
+   "instrument": "across",
+   "name": "y_steps",
+   "unit": {
+    "point": "0.8"
+   },
+   "estimate": [
+    -0.0602386556405116,
+    -0.053338898894781994
+   ],
+   "vector_key": "across/y_steps/point=0.8"
+  },
+  {
+   "instrument": "fluct",
+   "name": "y_steps",
+   "unit": {
+    "point": "0.8"
+   },
+   "estimate": [
+    -1.9959969742274066,
+    -1.9959302183722307
+   ],
+   "vector_key": "fluct/y_steps/point=0.8"
+  },
+  {
+   "instrument": "needle",
+   "name": "v_all",
+   "unit": {
+    "point": "0.8"
+   },
+   "estimate": [
+    0.08613563128254798,
+    0.013415445363158085,
+    0.0015975855371370695
+   ],
+   "vector_key": "needle/v_all/point=0.8"
+  },
+  {
+   "instrument": "needle",
+   "name": "g_final",
+   "unit": {
+    "point": "0.8"
+   },
+   "estimate": 0.8677270538324676,
+   "vector_key": "needle/g_final/point=0.8"
+  },
+  {
+   "instrument": "needle_chain",
+   "name": "velocity_prev",
+   "unit": {
+    "point": "0.8"
+   },
+   "estimate": 0.013302215239408333,
+   "vector_key": "needle_chain/velocity_prev/point=0.8"
+  },
+  {
+   "instrument": "across",
+   "name": "y_steps",
+   "unit": {
+    "point": "0.85"
+   },
+   "estimate": [
+    0.027327248567343157,
+    0.04476326903655109
+   ],
+   "vector_key": "across/y_steps/point=0.85"
+  },
+  {
+   "instrument": "fluct",
+   "name": "y_steps",
+   "unit": {
+    "point": "0.85"
+   },
+   "estimate": [
+    -1.988445359733716,
+    -1.9966199506861781
+   ],
+   "vector_key": "fluct/y_steps/point=0.85"
+  },
+  {
+   "instrument": "needle",
+   "name": "v_all",
+   "unit": {
+    "point": "0.85"
+   },
+   "estimate": [
+    0.08917376887541562,
+    0.014285558895963502,
+    0.0019225897264999459
+   ],
+   "vector_key": "needle/v_all/point=0.85"
+  },
+  {
+   "instrument": "needle",
+   "name": "g_final",
+   "unit": {
+    "point": "0.85"
+   },
+   "estimate": 0.8513523086243822,
+   "vector_key": "needle/g_final/point=0.85"
+  },
+  {
+   "instrument": "needle_chain",
+   "name": "velocity_prev",
+   "unit": {
+    "point": "0.85"
+   },
+   "estimate": 0.014084835337773272,
+   "vector_key": "needle_chain/velocity_prev/point=0.85"
+  },
+  {
+   "instrument": "across",
+   "name": "y_steps",
+   "unit": {
+    "point": "0.89294"
+   },
+   "estimate": [
+    0.16647677585344117,
+    0.1466007575413938
+   ],
+   "vector_key": "across/y_steps/point=0.89294"
+  },
+  {
+   "instrument": "fluct",
+   "name": "y_steps",
+   "unit": {
+    "point": "0.89294"
+   },
+   "estimate": [
+    -1.9891363534284456,
+    -1.9848952362915067
+   ],
+   "vector_key": "fluct/y_steps/point=0.89294"
+  },
+  {
+   "instrument": "needle",
+   "name": "v_all",
+   "unit": {
+    "point": "0.89294"
+   },
+   "estimate": [
+    0.0889072370980113,
+    0.012814276445359818,
+    0.00022064750238459663
+   ],
+   "vector_key": "needle/v_all/point=0.89294"
+  },
+  {
+   "instrument": "needle",
+   "name": "g_final",
+   "unit": {
+    "point": "0.89294"
+   },
+   "estimate": 0.8293627246321404,
+   "vector_key": "needle/g_final/point=0.89294"
+  },
+  {
+   "instrument": "needle_chain",
+   "name": "velocity_prev",
+   "unit": {
+    "point": "0.89294"
+   },
+   "estimate": 0.01223669072028255,
+   "vector_key": "needle_chain/velocity_prev/point=0.89294"
+  },
+  {
+   "instrument": "across",
+   "name": "y_steps",
+   "unit": {
+    "point": "0.95"
+   },
+   "estimate": [
+    0.6039671276898544,
+    0.8706168910690005
+   ],
+   "vector_key": "across/y_steps/point=0.95"
+  },
+  {
+   "instrument": "fluct",
+   "name": "y_steps",
+   "unit": {
+    "point": "0.95"
+   },
+   "estimate": [
+    -1.9543531232233342,
+    -1.974014168901
+   ],
+   "vector_key": "fluct/y_steps/point=0.95"
+  },
+  {
+   "instrument": "needle",
+   "name": "v_all",
+   "unit": {
+    "point": "0.95"
+   },
+   "estimate": [
+    0.07862915975192097,
+    -0.008313748312933633,
+    -0.0401538067806918
+   ],
+   "vector_key": "needle/v_all/point=0.95"
+  },
+  {
+   "instrument": "needle",
+   "name": "g_final",
+   "unit": {
+    "point": "0.95"
+   },
+   "estimate": 0.7363875218039889,
+   "vector_key": "needle/g_final/point=0.95"
+  },
+  {
+   "instrument": "needle_chain",
+   "name": "velocity_prev",
+   "unit": {
+    "point": "0.95"
+   },
+   "estimate": -0.005706346409141028,
+   "vector_key": "needle_chain/velocity_prev/point=0.95"
+  },
+  {
+   "instrument": "across",
+   "name": "y_steps",
+   "unit": {
+    "point": "1.0"
+   },
+   "estimate": [
+    0.9582616890856264,
+    0.38219054741101766
+   ],
+   "vector_key": "across/y_steps/point=1.0"
+  },
+  {
+   "instrument": "fluct",
+   "name": "y_steps",
+   "unit": {
+    "point": "1.0"
+   },
+   "estimate": [
+    -1.9149139696794741,
+    -2.0210477000600107
+   ],
+   "vector_key": "fluct/y_steps/point=1.0"
+  },
+  {
+   "instrument": "needle",
+   "name": "v_all",
+   "unit": {
+    "point": "1.0"
+   },
+   "estimate": [
+    0.048838534863557825,
+    -0.08243059109340001,
+    -0.20334929265132878
+   ],
+   "vector_key": "needle/v_all/point=1.0"
+  },
+  {
+   "instrument": "needle",
+   "name": "g_final",
+   "unit": {
+    "point": "1.0"
+   },
+   "estimate": 0.45564295104134783,
+   "vector_key": "needle/g_final/point=1.0"
+  },
+  {
+   "instrument": "needle_chain",
+   "name": "velocity_prev",
+   "unit": {
+    "point": "1.0"
+   },
+   "estimate": -0.07559348255995657,
+   "vector_key": "needle_chain/velocity_prev/point=1.0"
+  },
+  {
+   "instrument": "across",
+   "name": "y_steps",
+   "unit": {
+    "point": "1.1"
+   },
+   "estimate": [
+    0.20013895713293342,
+    -0.30672084890605
+   ],
+   "vector_key": "across/y_steps/point=1.1"
+  },
+  {
+   "instrument": "fluct",
+   "name": "y_steps",
+   "unit": {
+    "point": "1.1"
+   },
+   "estimate": [
+    -2.0679119387656417,
+    -1.9946419785439933
+   ],
+   "vector_key": "fluct/y_steps/point=1.1"
+  },
+  {
+   "instrument": "needle",
+   "name": "v_all",
+   "unit": {
+    "point": "1.1"
+   },
+   "estimate": [
+    -0.023233330959763654,
+    -0.19068355830905348,
+    -0.2232533102474743
+   ],
+   "vector_key": "needle/v_all/point=1.1"
+  },
+  {
+   "instrument": "needle",
+   "name": "g_final",
+   "unit": {
+    "point": "1.1"
+   },
+   "estimate": 0.15031300055105878,
+   "vector_key": "needle/g_final/point=1.1"
+  },
+  {
+   "instrument": "needle_chain",
+   "name": "velocity_prev",
+   "unit": {
+    "point": "1.1"
+   },
+   "estimate": -0.20862870237243103,
+   "vector_key": "needle_chain/velocity_prev/point=1.1"
+  },
+  {
+   "instrument": "across_delta",
+   "name": "delta",
+   "unit": {
+    "pair": [
+     "0.5",
+     "0.6"
+    ]
+   },
+   "estimate": [
+    -0.019342739832792333,
+    -0.01756927180495993,
+    -0.01731859730647156
+   ],
+   "vector_key": "across_delta/delta/pair=0.5->0.6"
+  },
+  {
+   "instrument": "across_delta",
+   "name": "y_steps",
+   "unit": {
+    "pair": [
+     "0.5",
+     "0.6"
+    ]
+   },
+   "estimate": [
+    -0.08753378388860546,
+    -0.013080631988429988
+   ],
+   "vector_key": "across_delta/y_steps/pair=0.5->0.6"
+  },
+  {
+   "instrument": "across_delta",
+   "name": "ratio",
+   "unit": {
+    "pair": [
+     "0.5",
+     "0.6"
+    ]
+   },
+   "estimate": 0.0,
+   "vector_key": "across_delta/ratio/pair=0.5->0.6"
+  },
+  {
+   "instrument": "across_delta",
+   "name": "delta",
+   "unit": {
+    "pair": [
+     "0.6",
+     "0.7"
+    ]
+   },
+   "estimate": [
+    -0.021628286950351572,
+    -0.019717343515343932,
+    -0.019487621348287187
+   ],
+   "vector_key": "across_delta/delta/pair=0.6->0.7"
+  },
+  {
+   "instrument": "across_delta",
+   "name": "y_steps",
+   "unit": {
+    "pair": [
+     "0.6",
+     "0.7"
+    ]
+   },
+   "estimate": [
+    -0.08420023151090451,
+    -0.01066724694474438
+   ],
+   "vector_key": "across_delta/y_steps/pair=0.6->0.7"
+  },
+  {
+   "instrument": "across_delta",
+   "name": "ratio",
+   "unit": {
+    "pair": [
+     "0.6",
+     "0.7"
+    ]
+   },
+   "estimate": 0.0,
+   "vector_key": "across_delta/ratio/pair=0.6->0.7"
+  },
+  {
+   "instrument": "across_delta",
+   "name": "delta",
+   "unit": {
+    "pair": [
+     "0.7",
+     "0.8"
+    ]
+   },
+   "estimate": [
+    -0.026659603556078104,
+    -0.02443406185706587,
+    -0.024109150688258585
+   ],
+   "vector_key": "across_delta/delta/pair=0.7->0.8"
+  },
+  {
+   "instrument": "across_delta",
+   "name": "y_steps",
+   "unit": {
+    "pair": [
+     "0.7",
+     "0.8"
+    ]
+   },
+   "estimate": [
+    -0.07934674370367632,
+    -0.012185073548169481
+   ],
+   "vector_key": "across_delta/y_steps/pair=0.7->0.8"
+  },
+  {
+   "instrument": "across_delta",
+   "name": "ratio",
+   "unit": {
+    "pair": [
+     "0.7",
+     "0.8"
+    ]
+   },
+   "estimate": 0.0,
+   "vector_key": "across_delta/ratio/pair=0.7->0.8"
+  },
+  {
+   "instrument": "across_delta",
+   "name": "delta",
+   "unit": {
+    "pair": [
+     "0.8",
+     "0.85"
+    ]
+   },
+   "estimate": [
+    -0.017482369495829153,
+    -0.016699749397449892,
+    -0.016374745208106556
+   ],
+   "vector_key": "across_delta/delta/pair=0.8->0.85"
+  },
+  {
+   "instrument": "across_delta",
+   "name": "y_steps",
+   "unit": {
+    "pair": [
+     "0.8",
+     "0.85"
+    ]
+   },
+   "estimate": [
+    -0.041688230711598995,
+    -0.017889378975766482
+   ],
+   "vector_key": "across_delta/y_steps/pair=0.8->0.85"
+  },
+  {
+   "instrument": "across_delta",
+   "name": "ratio",
+   "unit": {
+    "pair": [
+     "0.8",
+     "0.85"
+    ]
+   },
+   "estimate": 0.0,
+   "vector_key": "across_delta/ratio/pair=0.8->0.85"
+  },
+  {
+   "instrument": "across_delta",
+   "name": "delta",
+   "unit": {
+    "pair": [
+     "0.85",
+     "0.89294"
+    ]
+   },
+   "estimate": [
+    -0.018439497150643747,
+    -0.020287641768144016,
+    -0.021989583992229056
+   ],
+   "vector_key": "across_delta/delta/pair=0.85->0.89294"
+  },
+  {
+   "instrument": "across_delta",
+   "name": "y_steps",
+   "unit": {
+    "pair": [
+     "0.85",
+     "0.89294"
+    ]
+   },
+   "estimate": [
+    0.08694329518075307,
+    0.07332611004242702
+   ],
+   "vector_key": "across_delta/y_steps/pair=0.85->0.89294"
+  },
+  {
+   "instrument": "across_delta",
+   "name": "ratio",
+   "unit": {
+    "pair": [
+     "0.85",
+     "0.89294"
+    ]
+   },
+   "estimate": 0.0,
+   "vector_key": "across_delta/ratio/pair=0.85->0.89294"
+  },
+  {
+   "instrument": "across_delta",
+   "name": "delta",
+   "unit": {
+    "pair": [
+     "0.89294",
+     "0.95"
+    ]
+   },
+   "estimate": [
+    -0.034657711415654324,
+    -0.05260074854507624,
+    -0.09297520282815352
+   ],
+   "vector_key": "across_delta/delta/pair=0.89294->0.95"
+  },
+  {
+   "instrument": "across_delta",
+   "name": "y_steps",
+   "unit": {
+    "pair": [
+     "0.89294",
+     "0.95"
+    ]
+   },
+   "estimate": [
+    0.3797609969299496,
+    0.5184745125109014
+   ],
+   "vector_key": "across_delta/y_steps/pair=0.89294->0.95"
+  },
+  {
+   "instrument": "across_delta",
+   "name": "ratio",
+   "unit": {
+    "pair": [
+     "0.89294",
+     "0.95"
+    ]
+   },
+   "estimate": 0.0,
+   "vector_key": "across_delta/ratio/pair=0.89294->0.95"
+  },
+  {
+   "instrument": "across_delta",
+   "name": "delta",
+   "unit": {
+    "pair": [
+     "0.95",
+     "1.0"
+    ]
+   },
+   "estimate": [
+    -0.04766194874118168,
+    -0.11754908489198845,
+    -0.2807445707626378
+   ],
+   "vector_key": "across_delta/delta/pair=0.95->1.0"
+  },
+  {
+   "instrument": "across_delta",
+   "name": "y_steps",
+   "unit": {
+    "pair": [
+     "0.95",
+     "1.0"
+    ]
+   },
+   "estimate": [
+    0.8216935493904876,
+    0.7924444992668909
+   ],
+   "vector_key": "across_delta/y_steps/pair=0.95->1.0"
+  },
+  {
+   "instrument": "across_delta",
+   "name": "ratio",
+   "unit": {
+    "pair": [
+     "0.95",
+     "1.0"
+    ]
+   },
+   "estimate": 0.0,
+   "vector_key": "across_delta/ratio/pair=0.95->1.0"
+  },
+  {
+   "instrument": "across_delta",
+   "name": "delta",
+   "unit": {
+    "pair": [
+     "1.0",
+     "1.1"
+    ]
+   },
+   "estimate": [
+    -0.15239071308165808,
+    -0.28542593289415236,
+    -0.3053299504902892
+   ],
+   "vector_key": "across_delta/delta/pair=1.0->1.1"
+  },
+  {
+   "instrument": "across_delta",
+   "name": "y_steps",
+   "unit": {
+    "pair": [
+     "1.0",
+     "1.1"
+    ]
+   },
+   "estimate": [
+    0.5712068478182544,
+    0.06135961836929529
+   ],
+   "vector_key": "across_delta/y_steps/pair=1.0->1.1"
+  },
+  {
+   "instrument": "across_delta",
+   "name": "ratio",
+   "unit": {
+    "pair": [
+     "1.0",
+     "1.1"
+    ]
+   },
+   "estimate": 0.0,
+   "vector_key": "across_delta/ratio/pair=1.0->1.1"
+  },
+  {
+   "instrument": "along",
+   "name": "delta",
+   "unit": {
+    "pair": [
+     "0.5",
+     "0.6"
+    ]
+   },
+   "estimate": [
+    -0.019342739832792333,
+    -0.01756927180495993,
+    -0.01731859730647156
+   ],
+   "vector_key": "along/delta/pair=0.5->0.6"
+  },
+  {
+   "instrument": "along",
+   "name": "delta",
+   "unit": {
+    "pair": [
+     "0.6",
+     "0.7"
+    ]
+   },
+   "estimate": [
+    -0.021628286950351572,
+    -0.019717343515343932,
+    -0.019487621348287187
+   ],
+   "vector_key": "along/delta/pair=0.6->0.7"
+  },
+  {
+   "instrument": "along",
+   "name": "delta",
+   "unit": {
+    "pair": [
+     "0.7",
+     "0.8"
+    ]
+   },
+   "estimate": [
+    -0.026659603556078104,
+    -0.02443406185706587,
+    -0.024109150688258585
+   ],
+   "vector_key": "along/delta/pair=0.7->0.8"
+  },
+  {
+   "instrument": "along",
+   "name": "delta",
+   "unit": {
+    "pair": [
+     "0.8",
+     "0.85"
+    ]
+   },
+   "estimate": [
+    -0.017482369495829153,
+    -0.016699749397449892,
+    -0.016374745208106556
+   ],
+   "vector_key": "along/delta/pair=0.8->0.85"
+  },
+  {
+   "instrument": "along",
+   "name": "delta",
+   "unit": {
+    "pair": [
+     "0.85",
+     "0.89294"
+    ]
+   },
+   "estimate": [
+    -0.018439497150643747,
+    -0.020287641768144016,
+    -0.021989583992229056
+   ],
+   "vector_key": "along/delta/pair=0.85->0.89294"
+  }
+ ],
+ "signature_columns": [
+  "sink",
+  "needle",
+  "needle_pair",
+  "drift_code",
+  "flow",
+  "across",
+  "stability",
+  "two_start",
+  "probe"
+ ],
+ "signature": [
+  {
+   "point": "0.5",
+   "obtained": "truth",
+   "sink": "NEITHER",
+   "needle": "MID",
+   "needle_pair": "NOT-MEASURED",
+   "drift_code": "CONVERGING",
+   "flow": "STOPPED",
+   "across": "MARGINAL",
+   "stability": "NOT-MEASURED",
+   "two_start": "INDEP",
+   "probe": "COMPLETE",
+   "flags": {
+    "sink": [
+     "T"
+    ],
+    "needle": [
+     "T"
+    ],
+    "needle_pair": [
+     "T"
+    ],
+    "drift_code": [
+     "T"
+    ],
+    "flow": [
+     "T"
+    ],
+    "across": [
+     "H",
+     "T"
+    ],
+    "two_start": [
+     "T"
+    ]
+   },
+   "verdict": "REFUSE-STABILITY-UNMEASURED",
+   "verdict_class": "REFUSE",
+   "row_line": 282,
+   "why": "honest null: stability was not measured or not evaluated",
+   "geometry": "REFUSE-STABILITY-UNMEASURED",
+   "order": "CONTINUOUS",
+   "axis_lines": {
+    "geometry": 138,
+    "probe": 12,
+    "order": 72,
+    "compose": 36
+   }
+  },
+  {
+   "point": "0.6",
+   "obtained": "truth",
+   "sink": "NEITHER",
+   "needle": "MID",
+   "needle_pair": "NOT-MEASURED",
+   "drift_code": "CONVERGING",
+   "flow": "STOPPED",
+   "across": "MARGINAL",
+   "stability": "NOT-MEASURED",
+   "two_start": "INDEP",
+   "probe": "COMPLETE",
+   "flags": {
+    "sink": [
+     "T"
+    ],
+    "needle": [
+     "T"
+    ],
+    "needle_pair": [
+     "T"
+    ],
+    "drift_code": [
+     "T"
+    ],
+    "flow": [
+     "T"
+    ],
+    "across": [
+     "H",
+     "T"
+    ],
+    "two_start": [
+     "T"
+    ]
+   },
+   "verdict": "REFUSE-STABILITY-UNMEASURED",
+   "verdict_class": "REFUSE",
+   "row_line": 282,
+   "why": "honest null: stability was not measured or not evaluated",
+   "geometry": "REFUSE-STABILITY-UNMEASURED",
+   "order": "CONTINUOUS",
+   "axis_lines": {
+    "geometry": 138,
+    "probe": 12,
+    "order": 72,
+    "compose": 36
+   }
+  },
+  {
+   "point": "0.7",
+   "obtained": "truth",
+   "sink": "NEITHER",
+   "needle": "MID",
+   "needle_pair": "NOT-MEASURED",
+   "drift_code": "CONVERGING",
+   "flow": "STOPPED",
+   "across": "MARGINAL",
+   "stability": "NOT-MEASURED",
+   "two_start": "INDEP",
+   "probe": "COMPLETE",
+   "flags": {
+    "sink": [
+     "T"
+    ],
+    "needle": [
+     "T"
+    ],
+    "needle_pair": [
+     "T"
+    ],
+    "drift_code": [
+     "T"
+    ],
+    "flow": [
+     "T"
+    ],
+    "across": [
+     "H",
+     "T"
+    ],
+    "two_start": [
+     "T"
+    ]
+   },
+   "verdict": "REFUSE-STABILITY-UNMEASURED",
+   "verdict_class": "REFUSE",
+   "row_line": 282,
+   "why": "honest null: stability was not measured or not evaluated",
+   "geometry": "REFUSE-STABILITY-UNMEASURED",
+   "order": "CONTINUOUS",
+   "axis_lines": {
+    "geometry": 138,
+    "probe": 12,
+    "order": 72,
+    "compose": 36
+   }
+  },
+  {
+   "point": "0.8",
+   "obtained": "truth",
+   "sink": "NEITHER",
+   "needle": "MID",
+   "needle_pair": "NOT-MEASURED",
+   "drift_code": "CONVERGING",
+   "flow": "STOPPED",
+   "across": "MARGINAL",
+   "stability": "NOT-MEASURED",
+   "two_start": "INDEP",
+   "probe": "COMPLETE",
+   "flags": {
+    "sink": [
+     "T"
+    ],
+    "needle": [
+     "T"
+    ],
+    "needle_pair": [
+     "T"
+    ],
+    "drift_code": [
+     "T"
+    ],
+    "flow": [
+     "T"
+    ],
+    "across": [
+     "H",
+     "T"
+    ],
+    "two_start": [
+     "T"
+    ]
+   },
+   "verdict": "REFUSE-STABILITY-UNMEASURED",
+   "verdict_class": "REFUSE",
+   "row_line": 282,
+   "why": "honest null: stability was not measured or not evaluated",
+   "geometry": "REFUSE-STABILITY-UNMEASURED",
+   "order": "CONTINUOUS",
+   "axis_lines": {
+    "geometry": 138,
+    "probe": 12,
+    "order": 72,
+    "compose": 36
+   }
+  },
+  {
+   "point": "0.85",
+   "obtained": "truth",
+   "sink": "NEITHER",
+   "needle": "MID",
+   "needle_pair": "NOT-MEASURED",
+   "drift_code": "CONVERGING",
+   "flow": "STOPPED",
+   "across": "MARGINAL",
+   "stability": "NOT-MEASURED",
+   "two_start": "INDEP",
+   "probe": "COMPLETE",
+   "flags": {
+    "sink": [
+     "T"
+    ],
+    "needle": [
+     "T"
+    ],
+    "needle_pair": [
+     "T"
+    ],
+    "drift_code": [
+     "T"
+    ],
+    "flow": [
+     "T"
+    ],
+    "across": [
+     "H",
+     "T"
+    ],
+    "two_start": [
+     "T"
+    ]
+   },
+   "verdict": "REFUSE-STABILITY-UNMEASURED",
+   "verdict_class": "REFUSE",
+   "row_line": 282,
+   "why": "honest null: stability was not measured or not evaluated",
+   "geometry": "REFUSE-STABILITY-UNMEASURED",
+   "order": "CONTINUOUS",
+   "axis_lines": {
+    "geometry": 138,
+    "probe": 12,
+    "order": 72,
+    "compose": 36
+   }
+  },
+  {
+   "point": "0.89294",
+   "obtained": "truth",
+   "sink": "NEITHER",
+   "needle": "MID",
+   "needle_pair": "NOT-MEASURED",
+   "drift_code": "NOT-EVALUATED",
+   "flow": "STOPPED",
+   "across": "UNRES",
+   "stability": "NOT-MEASURED",
+   "two_start": "INDEP",
+   "probe": "COMPLETE",
+   "flags": {
+    "sink": [
+     "T"
+    ],
+    "needle": [
+     "T"
+    ],
+    "needle_pair": [
+     "T"
+    ],
+    "drift_code": [
+     "T"
+    ],
+    "flow": [
+     "T"
+    ],
+    "across": [
+     "H",
+     "T"
+    ],
+    "two_start": [
+     "T"
+    ]
+   },
+   "verdict": "REFUSE-UNRES",
+   "verdict_class": "REFUSE",
+   "row_line": 248,
+   "why": "verdict_x CAND_GS: across unresolved, whatever stability reads",
+   "geometry": "REFUSE-UNRES",
+   "order": "CONTINUOUS",
+   "axis_lines": {
+    "geometry": 113,
+    "probe": 12,
+    "order": 72,
+    "compose": 36
+   }
+  },
+  {
+   "point": "0.95",
+   "obtained": "truth",
+   "sink": "NEITHER",
+   "needle": "DIS",
+   "needle_pair": "NOT-MEASURED",
+   "drift_code": "PERSISTENT",
+   "flow": "FLOWING",
+   "across": "RELEVANT",
+   "stability": "NOT-MEASURED",
+   "two_start": "INDEP",
+   "probe": "COMPLETE",
+   "flags": {
+    "sink": [
+     "T"
+    ],
+    "needle": [
+     "T"
+    ],
+    "needle_pair": [
+     "T"
+    ],
+    "drift_code": [
+     "T"
+    ],
+    "flow": [
+     "T"
+    ],
+    "across": [
+     "H",
+     "T"
+    ],
+    "two_start": [
+     "T"
+    ]
+   },
+   "verdict": "NOT",
+   "verdict_class": "NOT",
+   "row_line": 36,
+   "why": "verdict_x STAGE1: off the window",
+   "geometry": "NOT",
+   "order": "OFF-WINDOW",
+   "axis_lines": {
+    "geometry": 19,
+    "probe": 12,
+    "order": 35,
+    "compose": 11
+   }
+  },
+  {
+   "point": "1.0",
+   "obtained": "truth",
+   "sink": "NEITHER",
+   "needle": "DIS",
+   "needle_pair": "NOT-MEASURED",
+   "drift_code": "PERSISTENT",
+   "flow": "FLOWING",
+   "across": "UNRES",
+   "stability": "NOT-MEASURED",
+   "two_start": "INDEP",
+   "probe": "COMPLETE",
+   "flags": {
+    "sink": [
+     "T"
+    ],
+    "needle": [
+     "T"
+    ],
+    "needle_pair": [
+     "T"
+    ],
+    "drift_code": [
+     "T"
+    ],
+    "flow": [
+     "T"
+    ],
+    "across": [
+     "H",
+     "T"
+    ],
+    "two_start": [
+     "T"
+    ]
+   },
+   "verdict": "NOT",
+   "verdict_class": "NOT",
+   "row_line": 36,
+   "why": "verdict_x STAGE1: off the window",
+   "geometry": "NOT",
+   "order": "OFF-WINDOW",
+   "axis_lines": {
+    "geometry": 19,
+    "probe": 12,
+    "order": 35,
+    "compose": 11
+   }
+  },
+  {
+   "point": "1.1",
+   "obtained": "truth",
+   "sink": "NEITHER",
+   "needle": "DIS",
+   "needle_pair": "NOT-MEASURED",
+   "drift_code": "PERSISTENT",
+   "flow": "FLOWING",
+   "across": "MARGINAL",
+   "stability": "NOT-MEASURED",
+   "two_start": "INDEP",
+   "probe": "COMPLETE",
+   "flags": {
+    "sink": [
+     "T"
+    ],
+    "needle": [
+     "T"
+    ],
+    "needle_pair": [
+     "T"
+    ],
+    "drift_code": [
+     "T"
+    ],
+    "flow": [
+     "T"
+    ],
+    "across": [
+     "H",
+     "T"
+    ],
+    "two_start": [
+     "T"
+    ]
+   },
+   "verdict": "NOT",
+   "verdict_class": "NOT",
+   "row_line": 36,
+   "why": "verdict_x STAGE1: off the window",
+   "geometry": "NOT",
+   "order": "OFF-WINDOW",
+   "axis_lines": {
+    "geometry": 19,
+    "probe": 12,
+    "order": 35,
+    "compose": 11
+   }
+  }
+ ],
+ "pairs": [
+  {
+   "pair": [
+    "0.5",
+    "0.6"
+   ],
+   "across_delta": "SLOW-",
+   "flags": [
+    "T"
+   ],
+   "delta_basis": "RAW"
+  },
+  {
+   "pair": [
+    "0.6",
+    "0.7"
+   ],
+   "across_delta": "SLOW-",
+   "flags": [
+    "T"
+   ],
+   "delta_basis": "RAW"
+  },
+  {
+   "pair": [
+    "0.7",
+    "0.8"
+   ],
+   "across_delta": "SLOW-",
+   "flags": [
+    "T"
+   ],
+   "delta_basis": "RAW"
+  },
+  {
+   "pair": [
+    "0.8",
+    "0.85"
+   ],
+   "across_delta": "SLOW-",
+   "flags": [
+    "T"
+   ],
+   "delta_basis": "RAW"
+  },
+  {
+   "pair": [
+    "0.85",
+    "0.89294"
+   ],
+   "across_delta": "SLOW+",
+   "flags": [
+    "T"
+   ],
+   "delta_basis": "RAW"
+  },
+  {
+   "pair": [
+    "0.89294",
+    "0.95"
+   ],
+   "across_delta": "SIG+",
+   "flags": [
+    "T"
+   ],
+   "delta_basis": "RAW"
+  },
+  {
+   "pair": [
+    "0.95",
+    "1.0"
+   ],
+   "across_delta": "SIG+",
+   "flags": [
+    "T"
+   ],
+   "delta_basis": "RAW"
+  },
+  {
+   "pair": [
+    "1.0",
+    "1.1"
+   ],
+   "across_delta": "SLOW+",
+   "flags": [
+    "T"
+   ],
+   "delta_basis": "RAW"
+  },
+  {
+   "pair": [
+    "0.5",
+    "0.6"
+   ],
+   "along": "SLOW-",
+   "flags": [
+    "T"
+   ]
+  },
+  {
+   "pair": [
+    "0.6",
+    "0.7"
+   ],
+   "along": "SLOW-",
+   "flags": [
+    "T"
+   ]
+  },
+  {
+   "pair": [
+    "0.7",
+    "0.8"
+   ],
+   "along": "SLOW-",
+   "flags": [
+    "T"
+   ]
+  },
+  {
+   "pair": [
+    "0.8",
+    "0.85"
+   ],
+   "along": "SLOW-",
+   "flags": [
+    "T"
+   ]
+  },
+  {
+   "pair": [
+    "0.85",
+    "0.89294"
+   ],
+   "along": "SLOW+",
+   "flags": [
+    "T"
+   ]
+  },
+  {
+   "pair": [
+    "0.89294",
+    "0.95"
+   ],
+   "along": "REFUSE-OFF-MANIFOLD",
+   "flags": [
+    "T"
+   ]
+  },
+  {
+   "pair": [
+    "0.95",
+    "1.0"
+   ],
+   "along": "REFUSE-OFF-MANIFOLD",
+   "flags": [
+    "T"
+   ]
+  },
+  {
+   "pair": [
+    "1.0",
+    "1.1"
+   ],
+   "along": "REFUSE-OFF-MANIFOLD",
+   "flags": [
+    "T"
+   ]
+  }
+ ],
+ "declared": {
+  "probe": "COMPLETE"
+ },
+ "pins": {
+  "tools/rust_samplers/src/lib.rs": {
+   "sha256": "19aecceb656f0903e56ff699e893ee241a3a231beb3a9a45033dbb43b2720715",
+   "commit": "working-tree"
+  },
+  "tools/lattice_xy.py": {
+   "sha256": "7fd3f80a26232340dbf92ac4baae657b388d344434326d872a99bd616520a70d",
+   "commit": "working-tree"
+  },
+  "tools/scale_xy.py": {
+   "sha256": "d520fd2d5ddd2bd0c40c3f0c6de2a6aac8dfd8f407c0df1e56381cb8faf464c7",
+   "commit": "working-tree"
+  }
+ }
+}

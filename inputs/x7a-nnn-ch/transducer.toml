@@ -1,0 +1,24 @@
+# inputs/x7a-nnn-ch/transducer.toml - the transducer file (plan 0883, Q0): the sampler, what the per-locus mean keeps and discards, the interval's role.
+schema = 1
+kind = "transducer"
+id = "x7a-nnn-ch"
+
+[transducer]
+model = "2D Ising at exact K_c (Swendsen–Wang) and nn + nnn Ising at K2 = 0.1"
+update = ["tools/lattice2.py sha256 24c33d7ecab691d589a429be830949309d119ca5f4e30c882a0a52440ace6827", "tools/lattice_at2.py sha256 640e32fdd1e56f1a939338885cc0f007dbd9709fc806ae34e0b5b592d320765d", "tools/lattice_nnn.py sha256 06032fd13127409a99edef403679aa1b3a1c770c404046482aeb82dbed61ec3e", "tools/scale.py sha256 1dff330d804d067e26f8c6c7dbe86739f0ee75635e5d1661f163d01bcf908f2b", "tools/flow.py sha256 5f5b225a2cbc49bf2eef8c2168a2059620476c304fe71524eb687b12e1b9cae7", "tools/flow2.py sha256 3a5197ff9c1fe711a1c141328cb4ba8bcf8b396a8c1db59135a54fc8fecc8936"]
+inputs = "chains: tools/0937_gen.py (sha256 e63e012793cea5351bc8c217fb9b1a5f213d34178a82136804ce2db4b5b269e2) and data/cc-chains-0937/MANIFEST.tsv (sha256 b74a41516567da7a5df839db0dce3d4149cb8e51cfd9ab404b2f68ad77446d5b); m.toml [0937.chains] (root_0937C, spawn keys); points, sizes, starts, N, burn, skip = the parent's: m.toml [P3] (data/p3) + [B3b] (data/b3) · studies/P3/simulate.py + studies/B3/simulate.py"
+output = "one configuration per recorded sweep; each configuration is one observation; the recorded sequence is NOT a process sequence (Phase 1 only)"
+
+[reduction]
+name = "per-locus mean of the declared observable over the declared configurations"
+keeps = "the typical value of the observable at the locus (one point, one size, one start)"
+discards = "the configuration-to-configuration variation and the order of the configurations"
+
+[interval]
+role = "projection C: places the reading's sign cell against its declared margin; never an operator input"
+keeps = "the position of the interval ends among the cuts -eps, 0, +eps"
+discards = "the shape of the resampled distribution"
+
+[provenance_note]
+declared_after = []
+note = "the 60 chain files of this input were produced by: tools/lattice2.py (exact Ising SW) for point k2-0.0, 30 files; tools/lattice_nnn.py (frozen python) for point k2-0.1, 30 files (the sampler string recorded in each chain's .rec.json header and in the chain manifest row); the parent's transducer pinned tools/lattice.py, tools/lattice_nnn.py (replaced here by the producers listed in update); data is not in git, pinned by fixtures/data/x7a-nnn-ch.toml; plan 0937 amendment 9 | parent note: two samplers, one per data directory (the m.toml says so)"

@@ -1,0 +1,7 @@
+# inputs/x4s-stack-ch/points.toml - the point -> case JOIN (taxonomy; never frozen)
+schema = 1
+kind = "points"
+input = "x4s-stack-ch"
+
+[points]
+"0.46" = "ising-field-decoy"

@@ -1,0 +1,13 @@
+# inputs/x3-clock6-3-ch/points.toml - the point -> case JOIN (taxonomy; never frozen)
+schema = 1
+kind = "points"
+input = "x3-clock6-3-ch"
+
+[points]
+"0.5" = "none"
+"0.7014" = "clock6-kt-ends"
+"0.75" = "clock6-critical-phase"
+"0.8" = "clock6-critical-phase"
+"0.85" = "clock6-critical-phase"
+"0.9008" = "clock6-kt-ends"
+"1.1" = "none"

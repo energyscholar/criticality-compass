@@ -1,0 +1,1420 @@
+# THIS IS CC's m.toml (Kernel V8's M for ONE input: what was measured and how).
+# It is NOT the toolset's m.toml (scratch/compass-toolset/m.toml, the study log).
+# inputs/b7-at-line-3/m.toml - like b7-at-line-2
+schema = 1
+kind = "input"
+id = "b7-at-line-3-ch"
+instruments = ["across", "stability", "along", "fluct"]
+
+[obtained]
+"0.0" = "truth"
+"0.07" = "truth"
+"0.14" = "truth"
+"0.21" = "truth"
+"0.2747" = "truth"
+
+[axes]
+point = ["0.0", "0.07", "0.14", "0.21", "0.2747"]
+size = [27, 81, 243]
+starts = ["random"]
+main_start = "random"
+
+[observable]
+name = "g1 of p = sigma tau"
+definition = "open-pair nearest-neighbour correlation of the block lattice (tools/flow.py g1)"
+levels = [2, 3, 4]
+final_size = 9
+
+[block_map]
+name = "majority3"
+factor = 3
+keeps = "the sign of the local majority; tie-free (odd block)"
+discards = "the magnitude of the local magnetisation"
+
+[relations.size]
+template = "chain"
+axis = "size"
+provenance = "Coupling"
+direction_from = "the declared blocking map: one more blocking step relates L to L/3"
+
+[relations.control]
+template = "chain"
+axis = "point"
+provenance = "Coupling"
+direction_from = "the declared order of the exact self-dual-line points (L4 increasing)"
+
+[interval]
+method = "chains"
+m = 10
+r = 2
+alpha = 0.021484375
+chain_root = "root_0937C"
+
+[eps]
+y = 0.25
+
+[conjugate]
+observable = "E"
+conjugate_to = "K (2-spin coupling)"
+hamiltonian_knowledge = true
+
+[kernel]
+uses = ["A", "B"]
+
+[data]
+format = "npz-v1"
+
+[[data.files]]
+point = "0.0"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p0_L27_s0_c0.npz"
+chain = 0
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.0"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p0_L27_s0_c1.npz"
+chain = 1
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.0"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p0_L27_s0_c2.npz"
+chain = 2
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.0"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p0_L27_s0_c3.npz"
+chain = 3
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.0"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p0_L27_s0_c4.npz"
+chain = 4
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.0"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p0_L27_s0_c5.npz"
+chain = 5
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.0"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p0_L27_s0_c6.npz"
+chain = 6
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.0"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p0_L27_s0_c7.npz"
+chain = 7
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.0"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p0_L27_s0_c8.npz"
+chain = 8
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.0"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p0_L27_s0_c9.npz"
+chain = 9
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.07"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p1_L27_s0_c0.npz"
+chain = 0
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.07"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p1_L27_s0_c1.npz"
+chain = 1
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.07"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p1_L27_s0_c2.npz"
+chain = 2
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.07"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p1_L27_s0_c3.npz"
+chain = 3
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.07"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p1_L27_s0_c4.npz"
+chain = 4
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.07"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p1_L27_s0_c5.npz"
+chain = 5
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.07"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p1_L27_s0_c6.npz"
+chain = 6
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.07"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p1_L27_s0_c7.npz"
+chain = 7
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.07"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p1_L27_s0_c8.npz"
+chain = 8
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.07"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p1_L27_s0_c9.npz"
+chain = 9
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.14"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p2_L27_s0_c0.npz"
+chain = 0
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.14"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p2_L27_s0_c1.npz"
+chain = 1
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.14"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p2_L27_s0_c2.npz"
+chain = 2
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.14"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p2_L27_s0_c3.npz"
+chain = 3
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.14"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p2_L27_s0_c4.npz"
+chain = 4
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.14"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p2_L27_s0_c5.npz"
+chain = 5
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.14"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p2_L27_s0_c6.npz"
+chain = 6
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.14"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p2_L27_s0_c7.npz"
+chain = 7
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.14"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p2_L27_s0_c8.npz"
+chain = 8
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.14"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p2_L27_s0_c9.npz"
+chain = 9
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.21"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p3_L27_s0_c0.npz"
+chain = 0
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.21"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p3_L27_s0_c1.npz"
+chain = 1
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.21"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p3_L27_s0_c2.npz"
+chain = 2
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.21"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p3_L27_s0_c3.npz"
+chain = 3
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.21"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p3_L27_s0_c4.npz"
+chain = 4
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.21"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p3_L27_s0_c5.npz"
+chain = 5
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.21"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p3_L27_s0_c6.npz"
+chain = 6
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.21"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p3_L27_s0_c7.npz"
+chain = 7
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.21"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p3_L27_s0_c8.npz"
+chain = 8
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.21"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p3_L27_s0_c9.npz"
+chain = 9
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.2747"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p4_L27_s0_c0.npz"
+chain = 0
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.2747"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p4_L27_s0_c1.npz"
+chain = 1
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.2747"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p4_L27_s0_c2.npz"
+chain = 2
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.2747"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p4_L27_s0_c3.npz"
+chain = 3
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.2747"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p4_L27_s0_c4.npz"
+chain = 4
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.2747"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p4_L27_s0_c5.npz"
+chain = 5
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.2747"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p4_L27_s0_c6.npz"
+chain = 6
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.2747"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p4_L27_s0_c7.npz"
+chain = 7
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.2747"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p4_L27_s0_c8.npz"
+chain = 8
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.2747"
+size = 27
+start = "random"
+path = "cc-chains-0937/b7/p4_L27_s0_c9.npz"
+chain = 9
+arrays.G = { key = "Gp", level = 1 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.0"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p0_L81_s0_c0.npz"
+chain = 0
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.0"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p0_L81_s0_c1.npz"
+chain = 1
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.0"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p0_L81_s0_c2.npz"
+chain = 2
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.0"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p0_L81_s0_c3.npz"
+chain = 3
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.0"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p0_L81_s0_c4.npz"
+chain = 4
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.0"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p0_L81_s0_c5.npz"
+chain = 5
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.0"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p0_L81_s0_c6.npz"
+chain = 6
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.0"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p0_L81_s0_c7.npz"
+chain = 7
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.0"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p0_L81_s0_c8.npz"
+chain = 8
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.0"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p0_L81_s0_c9.npz"
+chain = 9
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.07"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p1_L81_s0_c0.npz"
+chain = 0
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.07"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p1_L81_s0_c1.npz"
+chain = 1
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.07"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p1_L81_s0_c2.npz"
+chain = 2
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.07"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p1_L81_s0_c3.npz"
+chain = 3
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.07"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p1_L81_s0_c4.npz"
+chain = 4
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.07"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p1_L81_s0_c5.npz"
+chain = 5
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.07"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p1_L81_s0_c6.npz"
+chain = 6
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.07"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p1_L81_s0_c7.npz"
+chain = 7
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.07"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p1_L81_s0_c8.npz"
+chain = 8
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.07"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p1_L81_s0_c9.npz"
+chain = 9
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.14"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p2_L81_s0_c0.npz"
+chain = 0
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.14"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p2_L81_s0_c1.npz"
+chain = 1
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.14"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p2_L81_s0_c2.npz"
+chain = 2
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.14"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p2_L81_s0_c3.npz"
+chain = 3
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.14"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p2_L81_s0_c4.npz"
+chain = 4
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.14"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p2_L81_s0_c5.npz"
+chain = 5
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.14"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p2_L81_s0_c6.npz"
+chain = 6
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.14"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p2_L81_s0_c7.npz"
+chain = 7
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.14"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p2_L81_s0_c8.npz"
+chain = 8
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.14"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p2_L81_s0_c9.npz"
+chain = 9
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.21"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p3_L81_s0_c0.npz"
+chain = 0
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.21"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p3_L81_s0_c1.npz"
+chain = 1
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.21"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p3_L81_s0_c2.npz"
+chain = 2
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.21"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p3_L81_s0_c3.npz"
+chain = 3
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.21"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p3_L81_s0_c4.npz"
+chain = 4
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.21"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p3_L81_s0_c5.npz"
+chain = 5
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.21"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p3_L81_s0_c6.npz"
+chain = 6
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.21"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p3_L81_s0_c7.npz"
+chain = 7
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.21"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p3_L81_s0_c8.npz"
+chain = 8
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.21"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p3_L81_s0_c9.npz"
+chain = 9
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.2747"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p4_L81_s0_c0.npz"
+chain = 0
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.2747"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p4_L81_s0_c1.npz"
+chain = 1
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.2747"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p4_L81_s0_c2.npz"
+chain = 2
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.2747"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p4_L81_s0_c3.npz"
+chain = 3
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.2747"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p4_L81_s0_c4.npz"
+chain = 4
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.2747"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p4_L81_s0_c5.npz"
+chain = 5
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.2747"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p4_L81_s0_c6.npz"
+chain = 6
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.2747"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p4_L81_s0_c7.npz"
+chain = 7
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.2747"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p4_L81_s0_c8.npz"
+chain = 8
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.2747"
+size = 81
+start = "random"
+path = "cc-chains-0937/b7/p4_L81_s0_c9.npz"
+chain = 9
+arrays.G = { key = "Gp", level = 2 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.0"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p0_L243_s0_c0.npz"
+chain = 0
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.0"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p0_L243_s0_c1.npz"
+chain = 1
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.0"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p0_L243_s0_c2.npz"
+chain = 2
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.0"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p0_L243_s0_c3.npz"
+chain = 3
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.0"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p0_L243_s0_c4.npz"
+chain = 4
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.0"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p0_L243_s0_c5.npz"
+chain = 5
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.0"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p0_L243_s0_c6.npz"
+chain = 6
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.0"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p0_L243_s0_c7.npz"
+chain = 7
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.0"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p0_L243_s0_c8.npz"
+chain = 8
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.0"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p0_L243_s0_c9.npz"
+chain = 9
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.07"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p1_L243_s0_c0.npz"
+chain = 0
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.07"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p1_L243_s0_c1.npz"
+chain = 1
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.07"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p1_L243_s0_c2.npz"
+chain = 2
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.07"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p1_L243_s0_c3.npz"
+chain = 3
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.07"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p1_L243_s0_c4.npz"
+chain = 4
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.07"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p1_L243_s0_c5.npz"
+chain = 5
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.07"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p1_L243_s0_c6.npz"
+chain = 6
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.07"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p1_L243_s0_c7.npz"
+chain = 7
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.07"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p1_L243_s0_c8.npz"
+chain = 8
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.07"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p1_L243_s0_c9.npz"
+chain = 9
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.14"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p2_L243_s0_c0.npz"
+chain = 0
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.14"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p2_L243_s0_c1.npz"
+chain = 1
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.14"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p2_L243_s0_c2.npz"
+chain = 2
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.14"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p2_L243_s0_c3.npz"
+chain = 3
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.14"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p2_L243_s0_c4.npz"
+chain = 4
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.14"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p2_L243_s0_c5.npz"
+chain = 5
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.14"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p2_L243_s0_c6.npz"
+chain = 6
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.14"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p2_L243_s0_c7.npz"
+chain = 7
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.14"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p2_L243_s0_c8.npz"
+chain = 8
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.14"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p2_L243_s0_c9.npz"
+chain = 9
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.21"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p3_L243_s0_c0.npz"
+chain = 0
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.21"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p3_L243_s0_c1.npz"
+chain = 1
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.21"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p3_L243_s0_c2.npz"
+chain = 2
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.21"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p3_L243_s0_c3.npz"
+chain = 3
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.21"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p3_L243_s0_c4.npz"
+chain = 4
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.21"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p3_L243_s0_c5.npz"
+chain = 5
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.21"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p3_L243_s0_c6.npz"
+chain = 6
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.21"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p3_L243_s0_c7.npz"
+chain = 7
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.21"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p3_L243_s0_c8.npz"
+chain = 8
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.21"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p3_L243_s0_c9.npz"
+chain = 9
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.2747"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p4_L243_s0_c0.npz"
+chain = 0
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.2747"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p4_L243_s0_c1.npz"
+chain = 1
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.2747"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p4_L243_s0_c2.npz"
+chain = 2
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.2747"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p4_L243_s0_c3.npz"
+chain = 3
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.2747"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p4_L243_s0_c4.npz"
+chain = 4
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.2747"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p4_L243_s0_c5.npz"
+chain = 5
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.2747"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p4_L243_s0_c6.npz"
+chain = 6
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.2747"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p4_L243_s0_c7.npz"
+chain = 7
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.2747"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p4_L243_s0_c8.npz"
+chain = 8
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[[data.files]]
+point = "0.2747"
+size = 243
+start = "random"
+path = "cc-chains-0937/b7/p4_L243_s0_c9.npz"
+chain = 9
+arrays.G = { key = "Gp", level = 3 }
+arrays.E = { key = "E2" }
+
+[two_start]
+observable = "E2"
+definition = "E2 (the 2-spin energy sum) per snapshot / the declared bond count 2 L^2; read here by fluct only (this input measures no two_start)"
+unit_scale = { "27" = 1458, "81" = 13122, "243" = 118098 }   # 2 L^2 per size
