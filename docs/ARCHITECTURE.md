@@ -64,6 +64,11 @@ transducer file), `resources.py` 36, `author.py` 363 (authoring).
    the estimate and every resample), `basis`, `decays`, `off_manifold`; a `door.Null` becomes a reading whose cell is
    the null, reason kept (`detect.after`). Here `velocity [0.001459]`, `d_ord [0.108]`.
 5. **READING** - `readout.reading`: estimate = row 0; central 95 % interval of rows 1..400. `0.001459 [0.001324, 0.001605]`.
+   Under interval method `chains` (Detector v10; plan 0937) rows 1..m are the m chain readings and `readout.chains` takes the interval from their
+   order statistics `[v_(r), v_(m+1-r)]`. Two numbers then carry the name `estimate`, and they are different statistics: `readings[].estimate` is the
+   **median** of the m chain readings (the sealed estimand); `reports[].estimate` is **row 0 = chain 0's reading** (a reported scalar, read by no sign cell).
+   This is declared here, not changed: the v10 code and its stored records are frozen, and the next Detector version is where `reports[].estimate`
+   is to be made the median (plan 0937 amendment 7, F8; Fable #9 finding F8).
 6. **SIGN** - `sign.sign(lo, hi, eps)`: the position of both interval ends among the cuts `-eps, 0, +eps` is one of 8
    cells SIG-, NEG, SLOW-, ZERO!, SLOW+, POS, SIG+, UNRES (UNRES = straddles 0 and a margin edge); eps from
    `m.toml [eps]` via the instrument's `[columns]`. Here `eps step 0.01: bL 2, bU 2 -> SLOW+`.
