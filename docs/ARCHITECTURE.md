@@ -69,6 +69,14 @@ transducer file), `resources.py` 36, `author.py` 363 (authoring).
    **median** of the m chain readings (the sealed estimand); `reports[].estimate` is **row 0 = chain 0's reading** (a reported scalar, read by no sign cell).
    This is declared here, not changed: the v10 code and its stored records are frozen, and the next Detector version is where `reports[].estimate`
    is to be made the median (plan 0937 amendment 7, F8; Fable #9 finding F8).
+   **Provenance pins of the v10 chain inputs (plan 0937 amendment 9).** Each `-ch` input's `transducer.toml` pins, in `update`, the toolset files that
+   produced its chains (the sampler named in every chain's header, plus the reducers): the Rust kernel for w2, w3, x3, x9c and x2b; the Tier E drop-ins
+   `lattice_at2`, `lattice_bc2`, `lattice2`, `lattice_xy_e`, `lattice_bilayer2_e` for b7, c2, x7a-bc, x8, x7a-nnn (Ising points), x2, x5, x5n; and the frozen
+   Python samplers for w1, x4, x4s and x7a-nnn (nn+nnn points). The one exception to this rule is k4-m1, disclosed rather than rewritten: its v10 record
+   pins `tools/rust_samplers/src/lib.rs` at sha256 `ecc68f72...` (the source of the 2026-10-07 K4 build, `.so` `9a582823...`), while the chains the v10
+   read used were written by a different build (`.so` `ec7e2fb6...`, the build behind the other Rust families). `ecc68f72...` is the baseline-commit version
+   of that file (toolset commit `ea5bda5`); the current file is `19aecceb...` and the kernel source `discrete.rs` is unchanged between the two. The k4-m1 v10
+   record is kept as it was read.
 6. **SIGN** - `sign.sign(lo, hi, eps)`: the position of both interval ends among the cuts `-eps, 0, +eps` is one of 8
    cells SIG-, NEG, SLOW-, ZERO!, SLOW+, POS, SIG+, UNRES (UNRES = straddles 0 and a margin edge); eps from
    `m.toml [eps]` via the instrument's `[columns]`. Here `eps step 0.01: bL 2, bU 2 -> SLOW+`.
