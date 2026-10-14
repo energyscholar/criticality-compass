@@ -1,0 +1,286 @@
+# expected/v10-rules.toml - the SCOREBOARD LOCK for v10-rules (plan 0937 amendment 10 item 2; review research/compass-FABLE-09-0937-P5-2026-10-14.md section 3 step 6).
+# Detector v10 is a DEVELOPMENT record: it is not registered and not frozen (ruling 2026-10-13). This lock is a regression lock on the 34 -ch inputs' STORED v10 readings
+# (202 point-verdicts, 17 families), not a claim that those verdicts are true. It is NOT truth: agreement with class_truth / order_truth is reported by bin/cc tabulate, never here.
+# Source of the cells: results/<input>@v10-rules.json (re-run 2026-10-14 under the true-producer pins, plan 0937 amendment 9; verdicts re-checked line for line against the toolset's
+# results/0937-P4-diff-*.txt by tools/0937_a7_verify.py, 158 of 158 for the 30 amendment-9 inputs; the k4-m1-ch and x2b -ch records carry their own diff files).
+# Only k4-m1-ch (17 points) was read against per-point predictions sealed before the read; the other 185 point-verdicts were read against the sealed general prediction only.
+schema = 1
+kind = "expected"
+tables = "v10-rules"
+
+[verdicts.b7-at-line-2-ch]
+"0.0" = "REFUSE-NEEDLE-UNMEASURED"
+"0.07" = "REFUSE-NEEDLE-UNMEASURED"
+"0.14" = "REFUSE-NEEDLE-UNMEASURED"
+"0.21" = "REFUSE-NEEDLE-UNMEASURED"
+"0.2747" = "REFUSE-NEEDLE-UNMEASURED"
+
+[verdicts.b7-at-line-3-ch]
+"0.0" = "REFUSE-NEEDLE-UNMEASURED"
+"0.07" = "REFUSE-NEEDLE-UNMEASURED"
+"0.14" = "REFUSE-NEEDLE-UNMEASURED"
+"0.21" = "REFUSE-NEEDLE-UNMEASURED"
+"0.2747" = "REFUSE-NEEDLE-UNMEASURED"
+
+[verdicts.b7-at-line-4-ch]
+"0.0" = "REFUSE-TWO-START-UNMEASURED"
+"0.07" = "REFUSE-TWO-START-UNMEASURED"
+"0.14" = "REFUSE-TWO-START-UNMEASURED"
+"0.21" = "REFUSE-TWO-START-UNMEASURED"
+"0.2747" = "REFUSE-TWO-START-UNMEASURED"
+
+[verdicts.b7-at-line-5-ch]
+"0.0" = "REFUSE-TWO-START-UNMEASURED"
+"0.07" = "REFUSE-TWO-START-UNMEASURED"
+"0.14" = "REFUSE-TWO-START-UNMEASURED"
+"0.21" = "REFUSE-TWO-START-UNMEASURED"
+"0.2747" = "REFUSE-TWO-START-UNMEASURED"
+
+[verdicts.b7-at-line-ch]
+"0.0" = "REFUSE-NEEDLE-UNMEASURED"
+"0.07" = "REFUSE-NEEDLE-UNMEASURED"
+"0.14" = "REFUSE-NEEDLE-UNMEASURED"
+"0.21" = "REFUSE-NEEDLE-UNMEASURED"
+"0.2747" = "REFUSE-NEEDLE-UNMEASURED"
+
+[verdicts.c2-bc-two-start-ch]
+"d2.0-K1.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K1.2" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K1.4" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K1.6" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K1.8" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K2.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K2.3" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K2.6" = "REFUSE-NEEDLE-UNMEASURED"
+"d2.0-K3.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K1.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K1.2" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K1.4" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K1.6" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K1.8" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K2.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K2.3" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K2.6" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.95-K3.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K1.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K1.2" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K1.4" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K1.6" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K1.8" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K2.0" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K2.3" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K2.6" = "REFUSE-NEEDLE-UNMEASURED"
+"d1.9-K3.0" = "REFUSE-NEEDLE-UNMEASURED"
+
+[verdicts.k4-m1-ch]
+"0.30" = "NOT"
+"0.35" = "NOT"
+"0.40" = "NOT"
+"0.45" = "REFUSE-SLOW"
+"0.50" = "LINE"
+"0.55" = "LINE"
+"0.60" = "LINE"
+"0.65" = "LINE"
+"0.70" = "LINE"
+"0.75" = "LINE"
+"0.80" = "LINE"
+"0.85" = "LINE"
+"0.90" = "REFUSE-SLOW"
+"0.95" = "NOT"
+"1.00" = "NOT"
+"1.05" = "NOT"
+"1.10" = "NOT"
+
+[verdicts.w1-potts-ch]
+"2" = "REFUSE-NEEDLE-UNMEASURED"
+"3" = "REFUSE-NEEDLE-UNMEASURED"
+"4" = "REFUSE-NEEDLE-UNMEASURED"
+"5" = "REFUSE-NEEDLE-UNMEASURED"
+"7" = "REFUSE-NEEDLE-UNMEASURED"
+
+[verdicts.w2-potts-2-ch]
+"2" = "REFUSE-NEEDLE-UNMEASURED"
+"3" = "REFUSE-NEEDLE-UNMEASURED"
+"4" = "REFUSE-NEEDLE-UNMEASURED"
+"5" = "REFUSE-NEEDLE-UNMEASURED"
+
+[verdicts.w2-potts-ch]
+"2" = "REFUSE-NEEDLE-UNMEASURED"
+"3" = "REFUSE-NEEDLE-UNMEASURED"
+"4" = "REFUSE-NEEDLE-UNMEASURED"
+"5" = "REFUSE-NEEDLE-UNMEASURED"
+
+[verdicts.w3-potts-ch]
+"4" = "REFUSE-NEEDLE-UNMEASURED"
+"5" = "REFUSE-NEEDLE-UNMEASURED"
+"6" = "REFUSE-NEEDLE-UNMEASURED"
+
+[verdicts.x2-xy-line-2-ch]
+"0.5" = "REFUSE-SLOW"
+"0.6" = "REFUSE-SLOW"
+"0.7" = "REFUSE-SLOW"
+"0.89294" = "REFUSE-WEAK"
+"1.1" = "NOT"
+
+[verdicts.x2-xy-line-3-ch]
+"0.5" = "REFUSE-UNRES"
+"0.6" = "REFUSE-UNRES"
+"0.7" = "REFUSE-UNRES"
+"0.89294" = "REFUSE-WEAK"
+"1.1" = "NOT"
+
+[verdicts.x2-xy-line-ch]
+"0.5" = "REFUSE-SLOW"
+"0.6" = "REFUSE-SLOW"
+"0.7" = "REFUSE-SLOW"
+"0.89294" = "REFUSE-WEAK"
+"1.1" = "NOT"
+
+[verdicts.x2b-xy-2-ch]
+"0.5" = "REFUSE-STABILITY-UNMEASURED"
+"0.6" = "REFUSE-STABILITY-UNMEASURED"
+"0.7" = "REFUSE-STABILITY-UNMEASURED"
+"0.8" = "REFUSE-STABILITY-UNMEASURED"
+"0.85" = "REFUSE-STABILITY-UNMEASURED"
+"0.89294" = "REFUSE-UNRES"
+"0.95" = "NOT"
+"1.0" = "NOT"
+"1.1" = "NOT"
+
+[verdicts.x2b-xy-3-ch]
+"0.5" = "LINE"
+"0.6" = "LINE"
+"0.7" = "LINE"
+"0.8" = "LINE"
+"0.85" = "LINE"
+"0.89294" = "REFUSE-UNRES"
+"0.95" = "NOT"
+"1.0" = "NOT"
+"1.1" = "NOT"
+
+[verdicts.x2b-xy-ch]
+"0.5" = "REFUSE-STABILITY-UNMEASURED"
+"0.6" = "REFUSE-STABILITY-UNMEASURED"
+"0.7" = "REFUSE-STABILITY-UNMEASURED"
+"0.8" = "REFUSE-STABILITY-UNMEASURED"
+"0.85" = "REFUSE-STABILITY-UNMEASURED"
+"0.89294" = "REFUSE-WEAK"
+"0.95" = "NOT"
+"1.0" = "NOT"
+"1.1" = "NOT"
+
+[verdicts.x3-clock6-2-ch]
+"0.5" = "NOT"
+"0.7014" = "REFUSE-SLOW"
+"0.75" = "REFUSE-SLOW"
+"0.8" = "REFUSE-SLOW"
+"0.85" = "REFUSE-SLOW"
+"0.9008" = "REFUSE-SLOW"
+"1.1" = "NOT"
+
+[verdicts.x3-clock6-3-ch]
+"0.5" = "NOT"
+"0.7014" = "REFUSE-SLOW"
+"0.75" = "REFUSE-SLOW"
+"0.8" = "REFUSE-SLOW"
+"0.85" = "REFUSE-SLOW"
+"0.9008" = "REFUSE-SLOW"
+"1.1" = "NOT"
+
+[verdicts.x3-clock6-ch]
+"0.5" = "NOT"
+"0.7014" = "REFUSE-SLOW"
+"0.75" = "REFUSE-SLOW"
+"0.8" = "REFUSE-SLOW"
+"0.85" = "REFUSE-SLOW"
+"0.9008" = "REFUSE-SLOW"
+"1.1" = "NOT"
+
+[verdicts.x4-ising-field-2-ch]
+"0.46" = "NOT"
+"0.5" = "NOT"
+"0.55" = "NOT"
+
+[verdicts.x4-ising-field-3-ch]
+"0.46" = "NOT"
+"0.5" = "NOT"
+"0.55" = "NOT"
+
+[verdicts.x4-ising-field-ch]
+"0.46" = "NOT"
+"0.5" = "NOT"
+"0.55" = "NOT"
+
+[verdicts.x4s-stack-ch]
+"0.46" = "NOT"
+
+[verdicts.x5-bilayer-2-ch]
+"0.0" = "REFUSE-SLOW"
+"0.1" = "REFUSE-FLOW"
+"0.3" = "REFUSE-FLOW"
+
+[verdicts.x5-bilayer-ch]
+"0.0" = "REFUSE-SLOW"
+"0.1" = "REFUSE-FLOW"
+"0.3" = "REFUSE-FLOW"
+
+[verdicts.x5n-bilayer-2-ch]
+"0.0" = "REFUSE-SLOW"
+"0.1" = "REFUSE-STABILITY-UNMEASURED"
+"0.3" = "REFUSE-STABILITY-UNMEASURED"
+
+[verdicts.x5n-bilayer-3-ch]
+"0.0" = "REFUSE-SLOW"
+"0.1" = "REFUSE-STABILITY-UNMEASURED"
+"0.3" = "REFUSE-STABILITY-UNMEASURED"
+
+[verdicts.x5n-bilayer-ch]
+"0.0" = "REFUSE-SLOW"
+"0.1" = "REFUSE-STABILITY-UNMEASURED"
+"0.3" = "REFUSE-STABILITY-UNMEASURED"
+
+[verdicts.x7a-bc-ch]
+"0.0" = "NOT"
+"1.0" = "NOT"
+"1.5" = "NOT"
+"1.8" = "REFUSE-TWO-START-UNMEASURED"
+"1.9" = "NOT"
+"1.95" = "NOT"
+
+[verdicts.x7a-nnn-ch]
+"k2-0.0" = "REFUSE-TWO-START-UNMEASURED"
+"k2-0.1" = "REFUSE-TWO-START-UNMEASURED"
+
+[verdicts.x8-ising-needle-ch]
+"0.90" = "NOT"
+"0.95" = "NOT"
+"0.98" = "NOT"
+"0.99" = "NOT"
+"1.00" = "REFUSE-TWO-START-UNMEASURED"
+"1.01" = "NOT"
+"1.02" = "NOT"
+"1.05" = "NOT"
+"1.10" = "NOT"
+
+[verdicts.x9c-potts-2-ch]
+"3" = "REFUSE-STABILITY-UNMEASURED"
+"4" = "REFUSE-FLOW"
+"5" = "REFUSE-FLOW"
+"6" = "FIRST-ORDER"
+"8" = "FIRST-ORDER"
+"10" = "FIRST-ORDER"
+
+[verdicts.x9c-potts-ch]
+"3" = "REFUSE-STABILITY-UNMEASURED"
+"4" = "REFUSE-FLOW"
+"5" = "REFUSE-FLOW"
+"6" = "FIRST-ORDER"
+"8" = "FIRST-ORDER"
+"10" = "FIRST-ORDER"
+
+[[change]]
+date = "2026-10-14"
+points = ["*"]
+why = """Plan 0937 amendment 10 item 2: the stored v10-rules verdicts of the 34 -ch inputs (17 families, 202 point-verdicts), locked as a development regression lock. The readings were produced under frozen \
+v10-rules chains (m 10, r 2) against independent chains; the lock records what v10 read, so that a later change to tables/v10-rules that moves any of them is a finding, reported, never adjusted. \
+Detector v10 is not registered and not frozen. The 34 -ch input declarations, their fixtures/data manifests and results/*@v10-rules.{json,npz} ship in the same commit series; the chain data (data/cc-chains-0937) is held outside this repo."""
