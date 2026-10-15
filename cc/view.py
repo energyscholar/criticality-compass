@@ -7,6 +7,7 @@ import numpy as np
 import declare
 import detect
 import door
+import registry
 import sign
 from reverdict import cells_of   # noqa: F401
 
@@ -154,6 +155,12 @@ def identity(key, sha):
     return f"measure_hash {mh[:12]}" if mh else "measure_hash none"
 
 
+def units_of(res):
+    """The registry units a result used, in order of first appearance: its instruments (readings, pair readings, reports) and its interval method."""
+    inst = dict.fromkeys(r["instrument"] for r in [*res.get("readings", []), *res.get("pair_readings", []), *res.get("reports", [])])
+    return [*(f"instrument.{n}" for n in inst), f"interval.{res['interval']['method']}"]
+
+
 def show(res, join, mode, note="", tables_dir=None):
     """Every point of a result: a header, one line per signature column, a verdict line and its why."""
     bad = stale(res)
@@ -162,7 +169,8 @@ def show(res, join, mode, note="", tables_dir=None):
     cfg, T = config(), detect.load_tables(res["tables"], tables_dir)
     cols, iv = declare.code_cols(T.codes), res["interval"]
     out = [f"{res['input']}   rules: {res['tables']}   result: results/{res['run_id']}.json {note}".rstrip(),
-           f"report: {cfg['report']['verdict']}"]   # plan 0893 R1: what every verdict below IS, once per result (cc.toml [report])
+           f"report: {cfg['report']['verdict']}",   # plan 0893 R1: what every verdict below IS, once per result (cc.toml [report])
+           *registry.scope_lines(units_of(res), ROOT)]   # plan 1016: the pinned registry and the scope of each unit, from the CURRENT projection (the stored result is not edited)
     if mode == "advanced":
         files = [k for k in res["read"] if not k.startswith(cfg["data"]["name"] + "/")]
         out += [f"  interval: {iv['method']} " + cfg["interval_fields"][iv["method"]]["show"].format(**iv),

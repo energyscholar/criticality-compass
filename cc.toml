@@ -24,6 +24,7 @@ window_origin = ["extent-min"]   # [windows] origin of an input (plan 0884): the
 limited = ["none", "assigned", "resolution-limited"]   # [block_map] limited: what the finest level is (plan 0873): a value that is not a measured site
 replay = ["locked", "all"]   # [check] replay (plan 0886): `locked` replays the inputs expected/<set>.toml names; `all` replays every input on disk
 interval_method = ["block", "iid", "gamma", "chains"]   # [interval] method of an input's m.toml (plan 0883: was a tuple in declare.py; plan 0878 adds "gamma"); each has a [interval_fields.<method>] table below
+registry_status = ["registered", "registered-partial", "registered-synthetic-only", "built-not-registered", "non-identifiable", "superseded", "unbuilt", "future", "development"]   # plan 1016: the status alphabet of registry.toml; [registry.table] is total over it (and over alphabets.obtained + any)
 nulls = ["NOT-MEASURED", "NOT-EVALUATED"]       # the honest nulls, in rank order; never map keys
 
 # [levels]: the z of each declared interval level (plan 0878). A method whose [interval_fields.<method>] names level_in = "levels" refuses any level that is not a key here; no scipy.
@@ -220,3 +221,72 @@ match = ['^[-+]  [34] (RELATION|COMPARISON|KERNEL|C\+KERNEL|C) ']
 [golden.classes.h]    # plans 0892/0893 R4 (iii): the family `=>` line and its label line
 files = ["family-*.txt"]
 match = ['^[-+]  => family (verdict|report) ', '^\+     report: declared report — ']
+
+# plan 1016: the registry gate. registry.toml is a GENERATED projection of the toolset REGISTRY.toml (bin/cc registry pull <toolset-commit>); cc/registry.py is its one reader.
+# The registry is a property of the RELEASE: it is in no result file. sha256 = the pin of registry.toml; a mismatch makes every unit read as a Refuse value.
+[registry]
+sha256 = "09538502a656b57227198e3a771b6d626fc83db4c53e5cb0ceba0b940a187107"
+
+# [registry.units]: every unit this release can run -> its registry id (instrument.<name>, interval.<method>, family). A unit with no row reads as Refuse "mechanism not yet available".
+[registry.units]
+"instrument.needle" = "D-needle"
+"instrument.needle_o" = "D-needle-o"
+"instrument.needle_chain" = "D-needle-chain"
+"instrument.across" = "D-across"
+"instrument.across_delta" = "D-across-delta"
+"instrument.along" = "D-along"
+"instrument.stability" = "D-stability"
+"instrument.stability_delta" = "D-stability-delta"
+"instrument.two_start" = "D-two-start"
+"instrument.fluct" = "D-fluct"
+"instrument.transform" = "D-transform"
+"instrument.report" = "D-report"
+"interval.block" = "D-interval-block"
+"interval.iid" = "D-interval-iid"
+"interval.gamma" = "D-interval-gamma"
+"interval.chains" = "D-interval-chains"
+family = "D-family"
+
+# [registry.table]: the TOTAL table "<status>/<obtained>" -> Run | RunScoped | Refuse: <reason>. "no-module" is the key of a row that names no release_module; "any" is a lookup with no input in hand.
+[registry.table]
+"registered/truth" = "Run"
+"registered/navigated" = "Run"
+"registered/observed" = "Run"
+"registered/any" = "Run"
+"registered-partial/truth" = "RunScoped"
+"registered-partial/navigated" = "RunScoped"
+"registered-partial/observed" = "RunScoped"
+"registered-partial/any" = "RunScoped"
+"registered-synthetic-only/truth" = "RunScoped"
+"registered-synthetic-only/navigated" = "RunScoped"
+"registered-synthetic-only/observed" = "Refuse: registered synthetic-only; not for observed data"
+"registered-synthetic-only/any" = "RunScoped"
+"built-not-registered/truth" = "Refuse: mechanism not yet available"
+"built-not-registered/navigated" = "Refuse: mechanism not yet available"
+"built-not-registered/observed" = "Refuse: mechanism not yet available"
+"built-not-registered/any" = "Refuse: mechanism not yet available"
+"non-identifiable/truth" = "Refuse: mechanism not yet available"
+"non-identifiable/navigated" = "Refuse: mechanism not yet available"
+"non-identifiable/observed" = "Refuse: mechanism not yet available"
+"non-identifiable/any" = "Refuse: mechanism not yet available"
+"superseded/truth" = "Refuse: mechanism not yet available"
+"superseded/navigated" = "Refuse: mechanism not yet available"
+"superseded/observed" = "Refuse: mechanism not yet available"
+"superseded/any" = "Refuse: mechanism not yet available"
+"unbuilt/truth" = "Refuse: mechanism not yet available"
+"unbuilt/navigated" = "Refuse: mechanism not yet available"
+"unbuilt/observed" = "Refuse: mechanism not yet available"
+"unbuilt/any" = "Refuse: mechanism not yet available"
+"future/truth" = "Refuse: mechanism not yet available"
+"future/navigated" = "Refuse: mechanism not yet available"
+"future/observed" = "Refuse: mechanism not yet available"
+"future/any" = "Refuse: mechanism not yet available"
+"development/truth" = "RunScoped"
+"development/navigated" = "RunScoped"
+"development/observed" = "RunScoped"
+"development/any" = "RunScoped"
+"no-module/truth" = "Refuse: registered, no release module"
+"no-module/navigated" = "Refuse: registered, no release module"
+"no-module/observed" = "Refuse: registered, no release module"
+"no-module/any" = "Refuse: registered, no release module"
+

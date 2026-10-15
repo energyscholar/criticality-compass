@@ -634,6 +634,33 @@ def cmd_bench(a):   # plan 0932: the frozen benchmark suite as a manifest (cc/be
     return bench.main(a, {"cc": ROOT, "data": c.data_root}, ROOT)
 
 
+def cmd_registry(args):
+    """registry pull <toolset-commit> [--toolset DIR]: the ONLY writer of registry.toml and of the cc.toml [registry] pin (plan 1016). Reads the toolset's REGISTRY.toml at that commit through git."""
+    import registry
+    if len(args) < 2 or args[0] != "pull":
+        print("registry: need pull <toolset-commit>.\n  Next: bin/cc registry pull <toolset-commit> --toolset <dir>   (or set CC_TOOLSET)")
+        return 1
+    ts = opt(args, "--toolset", os.environ.get("CC_TOOLSET"))
+    if not ts:
+        print("registry pull: no toolset repository is named.\n  Next: bin/cc registry pull <toolset-commit> --toolset <dir>   (or set CC_TOOLSET)")
+        return 1
+    git = lambda *a: subprocess.run(["git", "-C", ts, *a], capture_output=True, text=True)  # noqa: E731
+    commit, blob, text = git("rev-parse", "--verify", args[1] + "^{commit}"), git("rev-parse", f"{args[1]}:taxonomy/REGISTRY.toml"), git("show", f"{args[1]}:taxonomy/REGISTRY.toml")
+    if commit.returncode or blob.returncode or text.returncode:
+        print(f"registry pull: cannot read taxonomy/REGISTRY.toml at '{args[1]}' in the toolset.\n  Next: pass a commit that holds it")
+        return 1
+    try:
+        out = registry.project(text.stdout, blob.stdout.strip(), commit.stdout.strip())
+    except ValueError as e:
+        print(f"registry pull: REFUSED: {e}\n  Next: fix the ids in the toolset REGISTRY.toml, then pull again")
+        return 1
+    (ROOT / "registry.toml").write_text(out)
+    cc = (ROOT / "cc.toml").read_text()
+    (ROOT / "cc.toml").write_text(re.sub(r'(?m)^(\[registry\]\nsha256 = ")[0-9a-f]{64}', lambda m: m.group(1) + registry.sha256_of(ROOT / "registry.toml"), cc))
+    print(f"registry pull: registry.toml from toolset {commit.stdout.strip()[:12]} (REGISTRY.toml blob {blob.stdout.strip()[:12]}); pin sha256 {registry.sha256_of(ROOT / 'registry.toml')[:12]}")
+    return 0
+
+
 def main(argv):
     global MODE
     advanced = "--advanced" in argv
@@ -652,7 +679,7 @@ def main(argv):
         print(help_text(advanced), end="")
         return 0
     table = {"show": lambda a: cmd_show(a, False), "explain": lambda a: cmd_show(a, True), "tabulate": cmd_tabulate,
-             "test": cmd_test, "run": cmd_run, "reverdict": cmd_reverdict, "family": cmd_family, "freeze": cmd_freeze, "check": cmd_check, "mutate": cmd_mutate, "bench": cmd_bench,
+             "test": cmd_test, "run": cmd_run, "reverdict": cmd_reverdict, "family": cmd_family, "freeze": cmd_freeze, "check": cmd_check, "mutate": cmd_mutate, "bench": cmd_bench, "registry": cmd_registry,
              "validate": lambda a: cmd_validate(a + (["--advanced"] if advanced else []))}
     if cmd in table:
         return table[cmd](rest)

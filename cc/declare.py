@@ -138,16 +138,41 @@ def _regex_ok(x):
         return False
 
 
+def chk_registry(p, d, c):
+    """cc.toml [registry] (plan 1016): the units map names every unit the release can run and nothing else, the table is total over (status, obtained) with a verb of cc/registry.py,
+    and registry.toml hashes to its pin (a mismatch is a finding, not a silent Refuse)."""
+    import registry
+    r, al = d["registry"], d["alphabets"]
+    out = shape(p, r, {"sha256": str, "units": dict, "table": dict}, pre="registry.")
+    if out or "registry_status" not in al:
+        return out + when("registry_status" not in al, p, "alphabets.registry_status", "missing", "write the status alphabet of registry.toml")
+    want = [f"instrument.{n}" for n in c.reg] + [f"interval.{m}" for m in al.get("interval_method", [])] + ["family"]
+    out += [at(p, f"registry.units.{u}", "a unit of this release with no registry id" if u in want else "not a unit of this release", f'write "{u}" = "<registry id>"' if u in want else "delete the line")
+            for u in sorted(set(want) ^ set(r["units"]))]
+    out += [at(p, f"registry.table.{k}", "missing: the table must be total over (status, obtained)", f'write "{k}" = "Run" | "RunScoped" | "Refuse: <reason>"')
+            for k in registry.table_keys(d) if k not in r["table"]]
+    out += [at(p, f"registry.table.{k}", "not a (status, obtained) key" if k not in registry.table_keys(d) else f"'{v}' is not Run, RunScoped or Refuse: <reason>",
+               "delete the line" if k not in registry.table_keys(d) else "use one of: Run | RunScoped | Refuse: <reason>")
+            for k, v in sorted(r["table"].items()) if k not in registry.table_keys(d) or not isinstance(v, str) or v.partition(": ")[0] not in registry.VERBS]
+    f = Path(c.root) / "registry.toml"
+    out += when(not f.is_file(), p, "registry.sha256", "registry.toml is missing", "bin/cc registry pull <toolset-commit>")
+    out += when(f.is_file() and registry.sha256_of(f) != r["sha256"], p, "registry.sha256", "registry.toml does not hash to its pin (registry pin mismatch: no unit runs)",
+                "bin/cc registry pull <toolset-commit> (the only writer of registry.toml)")
+    return out
+
+
 def chk_cc(p, d, c, stem=None):
     top = {k: dict for k in ("defaults", "data", "alphabets", "flags", "obtained_flag", "arrays", "basic", "check", "golden", "interval_binding")}
     out = header(p, d, "cc") + shape(p, d, top, {"formats": dict, "transducer": dict, "levels": dict, "interval_fields": dict, "conventional": dict,
-                                                 "report": dict, "step_labels": dict, "refusal_fields": dict, "projections": dict, "sources": dict})
+                                                 "report": dict, "step_labels": dict, "refusal_fields": dict, "projections": dict, "sources": dict, "registry": dict})
     if out:
         return out
     loc_ = d["data"].get("local", [])
     out += [at(p, "data.local", f"'{x}' is not a directory under data/ (data.local names the first directory of the paths that live in this repo)", f"commit data/{x}/ with an ATTRIBUTION.md, or delete the name")
             for x in (loc_ if isinstance(loc_, list) else [loc_]) if not (isinstance(x, str) and (Path(c.root) / "data" / x / "ATTRIBUTION.md").is_file())]
     out += when("interval_method" not in d["alphabets"], p, "alphabets.interval_method", "missing", 'write interval_method = ["block", "iid"]')
+    if "registry" in d:   # plan 1016: the registry gate's data, checked before anything reads it
+        out += chk_registry(p, d, c)
     methods, fields_ = d["alphabets"].get("interval_method", []), d.get("interval_fields", {})   # plan 0878: every method of the alphabet has its fields table, and no table names a method outside it
     out += [at(p, f"interval_fields.{k}", "no [interval_fields] table for this method of alphabets.interval_method" if k in methods else "not a method of alphabets.interval_method",
                f"add [interval_fields.{k}] with required = {{...}}" if k in methods else f"delete [interval_fields.{k}]") for k in sorted(set(methods) ^ set(fields_))]

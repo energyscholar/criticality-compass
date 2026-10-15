@@ -12,6 +12,7 @@ import detect
 import door
 import fingerprint
 import readout
+import registry
 import view
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -181,6 +182,8 @@ class Null(str):
 def run(root, fid, tables):
     """(refusal text, None) or (None, (decl, result dict, set name)): every refusal names its Next line."""
     root = Path(root)
+    if isinstance(e := registry.lookup("family", registry.ANY, root), registry.Refuse):   # plan 1016: the gate, through the one reader
+        return f"family {fid}: refused by the registry: {e.reason}\n  Next: bin/cc validate", None
     decl = load_decl(root, fid)
     names = " ".join(sorted(p.stem for p in (root / "families").glob("*.toml")))
     if decl is None:
@@ -251,5 +254,6 @@ def show(decl, out, tables):
     lines += [f"  end     {', '.join(f'{q} (bracket {a} .. {z})' for q, (a, z) in zip(out[k], out['end_bracket'])) or '(none)'}" for k in ("end_point",) if k in out]
     lines += [f"    {e['point']}: end of a LINE run ({e['side']} side, {e['kind']})" for e in out.get("ends", [])]
     return lines + [f"  => family report {out['verdict']}   class {out['class']}, family.toml line {out['line']}",
-                    f"     report: {view.config()['report']['family']}",   # plan 0892 (an external verifier (ruling Q19)): the declared label, cc.toml [report] family
+                    f"     report: {view.config()['report']['family']}",
+                    *[f"     {x}" for x in registry.scope_lines(["family"], view.ROOT)],   # plan 1016: the pinned registry and the family reader's scope   # plan 0892 (an external verifier (ruling Q19)): the declared label, cc.toml [report] family
                     f"     why: {out['why']}"]

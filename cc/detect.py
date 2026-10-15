@@ -2,7 +2,6 @@
 The staged entry points the breakers and the scoreboard call are the same functions `run` is built from."""
 import dataclasses
 import functools
-import importlib
 import json
 import subprocess
 import sys
@@ -13,6 +12,7 @@ import numpy as np
 import schema
 import door
 import readout
+import registry
 import resources
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -59,8 +59,20 @@ def refused(msg, nxt):
 
 @functools.lru_cache(maxsize=None)
 def instrument(name):
+    """(the instrument's declaration, its module) through the one reader (cc/registry.py, plan 1016). A unit the registry refuses has NO module (None): the run gate
+    (gate, below) refuses it before any reuse or measurement, and a stored result of it is still read."""
     d = tomllib.loads((ROOT / "instruments" / f"{name}.toml").read_text())
-    return d, importlib.import_module(d["module"])   # measure-key: seeded
+    e = registry.lookup(f"instrument.{name}", registry.ANY, ROOT)
+    return d, None if isinstance(e, registry.Refuse) else e.load()
+
+
+def gate(m):
+    """Plan 1016: the registry gate at DISPATCH. The first unit this input declares (each instrument, its interval method) that the pinned registry refuses for the
+    obtained values the input declares, as a declared refusal; nothing is reused or measured. Run and RunScoped proceed exactly as before."""
+    units = [*(f"instrument.{n}" for n in m["instruments"]), f"interval.{m['interval']['method']}"]
+    hit = registry.refusal(units, set(m["obtained"].values()), ROOT)
+    if hit:
+        raise refused(f"{hit[0]} is refused by the registry: {hit[1].reason}", "bin/cc validate (a pin mismatch names its own Next line), or declare an input that does not use this unit")
 
 
 def load_input(input_id):
@@ -116,7 +128,9 @@ READOUT = {"block": read_resampled, "iid": read_resampled, "gamma": read_gamma, 
 
 
 def read_vector(instrument_name, column, v, ctx):
-    """The readout of one resampled column: estimate, interval and sign cell against its declared eps."""
+    """The readout of one resampled column: estimate, interval and sign cell against its declared eps. The readout is looked up through the registry (plan 1016)."""
+    if isinstance(e := registry.lookup(f"interval.{ctx.method}", registry.ANY, ROOT), registry.Refuse):
+        raise refused(f"interval.{ctx.method} is refused by the registry: {e.reason}", "bin/cc validate")
     return READOUT[ctx.method](np.asarray(v, float), ctx, column, instrument(instrument_name)[0]["columns"][column])
 
 
@@ -481,7 +495,9 @@ def run(input_id, tables, write, tables_dir=None, reuse=True):
 
 def run_keyed(input_id, tables, write, tables_dir=None, reuse=True):
     """(result, how): how is 'measured', 'stored' (the keyed stored result) or 're-verdicted' (from a stored result under another set)."""
-    m, c, T = load_input(input_id), schema.Ctx(ROOT), load_tables(tables, tables_dir)
+    m = load_input(input_id)
+    gate(m)   # plan 1016: the registry gate comes first, before anything is loaded, reused or measured
+    c, T = schema.Ctx(ROOT), load_tables(tables, tables_dir)
     if m["interval"]["method"] not in T.interval_methods:   # plan 0937: the loader refuses a result the set does not read (a block result under v10-rules, a chains result under v09 and before)
         raise refused(f"tables/{tables} reads interval methods {list(T.interval_methods)}; {input_id} declares method '{m['interval']['method']}'",
                       f"run it under a set that reads '{m['interval']['method']}' (bin/cc tables fork <that set> <new-name> copies its interval binding)")
