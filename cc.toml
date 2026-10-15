@@ -290,3 +290,9 @@ family = "D-family"
 "no-module/observed" = "Refuse: registered, no release module"
 "no-module/any" = "Refuse: registered, no release module"
 
+[golden.classes.j]    # plan 1016: the registry pin line a result report prints under its header
+files = ["*.txt"]
+match = ['^\+\s*registry: sha256 [0-9a-f]{12}$']
+[golden.classes.k]    # plan 1016: the scope line(s) of the units a report used, from the pinned registry projection
+files = ["*.txt"]
+match = ['^\+\s*scope: ']

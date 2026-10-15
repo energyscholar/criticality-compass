@@ -18,6 +18,8 @@ family b7-at-line-2   rules: v01-rules   input: b7-at-line-2   interior: 0.0 0.0
     0.14->0.21 along ZERO!  -> MARGINAL
   => family report LINE   class LINE, family.toml line 55
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: B7 (SYNTHESIS-3): fingerprints 1 and 2 both resolved; X7a: POINT manifolds do not reach f2 MARGINAL
 ## b7-at-line-2 @ v02-rules
 family b7-at-line-2   rules: v02-rules   input: b7-at-line-2   interior: 0.0 0.07 0.14 0.21
@@ -39,6 +41,8 @@ family b7-at-line-2   rules: v02-rules   input: b7-at-line-2   interior: 0.0 0.0
     0.14->0.21 along ZERO!  -> MARGINAL
   => family report LINE   class LINE, family.toml line 55
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: B7 (SYNTHESIS-3): fingerprints 1 and 2 both resolved; X7a: POINT manifolds do not reach f2 MARGINAL
 ## b7-at-line-2 @ v03-rules
 family b7-at-line-2   rules: v03-rules   input: b7-at-line-2   interior: 0.0 0.07 0.14 0.21
@@ -60,6 +64,8 @@ family b7-at-line-2   rules: v03-rules   input: b7-at-line-2   interior: 0.0 0.0
     0.14->0.21 along ZERO!  -> MARGINAL
   => family report LINE   class LINE, family.toml line 55
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: B7 (SYNTHESIS-3): fingerprints 1 and 2 both resolved; X7a: POINT manifolds do not reach f2 MARGINAL
 ## b7-at-line-2 @ v04-rules
 family b7-at-line-2   rules: v04-rules   input: b7-at-line-2   interior: 0.0 0.07 0.14 0.21
@@ -81,6 +87,8 @@ family b7-at-line-2   rules: v04-rules   input: b7-at-line-2   interior: 0.0 0.0
     0.14->0.21 along ZERO!  -> MARGINAL
   => family report LINE   class LINE, family.toml line 55
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: B7 (SYNTHESIS-3): fingerprints 1 and 2 both resolved; X7a: POINT manifolds do not reach f2 MARGINAL
 ## b7-at-line-2 @ v05-rules
 family b7-at-line-2   rules: v05-rules   input: b7-at-line-2   interior: 0.0 0.07 0.14 0.21
@@ -114,6 +122,8 @@ family b7-at-line-2   rules: v05-rules   input: b7-at-line-2   interior: 0.0 0.0
   end     (none)
   => family report LINE   class LINE, family.toml line 223
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: B7 (SYNTHESIS-3): fingerprints 1 and 2 both resolved; X7a: POINT manifolds do not reach f2 MARGINAL
 ## b7-at-line-2 @ v06-rules
 family b7-at-line-2   rules: v06-rules   input: b7-at-line-2   interior: 0.0 0.07 0.14 0.21
@@ -147,6 +157,8 @@ family b7-at-line-2   rules: v06-rules   input: b7-at-line-2   interior: 0.0 0.0
   end     (none)
   => family report LINE   class LINE, family.toml line 223
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: B7 (SYNTHESIS-3): fingerprints 1 and 2 both resolved; X7a: POINT manifolds do not reach f2 MARGINAL
 ## b7-at-line-2 @ v07-rules
 family b7-at-line-2   rules: v07-rules   input: b7-at-line-2   interior: 0.0 0.07 0.14 0.21
@@ -180,6 +192,8 @@ family b7-at-line-2   rules: v07-rules   input: b7-at-line-2   interior: 0.0 0.0
   end     (none)
   => family report LINE   class LINE, family.toml line 223
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: B7 (SYNTHESIS-3): fingerprints 1 and 2 both resolved; X7a: POINT manifolds do not reach f2 MARGINAL
 ## b7-at-line-2 @ v08-rules
 no result for b7-at-line-2 under v08-rules yet.
@@ -285,6 +299,8 @@ family k4-m1   rules: v05-rules   input: k4-m1   interior: 0.45 0.50 0.55 0.60 0
     0.90: end of a LINE run (upper side, END-BKT-CANDIDATE)
   => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 488
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: 0863: no positive row yet
 ## k4-m1 @ v06-rules
 family k4-m1   rules: v06-rules   input: k4-m1   interior: 0.45 0.50 0.55 0.60 0.65 0.70 0.75 0.80 0.85 (rule mid-run-open)
@@ -372,6 +388,8 @@ family k4-m1   rules: v06-rules   input: k4-m1   interior: 0.45 0.50 0.55 0.60 0
     0.90: end of a LINE run (upper side, END-BKT-CANDIDATE)
   => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 488
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: 0863: no positive row yet
 ## k4-m1 @ v07-rules
 family k4-m1   rules: v07-rules   input: k4-m1   interior: 0.45 0.50 0.55 0.60 0.65 0.70 0.75 0.80 0.85 (rule mid-run-open)
@@ -459,6 +477,8 @@ family k4-m1   rules: v07-rules   input: k4-m1   interior: 0.45 0.50 0.55 0.60 0
     0.90: end of a LINE run (upper side, END-BKT-CANDIDATE)
   => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 488
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: 0863: no positive row yet
 ## k4-m1 @ v08-rules
 family k4-m1   rules: v08-rules   input: k4-m1   interior: 0.45 0.50 0.55 0.60 0.65 0.70 0.75 0.80 0.85 (rule mid-run-open)
@@ -538,6 +558,8 @@ family k4-m1   rules: v08-rules   input: k4-m1   interior: 0.45 0.50 0.55 0.60 0
     0.90: end of a LINE run (upper side, END-BKT-CANDIDATE)
   => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 409
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: 0863: no positive row yet (0862 X7b/X2-X4 decide)
 ## k4-m1 @ v10-rules
 no result for k4-m1 under v10-rules yet.
@@ -654,6 +676,8 @@ family x2b-xy-2   rules: v06-rules   input: x2b-xy-2   interior: 0.5 0.6 0.7 0.8
     0.89294: end of a LINE run (upper side, END-BKT-CANDIDATE)
   => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 448
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: 0863: no positive row yet (0862 X7b/X2-X4 decide)
 ## x2b-xy-2 @ v07-rules
 family x2b-xy-2   rules: v07-rules   input: x2b-xy-2   interior: 0.5 0.6 0.7 0.8 0.85
@@ -698,6 +722,8 @@ family x2b-xy-2   rules: v07-rules   input: x2b-xy-2   interior: 0.5 0.6 0.7 0.8
     0.89294: end of a LINE run (upper side, END-BKT-CANDIDATE)
   => family report BKT-END   class BKT-END, family.toml line 183
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: plan 0871 E2: the interior reads LINE (every interior point reads per-point LINE after the probe, or the LINE row's own f1 VARIES and f2 MARGINAL) and a side of it reads END-BKT-CANDIDATE: a LINE run meets a sink run whose starts agree. CAVEAT (review 0870 3.2.2): a sweep that steps OFF its manifold reads exactly this; the family cannot tell the line ended from the sweep left the line, only the declaration and the blind decoy (K4/K5) can. Next: read lower, upper and end_bracket (bin/cc family) before believing it
 ## x2b-xy-2 @ v08-rules
 no result for x2b-xy-2 under v08-rules yet.
@@ -765,6 +791,8 @@ family x2b-xy-3   rules: v08-rules   input: x2b-xy-3   interior: 0.5 0.6 0.7 0.8
     0.89294: end of a LINE run (upper side, END-BKT-CANDIDATE)
   => family report BKT-END   class BKT-END, family.toml line 184
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: plan 0871 E2: the interior reads LINE (every interior point reads per-point LINE after the probe, or the LINE row's own f1 VARIES and f2 MARGINAL) and a side of it reads END-BKT-CANDIDATE: a LINE run meets a sink run whose starts agree. CAVEAT (review 0870 3.2.2): a sweep that steps OFF its manifold reads exactly this; the family cannot tell the line ended from the sweep left the line, only the declaration and the blind decoy (K4/K5) can. Next: read lower, upper and end_bracket (bin/cc family) before believing it
 ## x2b-xy-3 @ v10-rules
 no result for x2b-xy-3 under v10-rules yet.
@@ -824,6 +852,8 @@ family x2b-xy   rules: v05-rules   input: x2b-xy   interior: 0.5 0.6 0.7 0.8 0.8
     0.89294: end of a LINE run (upper side, END-BKT-CANDIDATE)
   => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 448
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: 0863: no positive row yet (0862 X7b/X2-X4 decide)
 ## x2b-xy @ v06-rules
 family x2b-xy   rules: v06-rules   input: x2b-xy   interior: 0.5 0.6 0.7 0.8 0.85
@@ -868,6 +898,8 @@ family x2b-xy   rules: v06-rules   input: x2b-xy   interior: 0.5 0.6 0.7 0.8 0.8
     0.89294: end of a LINE run (upper side, END-BKT-CANDIDATE)
   => family report BKT-END   class BKT-END, family.toml line 183
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: plan 0871 E2: the interior reads LINE (every interior point reads per-point LINE after the probe, or the LINE row's own f1 VARIES and f2 MARGINAL) and a side of it reads END-BKT-CANDIDATE: a LINE run meets a sink run whose starts agree. CAVEAT (review 0870 3.2.2): a sweep that steps OFF its manifold reads exactly this; the family cannot tell the line ended from the sweep left the line, only the declaration and the blind decoy (K4/K5) can. Next: read lower, upper and end_bracket (bin/cc family) before believing it
 ## x2b-xy @ v07-rules
 family x2b-xy   rules: v07-rules   input: x2b-xy   interior: 0.5 0.6 0.7 0.8 0.85
@@ -912,6 +944,8 @@ family x2b-xy   rules: v07-rules   input: x2b-xy   interior: 0.5 0.6 0.7 0.8 0.8
     0.89294: end of a LINE run (upper side, END-BKT-CANDIDATE)
   => family report BKT-END   class BKT-END, family.toml line 183
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: plan 0871 E2: the interior reads LINE (every interior point reads per-point LINE after the probe, or the LINE row's own f1 VARIES and f2 MARGINAL) and a side of it reads END-BKT-CANDIDATE: a LINE run meets a sink run whose starts agree. CAVEAT (review 0870 3.2.2): a sweep that steps OFF its manifold reads exactly this; the family cannot tell the line ended from the sweep left the line, only the declaration and the blind decoy (K4/K5) can. Next: read lower, upper and end_bracket (bin/cc family) before believing it
 ## x2b-xy @ v08-rules
 no result for x2b-xy under v08-rules yet.
@@ -942,6 +976,8 @@ family x5n-g   rules: v04-rules   input: x5n-bilayer-3   interior: 0.0 0.1 0.3
     0.1->0.3 along NEG  -> IRRELEVANT
   => family report POINT-MANIFOLD   class POINT, family.toml line 75
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: plan 0870 P3: the exponent is constant along the navigated chain (f1) and every neighbouring pair has a difference that GROWS SLOWER than the size (f2 IRRELEVANT): the members are one point class, a manifold of points. The members' own per-point verdicts are not lifted (x5n: REFUSE-PROBE-INCOMPLETE); the family is the reading that carries the class. The first reading ever of this row (X7a's pairs were all off the manifold, E44/E46); x5n over g is its test
 ## x5n-g @ v05-rules
 family x5n-g   rules: v05-rules   input: x5n-bilayer-3   interior: 0.0 0.1 0.3
@@ -968,6 +1004,8 @@ family x5n-g   rules: v05-rules   input: x5n-bilayer-3   interior: 0.0 0.1 0.3
   end     (none)
   => family report POINT-MANIFOLD   class POINT, family.toml line 273
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: plan 0870 P3: the exponent is constant along the navigated chain (f1) and every neighbouring pair has a difference that GROWS SLOWER than the size (f2 IRRELEVANT): the members are one point class, a manifold of points. The members' own per-point verdicts are not lifted (x5n: REFUSE-PROBE-INCOMPLETE); the family is the reading that carries the class. The first reading ever of this row (X7a's pairs were all off the manifold, E44/E46); x5n over g is its test
 ## x5n-g @ v06-rules
 family x5n-g   rules: v06-rules   input: x5n-bilayer-3   interior: 0.0 0.1 0.3
@@ -994,6 +1032,8 @@ family x5n-g   rules: v06-rules   input: x5n-bilayer-3   interior: 0.0 0.1 0.3
   end     (none)
   => family report POINT-MANIFOLD   class POINT, family.toml line 273
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: plan 0870 P3: the exponent is constant along the navigated chain (f1) and every neighbouring pair has a difference that GROWS SLOWER than the size (f2 IRRELEVANT): the members are one point class, a manifold of points. The members' own per-point verdicts are not lifted (x5n: REFUSE-PROBE-INCOMPLETE); the family is the reading that carries the class. The first reading ever of this row (X7a's pairs were all off the manifold, E44/E46); x5n over g is its test
 ## x5n-g @ v07-rules
 family x5n-g   rules: v07-rules   input: x5n-bilayer-3   interior: 0.0 0.1 0.3
@@ -1020,6 +1060,8 @@ family x5n-g   rules: v07-rules   input: x5n-bilayer-3   interior: 0.0 0.1 0.3
   end     (none)
   => family report POINT-MANIFOLD   class POINT, family.toml line 273
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: plan 0870 P3: the exponent is constant along the navigated chain (f1) and every neighbouring pair has a difference that GROWS SLOWER than the size (f2 IRRELEVANT): the members are one point class, a manifold of points. The members' own per-point verdicts are not lifted (x5n: REFUSE-PROBE-INCOMPLETE); the family is the reading that carries the class. The first reading ever of this row (X7a's pairs were all off the manifold, E44/E46); x5n over g is its test
 ## x5n-g @ v08-rules
 no result for x5n-bilayer-3 under v08-rules yet.
@@ -1044,6 +1086,8 @@ family x7a-bc-lambda   rules: v01-rules   input: x7a-bc   interior: 0.0 1.0 1.5 
     1.9->1.95 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
   => family report REFUSE-OFF-MANIFOLD   class REFUSE, family.toml line 60
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: X7a: a member point off the manifold at L 243 (it also explains a non-monotone bracket, so it is read first by partition)
 ## x7a-bc-lambda @ v02-rules
 family x7a-bc-lambda   rules: v02-rules   input: x7a-bc   interior: 0.0 1.0 1.5 1.8 1.9 1.95
@@ -1062,6 +1106,8 @@ family x7a-bc-lambda   rules: v02-rules   input: x7a-bc   interior: 0.0 1.0 1.5 
     1.9->1.95 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
   => family report REFUSE-OFF-MANIFOLD   class REFUSE, family.toml line 60
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: X7a: a member point off the manifold at L 243 (it also explains a non-monotone bracket, so it is read first by partition)
 ## x7a-bc-lambda @ v03-rules
 family x7a-bc-lambda   rules: v03-rules   input: x7a-bc   interior: 0.0 1.0 1.5 1.8 1.9 1.95
@@ -1080,6 +1126,8 @@ family x7a-bc-lambda   rules: v03-rules   input: x7a-bc   interior: 0.0 1.0 1.5 
     1.9->1.95 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
   => family report REFUSE-OFF-MANIFOLD   class REFUSE, family.toml line 60
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: X7a: a member point off the manifold at L 243 (it also explains a non-monotone bracket, so it is read first by partition)
 ## x7a-bc-lambda @ v04-rules
 family x7a-bc-lambda   rules: v04-rules   input: x7a-bc   interior: 0.0 1.0 1.5 1.8 1.9 1.95
@@ -1098,6 +1146,8 @@ family x7a-bc-lambda   rules: v04-rules   input: x7a-bc   interior: 0.0 1.0 1.5 
     1.9->1.95 along REFUSE-OFF-MANIFOLD  -> REFUSE-OFF-MANIFOLD
   => family report REFUSE-OFF-MANIFOLD   class REFUSE, family.toml line 60
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: X7a: a member point off the manifold at L 243 (it also explains a non-monotone bracket, so it is read first by partition)
 ## x7a-bc-lambda @ v05-rules
 family x7a-bc-lambda   rules: v05-rules   input: x7a-bc   interior: 0.0 1.0 1.5 1.8 1.9 1.95
@@ -1130,6 +1180,8 @@ family x7a-bc-lambda   rules: v05-rules   input: x7a-bc   interior: 0.0 1.0 1.5 
   end     (none)
   => family report REFUSE-OFF-MANIFOLD   class REFUSE, family.toml line 178
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: plan 0871 G6: a member point off the manifold at L 243 is a fact about the chain; no row may override it, whatever the points and sides read (this row precedes the LINE and BKT-END rows by partition: they exclude it). It also explains a non-monotone bracket (X7a)
 ## x7a-bc-lambda @ v06-rules
 family x7a-bc-lambda   rules: v06-rules   input: x7a-bc   interior: 0.0 1.0 1.5 1.8 1.9 1.95
@@ -1162,6 +1214,8 @@ family x7a-bc-lambda   rules: v06-rules   input: x7a-bc   interior: 0.0 1.0 1.5 
   end     (none)
   => family report REFUSE-OFF-MANIFOLD   class REFUSE, family.toml line 178
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: plan 0871 G6: a member point off the manifold at L 243 is a fact about the chain; no row may override it, whatever the points and sides read (this row precedes the LINE and BKT-END rows by partition: they exclude it). It also explains a non-monotone bracket (X7a)
 ## x7a-bc-lambda @ v07-rules
 family x7a-bc-lambda   rules: v07-rules   input: x7a-bc   interior: 0.0 1.0 1.5 1.8 1.9 1.95
@@ -1194,6 +1248,8 @@ family x7a-bc-lambda   rules: v07-rules   input: x7a-bc   interior: 0.0 1.0 1.5 
   end     (none)
   => family report REFUSE-OFF-MANIFOLD   class REFUSE, family.toml line 178
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: plan 0871 G6: a member point off the manifold at L 243 is a fact about the chain; no row may override it, whatever the points and sides read (this row precedes the LINE and BKT-END rows by partition: they exclude it). It also explains a non-monotone bracket (X7a)
 ## x7a-bc-lambda @ v08-rules
 no result for x7a-bc under v08-rules yet.
@@ -1210,6 +1266,8 @@ family x7a-nnn-manifold   rules: v01-rules   input: x7a-nnn   interior: k2-0.0 k
     k2-0.0->k2-0.1 along NOT-EVALUATED  -> NOT-EVALUATED
   => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 75
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: 0863: no positive row yet (0862 X7b/X2-X4 decide)
 ## x7a-nnn-manifold @ v02-rules
 family x7a-nnn-manifold   rules: v02-rules   input: x7a-nnn   interior: k2-0.0 k2-0.1
@@ -1220,6 +1278,8 @@ family x7a-nnn-manifold   rules: v02-rules   input: x7a-nnn   interior: k2-0.0 k
     k2-0.0->k2-0.1 along NOT-EVALUATED  -> NOT-EVALUATED
   => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 75
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: 0863: no positive row yet (0862 X7b/X2-X4 decide)
 ## x7a-nnn-manifold @ v03-rules
 family x7a-nnn-manifold   rules: v03-rules   input: x7a-nnn   interior: k2-0.0 k2-0.1
@@ -1230,6 +1290,8 @@ family x7a-nnn-manifold   rules: v03-rules   input: x7a-nnn   interior: k2-0.0 k
     k2-0.0->k2-0.1 along NOT-EVALUATED  -> NOT-EVALUATED
   => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 75
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: 0863: no positive row yet (0862 X7b/X2-X4 decide)
 ## x7a-nnn-manifold @ v04-rules
 family x7a-nnn-manifold   rules: v04-rules   input: x7a-nnn   interior: k2-0.0 k2-0.1
@@ -1240,6 +1302,8 @@ family x7a-nnn-manifold   rules: v04-rules   input: x7a-nnn   interior: k2-0.0 k
     k2-0.0->k2-0.1 along NOT-EVALUATED  -> NOT-EVALUATED
   => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 95
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: 0863: no positive row yet (0862 X7b/X2-X4 decide)
 ## x7a-nnn-manifold @ v05-rules
 family x7a-nnn-manifold   rules: v05-rules   input: x7a-nnn   interior: k2-0.0 k2-0.1
@@ -1260,6 +1324,8 @@ family x7a-nnn-manifold   rules: v05-rules   input: x7a-nnn   interior: k2-0.0 k
   end     (none)
   => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 433
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: 0863: no positive row yet (0862 X7b/X2-X4 decide)
 ## x7a-nnn-manifold @ v06-rules
 family x7a-nnn-manifold   rules: v06-rules   input: x7a-nnn   interior: k2-0.0 k2-0.1
@@ -1280,6 +1346,8 @@ family x7a-nnn-manifold   rules: v06-rules   input: x7a-nnn   interior: k2-0.0 k
   end     (none)
   => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 433
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: 0863: no positive row yet (0862 X7b/X2-X4 decide)
 ## x7a-nnn-manifold @ v07-rules
 family x7a-nnn-manifold   rules: v07-rules   input: x7a-nnn   interior: k2-0.0 k2-0.1
@@ -1300,6 +1368,8 @@ family x7a-nnn-manifold   rules: v07-rules   input: x7a-nnn   interior: k2-0.0 k
   end     (none)
   => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 433
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: 0863: no positive row yet (0862 X7b/X2-X4 decide)
 ## x7a-nnn-manifold @ v08-rules
 no result for x7a-nnn under v08-rules yet.
@@ -1322,6 +1392,8 @@ family x8-ising-compass   rules: v01-rules   input: x8-ising-needle   interior: 
   f2      NOT-MEASURED
   => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 75
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: 0863: no positive row yet (0862 X7b/X2-X4 decide)
 ## x8-ising-compass @ v02-rules
 family x8-ising-compass   rules: v02-rules   input: x8-ising-needle   interior: 0.90 0.95 0.98 0.99 1.00 1.01 1.02 1.05 1.10
@@ -1338,6 +1410,8 @@ family x8-ising-compass   rules: v02-rules   input: x8-ising-needle   interior: 
   f2      NOT-MEASURED
   => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 75
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: 0863: no positive row yet (0862 X7b/X2-X4 decide)
 ## x8-ising-compass @ v03-rules
 family x8-ising-compass   rules: v03-rules   input: x8-ising-needle   interior: 0.90 0.95 0.98 0.99 1.00 1.01 1.02 1.05 1.10
@@ -1354,6 +1428,8 @@ family x8-ising-compass   rules: v03-rules   input: x8-ising-needle   interior: 
   f2      NOT-MEASURED
   => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 75
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: 0863: no positive row yet (0862 X7b/X2-X4 decide)
 ## x8-ising-compass @ v04-rules
 family x8-ising-compass   rules: v04-rules   input: x8-ising-needle   interior: 0.90 0.95 0.98 0.99 1.00 1.01 1.02 1.05 1.10
@@ -1370,6 +1446,8 @@ family x8-ising-compass   rules: v04-rules   input: x8-ising-needle   interior: 
   f2      NOT-MEASURED
   => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 95
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: 0863: no positive row yet (0862 X7b/X2-X4 decide)
 ## x8-ising-compass @ v05-rules
 family x8-ising-compass   rules: v05-rules   input: x8-ising-needle   interior: 0.90 0.95 0.98 0.99 1.00 1.01 1.02 1.05 1.10
@@ -1403,6 +1481,8 @@ family x8-ising-compass   rules: v05-rules   input: x8-ising-needle   interior: 
   end     (none)
   => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 433
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: 0863: no positive row yet (0862 X7b/X2-X4 decide)
 ## x8-ising-compass @ v06-rules
 family x8-ising-compass   rules: v06-rules   input: x8-ising-needle   interior: 0.90 0.95 0.98 0.99 1.00 1.01 1.02 1.05 1.10
@@ -1436,6 +1516,8 @@ family x8-ising-compass   rules: v06-rules   input: x8-ising-needle   interior: 
   end     (none)
   => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 433
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: 0863: no positive row yet (0862 X7b/X2-X4 decide)
 ## x8-ising-compass @ v07-rules
 family x8-ising-compass   rules: v07-rules   input: x8-ising-needle   interior: 0.90 0.95 0.98 0.99 1.00 1.01 1.02 1.05 1.10
@@ -1469,6 +1551,8 @@ family x8-ising-compass   rules: v07-rules   input: x8-ising-needle   interior: 
   end     (none)
   => family report REFUSE-UNCLASSIFIED-v0   class REFUSE, family.toml line 433
      report: declared report — a projection C over per-point sign cells, not a relational reading (an external verifier (ruling Q19), 2026-10-06)
+     registry: sha256 09538502a656
+     scope: development: not registered — family
      why: 0863: no positive row yet (0862 X7b/X2-X4 decide)
 ## x8-ising-compass @ v08-rules
 no result for x8-ising-needle under v08-rules yet.

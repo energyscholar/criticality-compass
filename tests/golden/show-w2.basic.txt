@@ -1,6 +1,8 @@
 $ bin/cc show w2-potts
 w2-potts   rules: v01-rules   result: results/w2-potts@v01-rules.json (frozen)
 report: declared report — a projection C over sign cells of declared comparisons (the blocking-map comparison of independent sizes; the two-start difference), not a relational reading (an external verifier, 2026-10-06)
+registry: sha256 09538502a656
+scope: development: not registered — across, needle, stability, two_start, block
 point 2   case ising-2d
   sink       BLANK (NOT-MEASURED: needle is not declared on this input)
   needle     BLANK (NOT-MEASURED: needle is not declared on this input)
