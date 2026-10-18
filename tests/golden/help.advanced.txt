@@ -21,4 +21,5 @@ cc - Criticality Compass   (ADVANCED)
   bin/cc help [--advanced]                                    this text
   bin/cc family <id> [--tables SET]                           the family report (a declared projection C over bracket, f1, f2: cc.toml [report] family) of a stored result; measures nothing
   bin/cc new family <id>                                      start a family declaration from the template
+  bin/cc intake explain | (lint | seal | run) <id>            the intake pipeline of a raw-data declaration declarations/<id>/ (explain prints its stage table; not `explain <input> <point>`)
 exit 0

@@ -1,0 +1,145 @@
+# intake/FORMAT.toml - declaration format v1 (plan 1136, amendment A2 ruling Q5): the S0 FORMAT schema as DATA. S0 (cc/intake_blind.py) walks
+# this table and emits the reason codes of intake/STAGES.toml directly; it holds no per-field code. Every field of format v1 is required.
+# A field row: type = str | int | num | list | table (cc/intake_blind.py TYPE); check = one of cc/intake_blind.py CHECK:
+#   TEXT      any text but the template's "TODO"
+#   NUMBER    any number
+#   CLOSED    `values` (value -> ADMIT or a reason code) plus every key of each `admit` source (policy.projection | policy.bridge |
+#             alphabet.<name> of cc.toml); a value in neither is the `absent` reason; "TODO" is VALUE_STILL_TODO
+#   ITEMS     a list whose every item has type `item`
+#   TABLE     a table with its own `fields`
+#   TABLES    a list of tables, each with `fields`
+#   INTERVAL  a table whose fields are cc.toml [interval_fields.<method>] for its `method` (required and optional)
+# A key that is no field row is FIELD_IS_STAMPED when it is in `stamped`, FIELD_IS_DERIVED when in `derived`, else FIELD_UNKNOWN.
+schema = 1
+kind = "intake-format"
+version = "1136-v1"
+header = { schema = 1, kind = "intake" }
+stamped = ["sealed_at", "author", "author_kind", "confirmed_by", "declaration_sha256", "code_identity", "protocol_identity", "universe_listing", "sampling", "pins"]
+derived = ["correlated"]
+
+[fields]
+schema = { type = "int", check = "NUMBER" }
+kind = { type = "str", check = "TEXT" }
+id = { type = "str", check = "TEXT" }
+
+[fields.intake]
+type = "table"
+check = "TABLE"
+[fields.intake.fields]
+mode = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { PROSPECTIVE = "ADMIT", RETROSPECTIVE_PREDECLARED = "ADMIT", EXPLORATORY = "ADMIT" } }
+
+[fields.basis]
+type = "table"
+check = "TABLE"
+[fields.basis.fields.read]
+type = "list"
+check = "TABLES"
+[fields.basis.fields.read.fields]
+what = { type = "str", check = "TEXT" }
+class = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { README = "ADMIT", LISTING = "ADMIT", HEADER = "ADMIT", UNITS_NOTE = "ADMIT", ACQUISITION_NOTE = "ADMIT", PAPER_METHODS = "ADMIT", READER_CODE = "ADMIT", ANALYSIS_CODE = "BASIS_NOT_METADATA", DATA_VALUES = "BASIS_NOT_METADATA", FIGURE = "BASIS_NOT_METADATA" } }
+
+[fields.source]
+type = "table"
+check = "TABLE"
+[fields.source.fields]
+origin = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { PLANTED = "ADMIT", EXPERIMENT = "ADMIT" } }
+deposit = { type = "str", check = "TEXT" }
+root = { type = "str", check = "TEXT" }
+universe = { type = "str", check = "TEXT" }
+truth_side = { type = "list", check = "ITEMS", item = "str" }
+reader = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { P1 = "ADMIT", L5 = "ADMIT", F1 = "ADMIT", C1 = "ADMIT", C4 = "ADMIT", npz-curve-v1 = "ADMIT" } }
+layout = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { positional = "ADMIT", named = "ADMIT", points = "ADMIT", channels = "ADMIT", keys = "ADMIT" } }
+
+[fields.selection]
+type = "table"
+check = "TABLE"
+[fields.selection.fields]
+pattern = { type = "str", check = "TEXT" }
+excluded = { type = "list", check = "TABLES", fields = { file = { type = "str", check = "TEXT" }, why = { type = "str", check = "TEXT" } } }
+[fields.selection.fields.index]
+type = "table"
+check = "TABLE"
+fields = { first = { type = "int", check = "NUMBER" }, last = { type = "int", check = "NUMBER" } }
+
+[fields.knobs]
+type = "table"
+check = "TABLE"
+[fields.knobs.fields.slow]
+type = "table"
+check = "TABLE"
+[fields.knobs.fields.slow.fields]
+name = { type = "str", check = "TEXT" }
+unit = { type = "str", check = "TEXT" }
+source = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { PATH_PATTERN = "ADMIT", PER_FILE = "ADMIT", FILE_KEY = "ADMIT" } }
+pattern = { type = "str", check = "TEXT" }
+per_file = { type = "list", check = "ITEMS", item = "num" }
+key = { type = "str", check = "TEXT" }
+[fields.knobs.fields.fast]
+type = "table"
+check = "TABLE"
+[fields.knobs.fields.fast.fields]
+name = { type = "str", check = "TEXT" }
+unit = { type = "str", check = "TEXT" }
+source = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { COLUMN = "ADMIT", FILE_KEY = "ADMIT" } }
+key = { type = "str", check = "TEXT" }
+
+[fields.measured]
+type = "table"
+check = "TABLE"
+[fields.measured.fields]
+name = { type = "str", check = "TEXT" }
+unit = { type = "str", check = "TEXT" }
+key = { type = "str", check = "TEXT" }
+shape = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { SCALAR_PER_LOCUS = "ADMIT", SERIES_PER_LOCUS = "ADMIT", PICTURE = "ADMIT", POSITIONS = "ADMIT" } }
+
+[fields.acquisition]
+type = "table"
+check = "TABLE"
+[fields.acquisition.fields]
+mode = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { INDEPENDENT = "ADMIT", SWEEP_CARRIED = "ADMIT", RAMP_CONTINUOUS = "ADMIT", REPEATED_FRAMES = "ADMIT" } }
+direction = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { ASCENDING = "ADMIT", DESCENDING = "ADMIT", UNORDERED = "ADMIT" } }
+row_order = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { ASCENDING = "ADMIT", DESCENDING = "ADMIT", ACQUISITION = "ADMIT" } }
+
+[fields.replicate]
+type = "table"
+check = "TABLE"
+[fields.replicate.fields]
+identity = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { NONE = "ADMIT", SEED = "ADMIT", RUN = "ADMIT", SAMPLE = "ADMIT", FILE = "ADMIT" } }
+key = { type = "str", check = "TEXT" }
+
+[fields.interval]
+type = "table"
+check = "INTERVAL"
+method = { type = "str", check = "CLOSED", admit = ["alphabet.interval_method"], absent = "VALUE_NOT_LISTED", values = {} }
+
+[fields.bracket]   # amendment A2 ruling Q8: the most a declaration requires of a bracket; VALIDATED_BRACKET needs frozen coverage evidence (S8)
+type = "table"
+check = "TABLE"
+[fields.bracket.fields]
+required = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { CANDIDATE_BRACKET = "ADMIT", VALIDATED_BRACKET = "ADMIT" } }
+
+[fields.projection]
+type = "list"
+check = "TABLES"
+[fields.projection.fields]
+lane = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { PRIMARY = "ADMIT", ALTERNATIVE = "ADMIT" } }
+from = { type = "str", check = "TEXT" }
+to = { type = "str", check = "TEXT" }
+bias = { type = "str", check = "CLOSED", admit = ["policy.projection"], absent = "BIAS_KEY_UNDECLARED", values = { INTERPOLATE = "STEP_IS_INTERPOLATION" } }
+keeps = { type = "str", check = "TEXT" }
+discards = { type = "str", check = "TEXT" }
+
+[fields.bridge]
+type = "list"
+check = "TABLES"
+[fields.bridge.fields]
+lane = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { PRIMARY = "ADMIT", ALTERNATIVE = "ADMIT" } }
+on = { type = "str", check = "TEXT" }
+template = { type = "str", check = "CLOSED", admit = ["policy.bridge"], absent = "VALUE_NOT_LISTED", values = { NONE_FITS = "BRIDGE_NONE_FITS", INTERPOLATE = "STEP_IS_INTERPOLATION" } }
+bias = { type = "str", check = "CLOSED", admit = ["policy.bridge"], absent = "BIAS_KEY_UNDECLARED", values = { INTERPOLATE = "STEP_IS_INTERPOLATION" } }
+
+[fields.shift]
+type = "table"
+check = "TABLE"
+[fields.shift.fields]
+c = { type = "num", check = "NUMBER" }

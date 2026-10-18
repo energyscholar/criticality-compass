@@ -1,0 +1,40 @@
+# intake/POLICY.toml - the intake's versioned POLICY (plan 1136, amendments A1.2, A1.11, A2 Q12): the bias rows a projection or a bridge
+# cites, and the policy settings. Every row here is POLICY backed by evidence, never a structural invariant. A projection cites a key under
+# [projection], a bridge a key under [bridge]; a key cited under the wrong link is absent, so it refuses (BIAS_KEY_UNDECLARED).
+schema = 1
+kind = "intake-policy"
+status = "POLICY"
+version = "1136-v1"
+evidence_note = "The plan 1118 banks were used to CHOOSE these rows; they cannot validate them (A1.10). Validation needs fresh held-out planted banks."
+
+[projection.ARGMAX_FAST]     # A1.2 'argmax_T': the location along the fast knob of a curve's maximum measured value
+estimand = "location of the curve's maximum along the fast knob (a measured fast-knob value, never between points)"
+measured_by = "plan 1118 (PAIR's T*), choosing banks only"
+cannot = "place the maximum between measured points; tell a critical POINT from a LINE"
+depends_on = "the fast-knob density of each curve near its peak"
+fails_when = "a curve's grid misses its own peak"
+
+[projection.MAX_MEASURED]    # A1.2 'max_C': the height of a curve's maximum measured value
+estimand = "height of the curve's maximum measured value"
+measured_by = "plan 1118 (REDUCE's r_k), choosing banks only"
+cannot = "tell a critical POINT from a LINE; correct for a grid that misses the peak (the height is biased low)"
+depends_on = "where the points sit around each curve's peak"
+fails_when = "neighbouring curves' differences are inside the noise width"
+
+[bridge.CHAIN_SLOW]          # door.TEMPLATES "chain" over the slow-knob axis
+relation = "consecutive curves in slow-knob order"
+measured_by = "plan 1118 (REDUCE path), choosing banks only"
+cannot = "relate non-adjacent curves"
+depends_on = "slow-knob spacing"
+fails_when = "the maximum is at either end of the path"
+
+[bridge.PAIR_NEAREST_FAST]   # plan 1118 PAIR: a door template not yet in CC (A2 Q4: deferred to its stage plan)
+relation = "per adjacent curve pair, the measured fast-knob point on the neighbour nearest to each curve's argmax (ties to the lower value)"
+measured_by = "plan 1118 (PAIR), choosing banks only"
+cannot = "compare points at equal fast-knob values when the grids are misaligned"
+depends_on = "per-curve grid alignment"
+fails_when = "the ridge moves between neighbouring curves by more than the grid step"
+
+[policy]
+real_data_lanes = 2                   # D5 / A1.11: real data are taken in through two lanes
+primary_projection = "MAX_MEASURED"   # the plan 1118 choice of REDUCE

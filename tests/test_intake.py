@@ -1,0 +1,246 @@
+"""test_intake - plan 1136 phase 1, tests 1 to 5 (amendment A2), and the binding checks of the intake's code.
+ 1. intake/STAGES.toml and the runner agree: the bodies are exactly the implemented rows; needs point back; every stage that reads data bytes
+    is after the seal; every stage after the seal has a signature; every reason code the code emits is a row of its stage.
+ 2. docs/INTAKE.md is docs/gen-intake.py's output byte for byte, and `bin/cc intake explain` prints the same text.
+ 3. A stub never produces PRIMARY_READY, and the verdict tables are total: EVERY fold of the stage table (each stage a stub, a passing or a
+    refusing body; the seal confirmed or not) is run, and the cells it reaches are exactly the reachable cells, never an IMPOSSIBLE one.
+ 4. The Seal (A2 Q11): (i) a Sealed cannot be built outside intake_seal (its constructor is a TypeError), and S2 in a run is a lookup that
+    refuses an absent seal, a changed declaration and a read before the seal; (ii) every data stage's signature takes Sealed-carrying evidence.
+ 5. Five planted bad declarations (the worked example with one planted edit each) are refused at S0 FORMAT with their named reasons.
+ Plus: the enum names parse as Boolean formulas (binding rule); S0's module can open nothing (imports and calls, over the AST); the copied
+ loader is byte-identical to its pin."""
+import ast
+import dataclasses
+import enum
+import hashlib
+import inspect
+import itertools
+import os
+import re
+import shutil
+import subprocess
+import sys
+import tempfile
+import tomllib
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path[:0] = [str(ROOT / "cc")]
+import intake  # noqa: E402
+import intake_blind as blind  # noqa: E402
+import intake_data  # noqa: E402
+import intake_seal  # noqa: E402
+
+bad = []
+
+
+def check(name, ok, why=""):
+    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
+    if not ok:
+        bad.append(name)
+
+
+T = intake.tables(ROOT)
+ST = T["stages"]["stage"]
+IDS = [s["id"] for s in ST]
+REASONS = {s["id"]: [r["code"] for r in s["reason"]] for s in ST}
+SEAL = T["stages"]["seal_stage"]
+EXAMPLE = ROOT / "declarations" / "dial1118-s1"
+FIXTURE = ROOT / "tests" / "planted" / "intake" / "p1118-bank-FIXTURE"
+
+# ---- 1. the stage table and the runner
+check("1. the bodies are exactly the stages with implemented = true", set(intake.bodies(T, EXAMPLE, "", [])) == {s["id"] for s in ST if s["implemented"]},
+      f"{sorted(intake.bodies(T, EXAMPLE, '', []))} against {[s['id'] for s in ST if s['implemented']]}")
+check("1. the stages are S0..S10 in run order (amendment A2 Q13)", IDS == [f"S{i}" for i in range(11)], str(IDS))
+check("1. every need names an earlier stage", all(n in IDS[:IDS.index(s["id"])] for s in ST for n in s["needs"]), "")
+check("1. every stage that reads data bytes has the seal stage in its transitive needs",
+      all(SEAL in intake.closure(T, s["id"]) for s in ST if s["reads_bytes"] != "NONE"), "")
+check("1. SIGNATURE has a row for exactly the stages after the seal", set(intake_data.SIGNATURE) == {s["id"] for s in ST if SEAL in intake.closure(T, s["id"])},
+      str(sorted(intake_data.SIGNATURE)))
+check("1. reads_bytes and verdict hold atoms of ReadsBytes and Scope", all(s["reads_bytes"] in intake.ReadsBytes.__members__ and s["verdict"] in intake.Scope.__members__ for s in ST), "")
+check("1. one ROBUSTNESS stage and one HANDOFF stage", [s["verdict"] for s in ST].count("ROBUSTNESS") == 1 and [s["verdict"] for s in ST].count("HANDOFF") == 1, "")
+codes = [c for v in REASONS.values() for c in v]
+check("1. reason codes are unique across the table", len(codes) == len(set(codes)), str([c for c in codes if codes.count(c) > 1]))
+
+
+def emitted(module, ctor):
+    """The string constants passed first to `ctor(...)` in a module's source."""
+    tree = ast.parse(Path(module.__file__).read_text())
+    return {n.args[0].value for n in ast.walk(tree) if isinstance(n, ast.Call) and getattr(n.func, "id", "") == ctor and n.args and isinstance(n.args[0], ast.Constant)}
+
+
+def fmt_codes(rows):
+    out = set()
+    for spec in rows.values():
+        out |= {v for v in spec.get("values", {}).values() if v != "ADMIT"} | ({spec["absent"]} if "absent" in spec else set())
+        out |= fmt_codes(spec.get("fields", {})) | (fmt_codes({"m": spec["method"]}) if "method" in spec else set())
+    return out
+
+
+s0 = emitted(blind, "Finding") | fmt_codes(T["format"]["fields"]) | {"VALUE_STILL_TODO", "FIELD_IS_STAMPED", "FIELD_IS_DERIVED", "FIELD_UNKNOWN"}
+check("1. every reason S0 emits (code and FORMAT.toml) is an S0 reason", s0 <= set(REASONS["S0"]), str(sorted(s0 - set(REASONS["S0"]))))
+check("1. every reason S2 emits (intake_seal) is an S2 reason", emitted(intake_seal, "Refuse") <= set(REASONS[SEAL]), str(sorted(emitted(intake_seal, "Refuse") - set(REASONS[SEAL]))))
+
+
+def words(rows, key):
+    return {spec[key] for spec in rows.values() if key in spec} | {w for spec in rows.values() for w in words(spec.get("fields", {}), key) | words({"m": spec["method"]} if "method" in spec else {}, key)}
+
+
+check("1. every check word of FORMAT.toml is a key of intake_blind.CHECK", words(T["format"]["fields"], "check") <= set(blind.CHECK), str(words(T["format"]["fields"], "check") - set(blind.CHECK)))
+check("1. every type word of FORMAT.toml is a key of intake_blind.TYPE", words(T["format"]["fields"], "type") | words(T["format"]["fields"], "item") <= set(blind.TYPE), "")
+check("1. every admit source of FORMAT.toml is a source the tables provide", all(src in T["admit"] for spec in [T["format"]["fields"]["interval"]["method"]] for src in spec["admit"]), "")
+
+# ---- 2. the generated docs page
+gen = subprocess.run([sys.executable, "docs/gen-intake.py"], capture_output=True, text=True, cwd=ROOT)
+check("2. docs/gen-intake.py reproduces docs/INTAKE.md byte for byte", gen.returncode == 0 and gen.stdout == (ROOT / "docs" / "INTAKE.md").read_text(), gen.stderr[-300:])
+exp = subprocess.run([str(ROOT / "bin" / "cc"), "intake", "explain"], capture_output=True, text=True, cwd=ROOT)
+check("2. bin/cc intake explain prints docs/INTAKE.md", exp.returncode == 0 and exp.stdout == (ROOT / "docs" / "INTAKE.md").read_text(), exp.stderr[-300:])
+
+# ---- 3. the verdict tables are total, every cell is reached or IMPOSSIBLE, and a stub never produces READY
+product = set(itertools.product(intake.Primary, blind.Mark))
+check("3. ROBUSTNESS and IMPOSSIBLE partition (PRIMARY x Mark)", set(intake.ROBUSTNESS) | set(intake.IMPOSSIBLE) == product and not set(intake.ROBUSTNESS) & set(intake.IMPOSSIBLE), "")
+check("3. PRIMARY is total over (R, U, C)", set(intake.PRIMARY) == set(itertools.product((False, True), repeat=3)), "")
+check("3. EXEC is total over (implemented, Upstream)", set(intake.EXEC) == set(itertools.product((False, True), intake.Upstream)), "")
+
+
+@dataclasses.dataclass(frozen=True)
+class Ev:
+    conf: bool
+
+    def summary(self):
+        return "planted"
+
+    def confirmed(self):
+        return self.conf
+
+
+CHOICE = {"stub": None, "pass": lambda *a: blind.Pass(Ev(False)), "refuse": lambda *a: blind.Refuse(REASONS["S0"][0], "planted")}
+SEAL_CHOICE = {**CHOICE, "pass-confirmed": lambda *a: blind.Pass(Ev(True))}
+hit_p, hit_r, stub_ready, body_on_stub, folds = set(), set(), [], [], 0
+prim = [s["id"] for s in ST if s["verdict"] == "PRIMARY"]
+axes = [{True: SEAL_CHOICE, False: CHOICE}[i == SEAL] for i in IDS[:-1]]
+for combo in itertools.product(*[list(a) for a in axes]):
+    pick = dict(zip(IDS[:-1], combo))
+    rows = [{**s, "implemented": pick.get(s["id"], "stub") != "stub"} for s in ST]
+    bodies = {i: {**CHOICE, **SEAL_CHOICE}[c] for i, c in pick.items() if c != "stub"}
+    t = {**T, "stages": {**T["stages"], "stage": rows}}
+    out = intake.fold(rows, bodies)
+    p, r = intake.verdicts(t, out)
+    folds += 1
+    marks = {out[i].mark for i in prim}
+    hit_p.add((blind.Mark.REFUSED in marks, len(intake._missing(prim, out)) > 0, out[SEAL].confirmed()))
+    hit_r.add((p.kind, out[IDS[-2]].mark))
+    stub_ready += [pick] * (p.kind is intake.Primary.PRIMARY_READY and any(not s["implemented"] for s in rows if s["id"] in prim))
+    body_on_stub += [pick] * any(isinstance(out[s["id"]], intake.Executed) for s in rows if not s["implemented"])
+print(f"  {folds} folds of the stage table enumerated")
+check("3. a stub never produces PRIMARY_READY (over every fold)", not stub_ready, str(stub_ready[:1]))
+check("3. a stage with no body is never EXECUTED (over every fold)", not body_on_stub, str(body_on_stub[:1]))
+check("3. every PRIMARY cell is reached", hit_p == set(intake.PRIMARY), str(set(intake.PRIMARY) - hit_p))
+check("3. the reached ROBUSTNESS cells are exactly the table's, and no IMPOSSIBLE cell is reached", hit_r == set(intake.ROBUSTNESS), str(hit_r ^ set(intake.ROBUSTNESS)))
+
+# ---- 4. the Seal
+for args in ((), (None, {}), ("decl", {"declaration_sha256": "0" * 64})):
+    try:
+        intake_seal.Sealed(*args)
+        check(f"4(i). Sealed{args!r:.30} outside intake_seal is a TypeError", False, "it was built")
+    except TypeError:
+        check(f"4(i). Sealed{args!r:.30} outside intake_seal is a TypeError", True)
+
+
+def carries(tp, seen=()):
+    return tp is intake_seal.Sealed or (dataclasses.is_dataclass(tp) and tp not in seen and any(carries(f.type, seen + (tp,)) for f in dataclasses.fields(tp)))
+
+
+ev = {**intake_data.EVIDENCE}
+for sid, sig in intake_data.SIGNATURE.items():
+    ann = [p.annotation for p in sig.parameters.values()]
+    need = [ev[n] for n in next(s for s in ST if s["id"] == sid)["needs"]]
+    check(f"4(ii). {sid}'s signature takes the evidence of its needs, each carrying a Sealed",
+          ann == need and all(carries(a) for a in ann) and blind.Declaration not in ann, f"{ann} against {need}")
+check("4(ii). every registered data-stage body has its SIGNATURE row", all(inspect.signature(b) == intake_data.SIGNATURE[k] for k, b in intake_data.BODIES.items()), "")
+with tempfile.TemporaryDirectory() as tmp:
+    d = Path(tmp) / "decl"
+    d.mkdir()
+    for n in intake_seal.FILES:
+        shutil.copyfile(EXAMPLE / n, d / n)
+    decl = blind.format_stage((d / "intake.toml").read_text(), [], T).evidence
+    check("4. S2 refuses SEAL_ABSENT before any seal", intake_seal.verify(decl, d) == blind.Refuse("SEAL_ABSENT", "no SEAL.json in the declaration 'dial1118-s1'"), str(intake_seal.verify(decl, d)))
+    who = {"author": "test", "author_kind": "AI_DRAFT", "confirmed_by": ""}
+    check("4. mint refuses a universe that is not a directory", intake_seal.mint(decl, d, str(Path(tmp) / "none"), who, ROOT, T).reason == "UNIVERSE_ROOT_ABSENT", "")
+    minted = intake_seal.mint(decl, d, str(FIXTURE), who, ROOT, T)
+    check("4. mint seals the example against the fixture (63 names, sizes 0)", isinstance(minted, blind.Pass) and len(minted.evidence.record["universe"]["listing"]) == 63, str(minted)[:300])
+    check("4. a second mint is ALREADY_SEALED", intake_seal.mint(decl, d, str(FIXTURE), who, ROOT, T).reason == "ALREADY_SEALED", "")
+    got = intake_seal.verify(decl, d)
+    check("4. S2 passes a Sealed built by verify", isinstance(got, blind.Pass) and isinstance(got.evidence, intake_seal.Sealed), str(got)[:200])
+    (d / "intake.toml").write_text((d / "intake.toml").read_text() + "# one edit after the seal\n")
+    check("4. S2 refuses SEAL_SHA_DIFFERS after an edit (a forged seal is a sha with no seal-log line)", intake_seal.verify(decl, d).reason == "SEAL_SHA_DIFFERS", "")
+    shutil.copyfile(EXAMPLE / "intake.toml", d / "intake.toml")
+    (d / "access.log").write_text('{"t_ns": 1, "route": "loader", "path": "S1/S1_c000.npz"}\n')
+    check("4. S2 refuses DATA_READ_PRECEDES_SEAL when a loader read precedes the seal", intake_seal.verify(decl, d).reason == "DATA_READ_PRECEDES_SEAL", "")
+
+# ---- 5. planted bad declarations, each refused at S0 with its named reason
+base = (EXAMPLE / "intake.toml").read_text()
+check("5. the clean base (the worked example) passes S0 with no transducer finding", isinstance(blind.format_stage(base, [], T), blind.Pass), str(blind.format_stage(base, [], T))[:300])
+PLANTED = [
+    ("a missing knob ([knobs.fast] deleted)", re.sub(r"(?s)\[knobs\.fast\].*?(?=\[measured\])", "", base), "FIELD_MISSING"),
+    ("a free-text bias", base.replace('bias = "MAX_MEASURED"', 'bias = "the largest C of each curve"'), "BIAS_KEY_UNDECLARED"),
+    ("an interpolation bridge", base.replace('template = "CHAIN_SLOW"', 'template = "INTERPOLATE"'), "STEP_IS_INTERPOLATION"),
+    ("a typed timestamp", base.replace('[intake]\n', '[intake]\nsealed_at = "2026-10-18T09:00:00Z"\n'), "FIELD_IS_STAMPED"),
+    ("no bridge fits", base.replace('template = "CHAIN_SLOW"', 'template = "NONE_FITS"'), "BRIDGE_NONE_FITS"),
+    ("(extra) a derived field typed", base.replace('[acquisition]\n', '[acquisition]\ncorrelated = true\n'), "FIELD_IS_DERIVED"),
+    ("(extra) a figure in the basis", base.replace('class = "PAPER_METHODS"', 'class = "FIGURE"'), "BASIS_NOT_METADATA"),
+    ("(extra) a TODO left", base.replace('mode = "EXPLORATORY"', 'mode = "TODO"'), "VALUE_STILL_TODO"),
+    ("(extra) not TOML", base + "\n[[[", "TOML_INVALID"),
+    ("(extra) another schema", base.replace("schema = 1", "schema = 2", 1), "SCHEMA_UNSUPPORTED"),
+    ("(extra) an interval field of another method", base.replace("b = 100\n", "b = 100\nwindow_s = 1.0\n"), "FIELD_UNKNOWN"),
+]
+for name, text, want in PLANTED:
+    got = blind.format_stage(text, [], T)
+    check(f"5. {name}: refused {want}", text != base and isinstance(got, blind.Refuse) and got.reason == want, str(got)[:300])
+got = blind.format_stage(base, ["transducer.update[0]: planted"], T)
+check("5. (extra) a transducer finding: refused TRANSDUCER_FILE_REFUSED", isinstance(got, blind.Refuse) and got.reason == "TRANSDUCER_FILE_REFUSED", str(got)[:200])
+
+# ---- binding rule: enum names are Boolean formulas
+ENUMS = [intake.Execution, intake.Cause, intake.Upstream, intake.Primary, intake.Robustness, intake.ReadsBytes, intake.Scope, blind.Mark]
+
+
+def parse(name, atoms):
+    """The set a constant name denotes: ATOM(_OR_ATOM)*, NOT_<ATOM> = the complement within the atoms; None when a part is no atom."""
+    out = set()
+    for part in name.split("_OR_"):
+        neg = part.startswith("NOT_") and part[4:] in atoms
+        lit = {True: atoms - {part[4:]}, False: {part} & atoms}[neg]
+        if not lit:
+            return None
+        out |= lit
+    return frozenset(out)
+
+
+check("binding: the parser reads NOT_EXECUTED as {STUB, WITHHELD} (breaker: a wrong name is seen)", parse("NOT_EXECUTED", {"STUB", "WITHHELD", "EXECUTED"}) == {"STUB", "WITHHELD"}, "")
+for E in ENUMS:
+    m = re.search(r"ATOMS: ([A-Z_\s|]+?)\.", E.__doc__ or "")
+    atoms = set(re.sub(r"\s", "", m[1]).split("|")) if m else set()
+    vals = [x.value for x in E]
+    check(f"binding: {E.__name__} declares ATOMS and an axiom, and its values partition them", bool(atoms) and "Axiom" in E.__doc__ and set().union(*vals) == atoms and sum(map(len, vals)) == len(atoms), str(atoms))
+    check(f"binding: every {E.__name__} name parses to its set", all(parse(x.name, atoms) == x.value for x in E), str([x.name for x in E if parse(x.name, atoms) != x.value]))
+
+# ---- blindness of S0: imports and calls of cc/intake_blind.py
+tree = ast.parse(Path(blind.__file__).read_text())
+mods = {a.name.split(".")[0] for n in ast.walk(tree) if isinstance(n, ast.Import) for a in n.names} | {(n.module or "").split(".")[0] for n in ast.walk(tree) if isinstance(n, ast.ImportFrom)}
+check("blind: cc/intake_blind.py imports only tomllib, enum, dataclasses, typing, re", mods <= {"tomllib", "enum", "dataclasses", "typing", "re"}, str(mods))
+calls = {n.func.id for n in ast.walk(tree) if isinstance(n, ast.Call) and isinstance(n.func, ast.Name)} & {"open", "exec", "eval", "compile", "__import__", "getattr", "globals"}
+check("blind: cc/intake_blind.py calls no open, exec, eval, compile or __import__", not calls, str(calls))
+
+# ---- the copied loader is the toolset's, byte for byte (amendment A2 Q1)
+pin = tomllib.loads((ROOT / "vendor" / "toolset" / "PIN.toml").read_text())
+for f in pin["file"]:
+    check(f"loader: {f['copy']} hashes to its recorded sha256", hashlib.sha256((ROOT / f["copy"]).read_bytes()).hexdigest() == f["sha256"], "")
+tools = Path(os.path.expanduser(os.environ.get("CC_DATA_ROOT", str(ROOT / "data")))).parent
+shown = [subprocess.run(["git", "-C", str(tools), "show", f"{pin['commit']}:{f['path']}"], capture_output=True) for f in pin["file"]]
+reach = all(s.returncode == 0 for s in shown)
+print({True: "  the toolset is reachable through the data root: its commit is compared too",
+       False: "  INFO: the toolset is not reachable through the data root (CC_DATA_ROOT); only the recorded sha256 is checked"}[reach])
+check("loader: the toolset commit holds each copied file with the recorded sha256 (when the toolset is reachable)",
+      not reach or all(hashlib.sha256(s.stdout).hexdigest() == f["sha256"] for s, f in zip(shown, pin["file"])), "")
+print("test_intake: " + ("FAILED " + "; ".join(bad) if bad else "all passed"))
+sys.exit(1 if bad else 0)

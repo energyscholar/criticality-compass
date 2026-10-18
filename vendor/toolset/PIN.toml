@@ -1,0 +1,17 @@
+# vendor/toolset/PIN.toml - the logged, hash-pinned loader, COPIED verbatim from the toolset (plan 1136, ruling Q1 B). Not imported by CC in
+# plan 1136 (every stage that reads data is a STUB); the stage plans route through it. Never edit a copied file: re-copy it and re-pin it here.
+# tests/test_intake.py checks that each file hashes to its sha256 below, and, when the toolset is reachable through CC_DATA_ROOT (the same rule
+# as cc/transducer.py: the toolset is the data root's parent), that the toolset commit holds that path with those bytes.
+schema = 1
+kind = "vendor-pin"
+commit = "fb0d7db83698b280481f24c625518d5a5f2e0910"   # toolset master when copied
+
+[[file]]
+copy = "vendor/toolset/t23.py"
+path = "studies/TAX-B1b/t23.py"
+sha256 = "abc7ef72198676fc958b637071dd3da23ad4594cb3b380a4d10b61b30fad7134"
+
+[[file]]
+copy = "vendor/toolset/intake.py"
+path = "adapters/intake.py"
+sha256 = "1dbce0292986c34b117713d02ee2a9c86814133b1fc2f1430d3ee13ef730f121"

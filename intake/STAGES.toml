@@ -1,0 +1,199 @@
+# intake/STAGES.toml - the intake pipeline's stages (plan 1136, amendment A2: renumbered S0-S10). The runner (cc/intake.py), `bin/cc intake
+# explain`, docs/INTAKE.md and the tests are generated from or checked against this file; no stage, reason or sentence exists anywhere else.
+# Fields: reads_bytes NONE | FIRST_FILE | ALL_FILES (the data bytes the stage reads); needs = the stages whose PASS evidence is its argument;
+# implemented = a body is registered for this id (LIVE) or not (STUB; a STUB is never a pass); verdict PRIMARY | ROBUSTNESS | HANDOFF.
+# A stage is BEFORE the seal exactly when seal_stage is not in its transitive needs; every stage that reads bytes has it there (test 1).
+schema = 1
+kind = "intake-stages"
+version = "1136-v1"
+seal_stage = "S2"
+
+[report]
+seal_claim = "The seal proves INTEGRITY (the declaration's sha256) and ORDERING (the seal time against the first logged data read). It never proves ignorance: mode is the declarer's sealed statement of what they had seen."
+unenforced = [   # verbatim from t23.UNENFORCED (cc/vendor/t23.py, the loader copied from the toolset)
+  "direct shell reads (cat, less, head, cp, rsync, scp) — not logged",
+  "other processes / external tools (MATLAB, editors, a Python without this module, Jupyter) — not logged",
+  "reads of another copy of the bytes (other host, backup, download cache) — not logged",
+  "atime tripwire is weak: relatime/noatime mounts suppress updates; SILENT is not evidence of no read",
+]
+stub = "This stage has no body yet, so nothing was checked; a stub is never a pass."
+after_refusal = "Not run: an earlier stage refused, and no later check can redeem a refusal."
+input_absent = "Not run: a stage it needs did not pass."
+confirmation = "No human has confirmed this declaration (confirmed_by is empty); PRIMARY_READY needs a non-empty confirmed_by."
+
+[[stage]]
+id = "S0"
+name = "FORMAT"
+purpose = "The declaration parses, holds every required field with the right type, and every closed-list field holds a listed value."
+reads_bytes = "NONE"
+needs = []
+implemented = true
+verdict = "PRIMARY"
+reason = [
+  { code = "TOML_INVALID",            sentence = "The declaration is not valid TOML; fix the syntax at the line shown." },
+  { code = "SCHEMA_UNSUPPORTED",      sentence = "The file does not say schema = 1 and kind = \"intake\"; this tool reads intake format v1 only." },
+  { code = "FIELD_MISSING",           sentence = "A required field is absent; every field of format v1 must be written, even when its honest value is a refusal value such as NONE_FITS." },
+  { code = "FIELD_UNKNOWN",           sentence = "A field the format does not define is present; check its spelling against bin/cc intake explain." },
+  { code = "FIELD_TYPE_WRONG",        sentence = "A field holds the wrong kind of value (for example text where a list is required)." },
+  { code = "VALUE_NOT_LISTED",        sentence = "A closed-list field holds a value its list does not name; use one of the listed values." },
+  { code = "VALUE_STILL_TODO",        sentence = "A field still holds the template's TODO; declare it, or write the field's refusal value if nothing honest fits." },
+  { code = "BIAS_KEY_UNDECLARED",     sentence = "A bias key is not a row of intake/POLICY.toml for this projection or bridge; free text is never a bias." },
+  { code = "FIELD_IS_STAMPED",        sentence = "A field the seal writes (a time, a hash, the author, the source universe listing, the sampling label) is typed in the declaration; delete it, the seal stamps it." },
+  { code = "FIELD_IS_DERIVED",        sentence = "A field that is derived from another (correlated, from acquisition.mode) is typed; delete it." },
+  { code = "STEP_IS_INTERPOLATION",   sentence = "A projection or bridge forms a value between measured points; interpolation is not admissible in any form." },
+  { code = "BRIDGE_NONE_FITS",        sentence = "The declaration says no bridge fits these data; this is an honest answer, and such an intake cannot be sealed." },
+  { code = "BASIS_NOT_METADATA",      sentence = "The declaration lists a source read before sealing that is not metadata (data values, a figure, or analysis code); the choice was made after seeing values." },
+  { code = "TRANSDUCER_FILE_REFUSED", sentence = "The declaration's transducer.toml is refused by the CC transducer check; its findings are listed with their Next lines." },
+]
+
+[[stage]]
+id = "S1"
+name = "CHOICES"
+purpose = "The declared choices are consistent with each other, and the declared operation graph uses only permitted operations (static admissibility)."
+reads_bytes = "NONE"
+needs = ["S0"]
+implemented = false
+verdict = "PRIMARY"
+reason = [
+  { code = "KNOBS_SAME_QUANTITY",            sentence = "The slow and fast knob name the same quantity or column; the Compass needs two distinct knobs." },
+  { code = "MEASURED_IS_A_KNOB",             sentence = "The measured number is one of the knobs." },
+  { code = "SLOW_VALUES_NOT_ONE_PER_FILE",   sentence = "Slow-knob values are declared per file, but the list does not give exactly one value per selected file." },
+  { code = "PROJECTION_REQUIRED",            sentence = "The raw observation is not one number per locus (a picture, positions, a series), and no projection to one number is declared before the bridge." },
+  { code = "PROJECTION_ESTIMAND_MIXED",      sentence = "One projection names two estimands (for example a location and a height); declare one projection per estimand." },
+  { code = "SECOND_LANE_MISSING",            sentence = "The source is real data and only one intake lane is declared; real data are taken in through two declared lanes (policy, intake/POLICY.toml)." },
+  { code = "LANES_IDENTICAL",                sentence = "The two declared lanes use the same projection and bridge; the alternative must differ." },
+  { code = "REPLICATE_IS_SWEEP_NEIGHBOUR",   sentence = "Replicates are declared as adjacent points of one sweep; a replicate is a repeated preparation, never a neighbouring point." },
+  { code = "OPERATION_NOT_PERMITTED",        sentence = "A declared step is not a permitted operation for its link of the chain (Raw, Projection, DerivedObservable, Bridge, KernelInput)." },
+  { code = "SHIFT_BEFORE_KERNEL_INPUT",      sentence = "A constant shift x + c is declared upstream of the kernel input; x + c applies only at the KernelInput boundary." },
+  { code = "PROVENANCE_HAS_NO_KERNEL_ROUTE", sentence = "The deposit's admissibility record (raw-admissibility.toml) gives the component carrying the measured number no kernel route." },
+  { code = "MODE_CONTRADICTS_SOURCE",        sentence = "The declared mode is PROSPECTIVE, but the selected files already exist, or the source is a published set whose figures have been seen." },
+]
+
+[[stage]]
+id = "S2"
+name = "SEAL"
+purpose = "Stamp the time, author, mode, code and protocol identity, and the source universe listing (names and sizes), and hash the declaration, before any data byte is read."
+reads_bytes = "NONE"
+needs = ["S0"]
+implemented = true
+verdict = "PRIMARY"
+reason = [
+  { code = "SEAL_ABSENT",                sentence = "This declaration has not been sealed; run bin/cc intake seal <id>." },
+  { code = "SEAL_SHA_DIFFERS",           sentence = "The declaration changed after it was sealed; a sealed intake is never edited, so declare a new id." },
+  { code = "DATA_READ_PRECEDES_SEAL",    sentence = "The access log holds a data read of this intake from before its seal; a seal made after reading cannot claim ordering." },
+  { code = "ALREADY_SEALED",             sentence = "This declaration is already sealed; a seal is never replaced, so declare a new id." },
+  { code = "UNIVERSE_ROOT_ABSENT",       sentence = "The declared source universe root was not given or is not a directory on this machine; give its location with --universe." },
+  { code = "SELECTION_OUTSIDE_UNIVERSE", sentence = "A selected file is not in the source universe listing." },
+]
+
+[[stage]]
+id = "S3"
+name = "SOURCE_INTEGRITY"
+purpose = "Each selected file is admitted before it is read, read once through the logged loader, and its sha256 is pinned at that first logged read."
+reads_bytes = "ALL_FILES"
+needs = ["S2"]
+implemented = false
+verdict = "PRIMARY"
+reason = [
+  { code = "PATH_NOT_ADMITTED", sentence = "The loader's admission refused this path before reading it (truth side of the deposit, or the slow-knob source does not resolve)." },
+  { code = "PIN_MISMATCH",      sentence = "The file's bytes do not match their pinned sha256; the data changed since they were pinned." },
+  { code = "UNIVERSE_CHANGED",  sentence = "The source universe now lists files that differ from the sealed listing (added, removed, or resized)." },
+]
+
+[[stage]]
+id = "S4"
+name = "SHAPE"
+purpose = "The first selected file has the declared columns or keys, units and axes, as its declared reader admits them."
+reads_bytes = "FIRST_FILE"
+needs = ["S3"]
+implemented = false
+verdict = "PRIMARY"
+reason = [
+  { code = "READER_REFUSED",    sentence = "The declared reader refused the file; its own reason is shown." },
+  { code = "COLUMNS_DIFFER",    sentence = "The file's columns or keys differ from the declared ones (count, names or order)." },
+  { code = "UNIT_DIFFERS",      sentence = "The file states a unit that differs from the declared unit." },
+  { code = "ROW_ORDER_DIFFERS", sentence = "The rows are not stored in the declared order of the fast knob." },
+]
+
+[[stage]]
+id = "S5"
+name = "CENSUS"
+purpose = "Every selected file matches the first, and the sampling label is recorded: curves, points per curve, spacing, missingness, ordering and replicate identity."
+reads_bytes = "ALL_FILES"
+needs = ["S3", "S4"]
+implemented = false
+verdict = "PRIMARY"
+reason = [
+  { code = "FILE_DIFFERS_FROM_FIRST",   sentence = "A selected file's shape, columns or keys differ from the first file's." },
+  { code = "CURVE_REPEATED",            sentence = "Two files carry the same slow-knob value and are not declared replicates." },
+  { code = "FAST_VALUE_REPEATED",       sentence = "A curve holds two points at the same fast-knob value and they are not declared replicates." },
+  { code = "REPLICATE_KEY_UNRESOLVED",  sentence = "The declared replicate identity cannot be read for a file or point." },
+  { code = "ACQUISITION_ORDER_DIFFERS", sentence = "The recorded acquisition order contradicts the declared direction." },
+]
+
+[[stage]]
+id = "S6"
+name = "ADMISSIBILITY"
+purpose = "The actual lineage obeys the sealed operation graph: every value reached the intake through the logged loader and the declared projections only (dynamic admissibility)."
+reads_bytes = "NONE"
+needs = ["S2", "S5"]
+implemented = false
+verdict = "PRIMARY"
+reason = [
+  { code = "READ_NOT_LOGGED",    sentence = "A record exists whose bytes have no loader line in the access log." },
+  { code = "BYPASS_READ_LOGGED", sentence = "The access log holds an in-process read of a data path that did not go through the loader." },
+  { code = "LINEAGE_OFF_GRAPH",  sentence = "A value's lineage includes a step that the sealed operation graph does not declare." },
+]
+
+[[stage]]
+id = "S7"
+name = "INTERVAL_FEASIBILITY"
+purpose = "The sampling admits the declared interval method's floor at every point, for every method (the iid gap, plan 1134)."
+reads_bytes = "NONE"
+needs = ["S2", "S5"]
+implemented = false
+verdict = "PRIMARY"
+reason = [
+  { code = "ONE_READING_PER_POINT", sentence = "Each point holds one reading (a continuous ramp); there is nothing to put an interval on." },
+  { code = "BELOW_METHOD_FLOOR",    sentence = "Some point holds fewer samples than the declared interval method's floor requires; the Next line names the routes." },
+  { code = "METHOD_HAS_NO_FLOOR",   sentence = "The declared interval method has no floor in CC yet; an interval method without a floor is not admitted." },
+]
+
+[[stage]]
+id = "S8"
+name = "RESOLUTION_AND_IDENTIFIABILITY"
+purpose = "The census makes the declared lanes feasible to attempt, and the evidence records what the available observables can and cannot identify."
+reads_bytes = "NONE"
+needs = ["S2", "S5"]
+implemented = false
+verdict = "PRIMARY"
+reason = [
+  { code = "TOO_FEW_CURVES",          sentence = "Fewer than three slow-knob values: no interior node exists, so no bracket can be formed." },
+  { code = "TOO_FEW_POINTS_IN_CURVE", sentence = "A curve holds fewer than three fast-knob points: no interior maximum can be formed on it." },
+  { code = "NO_COVERAGE_EVIDENCE",    sentence = "The declaration requires a validated bracket ([bracket] required = \"VALIDATED_BRACKET\"), and no frozen planted coverage evidence exists for this lane at this density." },
+]
+
+[[stage]]
+id = "S9"
+name = "ALTERNATIVE_INTAKE"
+purpose = "The second declared lane passes the same census-level checks as the first, so that both lanes can be run; concordance is measured later, from values."
+reads_bytes = "NONE"
+needs = ["S2", "S5"]
+implemented = false
+verdict = "ROBUSTNESS"
+reason = [
+  { code = "SECOND_LANE_INFEASIBLE", sentence = "The census does not support the second lane (for example a pairing finds no neighbouring point)." },
+]
+
+[[stage]]
+id = "S10"
+name = "KERNEL_HANDOFF"
+purpose = "Mint the kernel input (NodeField and Relations) through the provenance route and the door, applying x + c only here."
+reads_bytes = "ALL_FILES"
+needs = ["S6", "S7", "S8"]
+implemented = false
+verdict = "HANDOFF"
+reason = [
+  { code = "NO_KERNEL_ROUTE", sentence = "A column's provenance class and evidence have no kernel route." },
+  { code = "DOOR_REFUSED",    sentence = "The door refused the declared relations or values (cycle, endpoint, missing provenance, a non-finite value)." },
+]
