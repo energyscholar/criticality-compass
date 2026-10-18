@@ -4,10 +4,20 @@ import hashlib
 import os
 import re
 import subprocess
+import tomllib
 from pathlib import Path
 from schema import at, sha
 
-UPDATE = re.compile(r"(\S+) sha256 ([0-9a-f]{64})")
+UPDATE = re.compile(r"((?:[a-z]+:)?)(\S+) sha256 ([0-9a-f]{64})")   # [route] path sha256 hex
+CC = Path(__file__).resolve().parent.parent
+ROUTES = {k: CC / v for k, v in tomllib.loads((CC / "cc.toml").read_text())["transducer"]["update_routes"].items()}   # declared routes; "" is the toolset
+
+
+def routed(tools, m):
+    """(the git tree a pin resolves in, its path there, its sha) for an UPDATE match: no route = the toolset root `tools`; a route = its
+    directory of cc.toml [transducer] update_routes. An undeclared route resolves to None (update_findings reports it)."""
+    routes = {**ROUTES, "": tools}
+    return {True: lambda: routes[m[1]], False: lambda: None}[m[1] in routes](), m[2], m[3]
 RECORD = ("apparatus", "preparation", "observation", "authors_projection", "source")
 
 
@@ -71,9 +81,10 @@ def supplied(update, tools):
     out = {}
     for e in update:
         m = UPDATE.fullmatch(e) if isinstance(e, str) else None
-        got = retrieve(tools, m[1], m[2]) if m else None
+        base, rel, want = routed(tools, m) if m else (None, "", "")
+        got = retrieve(base, rel, want) if base else None
         if got:
-            out[m[1]] = {"sha256": m[2], "commit": got[0]}
+            out[m[1] + rel] = {"sha256": want, "commit": got[0]}
     return out
 
 
@@ -85,9 +96,12 @@ def update_findings(p, update, tools):
         if m is None:
             out.append(at(p, f"transducer.update[{i}]", f"'{e}' is not '<toolset-relative path> sha256 <64 hex>'", "write the path, the word sha256 and the 64 hex digits of sha256sum"))
             continue
-        rel, want = m[1], m[2]
-        if retrieve(tools, rel, want) is None:
-            head = _git(tools, "show", f"HEAD:{rel}")
+        base, rel, want = routed(tools, m)
+        if base is None:
+            out.append(at(p, f"transducer.update[{i}]", f"route '{m[1]}' is not declared", f"use a route of cc.toml [transducer] update_routes {sorted(ROUTES)}, or none (the toolset)"))
+            continue
+        if retrieve(base, rel, want) is None:
+            head = _git(base, "show", f"HEAD:{rel}")
             if head is not None:   # the pinned content is in no commit; the newest committed content of that path is the pin to write
                 got = hashlib.sha256(head).hexdigest()
                 out.append(at(p, f"transducer.update[{i}]", f"{rel} sha256 {want} differs from the toolset file's {got}", f"write {rel} sha256 {got}"))

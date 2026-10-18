@@ -197,7 +197,8 @@ def chk_cc(p, d, c, stem=None):
     out += [at(p, f"levels.{k}", "a level's z must be a number above 0", "write the z of that level, e.g. \"0.95\" = 1.959964")
             for k, v in d.get("levels", {}).items() if not (isinstance(v, NUM) and v > 0)]
     if "transducer" in d:   # plan 0883: the transducer file's sentences are data; the kinds are the two this code has a schema for
-        out += shape(p, d["transducer"], {"kinds": list, "phase1_output": str, "phase2_output": str, "interval_role": str}, pre="transducer.")
+        out += shape(p, d["transducer"], {"kinds": list, "phase1_output": str, "phase2_output": str, "interval_role": str},
+                     {"update_routes": dict}, pre="transducer.")   # plan 1139: update_routes, the declared routes of an update pin
         out += when(d["transducer"].get("kinds") != ["transducer", "record"], p, "transducer.kinds", f"{d['transducer'].get('kinds')} is not ['transducer', 'record']",
                     'write kinds = ["transducer", "record"]')
         if out:

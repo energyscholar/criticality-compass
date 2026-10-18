@@ -107,6 +107,7 @@ kinds = ["transducer", "record"]
 phase1_output = "one configuration per recorded sweep; each configuration is one observation; the recorded sequence is NOT a process sequence (Phase 1 only)"
 phase2_output = "one frame per recorded time; the recorded sequence IS a declared process sequence (Phase 2; real transient record only)"
 interval_role = "projection C: places the reading's sign cell against its declared margin; never an operator input"
+update_routes = { "compass:" = "." }   # plan 1139: an update pin "<route>path sha256 <hex>" with a route here resolves under that directory of the Compass (relative to the CC root); no route = the toolset
 
 [flags]                         # flag code -> the words every output prints (never the bare code)
 T = "truth point"
