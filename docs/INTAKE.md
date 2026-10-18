@@ -1,28 +1,29 @@
-# The intake pipeline (stage table 1136-v1, policy 1136-v1)
+# The intake pipeline (stage table 1139-v1, policy 1136-v1)
 
 Generated from intake/STAGES.toml and intake/POLICY.toml by `bin/cc intake explain` (docs/gen-intake.py); never edit it by hand.
 This is the intake's explain. `bin/cc explain <input> <point>` is a different command: it explains one point of a measured input.
 
 A declaration `declarations/<id>/` (intake.toml and the CC transducer.toml) goes through the stages below in order. Each stage is LIVE (it has a body) or a STUB (it has none, so nothing was checked; a stub is never a pass). An executed stage gives PASS or REFUSE with a named reason; after a refusal every later stage is WITHHELD.
 
-- **PRIMARY** verdict, over the PRIMARY stages: PRIMARY_REFUSED_AT when one refused; else PRIMARY_INCOMPLETE when one is not executed or the declaration has no confirmed_by; else PRIMARY_READY.
+- **PRIMARY** verdict, over the PRIMARY stages: PRIMARY_REFUSED_AT when one refused; else PRIMARY_INCOMPLETE when one is not executed or no seal with a non-empty confirmed_by holds the declaration now; else PRIMARY_READY.
 - **ROBUSTNESS** verdict, over the ROBUSTNESS stage: ROBUSTNESS_COMPLETE, ROBUSTNESS_INCOMPLETE, ROBUSTNESS_REFUSED, or ROBUSTNESS_WITHHELD after a PRIMARY refusal.
 - The HANDOFF stage is outside both verdicts.
+- The ADVISORY stage (the seal) is outside every verdict. It never refuses: every report carries its seal status, SEALED, UNSEALED or SEALED_THEN_EDITED, and an ordering note.
 
-**The seal.** The seal proves INTEGRITY (the declaration's sha256) and ORDERING (the seal time against the first logged data read). It never proves ignorance: mode is the declarer's sealed statement of what they had seen.
+**The seal.** Sealing is recommended and not enforced. It records what you declared and when; it is an integrity practice, like a lab notebook. A seal proves INTEGRITY (the declaration's sha256) and ORDERING (the seal time against the first logged data read). It never proves ignorance: mode is the declarer's sealed statement of what they had seen.
 
 | id | name | state | reads data bytes | needs | verdict |
 |---|---|---|---|---|---|
 | S0 | FORMAT | LIVE | NONE | - | PRIMARY |
 | S1 | CHOICES | STUB | NONE | S0 | PRIMARY |
-| S2 | SEAL | LIVE | NONE | S0 | PRIMARY |
-| S3 | SOURCE_INTEGRITY | STUB | ALL_FILES | S2 | PRIMARY |
+| S2 | SEAL | LIVE | NONE | S0 | ADVISORY |
+| S3 | SOURCE_INTEGRITY | STUB | ALL_FILES | S0 | PRIMARY |
 | S4 | SHAPE | STUB | FIRST_FILE | S3 | PRIMARY |
 | S5 | CENSUS | STUB | ALL_FILES | S3, S4 | PRIMARY |
-| S6 | ADMISSIBILITY | STUB | NONE | S2, S5 | PRIMARY |
-| S7 | INTERVAL_FEASIBILITY | STUB | NONE | S2, S5 | PRIMARY |
-| S8 | RESOLUTION_AND_IDENTIFIABILITY | STUB | NONE | S2, S5 | PRIMARY |
-| S9 | ALTERNATIVE_INTAKE | STUB | NONE | S2, S5 | ROBUSTNESS |
+| S6 | ADMISSIBILITY | STUB | NONE | S5 | PRIMARY |
+| S7 | INTERVAL_FEASIBILITY | STUB | NONE | S5 | PRIMARY |
+| S8 | RESOLUTION_AND_IDENTIFIABILITY | STUB | NONE | S5 | PRIMARY |
+| S9 | ALTERNATIVE_INTAKE | STUB | NONE | S5 | ROBUSTNESS |
 | S10 | KERNEL_HANDOFF | STUB | ALL_FILES | S6, S7, S8 | HANDOFF |
 
 ## S0 FORMAT (LIVE)
@@ -67,24 +68,28 @@ The declared choices are consistent with each other, and the declared operation 
 
 ## S2 SEAL (LIVE)
 
-Stamp the time, author, mode, code and protocol identity, and the source universe listing (names and sizes), and hash the declaration, before any data byte is read.
+Report the seal status: whether a seal (time, author, mode, code and protocol identity, the source universe's names and sizes, and the declaration's hash; written by bin/cc intake seal) holds this declaration now. Advisory: it never refuses and blocks nothing.
 
 | reason | what it means |
 |---|---|
-| SEAL_ABSENT | This declaration has not been sealed; run bin/cc intake seal <id>. |
-| SEAL_SHA_DIFFERS | The declaration changed after it was sealed; a sealed intake is never edited, so declare a new id. |
-| DATA_READ_PRECEDES_SEAL | The access log holds a data read of this intake from before its seal; a seal made after reading cannot claim ordering. |
 | ALREADY_SEALED | This declaration is already sealed; a seal is never replaced, so declare a new id. |
 | UNIVERSE_ROOT_ABSENT | The declared source universe root was not given or is not a directory on this machine; give its location with --universe. |
 | SELECTION_OUTSIDE_UNIVERSE | A selected file is not in the source universe listing. |
 
+| seal status | what it means |
+|---|---|
+| SEALED | A seal holds this declaration exactly as it is now. |
+| UNSEALED | This declaration has no seal. Sealing is recommended and not enforced: bin/cc intake seal <id>. |
+| SEALED_THEN_EDITED | This declaration was sealed and has been edited since; the seal records an earlier text. Declare a new id to seal the new text. |
+
 ## S3 SOURCE_INTEGRITY (STUB)
 
-Each selected file is admitted before it is read, read once through the logged loader, and its sha256 is pinned at that first logged read.
+Each selected file is admitted before it is read, read once through the logged loader, and its sha256 is pinned at its first logged read; a re-run compares against the pin, and a sealed universe listing against the universe now.
 
 | reason | what it means |
 |---|---|
-| PATH_NOT_ADMITTED | The loader's admission refused this path before reading it (truth side of the deposit, or the slow-knob source does not resolve). |
+| ROOT_UNRESOLVED | The declared source root is not a name of intake/ROOTS.toml followed by a relative path, or it names no directory on this machine. |
+| PATH_NOT_ADMITTED | The loader's admission refused this path before reading it (truth side of the deposit, the slow-knob source does not resolve, or the file is absent). |
 | PIN_MISMATCH | The file's bytes do not match their pinned sha256; the data changed since they were pinned. |
 | UNIVERSE_CHANGED | The source universe now lists files that differ from the sealed listing (added, removed, or resized). |
 
@@ -94,6 +99,7 @@ The first selected file has the declared columns or keys, units and axes, as its
 
 | reason | what it means |
 |---|---|
+| READER_NOT_LIVE | The declared reader has no body in the Compass yet (only csv-curve-v1 is live); the file cannot be read. |
 | READER_REFUSED | The declared reader refused the file; its own reason is shown. |
 | COLUMNS_DIFFER | The file's columns or keys differ from the declared ones (count, names or order). |
 | UNIT_DIFFERS | The file states a unit that differs from the declared unit. |

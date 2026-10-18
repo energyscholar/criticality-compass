@@ -27,12 +27,12 @@ D = ROOT / "declarations" / ID
 t, d, out = intake._go(ROOT, ID, lambda t: t["stages"]["stage"])
 p, r = intake.verdicts(t, out)
 check("6. S0 FORMAT passes (needs the toolset through CC_DATA_ROOT for the transducer pin)", out["S0"].mark is intake.Mark.PASSED, out["S0"].text(t)[:400])
-check("6. S2 SEAL passes: the committed SEAL.json and seal.log hold the declaration's sha", out["S2"].mark is intake.Mark.PASSED, out["S2"].text(t)[:300])
+check("6. S2 SEAL passes SEALED: the committed SEAL.json and seal.log hold the declaration's sha (plan 1139: the seal is advisory)", out["S2"].mark is intake.Mark.PASSED and out["S2"].result.evidence.status.name == "SEALED", out["S2"].text(t)[:300])
 check("6. PRIMARY_INCOMPLETE[S1, S3, S4, S5, S6, S7, S8, confirmation]",
       p.kind is intake.Primary.PRIMARY_INCOMPLETE and p.missing == ("S1", "S3", "S4", "S5", "S6", "S7", "S8", "confirmation"), f"{p}")
 check("6. ROBUSTNESS_INCOMPLETE[S9]", r.kind is intake.Robustness.ROBUSTNESS_INCOMPLETE and r.missing == ("S9",), f"{r}")
 check("6. S10 KERNEL_HANDOFF is a STUB", isinstance(out["S10"], intake.Stub), str(out["S10"]))
-text = intake.report(t, ID, out)
+text = intake.report(t, ID, out, intake.intake_seal.ordering(D, t))
 check("6. the committed intake-report.md is the report of a run now, byte for byte", text == (D / "intake-report.md").read_text(), "")
 stubs = [f"- **{s['id']} {s['name']}** (STUB): STUB. " for s in t["stages"]["stage"] if not s["implemented"]]
 check("6. the report lists every stub (S1, S3 to S10) as a STUB", len(stubs) == 9 and all(ln in text for ln in stubs), str([ln for ln in stubs if ln not in text]))

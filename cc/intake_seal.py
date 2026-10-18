@@ -1,12 +1,15 @@
-"""intake_seal - stage S2 SEAL of the intake (plan 1136): `mint` stamps a declaration (bin/cc intake seal), `verify` is the stage body
-(bin/cc intake run). Invariant: a Sealed is built in this module only, by `verify`, and only from a seal-log line whose sha256 equals the
-declaration's sha256 now; the seal records the source universe as names and sizes, never a hash and never a data byte (amendment A2 Q7).
-The seal proves integrity and ordering, never ignorance (intake/STAGES.toml [report] seal_claim)."""
+"""intake_seal - stage S2 SEAL of the intake (plan 1136; advisory since plan 1139, amendment A3): `mint` stamps a declaration (bin/cc intake
+seal), `verify` is the stage body (bin/cc intake run). Invariant: S2 never refuses; its PASS evidence is a SealState whose status is a lookup
+over (SEAL.json present, a seal-log line holds the declaration's sha256 now); the seal records the source universe as names and sizes, never a
+hash and never a data byte (amendment A2 Q7). Sealing is recommended and not enforced; the seal proves integrity and ordering, never ignorance
+(intake/STAGES.toml [report] seal_claim)."""
+import enum
 import hashlib
 import json
 import os
 import subprocess
 import time
+from dataclasses import dataclass
 from pathlib import Path
 
 from intake_blind import Pass, Refuse
@@ -15,33 +18,46 @@ FILES = ("intake.toml", "transducer.toml")   # the declaration: the two files it
 AUTHOR_KIND = {"human": "HUMAN", "ai-draft": "AI_DRAFT"}   # the --as word -> the sealed author_kind; a word outside it is a usage refusal
 
 
-class Sealed:
-    """S2 SEAL's PASS evidence: the Declaration and its SEAL.json record. Invariant: no public constructor (calling Sealed(...) is a
-    TypeError) and frozen; `verify` builds it with object.__new__. Python cannot forbid object.__new__ elsewhere; a forged Sealed carries a sha
-    with no seal-log line, which S6 ADMISSIBILITY (through the loader's t23.check) refuses once it is live."""
-    __slots__ = ("declaration", "record")
+class SealStatus(enum.Enum):
+    """The seal status every report carries. ATOMS: SEALED | UNSEALED | SEALED_THEN_EDITED. Axiom: exactly one holds for a declaration that
+    passed FORMAT (a seal holds its text now; it has no SEAL.json; it has a SEAL.json and no seal-log line holds its text now)."""
+    SEALED = frozenset({"SEALED"})
+    UNSEALED = frozenset({"UNSEALED"})
+    SEALED_THEN_EDITED = frozenset({"SEALED_THEN_EDITED"})
 
-    def __init__(self, *args, **kwargs):
-        raise TypeError("Sealed has no public constructor; it is the evidence of a passed S2 SEAL (bin/cc intake run)")
 
-    def __setattr__(self, key, value):
-        raise TypeError("a Sealed is frozen")
+class Ordering(enum.Enum):
+    """The ordering note of a report: information, never a refusal. ATOMS: NOT_SEALED | NO_DATA_READ_LOGGED | READS_FOLLOW_SEAL |
+    A_READ_PRECEDES_SEAL. Axiom: exactly one holds (no SEAL.json; else no logged loader read; else no logged read before the seal time; else one)."""
+    NOT_SEALED = frozenset({"NOT_SEALED"})
+    NO_DATA_READ_LOGGED = frozenset({"NO_DATA_READ_LOGGED"})
+    READS_FOLLOW_SEAL = frozenset({"READS_FOLLOW_SEAL"})
+    A_READ_PRECEDES_SEAL = frozenset({"A_READ_PRECEDES_SEAL"})
+
+
+STATUS = {(False, False): SealStatus.UNSEALED, (False, True): SealStatus.UNSEALED,   # (SEAL.json present, a seal-log line holds the sha now)
+          (True, True): SealStatus.SEALED, (True, False): SealStatus.SEALED_THEN_EDITED}
+
+
+@dataclass(frozen=True)
+class SealState:
+    """S2 SEAL's PASS evidence (advisory): the status, its sentence, and the SEAL.json record ({} when there is none). Invariant: confirmed()
+    holds exactly when the status is SEALED and the record's confirmed_by is not empty; no data stage takes it (plan 1139)."""
+    status: SealStatus
+    sentence: str
+    record: dict
 
     def summary(self):
-        r = self.record
-        return (f"Sealed at {r['sealed_at_utc']} (seal-log t_ns {r['sealed_at_ns']}) by {r['author']} ({r['author_kind']}), confirmed_by "
-                f"'{r['confirmed_by']}', mode {r['mode']}; declaration sha256 {r['declaration_sha256']}; universe '{r['universe']['root']}' "
-                f"(located at a directory named '{r['universe']['location_name']}'): {len(r['universe']['listing'])} files, names and sizes in SEAL.json")
+        return f"{self.status.name}. {self.sentence}" + {True: lambda: f" {_said(self.record)}", False: lambda: ""}[self.record != {}]()
 
     def confirmed(self):
-        return self.record["confirmed_by"] != ""
+        return self.status is SealStatus.SEALED and self.record["confirmed_by"] != ""
 
 
-def _built(declaration, record):
-    s = object.__new__(Sealed)
-    object.__setattr__(s, "declaration", declaration)
-    object.__setattr__(s, "record", record)
-    return s
+def _said(r):
+    return (f"Sealed at {r['sealed_at_utc']} (seal-log t_ns {r['sealed_at_ns']}) by {r['author']} ({r['author_kind']}), confirmed_by "
+            f"'{r['confirmed_by']}', mode {r['mode']}; declaration sha256 {r['declaration_sha256']}; universe '{r['universe']['root']}' "
+            f"(located at a directory named '{r['universe']['location_name']}'): {len(r['universe']['listing'])} files, names and sizes in SEAL.json")
 
 
 def declaration_sha(d):
@@ -61,25 +77,29 @@ def _append(p, rec):
     os.close(fd)
 
 
-VERIFY = {   # (SEAL.json present, a seal-log line holds the declaration's sha now, a logged loader read precedes that line) -> the S2 result
-    (False, False, False): lambda d, decl, sha, t: Refuse("SEAL_ABSENT", f"no SEAL.json in the declaration '{decl.id}'"),
-    (False, False, True): lambda d, decl, sha, t: Refuse("SEAL_ABSENT", f"no SEAL.json in the declaration '{decl.id}'"),
-    (False, True, False): lambda d, decl, sha, t: Refuse("SEAL_ABSENT", f"no SEAL.json in the declaration '{decl.id}' (its seal-log line is {sha[:12]})"),
-    (False, True, True): lambda d, decl, sha, t: Refuse("SEAL_ABSENT", f"no SEAL.json in the declaration '{decl.id}' (its seal-log line is {sha[:12]})"),
-    (True, False, False): lambda d, decl, sha, t: Refuse("SEAL_SHA_DIFFERS", f"the declaration hashes to {sha[:12]} now; no seal-log line holds it"),
-    (True, False, True): lambda d, decl, sha, t: Refuse("SEAL_SHA_DIFFERS", f"the declaration hashes to {sha[:12]} now; no seal-log line holds it"),
-    (True, True, True): lambda d, decl, sha, t: Refuse("DATA_READ_PRECEDES_SEAL", f"access.log holds a loader read before the seal at t_ns {t}"),
-    (True, True, False): lambda d, decl, sha, t: Pass(_built(decl, json.loads((Path(d) / "SEAL.json").read_text()))),
-}
+def record(d):
+    """SEAL.json as a value: {} when the declaration has none (Path.is_file is the key of a two-row table)."""
+    return {True: lambda: json.loads((Path(d) / "SEAL.json").read_text()), False: lambda: {}}[(Path(d) / "SEAL.json").is_file()]()
 
 
-def verify(declaration, d):
-    """S2 SEAL in a run: the declaration's sha256 now, looked up in the seal log, against the access log. Never mints."""
-    sha = declaration_sha(d)
-    sealed = [s["t_ns"] for s in lines(Path(d) / "seal.log") if s["sha256"] == sha]
-    reads = [a["t_ns"] for a in lines(Path(d) / "access.log") if a["route"] == "loader"]
-    before = [t for t in sealed for r in reads if r < t]
-    return VERIFY[((Path(d) / "SEAL.json").is_file(), len(sealed) > 0, len(before) > 0)](d, declaration, sha, (before + [""])[0])
+def verify(declaration, d, t):
+    """S2 SEAL in a run: always a Pass(SealState), the status looked up in STATUS. Never mints and never refuses (amendment A3)."""
+    held = any(s["sha256"] == declaration_sha(d) for s in lines(Path(d) / "seal.log"))
+    status = STATUS[((Path(d) / "SEAL.json").is_file(), held)]
+    return Pass(SealState(status, said(t, status), record(d)))
+
+
+def said(t, status):
+    """The sentence of a seal status: its row of the seal stage's `status` in intake/STAGES.toml."""
+    return {r["code"]: r["sentence"] for s in t["stages"]["stage"] if s["id"] == t["stages"]["seal_stage"] for r in s["status"]}[status.name]
+
+
+def ordering(d, t):
+    """The ordering note (information): (Ordering, its sentence) from SEAL.json's seal time and the access log's loader reads, read after the run."""
+    rec, reads = record(d), [a["t_ns"] for a in lines(Path(d) / "access.log") if a["route"] == "loader"]
+    o = {False: lambda: Ordering.NOT_SEALED,
+         True: lambda: list(Ordering)[1 + (len(reads) > 0) + any(r < rec["sealed_at_ns"] for r in reads)]}[rec != {}]()
+    return o, {r["code"]: r["sentence"] for r in t["stages"]["report"]["ordering"]}[o.name]
 
 
 def _git(root, *args):
@@ -118,7 +138,7 @@ def _stamp(d, decl, universe, have, who, root, tables, schema):
         "claim": tables["stages"]["report"]["seal_claim"],
     }
     (Path(d) / "SEAL.json").write_text(json.dumps(rec, indent=1) + "\n")
-    return Pass(_built(decl, rec))
+    return Pass(SealState(SealStatus.SEALED, said(tables, SealStatus.SEALED), rec))
 
 
 def mint(declaration, d, universe, who, root, tables):

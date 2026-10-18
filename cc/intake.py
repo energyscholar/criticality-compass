@@ -62,10 +62,12 @@ class ReadsBytes(enum.Enum):
 
 
 class Scope(enum.Enum):
-    """The verdict a stage counts toward (STAGES.toml verdict). ATOMS: PRIMARY | ROBUSTNESS | HANDOFF. Axiom: exactly one holds per stage."""
+    """The verdict a stage counts toward (STAGES.toml verdict). ATOMS: PRIMARY | ROBUSTNESS | HANDOFF | ADVISORY. Axiom: exactly one holds per
+    stage (ADVISORY: the seal stage, outside every verdict; it reports the seal status and never refuses, amendment A3)."""
     PRIMARY = frozenset({"PRIMARY"})
     ROBUSTNESS = frozenset({"ROBUSTNESS"})
     HANDOFF = frozenset({"HANDOFF"})
+    ADVISORY = frozenset({"ADVISORY"})
 
 
 @dataclass(frozen=True)
@@ -223,15 +225,18 @@ def explain(t):
            "Each stage is LIVE (it has a body) or a STUB (it has none, so nothing was checked; a stub is never a pass). "
            "An executed stage gives PASS or REFUSE with a named reason; after a refusal every later stage is WITHHELD.", "",
            "- **PRIMARY** verdict, over the PRIMARY stages: PRIMARY_REFUSED_AT when one refused; else PRIMARY_INCOMPLETE when one is not "
-           "executed or the declaration has no confirmed_by; else PRIMARY_READY.",
+           "executed or no seal with a non-empty confirmed_by holds the declaration now; else PRIMARY_READY.",
            "- **ROBUSTNESS** verdict, over the ROBUSTNESS stage: ROBUSTNESS_COMPLETE, ROBUSTNESS_INCOMPLETE, ROBUSTNESS_REFUSED, or "
            "ROBUSTNESS_WITHHELD after a PRIMARY refusal.",
-           "- The HANDOFF stage is outside both verdicts.", "",
+           "- The HANDOFF stage is outside both verdicts.",
+           "- The ADVISORY stage (the seal) is outside every verdict. It never refuses: every report carries its seal status, SEALED, UNSEALED or "
+           "SEALED_THEN_EDITED, and an ordering note.", "",
            f"**The seal.** {st['report']['seal_claim']}", "", "| id | name | state | reads data bytes | needs | verdict |", "|---|---|---|---|---|---|"]
     out += [f"| {s['id']} | {s['name']} | {state(s)} | {s['reads_bytes']} | {', '.join(s['needs']) or '-'} | {s['verdict']} |" for s in st["stage"]]
     for s in st["stage"]:
         out += ["", f"## {s['id']} {s['name']} ({state(s)})", "", s["purpose"], "", "| reason | what it means |", "|---|---|"]
         out += [f"| {r['code']} | {r['sentence']} |" for r in s["reason"]]
+        out += {True: lambda: ["", "| seal status | what it means |", "|---|---|"] + [f"| {r['code']} | {r['sentence']} |" for r in s["status"]], False: lambda: []}["status" in s]()
     out += ["", f"## Policy ({po['status']}, {po['version']})", "", po["evidence_note"], ""]
     for link in ("projection", "bridge"):
         out += [f"- {link} **{k}**: " + "; ".join(f"{f} = {v}" for f, v in row.items()) for k, row in po[link].items()]
@@ -241,13 +246,15 @@ def explain(t):
 
 
 def bodies(t, d, text, findings):
-    """The registered bodies of one run: S0 FORMAT and S2 SEAL (verify), plus intake_data.BODIES. Invariant: its keys are exactly the stages
-    whose implemented = true (tests/test_intake.py)."""
-    return {"S0": lambda: blind.format_stage(text, findings, t), "S2": lambda declaration: intake_seal.verify(declaration, d), **intake_data.BODIES}
+    """The registered bodies of one run: S0 FORMAT and S2 SEAL (verify, advisory), plus intake_data.BODIES. Invariant: its keys are exactly the
+    stages whose implemented = true (tests/test_intake.py)."""
+    return {"S0": lambda: blind.format_stage(text, findings, t), "S2": lambda declaration: intake_seal.verify(declaration, d, t), **intake_data.BODIES}
 
 
-def report(t, ident, out):
-    """intake-report.md of a run: the verdicts, then every stage in plain sentences, then the seal claim and what no stage can see."""
+def report(t, ident, out, note):
+    """intake-report.md of a run: the verdicts, the seal status and the ordering note (`note`, an (Ordering, sentence) read after the run), then
+    every stage in plain sentences, then the seal claim and what no stage can see."""
+    seal = t["stages"]["seal_stage"]
     p, r = verdicts(t, out)
     names = {s["id"]: s["name"] for s in t["stages"]["stage"]}
     words = lambda v: ", ".join(f"{m} {blind.look(names, m, '')}".strip() for m in v.missing) or "none"
@@ -256,7 +263,10 @@ def report(t, ident, out):
              f"- **Mode** (the declarer's sealed statement of what they had seen): {out['S0'].result.mode()}",
              f"- **PRIMARY verdict: {p.kind.name}**" + {True: f" at {p.at}", False: ""}[p.at != ""] + f". Missing: {words(p)}.",
              f"- **ROBUSTNESS verdict: {r.kind.name}**" + {True: f" at {r.at}", False: ""}[r.at != ""] + f". Missing: {words(r)}.",
-             f"- **{handoff} {names[handoff]}** (outside both verdicts): {out[handoff].atom.name}."]
+             f"- **{handoff} {names[handoff]}** (outside both verdicts): {out[handoff].atom.name}.",
+             "- **Seal status** (advisory; sealing is recommended and not enforced): " + {True: lambda: out[seal].result.evidence.summary(),
+                                                                                           False: lambda: "not reported: " + out[seal].text(t)}[out[seal].mark is Mark.PASSED](),
+             f"- **Ordering** (information, never a refusal): {note[0].name}. {note[1]}"]
     lines += {True: [f"- **confirmation**: {t['stages']['report']['confirmation']}"], False: []}["confirmation" in p.missing]
     lines += ["",
              "| stage | name | state | reads data bytes | execution |", "|---|---|---|---|---|"]
@@ -273,10 +283,10 @@ def closure(t, sid):
     return {n for m in row[sid]["needs"] for n in {m} | closure(t, m)}
 
 
-def before_seal(t):
-    """The stages before the seal: not the seal stage, and the seal stage is not in their transitive needs (bin/cc intake lint and seal)."""
-    seal = t["stages"]["seal_stage"]
-    return [s for s in t["stages"]["stage"] if s["id"] != seal and seal not in closure(t, s["id"])]
+def before_data(t):
+    """The stages of lint and seal: they read no data byte, no stage in their transitive needs reads one, and they are not the ADVISORY seal."""
+    reads = {s["id"] for s in t["stages"]["stage"] if s["reads_bytes"] != "NONE"}
+    return [s for s in t["stages"]["stage"] if s["verdict"] != "ADVISORY" and s["id"] not in reads and not closure(t, s["id"]) & reads]
 
 
 def _flag(args, name):
@@ -300,7 +310,7 @@ def _go(root, ident, pick):
 
 
 def lint(root, ident, args):
-    t, d, out = _go(root, ident, before_seal)
+    t, d, out = _go(root, ident, before_data)
     print("\n".join(f"{k} {e.text(t)}" for k, e in out.items()))
     return {True: 1, False: 0}[any(e.mark is Mark.REFUSED for e in out.values())]
 
@@ -319,7 +329,7 @@ def seal(root, ident, args):
 
 
 def _seal(root, ident, args):
-    t, d, out = _go(root, ident, before_seal)
+    t, d, out = _go(root, ident, before_data)
     print("\n".join(f"{k} {e.text(t)}" for k, e in out.items()))
     refused = any(e.mark is Mark.REFUSED for e in out.values())
     return {True: lambda: 1, False: lambda: _mint(root, ident, args, t, d, out)}[refused]()
@@ -327,7 +337,7 @@ def _seal(root, ident, args):
 
 def run(root, ident, args):
     t, d, out = _go(root, ident, lambda t: t["stages"]["stage"])
-    text = report(t, ident, out)
+    text = report(t, ident, out, intake_seal.ordering(d, t))
     (d / "intake-report.md").write_text(text)
     print(text, end="")
     return {Primary.PRIMARY_READY: 0, Primary.PRIMARY_INCOMPLETE: 0, Primary.PRIMARY_REFUSED_AT: 1}[verdicts(t, out)[0].kind]

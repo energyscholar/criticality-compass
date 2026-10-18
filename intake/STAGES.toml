@@ -1,15 +1,17 @@
-# intake/STAGES.toml - the intake pipeline's stages (plan 1136, amendment A2: renumbered S0-S10). The runner (cc/intake.py), `bin/cc intake
+# intake/STAGES.toml - the intake pipeline's stages (plan 1136, amendment A2: renumbered S0-S10; plan 1139: sealing advisory, S3-S5 LIVE). The runner (cc/intake.py), `bin/cc intake
 # explain`, docs/INTAKE.md and the tests are generated from or checked against this file; no stage, reason or sentence exists anywhere else.
 # Fields: reads_bytes NONE | FIRST_FILE | ALL_FILES (the data bytes the stage reads); needs = the stages whose PASS evidence is its argument;
-# implemented = a body is registered for this id (LIVE) or not (STUB; a STUB is never a pass); verdict PRIMARY | ROBUSTNESS | HANDOFF.
-# A stage is BEFORE the seal exactly when seal_stage is not in its transitive needs; every stage that reads bytes has it there (test 1).
+# implemented = a body is registered for this id (LIVE) or not (STUB; a STUB is never a pass); verdict PRIMARY | ROBUSTNESS | HANDOFF | ADVISORY.
+# The seal stage is ADVISORY (plan 1136 amendment A3): it never refuses, it is in no stage's needs, and its outcome is a seal status VALUE
+# (its `status` rows) that every report carries. Every stage that reads data bytes has S0 FORMAT (the parsed declaration) in its transitive
+# needs, and never the seal stage (test 1).
 schema = 1
 kind = "intake-stages"
-version = "1136-v1"
+version = "1139-v1"
 seal_stage = "S2"
 
 [report]
-seal_claim = "The seal proves INTEGRITY (the declaration's sha256) and ORDERING (the seal time against the first logged data read). It never proves ignorance: mode is the declarer's sealed statement of what they had seen."
+seal_claim = "Sealing is recommended and not enforced. It records what you declared and when; it is an integrity practice, like a lab notebook. A seal proves INTEGRITY (the declaration's sha256) and ORDERING (the seal time against the first logged data read). It never proves ignorance: mode is the declarer's sealed statement of what they had seen."
 unenforced = [   # verbatim from t23.UNENFORCED (cc/vendor/t23.py, the loader copied from the toolset)
   "direct shell reads (cat, less, head, cp, rsync, scp) — not logged",
   "other processes / external tools (MATLAB, editors, a Python without this module, Jupyter) — not logged",
@@ -19,7 +21,13 @@ unenforced = [   # verbatim from t23.UNENFORCED (cc/vendor/t23.py, the loader co
 stub = "This stage has no body yet, so nothing was checked; a stub is never a pass."
 after_refusal = "Not run: an earlier stage refused, and no later check can redeem a refusal."
 input_absent = "Not run: a stage it needs did not pass."
-confirmation = "No human has confirmed this declaration (confirmed_by is empty); PRIMARY_READY needs a non-empty confirmed_by."
+confirmation = "No human has confirmed this declaration (it is unsealed, edited after its seal, or sealed with an empty confirmed_by); PRIMARY_READY needs a seal that holds the declaration now with a non-empty confirmed_by."
+ordering = [   # the ordering note of a report (information, never a refusal): (ordering atom, sentence); total over intake_seal.Ordering
+  { code = "NOT_SEALED",            sentence = "There is no seal, so there is no ordering to report." },
+  { code = "NO_DATA_READ_LOGGED",   sentence = "The access log holds no data read of this declaration." },
+  { code = "READS_FOLLOW_SEAL",     sentence = "Every logged data read of this declaration came after its seal." },
+  { code = "A_READ_PRECEDES_SEAL",  sentence = "The access log holds a data read of this declaration from before its seal; the seal cannot claim ordering." },
+]
 
 [[stage]]
 id = "S0"
@@ -72,15 +80,17 @@ reason = [
 [[stage]]
 id = "S2"
 name = "SEAL"
-purpose = "Stamp the time, author, mode, code and protocol identity, and the source universe listing (names and sizes), and hash the declaration, before any data byte is read."
+purpose = "Report the seal status: whether a seal (time, author, mode, code and protocol identity, the source universe's names and sizes, and the declaration's hash; written by bin/cc intake seal) holds this declaration now. Advisory: it never refuses and blocks nothing."
 reads_bytes = "NONE"
 needs = ["S0"]
 implemented = true
-verdict = "PRIMARY"
-reason = [
-  { code = "SEAL_ABSENT",                sentence = "This declaration has not been sealed; run bin/cc intake seal <id>." },
-  { code = "SEAL_SHA_DIFFERS",           sentence = "The declaration changed after it was sealed; a sealed intake is never edited, so declare a new id." },
-  { code = "DATA_READ_PRECEDES_SEAL",    sentence = "The access log holds a data read of this intake from before its seal; a seal made after reading cannot claim ordering." },
+verdict = "ADVISORY"
+status = [   # the seal status a run reports (intake_seal.SealStatus); never a refusal
+  { code = "SEALED",             sentence = "A seal holds this declaration exactly as it is now." },
+  { code = "UNSEALED",           sentence = "This declaration has no seal. Sealing is recommended and not enforced: bin/cc intake seal <id>." },
+  { code = "SEALED_THEN_EDITED", sentence = "This declaration was sealed and has been edited since; the seal records an earlier text. Declare a new id to seal the new text." },
+]
+reason = [   # refusals of `bin/cc intake seal` (the seal command); a run's S2 never refuses
   { code = "ALREADY_SEALED",             sentence = "This declaration is already sealed; a seal is never replaced, so declare a new id." },
   { code = "UNIVERSE_ROOT_ABSENT",       sentence = "The declared source universe root was not given or is not a directory on this machine; give its location with --universe." },
   { code = "SELECTION_OUTSIDE_UNIVERSE", sentence = "A selected file is not in the source universe listing." },
@@ -89,13 +99,14 @@ reason = [
 [[stage]]
 id = "S3"
 name = "SOURCE_INTEGRITY"
-purpose = "Each selected file is admitted before it is read, read once through the logged loader, and its sha256 is pinned at that first logged read."
+purpose = "Each selected file is admitted before it is read, read once through the logged loader, and its sha256 is pinned at its first logged read; a re-run compares against the pin, and a sealed universe listing against the universe now."
 reads_bytes = "ALL_FILES"
-needs = ["S2"]
+needs = ["S0"]
 implemented = false
 verdict = "PRIMARY"
 reason = [
-  { code = "PATH_NOT_ADMITTED", sentence = "The loader's admission refused this path before reading it (truth side of the deposit, or the slow-knob source does not resolve)." },
+  { code = "ROOT_UNRESOLVED",   sentence = "The declared source root is not a name of intake/ROOTS.toml followed by a relative path, or it names no directory on this machine." },
+  { code = "PATH_NOT_ADMITTED", sentence = "The loader's admission refused this path before reading it (truth side of the deposit, the slow-knob source does not resolve, or the file is absent)." },
   { code = "PIN_MISMATCH",      sentence = "The file's bytes do not match their pinned sha256; the data changed since they were pinned." },
   { code = "UNIVERSE_CHANGED",  sentence = "The source universe now lists files that differ from the sealed listing (added, removed, or resized)." },
 ]
@@ -109,6 +120,7 @@ needs = ["S3"]
 implemented = false
 verdict = "PRIMARY"
 reason = [
+  { code = "READER_NOT_LIVE",   sentence = "The declared reader has no body in the Compass yet (only csv-curve-v1 is live); the file cannot be read." },
   { code = "READER_REFUSED",    sentence = "The declared reader refused the file; its own reason is shown." },
   { code = "COLUMNS_DIFFER",    sentence = "The file's columns or keys differ from the declared ones (count, names or order)." },
   { code = "UNIT_DIFFERS",      sentence = "The file states a unit that differs from the declared unit." },
@@ -136,7 +148,7 @@ id = "S6"
 name = "ADMISSIBILITY"
 purpose = "The actual lineage obeys the sealed operation graph: every value reached the intake through the logged loader and the declared projections only (dynamic admissibility)."
 reads_bytes = "NONE"
-needs = ["S2", "S5"]
+needs = ["S5"]
 implemented = false
 verdict = "PRIMARY"
 reason = [
@@ -150,7 +162,7 @@ id = "S7"
 name = "INTERVAL_FEASIBILITY"
 purpose = "The sampling admits the declared interval method's floor at every point, for every method (the iid gap, plan 1134)."
 reads_bytes = "NONE"
-needs = ["S2", "S5"]
+needs = ["S5"]
 implemented = false
 verdict = "PRIMARY"
 reason = [
@@ -164,7 +176,7 @@ id = "S8"
 name = "RESOLUTION_AND_IDENTIFIABILITY"
 purpose = "The census makes the declared lanes feasible to attempt, and the evidence records what the available observables can and cannot identify."
 reads_bytes = "NONE"
-needs = ["S2", "S5"]
+needs = ["S5"]
 implemented = false
 verdict = "PRIMARY"
 reason = [
@@ -178,7 +190,7 @@ id = "S9"
 name = "ALTERNATIVE_INTAKE"
 purpose = "The second declared lane passes the same census-level checks as the first, so that both lanes can be run; concordance is measured later, from values."
 reads_bytes = "NONE"
-needs = ["S2", "S5"]
+needs = ["S5"]
 implemented = false
 verdict = "ROBUSTNESS"
 reason = [

@@ -1,19 +1,18 @@
-"""intake_data - the data stages of the intake, S3 to S10 (plan 1136): their evidence types and their signatures, and no bodies.
-Invariant: every stage after the seal takes, as its only arguments, the PASS evidence of its `needs` (intake/STAGES.toml), and every such
-evidence type carries a Sealed, directly or through another evidence type; no data stage takes a Declaration. In plan 1136 BODIES is empty,
-so each of these stages is a STUB by absence (a stub is never a pass). A stage plan that makes one LIVE registers a body whose signature
-equals its SIGNATURE row (tests/test_intake.py)."""
+"""intake_data - the data stages of the intake, S3 to S10 (plan 1136; plan 1139): their evidence types, signatures and bodies.
+Invariant: every data stage takes, as its only arguments, the PASS evidence of its `needs` (intake/STAGES.toml); S3 SOURCE_INTEGRITY takes
+the Declaration and every later evidence type carries the Pinned bytes S3 read; no data stage takes a seal (amendment A3: sealing is
+advisory). A stage with no body is a STUB by absence (a stub is never a pass); each registered body's signature equals its SIGNATURE row
+(tests/test_intake.py)."""
 from dataclasses import dataclass
 from inspect import Parameter, Signature
 
-from intake_blind import Pass, Refuse
-from intake_seal import Sealed
+from intake_blind import Declaration, Pass, Refuse
 
 
 @dataclass(frozen=True)
 class Pinned:
-    """S3 SOURCE_INTEGRITY: one pin (path, sha256 at the first logged read) per selected file. Invariant: carries the Sealed it was read under."""
-    sealed: Sealed
+    """S3 SOURCE_INTEGRITY: one pin (path, sha256 at the first logged read) per selected file. Invariant: carries the Declaration it read."""
+    declaration: Declaration
     pins: tuple
 
 
@@ -73,15 +72,15 @@ def sig(**params):
     return Signature([Parameter(n, Parameter.POSITIONAL_OR_KEYWORD, annotation=t) for n, t in params.items()], return_annotation=Pass | Refuse)
 
 
-EVIDENCE = {"S2": Sealed, "S3": Pinned, "S4": Shaped, "S5": Census, "S6": Lineage, "S7": IntervalPlan, "S8": Feasibility, "S9": SecondLane, "S10": KernelInput}
-SIGNATURE = {   # every stage after the seal -> its signature: the evidence of its needs, in needs order (tests/test_intake.py)
-    "S3": sig(sealed=Sealed),
+EVIDENCE = {"S0": Declaration, "S3": Pinned, "S4": Shaped, "S5": Census, "S6": Lineage, "S7": IntervalPlan, "S8": Feasibility, "S9": SecondLane, "S10": KernelInput}
+SIGNATURE = {   # every data stage -> its signature: the evidence of its needs, in needs order (tests/test_intake.py)
+    "S3": sig(declaration=Declaration),
     "S4": sig(pinned=Pinned),
     "S5": sig(pinned=Pinned, shaped=Shaped),
-    "S6": sig(sealed=Sealed, census=Census),
-    "S7": sig(sealed=Sealed, census=Census),
-    "S8": sig(sealed=Sealed, census=Census),
-    "S9": sig(sealed=Sealed, census=Census),
+    "S6": sig(census=Census),
+    "S7": sig(census=Census),
+    "S8": sig(census=Census),
+    "S9": sig(census=Census),
     "S10": sig(lineage=Lineage, plan=IntervalPlan, feasibility=Feasibility),
 }
-BODIES = {}   # stage id -> body; empty in plan 1136
+BODIES = {}   # stage id -> body
