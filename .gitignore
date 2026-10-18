@@ -6,3 +6,4 @@ results/reduced/
 .venv/
 build/
 dist/
+scratch/intake-synth/

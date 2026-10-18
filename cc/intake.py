@@ -344,7 +344,7 @@ def run(root, ident, args):
 
 
 def _usage(why):
-    print(f"bin/cc intake: {why}\n  usage: bin/cc intake explain | lint <id> | seal <id> --universe DIR --author NAME --as human|ai-draft "
+    print(f"bin/cc intake: {why}\n  usage: bin/cc intake explain | synth <id> --seed N [--curves K] [--out DIR] | lint <id> | seal <id> --universe DIR --author NAME --as human|ai-draft "
           "(--confirmed-by NAME | --unconfirmed) | run <id>\n  Next: bin/cc intake explain")
     return 1
 
@@ -355,10 +355,17 @@ def _with_id(f):
                             False: lambda: _usage("name a declaration: declarations/<id>/ must be a directory")}[len(a) > 0 and (Path(root) / "declarations" / a[0]).is_dir()]()
 
 
-INTAKE = {"explain": lambda root, a: print(explain(tables(root)), end="") or 0, "lint": _with_id(lint), "seal": _with_id(seal), "run": _with_id(run)}
+def synth(root, args):
+    """bin/cc intake synth: the planted bank generator (cc/intake_synth.py, test infrastructure), imported here only: no stage imports it."""
+    import intake_synth
+    return intake_synth.cli(root, args)
+
+
+INTAKE = {"explain": lambda root, a: print(explain(tables(root)), end="") or 0, "lint": _with_id(lint), "seal": _with_id(seal), "run": _with_id(run),
+          "synth": synth}
 
 
 def cli(root, args):
-    """bin/cc intake <sub>: a total lookup over the four subcommands; any other word is a usage refusal."""
+    """bin/cc intake <sub>: a total lookup over the subcommands of INTAKE; any other word is a usage refusal."""
     sub = {True: lambda: args[0], False: lambda: ""}[len(args) > 0]()
     return blind.look(INTAKE, sub, lambda root, a: _usage(f"unknown subcommand '{sub}'"))(root, args[1:])
