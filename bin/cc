@@ -40,6 +40,8 @@ ADVANCED = [
     ("family <id> [--tables SET]", "the family report (a declared projection C over bracket, f1, f2: cc.toml [report] family) of a stored result; measures nothing"),
     ("new family <id>", "start a family declaration from the template"),
     ("intake explain | (lint | seal | run) <id>", "the intake pipeline of a raw-data declaration declarations/<id>/ (explain prints its stage table; not `explain <input> <point>`)"),
+    ("intake synth <id> --seed N [--curves K]", "write a planted synthetic bank to scratch/intake-synth/<id> (docs/INTAKE-QUICKSTART.md)"),
+    ("new intake <id> [--from-synth <id>]", "start a declaration declarations/<id>/ from the template (--from-synth fills the bank's metadata)"),
 ]
 
 
@@ -276,6 +278,9 @@ def cmd_author(cmd, args):
                                 opt(a, "--add-instrument"))
     if (cmd, sub) == ("new", "family") and len(a) == 1:
         return author.new_family(ROOT, a[0])
+    if (cmd, sub) == ("new", "intake") and a:
+        import intake
+        return intake.new(ROOT, a[0], opt(a, "--from-synth", ""))
     if (cmd, sub) == ("new", "instrument") and len(a) == 1:
         return author.new_instrument(ROOT, a[0])
     if (cmd, sub) == ("data", "add") and len(a) == 1:

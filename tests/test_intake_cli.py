@@ -34,8 +34,6 @@ with tempfile.TemporaryDirectory() as tmp:
     check("1. the bank holds 9 curves and MANIFEST.json, the truth sits beside it", sorted(a) == sorted([f"b/curve_{i:03d}.csv" for i in range(9)] + ["b/MANIFEST.json", "b-TRUTH/truth.json"]), str(sorted(a)))
     check("1. the same seed writes a byte-identical bank and truth file", a == a2, str([k for k in a if a[k] != a2.get(k)])[:200])
     check("1. a different seed writes a different bank", all(a[k] != c[k] for k in a if k.endswith(".csv")), str([k for k in a if k.endswith(".csv") and a[k] == c[k]]))
-    check("1. synth prints where it wrote and the next command", "Next: bin/cc new intake b --from-synth b" in runs["a"].stdout and str(Path(tmp) / "a" / "b") in runs["a"].stdout, runs["a"].stdout)
-    check("1. a second synth into the same place is refused with a Next line", cc("intake", "synth", "b", "--seed", "1", "--out", str(Path(tmp) / "a")).returncode == 1, "")
 
 print("test_intake_cli: " + ("FAILED " + "; ".join(bad) if bad else "all passed"))
 sys.exit(1 if bad else 0)

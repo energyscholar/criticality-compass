@@ -6,6 +6,7 @@ bank; the bank holds the curves and a MANIFEST of metadata (names, h, n, size, s
 import hashlib
 import json
 import re
+import tomllib
 from pathlib import Path
 
 import numpy as np
@@ -72,3 +73,32 @@ def cli(root, args):
     exists = lambda: print(f"synth {ident}: refused, {bank} or {truth} exists; a bank is never overwritten\n  Next: rm -r {bank} {truth}   (or choose another id)") or 1
     return {True: lambda: refuse("needs " + "; ".join(usage)),
             False: lambda: {True: exists, False: lambda: _done(bank, truth, ident, write(bank, truth, ident, int(seed), int(k)))}[bank.exists() or truth.exists()]()}[len(usage) > 0]()
+
+
+def declare(m, ident, sid):
+    """`bin/cc new intake <id> --from-synth <sid>`: (the intake.toml values the MANIFEST states as metadata, the CC transducer.toml text).
+    Invariant: it fills metadata only and never a choice (intake.mode, acquisition, interval, bracket, projection, bridge, their bias and
+    the shift stay TODO), and it writes no truth: neither h* nor the model's parameters appear in what it returns."""
+    q, cmd = (lambda v: json.dumps(v)), f"bin/cc intake synth {sid} --seed {m['seed']}"
+    values = {
+        "basis.read": f'[ {{ what = {q(f"<intake-synth>/{sid}/MANIFEST.json: file names, h, n, size and sha256 per file; the seed; the generator sha256")}, class = "LISTING" }} ]',
+        "source.origin": q("PLANTED"), "source.deposit": q(cmd + " (cc/intake_synth.py)"), "source.root": q(f"<intake-synth>/{sid}"),
+        "source.universe": q("*"), "source.truth_side": q(["truth.json"]), "source.reader": q(m["reader"]), "source.layout": q("named"),
+        "selection.pattern": q(m["pattern"]), "selection.index": f"{{ first = 0, last = {len(m['files']) - 1} }}",
+        "selection.excluded": '[ { file = "MANIFEST.json", why = "metadata (in basis), not a curve" } ]',
+        "knobs.slow.name": q(m["slow"]["name"]), "knobs.slow.unit": q(m["slow"]["unit"]), "knobs.slow.source": q("PER_FILE"), "knobs.slow.pattern": q(""),
+        "knobs.slow.per_file": q([f["h"] for f in m["files"]]), "knobs.slow.key": q(""),
+        "knobs.fast.name": q(m["fast"]["name"]), "knobs.fast.unit": q(m["fast"]["unit"]), "knobs.fast.source": q("COLUMN"), "knobs.fast.key": q(m["fast"]["column"]),
+        "measured.name": q(m["measured"]["name"]), "measured.unit": q(m["measured"]["unit"]), "measured.key": q(m["measured"]["column"]), "measured.shape": q("SCALAR_PER_LOCUS"),
+        "replicate.identity": q(m["replicate"]), "replicate.key": q(""),
+    }
+    cfg = tomllib.loads((Path(__file__).resolve().parent.parent / "cc.toml").read_text())["transducer"]
+    trans = (f"# declarations/{ident}/transducer.toml - written by bin/cc new intake {ident} --from-synth {sid}: the CC transducer file of a synthetic bank.\n"
+             f"# The update pin is the generator cc/intake_synth.py of the Compass itself (route compass:, cc.toml [transducer] update_routes).\n"
+             f'schema = 1\nkind = "transducer"\nid = {q(ident)}\n\n[transducer]\n'
+             f'model = "the planted synthetic bank of bin/cc intake synth: one peak in T per curve, on a seeded subset of a 161-point T grid, with Gaussian noise; the planted values are in the generator, not here"\n'
+             f'update = [{q("compass:" + m["generator"]["path"] + " sha256 " + m["generator"]["sha256"])}]\n'
+             f'inputs = {q(cmd)}\noutput = {q(cfg["phase1_output"])}\n\n'
+             f'[reduction]\nname = "none in the Compass: the bank stores one value of C per (h, T) point"\nkeeps = "the planted value of C at each kept point, with its noise"\n'
+             f'discards = "nothing the bank holds"\n\n[interval]\nrole = {q(cfg["interval_role"])}\nkeeps = "the planted noise sigma written on every row"\ndiscards = "the noise draw itself"\n')
+    return values, trans

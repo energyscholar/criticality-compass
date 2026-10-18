@@ -127,9 +127,11 @@ CHECK = {   # a FORMAT field's check word -> its findings for a value of the rig
 
 
 def typed(spec, v, loc, tables):
-    """A present field: FIELD_TYPE_WRONG, or the findings of its check."""
-    return {True: lambda: CHECK[spec["check"]](spec, v, loc, tables),
-            False: lambda: [Finding("FIELD_TYPE_WRONG", loc, f"{type(v).__name__}, want {spec['type']}")]}[TYPE[spec["type"]](v)]()
+    """A present field: VALUE_STILL_TODO when it is the template's "TODO" (whatever its type, plan 1139: `bin/cc new intake` writes TODO in
+    every field), else FIELD_TYPE_WRONG, or the findings of its check."""
+    return {True: lambda: [Finding("VALUE_STILL_TODO", loc, "TODO")],
+            False: lambda: {True: lambda: CHECK[spec["check"]](spec, v, loc, tables),
+                            False: lambda: [Finding("FIELD_TYPE_WRONG", loc, f"{type(v).__name__}, want {spec['type']}")]}[TYPE[spec["type"]](v)]()}[v == TODO]()
 
 
 def field(spec, d, key, loc, tables, required=True):

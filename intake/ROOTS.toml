@@ -1,0 +1,8 @@
+# intake/ROOTS.toml - the declared names of source roots (plan 1139). A declaration's [source] root is "<name>/<path>": a name below, then a
+# relative path under it. S3 SOURCE_INTEGRITY resolves the name here (a path relative to the Compass root) and refuses ROOT_UNRESOLVED for a
+# name that is not listed or a directory that does not exist. A declaration never holds a machine path.
+schema = 1
+kind = "intake-roots"
+
+[root]
+"<intake-synth>" = "scratch/intake-synth"   # the default --out of `bin/cc intake synth` (gitignored)

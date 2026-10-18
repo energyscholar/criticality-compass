@@ -2,6 +2,8 @@
 `bin/cc intake explain | lint | seal | run`. Invariant: every stage, reason and sentence comes from intake/STAGES.toml; a stage with no
 body is a STUB and a STUB is never a pass; a result is a value, never an exception; each dispatch below is a dict total over a named key."""
 import enum
+import json
+import re
 import tomllib
 from dataclasses import dataclass
 from pathlib import Path
@@ -341,6 +343,43 @@ def run(root, ident, args):
     (d / "intake-report.md").write_text(text)
     print(text, end="")
     return {Primary.PRIMARY_READY: 0, Primary.PRIMARY_INCOMPLETE: 0, Primary.PRIMARY_REFUSED_AT: 1}[verdicts(t, out)[0].kind]
+
+
+def fill(text, values):
+    """The template text with each `key = "TODO"` line of a [section] whose "section.key" is a key of `values` set to that TOML value."""
+    out, sec = [], ""
+    for ln in text.splitlines():
+        sec, m = {True: ln.strip("[] "), False: sec}[ln.startswith("[")], re.match(r'(\w+) = "TODO"(.*)', ln)
+        out.append({True: lambda: f"{m[1]} = {values[sec + '.' + m[1]]}{m[2]}", False: lambda: ln}[m is not None and f"{sec}.{m[1]}" in values]())
+    return "\n".join(out) + "\n"
+
+
+def _write_new(root, d, ident, values, trans):
+    d.mkdir(parents=True)
+    (d / "intake.toml").write_text(fill((Path(root) / "intake" / "TEMPLATE.intake.toml.in").read_text().replace("<ID>", ident), values))
+    (d / "transducer.toml").write_text(trans)
+    todo = [f"  declarations/{ident}/{n}:{i}: {ln}" for n in ("intake.toml", "transducer.toml") for i, ln in enumerate((d / n).read_text().splitlines(), 1) if '"TODO"' in ln]
+    print(f"wrote declarations/{ident}/intake.toml and transducer.toml; {len(todo)} TODO lines remain (yours to choose):\n" + "\n".join(todo)
+          + f"\n  Next: replace each TODO (docs/INTAKE-QUICKSTART.md shows a filled example), then bin/cc intake lint {ident}")
+    return 0
+
+
+def _from_synth(root, d, ident, sid, synth):
+    import intake_synth   # test infrastructure: it knows the MANIFEST it wrote
+    return _write_new(root, d, ident, *intake_synth.declare(json.loads(synth.read_text()), ident, sid))
+
+
+def new(root, ident, sid):
+    """bin/cc new intake <id> [--from-synth <sid>]: declarations/<id>/ from the committed templates; with --from-synth, the synth MANIFEST's
+    metadata filled in (intake_synth.declare) and every choice left TODO. Invariant: never overwrites; a refusal is a usage line with a Next."""
+    d, synth = Path(root) / "declarations" / ident, Path(root) / tomllib.loads((Path(root) / "intake" / "ROOTS.toml").read_text())["root"]["<intake-synth>"] / sid / "MANIFEST.json"
+    blank = lambda: _write_new(root, d, ident, {}, (Path(root) / "inputs" / "TEMPLATE.transducer.toml.in").read_text().replace("<ID>", ident))
+    filled = lambda: _from_synth(root, d, ident, sid, synth)
+    usage = [u for ok, u in ((re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]*", ident) is not None, f"an id (letters, digits, _ . -), not '{ident}'"),
+                             (not d.exists(), f"declarations/{ident} exists; a declaration is never overwritten (choose another id)"),
+                             (sid == "" or synth.is_file(), f"no synthetic bank '{sid}' (run bin/cc intake synth {sid} --seed N first)")) if not ok]
+    return {True: lambda: print(f"bin/cc new intake: refused, {'; '.join(usage)}\n  Next: bin/cc new intake <id> [--from-synth <synth-id>]") or 1,
+            False: {True: blank, False: filled}[sid == ""]}[len(usage) > 0]()
 
 
 def _usage(why):

@@ -1,0 +1,78 @@
+# declarations/<ID>/intake.toml - written by `bin/cc new intake <ID>` from intake/TEMPLATE.intake.toml.in (intake format v1, intake/FORMAT.toml).
+# Replace every TODO. A closed field takes one of the words its comment lists; `bin/cc intake lint <id>` names each field still wrong.
+# Write only what you read from metadata (a README, a listing, a header, the reader code), never from the data values.
+schema = 1
+kind = "intake"
+id = "<ID>"
+
+[intake]
+mode = "TODO"           # what you had seen of the data when you declared: PROSPECTIVE | RETROSPECTIVE_PREDECLARED | EXPLORATORY
+
+[basis]
+read = "TODO"           # what you read to write this: a list of { what = "...", class = README | LISTING | HEADER | UNITS_NOTE | ACQUISITION_NOTE | PAPER_METHODS | READER_CODE }
+
+[source]
+origin = "TODO"         # PLANTED (a generated bank) | EXPERIMENT
+deposit = "TODO"        # where the data came from, one line
+root = "TODO"           # <name>/<path>: a name of intake/ROOTS.toml, then the bank's directory under it
+universe = "TODO"       # a glob, relative to root, of every file the deposit holds (the seal lists their names and sizes)
+truth_side = "TODO"     # a list of file names on the truth side of a planted deposit; no stage may read them ([] for an experiment)
+reader = "TODO"         # csv-curve-v1 (live) | P1 | L5 | F1 | C1 | C4 | npz-curve-v1 (not live yet)
+layout = "TODO"         # positional | named | points | channels | keys
+
+[selection]
+pattern = "TODO"        # the file name under root, with {index}, e.g. "curve_{index:03d}.csv"
+index = "TODO"          # { first = <int>, last = <int> }: the indices the pattern selects
+excluded = "TODO"       # a list of { file = "...", why = "..." }: files in the universe that are not curves ([] when none)
+
+[knobs.slow]
+name = "TODO"           # the slow knob: one curve per value
+unit = "TODO"           # its unit
+source = "TODO"         # PER_FILE (values listed below) | PATH_PATTERN (read from the file name) | FILE_KEY
+pattern = "TODO"        # PATH_PATTERN: a regular expression with one group; "" otherwise
+per_file = "TODO"       # PER_FILE: one number per selected file, in index order; [] otherwise
+key = "TODO"            # FILE_KEY: the key; "" otherwise
+
+[knobs.fast]
+name = "TODO"           # the fast knob: the points along each curve
+unit = "TODO"           # its unit
+source = "TODO"         # COLUMN | FILE_KEY
+key = "TODO"            # its column name or key
+
+[measured]
+name = "TODO"           # the measured quantity
+unit = "TODO"           # its unit
+key = "TODO"            # its column name or key
+shape = "TODO"          # SCALAR_PER_LOCUS | SERIES_PER_LOCUS | PICTURE | POSITIONS
+
+[acquisition]
+mode = "TODO"           # how the points were taken: INDEPENDENT | SWEEP_CARRIED | RAMP_CONTINUOUS | REPEATED_FRAMES
+direction = "TODO"      # the order they were taken in along the fast knob: ASCENDING | DESCENDING | UNORDERED
+row_order = "TODO"      # the order the rows are stored in: ASCENDING | DESCENDING | ACQUISITION
+
+[replicate]
+identity = "TODO"       # what makes two curves at one slow value replicates: NONE | SEED | RUN | SAMPLE | FILE
+key = "TODO"            # the key that names a replicate; "" for NONE
+
+[interval]
+method = "TODO"         # block | iid | gamma | chains; then add that method's fields (cc.toml [interval_fields.<method>])
+
+[bracket]
+required = "TODO"       # the most this declaration requires of a bracket: CANDIDATE_BRACKET | VALIDATED_BRACKET
+
+[[projection]]
+lane = "TODO"           # PRIMARY | ALTERNATIVE
+from = "TODO"           # the measured quantity it projects
+to = "TODO"             # the name of what it yields
+bias = "TODO"           # a projection key of intake/POLICY.toml: ARGMAX_FAST | MAX_MEASURED
+keeps = "TODO"          # what the projection keeps, one sentence
+discards = "TODO"       # what it discards, one sentence
+
+[[bridge]]
+lane = "TODO"           # PRIMARY | ALTERNATIVE
+on = "TODO"             # the quantity the bridge joins
+template = "TODO"       # a bridge key of intake/POLICY.toml: CHAIN_SLOW | PAIR_NEAREST_FAST
+bias = "TODO"           # the same key as template
+
+[shift]
+c = "TODO"              # the one admissible step before A: x + c, a number (0.0 for none)
