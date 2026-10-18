@@ -17,9 +17,9 @@ A declaration `declarations/<id>/` (intake.toml and the CC transducer.toml) goes
 | S0 | FORMAT | LIVE | NONE | - | PRIMARY |
 | S1 | CHOICES | STUB | NONE | S0 | PRIMARY |
 | S2 | SEAL | LIVE | NONE | S0 | ADVISORY |
-| S3 | SOURCE_INTEGRITY | STUB | ALL_FILES | S0 | PRIMARY |
-| S4 | SHAPE | STUB | FIRST_FILE | S3 | PRIMARY |
-| S5 | CENSUS | STUB | ALL_FILES | S3, S4 | PRIMARY |
+| S3 | SOURCE_INTEGRITY | LIVE | ALL_FILES | S0 | PRIMARY |
+| S4 | SHAPE | LIVE | FIRST_FILE | S3 | PRIMARY |
+| S5 | CENSUS | LIVE | ALL_FILES | S3, S4 | PRIMARY |
 | S6 | ADMISSIBILITY | STUB | NONE | S5 | PRIMARY |
 | S7 | INTERVAL_FEASIBILITY | STUB | NONE | S5 | PRIMARY |
 | S8 | RESOLUTION_AND_IDENTIFIABILITY | STUB | NONE | S5 | PRIMARY |
@@ -82,7 +82,7 @@ Report the seal status: whether a seal (time, author, mode, code and protocol id
 | UNSEALED | This declaration has no seal. Sealing is recommended and not enforced: bin/cc intake seal <id>. |
 | SEALED_THEN_EDITED | This declaration was sealed and has been edited since; the seal records an earlier text. Declare a new id to seal the new text. |
 
-## S3 SOURCE_INTEGRITY (STUB)
+## S3 SOURCE_INTEGRITY (LIVE)
 
 Each selected file is admitted before it is read, read once through the logged loader, and its sha256 is pinned at its first logged read; a re-run compares against the pin, and a sealed universe listing against the universe now.
 
@@ -93,7 +93,7 @@ Each selected file is admitted before it is read, read once through the logged l
 | PIN_MISMATCH | The file's bytes do not match their pinned sha256; the data changed since they were pinned. |
 | UNIVERSE_CHANGED | The source universe now lists files that differ from the sealed listing (added, removed, or resized). |
 
-## S4 SHAPE (STUB)
+## S4 SHAPE (LIVE)
 
 The first selected file has the declared columns or keys, units and axes, as its declared reader admits them.
 
@@ -105,7 +105,7 @@ The first selected file has the declared columns or keys, units and axes, as its
 | UNIT_DIFFERS | The file states a unit that differs from the declared unit. |
 | ROW_ORDER_DIFFERS | The rows are not stored in the declared order of the fast knob. |
 
-## S5 CENSUS (STUB)
+## S5 CENSUS (LIVE)
 
 Every selected file matches the first, and the sampling label is recorded: curves, points per curve, spacing, missingness, ordering and replicate identity.
 

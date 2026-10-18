@@ -47,7 +47,7 @@ deposit = { type = "str", check = "TEXT" }
 root = { type = "str", check = "TEXT" }
 universe = { type = "str", check = "TEXT" }
 truth_side = { type = "list", check = "ITEMS", item = "str" }
-reader = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { P1 = "ADMIT", L5 = "ADMIT", F1 = "ADMIT", C1 = "ADMIT", C4 = "ADMIT", npz-curve-v1 = "ADMIT" } }
+reader = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { csv-curve-v1 = "ADMIT", P1 = "ADMIT", L5 = "ADMIT", F1 = "ADMIT", C1 = "ADMIT", C4 = "ADMIT", npz-curve-v1 = "ADMIT" } }
 layout = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { positional = "ADMIT", named = "ADMIT", points = "ADMIT", channels = "ADMIT", keys = "ADMIT" } }
 
 [fields.selection]

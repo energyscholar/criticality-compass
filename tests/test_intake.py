@@ -149,7 +149,7 @@ for sid, sig in intake_data.SIGNATURE.items():
     ann = [p.annotation for p in sig.parameters.values()]
     need = [intake_data.EVIDENCE[n] for n in next(s for s in ST if s["id"] == sid)["needs"]]
     check(f"4. {sid}'s signature takes the evidence of its needs and no seal", ann == need and not any("Seal" in a.__name__ for a in ann), f"{ann} against {need}")
-check("4. every registered data-stage body has its SIGNATURE row", all(inspect.signature(b) == intake_data.SIGNATURE[k] for k, b in intake_data.BODIES.items()), "")
+check("4. every registered data-stage body has its SIGNATURE row", all(inspect.signature(b) == intake_data.SIGNATURE[k] for k, b in intake_data.bodies(T, EXAMPLE).items()), "")
 with tempfile.TemporaryDirectory() as tmp:
     d = Path(tmp) / "decl"
     d.mkdir()

@@ -210,7 +210,8 @@ def tables(root=ROOT):
     admit = {"policy.projection": load["policy"]["projection"], "policy.bridge": load["policy"]["bridge"],
              **{f"alphabet.{k}": v for k, v in cfg["alphabets"].items()}}
     sentences = {r["code"]: r["sentence"] for s in load["stages"]["stage"] for r in s["reason"]}
-    return {**load, "admit": admit, "interval_fields": cfg["interval_fields"], "sentences": sentences}
+    roots = {k: str(Path(root) / v) for k, v in tomllib.loads((Path(root) / "intake" / "ROOTS.toml").read_text())["root"].items()}
+    return {**load, "admit": admit, "interval_fields": cfg["interval_fields"], "sentences": sentences, "roots": roots}
 
 
 def state(s):
@@ -248,9 +249,9 @@ def explain(t):
 
 
 def bodies(t, d, text, findings):
-    """The registered bodies of one run: S0 FORMAT and S2 SEAL (verify, advisory), plus intake_data.BODIES. Invariant: its keys are exactly the
+    """The registered bodies of one run: S0 FORMAT and S2 SEAL (verify, advisory), plus intake_data.bodies (S3, S4, S5). Invariant: its keys are exactly the
     stages whose implemented = true (tests/test_intake.py)."""
-    return {"S0": lambda: blind.format_stage(text, findings, t), "S2": lambda declaration: intake_seal.verify(declaration, d, t), **intake_data.BODIES}
+    return {"S0": lambda: blind.format_stage(text, findings, t), "S2": lambda declaration: intake_seal.verify(declaration, d, t), **intake_data.bodies(t, d)}
 
 
 def report(t, ident, out, note):

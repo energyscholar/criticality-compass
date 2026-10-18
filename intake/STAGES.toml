@@ -102,7 +102,7 @@ name = "SOURCE_INTEGRITY"
 purpose = "Each selected file is admitted before it is read, read once through the logged loader, and its sha256 is pinned at its first logged read; a re-run compares against the pin, and a sealed universe listing against the universe now."
 reads_bytes = "ALL_FILES"
 needs = ["S0"]
-implemented = false
+implemented = true
 verdict = "PRIMARY"
 reason = [
   { code = "ROOT_UNRESOLVED",   sentence = "The declared source root is not a name of intake/ROOTS.toml followed by a relative path, or it names no directory on this machine." },
@@ -117,7 +117,7 @@ name = "SHAPE"
 purpose = "The first selected file has the declared columns or keys, units and axes, as its declared reader admits them."
 reads_bytes = "FIRST_FILE"
 needs = ["S3"]
-implemented = false
+implemented = true
 verdict = "PRIMARY"
 reason = [
   { code = "READER_NOT_LIVE",   sentence = "The declared reader has no body in the Compass yet (only csv-curve-v1 is live); the file cannot be read." },
@@ -133,7 +133,7 @@ name = "CENSUS"
 purpose = "Every selected file matches the first, and the sampling label is recorded: curves, points per curve, spacing, missingness, ordering and replicate identity."
 reads_bytes = "ALL_FILES"
 needs = ["S3", "S4"]
-implemented = false
+implemented = true
 verdict = "PRIMARY"
 reason = [
   { code = "FILE_DIFFERS_FROM_FIRST",   sentence = "A selected file's shape, columns or keys differ from the first file's." },
