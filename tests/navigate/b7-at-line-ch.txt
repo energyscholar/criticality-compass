@@ -1,0 +1,9 @@
+UNTESTED: cc navigate (stored-map mode) ships untested. No transcript it prints has been scored against a known transition; nothing below is evidence of a located transition.
+map b7-at-line-ch (stored-map mode): 5 nodes in the declared order of axes.point; observable g1 of p = sigma tau; start random
+reading: navigator v2 at m 10, r 2 (rank(m, alpha 0.021484375); declared r 2); pair L81 vs L27; EPS 0.01; sink bound 1.0 at L81
+nodes (chain files declared per size): 0.0 [L81: 10, L27: 10] | 0.07 [L81: 10, L27: 10] | 0.14 [L81: 10, L27: 10] | 0.21 [L81: 10, L27: 10] | 0.2747 [L81: 10, L27: 10]
+walk: N0 bisection over nodes 0..4; moves on the sign cell (UNRES -> unresolved, never MID)
+  read 0.0 (node 0): side MID, cell ZERO!, median d -0.0010, interval [-0.0022, +0.0002], pinned L81 NONE / L27 NONE -> stop
+  read 0.2747 (node 4): side MID, cell ZERO!, median d +0.0029, interval [-0.0051, +0.0090], pinned L81 NONE / L27 NONE -> stop
+outcome: REFUSE (the ends read stop at 0.0 and stop at 0.2747; the walk needs lo (DIS) at the first node and hi (ORD) at the last, in the declared order of axes.point)
+T23 access log: b7-at-line-ch.access.jsonl (40 reads appended; nodes visited: 0.0, 0.2747); reads outside this loader (a shell, another process, another copy of the bytes) are not logged
