@@ -1,0 +1,295 @@
+{
+ "schema": 1,
+ "kind": "intake-seal",
+ "id": "dial1118-s1",
+ "sealed_at_ns": 1792342067119065918,
+ "sealed_at_utc": "2026-10-18T16:47:47Z",
+ "author": "Claude (plan 1136 phase 1)",
+ "author_kind": "AI_DRAFT",
+ "confirmed_by": "",
+ "mode": "EXPLORATORY",
+ "declaration_sha256": "d6f4186c418ddea67e21cab6808d23823221a6dd5bbd9dcf2436f80df340adc5",
+ "files": {
+  "intake.toml": "377d944a3634815fdcc652b1b5c74ed29cf8df2f1a6251eb414c2500a48748de",
+  "transducer.toml": "1b32b845d687693d68725491da40490f70e4028a52124d7c9d73114ae89b9b27"
+ },
+ "code_identity": {
+  "commit": "13c948092a0c111368bab784d2414b5d4794d901",
+  "code_hash": "58ed30b113d585775709a73161a9f044f285aed7378f10ff54935682ea3cd104",
+  "tree": "CLEAN"
+ },
+ "protocol_identity": {
+  "STAGES.toml": {
+   "sha256": "1be72bc6ebadf6d854a73c73b32ec67775d2b90a605fa4dab59159adabed1a37",
+   "version": "1136-v1"
+  },
+  "POLICY.toml": {
+   "sha256": "c97c3defbf2eec19d3e99b3e5bb91d8e4f0689ad00f867c9a0c4bf5f8ea01df4",
+   "version": "1136-v1"
+  },
+  "FORMAT.toml": {
+   "sha256": "a80b858a3f1d7aea21168a514262406d47c0580e124d773a67fdc13433106fa7",
+   "version": "1136-v1"
+  }
+ },
+ "universe": {
+  "root": "<p1118-bank>",
+  "location_name": "p1118-bank-FIXTURE",
+  "glob": "S1/*",
+  "listing": [
+   [
+    "S1/MANIFEST.json",
+    0
+   ],
+   [
+    "S1/S1_c000.npz",
+    0
+   ],
+   [
+    "S1/S1_c001.npz",
+    0
+   ],
+   [
+    "S1/S1_c002.npz",
+    0
+   ],
+   [
+    "S1/S1_c003.npz",
+    0
+   ],
+   [
+    "S1/S1_c004.npz",
+    0
+   ],
+   [
+    "S1/S1_c005.npz",
+    0
+   ],
+   [
+    "S1/S1_c006.npz",
+    0
+   ],
+   [
+    "S1/S1_c007.npz",
+    0
+   ],
+   [
+    "S1/S1_c008.npz",
+    0
+   ],
+   [
+    "S1/S1_c009.npz",
+    0
+   ],
+   [
+    "S1/S1_c010.npz",
+    0
+   ],
+   [
+    "S1/S1_c011.npz",
+    0
+   ],
+   [
+    "S1/S1_c012.npz",
+    0
+   ],
+   [
+    "S1/S1_c013.npz",
+    0
+   ],
+   [
+    "S1/S1_c014.npz",
+    0
+   ],
+   [
+    "S1/S1_c015.npz",
+    0
+   ],
+   [
+    "S1/S1_c016.npz",
+    0
+   ],
+   [
+    "S1/S1_c017.npz",
+    0
+   ],
+   [
+    "S1/S1_c018.npz",
+    0
+   ],
+   [
+    "S1/S1_c019.npz",
+    0
+   ],
+   [
+    "S1/S1_c020.npz",
+    0
+   ],
+   [
+    "S1/S1_c021.npz",
+    0
+   ],
+   [
+    "S1/S1_c022.npz",
+    0
+   ],
+   [
+    "S1/S1_c023.npz",
+    0
+   ],
+   [
+    "S1/S1_c024.npz",
+    0
+   ],
+   [
+    "S1/S1_c025.npz",
+    0
+   ],
+   [
+    "S1/S1_c026.npz",
+    0
+   ],
+   [
+    "S1/S1_c027.npz",
+    0
+   ],
+   [
+    "S1/S1_c028.npz",
+    0
+   ],
+   [
+    "S1/S1_c029.npz",
+    0
+   ],
+   [
+    "S1/S1_c030.npz",
+    0
+   ],
+   [
+    "S1/S1_c031.npz",
+    0
+   ],
+   [
+    "S1/S1_c032.npz",
+    0
+   ],
+   [
+    "S1/S1_c033.npz",
+    0
+   ],
+   [
+    "S1/S1_c034.npz",
+    0
+   ],
+   [
+    "S1/S1_c035.npz",
+    0
+   ],
+   [
+    "S1/S1_c036.npz",
+    0
+   ],
+   [
+    "S1/S1_c037.npz",
+    0
+   ],
+   [
+    "S1/S1_c038.npz",
+    0
+   ],
+   [
+    "S1/S1_c039.npz",
+    0
+   ],
+   [
+    "S1/S1_c040.npz",
+    0
+   ],
+   [
+    "S1/S1_c041.npz",
+    0
+   ],
+   [
+    "S1/S1_c042.npz",
+    0
+   ],
+   [
+    "S1/S1_c043.npz",
+    0
+   ],
+   [
+    "S1/S1_c044.npz",
+    0
+   ],
+   [
+    "S1/S1_c045.npz",
+    0
+   ],
+   [
+    "S1/S1_c046.npz",
+    0
+   ],
+   [
+    "S1/S1_c047.npz",
+    0
+   ],
+   [
+    "S1/S1_c048.npz",
+    0
+   ],
+   [
+    "S1/S1_c049.npz",
+    0
+   ],
+   [
+    "S1/S1_c050.npz",
+    0
+   ],
+   [
+    "S1/S1_c051.npz",
+    0
+   ],
+   [
+    "S1/S1_c052.npz",
+    0
+   ],
+   [
+    "S1/S1_c053.npz",
+    0
+   ],
+   [
+    "S1/S1_c054.npz",
+    0
+   ],
+   [
+    "S1/S1_c055.npz",
+    0
+   ],
+   [
+    "S1/S1_c056.npz",
+    0
+   ],
+   [
+    "S1/S1_c057.npz",
+    0
+   ],
+   [
+    "S1/S1_c058.npz",
+    0
+   ],
+   [
+    "S1/S1_c059.npz",
+    0
+   ],
+   [
+    "S1/S1_c060.npz",
+    0
+   ],
+   [
+    "S1/truth.json",
+    0
+   ]
+  ]
+ },
+ "claim": "The seal proves INTEGRITY (the declaration's sha256) and ORDERING (the seal time against the first logged data read). It never proves ignorance: mode is the declarer's sealed statement of what they had seen."
+}
