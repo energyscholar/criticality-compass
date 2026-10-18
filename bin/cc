@@ -37,6 +37,7 @@ ADVANCED = [
     ("test [-v] [--regolden [--classify]] [<name> ...]", "run the named tests (default all); --classify tags a regolden's changed lines a-e and undoes it on any (e)"),
     ("mutate <relpath> (--sed E | --py E) -- <test> ...", "run tests against a temporary mutation"),
     ("help [--advanced]", "this text"),
+    ("navigate <input> [--access-log PATH]", "UNTESTED: walk a stored map (an input with [interval] method chains) by the N0 bisection; reads only the nodes it visits, logged per T23"),
     ("family <id> [--tables SET]", "the family report (a declared projection C over bracket, f1, f2: cc.toml [report] family) of a stored result; measures nothing"),
     ("new family <id>", "start a family declaration from the template"),
     ("intake explain | (lint | seal | run) <id>", "the intake pipeline of a raw-data declaration declarations/<id>/ (explain prints its stage table; not `explain <input> <point>`)"),
@@ -77,6 +78,7 @@ def help_text(advanced):
   bin/cc tables drop <set>              delete a rulebook you no longer want
   bin/cc validate                       check every file; each problem says what to do next
   bin/cc check                          validate + tests + scoreboard; run it before a commit
+  bin/cc navigate <input>               UNTESTED: walk a stored map (stored-map mode only); every line it prints is untested
 
 inputs: {' '.join(inputs())}
 rules in use: {tables}   (cc.toml [defaults] tables)
@@ -649,6 +651,15 @@ def cmd_bench(a):   # plan 0932: the frozen benchmark suite as a manifest (cc/be
     return bench.main(a, {"cc": ROOT, "data": c.data_root}, ROOT)
 
 
+def cmd_navigate(args):
+    """navigate <input> [--access-log PATH]: stored-map mode (plan 1114, docs/navigate.md). UNTESTED: every output's first line says so."""
+    import navmap
+    log = opt(args, "--access-log")
+    lines, status = navmap.main(ROOT, (args + [""])[0], Path(log).resolve() if log else None)   # no input given: the typed refusal names the inputs
+    print("\n".join(lines))
+    return status
+
+
 def cmd_registry(args):
     """registry pull <toolset-commit> [--toolset DIR]: the ONLY writer of registry.toml and of the cc.toml [registry] pin (plan 1016). Reads the toolset's REGISTRY.toml at that commit through git."""
     import registry
@@ -694,7 +705,7 @@ def main(argv):
         print(help_text(advanced), end="")
         return 0
     table = {"show": lambda a: cmd_show(a, False), "explain": lambda a: cmd_show(a, True), "tabulate": cmd_tabulate,
-             "test": cmd_test, "run": cmd_run, "reverdict": cmd_reverdict, "family": cmd_family, "freeze": cmd_freeze, "check": cmd_check, "mutate": cmd_mutate, "bench": cmd_bench, "registry": cmd_registry, "intake": cmd_intake,
+             "test": cmd_test, "run": cmd_run, "reverdict": cmd_reverdict, "family": cmd_family, "freeze": cmd_freeze, "check": cmd_check, "mutate": cmd_mutate, "bench": cmd_bench, "registry": cmd_registry, "intake": cmd_intake, "navigate": cmd_navigate,
              "validate": lambda a: cmd_validate(a + (["--advanced"] if advanced else []))}
     if cmd in table:
         return table[cmd](rest)

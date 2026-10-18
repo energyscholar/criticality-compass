@@ -206,6 +206,24 @@ $ bin/cc tables drop my-rules
 dropped tables/my-rules
 ```
 
+## Navigating a stored map (UNTESTED)
+
+```
+bin/cc navigate b7-at-line-ch
+```
+
+walks a **stored map**: an input whose `[interval] method` is `chains` (m independent chains per point and size, format `npz-v1`,
+`arrays.G` on every chain file). It reads the two end points, and, when the first reads disordered and the last ordered, bisects
+between them, reading one point at a time with the navigator v2 needle (L 81 against L 27, m chains, order-statistic interval, margin
+0.01). It reads only stored points, only the ones the walk visits, and appends one line per chain file read to an access log
+(`results/navigate/<input>.access.jsonl`, or `--access-log PATH`).
+
+**This verb ships untested.** Every line it prints starts under a first line that says so; no transcript is evidence of a located
+transition. Its outcomes are values: BRACKET (two adjacent points), STOP (a point read inside the margin), UNRESOLVED (a point whose
+interval straddles 0 and the margin edge: no location is claimed), NOT_ESTABLISHED (fewer than m chains stored), REFUSE (the end points
+do not read disordered then ordered). An input that is not a stored map is refused (`REFUSED NOT_A_STORED_MAP`, exit status 1).
+`docs/navigate.md` holds the design, the predictions committed before the first run, and the one change from the navigator it ports.
+
 ## What v0.1 can and cannot say
 
 Twelve inputs are scored under the default rulebook (`v01-rules`), 79 points. Positive verdicts do exist on real

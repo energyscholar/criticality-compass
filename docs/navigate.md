@@ -21,9 +21,15 @@ A stored map is an existing CC input whose `[interval] method = "chains"` (cc.to
   The declared `[interval] r` is printed beside it.
 
 A input whose method is `block`, `iid` or `gamma` has one chain per cell: it is not a stored map. `cc navigate` refuses it with a typed
-refusal `NOT_A_STORED_MAP` (a value printed under the UNTESTED line, exit status 1). The table that decides this is total over
-`alphabets.interval_method` (built from the alphabet, `chains` mapped to the reader, every other method to the refusal), so a method added
-to the alphabet later is refused until someone maps it. An input id that is not a directory under `inputs/` is the same refusal.
+refusal `NOT_A_STORED_MAP` (a value printed under the UNTESTED line, exit status 1). An input id that is not a directory under `inputs/` is the
+same refusal.
+
+**Changed in step 1 (built after this section was first committed).** The step-0 text said the deciding table was keyed on the interval method
+alone. Running the reader over every `chains` input showed that is not enough: some `chains` inputs carry no `arrays.G` on every file (they
+declare `GL` or `Q` only), and one is `npy-v1` or `snapshots-v1`, not `npz-v1`. So the declared shape of a stored map is the triple
+(`[interval] method`, `[data] format`, `arrays.G` on every file) = (`chains`, `npz-v1`, yes). The table maps that one triple to the reader;
+every other triple is the refusal, and the refusal prints the input's own triple beside the declared one. An `arrays.G` with no `level`
+names a one-level series (column 0).
 
 A declared chain file that is not on disk is not read: the node simply holds fewer chains. Navigator v2's own eligibility rule then
 reads that node `NOT_ESTABLISHED (INSUFFICIENT_REPLICATES)` (nav2 lines 18, 104-110) — a value, never an exception.
