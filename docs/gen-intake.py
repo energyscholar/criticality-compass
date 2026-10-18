@@ -6,6 +6,6 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path[:0] = [str(ROOT / "cc")]
-import intake  # noqa: E402
+import intake  # after the path line: cc/ holds the module
 
 sys.stdout.write(intake.explain(intake.tables(ROOT)))
