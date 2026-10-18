@@ -78,7 +78,7 @@ def needle(a, b, m, r):
 def _bisect(read, lo, hi, trace):
     out = None
     while out is None and hi - lo > 1:   # form: nav.py line 45, bisection on node indices until one step wide or a terminal move
-        mid = (lo + hi) // 2
+        mid = (lo + hi) // 2   # form: nav.py line 46, the bisection midpoint of the node-index bracket
         trace.append((mid, read(mid)))
         lo, hi, out = STEP[trace[-1][1].move](lo, mid, hi)
     return Walk(out or "BRACKET", lo, hi, tuple(trace))
@@ -88,7 +88,10 @@ def _refuse_ends(read, lo, hi, trace):
     return Walk("REFUSE", lo, hi, tuple(trace))
 
 
+ENDS = {(a, b): _refuse_ends for a in STEP for b in STEP} | {("lo", "hi"): _bisect}   # form: nav.py lines 41-44 as a table total over every pair of end moves
+
+
 def walk(read, n):
     """N0 over node indices 0..n-1; read(j) -> Reading. The ends must read lo at 0 and hi at n-1 (nav.py lines 41-44: DIS ... ORD), else REFUSE."""
     trace = [(0, read(0)), (n - 1, read(n - 1))]
-    return {("lo", "hi"): _bisect}.get((trace[0][1].move, trace[1][1].move), _refuse_ends)(read, 0, n - 1, trace)
+    return ENDS[(trace[0][1].move, trace[1][1].move)](read, 0, n - 1, trace)
