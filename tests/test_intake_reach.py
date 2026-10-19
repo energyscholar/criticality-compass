@@ -205,6 +205,7 @@ with tempfile.TemporaryDirectory() as tmp:
     moved = [(h, [",".join([str(float(r.split(",")[0]) + 1000)] + r.split(",")[1:]) for r in rs] if i == 4 else rs) for i, (h, rs) in enumerate(curves)]   # 1160 P5
     PLANTS = [
         # S0 FORMAT, on the declaration text
+        ("DECLARATION_FILE_ABSENT", "(1164) a declaration directory with no intake.toml (what S0 receives: intake.declared)", lambda: s0(intake.declared(tmp / "nowhere"))),
         ("TOML_INVALID", "not TOML", lambda: s0(base + "\n[[[")),
         ("SCHEMA_UNSUPPORTED", "schema = 4 (1160: was schema = 3, now the format)", lambda: s0(base.replace("schema = 3", "schema = 4", 1))),
         ("COMMENT_PREFIX_EMPTY", "(1160) comment = [\"\"] on table-curve-v1", lambda: s0(long_table(m, "s0").replace('comment = ["#"]', 'comment = [""]', 1))),

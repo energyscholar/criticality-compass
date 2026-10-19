@@ -174,14 +174,15 @@ def _index(ref, names):
 
 
 def table(cells, spec, roles):
-    """Steps 2 to 6 over [(row number, cells)]: Grid(declared columns, stated units, rows in role order) | Unreadable."""
+    """Steps 2 to 6 over [(row number, cells)]: Grid(declared columns, stated units, rows in role order) | Unreadable. `roles` is a function of
+    the header rows, called only once the header is there (csv-curve-v1's roles are its header)."""
     rows = [(i, c) for i, c in cells if not all(_blank(x) for x in c)]
     h, lines = spec["header"], HEADER[spec["header"]["kind"]](spec["header"])
     head, body = rows[:h["rows"]], rows[h["rows"]:]
     return first([(lambda: len(head) == h["rows"] and all(1 <= n <= h["rows"] for n in lines.values()), "HEADER_LINE_ABSENT",
                    lambda: detail(rows=lines.values(), counts={"header lines": len(head), "header lines declared": h["rows"]})),
                   (lambda: len(body) > 0, "NO_DATA_ROW", lambda: detail(counts={"header lines": len(head), "data rows": 0}))],
-                 lambda: _columns(head, body, lines, roles, h))
+                 lambda: _columns(head, body, lines, roles(head), h))
 
 
 def _columns(head, body, lines, roles, h):
@@ -206,7 +207,7 @@ def read_table(data, d):
     """table-curve-v1: the declared format, comment prefixes, header and columns (role_columns) to a Grid | Unreadable."""
     spec = d["reader"]
     cells = CELLS[spec["format"]["kind"]](data, spec)
-    return {True: lambda: cells, False: lambda: table(cells, spec, role_columns(d))}[isinstance(cells, Unreadable)]()
+    return {True: lambda: cells, False: lambda: table(cells, spec, lambda head: role_columns(d))}[isinstance(cells, Unreadable)]()
 
 
 CSV_CURVE = {"comment": [], "format": {"kind": "COMMA"}, "header": {"kind": "NAMES", "rows": 1, "names": 1}}
@@ -216,8 +217,8 @@ def read_csv(data, d):
     """csv-curve-v1: table-curve-v1 with a fixed declaration (comma, no comment prefix, one header line of names) whose columns are
     the WHOLE header, in its order: its Grid's columns are the header, which S4 compares with the declared columns (COLUMNS_DIFFER)."""
     cells = CELLS["COMMA"](data, CSV_CURVE)
-    whole = lambda: tuple(_name(x) for x in ([c for _, c in cells if c][:1] or [[]])[0])
-    return {True: lambda: cells, False: lambda: table(cells, CSV_CURVE, tuple((h, h) for h in whole()))}[isinstance(cells, Unreadable)]()
+    whole = lambda head: tuple((n, n) for n in (_name(x) for x in head[0][1]))
+    return {True: lambda: cells, False: lambda: table(cells, CSV_CURVE, whole)}[isinstance(cells, Unreadable)]()
 
 
 def readers(t):

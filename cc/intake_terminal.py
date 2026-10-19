@@ -191,6 +191,19 @@ def bodies(t, d):
     return {"S10": s10}
 
 
+SEALED_FIELDS = ("declaration_sha256", "sealed_at_utc", "author_kind", "confirmed_by")
+IDENTITY = {   # the seal status -> RESULT.json's seal fields; total over SealStatus. UNSEALED has no SEAL.json (intake_seal.record is {}), so its
+    intake_seal.SealStatus.UNSEALED: lambda rec: {f: "" for f in SEALED_FIELDS},   # fields are empty by the status, never by a lookup default
+    intake_seal.SealStatus.SEALED: lambda rec: {f: rec[f] for f in SEALED_FIELDS},
+    intake_seal.SealStatus.SEALED_THEN_EDITED: lambda rec: {f: rec[f] for f in SEALED_FIELDS},
+}
+
+
+def identity(seal):
+    """RESULT.json's seal_identity of S2's SealState: the status and the record's fields, looked up in IDENTITY by the status."""
+    return {"status": seal.status.name, **IDENTITY[seal.status](seal.record)}
+
+
 def _record(root, t, d, out, primary):
     """RESULT.json of a run whose S10 passed: every PRIMARY bridge's result, the tiering, the identifiability, the bracket and why its tier
     claims no coverage, the confirmation, and the code and seal identity. Its only numbers are ranks, counts, Z and the span's slow values."""
@@ -202,7 +215,7 @@ def _record(root, t, d, out, primary):
            "confirmation": {True: "CONFIRMED", False: "UNCONFIRMED"}[out[t["stages"]["seal_stage"]].confirmed()], "primary_verdict": primary,
            "code_identity": {"commit": intake_seal._git(root, "rev-parse", "HEAD"), "code_hash": schema.code_hash(root),
                              "terminal_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest()},
-           "seal_identity": {"status": seal.status.name, **{f: seal.record.get(f, "") for f in ("declaration_sha256", "sealed_at_utc", "author_kind", "confirmed_by")}}}
+           "seal_identity": identity(seal)}
     (Path(d) / "RESULT.json").write_text(json.dumps(rec, indent=1) + "\n")
 
 

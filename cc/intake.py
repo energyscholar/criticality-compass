@@ -48,10 +48,15 @@ def _findings(root, d, ident):
     return [f"{f.loc}: {f.msg} (Next: {f.nxt})" for f in found]
 
 
+def declared(d):
+    """S0's input: the text of declarations/<id>/intake.toml, or blind.Absent when it is no file (S0 refuses DECLARATION_FILE_ABSENT)."""
+    f = Path(d) / "intake.toml"
+    return {True: lambda: f.read_text(), False: lambda: blind.Absent(f"declarations/{Path(d).name}/intake.toml")}[f.is_file()]()
+
+
 def _go(root, ident, pick):
     t, d = tables(root), Path(root) / "declarations" / ident
-    text = {True: lambda: (d / "intake.toml").read_text(), False: lambda: ""}[(d / "intake.toml").is_file()]()
-    return t, d, fold(pick(t), bodies(t, d, text, _findings(root, d, ident)))
+    return t, d, fold(pick(t), bodies(t, d, declared(d), _findings(root, d, ident)))
 
 
 def _before(root, ident):

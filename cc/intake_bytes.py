@@ -25,9 +25,10 @@ def _t23():
 
 
 def located(text, roots):
-    """The directory a declared source root names ("<name>/<relative path>", the name a row of intake/ROOTS.toml), or "" when it names none."""
-    m = re.fullmatch(r"(<[\w.-]+>)((?:/[\w.-]+)*)", text)
-    return {True: lambda: str(Path(roots[m[1]]) / m[2].lstrip("/")), False: lambda: ""}[m is not None and m[1] in roots and ".." not in m[2].split("/")]()
+    """The directory a declared source root names ("<name>/<relative path>", the name a row of intake/ROOTS.toml), or "" when it names none.
+    The pattern admits only a declared name (the never-matching (?!) keeps the alternation total) and no ".." part."""
+    m = re.fullmatch("(" + "|".join([*map(re.escape, roots), "(?!)"]) + r")((?:/(?!\.\.(?:/|$))[\w.-]+)*)", text)
+    return {True: lambda: str(Path(roots[m[1]]) / m[2].lstrip("/")), False: lambda: ""}[m is not None]()
 
 
 ADMIT = (   # the loader's admission of one selected name before any byte is read, one row per reason, in this order
@@ -80,9 +81,7 @@ def _read(declaration, d, loc, names, loader):
     """Each admitted file read once through the logged loader (the access log is declarations/<id>/access.log; the bank's parent directory is
     a declared partition too, so an in-process open of the truth side beside the bank is logged as a bypass); then each pin compared."""
     files = tuple(File(n, hashlib.sha256(b).hexdigest(), b) for n in names for b in [loader.read(Path(loc) / n)])
-    pins = {}
-    for a in intake_seal.lines(Path(d) / "access.log"):
-        pins.setdefault(a["path"], a["sha256"]) if a["route"] == "loader" else None
+    pins = dict(reversed([(a["path"], a["sha256"]) for a in intake_seal.lines(Path(d) / "access.log") if a["route"] == "loader"]))   # the first read wins
     moved = lambda: [f.name for f in files if pins[str((Path(loc) / f.name).resolve())] != f.sha256]
     return gate([(lambda: not moved(), "PIN_MISMATCH", lambda: detail(words=moved()[:3], counts={"files that differ from their pins": len(moved())}))], lambda: Pass(Pinned(declaration, files)))
 

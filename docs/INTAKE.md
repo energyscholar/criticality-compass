@@ -32,6 +32,7 @@ The declaration parses, holds every required field with the right type, and ever
 
 | reason | live | what it means |
 |---|---|---|
+| DECLARATION_FILE_ABSENT | live | declarations/<id>/ holds no intake.toml, and a directory alone declares nothing; write the file (docs/INTAKE-QUICKSTART.md starts one with bin/cc new intake). |
 | TOML_INVALID | live | The declaration is not valid TOML; fix the syntax at the line shown. |
 | SCHEMA_UNSUPPORTED | live | The file does not say schema = 3 and kind = "intake"; this tool reads intake format v3 only (a v1 or v2 declaration is history: restate it in v3 under a new id). |
 | FIELD_MISSING | live | A required field is absent; every field of format v3 must be written, even when its honest value is a refusal value such as NONE_FITS. |

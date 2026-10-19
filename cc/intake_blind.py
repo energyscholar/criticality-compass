@@ -192,6 +192,15 @@ class Unparsed:
 
 
 @dataclass(frozen=True)
+class Absent:
+    """declarations/<id>/intake.toml is no file: what S0 receives in place of the text. Invariant: its only finding is DECLARATION_FILE_ABSENT."""
+    path: str
+
+    def findings(self, transducer_findings, tables):
+        return [Finding("DECLARATION_FILE_ABSENT", "", f"{self.path} is no file")]
+
+
+@dataclass(frozen=True)
 class Parsed:
     """The text is TOML. Invariant: findings are the header, then every FORMAT field, then the transducer file's findings, in that order."""
     data: dict
@@ -211,9 +220,9 @@ def parse(text):
 
 
 def format_stage(text, transducer_findings, tables):
-    """S0 FORMAT. (declaration text, the transducer file's findings as text lines, the intake tables) -> Pass(Declaration) | Refuse.
+    """S0 FORMAT. (declaration text or Absent, the transducer file's findings as text lines, the intake tables) -> Pass(Declaration) | Refuse.
     Invariant: PASS exactly when there is no finding; a REFUSE names the first finding's reason and lists every finding."""
-    p = parse(text)
+    p = {str: parse, Absent: lambda a: a}[type(text)](text)
     found = p.findings(tuple(transducer_findings), tables)
     return {True: lambda: Pass(Declaration(p.data["id"], p.data["intake"]["mode"], p.data)),
             False: lambda: Refuse(found[0].reason, detail(words=[f"{f.reason} at {f.loc or 'the file'}: {f.detail}" for f in found]))}[not found]()

@@ -237,12 +237,15 @@ with tempfile.TemporaryDirectory() as tmp:
     drift22 = ("T,C,sigma,h\n" + "".join(f"-7357.{99 - j:02d}1,-7357.{b:02d}{j:02d}3,-7357.{b:02d}{j:02d}9,-7357.{b:02d}{j:02d}7\n"
                                           for b in range(22) for j in range(27 - (b >= 7)))).encode()   # 7 sweeps of 27 rows, 15 of 26: 579 rows
     S0 = lambda edit, trans=TRANS: (pf(PF, edit), PF, full(PF), trans)
+    GONE = "# plan 1164: this intake.toml is deleted by the plant's first step\n"
     ON_SENTINEL = {   # (1160 P5) a CHOICE_PLANTS PASS control the sentinel banks carry past S1 to a later refusal, and why
         "origin EXPERIMENT with two lanes that differ (ALTERNATIVE: C to T_star by ARGMAX_FAST, chained)": "SECOND_LANE_INFEASIBLE"}   # C ascends with T: every maximum at the fast end
     PLANTS = [
         ("PASS", "the PER_FILE sentinel bank, sealed", (pf(PF), PF, full(PF))),
         ("PASS", "the LONG_TABLE sentinel bank, sealed", (lt(LT), LT, full(LT))),
         # S0 FORMAT
+        ("DECLARATION_FILE_ABSENT", "(1164) the declaration's intake.toml deleted before lint and run (the directory stays)",
+         (lambda ident: GONE, PF, (lambda b: [f.unlink() for f in (w / "declarations").glob("*/intake.toml") if f.read_text() == GONE], ("lint",), ("run",)))),
         ("TOML_INVALID", "not TOML", S0(lambda t: t + "\n[[[")),
         ("SCHEMA_UNSUPPORTED", "schema = 4 (1160: was schema = 3, now the format)", S0(lambda t: t.replace("schema = 3", "schema = 4", 1))),
         ("COMMENT_PREFIX_EMPTY", "(1160) comment = [\"\"] on table-curve-v1", (lt(LT, lambda t: t.replace('comment = ["#"]', 'comment = [""]', 1)), LT, full(LT))),

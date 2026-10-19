@@ -197,7 +197,7 @@ def _mark(fr, step, k):
 
 POSITION = {   # a column ref's type -> (names texts, ref) -> its 0-based index, or None (absent, ambiguous or out of range)
     int: lambda texts, ref: {True: ref - 1, False: None}[1 <= ref <= len(texts)],
-    str: lambda texts, ref: {True: texts.index(ref) if ref in texts else None, False: None}[texts.count(ref) <= 1],
+    str: lambda texts, ref: look({t: i for i, t in enumerate(texts) if texts.count(t) == 1}, ref, None),   # a name held once
 }
 
 
@@ -349,7 +349,8 @@ def verify(files, units, outputs, frames):
     mark = lambda u: [s["mark"] for s in files[u]["steps"] if s["op"] == "DECIMAL_MARK"]
     src = lambda u, c: functools.reduce(lambda t, m: t.replace(m, "."), mark(u), grid[u][c])
     differ = lambda: [(u, c) for u, _, c, out in cells() if not _same(out, src(u, c))]
-    keys = lambda r: [min([tuple(c) for j, c in enumerate(row) if j not in r["broadcast"]], default=()) for row in r["cells"]]
+    hollow = lambda: [r for r, _ in outputs if any(all(j in r["broadcast"] for j in range(len(row))) for row in r["cells"])]
+    keys = lambda r: [min(tuple(c) for j, c in enumerate(row) if j not in r["broadcast"]) for row in r["cells"]]   # after `hollow`: never empty
     unordered = lambda: [r for r, _ in outputs if any(a >= b for a, b in zip(keys(r), keys(r)[1:]))]
     shaped = lambda: [r for (r, _), rows in zip(outputs, data) if r["path"] in shape()]
     cmap = "CELL_MAP_NOT_A_PERMUTATION"
@@ -358,6 +359,8 @@ def verify(files, units, outputs, frames):
                  (lambda: twice() == 0, cmap, lambda: detail(file=entries(twiced()), counts={"source cells written twice outside a broadcast column": twice()})),
                  (lambda: not unpartitioned(), cmap, lambda: detail(file=entries(unpartitioned()), words=[
                      "a source line is not exactly one of: written, dropped by a declared DROP_LINES step, dropped by DROP_ROWS_NOT_NUMERIC for a cell that is no number, blank, a names line"])),
+                 (lambda: not hollow(), cmap, lambda: detail(file=entries([r["unit"] for r in hollow()]), words=[r["path"] for r in hollow()][:3] + [
+                     "an output row holds no source cell outside a broadcast column"])),
                  (lambda: not differ(), "IDENTITY_FAILED", lambda: detail(file=entries([u for u, _ in differ()]), rows=sorted({c[0] for _, c in differ()})[:3],
                                                                         counts={"output cells not identical to their source cell": len(differ())})),
                  (lambda: not unordered(), "IDENTITY_FAILED", lambda: detail(file=entries([r["unit"] for r in unordered()]), words=[r["path"] for r in unordered()][:3] + ["rows not in source order"]))],
@@ -504,13 +507,17 @@ def _manifest_in(read):
 def chained(m, raw_of, bank_of, ct, want):
     """The chain of a bank: its manifest (m, or None), each raw file's sha256 and each bank file's against it, `want` (key -> declared value)
     against it, then the identity test on those very bytes. Pass(Verified) | Refuse (CONVERSION_CHAIN_BROKEN, or the identity's reason)."""
-    raws = {s["path"]: raw_of(s["path"]) for s in m["sources"]} if m is not None else {}
-    banks = [(r, bank_of(r["path"])) for r in m["outputs"]] if m is not None else []
+    return {True: lambda: Refuse("CONVERSION_CHAIN_BROKEN", detail(words=[f"no {MANIFEST} the converter wrote"])),
+            False: lambda: _chained(m, raw_of, bank_of, ct, want)}[m is None]()
+
+
+def _chained(m, raw_of, bank_of, ct, want):
+    raws = {s["path"]: raw_of(s["path"]) for s in m["sources"]}
+    banks = [(r, bank_of(r["path"])) for r in m["outputs"]]
     broken = lambda: ([f"{k} is not the manifest's" for k, v in want.items() if m[k] != v] + [f"raw '{s['path']}'" for s in m["sources"] if raws[s["path"]] is None or _sha(raws[s["path"]]) != s["sha256"]]
                       + [f"bank '{r['path']}'" for r, b in banks if b is None or _sha(b) != r["sha256"]])
     frames = lambda: [_in(_entry(m["files"][u["file"]]), frame(raws[m["sources"][u["source"]]["path"]], m["files"][u["file"]]["steps"], ct)) for u in m["units"]]
-    return gate([(lambda: m is not None, "CONVERSION_CHAIN_BROKEN", lambda: detail(words=[f"no {MANIFEST} the converter wrote"])),
-                 (lambda: not broken(), "CONVERSION_CHAIN_BROKEN", lambda: detail(words=broken()[:3], counts={"files or fields that differ": len(broken())}))],
+    return gate([(lambda: not broken(), "CONVERSION_CHAIN_BROKEN", lambda: detail(words=broken()[:3], counts={"files or fields that differ": len(broken())}))],
                 lambda: _frames_ok(frames(), lambda: verify(m["files"], m["units"], banks, frames())))
 
 
