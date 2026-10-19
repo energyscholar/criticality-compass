@@ -32,7 +32,7 @@ What each line does:
    STATED. `bin/cc intake explain` lists every row. The mode `RETROSPECTIVE_PREDECLARED` below says the files exist and you declare before
    looking at their values; `PROSPECTIVE` (no file exists yet) cannot be sealed over files that exist (MODE_CONTRADICTS_SOURCE).
 6. `seal` is optional. Sealing is recommended and not enforced. It records what you declared and when; it is an integrity practice, like a
-   lab notebook. Write your own name for `<name>`.
+   lab notebook. Write your own name for `<name>`. If `seal` refuses, fix the declaration and seal again; do not run.
 7. `run` runs every stage. SOURCE_INTEGRITY, SHAPE and CENSUS read the bank through the logged loader. ADMISSIBILITY then checks the
    access log: every file read has a loader line with its sha256, and no in-process read went around the loader. Then (plan 1160 P5)
    INTERVAL_FEASIBILITY checks the interval method against the readings per point, RESOLUTION_AND_IDENTIFIABILITY counts the curves and the
@@ -44,6 +44,8 @@ What each line does:
 
 These are the TODO lines of `declarations/demo1/intake.toml` and one choice for each, by section. A resampling method's fields
 would go under `[interval]` after `method`; `STATED` has none. Any other admissible choice is equally valid; this one is only an example.
+To apply it by hand: each `key = value` line under a section replaces that section's `key = "TODO"` line, and a key with no TODO line in
+that section goes after the last line you replaced in that section. Test 5 of tests/test_intake_cli.py applies it by exactly this rule.
 
 ```toml
 [intake]
@@ -80,12 +82,13 @@ c = 0.0
 - run: S3 SOURCE_INTEGRITY, S4 SHAPE, S5 CENSUS and S6 ADMISSIBILITY `EXECUTED, PASS` (S6 reads `ADMITTED_ON_LOGGED_PATHS_ONLY` and lists what it cannot see). The census reads
   `Sampling: 9 curves; points per curve min 44, median 78, max 116; 159 distinct T values; MISALIGNED; curves_with_slow = 9; readings per point min 1, max 1; distinct_slow_in_block max = 1`, and the report's
   `## Census` section lists the nine curves by ordinal and file name. No report prints a data value (a span, a slow value or a cell).
-- S7 INTERVAL_FEASIBILITY, S8 RESOLUTION_AND_IDENTIFIABILITY and S9 ALTERNATIVE_INTAKE `EXECUTED, PASS`: tiering `STATED`, max_bracket
-  `CANDIDATE_BRACKET`, identifiability `TRANSITION_TOPOLOGY_NOT_IDENTIFIABLE_FROM_AVAILABLE_OBSERVABLES`, and no ALTERNATIVE lane to check.
+- S7 INTERVAL_FEASIBILITY and S8 RESOLUTION_AND_IDENTIFIABILITY `EXECUTED, PASS`: tiering `STATED`, max_bracket `CANDIDATE_BRACKET`,
+  and identifiability `TRANSITION_TOPOLOGY_NOT_IDENTIFIABLE_FROM_AVAILABLE_OBSERVABLES`.
 - Seal status `SEALED`, or `UNSEALED` if you skipped the seal. If you edit the declaration after sealing, the status is `SEALED_THEN_EDITED`.
 - S10 KERNEL_HANDOFF `EXECUTED, PASS`: `Located, span ranks 4..6 (maximum at rank 5), tier RESOLVED, n_tied 1 of 9 curves`, and the
   identifiability value. The report prints ranks only; `declarations/demo1/RESULT.json` holds the slow values of the span, and says why
   RESOLVED here is no coverage claim (CANDIDATE_BRACKET).
+- S9 ALTERNATIVE_INTAKE, after S10 (plan 1160 A9), `EXECUTED, PASS`: there is no ALTERNATIVE lane to check.
 - `PRIMARY verdict: PRIMARY_INCOMPLETE`, missing only `confirmation`: every PRIMARY stage and the terminal passed, and the seal is not
   confirmed. RESULT.json is written with `confirmation = UNCONFIRMED`. To reach `PRIMARY_READY`, a human confirms the seal: see
   "From INCOMPLETE to READY" in docs/INTAKE-COMPLETION.md.

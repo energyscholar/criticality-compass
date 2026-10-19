@@ -154,6 +154,12 @@ with tempfile.TemporaryDirectory() as tmp:
     check("6. a run whose S10 refuses (c = nan: DOOR_REFUSED) removes a stale RESULT.json", "S10 KERNEL_HANDOFF** (LIVE): EXECUTED, REFUSE DOOR_REFUSED" in nanrun
           and not (w / "declarations" / "demo4" / "RESULT.json").exists(), nanrun[-900:])
 
+    before = (w / "declarations" / "demo4" / "intake.toml").read_bytes()
+    again = sh("bin/cc new intake demo4", w)
+    check("8. (1160 A14, D3) `new intake` with an id that exists refuses by name and overwrites nothing",
+          again.returncode != 0 and "declarations/demo4 exists; a declaration is never overwritten" in again.stdout
+          and (w / "declarations" / "demo4" / "intake.toml").read_bytes() == before, again.stdout[-300:])
+
     # ---- 4. advisory seal: an unsealed run reaches the data stages; an edit after the seal is reported
     sh("bin/cc new intake demo2 --from-synth demo1", w)
     fill(w / "declarations" / "demo2" / "intake.toml")
@@ -237,13 +243,22 @@ SENTENCES = [   # (doc, sentence, the defect it answers)
     ("INTAKE-CONVERSION.md", "If a data row holds an empty or text cell in a declared column, the intake refuses it (CELL_NOT_A_NUMBER; `nan` is text). "
      "Declare DROP_ROWS_NOT_NUMERIC on that column if the row is a reading the instrument did not record; declare another column if that column "
      "is the wrong one; or report the deposit as unreadable. A conversion cannot fill a row, and it drops one only through DROP_ROWS_NOT_NUMERIC.", "D6 (adapted, plan 1160 A11)"),
+    ("INTAKE-ON-A-DATA-HOST.md", "A clone that has been used before may hold declarations with the same ids; move them away or choose new ids.", "D3 (plan 1160 A14)"),
+    ("INTAKE-ON-A-DATA-HOST.md", "If `seal` refuses, fix the declaration and seal again; do not run.", "D7 (plan 1160 A14)"),
+    ("INTAKE-QUICKSTART.md", "If `seal` refuses, fix the declaration and seal again; do not run.", "D7 (plan 1160 A14)"),
+    ("INTAKE-CONVERSION.md", "Run `new intake` first: peek needs `declarations/<id>/`, and refuses \"name a declaration\" until it exists.", "D10b (plan 1160 A14)"),
+    ("INTAKE-ON-A-DATA-HOST.md", "A report prints a column declared by name in quotes (`'T'`) and one declared by position as `#k`, its 1-based position. S4 lists "
+     "the declared columns in role order: fast, measured, the uncertainty column when one is declared, then the slow column of a LONG_TABLE.", "D10a (plan 1160 A14)"),
+    ("INTAKE-QUICKSTART.md", "To apply it by hand: each `key = value` line under a section replaces that section's `key = \"TODO\"` line, and a key with no TODO "
+     "line in that section goes after the last line you replaced in that section.", "D10c (plan 1160 A14)"),
     ("INTAKE-ON-A-DATA-HOST.md", "A conversion reads the raw files before you seal; that is the designed order, so the ordering note reports it as information "
      "and never as a refusal: when declarations/<id>/conversion-access.log holds reads of raw files from before the seal, the note adds "
      "`CONVERSION_READ_BEFORE_SEAL (n files)`, and the seal claims ordering only for the intake's own reads", "D9 (adapted, plan 1160 A13)"),
     ("INTAKE-CONVERSION.md", "Peek every file of the family, not one per kind: files of one family can differ in header length and column order. The Detail of a "
      "conversion refusal names the file (`file '<from>' -> '<to>'`), so you know which one to peek again", "D8 (adapted, plan 1160 A12)"),
 ]
-GONE = [("INTAKE-COMPLETION.md", "A ROBUSTNESS refusal at S9 withholds S10", "D4 (plan 1160 A9: S10 runs before S9)")]
+GONE = [("INTAKE-COMPLETION.md", "A ROBUSTNESS refusal at S9 withholds S10", "D4 (plan 1160 A9: S10 runs before S9)"),
+        ("INTAKE-QUICKSTART.md", "S8 RESOLUTION_AND_IDENTIFIABILITY and S9 ALTERNATIVE_INTAKE", "the expected run (plan 1160 A14: S9 runs after S10)")]
 for doc, text, why in SENTENCES:
     check(f"8. {why}: docs/{doc} holds '{text[:60]}...'", text in flat(doc))
 for doc, text, why in GONE:

@@ -15,12 +15,17 @@ empty or text cell) is dropped, recorded by its line number, and the identity te
 ## What you do
 
 ```
+bin/cc new intake <id>                                      # first: declarations/<id>/, which peek and convert need
 bin/cc intake peek <id> <file> [--sheet NAME] [--depth N]   # look at a raw file's head without seeing a value
 #   write declarations/<id>/CONVERSION.toml (below)
 bin/cc intake convert <id>                                  # write <cc-banks>/<id>/bank and its CONVERSION-MANIFEST.json
 bin/cc intake convert <id> --verify                         # re-check the bank against the raw files, at any later time
-bin/cc new intake <id>                                      # then declare the bank: [source] kind = "CONVERTED"
+#   then declare the bank in declarations/<id>/intake.toml: [source] kind = "CONVERTED"
 ```
+
+Run `new intake` first: peek needs `declarations/<id>/`, and refuses "name a declaration" until it exists. One id serves the conversion
+and the declaration, so peek.log, CONVERSION.toml, conversion-access.log and the intake declaration sit together, and the seal's ordering
+note counts the conversion's reads (plan 1160 A13).
 
 1. The deposit sits in `<cc-datasets>/<id>/raw` (a root name of intake/ROOTS.toml: `~/scratch/cc-datasets` on the data host).
 2. `peek` prints the first lines of one raw file as counts and text names only, so you can see where the names line is without seeing a

@@ -19,6 +19,10 @@ git bundle create cc-intake.bundle <branch>
 To update an existing clone later, copy a new bundle the same way, then run
 `<host> 'cd ~/scratch/cc-intake && git pull ~/scratch/cc-intake.bundle <branch>'`.
 
+A clone that has been used before may hold declarations with the same ids; move them away or choose new ids. `bin/cc new intake <id>`
+never overwrites one: it refuses an id whose `declarations/<id>` exists, and names it ("declarations/<id> exists; a declaration is never
+overwritten (choose another id)").
+
 The host needs Python 3.11 or later and numpy. The xlsx format of the reader `table-curve-v1` also needs openpyxl. Without it an xlsx file
 is Unreadable XLSX_READER_ABSENT (a named refusal, never an exception). `bin/cc intake explain` lists every reason.
 
@@ -76,7 +80,9 @@ For a table, `[reader]` is `table-curve-v1`:
   refused COMMENT_PREFIX_EMPTY.
 
 Columns are named in `[knobs.fast]`, `[measured]` and `[measured.uncertainty]` (COLUMN or NONE): by NAME (a string) or by 1-based POSITION
-(an integer).
+(an integer). A report prints a column declared by name in quotes (`'T'`) and one declared by position as `#k`, its 1-based position. S4
+lists the declared columns in role order: fast, measured, the uncertainty column when one is declared, then the slow column of a
+LONG_TABLE. So `columns are #2, #3, #1` means the fast knob is column 2, the measured quantity column 3 and the slow knob column 1.
 
 `[acquisition]` says how the rows were taken and stored. `row_order` is how the rows are stored: `ASCENDING` or `DESCENDING` (sorted by
 the fast knob) or `ACQUISITION` (in the order they were taken). `direction` is the order they were taken in along the fast knob:
@@ -163,7 +169,7 @@ Then:
 <host> 'cd ~/scratch/cc-intake && bin/cc intake run <id> && cat declarations/<id>/intake-report.md'
 ```
 
-Sealing is recommended and not enforced. Seal before the first run: `run` reads the data through the logged loader, and the report's
+Sealing is recommended and not enforced. If `seal` refuses, fix the declaration and seal again; do not run. Seal before the first run: `run` reads the data through the logged loader, and the report's
 ordering note compares the seal time with the first logged read. A conversion reads the raw files before you seal; that is the designed
 order, so the ordering note reports it as information and never as a refusal: when declarations/<id>/conversion-access.log holds reads of
 raw files from before the seal, the note adds `CONVERSION_READ_BEFORE_SEAL (n files)`, and the seal claims ordering only for the intake's
