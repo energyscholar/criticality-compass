@@ -214,7 +214,9 @@ Before writing, the converter checks two things on the exact bytes it is about t
 - the raw files: path, sha256 and size;
 - the outputs: path, sha256, size, rows, number of columns and the cell map, as line and column numbers;
 - the dropped and names lines, by number, each dropped line with its step; for DROP_ROWS_NOT_NUMERIC, the line and column of the cell
-  that is not a number, and the count of rows dropped;
+  that is not a number, and the count of rows dropped, split into EMPTY (every cell of the row that is not a number is empty) and TEXT
+  (at least one such cell holds text). Each dropped row is classed once, so the two counts sum to the count. The convert summary prints
+  the same split per file;
 - the steps as you declared them;
 - the code hash and the time.
 

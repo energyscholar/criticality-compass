@@ -23,6 +23,9 @@ Plan 1160 loop 5 (S11.5b):
        record(slows, wheres). Seen RED: NoInteriorMaximum's row deleted from READING (FAIL).
  T15.2 (A15) RESULT.json's first keys are tiering, primary_verdict, reading, and a MaxLocated result reads READING[MaxLocated]. Seen RED:
        the record's key order reversed before it is written (FAIL).
+ T16.1 (A16) a converted file with 2 EMPTY and 3 TEXT rows dropped by DROP_ROWS_NOT_NUMERIC: the manifest's not_numeric_split and the convert
+       summary say EMPTY 2 / TEXT 3. Seen RED: every dropped row classed TEXT (FAIL).
+ T16.2 (A16) no dropped cell's text (a sentinel) appears in the summary, the manifest or the bank's files.
 """
 import json
 import shutil
@@ -269,6 +272,22 @@ with tempfile.TemporaryDirectory() as tmp:
     check("T32.2 (A32) WHITESPACE, every row as wide as the names line: PASS", code(got) == "PASS", str(got))
     got, _, _ = conv({"s.csv": b"T,C,D\n1.5,0.25,7\n1.6,0.5,\n"}, [("s.csv", "s.csv", "")])
     check("T32.3 (A32) the same row under COMMA keeps its empty cell (no refusal of this kind)", code(got) != "EMPTY_CELL_UNDER_WHITESPACE", str(got))
+
+    # ---- A16: DROP_ROWS_NOT_NUMERIC splits its dropped count EMPTY / TEXT, in the manifest and the convert summary, and prints no cell
+    sp = f"e{next(n)}"
+    (tmp / "cc-datasets" / sp / "raw").mkdir(parents=True)
+    (tmp / "cc-datasets" / sp / "raw" / "e.csv").write_bytes(b"T,C,D\n1.1,0.5,1\n1.2,,2\n1.3,QZXA,3\n1.4, ,4\n1.5,QZXB,5\n1.6,QZXC,6\n1.7,0.25,7\n")
+    (tmp / "declarations" / sp).mkdir(parents=True)
+    (tmp / "declarations" / sp / "CONVERSION.toml").write_text(conversion(f"<cc-datasets>/{sp}/raw", f"<cc-banks>/{sp}/bank",
+                                                                         [("e.csv", "e.csv", '{op = "DROP_ROWS_NOT_NUMERIC", columns = ["C"]}')]))
+    out = io.StringIO()
+    with contextlib.redirect_stdout(out):
+        rc = ic.convert_cli(tmp, sp, [], RT)
+    said, unit = out.getvalue(), json.loads((tmp / "cc-banks" / sp / "bank" / ic.MANIFEST).read_text())["units"][0]
+    every = said + "".join(f.read_text() for f in (tmp / "cc-banks" / sp / "bank").iterdir())
+    check("T16.1 (A16) 2 empty rows and 3 text rows dropped: the manifest says EMPTY 2 / TEXT 3 of 5, the summary says EMPTY 2, TEXT 3",
+          rc == 0 and unit["not_numeric_split"] == {"EMPTY": 2, "TEXT": 3} and unit["not_numeric_count"] == 5 and "EMPTY 2, TEXT 3" in said, f"{unit} {said}")
+    check("T16.2 (A16) no dropped cell's text appears in the summary, the manifest or any output file", "QZX" not in every, said)
 
 print("test_intake_loop2: " + ("FAILED " + "; ".join(bad) if bad else "all passed"))
 sys.exit(1 if bad else 0)

@@ -66,7 +66,8 @@ class Frame:
     cell), `names` (the names line's cells; a written name's source is None). `dropped` holds (line, step) of each source line a declared
     step dropped (step -1: a line with no text in any cell); `named` the names line's source line (none when written); `broadcast` the
     output columns whose source cell repeats down the rows (WIDE_TO_LONG fast and key); `not_numeric` the source cell that is no number in each
-    row DROP_ROWS_NOT_NUMERIC dropped (its [line, column]: a coordinate, never the cell's text; plan 1160 A11)."""
+    row DROP_ROWS_NOT_NUMERIC dropped (its [line, column]: a coordinate, never the cell's text; plan 1160 A11), and `not_numeric_kind` that
+    row's kind, EMPTY or TEXT (plan 1160 A16), one per row, in the same order."""
     raw: bytes = b""
     lines: tuple = ()
     rows: tuple = ()
@@ -75,6 +76,7 @@ class Frame:
     named: tuple = ()
     broadcast: frozenset = frozenset()
     not_numeric: tuple = ()
+    not_numeric_kind: tuple = ()
     cut: str = "NONE"   # (plan 1160 A32) the DELIMITER that cut the lines into cells (NONE: an xlsx sheet's cells, never cut from text)
 
 
@@ -269,14 +271,18 @@ def _wide(fr, step, k):
     return _columns(replace(fr, rows=()), [step["key"]], long)
 
 
+EMPTINESS = {True: "EMPTY", False: "TEXT"}   # (A16) a dropped row -> its one kind: is every cell of it that is no number empty; total over bool
+
+
 def _not_numeric(fr, step, k):
     """DROP_ROWS_NOT_NUMERIC (plan 1160 A11): each data row in which a named column's cell is no number (NUMBER: empty, or text) is dropped,
-    recorded with its step and the source cell that is no number; every kept row is unchanged, so the identity test still holds on it."""
+    recorded with its step, the source cell that is no number and (A16) the row's kind, classed once: EMPTY when every cell of the row that
+    is no number is empty, else TEXT. Every kept row is unchanged, so the identity test still holds on it."""
     def drop(at):
         bad = lambda cs: [cs[a][1] for a in at if NUMBER.fullmatch(cs[a][0].strip()) is None]
-        gone = [(n, bad(cs)[0]) for n, cs in fr.rows if bad(cs)]
-        return replace(fr, rows=tuple((n, cs) for n, cs in fr.rows if not bad(cs)), dropped=fr.dropped + tuple((n, k) for n, _ in gone),
-                       not_numeric=fr.not_numeric + tuple(c for _, c in gone))
+        gone = [(n, bad(cs)[0], EMPTINESS[all(t.strip() == "" for t, _ in cs if NUMBER.fullmatch(t.strip()) is None)]) for n, cs in fr.rows if bad(cs)]
+        return replace(fr, rows=tuple((n, cs) for n, cs in fr.rows if not bad(cs)), dropped=fr.dropped + tuple((n, k) for n, _, _ in gone),
+                       not_numeric=fr.not_numeric + tuple(c for _, c, _ in gone), not_numeric_kind=fr.not_numeric_kind + tuple(e for _, _, e in gone))
     return _columns(fr, step["columns"], drop)
 
 
@@ -415,10 +421,12 @@ class Converted:
     out: str
     verified: Verified
     listing: tuple
+    split: tuple   # (A16) per file that declares DROP_ROWS_NOT_NUMERIC: (its name, {EMPTY: n, TEXT: n}), counts only
 
     def summary(self):
         return (f"wrote {len(self.listing)} output files and {MANIFEST} to {self.out}; {self.verified.summary()}.\n"
-                + "\n".join(f"  {n}: {r} rows, {len(cs)} columns ({', '.join(NAME_SHOWN[classify(c)](c) for c in cs)})" for n, r, cs in self.listing))   # (A31) masked
+                + "\n".join(f"  {n}: {r} rows, {len(cs)} columns ({', '.join(NAME_SHOWN[classify(c)](c) for c in cs)})" for n, r, cs in self.listing)   # (A31) masked
+                + "".join(f"\n  {f}: rows dropped as not numeric (DROP_ROWS_NOT_NUMERIC): EMPTY {k['EMPTY']}, TEXT {k['TEXT']}" for f, k in self.split))
 
 
 def declared(text, ct):
@@ -466,10 +474,11 @@ def _built(conv, ct, raws):
 def _records(conv, ct, raws, built):
     """(units, outputs, frames): the manifest's records and the bytes they describe."""
     srcs = list(dict.fromkeys(f["from"] for f in conv["file"]))
+    kinded = lambda parts: dict((c, e) for _, fr in parts for c, e in zip(fr.not_numeric, fr.not_numeric_kind))   # each dropped row once, with its one kind
     units = [{"file": u, "source": srcs.index(conv["file"][u]["from"]), "dropped": sorted({tuple(x) for _, fr in parts for x in fr.dropped}),
-              "names": sorted({n for _, fr in parts for n in fr.named}), "not_numeric": [{True: lambda c=c: list(c), False: lambda: None}[c is not None]()
-                                                                                 for c in dict.fromkeys(c for _, fr in parts for c in fr.not_numeric)],
-              "not_numeric_count": len(dict.fromkeys(c for _, fr in parts for c in fr.not_numeric))} for u, parts in built]   # plan 1160 A11: lines and a count, never a cell
+              "names": sorted({n for _, fr in parts for n in fr.named}), "not_numeric": [{True: lambda c=c: list(c), False: lambda: None}[c is not None]() for c in kinded(parts)],
+              "not_numeric_count": len(kinded(parts)), "not_numeric_split": {e: list(kinded(parts).values()).count(e) for e in EMPTINESS.values()}}
+             for u, parts in built]   # plan 1160 A11: lines and a count, never a cell; A16: the count split EMPTY / TEXT, summing to it by construction
     outs = [(name, fr, u) for u, parts in built for name, fr in parts]
     rendered = [(render(fr), name, fr, u) for name, fr, u in outs]
     outputs = [({"path": name, "unit": u, "broadcast": sorted(fr.broadcast), "rows": len(fr.rows), "columns": len(fr.names), "sha256": _sha(b), "bytes": len(b),
@@ -499,7 +508,9 @@ def _write(conv, out, raws, units, outputs, verified, listing):
         "sources": [{"path": s, "sha256": _sha(raws[s]), "bytes": len(raws[s])} for s in srcs], "units": units, "outputs": [r for r, _ in outputs],
         "code_hash": schema.code_hash(intake_bytes.ROOT), "converter_sha256": _sha(Path(__file__).read_bytes()),
         "format_sha256": _sha((intake_bytes.ROOT / "intake" / "CONVERSION.toml").read_bytes()), "time": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}) + "\n")
-    return Pass(Converted(conv["out"], verified, tuple(listing)))
+    split = tuple((f"{conv['file'][u['file']]['from']} -> {conv['file'][u['file']]['to']}", u["not_numeric_split"]) for u in units
+                  if "DROP_ROWS_NOT_NUMERIC" in [x["op"] for x in conv["file"][u["file"]]["steps"]])   # (A16) as s3 names a converted file
+    return Pass(Converted(conv["out"], verified, tuple(listing), split))
 
 
 def convert(root, ident, t, ct):
