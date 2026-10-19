@@ -495,15 +495,15 @@ def verified(root, ident, t, ct):
 
 def s3(declaration, d, t, then):
     """S3 SOURCE_INTEGRITY for a CONVERTED source: the chain from converted_from to the bank (CONVERSION_CHAIN_BROKEN, every read through
-    the logged loader into declarations/<id>/access.log), then then() (the bank read exactly as a DEPOSIT)."""
+    the logged loader into declarations/<id>/access.log), then then(loader) (the bank read exactly as a DEPOSIT, through the same loader: plan 1160 P4)."""
     src = declaration.data["source"]
     bank, raw = intake_data.located(src["root"], t["roots"]), intake_data.located(src["converted_from"], t["roots"])
     def go():
-        loader = intake_data._t23().Loader({raw: "converted-from", bank: "universe"}, Path(d) / "access.log")
+        loader = intake_data._t23().Loader({raw: "converted-from", bank: "universe", str(Path(bank).parent): "outside-universe"}, Path(d) / "access.log")
         m = _bind(_reader(bank, loader)(MANIFEST), lambda b: {True: lambda: None, False: lambda: _manifest(b.decode("utf-8", "replace"))}[b is None]())
         got = chained(m, _reader(raw, loader), _reader(bank, loader), ctables(), {"source": src["converted_from"], "out": src["root"]})
         broken = {True: lambda: got, False: lambda: Refuse("CONVERSION_CHAIN_BROKEN", got.evidence.within("", got.reason))}
-        return {True: then, False: lambda: broken[got.reason == "CONVERSION_CHAIN_BROKEN"]()}[isinstance(got, Pass)]()
+        return {True: lambda: then(loader), False: lambda: broken[got.reason == "CONVERSION_CHAIN_BROKEN"]()}[isinstance(got, Pass)]()
     return gate([(lambda: "" not in (bank, raw) and Path(bank).is_dir() and Path(raw).is_dir(), "ROOT_UNRESOLVED",
                   lambda: detail(words=[f"root '{src['root']}'", f"converted_from '{src['converted_from']}'"]))], go)
 

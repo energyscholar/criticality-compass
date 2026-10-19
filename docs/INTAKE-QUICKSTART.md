@@ -31,8 +31,9 @@ What each line does:
    looking at their values; `PROSPECTIVE` (no file exists yet) cannot be sealed over files that exist (MODE_CONTRADICTS_SOURCE).
 6. `seal` is optional. Sealing is recommended and not enforced. It records what you declared and when; it is an integrity practice, like a
    lab notebook. Write your own name for `<name>`.
-7. `run` runs every stage. SOURCE_INTEGRITY, SHAPE and CENSUS read the bank through the logged loader. The other stages are STUBs, so the
-   PRIMARY verdict is PRIMARY_INCOMPLETE and the report lists them.
+7. `run` runs every stage. SOURCE_INTEGRITY, SHAPE and CENSUS read the bank through the logged loader. ADMISSIBILITY then checks the
+   access log: every file read has a loader line with its sha256, and no in-process read went around the loader. The stages after it are
+   STUBs, so the PRIMARY verdict is PRIMARY_INCOMPLETE and the report lists them.
 
 ## A filled example
 
@@ -75,7 +76,7 @@ c = 0.0
 ## What to expect
 
 - lint: `S0 EXECUTED, PASS` (FORMAT) and `S1 EXECUTED, PASS` (CHOICES).
-- run: S3 SOURCE_INTEGRITY, S4 SHAPE and S5 CENSUS `EXECUTED, PASS`. The census reads
+- run: S3 SOURCE_INTEGRITY, S4 SHAPE, S5 CENSUS and S6 ADMISSIBILITY `EXECUTED, PASS` (S6 reads `ADMITTED_ON_LOGGED_PATHS_ONLY` and lists what it cannot see). The census reads
   `Sampling: 9 curves; points per curve min 44, median 78, max 116; 159 distinct T values; MISALIGNED; curves_with_slow = 9; readings per point min 1, max 1; distinct_slow_in_block max = 1`, and the report's
   `## Census` section lists the nine curves by ordinal and file name. No report prints a data value (a span, a slow value or a cell).
 - Seal status `SEALED`, or `UNSEALED` if you skipped the seal. If you edit the declaration after sealing, the status is `SEALED_THEN_EDITED`.

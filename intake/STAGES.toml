@@ -178,11 +178,12 @@ name = "ADMISSIBILITY"
 purpose = "The actual lineage obeys the sealed operation graph: every value reached the intake through the logged loader and the declared projections only (dynamic admissibility)."
 reads_bytes = "NONE"
 needs = ["S5"]
-implemented = false
+implemented = true   # plan 1160 P4: READ_NOT_LOGGED and BYPASS_READ_LOGGED from the access log and the pins. LINEAGE_OFF_GRAPH stays live = false: the
+# terminal is table-driven from the sealed declaration, so an off-graph step is unreachable by construction.
 verdict = "PRIMARY"
 reason = [
-  { code = "READ_NOT_LOGGED",    live = false, sentence = "A record exists whose bytes have no loader line in the access log." },
-  { code = "BYPASS_READ_LOGGED", live = false, sentence = "The access log holds an in-process read of a data path that did not go through the loader." },
+  { code = "READ_NOT_LOGGED",    live = true,  sentence = "A record exists whose bytes have no loader line in the access log." },
+  { code = "BYPASS_READ_LOGGED", live = true,  sentence = "The access log holds an in-process read of a data path that did not go through the loader." },
   { code = "LINEAGE_OFF_GRAPH",  live = false, sentence = "A value's lineage includes a step that the sealed operation graph does not declare." },
 ]
 

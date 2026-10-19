@@ -20,7 +20,7 @@ A declaration `declarations/<id>/` (intake.toml and the CC transducer.toml) goes
 | S3 | SOURCE_INTEGRITY | LIVE | ALL_FILES | S0 | PRIMARY |
 | S4 | SHAPE | LIVE | FIRST_FILE | S3 | PRIMARY |
 | S5 | CENSUS | LIVE | ALL_FILES | S3, S4 | PRIMARY |
-| S6 | ADMISSIBILITY | STUB | NONE | S5 | PRIMARY |
+| S6 | ADMISSIBILITY | LIVE | NONE | S5 | PRIMARY |
 | S7 | INTERVAL_FEASIBILITY | STUB | NONE | S5 | PRIMARY |
 | S8 | RESOLUTION_AND_IDENTIFIABILITY | STUB | NONE | S5 | PRIMARY |
 | S9 | ALTERNATIVE_INTAKE | STUB | NONE | S5 | ROBUSTNESS |
@@ -142,14 +142,14 @@ Every selected file matches the first, and the sampling label is recorded: curve
 | REPLICATE_KEY_UNRESOLVED | live | The declared replicate identity cannot be read for a file or point. |
 | ACQUISITION_ORDER_DIFFERS | live | A curve stored in acquisition order (row_order ACQUISITION) does not run in the declared direction along the fast knob. |
 
-## S6 ADMISSIBILITY (STUB)
+## S6 ADMISSIBILITY (LIVE)
 
 The actual lineage obeys the sealed operation graph: every value reached the intake through the logged loader and the declared projections only (dynamic admissibility).
 
 | reason | live | what it means |
 |---|---|---|
-| READ_NOT_LOGGED | NOT LIVE | A record exists whose bytes have no loader line in the access log. |
-| BYPASS_READ_LOGGED | NOT LIVE | The access log holds an in-process read of a data path that did not go through the loader. |
+| READ_NOT_LOGGED | live | A record exists whose bytes have no loader line in the access log. |
+| BYPASS_READ_LOGGED | live | The access log holds an in-process read of a data path that did not go through the loader. |
 | LINEAGE_OFF_GRAPH | NOT LIVE | A value's lineage includes a step that the sealed operation graph does not declare. |
 
 ## S7 INTERVAL_FEASIBILITY (STUB)
@@ -204,8 +204,6 @@ The plan 1118 banks were used to CHOOSE these rows; they cannot validate them (A
 Each row below has live = false in intake/STAGES.toml: no body returns it today (a STUB stage's rows are never live), so a run cannot show it and its absence says nothing.
 
 - S1 SHIFT_BEFORE_KERNEL_INPUT
-- S6 READ_NOT_LOGGED
-- S6 BYPASS_READ_LOGGED
 - S6 LINEAGE_OFF_GRAPH
 - S7 ONE_READING_PER_POINT
 - S7 BELOW_METHOD_FLOOR

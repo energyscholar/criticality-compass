@@ -38,9 +38,10 @@ check("6. S10 KERNEL_HANDOFF is withheld after S3's refusal", isinstance(out["S1
 text = intake.report(t, ID, out, intake.intake_seal.ordering(D, t))
 check("6. the committed intake-report.md is the report of a run now, byte for byte", text == (D / "intake-report.md").read_text(), "")
 stubs = [f"- **{s['id']} {s['name']}** (STUB): STUB. " for s in t["stages"]["stage"] if not s["implemented"]]
-# plan 1160 P1: S1 has a body now (was: the one stub no refusal withholds), so every stub (S6..S10) is withheld after S3's refusal
-check("6. S1 CHOICES passes (one slow value per file), and no stub is listed as a STUB: each is withheld after S3", out["S1"].mark is intake.Mark.PASSED
-      and len(stubs) == 5 and all(ln not in text for ln in stubs), str([ln for ln in stubs if ln in text]))
+# plan 1160 P1: S1 has a body now (was: the one stub no refusal withholds), so every stub is withheld after S3's refusal; plan 1160 P4: S6
+# has a body too, so the stubs are S7..S10 (was: len(stubs) == 5)
+check("6. S1 CHOICES passes (every live row), and no stub is listed as a STUB: each is withheld after S3", out["S1"].mark is intake.Mark.PASSED
+      and len(stubs) == 4 and all(ln not in text for ln in stubs), str([ln for ln in stubs if ln in text]))
 check("6. the report carries the seal claim and the UNENFORCED list", t["stages"]["report"]["seal_claim"] in text and all(u in text for u in t["stages"]["report"]["unenforced"]), "")
 cli = subprocess.run([str(ROOT / "bin" / "cc"), "intake", "lint", ID], capture_output=True, text=True)
 check("6. bin/cc intake lint passes S0 and S1 (plan 1160 P1: was S1 STUB)", cli.returncode == 0 and "S1 EXECUTED, PASS." in cli.stdout, cli.stdout[-300:])

@@ -110,10 +110,18 @@ class Census:
 
 @dataclass(frozen=True)
 class Lineage:
-    """S6 ADMISSIBILITY: the loader's admission verdict and the UNENFORCED list. Invariant: carries the Census it audits."""
+    """S6 ADMISSIBILITY: the loader's admission verdict and the UNENFORCED list. Invariant: carries the Census it audits; built only when every
+    pinned file has a loader line in the access log with its path and sha256, and the log holds no in-process bypass line (plan 1160 P4)."""
     census: Census
     verdict: str
     unenforced: tuple
+
+    def summary(self):
+        return (f"{self.verdict}: every pinned file has a loader line in the access log with its sha256, and the log holds no in-process bypass. "
+                f"Not enforced (no check here can see them): {'; '.join(self.unenforced)}")
+
+    def confirmed(self):
+        return False
 
 
 @dataclass(frozen=True)
@@ -192,7 +200,7 @@ def admission(loc, names, src):
 
 
 SOURCE = {   # [source] kind -> the S3 body of that kind; total over FORMAT's [source] kinds (plan 1160 P1)
-    "DEPOSIT": lambda declaration, d, t: _deposit(declaration, d, t),
+    "DEPOSIT": lambda declaration, d, t: _deposit(declaration, d, t, lambda loc: _t23().Loader({loc: "universe", str(Path(loc).parent): "outside-universe"}, Path(d) / "access.log")),
     "CONVERTED": lambda declaration, d, t: _converted(declaration, d, t),
 }
 
@@ -204,15 +212,16 @@ def source_integrity(declaration, d, t):
 
 
 def _converted(declaration, d, t):
-    """S3 for a CONVERTED source: cc/intake_convert.py's chain check (imported here: it imports this module), then _deposit."""
+    """S3 for a CONVERTED source: cc/intake_convert.py's chain check (imported here: it imports this module), then _deposit through the same
+    loader (plan 1160 P4: one loader per run, so no loader's audit hook logs another loader's read as a bypass, which S6 would refuse)."""
     import intake_convert
-    return intake_convert.s3(declaration, d, t, lambda: _deposit(declaration, d, t))
+    return intake_convert.s3(declaration, d, t, lambda loader: _deposit(declaration, d, t, lambda loc: loader))
 
 
-def _deposit(declaration, d, t):
+def _deposit(declaration, d, t, made):
     """S3 for a DEPOSIT. Invariant: ROOT_UNRESOLVED | UNIVERSE_CHANGED (names and sizes against the seal, only when a SEAL.json exists) |
     PATH_OUTSIDE_ROOT | PATH_ON_TRUTH_SIDE | PATH_NOT_A_FILE (ADMIT) are decided before any byte is read; then each file is read once through the logged loader, and PIN_MISMATCH when its
-    sha256 differs from the sha256 at its first logged loader read (the pin)."""
+    sha256 differs from the sha256 at its first logged loader read (the pin). made(loc) is the run's one logged loader (SOURCE, _converted)."""
     src, sel = declaration.data["source"], declaration.data["selection"]
     loc, rec = located(src["root"], t["roots"]), intake_seal.record(d)
     names = intake_seal.selected(sel)
@@ -220,19 +229,33 @@ def _deposit(declaration, d, t):
                  (lambda: rec == {} or intake_seal.listing(loc, src["universe"]) == rec["universe"]["listing"], "UNIVERSE_CHANGED",
                   lambda: detail(counts={"names now": len(intake_seal.listing(loc, src["universe"])), "names sealed": len(rec["universe"]["listing"])})),
                  *admission(loc, names, src)],
-                lambda: _read(declaration, d, loc, names))
+                lambda: _read(declaration, d, loc, names, made(loc)))
 
 
-def _read(declaration, d, loc, names):
+def _read(declaration, d, loc, names, loader):
     """Each admitted file read once through the logged loader (the access log is declarations/<id>/access.log; the bank's parent directory is
     a declared partition too, so an in-process open of the truth side beside the bank is logged as a bypass); then each pin compared."""
-    loader = _t23().Loader({loc: "universe", str(Path(loc).parent): "outside-universe"}, Path(d) / "access.log")
     files = tuple(File(n, hashlib.sha256(b).hexdigest(), b) for n in names for b in [loader.read(Path(loc) / n)])
     pins = {}
     for a in intake_seal.lines(Path(d) / "access.log"):
         pins.setdefault(a["path"], a["sha256"]) if a["route"] == "loader" else None
     moved = lambda: [f.name for f in files if pins[str((Path(loc) / f.name).resolve())] != f.sha256]
     return gate([(lambda: not moved(), "PIN_MISMATCH", lambda: detail(words=moved()[:3], counts={"files that differ from their pins": len(moved())}))], lambda: Pass(Pinned(declaration, files)))
+
+
+def admissibility(census, d, t):
+    """S6 ADMISSIBILITY (reads no data byte; it reads declarations/<id>/access.log, which lies in no declared partition). READ_NOT_LOGGED: a
+    pinned file with no loader line holding its resolved path and its sha256 | BYPASS_READ_LOGGED: a line with route in-process-bypass (the
+    loader's audit hook saw an open of a declared-partition path outside the loader). LINEAGE_OFF_GRAPH has no row: the terminal is table-driven
+    from the sealed declaration, so an off-graph step is unreachable by construction (STAGES.toml)."""
+    loc, log = located(census.pinned.declaration.data["source"]["root"], t["roots"]), intake_seal.lines(Path(d) / "access.log")
+    logged = {(a["path"], a["sha256"]) for a in log if a["route"] == "loader"}
+    unlogged = [f.name for f in census.pinned.files if (str((Path(loc) / f.name).resolve()), f.sha256) not in logged]
+    bypass = [a for a in log if a["route"] == "in-process-bypass"]
+    return gate([(lambda: not unlogged, "READ_NOT_LOGGED", lambda: detail(words=unlogged[:3], counts={"pinned files with no loader line": len(unlogged)})),
+                 (lambda: not bypass, "BYPASS_READ_LOGGED",
+                  lambda: detail(words=sorted({f"partition {a['partition']}" for a in bypass}), counts={"in-process bypass lines": len(bypass)}))],
+                lambda: Pass(Lineage(census, "ADMITTED_ON_LOGGED_PATHS_ONLY", tuple(t["stages"]["report"]["unenforced"]))))
 
 
 def read(t, d, f):
@@ -361,7 +384,7 @@ def label(curves, points, fast):
 
 
 def bodies(t, d):
-    """The registered data-stage bodies of one run (S3, S4, S5; plan 1139), closed over the tables and the declaration directory. Each has
+    """The registered data-stage bodies of one run (S3, S4, S5; plan 1139; S6, plan 1160 P4), closed over the tables and the declaration directory. Each has
     exactly its SIGNATURE row (tests/test_intake.py)."""
     def s3(declaration: Declaration) -> Pass | Refuse:
         return source_integrity(declaration, d, t)
@@ -371,4 +394,7 @@ def bodies(t, d):
 
     def s5(pinned: Pinned, shaped: Shaped) -> Pass | Refuse:
         return census(pinned, shaped, t)
-    return {"S3": s3, "S4": s4, "S5": s5}
+
+    def s6(census: Census) -> Pass | Refuse:
+        return admissibility(census, d, t)
+    return {"S3": s3, "S4": s4, "S5": s5, "S6": s6}
