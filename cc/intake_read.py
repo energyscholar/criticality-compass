@@ -96,16 +96,18 @@ def _text_cells(kind):
 
 
 def _xlsx_cells(data, spec):
-    """XLSX through openpyxl (installed: the key of the XLSX table below): the declared sheet's rows, or Unreadable NOT_AN_XLSX | SHEET_ABSENT."""
+    """XLSX through openpyxl (installed: the key of the XLSX table below): the declared sheet's rows, or Unreadable NOT_AN_XLSX | SHEET_ABSENT.
+    openpyxl parses a read-only sheet lazily, so the rows are drawn inside the one decoding boundary: a workbook whose cells do not parse is
+    NOT_AN_XLSX, never an exception later."""
     import openpyxl
-    try:
-        book = openpyxl.load_workbook(io.BytesIO(data), read_only=True, data_only=True)
-    except Exception as e:   # openpyxl raises zipfile, KeyError, ValueError and its own errors for a file that is no workbook
-        return Unreadable("NOT_AN_XLSX", f"{type(e).__name__}: {e}")
     sheet = spec["format"]["sheet"]
+    try:   # the decoding boundary: openpyxl raises zipfile, KeyError, ValueError and its own errors for bytes that are no readable workbook
+        book = openpyxl.load_workbook(io.BytesIO(data), read_only=True, data_only=True)
+        rows = {True: lambda: list(book[sheet].iter_rows(values_only=True)), False: lambda: []}[sheet in book.sheetnames]()
+    except Exception as e:
+        return Unreadable("NOT_AN_XLSX", f"{type(e).__name__}: {e}")
     return {False: lambda: Unreadable("SHEET_ABSENT", f"sheet '{sheet}' (the workbook has {book.sheetnames})"),
-            True: lambda: [(i, list(r)) for i, r in enumerate(book[sheet].iter_rows(values_only=True), 1)
-                           if not (len(r) > 0 and _comment(r[0], spec["comment"]))]}[sheet in book.sheetnames]()
+            True: lambda: [(i, list(r)) for i, r in enumerate(rows, 1) if not (len(r) > 0 and _comment(r[0], spec["comment"]))]}[sheet in book.sheetnames]()
 
 
 XLSX = {   # is openpyxl installed -> the xlsx cell reader (plan 1145: xlsx is read with openpyxl or not at all)

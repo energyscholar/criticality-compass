@@ -12,11 +12,13 @@ ROOT = Path(__file__).resolve().parent.parent
 
 
 def xlsx(rows, sheet="data"):
-    """A minimal xlsx workbook (inline strings, numbers as numbers), written with zipfile only: the planted xlsx file."""
+    """A minimal xlsx workbook (inline strings, numbers as numbers), written with zipfile only: the planted xlsx file. A bytes value is
+    written as a number cell's raw text (a workbook whose number cell does not parse); None is an empty cell."""
     def cell(i, j, v):
         ref = f"{'ABCDEFGH'[j]}{i}"
-        return {True: f'<c r="{ref}" t="inlineStr"><is><t>{v}</t></is></c>', False: f'<c r="{ref}"><v>{v!r}</v></c>'}[isinstance(v, str)]
-    data = "".join(f'<row r="{i}">' + "".join(cell(i, j, v) for j, v in enumerate(r)) + "</row>" for i, r in enumerate(rows, 1))
+        return {str: lambda: f'<c r="{ref}" t="inlineStr"><is><t>{v}</t></is></c>', bytes: lambda: f'<c r="{ref}"><v>{v.decode()}</v></c>',
+                int: lambda: f'<c r="{ref}"><v>{v!r}</v></c>', float: lambda: f'<c r="{ref}"><v>{v!r}</v></c>'}[type(v)]()
+    data = "".join(f'<row r="{i}">' + "".join(cell(i, j, v) for j, v in enumerate(r) if v is not None) + "</row>" for i, r in enumerate(rows, 1))   # None: an empty cell
     parts = {
         "[Content_Types].xml": '<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
                                '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/>'

@@ -105,6 +105,7 @@ refused("a comment line not declared as one (it becomes header line 1: the names
 xl_ok = {True: lambda: None, False: lambda: print("  (the xlsx SHEET_ABSENT and NOT_AN_XLSX cases need openpyxl: not run on this machine)")}[HAS_XLSX]()
 {True: lambda: [refused("an xlsx sheet that is absent", rd.read_table(xlsx([NAMES, UNITS] + [list(r) for r in ROWS], sheet="other"), decl({"kind": "XLSX", "sheet": "data"}, NU)), "SHEET_ABSENT", "'data'"),
                 refused("bytes that are no workbook", rd.read_table(b"PK not a zip", decl({"kind": "XLSX", "sheet": "data"}, NU)), "NOT_AN_XLSX"),
+                refused("an xlsx number cell whose text does not parse (openpyxl reads rows lazily)", rd.read_table(xlsx([NAMES, UNITS, [2.5, b"x0.75", 0.03]]), decl({"kind": "XLSX", "sheet": "data"}, NU)), "NOT_AN_XLSX", "ValueError"),
                 refused("an xlsx text cell in a number column", rd.read_table(xlsx([NAMES, UNITS, [2.5, "n/a", 0.03]]), decl({"kind": "XLSX", "sheet": "data"}, NU)), "CELL_NOT_A_NUMBER", "row 3", "'C'")],
  False: lambda: None}[HAS_XLSX]()
 

@@ -25,7 +25,7 @@ import intake_blind as blind  # noqa: E402
 import intake_read as rd  # noqa: E402
 import intake_seal  # noqa: E402
 import intake_synth  # noqa: E402
-from intake_plant import long_table, per_file, rooted, run, write_long, xlsx  # noqa: E402
+from intake_plant import long_table, outcome, per_file, rooted, run, write_long, xlsx  # noqa: E402
 
 bad = []
 
@@ -87,6 +87,12 @@ with tempfile.TemporaryDirectory() as tmp:
     def lt(name, edit=lambda x: x, **k):
         ident = f"d{next(n)}"
         return first(run(T, tmp, ident, edit(long_table(m, ident, **k).replace("<long-test>/pf", f"<long-test>/{name}"))))
+
+    def census(name, edit=lambda x: x):
+        """The S5 census label of a LONG_TABLE declaration of bank `name` (its reason when S5 did not pass)."""
+        ident = f"d{next(n)}"
+        got = outcome(run(T, tmp, ident, edit(long_table(m, ident).replace("<long-test>/pf", f"<long-test>/{name}"))), "S5")
+        return getattr(got[1], "label", got[0])
 
     def pf(name, edit=lambda x: x):
         ident = f"d{next(n)}"
@@ -183,7 +189,7 @@ with tempfile.TemporaryDirectory() as tmp:
                    ("NOT_AN_XLSX", "bytes that are no workbook", lambda: lt(bank(raw=b"T,C,sigma,h\n"), xl("data"))),
                    ("SHEET_ABSENT", "sheet 'data' declared, the workbook holds 'Sheet1'", lambda: lt(bank(raw=xlsx([["T", "C", "sigma", "h"]] + rows, "Sheet1")), xl("data"))),
                    ("XLSX_GRID", "(not a reason) an xlsx bank passes S5 with the comma bank's census label", lambda: {True: "XLSX_GRID", False: "x"}[
-                       lt(bank(raw=xlsx([["T", "C", "sigma", "h"]] + rows, "data")), xl("data")) == "PASS"])]}[HAS_XLSX]
+                       census(bank(raw=xlsx([["T", "C", "sigma", "h"]] + rows, "data")), xl("data")) == census(bank())])]}[HAS_XLSX]
     NOT_HERE = {False: ["NOT_AN_XLSX", "SHEET_ABSENT"], True: []}[HAS_XLSX]
     reached = set()
     for code, what, plant in PLANTS + XLSX:
