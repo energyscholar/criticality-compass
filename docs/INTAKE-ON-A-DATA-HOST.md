@@ -49,22 +49,44 @@ there.
 <host> 'cd ~/scratch/cc-intake && bin/cc new intake <id>'
 ```
 
-The new declaration's TODO lines are the choices. For a table, `[reader]` is `table-curve-v1`:
+The new declaration's TODO lines are the choices. It is intake format v3 (`schema = 3`); a v2 declaration is refused SCHEMA_UNSUPPORTED,
+so restate it in v3 under a new id.
+
+`[source]` says what the files are:
+
+- `kind`: `DEPOSIT` (the files as deposited, read directly) or `CONVERTED` (a bank written by a declared conversion; it also carries
+  `converted_from`, and its `root` is under `<cc-banks>/`). A CONVERTED source is refused CONVERSION_NOT_LIVE at S3 until the conversion
+  has a body.
+- `admissibility`: `RAW`, `DECLARABLE`, `FIGURE_LEVEL` or `PROCESSED_UNDECLARABLE`, read from the deposit's metadata. It is sealed with the
+  declaration.
+
+For a table, `[reader]` is `table-curve-v1`:
 
 - `[reader.format]` sets `kind`: `COMMA`, `TAB`, `WHITESPACE`, or `XLSX` with a `sheet`.
 - `[reader.header]` sets `kind`:
   - `SKIP` with `rows`;
   - `NAMES` with `rows` and the line of `names`;
   - `NAMES_UNITS` with `rows`, the line of `names` and the line of `units`.
-- `comment` holds the line prefixes to drop, for example `["#"]`.
+- `comment` holds the line prefixes to drop, for example `["#"]`, or `[]` for none. An empty prefix `""` would drop every line, so it is
+  refused COMMENT_PREFIX_EMPTY.
 
 Columns are named in `[knobs.fast]`, `[measured]` and `[measured.uncertainty]` (COLUMN or NONE): by NAME (a string) or by 1-based POSITION
 (an integer).
 
 There are two layouts in `[selection]`:
 
-- `PER_FILE`: one curve per file.
+- `PER_FILE`: one curve per file. `files` lists them, in curve order. `[selection.slow]` says where each curve's slow-knob value comes
+  from:
+  - `LISTED` with `values`: one number per file of `files`, in that order, each written as text (`["-0.15", "-0.10"]`). A count that
+    differs from `files` is refused SLOW_VALUES_NOT_ONE_PER_FILE before any byte is read.
+  - `FILE_KEY` with `key`: each file has a header line whose first cell is the key and whose second cell is the value. Declare that
+    line among the header rows. A file without exactly one such line holding a number is refused SLOW_KEY_UNRESOLVED.
+  - `NONE`: the deposit has no slow knob. The census forms the curves with no slow value (`curves_with_slow = 0`).
 - `LONG_TABLE`: one `file` holds every curve, and `[selection.slow]` is `COLUMN` with its `key`.
+
+`excluded` lists the files of the universe that are not curves, each with a `why`. The seal checks that the universe is exactly the
+selected files, the excluded files and the truth side, each file in one part. Otherwise it refuses UNIVERSE_NOT_PARTITIONED, or
+SELECTION_DUPLICATE when a name is given twice.
 
 Then:
 
