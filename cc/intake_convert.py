@@ -54,7 +54,8 @@ class Frame:
     filled: `raw` (bytes), `lines` ((line, text) in source order), `rows` ((line, cells), a cell (text, (line, column)) naming its source
     cell), `names` (the names line's cells; a written name's source is None). `dropped` holds (line, step) of each source line a declared
     step dropped (step -1: a line with no text in any cell); `named` the names line's source line (none when written); `broadcast` the
-    output columns whose source cell repeats down the rows (WIDE_TO_LONG fast and key)."""
+    output columns whose source cell repeats down the rows (WIDE_TO_LONG fast and key); `not_numeric` the source cell that is no number in each
+    row DROP_ROWS_NOT_NUMERIC dropped (its [line, column]: a coordinate, never the cell's text; plan 1160 A11)."""
     raw: bytes = b""
     lines: tuple = ()
     rows: tuple = ()
@@ -62,6 +63,7 @@ class Frame:
     dropped: tuple = ()
     named: tuple = ()
     broadcast: frozenset = frozenset()
+    not_numeric: tuple = ()
 
 
 def _decoded(raw, encoding):
@@ -240,6 +242,17 @@ def _wide(fr, step, k):
     return _columns(replace(fr, rows=()), [step["key"]], long)
 
 
+def _not_numeric(fr, step, k):
+    """DROP_ROWS_NOT_NUMERIC (plan 1160 A11): each data row in which a named column's cell is no number (NUMBER: empty, or text) is dropped,
+    recorded with its step and the source cell that is no number; every kept row is unchanged, so the identity test still holds on it."""
+    def drop(at):
+        bad = lambda cs: [cs[a][1] for a in at if NUMBER.fullmatch(cs[a][0].strip()) is None]
+        gone = [(n, bad(cs)[0]) for n, cs in fr.rows if bad(cs)]
+        return replace(fr, rows=tuple((n, cs) for n, cs in fr.rows if not bad(cs)), dropped=fr.dropped + tuple((n, k) for n, _ in gone),
+                       not_numeric=fr.not_numeric + tuple(c for _, c in gone))
+    return _columns(fr, step["columns"], drop)
+
+
 def _one(op):
     """An op on one frame as an op on one output: [(its name, the new frame)] or the Refuse."""
     return lambda name, fr, step, k: _bind(op(fr, step, k), lambda f: [(name, f)])
@@ -248,7 +261,7 @@ def _one(op):
 OPS = {   # the closed alphabet: op -> (output name, frame, step, its index among the declared steps) -> [(name, frame)] | Refuse; total over
     "UNPACK": _one(_unpack), "DECODE": _one(_decode), "DROP_LINES": _one(_drop), "DELIMITER": _one(_delimit),   # intake/CONVERSION.toml [op]
     "SHEET_TO_CSV": _one(_sheet), "NAMES_LINE": _one(_named), "DECIMAL_MARK": _one(_mark), "SELECT_COLUMNS": _one(_select),
-    "RENAME": _one(_rename), "WIDE_TO_LONG": _one(_wide),
+    "RENAME": _one(_rename), "WIDE_TO_LONG": _one(_wide), "DROP_ROWS_NOT_NUMERIC": _one(_not_numeric),
     "SPLIT_ROWS": lambda name, fr, step, k: SPLITS[step["rule"]["kind"]](step["rule"], fr, name),
 }
 LEVEL = {"RAW": 0, "TEXT": 1, "TABLE": 2, "NAMED": 3}
@@ -316,7 +329,9 @@ def verify(files, units, outputs, frames):
     twice = lambda: len(used()) - len(set(used()))
     mapped = lambda u: {c[0] for v, c in used() if v == u}
     held = lambda u: sorted(mapped(u)) + sorted(n for n, _ in units[u]["dropped"]) + sorted(units[u]["names"])
-    unjustified = lambda u: [n for n, s in units[u]["dropped"] if not ({True: lambda: n in blank[u], False: lambda: files[u]["steps"][s]["op"] == "DROP_LINES"}[s == -1]())]
+    nonnumber = lambda u: {c[0] for c in units[u].get("not_numeric", []) if _cell_ok(c) and tuple(c) in grid[u] and NUMBER.fullmatch(src(u, tuple(c)).strip()) is None}
+    why = {"DROP_LINES": lambda u, n: True, "DROP_ROWS_NOT_NUMERIC": lambda u, n: n in nonnumber(u)}   # plan 1160 A11: a row's drop needs its cell no number
+    unjustified = lambda u: [n for n, s in units[u]["dropped"] if not ({True: lambda: n in blank[u], False: lambda: look(why, files[u]["steps"][s]["op"], lambda u, n: False)(u, n)}[s == -1]())]
     unpartitioned = lambda: [u for u in range(len(frames)) if sorted(held(u)) != sorted(lines[u]) or len(set(held(u))) != len(held(u)) or unjustified(u)]
     mark = lambda u: [s["mark"] for s in files[u]["steps"] if s["op"] == "DECIMAL_MARK"]
     src = lambda u, c: functools.reduce(lambda t, m: t.replace(m, "."), mark(u), grid[u][c])
@@ -328,7 +343,7 @@ def verify(files, units, outputs, frames):
                  (lambda: not sourceless(), cmap, lambda: detail(counts={"output cells with no source cell": len(sourceless())})),
                  (lambda: twice() == 0, cmap, lambda: detail(counts={"source cells written twice outside a broadcast column": twice()})),
                  (lambda: not unpartitioned(), cmap, lambda: detail(words=[files[u]["from"] for u in unpartitioned()][:3] + [
-                     "a source line is not exactly one of: written, dropped by a declared DROP_LINES step, blank, a names line"])),
+                     "a source line is not exactly one of: written, dropped by a declared DROP_LINES step, dropped by DROP_ROWS_NOT_NUMERIC for a cell that is no number, blank, a names line"])),
                  (lambda: not differ(), "IDENTITY_FAILED", lambda: detail(rows=sorted({c[0] for c in differ()})[:3], counts={"output cells not identical to their source cell": len(differ())})),
                  (lambda: not unordered(), "IDENTITY_FAILED", lambda: detail(words=unordered()[:3] + ["rows not in source order"]))],
                 lambda: Pass(Verified(len(outputs), sum(len(x) for x in data), len(cells()))))
@@ -403,7 +418,9 @@ def _records(conv, ct, raws, built):
     """(units, outputs, frames): the manifest's records and the bytes they describe."""
     srcs = list(dict.fromkeys(f["from"] for f in conv["file"]))
     units = [{"file": u, "source": srcs.index(conv["file"][u]["from"]), "dropped": sorted({tuple(x) for _, fr in parts for x in fr.dropped}),
-              "names": sorted({n for _, fr in parts for n in fr.named})} for u, parts in built]
+              "names": sorted({n for _, fr in parts for n in fr.named}), "not_numeric": [{True: lambda c=c: list(c), False: lambda: None}[c is not None]()
+                                                                                 for c in dict.fromkeys(c for _, fr in parts for c in fr.not_numeric)],
+              "not_numeric_count": len(dict.fromkeys(c for _, fr in parts for c in fr.not_numeric))} for u, parts in built]   # plan 1160 A11: lines and a count, never a cell
     outs = [(name, fr, u) for u, parts in built for name, fr in parts]
     rendered = [(render(fr), name, fr, u) for name, fr, u in outs]
     outputs = [({"path": name, "unit": u, "broadcast": sorted(fr.broadcast), "rows": len(fr.rows), "columns": len(fr.names), "sha256": _sha(b), "bytes": len(b),
@@ -504,7 +521,10 @@ def s3(declaration, d, t, then):
         m = _bind(_reader(bank, loader)(MANIFEST), lambda b: {True: lambda: None, False: lambda: _manifest(b.decode("utf-8", "replace"))}[b is None]())
         got = chained(m, _reader(raw, loader), _reader(bank, loader), ctables(), {"source": src["converted_from"], "out": src["root"]})
         broken = {True: lambda: got, False: lambda: Refuse("CONVERSION_CHAIN_BROKEN", got.evidence.within("", got.reason))}
-        return {True: lambda: then(loader), False: lambda: broken[got.reason == "CONVERSION_CHAIN_BROKEN"]()}[isinstance(got, Pass)]()
+        dropped = lambda: tuple((f"{m['files'][u['file']]['from']} -> {m['files'][u['file']]['to']}", u["not_numeric_count"]) for u in m["units"]
+                                if "DROP_ROWS_NOT_NUMERIC" in [x["op"] for x in m["files"][u["file"]]["steps"]])   # plan 1160 A11: the census prints the count
+        return {True: lambda: _bind(then(loader), lambda p: Pass(replace(p.evidence, dropped=dropped()))),
+                False: lambda: broken[got.reason == "CONVERSION_CHAIN_BROKEN"]()}[isinstance(got, Pass)]()
     return gate([(lambda: "" not in (bank, raw) and Path(bank).is_dir() and Path(raw).is_dir(), "ROOT_UNRESOLVED",
                   lambda: detail(words=[f"root '{src['root']}'", f"converted_from '{src['converted_from']}'"]))], go)
 

@@ -41,9 +41,11 @@ class File:
 @dataclass(frozen=True)
 class Pinned:
     """S3 SOURCE_INTEGRITY: every selected file, admitted, read once through the logged loader and pinned. Invariant: carries the Declaration
-    it read and the bytes, so no later stage opens a file."""
+    it read and the bytes, so no later stage opens a file. `dropped`: per converted file that declares DROP_ROWS_NOT_NUMERIC, (its name, the rows
+    dropped), set by intake_convert.s3 from the manifest (plan 1160 A11)."""
     declaration: Declaration
     files: tuple
+    dropped: tuple = ()
 
     def summary(self):
         return (f"{len(self.files)} files admitted, read once each through the logged loader (declarations/{self.declaration.id}/access.log) "
@@ -104,7 +106,7 @@ class Census:
 
     def listing(self):
         """The report's census section: each curve by ordinal and file name (a LONG_TABLE block by its ordinal), never by its slow value."""
-        return [f"{i}. {where}: {n} points" for i, (where, n) in enumerate(self.curves, 1)]
+        return [f"{i}. {where}: {n} points" for i, (where, n) in enumerate(self.curves, 1)] + [f"- converted {f}: rows dropped as not numeric (DROP_ROWS_NOT_NUMERIC): {k}" for f, k in self.pinned.dropped]
 
     def confirmed(self):
         return False

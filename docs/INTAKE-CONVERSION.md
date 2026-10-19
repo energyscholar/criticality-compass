@@ -7,9 +7,10 @@ about the Compass. Read the rule first, then the steps, then the op you need.
 
 A conversion moves cells. It drops header lines, cuts lines into cells, picks columns, renames them, splits rows into files and turns a
 wide table into a long one. It never computes anything. Each cell is text from the moment it is read to the moment it is written. There
-is no op to interpolate, smooth, resample, change a unit, average, round, sort rows, fill a gap or drop a data row. A declaration that
-asks for one is refused OPERATION_NOT_LISTED. The one change to a cell's text is DECIMAL_MARK (`1,5` becomes `1.5`), and the identity test
-still demands the same number.
+is no op to interpolate, smooth, resample, change a unit, average, round, sort rows or fill a gap. A declaration that asks for one is
+refused OPERATION_NOT_LISTED. The one change to a cell's text is DECIMAL_MARK (`1,5` becomes `1.5`), and the identity test still demands
+the same number. The one drop of a data row is DROP_ROWS_NOT_NUMERIC (plan 1160 A11): a row whose declared column holds no number (an
+empty or text cell) is dropped, recorded by its line number, and the identity test refuses the drop if that cell is a number.
 
 ## What you do
 
@@ -150,6 +151,23 @@ of rows, and each row of the block holds `fast` (the names cell, verbatim), `mea
 Every name except the key's must be a number (NAMES_NOT_NUMERIC otherwise). A row shorter than the names line is refused COLUMN_ABSENT.
 Declare the bank as a LONG_TABLE whose slow column is the key.
 
+### DROP_ROWS_NOT_NUMERIC
+
+NAMED to NAMED (plan 1160 A11): each data row in which any of `columns` holds a cell that is not a number (an empty cell, or text) is
+dropped. Name a column by its name or by its 1-based position. Every kept row is written unchanged.
+`T,C` / `1.5,0.25` / `1.6,` / `1.7,n/a` / `1.8,0.5` with `{op = "DROP_ROWS_NOT_NUMERIC", columns = ["C"]}` is written as `T,C` / `1.5,0.25` / `1.8,0.5`.
+The manifest records each dropped row's source line number, its step, the line and column of the cell that is not a number, and the count;
+never the cell. The identity test refuses (CELL_MAP_NOT_A_PERMUTATION) a drop whose recorded cell is a number. The census of the run that
+reads the bank prints, per converted file, how many rows were dropped.
+Declare it after DECIMAL_MARK (a `1,5` is not a number until the mark is replaced, and the identity test would refuse its drop), and before
+WIDE_TO_LONG (a wide row becomes many long rows: drop the whole source row, or none of it).
+
+**When to use it, and when not.** Use it when a declared column of a data row holds an empty cell or a word such as `n/a` (a reading
+the instrument did not record). A row dropped this way loses its other cells too. If the rows it would drop are a second header block in
+mid-file, a repeated names line, or a comment line, the column is not wrong: those are not data rows, and DROP_LINES (PREFIX or FIRST) or
+SPLIT_ROWS (one output per block) handles them, so that each block keeps its own names line. If most rows of a column would be dropped,
+it is a sign the column is the wrong one: peek again and declare another column.
+
 ## Shapes that convert (tests/test_intake_convert.py V3)
 
 - **MultiVu-like** (`[Header]` ... `[Data]`, then a names line): `DROP_LINES` with rule MARKER `[Data]`.
@@ -164,8 +182,8 @@ Declare the bank as a LONG_TABLE whose slow column is the key.
 Before writing, the converter checks two things on the exact bytes it is about to write:
 
 - **The cell map is a permutation.** Every output cell names one source cell (line and column). No source cell feeds two output cells,
-  except the repeated fast and key columns of WIDE_TO_LONG. Every source line is written, dropped by a declared DROP_LINES step, blank,
-  or a names line, exactly once. Otherwise the refusal is CELL_MAP_NOT_A_PERMUTATION.
+  except the repeated fast and key columns of WIDE_TO_LONG. Every source line is written, dropped by a declared DROP_LINES step, dropped by
+  DROP_ROWS_NOT_NUMERIC for a cell that is not a number, blank, or a names line, exactly once. Otherwise the refusal is CELL_MAP_NOT_A_PERMUTATION.
 - **The identity holds.** Two numbers must be bitwise equal as floats, and any other cell must have equal text. Rows must stay in
   source order. Otherwise the refusal is IDENTITY_FAILED.
 
@@ -173,7 +191,8 @@ Before writing, the converter checks two things on the exact bytes it is about t
 
 - the raw files: path, sha256 and size;
 - the outputs: path, sha256, size, rows, number of columns and the cell map, as line and column numbers;
-- the dropped and names lines, by number;
+- the dropped and names lines, by number, each dropped line with its step; for DROP_ROWS_NOT_NUMERIC, the line and column of the cell
+  that is not a number, and the count of rows dropped;
 - the steps as you declared them;
 - the code hash and the time.
 
@@ -202,3 +221,7 @@ others are:
 | NAMES_NOT_NUMERIC | WIDE_TO_LONG met a text name besides the key; SELECT_COLUMNS it away first |
 | CELL_MAP_NOT_A_PERMUTATION, IDENTITY_FAILED | the steps would lose, repeat, reorder or change a cell; this is the rule at the top |
 | CONVERSION_CHAIN_BROKEN | the raw files or the bank changed after the conversion; convert again under a new id |
+
+If a data row holds an empty or text cell in a declared column, the intake refuses it (CELL_NOT_A_NUMBER; `nan` is text). Declare
+DROP_ROWS_NOT_NUMERIC on that column if the row is a reading the instrument did not record; declare another column if that column is the
+wrong one; or report the deposit as unreadable. A conversion cannot fill a row, and it drops one only through DROP_ROWS_NOT_NUMERIC.

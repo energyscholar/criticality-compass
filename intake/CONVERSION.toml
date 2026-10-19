@@ -4,7 +4,9 @@
 # section: the same field rows, check words and reason codes as intake/FORMAT.toml) and then runs cc/intake_convert.py.
 # Every operation is a function from text cells to text cells: the converter's cell type is str end to end, so no arithmetic on a value is
 # reachable. A conversion is not allowed to change a number; a step that would (interpolate, smooth, resample, change a unit, average,
-# round, sort rows, fill a NaN, drop a data row) has no row here, and S0 of the conversion refuses it OPERATION_NOT_LISTED.
+# round, sort rows, fill a NaN, drop a data row) has no row here, and S0 of the conversion refuses it OPERATION_NOT_LISTED. The one drop of a
+# data row is DROP_ROWS_NOT_NUMERIC (plan 1160 A11): a row whose declared column holds no number, each drop recorded and justified by the
+# identity test against the source cell; it changes no number.
 # The declaration (schema 1, kind "conversion"):
 #   source  "<cc-datasets>/<id>/raw": the deposit, a root name of intake/ROOTS.toml and a path under it
 #   out     "<cc-banks>/<id>/bank": the bank the converter writes (it never overwrites one: BANK_EXISTS)
@@ -17,7 +19,7 @@
 # total over them).
 schema = 1
 kind = "intake-conversion"
-version = "1160-v1"
+version = "1160-v2"   # plan 1160 A10 (SHEET_REQUIRED) and A11 (DROP_ROWS_NOT_NUMERIC)
 header = { schema = 1, kind = "conversion" }
 stamped = []
 derived = []
@@ -48,6 +50,7 @@ SHEET_TO_CSV = { sheet = { type = "str", check = "TEXT" } }
 SELECT_COLUMNS = { columns = { type = "list", check = "ITEMS", item = "ref" } }
 RENAME = { pairs = { type = "list", check = "TABLES", fields = { from = { type = "str", check = "TEXT" }, to = { type = "str", check = "TEXT" } } } }
 WIDE_TO_LONG = { key = { type = "ref", check = "REF" }, fast = { type = "str", check = "TEXT" }, measured = { type = "str", check = "TEXT" } }
+DROP_ROWS_NOT_NUMERIC = { columns = { type = "list", check = "ITEMS", item = "ref" } }   # plan 1160 A11
 [fields.file.fields.steps.variants.DROP_LINES.rule]
 type = "table"
 check = "VARIANT"
@@ -78,6 +81,7 @@ DECIMAL_MARK = { stage = "NAMED", gives = "NAMED", does = "in every data cell an
 SELECT_COLUMNS = { stage = "NAMED", gives = "NAMED", does = "the columns named (a name, or a 1-based position), in the declared order (COLUMN_ABSENT for a name no column or two columns hold, or a position out of range)" }
 RENAME = { stage = "NAMED", gives = "NAMED", does = "each names cell `from` becomes `to` (COLUMN_ABSENT when no single column holds `from`)" }
 SPLIT_ROWS = { stage = "NAMED", gives = "NAMED", does = "rule RANGES: one output per part `name`, data rows `first`..`last` (1-based, inclusive); CHANGE: a new output where the text of `column` changes, named <to stem>_000.csv, _001.csv, ... Rows are copied verbatim, in order; a data row in no part fails the identity test (CELL_MAP_NOT_A_PERMUTATION)" }
+DROP_ROWS_NOT_NUMERIC = { stage = "NAMED", gives = "NAMED", does = "each data row in which any of `columns` (names, or 1-based positions) holds a cell that is no number (empty, or text) is dropped; the manifest records each dropped row's source line, its step, the [line, column] of the cell that is no number, and the count, never a cell. The identity test refuses a drop whose recorded cell is a number (CELL_MAP_NOT_A_PERMUTATION); every kept cell is unchanged. Declare it after DECIMAL_MARK (plan 1160 A11)" }
 WIDE_TO_LONG = { stage = "NAMED", gives = "NAMED", does = "a names line whose every name but the `key` column's is a number (NAMES_NOT_NUMERIC otherwise): each source row becomes one block of rows (`fast` = the names cell, verbatim; `measured` = the row's cell; then the key column, the row's key cell); the names line is fast, measured, the key's name" }
 
 [[reason]]

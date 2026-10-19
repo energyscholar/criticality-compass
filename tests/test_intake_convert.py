@@ -4,6 +4,9 @@ peek`). Planted inputs only (no real data).
      --verify passes on it (SHEET_TO_CSV only where openpyxl is installed; elsewhere it refuses XLSX_READER_ABSENT and is NOT REACHED here).
  V2. The identity test catches a cell rewritten as repr(float(cell) + 1e-9), a dropped row and a reordered row (each a mutation of
      intake_convert.render, so the bytes about to be written differ from what the ops built): convert refuses and writes no bank.
+ V2 (1160 A11). DROP_ROWS_NOT_NUMERIC: the manifest records the dropped rows' source lines (with the step), the [line, column] of each
+     cell that is no number and the count, never a cell; the identity test refuses a mutation of the op that drops a numeric row (recording
+     that row's own cell, another row's cell, no cell, or a sourceless cell), and a drop declared before DECIMAL_MARK.
  V3. Planted shapes convert and reach an S5 census: a MultiVu-like file through DROP_LINES; a semicolon file with a `##Temp./°C;...` names
      line and decimal commas through DELIMITER + NAMES_LINE + DECIMAL_MARK + RENAME; a WIDE file through WIDE_TO_LONG to a LONG_TABLE; a
      two-sheet xlsx through SHEET_TO_CSV + SELECT_COLUMNS + SPLIT_ROWS to two PER_FILE curves (NOT REACHED without openpyxl: it must run on
@@ -23,6 +26,10 @@ Seen RED (each mutation applied by hand, the test run, the mutation reverted):
  - verify's `unpartitioned` check removed: V2 FAILS on the dropped row and V6 on the RANGES plant that omits a row (PASS);
  - chained without the raw sha256 comparison: V5 FAILS (no refusal after a source byte changed) and V6's totality (CHAIN_BROKEN unreached);
  - DROP["MARKER"] dropping only the marker line: V1 FAILS on the MARKER case (its header lines are written).
+ - (1160 A11) DROP_ROWS_NOT_NUMERIC dropping the rows whose cell IS a number: V1 FAILS; verify justifying every DROP_ROWS_NOT_NUMERIC drop:
+   V2 FAILS (each numeric-row drop passes); verify judging the cell without the decimal mark: V2 FAILS (the drop before DECIMAL_MARK passes);
+   the manifest's not_numeric_count off by one: V2 FAILS (the manifest record).
+ - (1160 A10) _xlsx always False: V4 and V6 FAIL; _named printing every name unmasked: V4 FAILS (the sheet-name words).
 Not seen red: _same comparing text only. Every op copies a cell's text (DECIMAL_MARK's replacement is applied to the source cell too), so
 an output numeral always has its source's text and the bitwise float comparison the plan asks for never decides a case here.
 The xlsx shapes run where openpyxl is installed (the data host, docs/INTAKE-ON-A-DATA-HOST.md)."""
@@ -116,6 +123,8 @@ with tempfile.TemporaryDirectory() as tmp:
          {"out_000.csv": "T,C,h\n1.5,0.25,0.1\n1.6,0.5,0.1\n", "out_001.csv": "T,C,h\n1.5,0.75,0.2\n"}),
         ("WIDE_TO_LONG", {"a.csv": b"h,1.5,1.6\n0.1,0.25,0.5\n0.2,0.75,1.0\n"}, "a.csv", '{op = "WIDE_TO_LONG", key = "h", fast = "T", measured = "C"}',
          {"out.csv": "T,C,h\n1.5,0.25,0.1\n1.6,0.5,0.1\n1.5,0.75,0.2\n1.6,1.0,0.2\n"}),
+        ("DROP_ROWS_NOT_NUMERIC", {"a.csv": b"T,C\n1.5,0.25\n1.6,\n1.7,n/a\n1.8,0.5\n"}, "a.csv", '{op = "DROP_ROWS_NOT_NUMERIC", columns = ["C"]}',   # 1160 A11
+         {"out.csv": "T,C\n1.5,0.25\n1.8,0.5\n"}),
     ]
     XCASE = ("SHEET_TO_CSV", {"a.xlsx": workbook({"notes": [["planted"]], "data": [["T", "C"], [1.5, 0.25]]})}, "a.xlsx", '{op = "SHEET_TO_CSV", sheet = "data"}',
              {"out.csv": "T,C\n1.5,0.25\n"})
@@ -143,6 +152,29 @@ with tempfile.TemporaryDirectory() as tmp:
         ic.render = rendered
         check(f"V2. the identity test catches {what}: convert refuses ({code(got)}) and writes no bank",
               code(got) in ("IDENTITY_FAILED", "CELL_MAP_NOT_A_PERMUTATION") and not bank.exists(), code(got))
+
+    # ---- V2. (1160 A11) DROP_ROWS_NOT_NUMERIC: the manifest's lines and count, and the identity test refuses a drop of a numeric row
+    NN = ({"a.csv": b"T,C\n1.5,0.25\n1.6,\n1.7,n/a\n1.8,0.5\n"}, "a.csv", '{op = "DROP_ROWS_NOT_NUMERIC", columns = ["C"]}')
+    got, bank, _ = conv(NN[0], [(NN[1], "out.csv", NN[2])])
+    man = (bank / ic.MANIFEST).read_text()
+    unit = json.loads(man)["units"][0]
+    check("V2. (1160 A11) the manifest records the dropped rows' source lines with their step, the cells that are no number, and the count; no cell",
+          unit["dropped"] == [[3, 0], [4, 0]] and unit["not_numeric"] == [[3, 1], [4, 1]] and unit["not_numeric_count"] == 2 and "n/a" not in man, str(unit))
+    dropper = ic.OPS["DROP_ROWS_NOT_NUMERIC"]
+    NUMERIC_DROPS = {   # a mutation of the op's result: the frame it returns drops the numeric row of line 5 (1.8,0.5) as well
+        "recording that row's own cell (a number)": lambda fr: replace(fr, rows=fr.rows[:-1], dropped=fr.dropped + ((5, 0),), not_numeric=fr.not_numeric + ((5, 1),)),
+        "recording another row's cell that is no number": lambda fr: replace(fr, rows=fr.rows[:-1], dropped=fr.dropped + ((5, 0),), not_numeric=fr.not_numeric + ((3, 1),)),
+        "recording no cell": lambda fr: replace(fr, rows=fr.rows[:-1], dropped=fr.dropped + ((5, 0),)),
+        "recording a sourceless cell": lambda fr: replace(fr, rows=fr.rows[:-1], dropped=fr.dropped + ((5, 0),), not_numeric=fr.not_numeric + (None,)),
+    }
+    for what, mut in NUMERIC_DROPS.items():
+        ic.OPS["DROP_ROWS_NOT_NUMERIC"] = lambda name, fr, step, k, mut=mut: [(nm, mut(f)) for nm, f in dropper(name, fr, step, k)]
+        got, bank, _ = conv(NN[0], [(NN[1], "out.csv", NN[2])])
+        ic.OPS["DROP_ROWS_NOT_NUMERIC"] = dropper
+        check(f"V2. (1160 A11) the identity test refuses a drop of a numeric row {what}: CELL_MAP_NOT_A_PERMUTATION, no bank",
+              code(got) == "CELL_MAP_NOT_A_PERMUTATION" and not bank.exists(), code(got))
+    got, bank, _ = conv({"a.csv": b"T;C\n1,5;0,25\n1,6;\n"}, [("a.csv", "out.csv", '{op = "DELIMITER", from = "SEMICOLON"}, {op = "DROP_ROWS_NOT_NUMERIC", columns = ["C"]}, {op = "DECIMAL_MARK", mark = ","}')])
+    check("V2. (1160 A11) a DROP_ROWS_NOT_NUMERIC declared on a column before its DECIMAL_MARK drops '0,25' too, and the identity test refuses it", code(got) == "CELL_MAP_NOT_A_PERMUTATION", code(got))
 
     # ---- V3. planted shapes reach a census
     banks = tmp / "banks"

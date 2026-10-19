@@ -234,6 +234,9 @@ SENTENCES = [   # (doc, sentence, the defect it answers)
     ("INTAKE-COMPLETION.md", "A refused second lane does not withhold the result", "D4"),
     ("INTAKE-CONVERSION.md", "For an xlsx, `--sheet` is required; to learn the sheet names, peek without `--sheet`: it refuses SHEET_REQUIRED, and "
      "its Detail lists the workbook's sheet names", "D5"),
+    ("INTAKE-CONVERSION.md", "If a data row holds an empty or text cell in a declared column, the intake refuses it (CELL_NOT_A_NUMBER; `nan` is text). "
+     "Declare DROP_ROWS_NOT_NUMERIC on that column if the row is a reading the instrument did not record; declare another column if that column "
+     "is the wrong one; or report the deposit as unreadable. A conversion cannot fill a row, and it drops one only through DROP_ROWS_NOT_NUMERIC.", "D6 (adapted, plan 1160 A11)"),
 ]
 GONE = [("INTAKE-COMPLETION.md", "A ROBUSTNESS refusal at S9 withholds S10", "D4 (plan 1160 A9: S10 runs before S9)")]
 for doc, text, why in SENTENCES:

@@ -27,6 +27,7 @@ Seen RED (each mutation applied by hand, the test run, the mutation reverted):
  - (1160 P2) BREAK["FAST_RESTART"] made the EXACT rule: K2 FAILS on the two-sweep FAST_RESTART PASS plant (CURVE_REPEATED) and K5 FAILS (579 one-point curves);
  - (1160 P2) intake_names.masked returning the stated text unmasked: K3 FAILS on both UNIT_DIFFERS plants whose unit holds a sentinel
    (NAMES_UNITS 'K -7357.15', NAMES_UNITS_IN_NAMES 'T/K -7357.25').;
+ - (1160 A11) intake_convert.s3 setting no dropped counts: K4 FAILS (the census section of the DROP_ROWS_NOT_NUMERIC plant);
  - (1160 A10) intake_convert._named printing every sheet name unmasked: K6 FAILS where openpyxl is installed (here, without openpyxl, the
    names are not listed: NOT seen red on this machine; the word table is seen red in test_intake_convert V4);
  - (1160 P3) intake_convert._said printing every head cell unmasked (numeric names included): K6 FAILS (peek stdout and peek.log);
@@ -210,6 +211,7 @@ with tempfile.TemporaryDirectory() as tmp:
 
     curve_files = {f"curve_{i:03d}.csv": (banks / PF / f"curve_{i:03d}.csv").read_bytes() for i in range(K)}
     as_is = [(f, f, "") for f in curve_files]
+    NN = {f: b.replace(b"\n", f"\n{cell(i, 60, 1)},n/a,{cell(i, 60, 3)}\n".encode(), 1) for i, (f, b) in enumerate(curve_files.items())}   # (1160 A11) a not-numeric row
     cv = lambda name: (pf(PF, lambda t: convert(t, f"<cc-banks>/{name}/bank", f"<cc-datasets>/{name}/raw")), PF)
 
     def keyed(line):
@@ -278,6 +280,8 @@ with tempfile.TemporaryDirectory() as tmp:
         ("CONVERSION_CHAIN_BROKEN", "(1160 P3) one byte of a raw sentinel file changed after the conversion",
          (*cv(conv_bank(curve_files, as_is, lambda raw, bank: (raw / "curve_001.csv").write_bytes((raw / "curve_001.csv").read_bytes().replace(b"T", b"t", 1)))), unsealed)),
         ("PASS", "(1160 P3) the converted PER_FILE sentinel bank, sealed", (*cv(CV := conv_bank(curve_files, as_is)), (("lint",), SEAL(tmp / "cc-banks" / CV / "bank"), ("run",)))),
+        ("PASS", "(1160 A11) the converted PER_FILE sentinel bank, a sentinel row with C = n/a in each file dropped by DROP_ROWS_NOT_NUMERIC, sealed",
+         (*cv(DNN := conv_bank(NN, [(f, f, '{op = "DROP_ROWS_NOT_NUMERIC", columns = ["C"]}') for f in NN])), (("lint",), SEAL(tmp / "cc-banks" / DNN / "bank"), ("run",)))),
         # S6 ADMISSIBILITY (1160 P4): linted, sealed, then run with the edit between S5 and S6
         ("READ_NOT_LOGGED", "(1160 P4) the loader lines of curve_002.csv deleted from the access log", (pf(PF), PF, full(PF)[:2] + (AtS6(lambda b, d: unlog(d, "curve_002.csv")),))),
         ("BYPASS_READ_LOGGED", "(1160 P4) curve_001.csv opened directly in the test process (open(), not the loader)", (pf(PF), PF, full(PF)[:2] + (AtS6(lambda b, d: (b / "curve_001.csv").read_bytes()),))),
@@ -396,6 +400,13 @@ with tempfile.TemporaryDirectory() as tmp:
                       ("PASS the LONG_TABLE sentinel bank, sealed", [f"{i + 1}. bank.csv block {i + 1}: {6 + i} points" for i in range(K)])):
         sec = said[key].split("## Census\n", 1)[-1].split("\n## ", 1)[0]
         check(f"K4. {key.split(' ', 1)[1]}: the census section lists each curve by ordinal and file name", "## Census\n" in said[key] and all(x in sec.splitlines() for x in want), sec[:400])
+
+    # ---- K4. (1160 A11) the census of the bank DROP_ROWS_NOT_NUMERIC converted prints the dropped count per converted file, no value
+    out = said["PASS (1160 A11) the converted PER_FILE sentinel bank, a sentinel row with C = n/a in each file dropped by DROP_ROWS_NOT_NUMERIC, sealed"]
+    sec = out.split("## Census\n", 1)[-1].split("\n## ", 1)[0]
+    check("K4. (1160 A11) the census section prints, per converted file, the rows DROP_ROWS_NOT_NUMERIC dropped (1 each)",
+          all(f"- converted curve_{i:03d}.csv -> curve_{i:03d}.csv: rows dropped as not numeric (DROP_ROWS_NOT_NUMERIC): 1" in sec.splitlines() for i in range(K)), sec[:600])
+    check("K4. (1160 A11) the dropped sentinel rows reach no output: the bank files are the deposit's", all((tmp / "cc-banks" / DNN / "bank" / f).read_bytes() == b for f, b in curve_files.items()))
 
     # ---- K5. (1160 P2) the drift bank's census: 22 curves, its drift reported as a count
     out = said["PASS (1160 P2) block FAST_RESTART on a drift bank: 22 sweeps, 579 distinct slow values, sealed"]
