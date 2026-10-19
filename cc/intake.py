@@ -288,6 +288,9 @@ def report(t, ident, out, note):
              "| stage | name | state | reads data bytes | execution |", "|---|---|---|---|---|"]
     lines += [f"| {s['id']} | {s['name']} | {state(s)} | {s['reads_bytes']} | {out[s['id']].atom.name} |" for s in t["stages"]["stage"]]
     lines += [""] + [f"- **{s['id']} {s['name']}** ({state(s)}): {out[s['id']].text(t)}" for s in t["stages"]["stage"]]
+    census = [s["id"] for s in t["stages"]["stage"] if s["name"] == "CENSUS"][0]   # the census section: only when the census passed (plan 1160 P0)
+    lines += {True: lambda: ["", "## Census", "", f"The curves of {census} CENSUS, by ordinal and file name (never by slow value):", ""] + out[census].result.evidence.listing(),
+              False: lambda: []}[out[census].mark is Mark.PASSED]()
     lines += ["", "## What the seal proves", "", t["stages"]["report"]["seal_claim"], ""] + not_live(t) + [
               "## What no stage can see", ""] + [f"- {u}" for u in t["stages"]["report"]["unenforced"]]
     return "\n".join(lines) + "\n"

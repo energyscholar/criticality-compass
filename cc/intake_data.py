@@ -16,7 +16,7 @@ from pathlib import Path
 
 import intake_read
 import intake_seal
-from intake_blind import NUMBER, Declaration, Pass, Refuse, detail, numbered
+from intake_blind import NUMBER, Declaration, Pass, Refuse, detail, numbered, shown
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -60,7 +60,7 @@ class Shaped:
 
     def summary(self):
         d = self.pinned.declaration.data
-        return (f"The first file's columns are {','.join(map(str, self.columns))}, the declared columns, its stated units (if any) are the declared "
+        return (f"The first file's columns are {', '.join(shown(self.columns))}, the declared columns, its stated units (if any) are the declared "
                 f"units, and its rows are stored {d['acquisition']['row_order']} in {d['knobs']['fast']['name']} within each curve")
 
     def confirmed(self):
@@ -69,26 +69,33 @@ class Shaped:
 
 @dataclass(frozen=True)
 class Sampling:
-    """The sampling label of a census. Invariant: n_min <= n_median <= n_max over `curves` curves; span is the (lowest, highest) fast value."""
+    """The sampling label of a census: counts and structure, never a value (plan 1160 P0). Invariant: n_min <= n_median <= n_max over `curves`
+    curves; `distinct` is the count of distinct fast values over every curve."""
     curves: int
     n_min: int
     n_median: float
     n_max: int
     fast: str
-    span: tuple
+    distinct: int
     alignment: Alignment
 
 
 @dataclass(frozen=True)
 class Census:
-    """S5 CENSUS: the sampling label (curves, points per curve, fast-knob span, alignment). Invariant: carries the Pinned it counted."""
+    """S5 CENSUS: the sampling label (curves, points per curve, distinct fast values, alignment) and the curves as (where, points) in census
+    order. Invariant: carries the Pinned it counted; it holds counts and names, never a value (plan 1160 P0)."""
     pinned: Pinned
     label: Sampling
+    curves: tuple
 
     def summary(self):
         x = self.label
         return (f"Every file has the first file's columns; no slow value or fast value repeats; no curve contradicts the declared direction. Sampling: {x.curves} curves; points per curve "
-                f"min {x.n_min}, median {x.n_median:g}, max {x.n_max}; {x.fast} span [{x.span[0]:g}, {x.span[1]:g}]; {x.alignment.name}")
+                f"min {x.n_min}, median {x.n_median:g}, max {x.n_max}; {x.distinct} distinct {x.fast} values; {x.alignment.name}")
+
+    def listing(self):
+        """The report's census section: each curve by ordinal and file name (a LONG_TABLE block by its ordinal), never by its slow value."""
+        return [f"{i}. {where}: {n} points" for i, (where, n) in enumerate(self.curves, 1)]
 
     def confirmed(self):
         return False
@@ -297,14 +304,14 @@ def census(pinned, shaped, t):
                  (lambda: rep[0] or len(set(hs())) == len(hs()), "CURVE_REPEATED", lambda: detail(words=again()[:3], counts={"curves whose slow value another curve has": len(again())})),
                  (lambda: not twice(), "FAST_VALUE_REPEATED", lambda: detail(words=twice()[:3], counts={"curves": len(twice())})),
                  (lambda: not against(), "ACQUISITION_ORDER_DIFFERS", lambda: detail(words=against()[:3] + [f"stored in acquisition order, not {acq['direction']}"], counts={"curves": len(against())}))],
-                lambda: Pass(Census(pinned, label(curves(), d["knobs"]["fast"]["name"]))))
+                lambda: Pass(Census(pinned, label(curves(), d["knobs"]["fast"]["name"]), tuple((c.where, len(c.rows)) for c in curves()))))
 
 
 def label(curves, fast):
     """The sampling label of curves whose rows hold the fast knob first."""
     ns, xs = [len(c.rows) for c in curves], [r[0] for c in curves for r in c.rows]
     seqs = {tuple(r[0] for r in c.rows) for c in curves}
-    return Sampling(len(curves), min(ns), statistics.median(ns), max(ns), fast, (min(xs), max(xs)), {True: Alignment.ALIGNED, False: Alignment.MISALIGNED}[len(seqs) == 1])
+    return Sampling(len(curves), min(ns), statistics.median(ns), max(ns), fast, len(set(xs)), {True: Alignment.ALIGNED, False: Alignment.MISALIGNED}[len(seqs) == 1])
 
 
 def bodies(t, d):
