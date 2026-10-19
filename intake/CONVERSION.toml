@@ -8,7 +8,7 @@
 # data row is DROP_ROWS_NOT_NUMERIC (plan 1160 A11): a row whose declared column holds no number, each drop recorded and justified by the
 # identity test against the source cell; it changes no number.
 # The declaration (schema 1, kind "conversion"):
-#   source  "<cc-datasets>/<id>/raw": the deposit, a root name of intake/ROOTS.toml and a path under it
+#   source  "<cc-datasets>/<name>/raw" (an example): the deposit, a root name of intake/ROOTS.toml and a path under it; the id is free
 #   out     "<cc-banks>/<id>/bank": the bank the converter writes (it never overwrites one: BANK_EXISTS)
 #   [[file]] one per output file: `from` (a file under source), `to` (the output's name in the bank), `steps` (applied in order)
 # A step meets the file at a stage, RAW (bytes) < TEXT (lines) < TABLE (rows of cells) < NAMED (a names line and rows). A step that needs a
@@ -19,7 +19,7 @@
 # total over them).
 schema = 1
 kind = "intake-conversion"
-version = "1160-v2"   # plan 1160 A10 (SHEET_REQUIRED) and A11 (DROP_ROWS_NOT_NUMERIC)
+version = "1160-v3"   # plan 1160 A21 (a sheet by name or position), A23 (CONVERSION_CHAIN_BROKEN Next); plan 1160 A10 (SHEET_REQUIRED) and A11 (DROP_ROWS_NOT_NUMERIC)
 header = { schema = 1, kind = "conversion" }
 stamped = []
 derived = []
@@ -46,7 +46,7 @@ UNPACK = { member = { type = "str", check = "TEXT" } }   # RAW -> RAW: the bytes
 DECODE = { encoding = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { "utf-8" = "ADMIT", "utf-8-sig" = "ADMIT", "latin-1" = "ADMIT", "cp1252" = "ADMIT", "utf-16" = "ADMIT" } } }
 DELIMITER = { from = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { COMMA = "ADMIT", SEMICOLON = "ADMIT", TAB = "ADMIT", WHITESPACE = "ADMIT" } } }
 DECIMAL_MARK = { mark = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { "," = "ADMIT" } } }
-SHEET_TO_CSV = { sheet = { type = "str", check = "TEXT" } }
+SHEET_TO_CSV = { sheet = { type = "ref", check = "REF" } }   # plan 1160 A21: a name or a 1-based position
 SELECT_COLUMNS = { columns = { type = "list", check = "ITEMS", item = "ref" } }
 RENAME = { pairs = { type = "list", check = "TABLES", fields = { from = { type = "str", check = "TEXT" }, to = { type = "str", check = "TEXT" } } } }
 WIDE_TO_LONG = { key = { type = "ref", check = "REF" }, fast = { type = "str", check = "TEXT" }, measured = { type = "str", check = "TEXT" } }
@@ -155,7 +155,7 @@ sentence = "The workbook holds no sheet of the declared name."
 [[reason]]
 code = "SHEET_REQUIRED"
 live = true
-sentence = "peek on an xlsx workbook needs --sheet NAME; the Detail lists the workbook's sheet names (a numeric name counted, never printed). Peek again with --sheet."
+sentence = "peek on an xlsx workbook needs --sheet; the Detail lists the workbook's sheets by position, each with its name (a text name masked, a numeric name never printed). Peek again with --sheet k (the position) or --sheet NAME."
 [[reason]]
 code = "MARKER_LINE_ABSENT"
 live = true
@@ -183,4 +183,4 @@ sentence = "An output cell is not its source cell (a number not bitwise equal as
 [[reason]]
 code = "CONVERSION_CHAIN_BROKEN"
 live = true
-sentence = "The bank has no CONVERSION-MANIFEST.json, or the manifest's steps are not the declaration's, or a raw file's or a bank file's sha256 is not the manifest's."
+sentence = "The bank has no CONVERSION-MANIFEST.json, or the manifest's steps are not the declaration's, or a raw file's or a bank file's sha256 is not the manifest's. Next: `bin/cc intake convert <id>` writes it; `--verify` re-checks an existing bank."

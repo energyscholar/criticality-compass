@@ -46,7 +46,8 @@ line then says `none`.
 ## 3. Declare a data set
 
 The root name `<cc-datasets>` (intake/ROOTS.toml) is `~/scratch/cc-datasets` under the home directory. A declaration names its files as
-`root = "<cc-datasets>/<id>"`. On a machine without that directory, S3 refuses ROOT_UNRESOLVED. That refusal is honest: the data are not
+`root = "<cc-datasets>/<name>"` (an example: the root-named path is the declaration, and the id is free; it names only
+`declarations/<id>/`, plan 1160 A19). Peek names a file the same way: `bin/cc intake peek <id> <cc-datasets>/<name>/raw/<file>`. On a machine without that directory, S3 refuses ROOT_UNRESOLVED. That refusal is honest: the data are not
 there.
 
 ```
@@ -83,6 +84,8 @@ Columns are named in `[knobs.fast]`, `[measured]` and `[measured.uncertainty]` (
 (an integer). A report prints a column declared by name in quotes (`'T'`) and one declared by position as `#k`, its 1-based position. S4
 lists the declared columns in role order: fast, measured, the uncertainty column when one is declared, then the slow column of a
 LONG_TABLE. So `columns are #2, #3, #1` means the fast knob is column 2, the measured quantity column 3 and the slow knob column 1.
+The reader takes the declared columns only: extra columns, and rows of differing width beyond them, do not matter. When a card (a
+README, a column index) disagrees with the file, the file wins: peek it and declare what it holds (plan 1160 A23).
 
 `[acquisition]` says how the rows were taken and stored. `row_order` is how the rows are stored: `ASCENDING` or `DESCENDING` (sorted by
 the fast knob) or `ACQUISITION` (in the order they were taken). `direction` is the order they were taken in along the fast knob:
@@ -90,7 +93,8 @@ the fast knob) or `ACQUISITION` (in the order they were taken). `direction` is t
 ACQUISITION` and `direction = UNORDERED`; ASCENDING and DESCENDING assert a monotone sweep and S4 refuses a file that is not one. When S4
 refuses ROW_ORDER_DIFFERS, its Detail counts the curves of the refused file that are in the declared order, in the opposite order, and in
 neither order (not monotone). These are counts only, never a value. A curve in the opposite order means the other direction fits it;
-a curve in neither order means no sorted order fits, and `ACQUISITION` with `UNORDERED` is the declaration that does.
+a curve in neither order means no sorted order fits, and `ACQUISITION` with `UNORDERED` is the declaration that does. A guessed
+`direction` is a declaration S5 tests (ACQUISITION_ORDER_DIFFERS), so a wrong guess is refused, never taken silently (plan 1160 A23).
 (A LONG_TABLE with block `FAST_RESTART` needs a direction; see below.)
 
 There are two layouts in `[selection]`:
@@ -182,11 +186,12 @@ Then:
 
 ```
 <host> 'cd ~/scratch/cc-intake && bin/cc intake lint <id>'
-<host> 'cd ~/scratch/cc-intake && bin/cc intake seal <id> --universe ~/scratch/cc-datasets/<id> --author "<name>" --as human --unconfirmed'
+<host> 'cd ~/scratch/cc-intake && bin/cc intake seal <id> --author "<name>" --as human --unconfirmed'
 <host> 'cd ~/scratch/cc-intake && bin/cc intake run <id> && cat declarations/<id>/intake-report.md'
 ```
 
-Sealing is recommended and not enforced. If `seal` refuses, fix the declaration and seal again; do not run. Seal before the first run: `run` reads the data through the logged loader, and the report's
+Sealing is recommended and not enforced. The seal lists the universe under the declared `[source] root`, the directory S3 reads; it takes
+no `--universe`. If `seal` refuses, fix the declaration and seal again; do not run. Seal before the first run: `run` reads the data through the logged loader, and the report's
 ordering note compares the seal time with the first logged read. A conversion reads the raw files before you seal; that is the designed
 order, so the ordering note reports it as information and never as a refusal: when declarations/<id>/conversion-access.log holds reads of
 raw files from before the seal, the note adds `CONVERSION_READ_BEFORE_SEAL (n files)`, and the seal claims ordering only for the intake's

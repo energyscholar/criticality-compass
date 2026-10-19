@@ -72,14 +72,15 @@ def lint(root, ident, args):
 
 def _mint(root, ident, args, t, d, out):
     who = {"author": blind.flag(args, "--author", ""), "author_kind": intake_seal.AUTHOR_KIND[blind.flag(args, "--as", "")], "confirmed_by": blind.flag(args, "--confirmed-by", "")}
-    res = intake_seal.mint(out["S0"].result.evidence, d, blind.flag(args, "--universe", ""), who, root, t)
+    res = intake_seal.mint(out["S0"].result.evidence, d, who, root, t)   # plan 1160 A20: the universe is the declared root
     print(f"seal {ident}: " + res.text(t["sentences"]))
     return {Mark.PASSED: 0, Mark.REFUSED: 1}[res.mark]
 
 
 def seal(root, ident, args):
     usage = [u for ok, u in ((blind.flag(args, "--author", "") != "", "--author NAME"), (blind.flag(args, "--as", "") in intake_seal.AUTHOR_KIND, "--as human|ai-draft"),
-                             ((blind.flag(args, "--confirmed-by", "") != "") != ("--unconfirmed" in args), "exactly one of --confirmed-by NAME | --unconfirmed")) if not ok]
+                             ((blind.flag(args, "--confirmed-by", "") != "") != ("--unconfirmed" in args), "exactly one of --confirmed-by NAME | --unconfirmed"),
+                             ("--universe" not in args, "no --universe (the universe is the declared [source] root)")) if not ok]
     return {True: lambda: _usage(f"seal needs {'; '.join(usage)}"), False: lambda: _seal(root, ident, args)}[len(usage) > 0]()
 
 
@@ -98,8 +99,8 @@ def run(root, ident, args):
 
 
 def _usage(why):
-    print(f"bin/cc intake: {why}\n  usage: bin/cc intake explain | synth <id> --seed N [--curves K] [--out DIR] | lint <id> | seal <id> --universe DIR --author NAME --as human|ai-draft "
-          "(--confirmed-by NAME | --unconfirmed) | run <id> | convert <id> [--verify] | peek <id> <file> [--sheet NAME] [--depth N]\n  Next: bin/cc intake explain")
+    print(f"bin/cc intake: {why}\n  usage: bin/cc intake explain | synth <id> --seed N [--curves K] [--out DIR] | lint <id> | seal <id> --author NAME --as human|ai-draft "
+          "(--confirmed-by NAME | --unconfirmed) | run <id> | convert <id> [--verify] | peek <id> <cc-datasets>/<name>/raw/<file> [--sheet NAME|k] [--depth N] [--encoding E]\n  Next: bin/cc intake explain")
     return 1
 
 

@@ -233,32 +233,34 @@ with tempfile.TemporaryDirectory() as tmp:
         with contextlib.redirect_stdout(out):
             rc = ic.peek_cli(tmp, ident, list(args), rooted(T, tmp))
         return rc, out.getvalue()
-    rc, said = peek(WD, "wide.csv")
+    peekf = lambda ident, f, *args: peek(ident, f"<cc-datasets>/{ident}/raw/{f}", *args)   # (1160 A19) the file by its root-named path
+    rc, said = peekf(WD, "wide.csv")
     check("V4. peek on the WIDE file prints '1 text name + 40 numeric names' and stops before the first line of numbers",
           rc == 0 and "line 1: 1 text name + 40 numeric names: 'h'" in said and "stopped: a line of numbers (not printed)" in said and "line 2" not in said, said)
     check("V4. peek prints no value: no names-line number and no data cell", not [x for x in Ts + WIDE.decode().split("\n")[1].split(",") if x in said], said)
-    rc, said = peek(name, list(semi)[0], "--depth", "0")
+    rc, said = peekf(name, list(semi)[0], "--depth", "0")
     check("V4. peek prints at most depth + 2 lines, masking a numeral in a text name", said.count("\n  line ") + said.startswith("  line ") <= 2 and "'##Temp./°C'" in said, said)
     log = [json.loads(x) for x in (tmp / "declarations" / WD / "peek.log").read_text().splitlines()]
-    check("V4. peek appends to declarations/<id>/peek.log what was asked and how many lines printed", log[-1]["file"] == "wide.csv" and log[-1]["printed"] == 1, str(log))
-    rc, said = peek(WD, "../" + WD + "/raw/wide.csv")
-    check("V4. peek refuses a file outside <cc-datasets>/<id>/raw (SOURCE_FILE_ABSENT)", rc == 1 and "SOURCE_FILE_ABSENT" in said, said)
+    check("V4. peek appends to declarations/<id>/peek.log what was asked and how many lines printed", log[-1]["file"] == f"<cc-datasets>/{WD}/raw/wide.csv" and log[-1]["printed"] == 1, str(log))
+    outside = [peek(WD, p) for p in (f"<cc-banks>/{WD}/bank/bank.csv", str(tmp / "cc-datasets" / WD / "raw" / "wide.csv"), f"<cc-datasets>/../cc-datasets/{WD}/raw/wide.csv", "wide.csv")]
+    check("V4. (1160 A19: was 'outside <cc-datasets>/<id>/raw') peek refuses a path outside the <cc-datasets> root: another root, an absolute path, "
+          "a '..' part, a bare name (SOURCE_FILE_ABSENT)", all(rc == 1 and "SOURCE_FILE_ABSENT" in said for rc, said in outside), str(outside))
 
     # ---- V4. (1160 A10) peek on an xlsx with no --sheet: SHEET_REQUIRED, its Detail the sheet names (text masked, numeric counted)
     got, bank, XP = conv({"book.xlsx": workbook({"notes 2": [["planted"]], "1.5": [["T"], [1.5]], "data": [["T"], [1.5]]})}, [("book.xlsx", "x.csv", '{op = "SHEET_TO_CSV", sheet = "data"}')])
-    rc, said = peek(XP, "book.xlsx")
+    rc, said = peekf(XP, "book.xlsx")
     check("V4. (1160 A10) peek on an xlsx with no --sheet refuses SHEET_REQUIRED and prints no byte of the archive",
           rc == 1 and "SHEET_REQUIRED" in said and "PK" not in said and "1.5" not in said and "xl/" not in said, said)
     check("V4. (1160 A10) its Detail lists the sheet names where openpyxl is installed, and says it cannot list them where it is not",
-          {True: "the workbook's sheets: 2 text names + 1 numeric name: 'notes #', 'data'" in said,
+          {True: "the workbook's sheets: #1 'notes #', #2 a numeric name, #3 'data'" in said,   # (1160 A21: was '2 text names + 1 numeric name: ...')
            False: "openpyxl is not installed on this machine, so the sheet names cannot be listed here" in said}[HAS_XLSX], said)
-    check("V4. (1160 A10) the sheet-name words: TEXT names masked, a NUMERIC name counted and never printed",
-          ic.SHEET_WORDS[(True, True)](["notes 2", "1.5", "data"]) == ["the workbook's sheets: 2 text names + 1 numeric name: 'notes #', 'data'"],
+    check("V4. (1160 A10; A21: each by its position, was counted) the sheet-name words: TEXT names masked, a NUMERIC name never printed",
+          ic.SHEET_WORDS[(True, True)](["notes 2", "1.5", "data"]) == ["the workbook's sheets: #1 'notes #', #2 a numeric name, #3 'data'; name one with --sheet k (its position) or --sheet NAME"],
           str(ic.SHEET_WORDS[(True, True)](["notes 2", "1.5", "data"])))
-    rc, said = peek(XP, "book.xlsx", "--sheet", "data")
+    rc, said = peekf(XP, "book.xlsx", "--sheet", "data")
     check("V4. (1160 A10) peek on the xlsx with --sheet reads that sheet (XLSX_READER_ABSENT without openpyxl)",
           {True: "line 1: 1 text name + 0 numeric names: 'T'" in said, False: "XLSX_READER_ABSENT" in said}[HAS_XLSX], said)
-    rc, said = peek(name, list(semi)[0], "--depth", "0")
+    rc, said = peekf(name, list(semi)[0], "--depth", "0")
     check("V4. (1160 A10) a text file with no --sheet is peeked as text, as before", rc == 0 and "line 1:" in said, said)
 
     # ---- V5. the chain
@@ -302,7 +304,7 @@ with tempfile.TemporaryDirectory() as tmp:
         ("CELL_MAP_NOT_A_PERMUTATION", lambda: conv({"a.csv": b"T\n1\n2\n3\n"}, [("a.csv", "a.csv", '{op = "SPLIT_ROWS", rule = {kind = "RANGES", parts = [{name = "a.csv", first = 1, last = 1}, {name = "b.csv", first = 3, last = 3}]}}')])),
         ("CELL_MAP_NOT_A_PERMUTATION", lambda: conv({"a.csv": b"T\n1\n2\n3\n"}, [("a.csv", "a.csv", '{op = "SPLIT_ROWS", rule = {kind = "RANGES", parts = [{name = "a.csv", first = 1, last = 2}, {name = "b.csv", first = 2, last = 3}]}}')])),
         ("XLSX_READER_ABSENT", lambda: conv({"a.xlsx": workbook({"data": [["T"], [1.5]]})}, [("a.xlsx", "a.csv", '{op = "SHEET_TO_CSV", sheet = "data"}')])),
-        ("SHEET_REQUIRED", lambda: REACHED.add(code(ic._head(workbook({"data": [["T"], [1.5]]}), "")))),   # (1160 A10) peek's refusal
+        ("SHEET_REQUIRED", lambda: REACHED.add(code(ic._head(workbook({"data": [["T"], [1.5]]}), "", "utf-8-sig")))),   # (1160 A22: _head takes the encoding)   # (1160 A10) peek's refusal
         ("SHEET_ABSENT", lambda: conv({"a.xlsx": workbook({"data": [["T"], [1.5]]})}, [("a.xlsx", "a.csv", '{op = "SHEET_TO_CSV", sheet = "Sheet9"}')])),
     ]
     NOT_HERE = {False: ["SHEET_ABSENT"], True: ["XLSX_READER_ABSENT"]}[HAS_XLSX]
@@ -316,7 +318,8 @@ with tempfile.TemporaryDirectory() as tmp:
         check(f"V6. {want} is reached by its plant{' (NOT REACHED HERE)' * (want in NOT_HERE)}", want in NOT_HERE or got == want, str(got))
     check("V6. the codes reached are exactly the rows of intake/CONVERSION.toml (with the machine's NOT REACHED xlsx row)",
           (REACHED - {"PASS"}) | set(NOT_HERE) == ROWS, f"rows never reached: {sorted(ROWS - REACHED - set(NOT_HERE))}; reached, no row: {sorted(REACHED - ROWS - {'PASS'})}")
-    print(f"  openpyxl {'installed' if HAS_XLSX else 'NOT installed'} on this machine; NOT REACHED HERE: {NOT_HERE}")
+    print(f"  openpyxl {'installed' if HAS_XLSX else 'NOT installed'} on this machine; NOT REACHED HERE: {NOT_HERE} ("   # (1160 A23: the reason printed with the row)
+          + {True: "openpyxl is installed, so the reader-absent refusal cannot fire here; xlsx IS read", False: "no openpyxl: the xlsx rows run on the data host"}[HAS_XLSX] + ")")
     check("V6. (1160 A12) every plant's conversion refusal names its file in the Detail (the declaration's own: CONVERSION.toml)", not UNFILED, str(UNFILED))
 
     # ---- V7. (1160 A12) the Detail names the file of a family; peek's blank is the converter's; peek decodes utf-8-sig
@@ -325,11 +328,11 @@ with tempfile.TemporaryDirectory() as tmp:
     check("V7. (1160 A12) of two files under one step, the refusal names the file that lacks the marker (b.csv), not the other",
           code(got) == "MARKER_LINE_ABSENT" and "b.csv" in str(got.evidence) and "a.csv" not in str(got.evidence), str(got))
     got, bank, QB = conv({"q.csv": b'T,C\n"",""\n1.5,0.25\n'}, [("q.csv", "q.csv", "")])
-    rc, said = peek(QB, "q.csv", "--depth", "3")
+    rc, said = peekf(QB, "q.csv", "--depth", "3")
     check("V7. (1160 A12) a line of quoted empty cells is blank to peek and to the converter alike (one definition)",
           "line 2: blank" in said and code(got) == "PASS" and [2, -1] in json.loads((bank / ic.MANIFEST).read_text())["units"][0]["dropped"], said + code(got))
     got, bank, BB = conv({"bom.csv": b"\xef\xbb\xbfT,C\n1.5,0.25\n"}, [("bom.csv", "bom.csv", "")])
-    rc, said = peek(BB, "bom.csv")
+    rc, said = peekf(BB, "bom.csv")
     check("V7. (1160 A12) peek decodes utf-8-sig, as the converter's default DECODE: a byte-order mark is no part of the first name",
           "line 1: 2 text names + 0 numeric names: 'T', 'C'" in said, said)
     got, bank, name = conv({"a.csv": b"T,C\n1.5,0.25\n"}, [("a.csv", "a.csv", "")])

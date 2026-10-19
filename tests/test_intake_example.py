@@ -50,7 +50,7 @@ check("6. S1 CHOICES passes (every live row), and no stub is listed as a STUB: e
 check("6. the report carries the seal claim and the UNENFORCED list", t["stages"]["report"]["seal_claim"] in text and all(u in text for u in t["stages"]["report"]["unenforced"]), "")
 cli = subprocess.run([str(ROOT / "bin" / "cc"), "intake", "lint", ID], capture_output=True, text=True)
 check("6. bin/cc intake lint passes S0 and S1 (plan 1160 P1: was S1 STUB)", cli.returncode == 0 and "S1 EXECUTED, PASS." in cli.stdout, cli.stdout[-300:])
-again = subprocess.run([str(ROOT / "bin" / "cc"), "intake", "seal", ID, "--universe", str(ROOT / "tests/planted/intake/p1118-bank-FIXTURE"), "--author", "x", "--as", "human", "--unconfirmed"],
+again = subprocess.run([str(ROOT / "bin" / "cc"), "intake", "seal", ID, "--author", "x", "--as", "human", "--unconfirmed"],   # plan 1160 A20: no --universe (was the fixture)
                        capture_output=True, text=True)
 check("6. sealing it again is refused ALREADY_SEALED and writes nothing", again.returncode == 1 and "ALREADY_SEALED" in again.stdout, again.stdout[-300:])
 usage = subprocess.run([str(ROOT / "bin" / "cc"), "intake", "fold"], capture_output=True, text=True)

@@ -141,7 +141,7 @@ with tempfile.TemporaryDirectory() as tmp:
             intake.cli(w, list(args))
         return out.getvalue() + err.getvalue()
 
-    SEAL = lambda u: ("seal", "--universe", str(u), "--author", "plan 1160 leak test", "--as", "ai-draft", "--unconfirmed")
+    SEAL = ("seal", "--author", "plan 1160 leak test", "--as", "ai-draft", "--unconfirmed")   # (1160 A20: was SEAL(u) with --universe u; the universe is the root)
 
     def plant(text, bank, steps, trans=TRANS, ident=None):
         """Write the declaration, run `steps` (each a tuple of CLI words after the id, or a function of the bank dir), and return (its code,
@@ -223,7 +223,7 @@ with tempfile.TemporaryDirectory() as tmp:
     def keyed(line):
         """(1160 P1) A bank edit: each curve file i gets `line(i)` above its names line (a FILE_KEY header line)."""
         return lambda b: [(b / f"curve_{i:03d}.csv").write_text(line(i) + (b / f"curve_{i:03d}.csv").read_text()) for i in range(K)]
-    full = lambda bank: (("lint",), SEAL(banks / bank), ("run",))
+    full = lambda bank: (("lint",), SEAL, ("run",))
     unsealed = (("lint",), ("run",))
     append = lambda name, text: lambda b: (b / name).write_text((b / name).read_text() + text)
     asc = lambda t: t.replace('row_order = "ASCENDING"', 'row_order = "ACQUISITION"')
@@ -270,14 +270,14 @@ with tempfile.TemporaryDirectory() as tmp:
         *[(ON_SENTINEL.get(what, code), f"(1160 P4) {what}", S0(edit)) for code, what, edit in CHOICE_PLANTS],   # every live S1 row (and its PASS controls), linted, sealed, run
         ("BLOCK_RULE_HAS_NO_DIRECTION", "(1160 P2) block FAST_RESTART, rows in acquisition order, direction UNORDERED", (lt(LT, asc, block='"FAST_RESTART"'), LT, full(LT))),
         # S2 SEAL
-        ("ALREADY_SEALED", "a second seal", (pf(PF), PF, (SEAL(banks / PF), SEAL(banks / PF)))),
-        ("UNIVERSE_ROOT_ABSENT", "a universe that is no directory", (pf(PF), PF, (SEAL(tmp / "nowhere"),))),
-        ("SELECTION_OUTSIDE_UNIVERSE", "an empty universe", (pf(PF), PF, (lambda b: (tmp / "empty").mkdir(), SEAL(tmp / "empty")))),
+        ("ALREADY_SEALED", "a second seal", (pf(PF), PF, (SEAL, SEAL))),
+        ("UNIVERSE_ROOT_ABSENT", "a root that names no directory (1160 A20: was a --universe that is none)", (pf("nowhere"), PF, (SEAL,))),
+        ("SELECTION_OUTSIDE_UNIVERSE", "an empty universe", (pf("empty"), PF, (lambda b: (banks / "empty").mkdir(), SEAL))),
         ("MODE_CONTRADICTS_SOURCE", "(1160 P4) mode PROSPECTIVE, sealed over the bank that holds the selected files", S0(lambda t: t.replace('mode = "RETROSPECTIVE_PREDECLARED"', 'mode = "PROSPECTIVE"', 1))),
         ("SELECTION_DUPLICATE", "(1160) a file named twice in files", (pf(PF, lambda t: t.replace("files = [", 'files = ["curve_002.csv", ', 1).replace("values = [", f'values = ["{slow(2)}", ', 1)), PF, full(PF))),
         ("UNIVERSE_NOT_PARTITIONED", "(1160) a universe file in no part", (pf(UP := pf_bank(lambda b: (b / "notes.txt").write_text("planted\n"))), UP, full(UP))),
         # S3 SOURCE_INTEGRITY
-        ("ROOT_UNRESOLVED", "a root name ROOTS.toml does not hold", (pf(PF, lambda t: t.replace("<leak>/", "<no-such-root>/")), PF, full(PF))),
+        ("ROOT_UNRESOLVED", "a root name ROOTS.toml does not hold (1160 A20: unsealed, was full: the seal now refuses it first, UNIVERSE_ROOT_ABSENT)", (pf(PF, lambda t: t.replace("<leak>/", "<no-such-root>/")), PF, unsealed)),
         ("PATH_OUTSIDE_ROOT", "(1160) a files entry naming a file of another bank (unsealed)", (pf(PO := pf_bank(), lambda t: t.replace('files = ["curve_000.csv"', f'files = ["../{PF}/curve_000.csv"', 1)), PO, unsealed)),
         ("PATH_ON_TRUTH_SIDE", "(1160) truth_side names a selected file (unsealed)", (pf(PF, lambda t: t.replace('truth_side = ["truth.json"]', 'truth_side = ["truth.json", "curve_003.csv"]', 1)), PF, unsealed)),
         ("PATH_NOT_A_FILE", "a selected file deleted (unsealed: the seal would refuse it; 1160: was PATH_NOT_ADMITTED)", (pf(pf_bank(lambda b: (b / "curve_003.csv").unlink())), PF, unsealed)),
@@ -288,9 +288,9 @@ with tempfile.TemporaryDirectory() as tmp:
          (*cv(conv_bank(curve_files, as_is, lambda raw, bank: (bank / "CONVERSION-MANIFEST.json").unlink())), unsealed)),
         ("CONVERSION_CHAIN_BROKEN", "(1160 P3) one byte of a raw sentinel file changed after the conversion",
          (*cv(conv_bank(curve_files, as_is, lambda raw, bank: (raw / "curve_001.csv").write_bytes((raw / "curve_001.csv").read_bytes().replace(b"T", b"t", 1)))), unsealed)),
-        ("PASS", "(1160 P3) the converted PER_FILE sentinel bank, sealed", (*cv(CV := conv_bank(curve_files, as_is)), (("lint",), SEAL(tmp / "cc-banks" / CV / "bank"), ("run",)))),
+        ("PASS", "(1160 P3) the converted PER_FILE sentinel bank, sealed", (*cv(CV := conv_bank(curve_files, as_is)), (("lint",), SEAL, ("run",)))),
         ("PASS", "(1160 A11) the converted PER_FILE sentinel bank, a sentinel row with C = n/a in each file dropped by DROP_ROWS_NOT_NUMERIC, sealed",
-         (*cv(DNN := conv_bank(NN, [(f, f, '{op = "DROP_ROWS_NOT_NUMERIC", columns = ["C"]}') for f in NN])), (("lint",), SEAL(tmp / "cc-banks" / DNN / "bank"), ("run",)), TRANS, DNN)),
+         (*cv(DNN := conv_bank(NN, [(f, f, '{op = "DROP_ROWS_NOT_NUMERIC", columns = ["C"]}') for f in NN])), (("lint",), SEAL, ("run",)), TRANS, DNN)),
         # S6 ADMISSIBILITY (1160 P4): linted, sealed, then run with the edit between S5 and S6
         ("READ_NOT_LOGGED", "(1160 P4) the loader lines of curve_002.csv deleted from the access log", (pf(PF), PF, full(PF)[:2] + (AtS6(lambda b, d: unlog(d, "curve_002.csv")),))),
         ("BYPASS_READ_LOGGED", "(1160 P4) curve_001.csv opened directly in the test process (open(), not the loader)", (pf(PF), PF, full(PF)[:2] + (AtS6(lambda b, d: (b / "curve_001.csv").read_bytes()),))),
@@ -389,11 +389,13 @@ with tempfile.TemporaryDirectory() as tmp:
     # ---- K6. (1160 P3) convert, its manifest and peek print and write no sentinel
     wide = (f"h,{cell(0, 0, 1)},{cell(0, 1, 1)},{cell(0, 2, 1)}\n" + "".join(f"{slow(k)},{cell(k, 0, 2)},{cell(k, 1, 2)},{cell(k, 2, 2)}\n" for k in range(K))).encode()
     WD = conv_bank({"wide.csv": wide}, [("wide.csv", "long.csv", '{op = "WIDE_TO_LONG", key = "h", fast = "T", measured = "C"}')])
-    peeked = "".join(cli("peek", WD, "wide.csv", "--depth", str(k)) for k in (0, 1, 5)) + cli("peek", CV, "curve_000.csv", "--depth", "3")
+    raw = lambda ident, f: f"<cc-datasets>/{ident}/raw/{f}"   # (1160 A19) peek names its file by the root-named path (was the bare name)
+    peeked = "".join(cli("peek", WD, raw(WD, "wide.csv"), "--depth", str(k)) for k in (0, 1, 5)) + cli("peek", CV, raw(CV, "curve_000.csv"), "--depth", "3")
+    check("K6. (1160 A19) peek reads the files it is given (no SOURCE_FILE_ABSENT), so the scan below is not vacuous", "SOURCE_FILE_ABSENT" not in peeked and "line 1:" in peeked, peeked[:300])
     # (1160 A10) an xlsx peeked with no --sheet: SHEET_REQUIRED, its sheets named by a sentinel numeric name and a text name holding one
     XB = conv_bank({"book.xlsx": workbook({cell(0, 0, 1): [[cell(0, 1, 2)]], f"run {cell(1, 0, 1)}": [["T"], [float(cell(1, 1, 2))]]})},
                    [("book.xlsx", "x.csv", '{op = "SHEET_TO_CSV", sheet = "data"}')])
-    xpeek = cli("peek", XB, "book.xlsx")
+    xpeek = cli("peek", XB, raw(XB, "book.xlsx"))
     check("K6. (1160 A10) peek on the sentinel xlsx with no --sheet refuses SHEET_REQUIRED", "SHEET_REQUIRED" in xpeek, xpeek[:400])
     peeked += xpeek
     peeked += (w / "declarations" / WD / "peek.log").read_text() + (w / "declarations" / CV / "peek.log").read_text() + (w / "declarations" / XB / "peek.log").read_text()

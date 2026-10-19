@@ -9,7 +9,7 @@
 # needs, and never the seal stage (test 1).
 schema = 1
 kind = "intake-stages"
-version = "1160-v7"   # plan 1160 A17: S1 MEASURED_KNOB_HAS_NO_POINTS, schema 4; plan 1160 A9: S10 runs before S9 (a refused second lane never withholds the terminal); A13: conversion_read
+version = "1160-v8"   # plan 1160 A20: UNIVERSE_ROOT_ABSENT names the root (seal has no --universe); plan 1160 A17: S1 MEASURED_KNOB_HAS_NO_POINTS, schema 4; plan 1160 A9: S10 runs before S9 (a refused second lane never withholds the terminal); A13: conversion_read
 seal_stage = "S2"
 
 [report]
@@ -123,7 +123,7 @@ status = [   # the seal status a run reports (intake_seal.SealStatus); never a r
 ]
 reason = [   # refusals of `bin/cc intake seal` (the seal command); a run's S2 never refuses
   { code = "ALREADY_SEALED",             live = true,  sentence = "This declaration is already sealed; a seal is never replaced, so declare a new id." },
-  { code = "UNIVERSE_ROOT_ABSENT",       live = true,  sentence = "The declared source universe root was not given or is not a directory on this machine; give its location with --universe." },
+  { code = "UNIVERSE_ROOT_ABSENT",       live = true,  sentence = "The declared [source] root names no directory on this machine (a name of intake/ROOTS.toml, then a path under it); the seal lists the universe there, so name it in the root." },
   { code = "SELECTION_DUPLICATE",        live = true,  sentence = "A file name is given more than once in `files` (or in `excluded`); each file is one curve, named once." },
   { code = "MODE_CONTRADICTS_SOURCE",    live = true,  sentence = "The declared mode is PROSPECTIVE, but a selected file is already in the source universe listing at the seal (plan 1160 P4: moved here from S1, which sees no listing)." },
   { code = "SELECTION_OUTSIDE_UNIVERSE", live = true,  sentence = "A selected file is not in the source universe listing." },

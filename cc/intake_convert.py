@@ -326,45 +326,60 @@ def _cell_ok(c):
     return isinstance(c, list) and len(c) == 2 and all(type(v) is int for v in c)
 
 
+@dataclass(frozen=True)
+class Mapped:
+    """(plan 1160 A18) One unit's cell map as the identity test reads it, computed once and carried as a value: the source cells written
+    outside a broadcast column (as written, a repeat kept), the lines they hold, and the lines of its not_numeric cells that are cells of
+    its source frame and no number (after its DECIMAL_MARK steps). Invariant: line and column numbers only, never a cell."""
+    used: tuple
+    mapped: frozenset
+    nonnumber: frozenset
+
+
 def verify(files, units, outputs, frames):
-    """The identity test. files: the [[file]] entries as declared; units: per entry {dropped, names}; outputs: [(record {unit, broadcast,
-    cells}, its bytes)]; frames: per entry its source frame (or a Refuse). Pass(counts) | Refuse CELL_MAP_NOT_A_PERMUTATION | IDENTITY_FAILED."""
+    """The identity test. files: the [[file]] entries as declared; units: per entry {dropped, names, not_numeric}; outputs: [(record {unit,
+    broadcast, cells}, its bytes)]; frames: per entry its source frame (or a Refuse). Pass(counts) | Refuse CELL_MAP_NOT_A_PERMUTATION |
+    IDENTITY_FAILED. Every set is computed once (plan 1160 A18: the Mapped of each unit), so it is linear in the cells and the dropped rows."""
     grid = [{at: t for _, cs in f.rows for t, at in cs} for f in frames]
     lines = [{n for n, _ in f.rows} | {n for n, _ in f.dropped} for f in frames]
     blank = [{n for n, s in f.dropped if s == -1} for f in frames]
     data = [list(csv.reader(io.StringIO(b.decode("utf-8"))))[1:] for _, b in outputs]
-    cells = lambda: [(r["unit"], j in r["broadcast"], tuple(c), out) for (r, _), rows in zip(outputs, data) for row, outs in zip(r["cells"], rows) for j, (c, out) in enumerate(zip(row, outs))]
-    shape = lambda: [r["path"] for (r, _), rows in zip(outputs, data) if [len(x) for x in r["cells"]] != [len(x) for x in rows] or not all(c is None or _cell_ok(c) for x in r["cells"] for c in x)]
-    sourceless = lambda: [(u, c) for u, _, c, _ in cells() if c not in grid[u]]
-    used = lambda: [(u, c) for u, b, c, _ in cells() if not b]
-    twice = lambda: len(used()) - len(set(used()))
-    twiced = lambda: [u for u in range(len(frames)) if len([c for v, c in used() if v == u]) != len({c for v, c in used() if v == u})]
-    entries = lambda us: ", ".join(_entry(files[u]) for u in sorted(set(us))[:3])   # plan 1160 A12: the Detail names the file
-    mapped = lambda u: {c[0] for v, c in used() if v == u}
-    held = lambda u: sorted(mapped(u)) + sorted(n for n, _ in units[u]["dropped"]) + sorted(units[u]["names"])
-    nonnumber = lambda u: {c[0] for c in units[u].get("not_numeric", []) if _cell_ok(c) and tuple(c) in grid[u] and NUMBER.fullmatch(src(u, tuple(c)).strip()) is None}
-    why = {"DROP_LINES": lambda u, n: True, "DROP_ROWS_NOT_NUMERIC": lambda u, n: n in nonnumber(u)}   # plan 1160 A11: a row's drop needs its cell no number
-    unjustified = lambda u: [n for n, s in units[u]["dropped"] if not ({True: lambda: n in blank[u], False: lambda: look(why, files[u]["steps"][s]["op"], lambda u, n: False)(u, n)}[s == -1]())]
-    unpartitioned = lambda: [u for u in range(len(frames)) if sorted(held(u)) != sorted(lines[u]) or len(set(held(u))) != len(held(u)) or unjustified(u)]
+    shape = [r["path"] for (r, _), rows in zip(outputs, data) if [len(x) for x in r["cells"]] != [len(x) for x in rows] or not all(c is None or _cell_ok(c) for x in r["cells"] for c in x)]
+    return gate([(lambda: not shape, "CELL_MAP_NOT_A_PERMUTATION", lambda: detail(file=", ".join(_entry(files[u]) for u in sorted({r["unit"] for r, _ in outputs if r["path"] in shape})[:3]), words=shape[:3] + ["the cell map's shape is not the output's rows and columns"]))],
+                lambda: _mapped(files, units, outputs, frames, data, grid, lines, blank))
+
+
+def _mapped(files, units, outputs, frames, data, grid, lines, blank):
+    """verify after the cell map's shape holds (so every cell is None or a [line, column]): each set once, then the gate rows in order."""
+    cells = [(r["unit"], j in r["broadcast"], tuple(c), out) for (r, _), rows in zip(outputs, data) for row, outs in zip(r["cells"], rows) for j, (c, out) in enumerate(zip(row, outs))]
+    sourceless = [(u, c) for u, _, c, _ in cells if c not in grid[u]]
     mark = lambda u: [s["mark"] for s in files[u]["steps"] if s["op"] == "DECIMAL_MARK"]
     src = lambda u, c: functools.reduce(lambda t, m: t.replace(m, "."), mark(u), grid[u][c])
-    differ = lambda: [(u, c) for u, _, c, out in cells() if not _same(out, src(u, c))]
+    used = [[c for v, b, c, _ in cells if not b and v == u] for u in range(len(frames))]
+    per = [Mapped(tuple(used[u]), frozenset(c[0] for c in used[u]), frozenset(
+        c[0] for c in units[u]["not_numeric"] if _cell_ok(c) and tuple(c) in grid[u] and NUMBER.fullmatch(src(u, tuple(c)).strip()) is None)) for u in range(len(frames))]
+    twiced = [u for u, mp in enumerate(per) if len(mp.used) != len(set(mp.used))]
+    twice = sum(len(mp.used) - len(set(mp.used)) for mp in per)
+    entries = lambda us: ", ".join(_entry(files[u]) for u in sorted(set(us))[:3])   # plan 1160 A12: the Detail names the file
+    held = lambda u: sorted(per[u].mapped) + sorted(n for n, _ in units[u]["dropped"]) + sorted(units[u]["names"])
+    why = {"DROP_LINES": lambda u, n: True, "DROP_ROWS_NOT_NUMERIC": lambda u, n: n in per[u].nonnumber}   # plan 1160 A11: a row's drop needs its cell no number
+    unjustified = lambda u: [n for n, s in units[u]["dropped"] if not ({True: lambda: n in blank[u], False: lambda: look(why, files[u]["steps"][s]["op"], lambda u, n: False)(u, n)}[s == -1]())]
+    unpartitioned = [u for u in range(len(frames)) if sorted(held(u)) != sorted(lines[u]) or len(set(held(u))) != len(held(u)) or unjustified(u)]
+    differ = lambda: [(u, c) for u, _, c, out in cells if not _same(out, src(u, c))]
     hollow = lambda: [r for r, _ in outputs if any(all(j in r["broadcast"] for j in range(len(row))) for row in r["cells"])]
     keys = lambda r: [min(tuple(c) for j, c in enumerate(row) if j not in r["broadcast"]) for row in r["cells"]]   # after `hollow`: never empty
     unordered = lambda: [r for r, _ in outputs if any(a >= b for a, b in zip(keys(r), keys(r)[1:]))]
-    shaped = lambda: [r for (r, _), rows in zip(outputs, data) if r["path"] in shape()]
     cmap = "CELL_MAP_NOT_A_PERMUTATION"
-    return gate([(lambda: not shape(), cmap, lambda: detail(file=entries([r["unit"] for r in shaped()]), words=shape()[:3] + ["the cell map's shape is not the output's rows and columns"])),
-                 (lambda: not sourceless(), cmap, lambda: detail(file=entries([u for u, _ in sourceless()]), counts={"output cells with no source cell": len(sourceless())})),
-                 (lambda: twice() == 0, cmap, lambda: detail(file=entries(twiced()), counts={"source cells written twice outside a broadcast column": twice()})),
-                 (lambda: not unpartitioned(), cmap, lambda: detail(file=entries(unpartitioned()), words=[
+    return gate([(lambda: not sourceless, cmap, lambda: detail(file=entries([u for u, _ in sourceless]), counts={"output cells with no source cell": len(sourceless)})),
+                 (lambda: twice == 0, cmap, lambda: detail(file=entries(twiced), counts={"source cells written twice outside a broadcast column": twice})),
+                 (lambda: not unpartitioned, cmap, lambda: detail(file=entries(unpartitioned), words=[
                      "a source line is not exactly one of: written, dropped by a declared DROP_LINES step, dropped by DROP_ROWS_NOT_NUMERIC for a cell that is no number, blank, a names line"])),
                  (lambda: not hollow(), cmap, lambda: detail(file=entries([r["unit"] for r in hollow()]), words=[r["path"] for r in hollow()][:3] + [
                      "an output row holds no source cell outside a broadcast column"])),
                  (lambda: not differ(), "IDENTITY_FAILED", lambda: detail(file=entries([u for u, _ in differ()]), rows=sorted({c[0] for _, c in differ()})[:3],
                                                                         counts={"output cells not identical to their source cell": len(differ())})),
                  (lambda: not unordered(), "IDENTITY_FAILED", lambda: detail(file=entries([r["unit"] for r in unordered()]), words=[r["path"] for r in unordered()][:3] + ["rows not in source order"]))],
-                lambda: Pass(Verified(len(outputs), sum(len(x) for x in data), len(cells()))))
+                lambda: Pass(Verified(len(outputs), sum(len(x) for x in data), len(cells))))
 
 
 @dataclass(frozen=True)
@@ -493,7 +508,8 @@ def _manifest(text):
     """The manifest as plain values, or None when it is absent, not JSON, or not of the converter's shape: the one place that becomes a value."""
     try:
         m = json.loads(text)
-        ok = all(isinstance(m[k], list) for k in ("files", "sources", "units", "outputs")) and all(isinstance(r["cells"], list) for r in m["outputs"])
+        ok = (all(isinstance(m[k], list) for k in ("files", "sources", "units", "outputs")) and all(isinstance(r["cells"], list) for r in m["outputs"])
+              and all(isinstance(u["not_numeric"], list) for u in m["units"]))   # plan 1160 A18: not_numeric is required (no default)
         return {True: m, False: None}[ok]
     except (ValueError, KeyError, TypeError):
         return None
@@ -591,8 +607,17 @@ def _book_names(raw):
         return None
 
 
-SHEET_WORDS = {   # (is openpyxl installed, the names it read or None) -> the words of SHEET_REQUIRED's Detail (plan 1160 A10); the names as _named
-    (True, True): lambda names: [f"the workbook's sheets: {_named(names)}"],
+SHEET_NAME = {Name.TEXT: lambda n: f"'{masked(n)}'", Name.NUMERIC: lambda n: "a numeric name"}   # (plan 1160 A21) a sheet name beside its position
+
+
+def _addressed(names):
+    """(plan 1160 A21) The sheets as addresses: each by its 1-based position, which --sheet and `sheet =` take, then its name as a column's
+    is printed by peek (a TEXT name masked, a numeric name never)."""
+    return ", ".join(f"#{k} {SHEET_NAME[classify(n)](n)}" for k, n in enumerate(names, 1))
+
+
+SHEET_WORDS = {   # (is openpyxl installed, the names it read or None) -> the words of SHEET_REQUIRED's Detail (plan 1160 A10); the names as _addressed (A21)
+    (True, True): lambda names: [f"the workbook's sheets: {_addressed(names)}; name one with --sheet k (its position) or --sheet NAME"],
     (True, False): lambda names: ["openpyxl cannot open the workbook, so its sheet names cannot be listed (CONTAINER_UNREADABLE)"],
     (False, False): lambda names: ["openpyxl is not installed on this machine, so the sheet names cannot be listed here; peek on the data host"],
 }
@@ -611,39 +636,52 @@ def _xlsx(raw):
     return z is not None and "xl/workbook.xml" in z.namelist()
 
 
-def _head(raw, sheet):
-    """The lines peek may look at: [(line number, cells)] of a text file (utf-8-sig as DECODE's default, an undecodable byte replaced) or of one xlsx sheet; an xlsx
-    with no sheet named is refused SHEET_REQUIRED with its sheet names."""
+def _head(raw, sheet, encoding):
+    """The lines peek may look at: [(line number, cells)] of a text file (decoded from `encoding`, utf-8-sig unless --encoding names one of
+    DECODE's alphabet; an undecodable byte replaced) or of one xlsx sheet; an xlsx with no sheet named is refused SHEET_REQUIRED with its sheet names."""
     rows = lambda: _bind(sheet_rows(raw, sheet), lambda rows: [(n, [c.strip() for c in cs if c.strip()]) for n, cs in rows])
-    return {(True, False): lambda: [(n, _cells(t)) for n, t in _split(raw.decode("utf-8-sig", "replace"))], (True, True): lambda: _sheets(raw),
+    return {(True, False): lambda: [(n, _cells(t)) for n, t in _split(raw.decode(encoding, "replace"))], (True, True): lambda: _sheets(raw),
             (False, False): rows, (False, True): rows}[(sheet == "", _xlsx(raw))]()   # plan 1160 A10: an xlsx with no --sheet is SHEET_REQUIRED
 
 
-def peek(raw, sheet, depth):
+def decodes(raw, codes):
+    """(plan 1160 A22) Which encodings of DECODE's alphabet decode the bytes whole: words of the alphabet only, never a byte of the file."""
+    ok = [e for e in codes if _decoded(raw, e) is not None]
+    return f"decodes as: {', '.join(ok) or '(none of them)'}; not as: {', '.join(e for e in codes if e not in ok) or '(none of them)'}"
+
+
+def peek(raw, sheet, depth, encoding):
     """The lines peek prints: at most depth + 2 head lines, stopping before the first line whose every cell is a number (a data line)."""
     def lines(rows):
         stop = [i for i, (_, cs) in enumerate(rows) if cs and all(classify(c) is Name.NUMERIC for c in cs)] + [len(rows)]
         shown_ = rows[:min(stop[0], depth + 2)]
         return [_said(n, cs) for n, cs in shown_], {True: "a line of numbers (not printed)", False: "depth + 2 lines"}[stop[0] <= depth + 2 and stop[0] < len(rows)]
-    return _bind(_head(raw, sheet), lines)
+    return _bind(_head(raw, sheet, encoding), lines)
 
 
 def peek_cli(root, ident, args, t):
-    """bin/cc intake peek <id> <file> [--sheet NAME] [--depth N]: the head of <cc-datasets>/<id>/raw/<file>, read through the logged loader;
-    appended to declarations/<id>/peek.log (what was asked and how many lines were printed, never a line)."""
+    """bin/cc intake peek <id> <cc-datasets>/<name>/raw/<file> [--sheet NAME|k] [--depth N] [--encoding E]: first which encodings of DECODE's
+    alphabet decode the file whole (A22; --encoding, one of them, decodes the head lines), then the head of a file named by its root-named path
+    (plan 1160 A19: nothing is derived from the id, which names only declarations/<id>/), resolved under the <cc-datasets> root alone and
+    read through the logged loader; appended to declarations/<id>/peek.log (what was asked and how many lines were printed, never a line)."""
     d, ct = Path(root) / "declarations" / ident, ctables()
-    rel, sheet, depth = {True: lambda: args[0], False: lambda: ""}[len(args) > 0](), flag(args, "--sheet", ""), flag(args, "--depth", "1")
-    base = intake_bytes.located(f"<cc-datasets>/{ident}/raw", t["roots"])
+    codes, enc = list(ct["fields"]["file"]["fields"]["steps"]["variants"]["DECODE"]["encoding"]["values"]), flag(args, "--encoding", "utf-8-sig")   # (A22)
+    rel, depth = {True: lambda: args[0], False: lambda: ""}[len(args) > 0](), flag(args, "--depth", "1")
+    sheet = {True: int, False: str}[re.fullmatch(r"[1-9]\d*", flag(args, "--sheet", "")) is not None](flag(args, "--sheet", ""))   # (A21) a position, or a name
+    base = t["roots"]["<cc-datasets>"]
+    at = intake_bytes.located(rel, {"<cc-datasets>": base})   # "" for any other root, an absolute path or a ".." part
     ok = rel != "" and not rel.startswith("--") and re.fullmatch(r"\d+", depth) is not None
     def go():
         loader = intake_bytes._t23().Loader({base: "converted-from"}, d / "conversion-access.log")
-        raw = _reader(base, loader)(rel)
-        got = {True: lambda: Refuse("SOURCE_FILE_ABSENT", detail(words=[f"'{rel}' under <cc-datasets>/{ident}/raw"])), False: lambda: _in(f"file '{rel}'", peek(raw, sheet, int(depth)))}[raw is None]()
+        raw = {True: lambda: None, False: lambda: _reader(base, loader)(Path(at).relative_to(base))}[at == ""]()
+        got = gate([(lambda: raw is not None, "SOURCE_FILE_ABSENT", lambda: detail(words=[f"'{rel}' (a file under the <cc-datasets> root)"])),
+                    (lambda: enc in codes, "VALUE_NOT_LISTED", lambda: detail(words=[f"--encoding '{enc}'", f"DECODE's alphabet: {', '.join(codes)}"]))],
+                   lambda: _bind(_in(f"file '{rel}'", peek(raw, sheet, int(depth), enc)), lambda g: (g[0], g[1], decodes(raw, codes))))   # (A22)
         with open(d / "peek.log", "a") as f:
-            f.write(json.dumps({"time": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "file": rel, "sheet": sheet, "depth": depth,
+            f.write(json.dumps({"time": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "file": rel, "sheet": sheet, "depth": depth, "encoding": enc,
                                 "printed": {True: lambda: 0, False: lambda: len(got[0])}[isinstance(got, Refuse)](),
                                 "stopped": {True: lambda: got.reason, False: lambda: got[1]}[isinstance(got, Refuse)]()}) + "\n")
         print({True: lambda: f"peek {ident} {rel}: " + got.text(ct["sentences"]),
-               False: lambda: f"peek {ident} {rel}:\n" + "".join(f"  {x}\n" for x in got[0]) + f"  stopped: {got[1]}"}[isinstance(got, Refuse)]())
+               False: lambda: f"peek {ident} {rel}:\n  {got[2]}\n" + "".join(f"  {x}\n" for x in got[0]) + f"  stopped: {got[1]}"}[isinstance(got, Refuse)]())
         return {True: 1, False: 0}[isinstance(got, Refuse)]
-    return {True: go, False: lambda: print("bin/cc intake peek: usage: peek <id> <file under <cc-datasets>/<id>/raw> [--sheet NAME] [--depth N]") or 1}[ok]()
+    return {True: go, False: lambda: print("bin/cc intake peek: usage: peek <id> <cc-datasets>/<name>/raw/<file> [--sheet NAME|k] [--depth N] [--encoding E]") or 1}[ok]()

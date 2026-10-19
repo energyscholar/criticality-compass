@@ -21,7 +21,7 @@ root = "TODO"           # <name>/<path>: a name of intake/ROOTS.toml, then the b
 universe = "TODO"       # a glob, relative to root, of every file the deposit holds (the seal lists their names and sizes)
 truth_side = "TODO"     # a list of file names on the truth side of a planted deposit; no stage may read them ([] for an experiment)
 admissibility = "TODO"  # the deposit's class, read from its metadata: RAW | DECLARABLE | FIGURE_LEVEL | PROCESSED_UNDECLARABLE
-converted_from = "TODO" # CONVERTED: "<cc-datasets>/<id>/raw", the deposit the conversion read
+converted_from = "TODO" # CONVERTED: "<cc-datasets>/<name>/raw" (an example), the deposit the conversion read
 
 # [reader]: VARIANT on name
 [reader]

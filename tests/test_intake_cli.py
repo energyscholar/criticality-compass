@@ -64,7 +64,7 @@ bin/cc intake synth demo1 --seed 1
 bin/cc new intake demo1 --from-synth demo1
 #   edit declarations/demo1/intake.toml: replace each remaining TODO (the quickstart shows a filled example)
 bin/cc intake lint demo1
-bin/cc intake seal demo1 --universe scratch/intake-synth/demo1 --author "<name>" --as human --unconfirmed    # optional
+bin/cc intake seal demo1 --author "<name>" --as human --unconfirmed    # optional
 bin/cc intake run demo1
 cat declarations/demo1/intake-report.md"""
 QS = (ROOT / "docs" / "INTAKE-QUICKSTART.md").read_text()

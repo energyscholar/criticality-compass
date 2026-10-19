@@ -1,4 +1,4 @@
-# The intake pipeline (stage table 1160-v7, policy 1136-v1)
+# The intake pipeline (stage table 1160-v8, policy 1136-v1)
 
 Generated from intake/STAGES.toml and intake/POLICY.toml by `bin/cc intake explain` (docs/gen-intake.py); never edit it by hand.
 This is the intake's explain. `bin/cc explain <input> <point>` is a different command: it explains one point of a measured input.
@@ -78,7 +78,7 @@ Report the seal status: whether a seal (time, author, mode, code and protocol id
 | reason | live | what it means |
 |---|---|---|
 | ALREADY_SEALED | live | This declaration is already sealed; a seal is never replaced, so declare a new id. |
-| UNIVERSE_ROOT_ABSENT | live | The declared source universe root was not given or is not a directory on this machine; give its location with --universe. |
+| UNIVERSE_ROOT_ABSENT | live | The declared [source] root names no directory on this machine (a name of intake/ROOTS.toml, then a path under it); the seal lists the universe there, so name it in the root. |
 | SELECTION_DUPLICATE | live | A file name is given more than once in `files` (or in `excluded`); each file is one curve, named once. |
 | MODE_CONTRADICTS_SOURCE | live | The declared mode is PROSPECTIVE, but a selected file is already in the source universe listing at the seal (plan 1160 P4: moved here from S1, which sees no listing). |
 | SELECTION_OUTSIDE_UNIVERSE | live | A selected file is not in the source universe listing. |

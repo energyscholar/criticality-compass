@@ -10,7 +10,7 @@ bin/cc intake synth demo1 --seed 1
 bin/cc new intake demo1 --from-synth demo1
 #   edit declarations/demo1/intake.toml: replace each remaining TODO (the quickstart shows a filled example)
 bin/cc intake lint demo1
-bin/cc intake seal demo1 --universe scratch/intake-synth/demo1 --author "<name>" --as human --unconfirmed    # optional
+bin/cc intake seal demo1 --author "<name>" --as human --unconfirmed    # optional
 bin/cc intake run demo1
 cat declarations/demo1/intake-report.md
 ```
@@ -32,7 +32,8 @@ What each line does:
    STATED. `bin/cc intake explain` lists every row. The mode `RETROSPECTIVE_PREDECLARED` below says the files exist and you declare before
    looking at their values; `PROSPECTIVE` (no file exists yet) cannot be sealed over files that exist (MODE_CONTRADICTS_SOURCE).
 6. `seal` is optional. Sealing is recommended and not enforced. It records what you declared and when; it is an integrity practice, like a
-   lab notebook. Write your own name for `<name>`. If `seal` refuses, fix the declaration and seal again; do not run.
+   lab notebook. Write your own name for `<name>`. It lists the files under the declared `[source] root` (there is no `--universe`).
+   If `seal` refuses, fix the declaration and seal again; do not run.
 7. `run` runs every stage. SOURCE_INTEGRITY, SHAPE and CENSUS read the bank through the logged loader. ADMISSIBILITY then checks the
    access log: every file read has a loader line with its sha256, and no in-process read went around the loader. Then (plan 1160 P5)
    INTERVAL_FEASIBILITY checks the interval method against the readings per point, RESOLUTION_AND_IDENTIFIABILITY counts the curves and the

@@ -112,7 +112,8 @@ differ, for example:
   measured quantity to `X_star`, then `CHAIN_SLOW` on `X_star`, when every curve's maximum is interior.
 
 `peek` and the census cannot tell you whether a maximum is interior (that is a value). If S9 refuses, the result of S10 stands; the
-second lane is what was refused.
+second lane is what was refused. When you cannot know the maxima are interior, declare `PAIR_NEAREST_FAST` as the ALTERNATIVE bridge
+(plan 1160 A23).
 
 ## RESULT.json
 
@@ -139,7 +140,7 @@ prints a slow or measured value. The slow values are only in RESULT.json.
 ```
 bin/cc intake run demo1                      # PRIMARY_INCOMPLETE, missing confirmation; RESULT.json confirmation UNCONFIRMED
 rm declarations/demo1/SEAL.json declarations/demo1/seal.log
-bin/cc intake seal demo1 --universe scratch/intake-synth/demo1 --author "<name>" --as human --confirmed-by "<name>"
+bin/cc intake seal demo1 --author "<name>" --as human --confirmed-by "<name>"
 bin/cc intake run demo1                      # PRIMARY_READY; RESULT.json confirmation CONFIRMED
 ```
 

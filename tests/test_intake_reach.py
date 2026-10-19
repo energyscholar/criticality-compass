@@ -152,16 +152,17 @@ with tempfile.TemporaryDirectory() as tmp:
         got = outcome(run(T, tmp, ident, restate(per_file(m, ident).replace("<long-test>/pf", f"<long-test>/{name}"))), "S5")
         return getattr(got[1], "label", got[0])
 
-    def mint(universe, times=1, edit=lambda t: t):
+    def mint(bank, times=1, edit=lambda t: t):
+        """(1160 A20: was mint(universe, ...), the directory given beside the root) Seal a PER_FILE declaration whose root is <long-test>/<bank>."""
         ident = f"d{next(n)}"
-        text = edit(per_file(m, ident))
+        text = edit(per_file(m, ident).replace("<long-test>/pf", f"<long-test>/{bank}"))
         d = tmp / "declarations" / ident
         d.mkdir(parents=True)
         (d / "intake.toml").write_text(text)
         (d / "transducer.toml").write_text("# planted: the seal hashes this file; S0's transducer check is not run here\n")
         decl = blind.format_stage(text, [], T).evidence
         who = {"author": "plan 1145 test", "author_kind": intake_seal.AUTHOR_KIND["ai-draft"], "confirmed_by": ""}
-        got = [intake_seal.mint(decl, d, str(universe), who, ROOT, rooted(T, tmp)) for _ in range(times)][-1]
+        got = [intake_seal.mint(decl, d, who, ROOT, rooted(T, tmp)) for _ in range(times)][-1]
         return {True: lambda: got.reason, False: lambda: "PASS"}[got.mark is blind.Mark.REFUSED]()
 
     def sealed_then(between):
@@ -174,7 +175,7 @@ with tempfile.TemporaryDirectory() as tmp:
         (d / "intake.toml").write_text(text)
         (d / "transducer.toml").write_text("# planted: the seal hashes this file; S0's transducer check is not run here\n")
         who = {"author": "plan 1145 test", "author_kind": intake_seal.AUTHOR_KIND["ai-draft"], "confirmed_by": ""}
-        intake_seal.mint(blind.format_stage(text, [], T).evidence, d, str(banks / name), who, ROOT, rooted(T, tmp))
+        intake_seal.mint(blind.format_stage(text, [], T).evidence, d, who, ROOT, rooted(T, tmp))
         between(banks / name)
         return first(run(T, tmp, ident, text))
 
@@ -229,18 +230,18 @@ with tempfile.TemporaryDirectory() as tmp:
         ("SELECTION_EMPTY", "(1160 P2, A1) files = [] and values = []", lambda: pf("pf", lambda t: re.sub(r"values = \[[^\]]*\]", "values = []", re.sub(r"files = \[[^\]]*\]", "files = []", t, count=1), count=1))),
         ("SLOW_VALUES_NOT_ONE_PER_FILE", "(1160) one LISTED value fewer than the files", lambda: pf("pf", lambda t: re.sub(r'values = \["[^"]*", ', 'values = [', t, count=1))),
         # S2 SEAL (bin/cc intake seal)
-        ("ALREADY_SEALED", "a second seal", lambda: mint(banks / "pf", 2)),
-        ("UNIVERSE_ROOT_ABSENT", "a universe that is no directory", lambda: mint(tmp / "nowhere")),
-        ("SELECTION_OUTSIDE_UNIVERSE", "an empty universe", lambda: mint([p for p in [tmp / "empty"] if p.mkdir() is None][0])),
-        ("SELECTION_OUTSIDE_UNIVERSE", "(1160) a files entry the universe does not hold", lambda: mint(banks / "pf", edit=lambda t: grow(t, "curve_999.csv"))),
+        ("ALREADY_SEALED", "a second seal", lambda: mint("pf", 2)),
+        ("UNIVERSE_ROOT_ABSENT", "a universe that is no directory", lambda: mint("nowhere")),
+        ("SELECTION_OUTSIDE_UNIVERSE", "an empty universe", lambda: mint([p.name for p in [banks / "empty"] if p.mkdir() is None][0])),
+        ("SELECTION_OUTSIDE_UNIVERSE", "(1160) a files entry the universe does not hold", lambda: mint("pf", edit=lambda t: grow(t, "curve_999.csv"))),
         ("MODE_CONTRADICTS_SOURCE", "(1160 P4) mode PROSPECTIVE, sealed over a universe that holds the selected files",
-         lambda: mint(banks / "pf", edit=lambda t: t.replace('mode = "RETROSPECTIVE_PREDECLARED"', 'mode = "PROSPECTIVE"', 1))),
-        ("SELECTION_DUPLICATE", "(1160) a file named twice in files", lambda: mint(banks / "pf", edit=lambda t: grow(t, m["files"][2]["name"]))),
-        ("UNIVERSE_NOT_PARTITIONED", "(1160) a universe file in no part", lambda: mint(banks / copy(lambda b: (b / "notes.txt").write_text("planted\n")))),
-        ("UNIVERSE_NOT_PARTITIONED", "(1160) a file both selected and excluded", lambda: mint(banks / "pf", edit=lambda t: t.replace('why = "metadata', f'why = "x" }}, {{ file = "{m["files"][1]["name"]}", why = "metadata', 1))),
-        ("UNIVERSE_NOT_PARTITIONED", "(1160) an excluded entry with an empty why", lambda: mint(banks / "pf", edit=lambda t: re.sub(r'why = "[^"]*"', 'why = ""', t, count=1))),
-        ("UNIVERSE_NOT_PARTITIONED", "(1160) an excluded file the universe does not hold", lambda: mint(banks / "pf", edit=lambda t: t.replace('file = "MANIFEST.json"', 'file = "MANIFEST.json", why = "x" }, { file = "README.md"', 1))),
-        ("PASS", "(1160) the partition holds: files, MANIFEST.json excluded (the truth sits outside the bank)", lambda: mint(banks / copy(lambda b: None))),
+         lambda: mint("pf", edit=lambda t: t.replace('mode = "RETROSPECTIVE_PREDECLARED"', 'mode = "PROSPECTIVE"', 1))),
+        ("SELECTION_DUPLICATE", "(1160) a file named twice in files", lambda: mint("pf", edit=lambda t: grow(t, m["files"][2]["name"]))),
+        ("UNIVERSE_NOT_PARTITIONED", "(1160) a universe file in no part", lambda: mint(copy(lambda b: (b / "notes.txt").write_text("planted\n")))),
+        ("UNIVERSE_NOT_PARTITIONED", "(1160) a file both selected and excluded", lambda: mint("pf", edit=lambda t: t.replace('why = "metadata', f'why = "x" }}, {{ file = "{m["files"][1]["name"]}", why = "metadata', 1))),
+        ("UNIVERSE_NOT_PARTITIONED", "(1160) an excluded entry with an empty why", lambda: mint("pf", edit=lambda t: re.sub(r'why = "[^"]*"', 'why = ""', t, count=1))),
+        ("UNIVERSE_NOT_PARTITIONED", "(1160) an excluded file the universe does not hold", lambda: mint("pf", edit=lambda t: t.replace('file = "MANIFEST.json"', 'file = "MANIFEST.json", why = "x" }, { file = "README.md"', 1))),
+        ("PASS", "(1160) the partition holds: files, MANIFEST.json excluded (the truth sits outside the bank)", lambda: mint(copy(lambda b: None))),
         # S3 SOURCE_INTEGRITY
         ("ROOT_UNRESOLVED", "a root name ROOTS.toml does not hold", lambda: pf("pf", lambda t: t.replace("<long-test>/pf", "<no-such-root>/pf"))),
         ("PATH_OUTSIDE_ROOT", "(1160) a files entry ../pf/<a curve file>: a file of another bank, outside this root", lambda: pf(copy(lambda b: None), lambda t: t.replace(f'files = ["{m["files"][0]["name"]}"', f'files = ["../pf/{m["files"][0]["name"]}"', 1))),

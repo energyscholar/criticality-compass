@@ -12,6 +12,7 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 
+import intake_bytes   # plan 1160 A20: located, the universe from the declared root (intake_bytes imports this module too; both use the other at call time only)
 from intake_blind import Pass, Refuse, detail, gate
 
 FILES = ("intake.toml", "transducer.toml")   # the declaration: the two files its sha256 covers, in this order
@@ -184,9 +185,11 @@ def _stamp(d, decl, universe, have, who, root, tables, schema, counts):
     return Pass(SealState(SealStatus.SEALED, said(tables, SealStatus.SEALED), rec))
 
 
-def mint(declaration, d, universe, who, root, tables):
+def mint(declaration, d, who, root, tables):
     """bin/cc intake seal, after S0 passed: ALREADY_SEALED | UNIVERSE_ROOT_ABSENT | _write's rows, or append the seal-log line and
-    write SEAL.json. `who` = {author, author_kind, confirmed_by}; `universe` is the directory --universe names (a str; "" when not given)."""
+    write SEAL.json. `who` = {author, author_kind, confirmed_by}. The universe is the directory the declared [source] root names through
+    the tables' roots (plan 1160 A20: was a --universe flag), the very directory S3 lists, so a seal cannot list another one."""
+    universe = intake_bytes.located(declaration.data["source"]["root"], tables["roots"])   # "" when the root names no declared root
     return {True: lambda: Refuse("ALREADY_SEALED", detail(words=["SEAL.json exists; a seal is never replaced"])),
-            False: lambda: {False: lambda: Refuse("UNIVERSE_ROOT_ABSENT", detail(words=[f"'{universe}' is not a directory on this machine"])),
+            False: lambda: {False: lambda: Refuse("UNIVERSE_ROOT_ABSENT", detail(words=[f"root '{declaration.data['source']['root']}' names no directory on this machine"])),
                             True: lambda: _write(d, declaration, Path(universe), who, root, tables)}[universe != "" and Path(universe).is_dir()]()}[(Path(d) / "SEAL.json").is_file()]()

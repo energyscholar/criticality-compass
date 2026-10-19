@@ -16,7 +16,7 @@ empty or text cell) is dropped, recorded by its line number, and the identity te
 
 ```
 bin/cc new intake <id>                                      # first: declarations/<id>/, which peek and convert need
-bin/cc intake peek <id> <file> [--sheet NAME] [--depth N]   # look at a raw file's head without seeing a value
+bin/cc intake peek <id> <cc-datasets>/<name>/raw/<file> [--sheet NAME|k] [--depth N] [--encoding E]   # a raw file's head, no value
 #   write declarations/<id>/CONVERSION.toml (below)
 bin/cc intake convert <id>                                  # write <cc-banks>/<id>/bank and its CONVERSION-MANIFEST.json
 bin/cc intake convert <id> --verify                         # re-check the bank against the raw files, at any later time
@@ -27,20 +27,26 @@ Run `new intake` first: peek needs `declarations/<id>/`, and refuses "name a dec
 and the declaration, so peek.log, CONVERSION.toml, conversion-access.log and the intake declaration sit together, and the seal's ordering
 note counts the conversion's reads (plan 1160 A13).
 
-1. The deposit sits in `<cc-datasets>/<id>/raw` (a root name of intake/ROOTS.toml: `~/scratch/cc-datasets` on the data host).
-2. `peek` prints the first lines of one raw file as counts and text names only, so you can see where the names line is without seeing a
+1. The deposit sits under the `<cc-datasets>` root (a root name of intake/ROOTS.toml: `~/scratch/cc-datasets` on the data host);
+   `<cc-datasets>/<name>/raw` is an example. The root-named path you declare (`source`, and peek's file argument) names the files; the
+   id is free and names only `declarations/<id>/` (plan 1160 A19): a declaration `a-r3` peeks `<cc-datasets>/a/raw/<file>`.
+2. `peek` takes the file by its root-named path under `<cc-datasets>` (another root, an absolute path or a `..` part is
+   SOURCE_FILE_ABSENT). It first prints which encodings of DECODE's alphabet decode the whole file (`decodes as: …; not as: …`, words of
+   the alphabet only), and `--encoding E` (one of them) decodes the head lines (plan 1160 A22). It prints the first lines of one raw file as counts and text names only, so you can see where the names line is without seeing a
    value. It prints at most depth + 2 lines (depth 1 unless you say) and stops before the first line whose every cell is a number. A
    number in a text name prints as `#`. Each peek is recorded in `declarations/<id>/peek.log`. For an xlsx, `--sheet` is required; to learn
-   the sheet names, peek without `--sheet`: it refuses SHEET_REQUIRED, and its Detail lists the workbook's sheet names as it lists any
-   names (a text name masked, a numeric name counted, never printed). Listing the names needs openpyxl, as SHEET_TO_CSV does, so peek on
+   the sheet names, peek without `--sheet`: it refuses SHEET_REQUIRED, and its Detail lists the workbook's sheet names, each after its
+   position (`#1 'notes'`, `#2 a numeric name`: a text name masked, a numeric name never printed). `--sheet` and `sheet =` take the name or
+   the 1-based position (`--sheet 2`, `sheet = 2`), so a sheet whose name does not print is still addressed (plan 1160 A21). Listing the names needs openpyxl, as SHEET_TO_CSV does, so peek on
    the data host (plan 1160 A10). Peek every file of the family, not one per kind: files of one family can differ in header length and
    column order. The Detail of a conversion refusal names the file (`file '<from>' -> '<to>'`), so you know which one to peek again
    (plan 1160 A12). Peek's `blank` is the converter's blank: a line with no text in any cell, which the converter records as blank and
    never as a row. Peek decodes as the default DECODE does (utf-8-sig), so a byte-order mark is no part of the first name.
 3. You write `declarations/<id>/CONVERSION.toml`.
 4. `convert` writes the bank to `<cc-banks>/<id>/bank` (`~/scratch/cc-banks` on the data host). It never overwrites a bank: remove the
-   old one, or use a new id (BANK_EXISTS). It writes nothing unless the identity test passes on the exact bytes it is about to write.
-5. In the intake declaration, `[source]` says `kind = "CONVERTED"`, `converted_from = "<cc-datasets>/<id>/raw"` and
+   old one, or use a new id (BANK_EXISTS). A conversion takes seconds; one that runs for minutes is a defect, report it. A killed
+   conversion writes no bank; `declarations/<id>/conversion-access.log` lists the files it had read (plan 1160 A23). It writes nothing unless the identity test passes on the exact bytes it is about to write.
+5. In the intake declaration, `[source]` says `kind = "CONVERTED"`, `converted_from = "<cc-datasets>/<name>/raw"` (the deposit you converted) and
    `root = "<cc-banks>/<id>/bank"`, and `[selection]` excludes `CONVERSION-MANIFEST.json`. At S3 the intake checks the chain from the raw
    files to the bank (CONVERSION_CHAIN_BROKEN) and then reads the bank exactly as a deposit.
 
@@ -205,7 +211,8 @@ Before writing, the converter checks two things on the exact bytes it is about t
 - the code hash and the time.
 
 `convert <id> --verify` and S3 recompute everything from the files on disk. If a raw file or a bank file no longer has its recorded sha256,
-the refusal is CONVERSION_CHAIN_BROKEN. If the cells no longer match, the refusal is the identity test's.
+the refusal is CONVERSION_CHAIN_BROKEN. If the cells no longer match, the refusal is the identity test's. Order: `convert <id>` writes the
+bank and its manifest; `--verify` re-checks an existing bank, so on a bank that was never converted it refuses CONVERSION_CHAIN_BROKEN.
 
 ## Refusals
 
@@ -222,10 +229,10 @@ others are:
 | STEP_OUT_OF_ORDER | move the step earlier: see the stages above |
 | SOURCE_FILE_ABSENT | `from` (or an UNPACK member) is not in the deposit |
 | CONTAINER_UNREADABLE, XLSX_READER_ABSENT, SHEET_ABSENT | the archive or workbook cannot be read as declared |
-| SHEET_REQUIRED | peek on an xlsx with no `--sheet`: the Detail lists the sheet names; peek again with `--sheet NAME` |
+| SHEET_REQUIRED | peek on an xlsx with no `--sheet`: the Detail lists the sheets by position; peek again with `--sheet k` or `--sheet NAME` |
 | MARKER_LINE_ABSENT | no line is the marker, or the first row lacks the prefix |
 | COLUMN_ABSENT | a named column is missing or ambiguous, or a row is too short for it |
-| ENCODING_INVALID | the bytes are not the declared encoding: peek, then choose another |
+| ENCODING_INVALID | the bytes are not the declared encoding: peek's `decodes as:` line names those that decode; choose one |
 | NAMES_NOT_NUMERIC | WIDE_TO_LONG met a text name besides the key; SELECT_COLUMNS it away first |
 | CELL_MAP_NOT_A_PERMUTATION, IDENTITY_FAILED | the steps would lose, repeat, reorder or change a cell; this is the rule at the top |
 | CONVERSION_CHAIN_BROKEN | the raw files or the bank changed after the conversion; convert again under a new id |
