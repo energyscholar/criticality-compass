@@ -288,7 +288,7 @@ def shape(pinned, t):
     return gate([(lambda: d["reader"]["name"] in intake_read.LIVE, "READER_NOT_LIVE", lambda: detail(words=[f"reader '{d['reader']['name']}'"])),
                  (lambda: g.readable, "READER_REFUSED", lambda: g.detail.within(f.name, g.reason)),
                  (lambda: g.columns == cols, "COLUMNS_DIFFER", lambda: detail(f.name, columns=numbered(g.columns) + cols, counts={"columns in the file": len(g.columns), "declared": len(cols)})),
-                 (lambda: not units(), "UNIT_DIFFERS", lambda: detail(f.name, words=[x for r, u, w in units() for x in (f"{r} stated in", u, f"declared {w}")])),
+                 (lambda: not units(), "UNIT_DIFFERS", lambda: detail(f.name, words=[f"{r} declared {w}" for r, u, w in units()], stated=[(r, u) for r, u, w in units()])),
                  (lambda: not unordered(), "ROW_ORDER_DIFFERS", lambda: detail(words=unordered()[:3] + [f"not {d['acquisition']['row_order']} in {d['knobs']['fast']['name']}"], counts={"curves": len(unordered())}))],
                 lambda: Pass(Shaped(pinned, g.columns)))
 

@@ -10,6 +10,7 @@ plumbing = ["bin/cc", "cc/admit.py", "cc/schema.py", "cc/declare.py", "cc/author
   ".githooks/pre-commit"]
 intake = ["cc/intake.py", "cc/intake_blind.py", "cc/intake_seal.py", "cc/intake_data.py", "cc/intake_read.py", "docs/gen-intake.py"]   # plan 1136: the intake pipeline (plan 1145: its own role and line cap, tests/test_budget.py INTAKE_CAP; was in plumbing)
 benchmark = []
+intake_names = ["cc/intake_names.py"]   # plan 1160 P2: the name classifier and Detail of the intake, moved out of intake_blind with its own cap (tests/test_budget.py NAMES_CAP), so INTAKE_CAP stays 1200
 test_infrastructure = ["cc/intake_synth.py", "tests/intake_plant.py"]   # plan 1139: the planted synthetic bank of `bin/cc intake synth`; plan 1145: the planted inputs of the intake tests; outside the measurement closure
 methods = ["cc/detect.py"]
 tests = [
@@ -41,4 +42,4 @@ numpy = [
 
 [closure.measure]               # plan 0886: the measurement closure, declared. Membership is COMPUTED (schema.import_closure); only these two lists are data.
 entries = ["cc/detect.py", "cc/door.py"]        # + each input's instrument modules (seeded at measure time: schema.MEASURE_SEEDED)
-outside = ["cc/declare.py", "cc/author.py", "cc/view.py", "cc/score.py", "cc/family.py", "cc/transducer.py", "cc/fingerprint.py", "bin/cc", "cc/intake.py", "cc/intake_blind.py", "cc/intake_seal.py", "cc/intake_data.py", "cc/intake_read.py", "cc/intake_synth.py"]
+outside = ["cc/declare.py", "cc/author.py", "cc/view.py", "cc/score.py", "cc/family.py", "cc/transducer.py", "cc/fingerprint.py", "bin/cc", "cc/intake.py", "cc/intake_blind.py", "cc/intake_seal.py", "cc/intake_data.py", "cc/intake_read.py", "cc/intake_names.py", "cc/intake_synth.py"]

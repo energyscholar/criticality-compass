@@ -13,7 +13,8 @@ Seen RED (each mutation applied by hand, the test run, the mutation reverted):
  - the fast-span summary reinstated in cc/intake_data.py Census.summary (`{x.fast} span [{lo:g}, {hi:g}]`): K3 FAILS on the two PASS runs;
  - _blocks' where reinstated as f"{f.name} block {i} ({g.columns[-1]} = {h:g})": K3 FAILS (the LONG_TABLE census section and CURVE_REPEATED);
  - _resolve's COLUMN_NAME_ABSENT detail printing the names line (f"... {names}"): K3 FAILS on the numeric-names plant;
- - Census.listing printing the slow value instead of the where: K4 and K3 FAIL."""
+ - Census.listing printing the slow value instead of the where: K4 and K3 FAIL;
+ - (1160 P2) intake_names.masked returning the stated text unmasked: K3 FAILS on the UNIT_DIFFERS plant whose unit holds a sentinel."""
 import contextlib
 import hashlib
 import io
@@ -173,6 +174,8 @@ with tempfile.TemporaryDirectory() as tmp:
         ("COLUMNS_DIFFER", "csv-curve-v1, the first file's names line holds a NUMERIC name",
          (pf(CD := pf_bank(lambda b: (b / "curve_000.csv").write_text((b / "curve_000.csv").read_text().replace("T,C,sigma", f"T,{cell(0, 0, 2)},sigma", 1)))), CD, full(CD))),
         ("UNIT_DIFFERS", "a NAMES_UNITS header stating T in K", (lt(UD := lt_bank(head="T,C,sigma,h\nK,dimensionless,dimensionless,dimensionless\n"), header=nu), UD, full(UD))),
+        ("UNIT_DIFFERS", "(1160 P2) a NAMES_UNITS header whose unit of T holds a sentinel number ('K -7357.15'): the stated unit prints masked",
+         (lt(US := lt_bank(head=f"T,C,sigma,h\nK {slow(0)},dimensionless,dimensionless,dimensionless\n"), header=nu), US, full(US))),
         ("ROW_ORDER_DIFFERS", "one swapped pair inside block 5",
          (lt(RO := lt_bank([(h, rs[:3] + [rs[4], rs[3]] + rs[5:]) if i == 4 else (h, rs) for i, (h, rs) in enumerate(CURVES)])), RO, full(RO))),
         # S5 CENSUS

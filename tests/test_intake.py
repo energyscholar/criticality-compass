@@ -30,6 +30,7 @@ sys.path[:0] = [str(ROOT / "cc")]
 import intake  # noqa: E402
 import intake_blind as blind  # noqa: E402
 import intake_data  # noqa: E402
+import intake_names  # noqa: E402
 import intake_seal  # noqa: E402
 
 bad = []
@@ -258,12 +259,14 @@ for E in ENUMS:
     check(f"binding: {E.__name__} declares ATOMS and an axiom, and its values partition them", bool(atoms) and "Axiom" in E.__doc__ and set().union(*vals) == atoms and sum(map(len, vals)) == len(atoms), str(atoms))
     check(f"binding: every {E.__name__} name parses to its set", all(parse(x.name, atoms) == x.value for x in E), str([x.name for x in E if parse(x.name, atoms) != x.value]))
 
-# ---- blindness of S0: imports and calls of cc/intake_blind.py
-tree = ast.parse(Path(blind.__file__).read_text())
-mods = {a.name.split(".")[0] for n in ast.walk(tree) if isinstance(n, ast.Import) for a in n.names} | {(n.module or "").split(".")[0] for n in ast.walk(tree) if isinstance(n, ast.ImportFrom)}
-check("blind: cc/intake_blind.py imports only tomllib, enum, dataclasses, typing, re", mods <= {"tomllib", "enum", "dataclasses", "typing", "re"}, str(mods))
-calls = {n.func.id for n in ast.walk(tree) if isinstance(n, ast.Call) and isinstance(n.func, ast.Name)} & {"open", "exec", "eval", "compile", "__import__", "getattr", "globals"}
-check("blind: cc/intake_blind.py calls no open, exec, eval, compile or __import__", not calls, str(calls))
+# ---- blindness of S0: imports and calls of cc/intake_blind.py and of cc/intake_names.py (plan 1160 P2: the classifier moved there)
+ALLOWED = {blind: {"tomllib", "enum", "dataclasses", "typing", "intake_names"}, intake_names: {"re", "enum", "dataclasses"}}
+for mod, allowed in ALLOWED.items():
+    tree = ast.parse(Path(mod.__file__).read_text())
+    mods = {a.name.split(".")[0] for n in ast.walk(tree) if isinstance(n, ast.Import) for a in n.names} | {(n.module or "").split(".")[0] for n in ast.walk(tree) if isinstance(n, ast.ImportFrom)}
+    check(f"blind: {Path(mod.__file__).name} imports only {', '.join(sorted(allowed))}", mods <= allowed, str(mods))
+    calls = {n.func.id for n in ast.walk(tree) if isinstance(n, ast.Call) and isinstance(n.func, ast.Name)} & {"open", "exec", "eval", "compile", "__import__", "getattr", "globals"}
+    check(f"blind: {Path(mod.__file__).name} calls no open, exec, eval, compile or __import__", not calls, str(calls))
 
 # ---- the copied loader is the toolset's, byte for byte (amendment A2 Q1)
 pin = tomllib.loads((ROOT / "vendor" / "toolset" / "PIN.toml").read_text())
