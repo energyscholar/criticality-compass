@@ -40,6 +40,7 @@ ADVANCED = [
     ("family <id> [--tables SET]", "the family report (a declared projection C over bracket, f1, f2: cc.toml [report] family) of a stored result; measures nothing"),
     ("new family <id>", "start a family declaration from the template"),
     ("intake explain | (lint | seal | run) <id>", "the intake pipeline of a raw-data declaration declarations/<id>/ (explain prints its stage table; not `explain <input> <point>`)"),
+    ("intake convert <id> [--verify] | peek <id> <file>", "convert a deposit into a canonical bank per declarations/<id>/CONVERSION.toml, or print the head of a raw file without a value (docs/INTAKE-CONVERSION.md)"),
     ("intake synth <id> --seed N [--curves K]", "write a planted synthetic bank to scratch/intake-synth/<id> (docs/INTAKE-QUICKSTART.md)"),
     ("new intake <id> [--from-synth <id>]", "start a declaration declarations/<id>/ from the template (--from-synth fills the bank's metadata)"),
 ]

@@ -550,7 +550,7 @@ def peek_cli(root, ident, args, t):
     """bin/cc intake peek <id> <file> [--sheet NAME] [--depth N]: the head of <cc-datasets>/<id>/raw/<file>, read through the logged loader;
     appended to declarations/<id>/peek.log (what was asked and how many lines were printed, never a line)."""
     d, ct = Path(root) / "declarations" / ident, ctables(root)
-    rel, sheet, depth = _flag(["peek"] + args, "peek", ""), _flag(args, "--sheet", ""), _flag(args, "--depth", "1")
+    rel, sheet, depth = {True: lambda: args[0], False: lambda: ""}[len(args) > 0](), _flag(args, "--sheet", ""), _flag(args, "--depth", "1")
     base = intake_data.located(f"<cc-datasets>/{ident}/raw", t["roots"])
     ok = rel != "" and not rel.startswith("--") and re.fullmatch(r"\d+", depth) is not None
     def go():
@@ -559,7 +559,8 @@ def peek_cli(root, ident, args, t):
         got = {True: lambda: Refuse("SOURCE_FILE_ABSENT", detail(words=[f"'{rel}' under <cc-datasets>/{ident}/raw"])), False: lambda: peek(raw, sheet, int(depth))}[raw is None]()
         with open(d / "peek.log", "a") as f:
             f.write(json.dumps({"time": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "file": rel, "sheet": sheet, "depth": depth,
-                                "printed": {True: lambda: 0, False: lambda: len(got[0])}[isinstance(got, Refuse)]()}) + "\n")
+                                "printed": {True: lambda: 0, False: lambda: len(got[0])}[isinstance(got, Refuse)](),
+                                "stopped": {True: lambda: got.reason, False: lambda: got[1]}[isinstance(got, Refuse)]()}) + "\n")
         print({True: lambda: f"peek {ident} {rel}: " + got.text(ct["sentences"]),
                False: lambda: f"peek {ident} {rel}:\n" + "".join(f"  {x}\n" for x in got[0]) + f"  stopped: {got[1]}"}[isinstance(got, Refuse)]())
         return {True: 1, False: 0}[isinstance(got, Refuse)]

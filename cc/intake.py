@@ -406,7 +406,7 @@ def new(root, ident, sid):
 
 def _usage(why):
     print(f"bin/cc intake: {why}\n  usage: bin/cc intake explain | synth <id> --seed N [--curves K] [--out DIR] | lint <id> | seal <id> --universe DIR --author NAME --as human|ai-draft "
-          "(--confirmed-by NAME | --unconfirmed) | run <id>\n  Next: bin/cc intake explain")
+          "(--confirmed-by NAME | --unconfirmed) | run <id> | convert <id> [--verify] | peek <id> <file> [--sheet NAME] [--depth N]\n  Next: bin/cc intake explain")
     return 1
 
 
@@ -422,8 +422,16 @@ def synth(root, args):
     return intake_synth.cli(root, args)
 
 
+def _handoff(pick):
+    """bin/cc intake convert | peek: the conversion before the intake (cc/intake_convert.py, role intake_handoff), imported when asked for."""
+    def go(root, ident, a):
+        import intake_convert
+        return pick(intake_convert)(root, ident, a, tables(root))
+    return _with_id(go)
+
+
 INTAKE = {"explain": lambda root, a: print(explain(tables(root)), end="") or 0, "lint": _with_id(lint), "seal": _with_id(seal), "run": _with_id(run),
-          "synth": synth}
+          "synth": synth, "convert": _handoff(lambda m: m.convert_cli), "peek": _handoff(lambda m: m.peek_cli)}
 
 
 def cli(root, args):
