@@ -14,6 +14,9 @@ plan-1139 report lists them).
     RESULT.json is written on the INCOMPLETE run (confirmation UNCONFIRMED, the E8 sentence); docs/INTAKE-COMPLETION.md's command block
     (remove the seal, seal --as human --confirmed-by, run) then gives PRIMARY_READY and RESULT.json confirmation CONFIRMED; a run whose S10
     refuses removes RESULT.json. Seen RED: see the P6.2 lines of the scratchpad's p6-seenred.txt.
+ 7. (plan 1160 A8) docs/INTAKE-ON-A-DATA-HOST.md holds D2's sentence and one worked kind = "record" transducer.toml that the transducer
+    check passes; the transducer template's comments name every required table. Seen RED: the worked file's [interval] role reworded;
+    its [record] source line deleted; the D2 sentence's "[reduction]" dropped from the doc.
 Tests 2 to 5 run in one copy of the Compass (its code, tables and docs; not .git, results, benchmark, fixtures, data), never in this tree."""
 import json
 import os
@@ -197,6 +200,27 @@ with tempfile.TemporaryDirectory() as tmp:
     for name, ident, before, after, want in cases:
         got = planted(ident, before, after)
         check(name, want in got and "PRIMARY verdict: PRIMARY_REFUSED_AT" in got, "\n".join(x for x in got.splitlines() if "EXECUTED" in x or "verdict" in x)[:700])
+
+# ---- 7. (1160 A8) the data-host doc's worked record file passes the transducer check; the template names every required table
+sys.path.insert(0, str(ROOT / "cc"))
+import intake  # noqa: E402
+
+DH = (ROOT / "docs" / "INTAKE-ON-A-DATA-HOST.md").read_text()
+D2 = ('Alongside intake.toml, `new intake` writes transducer.toml. For real data it must say `kind = "record"` with `[record]` (apparatus, preparation, '
+      'observation, authors_projection, source) plus `[reduction]` (name, keeps, discards) and `[interval]` (role as printed, keeps, discards); lint refuses while any TODO remains.')
+check("7. (1160 A8) docs/INTAKE-ON-A-DATA-HOST.md holds D2's sentence, verbatim", D2 in DH)
+REC = re.findall(r"```toml\n(# declarations/<id>/transducer\.toml.*?)\n```", DH, re.S)
+with tempfile.TemporaryDirectory() as tmp:
+    d = Path(tmp) / "rec7"
+    d.mkdir()
+    (d / "transducer.toml").write_text((REC + [""])[0].replace("<id>", "rec7"))
+    found = intake._findings(ROOT, d, "rec7")
+    (d / "transducer.toml").write_text((ROOT / "inputs" / "TEMPLATE.transducer.toml.in").read_text().replace("<ID>", "rec7"))
+    blank = intake._findings(ROOT, d, "rec7")
+check("7. (1160 A8) the doc holds one worked kind = \"record\" transducer.toml, and the transducer check (S0) finds nothing in it",
+      len(REC) == 1 and 'kind = "record"' in REC[0] and found == [], str((len(REC), found))[:600])
+check("7. (1160 A8) the template as `new intake` writes it is refused (its TODOs), and its comments name [record], [reduction] and [interval]",
+      blank != [] and all(x in (ROOT / "inputs" / "TEMPLATE.transducer.toml.in").read_text().split("\nschema")[0] for x in ("[record]", "[reduction]", "[interval]")), str(blank)[:300])
 
 print("test_intake_cli: " + ("FAILED " + "; ".join(bad) if bad else "all passed"))
 sys.exit(1 if bad else 0)

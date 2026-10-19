@@ -1,24 +1,27 @@
 # inputs/TEMPLATE.transducer.toml.in - read by `bin/cc new input <id>`; writes inputs/<id>/transducer.toml
 # (the transducer file, plan 0883: how the data entered M, what the per-locus mean keeps and discards, the interval's role).
-# Replace every TODO value. The two sentences below are checked by equality against cc.toml [transducer]; do not reword them.
-# A real-data input: set kind = "record", delete [transducer], and write [record] (apparatus, preparation, observation,
-# authors_projection, source) in its place.
+# Replace every TODO value; lint refuses while any TODO remains. Three tables are required: [transducer] (or [record] for real data),
+# [reduction] (name, keeps, discards) and [interval] (role, keeps, discards). The two sentences below (output, interval.role) are
+# checked by equality against cc.toml [transducer]; do not reword them.
+# A real-data input (and every declaration of bin/cc new intake on a data set): set kind = "record", delete [transducer], and write
+# [record] (apparatus, preparation, observation, authors_projection, source) in its place; keep [reduction] and [interval].
+# docs/INTAKE-ON-A-DATA-HOST.md, "transducer.toml for real data", has one complete record file.
 schema = 1
 kind = "transducer"
 id = "<ID>"
 
-[transducer]
+[transducer]            # required (kind = "transducer"); for kind = "record" write [record] here instead
 model = "TODO"          # the model the sampler runs, one line
 update = ["TODO"]       # one entry per frozen sampler file: "<toolset-relative path> sha256 <64 hex>" (sha256sum of the toolset file)
 inputs = "TODO"         # the study section(s) and driver(s) in the toolset m.toml
 output = "one configuration per recorded sweep; each configuration is one observation; the recorded sequence is NOT a process sequence (Phase 1 only)"
 
-[reduction]
+[reduction]             # required: name, keeps, discards
 name = "TODO"
 keeps = "TODO"
 discards = "TODO"
 
-[interval]
+[interval]              # required: role (as printed, do not reword), keeps, discards
 role = "projection C: places the reading's sign cell against its declared margin; never an operator input"
 keeps = "TODO"
 discards = "TODO"

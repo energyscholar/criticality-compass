@@ -112,6 +112,49 @@ refused ROW_ORDER_DIFFERS (rows declared ASCENDING or DESCENDING).
 selected files, the excluded files and the truth side, each file in one part. Otherwise it refuses UNIVERSE_NOT_PARTITIONED, or
 SELECTION_DUPLICATE when a name is given twice.
 
+### transducer.toml for real data
+
+Alongside intake.toml, `new intake` writes transducer.toml. For real data it must say `kind = "record"` with `[record]` (apparatus, preparation, observation, authors_projection, source) plus `[reduction]` (name, keeps, discards) and `[interval]` (role as printed, keeps, discards); lint refuses while any TODO remains.
+
+The file `new intake` writes is the transducer template, `kind = "transducer"`, made for a simulation. For a deposit, delete its
+`[transducer]` table and write `[record]` in its place. Each field is one line of words about the deposit, taken from its metadata,
+never a value read from a data file:
+
+- `apparatus`: the instrument and its settings, as the deposit states them.
+- `preparation`: the sample, and how it was prepared and brought to each slow-knob value.
+- `observation`: what one row of the file is.
+- `authors_projection`: any step the authors applied before depositing (a background subtraction, a normalisation); "none stated" if
+  the deposit states none.
+- `source`: where the files come from (repository, DOI or accession, licence).
+
+`[reduction]` says what the Compass keeps of each point and what it discards. `[interval]` says what the interval keeps and discards.
+Its `role` is fixed: write it exactly as in the example below (S0 compares it with cc.toml). `[provenance_note]` is optional. One complete
+file, for a hypothetical deposit (every line here is illustrative):
+
+```toml
+# declarations/<id>/transducer.toml - the record file of a deposited data set
+schema = 1
+kind = "record"
+id = "<id>"
+
+[record]
+apparatus = "a SQUID magnetometer, field 10 mT, temperature swept at 1 K/min (as stated in the deposit's README)"
+preparation = "one powder sample, zero-field cooled before each field value"
+observation = "one row = one magnetization reading at one temperature"
+authors_projection = "none stated: the deposit's README says the columns are the instrument output"
+source = "the data repository record named in the README (licence CC BY 4.0)"
+
+[reduction]
+name = "none in the Compass: the file stores one value of the measured quantity per (slow, fast) point"
+keeps = "the deposited value at each point"
+discards = "nothing the file holds"
+
+[interval]
+role = "projection C: places the reading's sign cell against its declared margin; never an operator input"
+keeps = "the uncertainty column as deposited"
+discards = "how the authors computed it"
+```
+
 Then:
 
 ```
