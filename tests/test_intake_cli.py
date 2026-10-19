@@ -10,6 +10,10 @@ plan-1139 report lists them).
     by applying the quickstart's filled example.
     Plan 1160 P5: the run now passes S7, S8 and S9 (interval STATED, tiering STATED; CANDIDATE_BRACKET) and is PRIMARY_INCOMPLETE missing
     only confirmation. Seen RED: TIERING["STATED"] made REPLICATES in cc/intake_feasible.py: the S7-S9 check FAILS.
+ 6. (plan 1160 P6) The terminal from the command line: S10 passes Located on the quickstart bank, its report line carries ranks and no value,
+    RESULT.json is written on the INCOMPLETE run (confirmation UNCONFIRMED, the E8 sentence); docs/INTAKE-COMPLETION.md's command block
+    (remove the seal, seal --as human --confirmed-by, run) then gives PRIMARY_READY and RESULT.json confirmation CONFIRMED; a run whose S10
+    refuses removes RESULT.json. Seen RED: see the P6.2 lines of the scratchpad's p6-seenred.txt.
 Tests 2 to 5 run in one copy of the Compass (its code, tables and docs; not .git, results, benchmark, fixtures, data), never in this tree."""
 import json
 import os
@@ -116,6 +120,34 @@ with tempfile.TemporaryDirectory() as tmp:
     acc = [json.loads(x) for x in slurp(log).splitlines()]
     check("2. the access log holds 9 loader reads and nothing else; none of the truth directory",
           len(acc) == 9 and all(a["route"] == "loader" and Path(a["path"]).parent == bank.resolve() for a in acc), str([(a["route"], a["path"]) for a in acc if a["route"] != "loader" or "TRUTH" in a["path"]])[:400])
+
+    # ---- 6. (1160 P6) the terminal: RESULT.json on the INCOMPLETE run; READY after a human confirms the seal (after test 2: these runs read again)
+    dd = w / "declarations" / "demo1"
+    res = json.loads(slurp(dd / "RESULT.json") or "{}")
+    s10 = [ln for ln in report.splitlines() if ln.startswith("- **S10 KERNEL_HANDOFF** (LIVE)")]
+    check("6. S10 EXECUTED PASS: Located, its ranks, tier and n_tied of 9 curves, and the identifiability value; no value in that line",
+          len(s10) == 1 and "EXECUTED, PASS. PRIMARY CHAIN_SLOW on 'C_max' (MAX_MEASURED): Located, span ranks " in s10[0] and "of 9 curves. Identifiability: " in s10[0]
+          and not re.search(r"\d\.\d", s10[0]), str(s10)[:400])
+    check("6. RESULT.json is written on the INCOMPLETE run: Located, UNCONFIRMED, PRIMARY_INCOMPLETE, CANDIDATE_BRACKET and why its tier is no coverage claim",
+          [r.get("type") for r in res.get("results", [])] == ["Located"] and (res.get("confirmation"), res.get("primary_verdict"), res.get("max_bracket")) == ("UNCONFIRMED", "PRIMARY_INCOMPLETE", "CANDIDATE_BRACKET")
+          and "no tier here is a coverage claim" in res.get("why_this_tier", "") and res.get("seal_identity", {}).get("status") == "SEALED", json.dumps(res)[:600])
+    DONE = [b for lang, b in re.findall(r"```(\w*)\n(.*?)\n```", (w / "docs" / "INTAKE-COMPLETION.md").read_text(), re.S) if "--confirmed-by" in b]
+    check("6. docs/INTAKE-COMPLETION.md has one command block that confirms the seal", len(DONE) == 1, str(len(DONE)))
+    steps = [sh(ln, w) for ln in (DONE or [""])[0].splitlines()]
+    ready, res2 = slurp(dd / "intake-report.md"), json.loads(slurp(dd / "RESULT.json") or "{}")
+    check("6. that block runs clean and the run after it is PRIMARY_READY", all(r.returncode == 0 for r in steps) and "PRIMARY verdict: PRIMARY_READY**" in ready,
+          str([r.stdout[-200:] + r.stderr[-200:] for r in steps if r.returncode])[:600] + ready[:300])
+    check("6. RESULT.json after it: confirmation CONFIRMED, PRIMARY_READY, the seal's author kind HUMAN, the same result",
+          (res2.get("confirmation"), res2.get("primary_verdict"), res2.get("seal_identity", {}).get("author_kind")) == ("CONFIRMED", "PRIMARY_READY", "HUMAN")
+          and res2.get("results") == res.get("results"), json.dumps(res2)[:600])
+    sh("bin/cc new intake demo4 --from-synth demo1", w)
+    fill(w / "declarations" / "demo4" / "intake.toml")
+    (w / "declarations" / "demo4" / "RESULT.json").write_text("{}\n")   # a stale result
+    t4 = w / "declarations" / "demo4" / "intake.toml"
+    t4.write_text(re.sub(r"(\[shift\][^\[]*?\nc = )[^\n#]*", lambda mm: mm.group(1) + "nan ", t4.read_text(), count=1))
+    nanrun = (sh("bin/cc intake run demo4", w), slurp(w / "declarations" / "demo4" / "intake-report.md"))[1]
+    check("6. a run whose S10 refuses (c = nan: DOOR_REFUSED) removes a stale RESULT.json", "S10 KERNEL_HANDOFF** (LIVE): EXECUTED, REFUSE DOOR_REFUSED" in nanrun
+          and not (w / "declarations" / "demo4" / "RESULT.json").exists(), nanrun[-900:])
 
     # ---- 4. advisory seal: an unsealed run reaches the data stages; an edit after the seal is reported
     sh("bin/cc new intake demo2 --from-synth demo1", w)
