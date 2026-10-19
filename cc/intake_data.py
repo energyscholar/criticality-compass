@@ -246,7 +246,7 @@ def _read(declaration, d, loc, names, loader):
 def admissibility(census, d, t):
     """S6 ADMISSIBILITY (reads no data byte; it reads declarations/<id>/access.log, which lies in no declared partition). READ_NOT_LOGGED: a
     pinned file with no loader line holding its resolved path and its sha256 | BYPASS_READ_LOGGED: a line with route in-process-bypass (the
-    loader's audit hook saw an open of a declared-partition path outside the loader). LINEAGE_OFF_GRAPH has no row: the terminal is table-driven
+    loader's audit hook saw an open of a declared-partition path outside the loader). LINEAGE_OFF_GRAPH has no row (deleted, plan 1160 P5 A3): the terminal is table-driven
     from the sealed declaration, so an off-graph step is unreachable by construction (STAGES.toml)."""
     loc, log = located(census.pinned.declaration.data["source"]["root"], t["roots"]), intake_seal.lines(Path(d) / "access.log")
     logged = {(a["path"], a["sha256"]) for a in log if a["route"] == "loader"}

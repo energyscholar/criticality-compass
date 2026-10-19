@@ -66,7 +66,6 @@ The declared choices are consistent with each other, and the declared operation 
 | LANES_IDENTICAL | live | The two declared lanes use the same projection and bridge; the alternative must differ. |
 | REPLICATE_IS_SWEEP_NEIGHBOUR | live | Replicates are declared as adjacent points of one sweep (the replicate key is the fast knob); a replicate is a repeated preparation, never a neighbouring point. |
 | OPERATION_NOT_PERMITTED | live | A declared step is not a permitted operation for its link of the chain (Raw, Projection, DerivedObservable, Bridge, KernelInput). |
-| SHIFT_BEFORE_KERNEL_INPUT | NOT LIVE | A constant shift x + c is declared upstream of the kernel input; x + c applies only at the KernelInput boundary. |
 | PROVENANCE_HAS_NO_KERNEL_ROUTE | live | The source's admissibility ([source] admissibility, the deposit's class as the declarer read it from metadata) is FIGURE_LEVEL or PROCESSED_UNDECLARABLE, which has no kernel route. |
 | METHOD_NEEDS_UNCERTAINTY_COLUMN | live | The interval method is STATED (each point's interval is the declared uncertainty column), and [measured.uncertainty] declares none (kind NONE). |
 
@@ -150,7 +149,6 @@ The actual lineage obeys the sealed operation graph: every value reached the int
 |---|---|---|
 | READ_NOT_LOGGED | live | A record exists whose bytes have no loader line in the access log. |
 | BYPASS_READ_LOGGED | live | The access log holds an in-process read of a data path that did not go through the loader. |
-| LINEAGE_OFF_GRAPH | NOT LIVE | A value's lineage includes a step that the sealed operation graph does not declare. |
 
 ## S7 INTERVAL_FEASIBILITY (STUB)
 
@@ -203,8 +201,6 @@ The plan 1118 banks were used to CHOOSE these rows; they cannot validate them (A
 
 Each row below has live = false in intake/STAGES.toml: no body returns it today (a STUB stage's rows are never live), so a run cannot show it and its absence says nothing.
 
-- S1 SHIFT_BEFORE_KERNEL_INPUT
-- S6 LINEAGE_OFF_GRAPH
 - S7 ONE_READING_PER_POINT
 - S7 BELOW_METHOD_FLOOR
 - S7 METHOD_HAS_NO_FLOOR

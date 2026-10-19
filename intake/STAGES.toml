@@ -64,9 +64,7 @@ name = "CHOICES"
 purpose = "The declared choices are consistent with each other, and the declared operation graph uses only permitted operations (static admissibility)."
 reads_bytes = "NONE"
 needs = ["S0"]
-implemented = true   # plan 1160 P1-P2: SLOW_VALUES_NOT_ONE_PER_FILE, SELECTION_EMPTY (A1), BLOCK_RULE_HAS_NO_DIRECTION; plan 1160 P4 (cc/intake_choices.py): every other row live but
-# SHIFT_BEFORE_KERNEL_INPUT, which no body can return: the format's one shift is [shift] c, the KernelInput boundary's own field, and a shift written
-# anywhere else is a field the format does not define (S0 FIELD_UNKNOWN), so no declaration that reaches S1 holds a shift upstream of the kernel input.
+implemented = true   # plan 1160 P1-P2: SLOW_VALUES_NOT_ONE_PER_FILE, SELECTION_EMPTY (A1), BLOCK_RULE_HAS_NO_DIRECTION; plan 1160 P4 (cc/intake_choices.py): every other row live.
 # MODE_CONTRADICTS_SOURCE moved to S2 (P4): whether the selected files exist is seen only in the universe listing, which bin/cc intake seal takes.
 verdict = "PRIMARY"
 reason = [
@@ -81,7 +79,9 @@ reason = [
   { code = "LANES_IDENTICAL",                live = true,  sentence = "The two declared lanes use the same projection and bridge; the alternative must differ." },
   { code = "REPLICATE_IS_SWEEP_NEIGHBOUR",   live = true,  sentence = "Replicates are declared as adjacent points of one sweep (the replicate key is the fast knob); a replicate is a repeated preparation, never a neighbouring point." },
   { code = "OPERATION_NOT_PERMITTED",        live = true,  sentence = "A declared step is not a permitted operation for its link of the chain (Raw, Projection, DerivedObservable, Bridge, KernelInput)." },
-  { code = "SHIFT_BEFORE_KERNEL_INPUT",      live = false, sentence = "A constant shift x + c is declared upstream of the kernel input; x + c applies only at the KernelInput boundary." },
+  # (plan 1160 P5, amendment A3) SHIFT_BEFORE_KERNEL_INPUT is deleted: a shift upstream of the kernel input is unreachable by construction. The
+  # format's one shift is the one-field [shift] c (intake/FORMAT.toml), the KernelInput boundary's own field, and a shift written anywhere else is
+  # a field the format does not define, which S0 refuses FIELD_UNKNOWN.
   { code = "PROVENANCE_HAS_NO_KERNEL_ROUTE", live = true,  sentence = "The source's admissibility ([source] admissibility, the deposit's class as the declarer read it from metadata) is FIGURE_LEVEL or PROCESSED_UNDECLARABLE, which has no kernel route." },
   { code = "METHOD_NEEDS_UNCERTAINTY_COLUMN", live = true,  sentence = "The interval method is STATED (each point's interval is the declared uncertainty column), and [measured.uncertainty] declares none (kind NONE)." },
 ]
@@ -178,13 +178,13 @@ name = "ADMISSIBILITY"
 purpose = "The actual lineage obeys the sealed operation graph: every value reached the intake through the logged loader and the declared projections only (dynamic admissibility)."
 reads_bytes = "NONE"
 needs = ["S5"]
-implemented = true   # plan 1160 P4: READ_NOT_LOGGED and BYPASS_READ_LOGGED from the access log and the pins. LINEAGE_OFF_GRAPH stays live = false: the
-# terminal is table-driven from the sealed declaration, so an off-graph step is unreachable by construction.
+implemented = true   # plan 1160 P4: READ_NOT_LOGGED and BYPASS_READ_LOGGED from the access log and the pins.
 verdict = "PRIMARY"
 reason = [
   { code = "READ_NOT_LOGGED",    live = true,  sentence = "A record exists whose bytes have no loader line in the access log." },
   { code = "BYPASS_READ_LOGGED", live = true,  sentence = "The access log holds an in-process read of a data path that did not go through the loader." },
-  { code = "LINEAGE_OFF_GRAPH",  live = false, sentence = "A value's lineage includes a step that the sealed operation graph does not declare." },
+  # (plan 1160 P5, amendment A3) LINEAGE_OFF_GRAPH is deleted: an off-graph step is unreachable by construction, because the terminal is
+  # table-driven from the sealed declaration (every step it takes is a row its declared projection and bridge select).
 ]
 
 [[stage]]

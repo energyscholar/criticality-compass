@@ -14,7 +14,9 @@ Seen RED (1160 P4; each mutation applied, the test run, the mutation reverted): 
 interval-alphabet check FAILS; PERMITTED without (PAIR_NEAREST_FAST, NO_LINK): the PERMITTED totality check FAILS; ROUTE without DECLARABLE,
 and intake_seal.SEEN without EXPLORATORY: the S1-tables totality check FAILS; STAGES LANES_IDENTICAL live = false: the S1 live-rows-in-order
 check FAILS (and the INTAKE.md checks); S1's first two rows swapped in intake_choices.choices: the in-order check FAILS; `import os` in
-cc/intake_choices.py: its blindness check FAILS."""
+cc/intake_choices.py: its blindness check FAILS.
+Seen RED (1160 P5, A3): a LINEAGE_OFF_GRAPH row (live = false) put back in S6, or a SHIFT_BEFORE_KERNEL_INPUT row put back in S1: the
+A3 check (no row of an implemented stage is live = false, neither deleted code is a row) FAILS."""
 import ast
 import dataclasses
 import enum
@@ -119,11 +121,15 @@ check("1. (1160 P1) PATH_NOT_ADMITTED is gone from STAGES.toml and the code; its
       "PATH_NOT_ADMITTED" not in codes and "PATH_NOT_ADMITTED" not in Path(intake_data.__file__).read_text()
       and [c for c, _, _ in intake_data.ADMIT] == [c for c in REASONS["S3"] if c.startswith("PATH_")] == ["PATH_OUTSIDE_ROOT", "PATH_ON_TRUTH_SIDE", "PATH_NOT_A_FILE"], str(REASONS["S3"]))
 S1_ROWS = [r for s in ST if s["id"] == "S1" for r in s["reason"]]
-NOT_LIVE_S1 = ["SHIFT_BEFORE_KERNEL_INPUT"]   # plan 1160 P4: no body can return it (its reason is in STAGES.toml's comment and the P4 report)
+NOT_LIVE_S1 = []   # plan 1160 P5 (A3): SHIFT_BEFORE_KERNEL_INPUT is deleted, unreachable by construction (was: ["SHIFT_BEFORE_KERNEL_INPUT"], P4)
 CHOSEN = intake_choices.choices(blind.format_stage((EXAMPLE / "intake.toml").read_text(), [], T).evidence, T["policy"])
-check("1. (1160 P4) S1's live rows are every S1 row but SHIFT_BEFORE_KERNEL_INPUT, and the rows its body checks are exactly them, in STAGES.toml order",
+check("1. (1160 P4, P5) S1's live rows are every S1 row, and the rows its body checks are exactly them, in STAGES.toml order",
       [r["code"] for r in S1_ROWS if not r["live"]] == NOT_LIVE_S1 and isinstance(CHOSEN, blind.Pass) and list(CHOSEN.evidence.checked) == [r["code"] for r in S1_ROWS if r["live"]],
       str(CHOSEN)[:300])
+DELETED = ("SHIFT_BEFORE_KERNEL_INPUT", "LINEAGE_OFF_GRAPH")   # plan 1160 P5, amendment A3: each unreachable by construction, named in STAGES.toml's comment
+check("1. (1160 P5, A3) no row of an implemented stage is live = false, and SHIFT_BEFORE_KERNEL_INPUT and LINEAGE_OFF_GRAPH are no row of STAGES.toml",
+      not [r["code"] for s in ST if s["implemented"] for r in s["reason"] + blind.look(s, "reader_reason", []) if not r["live"]] and not set(DELETED) & set(codes),
+      str([r["code"] for s in ST if s["implemented"] for r in s["reason"] if not r["live"]]))
 ALPHA = set(T["format"]["fields"]["interval"]["method"]["values"]) | set(tomllib.loads((ROOT / "cc.toml").read_text())["alphabets"]["interval_method"])
 check("1. (1160 P4) the intake's interval alphabet is cc.toml's with STATED and NONE; NEEDS_COLUMN is total over it and every method has its fields",
       ALPHA == set(intake_choices.NEEDS_COLUMN) and {"STATED", "NONE"} < ALPHA and ALPHA <= set(T["interval_fields"]), str(sorted(ALPHA)))

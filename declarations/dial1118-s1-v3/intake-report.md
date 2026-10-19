@@ -43,8 +43,6 @@ Sealing is recommended and not enforced. It records what you declared and when; 
 
 Each row below has live = false in intake/STAGES.toml: no body returns it today (a STUB stage's rows are never live), so a run cannot show it and its absence says nothing.
 
-- S1 SHIFT_BEFORE_KERNEL_INPUT
-- S6 LINEAGE_OFF_GRAPH
 - S7 ONE_READING_PER_POINT
 - S7 BELOW_METHOD_FLOOR
 - S7 METHOD_HAS_NO_FLOOR

@@ -226,6 +226,9 @@ on = { type = "str", check = "TEXT" }
 template = { type = "str", check = "CLOSED", admit = ["policy.bridge"], absent = "VALUE_NOT_LISTED", values = { NONE_FITS = "BRIDGE_NONE_FITS", INTERPOLATE = "STEP_IS_INTERPOLATION" } }
 bias = { type = "str", check = "CLOSED", admit = ["policy.bridge"], absent = "BIAS_KEY_UNDECLARED", values = { INTERPOLATE = "STEP_IS_INTERPOLATION" } }
 
+# [shift] is the format's ONE shift, and its one field is c (plan 1160 P5, amendment A3): x + c applies only at the KernelInput boundary. A
+# shift written anywhere upstream is a field this format does not define, which S0 refuses FIELD_UNKNOWN, so a shift before the kernel input is
+# unreachable by construction (STAGES.toml carries no SHIFT_BEFORE_KERNEL_INPUT row).
 [fields.shift]
 type = "table"
 check = "TABLE"
