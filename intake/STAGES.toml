@@ -9,7 +9,7 @@
 # needs, and never the seal stage (test 1).
 schema = 1
 kind = "intake-stages"
-version = "1160-v8"   # plan 1160 A20: UNIVERSE_ROOT_ABSENT names the root (seal has no --universe); plan 1160 A17: S1 MEASURED_KNOB_HAS_NO_POINTS, schema 4; plan 1160 A9: S10 runs before S9 (a refused second lane never withholds the terminal); A13: conversion_read
+version = "1160-v9"   # plan 1160 A24: S1 SLOW_NONE_HAS_NO_PATH; plan 1160 A20: UNIVERSE_ROOT_ABSENT names the root (seal has no --universe); plan 1160 A17: S1 MEASURED_KNOB_HAS_NO_POINTS, schema 4; plan 1160 A9: S10 runs before S9 (a refused second lane never withholds the terminal); A13: conversion_read
 seal_stage = "S2"
 
 [report]
@@ -93,6 +93,7 @@ reason = [
   { code = "MEASURED_IS_A_KNOB",             live = true,  sentence = "The measured number is one of the knobs." },
   { code = "SELECTION_EMPTY",                live = true,  sentence = "The selection names no file (`files = []`); a census needs at least one curve file." },
   { code = "SLOW_VALUES_NOT_ONE_PER_FILE",   live = true,  sentence = "Slow-knob values are declared per file (LISTED), but `values` does not give exactly one value per file of `files`." },
+  { code = "SLOW_NONE_HAS_NO_PATH",          live = true,  sentence = "The slow knob is declared NONE ([selection.slow] source NONE): no curve carries a slow value, so S8 would refuse TOO_FEW_CURVES and no declaration of any layout reaches S10. Declare the slow knob (LISTED, FILE_KEY or COLUMN), or report the deposit as one with no slow knob." },   # plan 1160 A24
   { code = "BLOCK_RULE_HAS_NO_DIRECTION",    live = true,  sentence = "A LONG_TABLE declares block FAST_RESTART, but the fast knob has no declared direction (row_order ACQUISITION with direction UNORDERED), so no restart of a sweep can be seen." },
   { code = "PROJECTION_REQUIRED",            live = true,  sentence = "The raw observation is not one number per locus (a picture, positions, a series), and a bridge takes it with no projection to one number before it." },
   { code = "PROJECTION_ESTIMAND_MIXED",      live = true,  sentence = "One projection names two estimands (for example a location and a height); declare one projection per estimand." },

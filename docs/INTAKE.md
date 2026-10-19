@@ -1,4 +1,4 @@
-# The intake pipeline (stage table 1160-v8, policy 1136-v1)
+# The intake pipeline (stage table 1160-v9, policy 1136-v1)
 
 Generated from intake/STAGES.toml and intake/POLICY.toml by `bin/cc intake explain` (docs/gen-intake.py); never edit it by hand.
 This is the intake's explain. `bin/cc explain <input> <point>` is a different command: it explains one point of a measured input.
@@ -60,6 +60,7 @@ The declared choices are consistent with each other, and the declared operation 
 | MEASURED_IS_A_KNOB | live | The measured number is one of the knobs. |
 | SELECTION_EMPTY | live | The selection names no file (`files = []`); a census needs at least one curve file. |
 | SLOW_VALUES_NOT_ONE_PER_FILE | live | Slow-knob values are declared per file (LISTED), but `values` does not give exactly one value per file of `files`. |
+| SLOW_NONE_HAS_NO_PATH | live | The slow knob is declared NONE ([selection.slow] source NONE): no curve carries a slow value, so S8 would refuse TOO_FEW_CURVES and no declaration of any layout reaches S10. Declare the slow knob (LISTED, FILE_KEY or COLUMN), or report the deposit as one with no slow knob. |
 | BLOCK_RULE_HAS_NO_DIRECTION | live | A LONG_TABLE declares block FAST_RESTART, but the fast knob has no declared direction (row_order ACQUISITION with direction UNORDERED), so no restart of a sweep can be seen. |
 | PROJECTION_REQUIRED | live | The raw observation is not one number per locus (a picture, positions, a series), and a bridge takes it with no projection to one number before it. |
 | PROJECTION_ESTIMAND_MIXED | live | One projection names two estimands (for example a location and a height); declare one projection per estimand. |

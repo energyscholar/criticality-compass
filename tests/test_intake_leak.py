@@ -322,7 +322,7 @@ with tempfile.TemporaryDirectory() as tmp:
         ("SLOW_KEY_UNRESOLVED", "(1160) FILE_KEY h, each key line's value a sentinel followed by 'x'",
          (pf(SK := pf_bank(keyed(lambda i: f"h,{slow(i)}x\n")), lambda t: slow_source(t, "FILE_KEY")), SK, full(SK))),
         ("PASS", "(1160) FILE_KEY h on the PER_FILE sentinel bank, sealed", (pf(FK := pf_bank(keyed(lambda i: f"h,{slow(i)}\n")), lambda t: slow_source(t, "FILE_KEY")), FK, full(FK))),
-        ("TOO_FEW_CURVES", "(1160) slow source NONE on the PER_FILE sentinel bank, sealed (1160 P5: was PASS; no curve carries a slow value, S8)", (pf(PF, lambda t: slow_source(t, "NONE")), PF, full(PF))),
+        ("SLOW_NONE_HAS_NO_PATH", "(1160) slow source NONE on the PER_FILE sentinel bank, sealed (1160 A24: was TOO_FEW_CURVES at S8; 1160 P5: was PASS)", (pf(PF, lambda t: slow_source(t, "NONE")), PF, full(PF))),
         ("REPLICATE_KEY_UNRESOLVED", "a FILE identity on a LONG_TABLE", (lt(RK := lt_bank(CURVES + CURVES[:1]), lambda t: t.replace('identity = "NONE"', 'identity = "FILE"')), RK, full(RK))),
         ("ACQUISITION_ORDER_DIFFERS", "ascending rows in acquisition order, declared DESCENDING",
          (lt(AO := lt_bank(), lambda t: asc(t).replace('direction = "UNORDERED"', 'direction = "DESCENDING"')), AO, full(AO))),

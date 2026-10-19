@@ -148,6 +148,8 @@ SLOWS = {lay: set(F["selection"]["variants"][lay]["slow"]["variants"]) for lay i
 check("1. (1160 P1) the [source] kinds are DEPOSIT and CONVERTED, and SOURCE (the S3 body per kind) is total over them", KINDS == {"DEPOSIT", "CONVERTED"} and set(intake_bytes.SOURCE) == KINDS, str(KINDS))
 check("1. (1160 P1) the PER_FILE slow sources are LISTED, FILE_KEY, NONE; SLOW and UNKEYED are total over them",
       SLOWS["PER_FILE"] == {"LISTED", "FILE_KEY", "NONE"} and set(intake_census.SLOW) == set(intake_census.UNKEYED) == SLOWS["PER_FILE"], str(SLOWS))
+check("1. (1160 A24) SLOW_PATH (S1) is total over every slow source of every layout, and NONE alone has no path",
+      set(intake_choices.SLOW_PATH) == set().union(*SLOWS.values()) and {k for k, v in intake_choices.SLOW_PATH.items() if not v} == {"NONE"}, str(intake_choices.SLOW_PATH))
 check("1. (1160 P1) ONE_PER_FILE (S1) is total over every slow source of every layout", set(intake_choices.ONE_PER_FILE) == set().union(*SLOWS.values()), str(sorted(intake_choices.ONE_PER_FILE)))
 check("1. (1160 P1) KEYS and CURVES are total over the layouts", set(intake_census.KEYS) == set(intake_census.CURVES) == set(F["selection"]["variants"]), "")
 check("1. (1160 P1) [source] admissibility is RAW | DECLARABLE | FIGURE_LEVEL | PROCESSED_UNDECLARABLE in every kind",

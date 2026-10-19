@@ -105,7 +105,9 @@ There are two layouts in `[selection]`:
     differs from `files` is refused SLOW_VALUES_NOT_ONE_PER_FILE before any byte is read.
   - `FILE_KEY` with `key`: each file has a header line whose first cell is the key and whose second cell is the value. Declare that
     line among the header rows. A file without exactly one such line holding a number is refused SLOW_KEY_UNRESOLVED.
-  - `NONE`: the deposit has no slow knob. The census forms the curves with no slow value (`curves_with_slow = 0`).
+  - `NONE`: the deposit has no slow knob. No curve then carries a slow value, so S8 would refuse TOO_FEW_CURVES and no layout can
+    reach S10: S1 refuses SLOW_NONE_HAS_NO_PATH at lint, before any byte is read (plan 1160 A24). Declare the slow knob, or report the
+    deposit as one with no slow knob.
 - `LONG_TABLE`: one `file` holds every curve, and `[selection.slow]` is `COLUMN` with its `key`. `block` says where a curve begins:
   - `EXACT`: a curve is a run of consecutive rows with one slow value. A slow value in two runs that are not adjacent is refused
     CURVE_REPEATED.
@@ -133,7 +135,13 @@ FAST_VALUE_REPEATED's detail counts, over the refused curves, `consecutive runs`
 - **K4** a long flat run (a hold: a segment, not a replicate): `control = "MEASURED"`, or exclude the segment.
 
 Not available: `[replicate] adjacency = "ANYWHERE"` (a point as every row with one fast value, wherever it lies); a revisit under SET
-stays refused.
+stays refused. A loop (up then down along the same fast knob) is two branches: a SET knob's loop is split into one file per branch by
+conversion (SPLIT_ROWS) before it can be declared; a MEASURED knob's loop is admitted as rows: declare `control = "MEASURED"` (plan 1160
+A25).
+
+`root` is the directory that holds the files: the deposit's `.../raw`, or for a CONVERTED source the bank directory; the seal lists
+that same directory. A deposit with no files.lst is declared from its raw directory listing. For a bank, `excluded` lists
+`CONVERSION-MANIFEST.json` (plan 1160 A26).
 
 `excluded` lists the files of the universe that are not curves, each with a `why`. The seal checks that the universe is exactly the
 selected files, the excluded files and the truth side, each file in one part. Otherwise it refuses UNIVERSE_NOT_PARTITIONED, or
@@ -190,7 +198,8 @@ Then:
 <host> 'cd ~/scratch/cc-intake && bin/cc intake run <id> && cat declarations/<id>/intake-report.md'
 ```
 
-Sealing is recommended and not enforced. The seal lists the universe under the declared `[source] root`, the directory S3 reads; it takes
+S1 refusals appear at lint and at seal: a seal refused for an S1 reason makes no run and no intake-report.md, and the refusal is the
+answer (plan 1160 A26). Sealing is recommended and not enforced. The seal lists the universe under the declared `[source] root`, the directory S3 reads; it takes
 no `--universe`. If `seal` refuses, fix the declaration and seal again; do not run. Seal before the first run: `run` reads the data through the logged loader, and the report's
 ordering note compares the seal time with the first logged read. A conversion reads the raw files before you seal; that is the designed
 order, so the ordering note reports it as information and never as a refusal: when declarations/<id>/conversion-access.log holds reads of

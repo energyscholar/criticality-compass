@@ -295,7 +295,7 @@ with tempfile.TemporaryDirectory() as tmp:
                                                                                                          lambda t: slow_source(t, "FILE_KEY"))),
         ("SLOW_KEY_UNRESOLVED", "(1160) FILE_KEY h, a key line whose value is not a number", lambda: pf(copy(lambda b: key_lines(b, m, lambda h: f"h,{h}x\n")), lambda t: slow_source(t, "FILE_KEY"))),
         ("PASS", "(1160) FILE_KEY h, every file's key line a number", lambda: pf(copy(lambda b: key_lines(b, m)), lambda t: slow_source(t, "FILE_KEY"))),
-        ("TOO_FEW_CURVES", "(1160) slow source NONE (1160 P5: was PASS; no curve carries a slow value, S8)", lambda: pf("pf", lambda t: slow_source(t, "NONE"))),
+        ("SLOW_NONE_HAS_NO_PATH", "(1160) slow source NONE (1160 A24: was TOO_FEW_CURVES at S8, now refused at S1; 1160 P5: was PASS)", lambda: pf("pf", lambda t: slow_source(t, "NONE"))),
         ("REPLICATE_KEY_UNRESOLVED", "a FILE identity on a LONG_TABLE", lambda: lt(bank(curves + curves[:1]), lambda t: t.replace('identity = "NONE"', 'identity = "FILE"'))),
         ("ACQUISITION_ORDER_DIFFERS", "ascending rows in acquisition order, declared DESCENDING", lambda: lt(bank(), lambda t: asc(t).replace('direction = "UNORDERED"', 'direction = "DESCENDING"'))),
         # S4 reader reasons (table-curve-v1), each the detail of READER_REFUSED
@@ -348,8 +348,8 @@ with tempfile.TemporaryDirectory() as tmp:
           "CHAIN_SLOW on 'C' (RAW; it is permitted on DERIVED_OBSERVABLE (the `to` of a projection of the same lane))" in words(lambda t: t.replace('on = "C_max"', 'on = "C"', 1)),
           words(lambda t: t.replace('on = "C_max"', 'on = "C"', 1)))
     none = slow_label("pf", "NONE")
-    check("E2. (1160 P1) slow source NONE reaches the census with curves_with_slow = 0, every curve formed",
-          (getattr(none, "with_slow", None), getattr(none, "curves", None)) == (0, len(m["files"])), str(none))
+    check("E2. (1160 A24; was P1: NONE reached the census with curves_with_slow = 0) slow source NONE is refused at S1 before any byte is read",
+          none == "SLOW_NONE_HAS_NO_PATH", str(none))
     keyed = slow_label(copy(lambda b: key_lines(b, m)), "FILE_KEY")
     check("E2. (1160 P1) FILE_KEY reaches the census with every curve's slow value, as LISTED does", (getattr(keyed, "with_slow", None), getattr(keyed, "curves", None)) == (len(m["files"]),) * 2
           and keyed == slow_label("pf", "LISTED"), str(keyed))

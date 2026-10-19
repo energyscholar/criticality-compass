@@ -122,7 +122,8 @@ TABLE to NAMED: which row is the names line.
 
 - `rule = {kind = "FIRST"}`: the first row (the default).
 - `rule = {kind = "WRITE", names = ["T", "C"]}`: the file has no names line, and these names are written. `1.5,0.25` / `1.6,0.5` is
-  written as `T,C` / `1.5,0.25` / `1.6,0.5`. No row is taken from the file.
+  written as `T,C` / `1.5,0.25` / `1.6,0.5`. No row is taken from the file. SELECT_COLUMNS then NAMES_LINE WRITE: every converted file
+  of one declaration must carry identical names, so write them in each file's steps (plan 1160 A26).
 - `rule = {kind = "REPLACE_PREFIXED", prefix = "##"}`: the first row must begin with `##` (MARKER_LINE_ABSENT otherwise). It is the
   names line without the prefix: `##T,C` / `1.5,0.25` is written as `T,C` / `1.5,0.25`.
 
