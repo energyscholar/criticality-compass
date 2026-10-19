@@ -28,7 +28,10 @@ bin/cc new intake <id>                                      # then declare the b
    number in a text name prints as `#`. Each peek is recorded in `declarations/<id>/peek.log`. For an xlsx, `--sheet` is required; to learn
    the sheet names, peek without `--sheet`: it refuses SHEET_REQUIRED, and its Detail lists the workbook's sheet names as it lists any
    names (a text name masked, a numeric name counted, never printed). Listing the names needs openpyxl, as SHEET_TO_CSV does, so peek on
-   the data host (plan 1160 A10).
+   the data host (plan 1160 A10). Peek every file of the family, not one per kind: files of one family can differ in header length and
+   column order. The Detail of a conversion refusal names the file (`file '<from>' -> '<to>'`), so you know which one to peek again
+   (plan 1160 A12). Peek's `blank` is the converter's blank: a line with no text in any cell, which the converter records as blank and
+   never as a row. Peek decodes as the default DECODE does (utf-8-sig), so a byte-order mark is no part of the first name.
 3. You write `declarations/<id>/CONVERSION.toml`.
 4. `convert` writes the bank to `<cc-banks>/<id>/bank` (`~/scratch/cc-banks` on the data host). It never overwrites a bank: remove the
    old one, or use a new id (BANK_EXISTS). It writes nothing unless the identity test passes on the exact bytes it is about to write.

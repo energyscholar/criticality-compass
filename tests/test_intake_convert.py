@@ -16,6 +16,8 @@ peek`). Planted inputs only (no real data).
      NUMERIC name counted), or, without openpyxl, that they cannot be listed here; no byte of the archive is printed.
  V5. The chain: --verify refuses CONVERSION_CHAIN_BROKEN after one source byte changes, and IDENTITY_FAILED when a bank cell changes and the
      manifest's sha256 is rewritten to match.
+ V7 (1160 A12). Every conversion refusal's Detail names the file (V6: each plant's; of two files under one step, the one that refused);
+     a line of quoted empty cells is blank to peek and to the converter (one definition, intake_convert.blank); peek decodes utf-8-sig.
  V6. Structure: OPS is total over the [op] alphabet and the steps VARIANT; each rule table over its kinds; `float` is called only in _same,
      `int` only in peek_cli; every reason the module can emit is a row of intake/CONVERSION.toml; and every row is reached by a plant here
      (with the machine's NOT REACHED xlsx row).
@@ -29,6 +31,8 @@ Seen RED (each mutation applied by hand, the test run, the mutation reverted):
  - (1160 A11) DROP_ROWS_NOT_NUMERIC dropping the rows whose cell IS a number: V1 FAILS; verify justifying every DROP_ROWS_NOT_NUMERIC drop:
    V2 FAILS (each numeric-row drop passes); verify judging the cell without the decimal mark: V2 FAILS (the drop before DECIMAL_MARK passes);
    the manifest's not_numeric_count off by one: V2 FAILS (the manifest record).
+ - (1160 A12) _in keeping the file empty: V6 and V7 FAIL; _built naming the first entry for every file, verify's IDENTITY_FAILED without its
+   file, peek's old re.split cut, peek decoding utf-8: V7 FAILS.
  - (1160 A10) _xlsx always False: V4 and V6 FAIL; _named printing every name unmasked: V4 FAILS (the sheet-name words).
 Not seen red: _same comparing text only. Every op copies a cell's text (DECIMAL_MARK's replacement is applied to the source cell too), so
 an output numeral always has its source's text and the bitwise float comparison the plan asks for never decides a case here.
@@ -302,14 +306,39 @@ with tempfile.TemporaryDirectory() as tmp:
         ("SHEET_ABSENT", lambda: conv({"a.xlsx": workbook({"data": [["T"], [1.5]]})}, [("a.xlsx", "a.csv", '{op = "SHEET_TO_CSV", sheet = "Sheet9"}')])),
     ]
     NOT_HERE = {False: ["SHEET_ABSENT"], True: ["XLSX_READER_ABSENT"]}[HAS_XLSX]
+    UNFILED = []   # (1160 A12) the plants whose refusal's Detail names no file (ROOT_UNRESOLVED and BANK_EXISTS name the root or the out instead)
     for want, plant in PLANTS:
         before = set(REACHED)
         got = plant()
+        UNFILED += [want for x in [got] if isinstance(x, tuple) and len(x) == 3 and hasattr(x[0], "reason") and x[0].reason not in ("ROOT_UNRESOLVED", "BANK_EXISTS")
+                    and x[0].evidence.file == ""]
         got = {True: lambda: code(got[0]), False: lambda: want if want in REACHED - before else sorted(REACHED - before)}[isinstance(got, tuple) and len(got) == 3]()
         check(f"V6. {want} is reached by its plant{' (NOT REACHED HERE)' * (want in NOT_HERE)}", want in NOT_HERE or got == want, str(got))
     check("V6. the codes reached are exactly the rows of intake/CONVERSION.toml (with the machine's NOT REACHED xlsx row)",
           (REACHED - {"PASS"}) | set(NOT_HERE) == ROWS, f"rows never reached: {sorted(ROWS - REACHED - set(NOT_HERE))}; reached, no row: {sorted(REACHED - ROWS - {'PASS'})}")
     print(f"  openpyxl {'installed' if HAS_XLSX else 'NOT installed'} on this machine; NOT REACHED HERE: {NOT_HERE}")
+    check("V6. (1160 A12) every plant's conversion refusal names its file in the Detail (the declaration's own: CONVERSION.toml)", not UNFILED, str(UNFILED))
+
+    # ---- V7. (1160 A12) the Detail names the file of a family; peek's blank is the converter's; peek decodes utf-8-sig
+    got, _, _ = conv({"a.csv": b"[Data]\nT,C\n1.5,0.25\n", "b.csv": b"[Header]\nT,C\n1.5,0.25\n"},
+                     [(f, f, '{op = "DROP_LINES", rule = {kind = "MARKER", marker = "[Data]"}}') for f in ("a.csv", "b.csv")])
+    check("V7. (1160 A12) of two files under one step, the refusal names the file that lacks the marker (b.csv), not the other",
+          code(got) == "MARKER_LINE_ABSENT" and "b.csv" in str(got.evidence) and "a.csv" not in str(got.evidence), str(got))
+    got, bank, QB = conv({"q.csv": b'T,C\n"",""\n1.5,0.25\n'}, [("q.csv", "q.csv", "")])
+    rc, said = peek(QB, "q.csv", "--depth", "3")
+    check("V7. (1160 A12) a line of quoted empty cells is blank to peek and to the converter alike (one definition)",
+          "line 2: blank" in said and code(got) == "PASS" and [2, -1] in json.loads((bank / ic.MANIFEST).read_text())["units"][0]["dropped"], said + code(got))
+    got, bank, BB = conv({"bom.csv": b"\xef\xbb\xbfT,C\n1.5,0.25\n"}, [("bom.csv", "bom.csv", "")])
+    rc, said = peek(BB, "bom.csv")
+    check("V7. (1160 A12) peek decodes utf-8-sig, as the converter's default DECODE: a byte-order mark is no part of the first name",
+          "line 1: 2 text names + 0 numeric names: 'T', 'C'" in said, said)
+    got, bank, name = conv({"a.csv": b"T,C\n1.5,0.25\n"}, [("a.csv", "a.csv", "")])
+    (bank / "a.csv").write_bytes(b"T,C\n1.5,0.26\n")
+    man = json.loads((bank / ic.MANIFEST).read_text())
+    man["outputs"][0]["sha256"] = ic._sha((bank / "a.csv").read_bytes())
+    (bank / ic.MANIFEST).write_text(json.dumps(man))
+    got = verify(name)
+    check("V7. (1160 A12) --verify's IDENTITY_FAILED names the file", code(got) == "IDENTITY_FAILED" and "file 'a.csv' -> 'a.csv'" in str(got.evidence), str(got))
 
 # ---- V6. structure
 spec = CT["fields"]["file"]["fields"]["steps"]
