@@ -1,7 +1,7 @@
-"""intake_data - the data stages of the intake, S3 to S10 (plan 1136; plan 1139): their evidence types, signatures and bodies.
+"""intake_data - the data stages of the intake, S3 to S10: their evidence types and bodies.
 Invariant: every data stage takes, as its only arguments, the PASS evidence of its `needs` (intake/STAGES.toml); S3 SOURCE_INTEGRITY takes
 the Declaration and every later evidence type carries the Pinned bytes S3 read, so a data file is opened once, by the logged loader, in S3;
-no data stage takes a seal (amendment A3: sealing is advisory). A stage with no body is a STUB by absence (a stub is never a pass); each
+no data stage takes a seal (sealing is advisory). A stage with no body is a STUB by absence (a stub is never a pass); each
 registered body's signature equals its SIGNATURE row (tests/test_intake.py). Every refusal is a value: a check is a (holds, reason, detail)
 row and `gate` returns the first row that does not hold, so no check after it is evaluated."""
 import enum
@@ -11,12 +11,11 @@ import itertools
 import re
 import statistics
 from dataclasses import dataclass
-from inspect import Parameter, Signature
 from pathlib import Path
 
 import intake_read
 import intake_seal
-from intake_blind import NUMBER, RESTARTS, SWEEP, Declaration, Pass, Refuse, detail, gate, numbered, shown, sweeps
+from intake_blind import NUMBER, RESTARTS, SWEEP, Declaration, Evidence, Pass, Refuse, detail, gate, numbered, shown, sweeps
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -39,10 +38,10 @@ class File:
 
 
 @dataclass(frozen=True)
-class Pinned:
+class Pinned(Evidence):
     """S3 SOURCE_INTEGRITY: every selected file, admitted, read once through the logged loader and pinned. Invariant: carries the Declaration
     it read and the bytes, so no later stage opens a file. `dropped`: per converted file that declares DROP_ROWS_NOT_NUMERIC, (its name, the rows
-    dropped), set by intake_convert.s3 from the manifest (plan 1160 A11)."""
+    dropped), set by intake_convert.s3 from the manifest."""
     declaration: Declaration
     files: tuple
     dropped: tuple = ()
@@ -51,12 +50,9 @@ class Pinned:
         return (f"{len(self.files)} files admitted, read once each through the logged loader (declarations/{self.declaration.id}/access.log) "
                 f"and each sha256 equal to its pin at the first logged read")
 
-    def confirmed(self):
-        return False
-
 
 @dataclass(frozen=True)
-class Shaped:
+class Shaped(Evidence):
     """S4 SHAPE: the first file's columns, equal to the declared ones, its rows in the declared order. Invariant: carries the Pinned."""
     pinned: Pinned
     columns: tuple
@@ -66,15 +62,12 @@ class Shaped:
         return (f"The first file's columns are {', '.join(shown(self.columns))}, the declared columns, its stated units (if any) are the declared "
                 f"units, and its rows are stored {d['acquisition']['row_order']} in {d['knobs']['fast']['name']} within each curve")
 
-    def confirmed(self):
-        return False
-
 
 @dataclass(frozen=True)
 class Sampling:
-    """The sampling label of a census: counts and structure, never a value (plan 1160 P0). Invariant: n_min <= n_median <= n_max points over
+    """The sampling label of a census: counts and structure, never a value. Invariant: n_min <= n_median <= n_max points over
     `curves` curves; `distinct` is the count of distinct fast values over every curve; `with_slow` is the count of curves that carry a slow value
-    (0 under [selection.slow] source NONE, plan 1160 P1; else every curve); `readings` is (min, max) readings per point (plan 1160 P2: more
+    (0 under [selection.slow] source NONE; else every curve); `readings` is (min, max) readings per point (more
     than 1 only under [replicate] identity SAME_FAST_VALUE); `drift` is the most distinct slow values in one curve (a FAST_RESTART block)."""
     curves: int
     with_slow: int
@@ -89,10 +82,10 @@ class Sampling:
 
 
 @dataclass(frozen=True)
-class Census:
+class Census(Evidence):
     """S5 CENSUS: the sampling label (curves, points per curve, distinct fast values, alignment), the curves as (where, points) in census
-    order, and per curve the readings of each point in row order (plan 1160 P5, S7's floor). Invariant: carries the Pinned it counted; it holds
-    counts and names, never a value (plan 1160 P0)."""
+    order, and per curve the readings of each point in row order (S7's floor). Invariant: carries the Pinned it counted; it holds
+    counts and names, never a value."""
     pinned: Pinned
     label: Sampling
     curves: tuple
@@ -108,14 +101,11 @@ class Census:
         """The report's census section: each curve by ordinal and file name (a LONG_TABLE block by its ordinal), never by its slow value."""
         return [f"{i}. {where}: {n} points" for i, (where, n) in enumerate(self.curves, 1)] + [f"- converted {f}: rows dropped as not numeric (DROP_ROWS_NOT_NUMERIC): {k}" for f, k in self.pinned.dropped]
 
-    def confirmed(self):
-        return False
-
 
 @dataclass(frozen=True)
-class Lineage:
+class Lineage(Evidence):
     """S6 ADMISSIBILITY: the loader's admission verdict and the UNENFORCED list. Invariant: carries the Census it audits; built only when every
-    pinned file has a loader line in the access log with its path and sha256, and the log holds no in-process bypass line (plan 1160 P4)."""
+    pinned file has a loader line in the access log with its path and sha256, and the log holds no in-process bypass line."""
     census: Census
     verdict: str
     unenforced: tuple
@@ -124,13 +114,10 @@ class Lineage:
         return (f"{self.verdict}: every pinned file has a loader line in the access log with its sha256, and the log holds no in-process bypass. "
                 f"Not enforced (no check here can see them): {'; '.join(self.unenforced)}")
 
-    def confirmed(self):
-        return False
-
 
 @dataclass(frozen=True)
-class IntervalPlan:
-    """S7 INTERVAL_FEASIBILITY (plan 1160 P5, cc/intake_feasible.py): the method, the tiering it gives the terminal (STATED | REPLICATES | NONE)
+class IntervalPlan(Evidence):
+    """S7 INTERVAL_FEASIBILITY (cc/intake_feasible.py): the method, the tiering it gives the terminal (STATED | REPLICATES | NONE)
     and the points (curve, ordinal, readings) its floor was checked on. Invariant: carries the Census it was planned on."""
     census: Census
     method: str
@@ -140,12 +127,9 @@ class IntervalPlan:
     def summary(self):
         return f"interval method {self.method}: {len(self.floors)} points meet its floor; tiering = {self.tiering}"
 
-    def confirmed(self):
-        return False
-
 
 @dataclass(frozen=True)
-class Feasibility:
+class Feasibility(Evidence):
     """S8 RESOLUTION_AND_IDENTIFIABILITY: the most bracket the census permits and the identifiability value. Invariant: carries the Census."""
     census: Census
     max_bracket: str
@@ -154,28 +138,22 @@ class Feasibility:
     def summary(self):
         return f"at least 3 curves with a slow value and 3 points per curve; max_bracket = {self.max_bracket}; identifiability = {self.identifiability}"
 
-    def confirmed(self):
-        return False
-
 
 @dataclass(frozen=True)
-class SecondLane:
-    """S9 ALTERNATIVE_INTAKE: the ALTERNATIVE lane's steps checked on the census, as words (plan 1160 P5: was a Feasibility, which only S8
-    builds). Invariant: carries the Census."""
+class SecondLane(Evidence):
+    """S9 ALTERNATIVE_INTAKE: the ALTERNATIVE lane's steps checked on the census, as words (a Feasibility is
+    what only S8 builds). Invariant: carries the Census."""
     census: Census
     lanes: tuple
-    n_lanes: int   # plan 1160 A5: the lanes with a bridge, 1 or 2 (S1 SECOND_LANE_MISSING needs one; FORMAT's lane alphabet has two); NOT_EXAMINED at 1
+    n_lanes: int   # the lanes with a bridge, 1 or 2 (S1 SECOND_LANE_MISSING needs one; FORMAT's lane alphabet has two); NOT_EXAMINED at 1
 
     def summary(self):
         return f"ALTERNATIVE lane steps feasible on the census: {', '.join(self.lanes) or 'none declared (one lane: nothing for S9 to check)'}"
 
-    def confirmed(self):
-        return False
-
 
 @dataclass(frozen=True)
-class KernelInput:
-    """S10 KERNEL_HANDOFF (plan 1160 P6, cc/intake_terminal.py): one Handoff per PRIMARY bridge (its kernel input's result). Invariant: carries
+class KernelInput(Evidence):
+    """S10 KERNEL_HANDOFF (cc/intake_terminal.py): one Handoff per PRIMARY bridge (its kernel input's result). Invariant: carries
     the Lineage that admitted them; its summary prints result types, ranks, tiers and counts (never a value) and the identifiability value."""
     lineage: Lineage
     columns: tuple
@@ -183,27 +161,6 @@ class KernelInput:
 
     def summary(self):
         return "; ".join(h.words() for h in self.columns) + f". Identifiability: {self.identifiability}"
-
-    def confirmed(self):
-        return False
-
-
-def sig(**params):
-    """A stage signature: the named evidence parameters in order, returning a StageResult (Pass | Refuse)."""
-    return Signature([Parameter(n, Parameter.POSITIONAL_OR_KEYWORD, annotation=t) for n, t in params.items()], return_annotation=Pass | Refuse)
-
-
-EVIDENCE = {"S0": Declaration, "S3": Pinned, "S4": Shaped, "S5": Census, "S6": Lineage, "S7": IntervalPlan, "S8": Feasibility, "S9": SecondLane, "S10": KernelInput}
-SIGNATURE = {   # every data stage -> its signature: the evidence of its needs, in needs order (tests/test_intake.py)
-    "S3": sig(declaration=Declaration),
-    "S4": sig(pinned=Pinned),
-    "S5": sig(pinned=Pinned, shaped=Shaped),
-    "S6": sig(census=Census),
-    "S7": sig(census=Census),
-    "S8": sig(census=Census),
-    "S9": sig(census=Census),
-    "S10": sig(lineage=Lineage, plan=IntervalPlan, feasibility=Feasibility),
-}
 
 
 def _t23():
@@ -221,7 +178,7 @@ def located(text, roots):
     return {True: lambda: str(Path(roots[m[1]]) / m[2].lstrip("/")), False: lambda: ""}[m is not None and m[1] in roots and ".." not in m[2].split("/")]()
 
 
-ADMIT = (   # plan 1160 P1: the loader's admission of one selected name before any byte is read, one row per reason, in this order
+ADMIT = (   # the loader's admission of one selected name before any byte is read, one row per reason, in this order
     ("PATH_OUTSIDE_ROOT", "names that resolve outside the source root", lambda loc, n, src: (Path(loc) / n).resolve().is_relative_to(Path(loc).resolve())),
     ("PATH_ON_TRUTH_SIDE", "names with a path part on the truth side", lambda loc, n, src: not set(Path(n).parts) & set(src["truth_side"])),
     ("PATH_NOT_A_FILE", "names that are not a file", lambda loc, n, src: (Path(loc) / n).is_file()),
@@ -234,21 +191,21 @@ def admission(loc, names, src):
     return [(lambda ok=ok: not failing(ok), code, lambda ok=ok, what=what: detail(words=failing(ok)[:3], counts={what: len(failing(ok))})) for code, what, ok in ADMIT]
 
 
-SOURCE = {   # [source] kind -> the S3 body of that kind; total over FORMAT's [source] kinds (plan 1160 P1)
+SOURCE = {   # [source] kind -> the S3 body of that kind; total over FORMAT's [source] kinds
     "DEPOSIT": lambda declaration, d, t: _deposit(declaration, d, t, lambda loc: _t23().Loader({loc: "universe", str(Path(loc).parent): "outside-universe"}, Path(d) / "access.log")),
     "CONVERTED": lambda declaration, d, t: _converted(declaration, d, t),
 }
 
 
 def source_integrity(declaration, d, t):
-    """S3 SOURCE_INTEGRITY: its body for the declared [source] kind (SOURCE). A CONVERTED source (plan 1160 P3) first proves the chain from
+    """S3 SOURCE_INTEGRITY: its body for the declared [source] kind (SOURCE). A CONVERTED source first proves the chain from
     converted_from to the bank (CONVERSION_CHAIN_BROKEN), then its bank is read exactly as a DEPOSIT."""
     return SOURCE[declaration.data["source"]["kind"]](declaration, d, t)
 
 
 def _converted(declaration, d, t):
     """S3 for a CONVERTED source: cc/intake_convert.py's chain check (imported here: it imports this module), then _deposit through the same
-    loader (plan 1160 P4: one loader per run, so no loader's audit hook logs another loader's read as a bypass, which S6 would refuse)."""
+    loader (one loader per run, so no loader's audit hook logs another loader's read as a bypass, which S6 would refuse)."""
     import intake_convert
     return intake_convert.s3(declaration, d, t, lambda loader: _deposit(declaration, d, t, lambda loc: loader))
 
@@ -281,7 +238,7 @@ def _read(declaration, d, loc, names, loader):
 def admissibility(census, d, t):
     """S6 ADMISSIBILITY (reads no data byte; it reads declarations/<id>/access.log, which lies in no declared partition). READ_NOT_LOGGED: a
     pinned file with no loader line holding its resolved path and its sha256 | BYPASS_READ_LOGGED: a line with route in-process-bypass (the
-    loader's audit hook saw an open of a declared-partition path outside the loader). LINEAGE_OFF_GRAPH has no row (deleted, plan 1160 P5 A3): the terminal is table-driven
+    loader's audit hook saw an open of a declared-partition path outside the loader). LINEAGE_OFF_GRAPH has no row: the terminal is table-driven
     from the sealed declaration, so an off-graph step is unreachable by construction (STAGES.toml)."""
     loc, log = located(census.pinned.declaration.data["source"]["root"], t["roots"]), intake_seal.lines(Path(d) / "access.log")
     logged = {(a["path"], a["sha256"]) for a in log if a["route"] == "loader"}
@@ -301,9 +258,9 @@ def read(t, d, f):
 @dataclass(frozen=True)
 class Curve:
     """One curve of a census. Invariant: `rows` are the readable rows of one curve in file order, each in role order (fast first); `slow` is
-    the tuple of slow-knob values its source gives it (plan 1160 P1): after S5's SLOW_KEY_UNRESOLVED row holds, one value, or none under
-    [selection.slow] source NONE; `where` names the file (PER_FILE) or the file and its block's ordinal (LONG_TABLE), never a value (plan 1160 P0);
-    `drift` is the count of distinct slow values its rows hold (plan 1160 P2: more than 1 only in a FAST_RESTART block; a count, never a value)."""
+    the tuple of slow-knob values its source gives it: after S5's SLOW_KEY_UNRESOLVED row holds, one value, or none under
+    [selection.slow] source NONE; `where` names the file (PER_FILE) or the file and its block's ordinal (LONG_TABLE), never a value;
+    `drift` is the count of distinct slow values its rows hold (more than 1 only in a FAST_RESTART block; a count, never a value)."""
     where: str
     slow: tuple
     rows: tuple
@@ -318,7 +275,7 @@ BREAK = {   # LONG_TABLE [selection] block -> (the declaration) -> (previous row
 
 def _blocks(f, g, d):
     """LONG_TABLE: the blocks of consecutive rows the declared block rule (BREAK) cuts the file into, in file order, each one Curve whose slow
-    value is its FIRST row's (a value as measured, never a mean; plan 1160 P2)."""
+    value is its FIRST row's (a value as measured, never a mean)."""
     brk, rows = BREAK[d["selection"]["block"]](d), tuple(g.rows)
     ids = itertools.accumulate(int(brk(p, r)) for p, r in zip(rows[:1] + rows[:-1], rows))
     runs = [[r for _, r in rs] for _, rs in itertools.groupby(zip(ids, rows), key=lambda x: x[0])]
@@ -339,7 +296,7 @@ KEYS = {   # [selection] layout -> (declaration, files, grids) -> the files whos
     "PER_FILE": lambda d, files, grids: UNKEYED[d["selection"]["slow"]["source"]](d["selection"]["slow"], files, grids),
     "LONG_TABLE": lambda d, files, grids: [],   # the slow knob is a column, every cell a number (S4, the reader)
 }
-CURVES = {   # [selection] layout -> (declaration, files, their grids) -> the curves, in file order; total over FORMAT's layouts (plan 1145)
+CURVES = {   # [selection] layout -> (declaration, files, their grids) -> the curves, in file order; total over FORMAT's layouts
     "PER_FILE": lambda d, files, grids: [Curve(f.name, s, g.rows, len(s)) for f, g, s in zip(files, grids, SLOW[d["selection"]["slow"]["source"]](d["selection"]["slow"], grids))],
     "LONG_TABLE": lambda d, files, grids: [c for f, g in zip(files, grids) for c in _blocks(f, g, d)],
 }
@@ -375,12 +332,12 @@ def shape(pinned, t):
 
 REPLICATE = {   # ([selection] layout, [replicate] identity) -> (may two curves share a slow value, can the reader resolve the identity); total
     **{(lay, k): v for lay in ("PER_FILE", "LONG_TABLE") for k, v in (("NONE", (False, True)), ("SEED", (False, False)), ("RUN", (False, False)), ("SAMPLE", (False, False)),
-                                                                     ("SAME_FAST_VALUE", (False, True)))},   # 1160 P2: replicate readings of a point, inside one curve
+                                                                     ("SAME_FAST_VALUE", (False, True)))},   # replicate readings of a point, inside one curve
     ("PER_FILE", "FILE"): (True, True),
     ("LONG_TABLE", "FILE"): (False, False),   # one file holds every curve: the file tells no two curves apart
 }
 
-POINTS = {   # [replicate] identity -> a curve's rows -> its points as (fast value, readings); total over FORMAT's identities (plan 1160 P2)
+POINTS = {   # [replicate] identity -> a curve's rows -> its points as (fast value, readings); total over FORMAT's identities
     **{k: (lambda rows: [(r[0], 1) for r in rows]) for k in ("NONE", "SEED", "RUN", "SAMPLE", "FILE")},   # every row is one point
     "SAME_FAST_VALUE": lambda rows: [(x, len(list(rs))) for x, rs in itertools.groupby(rows, key=lambda r: r[0])],   # a run of one fast value is one point
 }
@@ -412,7 +369,7 @@ def census(pinned, shaped, t):
 
 
 def label(curves, points, fast):
-    """The sampling label of curves and their points (fast value, readings), counted per point (plan 1160 P2)."""
+    """The sampling label of curves and their points (fast value, readings), counted per point."""
     ns, xs, rs = [len(p) for p in points], [x for p in points for x, _ in p], [n for p in points for _, n in p]
     seqs = {tuple(x for x, _ in p) for p in points}
     return Sampling(len(curves), sum(len(c.slow) for c in curves), min(ns), statistics.median(ns), max(ns), fast, len(set(xs)),
@@ -420,7 +377,7 @@ def label(curves, points, fast):
 
 
 def bodies(t, d):
-    """The registered data-stage bodies of one run (S3, S4, S5; plan 1139; S6, plan 1160 P4), closed over the tables and the declaration directory. Each has
+    """The registered data-stage bodies of one run (S3, S4, S5, S6), closed over the tables and the declaration directory. Each has
     exactly its SIGNATURE row (tests/test_intake.py)."""
     def s3(declaration: Declaration) -> Pass | Refuse:
         return source_integrity(declaration, d, t)

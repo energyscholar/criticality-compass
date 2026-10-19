@@ -6,6 +6,7 @@ import zipfile
 from pathlib import Path
 
 import intake
+import intake_new
 import intake_synth
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -114,7 +115,7 @@ key = {slow}
 def per_file(m, ident):
     """The PER_FILE declaration text of a synth bank: the template filled by --from-synth's values and the choices above."""
     values, dropped, _ = intake_synth.declare(m, ident, "pf")   # the root names bank pf; a test re-points it
-    text = intake.fill((ROOT / "intake" / "TEMPLATE.intake.toml.in").read_text().replace("<ID>", ident), {**values, **CHOICES}, dropped)
+    text = intake_new.fill((ROOT / "intake" / "TEMPLATE.intake.toml.in").read_text().replace("<ID>", ident), {**values, **CHOICES}, dropped)
     return text.replace("<intake-synth>/", "<long-test>/")
 
 

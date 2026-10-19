@@ -1,14 +1,14 @@
-"""intake_blind - stage S0 FORMAT of the intake (plan 1136): the declaration text against intake/FORMAT.toml, as a value.
-Invariant (blindness, plan 1136 contract 4): this module receives TEXT and plain values only and can open nothing. Its imports are tomllib,
-dataclasses, typing and intake_names (as blind as it); it calls no open, exec, eval or __import__ (tests/test_intake.py checks both over the AST). Every refusal is a
-reason code of intake/STAGES.toml S0, emitted by walking the FORMAT table; no message text is ever matched. It also holds the two StageResult values, which
-every intake module shares and which need no import beyond dataclasses and enum, and re-exports Detail, the one type of every refusal's
-detail (plan 1160 P0), with the name classifier it prints through (both in cc/intake_names.py since plan 1160 P2)."""
+"""intake_blind - stage S0 FORMAT of the intake: the declaration text against intake/FORMAT.toml, as a value.
+Invariant (blindness): this module receives TEXT and plain values only and can open nothing. Its imports are tomllib, dataclasses, typing
+and intake_names (as blind as it); it calls no open, exec, eval or __import__ (tests/test_intake.py checks both over the AST). Every refusal
+is a reason code of intake/STAGES.toml S0, emitted by walking the FORMAT table; no message text is ever matched. It also holds what every
+intake module shares and which needs no import beyond dataclasses and enum: the two StageResult values, the Evidence base, `gate`, `look`
+and `flag`; and it re-exports Detail, the one type of every refusal's detail, with the name classifier it prints through (cc/intake_names.py)."""
 import enum
 import tomllib
 from dataclasses import dataclass
 
-from intake_names import NUMBER, Detail, Name, classify, detail, numbered, shown, sweeps   # noqa: F401 - the classifier and Detail (plan 1160 P2: own role)
+from intake_names import NUMBER, Detail, Name, classify, detail, numbered, shown, sweeps   # noqa: F401 - the classifier and Detail
 
 TODO = "TODO"
 
@@ -66,8 +66,16 @@ class Finding:
     detail: str
 
 
+class Evidence:
+    """The base of every stage's PASS evidence. Invariant: no evidence is a human confirmation, so confirmed() is False; only the seal's
+    SealState (cc/intake_seal.py) answers otherwise, and it does not derive from this class."""
+
+    def confirmed(self):
+        return False
+
+
 @dataclass(frozen=True)
-class Declaration:
+class Declaration(Evidence):
     """S0's PASS evidence: the parsed declaration as plain values. Invariant: built only from a text whose every field S0 admitted; holds no
     path and no opener, so a stage that receives it can read no byte."""
     id: str
@@ -77,13 +85,15 @@ class Declaration:
     def summary(self):
         return f"The declaration '{self.id}' parses, and every field of format v3 is present, typed and listed (mode {self.mode})"
 
-    def confirmed(self):
-        return False
-
 
 def look(table, key, absent):
     """Total lookup: the row of `key`, or `absent` when `key` is no row. Membership is the boolean key of a two-row table (no default value)."""
     return {True: lambda: table[key], False: lambda: absent}[key in table]()
+
+
+def flag(args, name, absent):
+    """The word after `name` in a command line, or `absent` when the flag is not there or is the last word."""
+    return {True: lambda: args[args.index(name) + 1], False: lambda: absent}[name in args and args.index(name) + 1 < len(args)]()
 
 
 TYPE = {   # a FORMAT field's type word -> its membership test; total over the type words FORMAT.toml uses (tests/test_intake.py)
@@ -93,7 +103,7 @@ TYPE = {   # a FORMAT field's type word -> its membership test; total over the t
     "list": lambda v: isinstance(v, list),
     "table": lambda v: isinstance(v, dict),
     "ref": lambda v: isinstance(v, str) or (isinstance(v, int) and not isinstance(v, bool)),   # a column: a name, or a 1-based position
-    "numeral": lambda v: isinstance(v, str) and NUMBER.fullmatch(v.strip()) is not None,   # a decimal number written as TEXT (plan 1160 P1: LISTED values)
+    "numeral": lambda v: isinstance(v, str) and NUMBER.fullmatch(v.strip()) is not None,   # a decimal number written as TEXT (LISTED values)
 }
 
 
@@ -119,7 +129,7 @@ def _interval(spec, v, loc, tables):
 
 
 def _variant(spec, v, loc, tables):
-    """VARIANT: the `select` field first, CLOSED over the keys of `variants` (a value of no row is the spec's `absent` reason, plan 1160 P3);
+    """VARIANT: the `select` field first, CLOSED over the keys of `variants` (a value of no row is the spec's `absent` reason);
     then exactly the fields of the row it names (none when it names no row, so every other key is FIELD_UNKNOWN after the selector's own
     finding). Invariant: no field of another row is ever admitted."""
     sel = spec["select"]
@@ -135,20 +145,20 @@ CHECK = {   # a FORMAT field's check word -> its findings for a value of the rig
     "CLOSED": _closed,
     "ITEMS": lambda spec, v, loc, tables: [Finding("FIELD_TYPE_WRONG", f"{loc}[{i}]", f"want {spec['item']}") for i, x in enumerate(v) if not TYPE[spec["item"]](x)],
     "PREFIXES": lambda spec, v, loc, tables: CHECK["ITEMS"](spec, v, loc, tables) + [Finding("COMMENT_PREFIX_EMPTY", f"{loc}[{i}]", "an empty prefix marks every line a comment")
-                                                                                     for i, x in enumerate(v) if x == ""],   # plan-1145 E8
+                                                                                     for i, x in enumerate(v) if x == ""],
     "TABLE": lambda spec, v, loc, tables: section(spec["fields"], v, loc, tables),
     "TABLES": lambda spec, v, loc, tables: [f for i, x in enumerate(v) for f in {True: lambda: section(spec["fields"], x, f"{loc}[{i}]", tables),
                                                                                   False: lambda: [Finding("FIELD_TYPE_WRONG", f"{loc}[{i}]", "want a table")]}[TYPE["table"](x)]()],
     "INTERVAL": _interval,
     "REF": lambda spec, v, loc, tables: [],   # a name or a position, typed by TYPE["ref"]; "TODO" is refused before any check (typed)
     "VARIANT": _variant,
-    "VARIANTS": lambda spec, v, loc, tables: [f for i, x in enumerate(v) for f in {True: lambda: _variant(spec, x, f"{loc}[{i}]", tables),   # 1160 P3: a list of
+    "VARIANTS": lambda spec, v, loc, tables: [f for i, x in enumerate(v) for f in {True: lambda: _variant(spec, x, f"{loc}[{i}]", tables),   # a list of
                                                                                    False: lambda: [Finding("FIELD_TYPE_WRONG", f"{loc}[{i}]", "want a table")]}[TYPE["table"](x)]()],   # VARIANT tables
 }
 
 
 def typed(spec, v, loc, tables):
-    """A present field: VALUE_STILL_TODO when it is the template's "TODO" (whatever its type, plan 1139: `bin/cc new intake` writes TODO in
+    """A present field: VALUE_STILL_TODO when it is the template's "TODO" (whatever its type: `bin/cc new intake` writes TODO in
     every field), else FIELD_TYPE_WRONG, or the findings of its check."""
     return {True: lambda: [Finding("VALUE_STILL_TODO", loc, "TODO")],
             False: lambda: {True: lambda: CHECK[spec["check"]](spec, v, loc, tables),
@@ -209,18 +219,18 @@ def format_stage(text, transducer_findings, tables):
             False: lambda: Refuse(found[0].reason, detail(words=[f"{f.reason} at {f.loc or 'the file'}: {f.detail}" for f in found]))}[not found]()
 
 
-def gate(checks, then):
-    """then() (a Pass or a Refuse) when every (holds, reason, detail) row holds, else Refuse(reason, detail()) of the first row that does not.
-    Rows are evaluated in order and lazily (each `holds` and `detail` is a function): zip with range(1) draws at most one failing row, so no
-    row after it runs. (Moved here from intake_data by plan 1160 P1, so S1, cc/intake_choices.py, uses it within the blind import allow-list.)"""
+def gate(checks, then, refuse=Refuse):
+    """then() (a Pass or a Refuse) when every (holds, reason, detail) row holds, else refuse(reason, detail()) of the first row that does not
+    (a Refuse; a reader's is intake_read.Unreadable). Rows are evaluated in order and lazily (each `holds` and `detail` is a function): zip
+    with range(1) draws at most one failing row, so no row after it runs."""
     failed = [c for _, c in zip(range(1), (c for c in checks if not c[0]()))]
-    return {True: then, False: lambda: Refuse(failed[0][1], failed[0][2]())}[not failed]()
+    return {True: then, False: lambda: refuse(failed[0][1], failed[0][2]())}[not failed]()
 
 
-SWEEP = {   # [acquisition] row_order -> (the [acquisition] table) -> the direction the fast knob runs within a curve (plan 1160 P2); total
+SWEEP = {   # [acquisition] row_order -> (the [acquisition] table) -> the direction the fast knob runs within a curve; total
     "ASCENDING": lambda acq: "ASCENDING", "DESCENDING": lambda acq: "DESCENDING", "ACQUISITION": lambda acq: acq["direction"],
 }
 RESTARTS = {   # a direction a curve runs in -> (previous fast value, fast value) -> does a new sweep begin (the fast knob turns back); S1's tables
-    # (cc/intake_choices.py since plan 1160 P4) and S5's (intake_data.BREAK) both read SWEEP and RESTARTS
+    # (cc/intake_choices.py) and S5's (intake_data.BREAK) both read SWEEP and RESTARTS
     "ASCENDING": lambda a, b: b < a, "DESCENDING": lambda a, b: b > a,   # UNORDERED has no row: S1 refuses BLOCK_RULE_HAS_NO_DIRECTION first
 }

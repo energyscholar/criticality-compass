@@ -29,7 +29,7 @@ from pathlib import Path
 import intake_data
 import intake_read
 import schema
-from intake_blind import NUMBER, Name, Pass, Refuse, classify, detail, gate, look, parse, shown
+from intake_blind import NUMBER, Name, Pass, Refuse, classify, detail, flag, gate, look, parse, shown
 from intake_names import masked
 
 MANIFEST = "CONVERSION-MANIFEST.json"
@@ -132,12 +132,7 @@ def _drop(fr, step, k):
                                    dropped=fr.dropped + tuple((fr.lines[i][0], k) for i in sorted(gone)))}[gone is None]()
 
 
-SPLIT = {   # DELIMITER from -> one line to its cells; total over its values. A cell's text is never changed
-    "COMMA": lambda ln: next(csv.reader([ln], delimiter=","), []),
-    "SEMICOLON": lambda ln: next(csv.reader([ln], delimiter=";"), []),
-    "TAB": lambda ln: next(csv.reader([ln], delimiter="\t"), []),
-    "WHITESPACE": lambda ln: ln.split(),
-}
+SPLIT = {**intake_read.SPLIT, "SEMICOLON": lambda ln: next(csv.reader([ln], delimiter=";"))}   # DELIMITER from -> one line to its cells; total
 
 
 def blank(cs):
@@ -500,6 +495,11 @@ def _manifest(text):
         return None
 
 
+def _manifest_in(read):
+    """The manifest a reader of a bank finds: _manifest of its text, or None when the bank holds no manifest file."""
+    return _bind(read(MANIFEST), lambda b: {True: lambda: None, False: lambda: _manifest(b.decode("utf-8", "replace"))}[b is None]())
+
+
 def chained(m, raw_of, bank_of, ct, want):
     """The chain of a bank: its manifest (m, or None), each raw file's sha256 and each bank file's against it, `want` (key -> declared value)
     against it, then the identity test on those very bytes. Pass(Verified) | Refuse (CONVERSION_CHAIN_BROKEN, or the identity's reason)."""
@@ -524,7 +524,7 @@ def verified(root, ident, t, ct):
         def placed(where):
             src, out = where
             loader = intake_data._t23().Loader({str(src): "converted-from", str(out): "bank"}, d / "conversion-access.log")
-            m = _bind(_reader(out, loader)(MANIFEST), lambda b: {True: lambda: None, False: lambda: _manifest(b.decode("utf-8", "replace"))}[b is None]())
+            m = _manifest_in(_reader(out, loader))
             return chained(m, _reader(src, loader), _reader(out, loader), ct, {"files": conv["file"], "source": conv["source"], "out": conv["out"]})
         return _bind(_where(conv, t), placed)
     return _bind(declared(_text(d / "CONVERSION.toml"), ct), go)
@@ -537,7 +537,7 @@ def s3(declaration, d, t, then):
     bank, raw = intake_data.located(src["root"], t["roots"]), intake_data.located(src["converted_from"], t["roots"])
     def go():
         loader = intake_data._t23().Loader({raw: "converted-from", bank: "universe", str(Path(bank).parent): "outside-universe"}, Path(d) / "access.log")
-        m = _bind(_reader(bank, loader)(MANIFEST), lambda b: {True: lambda: None, False: lambda: _manifest(b.decode("utf-8", "replace"))}[b is None]())
+        m = _manifest_in(_reader(bank, loader))
         got = chained(m, _reader(raw, loader), _reader(bank, loader), ctables(), {"source": src["converted_from"], "out": src["root"]})
         broken = {True: lambda: got, False: lambda: Refuse("CONVERSION_CHAIN_BROKEN", got.evidence.within(got.evidence.file, got.reason))}
         dropped = lambda: tuple((f"{m['files'][u['file']]['from']} -> {m['files'][u['file']]['to']}", u["not_numeric_count"]) for u in m["units"]
@@ -603,10 +603,6 @@ def _xlsx(raw):
     return z is not None and "xl/workbook.xml" in z.namelist()
 
 
-def _flag(args, name, absent):
-    return {True: lambda: args[args.index(name) + 1], False: lambda: absent}[name in args and args.index(name) + 1 < len(args)]()
-
-
 def _head(raw, sheet):
     """The lines peek may look at: [(line number, cells)] of a text file (utf-8-sig as DECODE's default, an undecodable byte replaced) or of one xlsx sheet; an xlsx
     with no sheet named is refused SHEET_REQUIRED with its sheet names."""
@@ -628,7 +624,7 @@ def peek_cli(root, ident, args, t):
     """bin/cc intake peek <id> <file> [--sheet NAME] [--depth N]: the head of <cc-datasets>/<id>/raw/<file>, read through the logged loader;
     appended to declarations/<id>/peek.log (what was asked and how many lines were printed, never a line)."""
     d, ct = Path(root) / "declarations" / ident, ctables()
-    rel, sheet, depth = {True: lambda: args[0], False: lambda: ""}[len(args) > 0](), _flag(args, "--sheet", ""), _flag(args, "--depth", "1")
+    rel, sheet, depth = {True: lambda: args[0], False: lambda: ""}[len(args) > 0](), flag(args, "--sheet", ""), flag(args, "--depth", "1")
     base = intake_data.located(f"<cc-datasets>/{ident}/raw", t["roots"])
     ok = rel != "" and not rel.startswith("--") and re.fullmatch(r"\d+", depth) is not None
     def go():

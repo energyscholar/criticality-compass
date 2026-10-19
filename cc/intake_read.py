@@ -1,4 +1,4 @@
-"""intake_read - the readers of the intake: a file's bytes and the declaration to a Grid or an Unreadable (plan 1139 csv-curve-v1; plan 1145
+"""intake_read - the readers of the intake: a file's bytes and the declaration to a Grid or an Unreadable (csv-curve-v1;
 table-curve-v1). Invariant: a reader never opens a path (S3 SOURCE_INTEGRITY read the bytes once, through the logged loader); a value is a
 cell exactly as written (no unit conversion, no NaN, no filling, no skipped row); every way a file cannot be read is an Unreadable whose
 `reason` is a `reader_reason` code of S4 in intake/STAGES.toml, with its row and column in a Detail. The one place a decode error or an
@@ -14,11 +14,12 @@ Reading, in order (table-curve-v1; csv-curve-v1 is the same reader with a fixed 
      COLUMN_NAME_AMBIGUOUS, COLUMN_POSITION_OUT_OF_RANGE);
   6. every cell of a declared column is a number (CELL_NOT_A_NUMBER): text that is a decimal number, or a numeric xlsx cell."""
 import csv
+import functools
 import importlib.util
 import io
 from dataclasses import dataclass, field
 
-from intake_blind import NUMBER, Detail, detail
+from intake_blind import NUMBER, Detail, detail, gate
 from intake_names import split_unit
 
 
@@ -28,7 +29,7 @@ class Grid:
     role, in role order; csv-curve-v1: its header line); every row of `rows` holds one float per column, in file order; `units` holds the
     (role, unit) pairs the file states (a NAMES_UNITS header, or NAMES_UNITS_IN_NAMES: "" for a names cell with no unit), () when it
     states none; `head` holds the header lines as read, each a tuple of
-    cell texts (plan 1160 P1: the one place a FILE_KEY slow value is found, see keyed), and takes no part in comparing two Grids."""
+    cell texts (the one place a FILE_KEY slow value is found, see keyed), and takes no part in comparing two Grids."""
     columns: tuple
     units: tuple
     rows: tuple
@@ -57,13 +58,7 @@ def role_columns(d):
     return (("fast", d["knobs"]["fast"]["key"]), ("measured", d["measured"]["key"])) + unc + slow
 
 
-def first(checks, then):
-    """then() when every (holds, reason, detail) row holds, else Unreadable(reason, detail()) of the first row that does not; rows run lazily
-    and in order, so a row runs only when every row before it held (intake_data.gate, for readers)."""
-    for holds, reason, said in checks:
-        if not holds():
-            return Unreadable(reason, said())
-    return then()
+first = functools.partial(gate, refuse=Unreadable)   # gate for readers: the first failing row's Unreadable, else then()
 
 
 # ---- 1. cells
@@ -110,7 +105,7 @@ def _xlsx_cells(data, spec):
             True: lambda: [(i, list(r)) for i, r in enumerate(rows, 1) if not (len(r) > 0 and _comment(r[0], spec["comment"]))]}[sheet in book.sheetnames]()
 
 
-XLSX = {   # is openpyxl installed -> the xlsx cell reader (plan 1145: xlsx is read with openpyxl or not at all)
+XLSX = {   # is openpyxl installed -> the xlsx cell reader (xlsx is read with openpyxl or not at all)
     True: _xlsx_cells,
     False: lambda data, spec: Unreadable("XLSX_READER_ABSENT", detail(words=["openpyxl is not installed on this machine, so an xlsx file cannot be read here"])),
 }
@@ -149,7 +144,7 @@ def _said(cell):
 
 
 def keyed(grid, key):
-    """FILE_KEY (plan 1160 P1): the second cell of each header line of a Grid whose first cell is `key`, as text. The census refuses
+    """FILE_KEY: the second cell of each header line of a Grid whose first cell is `key`, as text. The census refuses
     SLOW_KEY_UNRESOLVED unless this is exactly one decimal number as written."""
     return [c[1] for c in grid.head if len(c) > 1 and c[0] == key]
 
@@ -158,7 +153,7 @@ HEADER = {   # [reader.header] kind -> (the 1-based header lines it names: names
     "SKIP": lambda h: {},
     "NAMES": lambda h: {"names": h["names"]},
     "NAMES_UNITS": lambda h: {"names": h["names"], "units": h["units"]},
-    "NAMES_UNITS_IN_NAMES": lambda h: {"names": h["names"]},   # plan 1160 P2: the units are inside the names line (NAMED)
+    "NAMES_UNITS_IN_NAMES": lambda h: {"names": h["names"]},   # the units are inside the names line (NAMED)
 }
 NAMED = {   # [reader.header] kind -> (its row, the cells of each line HEADER names) -> the names and the units the file states; total (test)
     **{k: (lambda h, lined: lined) for k in ("SKIP", "NAMES", "NAMES_UNITS")},
@@ -218,7 +213,7 @@ CSV_CURVE = {"comment": [], "format": {"kind": "COMMA"}, "header": {"kind": "NAM
 
 
 def read_csv(data, d):
-    """csv-curve-v1 (plan 1139): table-curve-v1 with a fixed declaration (comma, no comment prefix, one header line of names) whose columns are
+    """csv-curve-v1: table-curve-v1 with a fixed declaration (comma, no comment prefix, one header line of names) whose columns are
     the WHOLE header, in its order: its Grid's columns are the header, which S4 compares with the declared columns (COLUMNS_DIFFER)."""
     cells = CELLS["COMMA"](data, CSV_CURVE)
     whole = lambda: tuple(_name(x) for x in ([c for _, c in cells if c][:1] or [[]])[0])

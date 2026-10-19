@@ -6,7 +6,7 @@ lookup in a table total over its alphabet (tests/test_intake.py asserts each), t
 refusal's detail carries declared names, words and counts, never a data value (it has none: S1 reads no byte)."""
 from dataclasses import dataclass
 
-from intake_blind import RESTARTS, SWEEP, Declaration, Pass, gate, look
+from intake_blind import RESTARTS, SWEEP, Declaration, Evidence, Pass, gate, look
 from intake_names import detail
 
 ONE_PER_FILE = {   # [selection.slow] source -> does the declaration give one slow value per selected file; total over FORMAT's sources (test)
@@ -50,7 +50,7 @@ HAS_COLUMN = {"COLUMN": True, "NONE": False}   # [measured.uncertainty] kind -> 
 
 
 @dataclass(frozen=True)
-class Chosen:
+class Chosen(Evidence):
     """S1 CHOICES' PASS evidence. Invariant: built only from a Declaration for which every row in `checked` held; `checked` is exactly the
     S1 rows with live = true, in STAGES.toml order (tests/test_intake.py)."""
     declaration: Declaration
@@ -58,9 +58,6 @@ class Chosen:
 
     def summary(self):
         return f"Checked: {', '.join(self.checked)}. The S1 rows that are not live are listed under the reasons no body can return yet"
-
-    def confirmed(self):
-        return False
 
 
 def chain(d):

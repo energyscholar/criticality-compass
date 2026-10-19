@@ -49,6 +49,30 @@ import intake_data  # noqa: E402
 import intake_names  # noqa: E402
 import intake_seal  # noqa: E402
 
+# The stage-signature oracle (it was SIGNATURE/EVIDENCE/sig, production code only this test read): every data stage -> the
+# evidence of its needs, in needs order.
+D = intake_data
+
+
+def sig(**params):
+    """A stage signature: the named evidence parameters in order, returning a StageResult (Pass | Refuse)."""
+    return inspect.Signature([inspect.Parameter(n, inspect.Parameter.POSITIONAL_OR_KEYWORD, annotation=t) for n, t in params.items()],
+                             return_annotation=blind.Pass | blind.Refuse)
+
+
+EVIDENCE = {"S0": blind.Declaration, "S3": D.Pinned, "S4": D.Shaped, "S5": D.Census, "S6": D.Lineage, "S7": D.IntervalPlan, "S8": D.Feasibility,
+            "S9": D.SecondLane, "S10": D.KernelInput}
+SIGNATURE = {
+    "S3": sig(declaration=blind.Declaration),
+    "S4": sig(pinned=D.Pinned),
+    "S5": sig(pinned=D.Pinned, shaped=D.Shaped),
+    "S6": sig(census=D.Census),
+    "S7": sig(census=D.Census),
+    "S8": sig(census=D.Census),
+    "S9": sig(census=D.Census),
+    "S10": sig(lineage=D.Lineage, plan=D.IntervalPlan, feasibility=D.Feasibility),
+}
+
 bad = []
 
 
@@ -78,7 +102,7 @@ check("1. every stage that reads data bytes has S0 and never the seal stage in i
 check("1. the seal stage is ADVISORY and in no stage's transitive needs", [s["verdict"] for s in ST if s["id"] == SEAL] == ["ADVISORY"] and all(SEAL not in intake.closure(T, i) for i in IDS), "")
 READS = {s["id"] for s in ST if s["reads_bytes"] != "NONE"}
 check("1. SIGNATURE has a row for exactly the data stages (they read bytes, or a stage they need does)",
-      set(intake_data.SIGNATURE) == {s["id"] for s in ST if s["id"] in READS or intake.closure(T, s["id"]) & READS}, str(sorted(intake_data.SIGNATURE)))
+      set(SIGNATURE) == {s["id"] for s in ST if s["id"] in READS or intake.closure(T, s["id"]) & READS}, str(sorted(SIGNATURE)))
 check("1. the seal status and ordering rows are exactly the atoms of SealStatus and Ordering",
       [r["code"] for s in ST if s["id"] == SEAL for r in s["status"]] == [x.name for x in intake_seal.SealStatus]
       and [r["code"] for r in T["stages"]["report"]["ordering"]] == [x.name for x in intake_seal.Ordering], "")
@@ -250,11 +274,11 @@ check("3. (1160 A5) every ROBUSTNESS verdict is reached, NOT_EXAMINED (one lane)
 check("3. (1160 A5) EXAMINED is total over FORMAT's lane counts (1 and 2: PRIMARY | ALTERNATIVE)", set(intake.EXAMINED) == set(range(1, 1 + len(FM["projection"]["fields"]["lane"]["values"]))), str(intake.EXAMINED))
 
 # ---- 4. the seal is advisory (plan 1139, A3): a status value, never a refusal; plan 1136's test 4 (Sealed-carrying signatures) is retired
-for sid, sig in intake_data.SIGNATURE.items():
+for sid, sig in SIGNATURE.items():
     ann = [p.annotation for p in sig.parameters.values()]
-    need = [intake_data.EVIDENCE[n] for n in next(s for s in ST if s["id"] == sid)["needs"]]
+    need = [EVIDENCE[n] for n in next(s for s in ST if s["id"] == sid)["needs"]]
     check(f"4. {sid}'s signature takes the evidence of its needs and no seal", ann == need and not any("Seal" in a.__name__ for a in ann), f"{ann} against {need}")
-check("4. every registered data-stage body has its SIGNATURE row (1160 P5, P6: the S7-S9 and S10 bodies too)", all(inspect.signature(b) == intake_data.SIGNATURE[k]
+check("4. every registered data-stage body has its SIGNATURE row (1160 P5, P6: the S7-S9 and S10 bodies too)", all(inspect.signature(b) == SIGNATURE[k]
       for k, b in {**intake_data.bodies(T, EXAMPLE), **intake_feasible.bodies(T, EXAMPLE), **intake_terminal.bodies(T, EXAMPLE)}.items()), "")
 with tempfile.TemporaryDirectory() as tmp:
     d = Path(tmp) / "decl"

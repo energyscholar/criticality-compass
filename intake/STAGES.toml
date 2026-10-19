@@ -25,6 +25,25 @@ after_refusal = "Not run: an earlier stage refused, and no later check can redee
 input_absent = "Not run: a stage it needs did not pass."
 confirmation = "No human has confirmed this declaration (it is unsealed, edited after its seal, or sealed with an empty confirmed_by); PRIMARY_READY needs a seal that holds the declaration now with a non-empty confirmed_by."
 conversion_read = "A conversion read these raw files before the seal. That is the designed order (convert, then declare and seal), so it is information and never a refusal; the seal claims ordering only for the intake's own reads."   # plan 1160 A13
+explain = [   # the prose of `bin/cc intake explain` (and docs/INTAKE.md), between its title and the seal claim, one line per entry
+  "Generated from intake/STAGES.toml and intake/POLICY.toml by `bin/cc intake explain` (docs/gen-intake.py); never edit it by hand.",
+  "This is the intake's explain. `bin/cc explain <input> <point>` is a different command: it explains one point of a measured input.",
+  "",
+  "A declaration `declarations/<id>/` (intake.toml and the CC transducer.toml) goes through the stages below in order. Each stage is LIVE (it has a body) or a STUB (it has none, so nothing was checked; a stub is never a pass). An executed stage gives PASS or REFUSE with a named reason; after a refusal every later stage is WITHHELD.",
+  "",
+  "- **PRIMARY** verdict, over the PRIMARY stages and the HANDOFF stage (the terminal): PRIMARY_REFUSED_AT when one refused; else PRIMARY_INCOMPLETE when one is not executed or no seal with a non-empty confirmed_by holds the declaration now; else PRIMARY_READY.",
+  "- **ROBUSTNESS** verdict, over the ROBUSTNESS stage: ROBUSTNESS_COMPLETE (it passed with two lanes declared), ROBUSTNESS_NOT_EXAMINED (it passed with one lane declared: nothing was examined), ROBUSTNESS_INCOMPLETE, ROBUSTNESS_REFUSED, or ROBUSTNESS_WITHHELD after a PRIMARY refusal.",
+  "- The HANDOFF stage is the terminal (docs/INTAKE-COMPLETION.md): PRIMARY_READY needs it executed. It runs before the ROBUSTNESS stage, so a ROBUSTNESS refusal never withholds it (plan 1160 A9).",
+  "- The ADVISORY stage (the seal) is outside every verdict. It never refuses: every report carries its seal status, SEALED, UNSEALED or SEALED_THEN_EDITED, and an ordering note.",
+  "",
+]
+not_live = [   # the head of the section every explain and report carries on the reason rows no body can return yet
+  "## Reasons no body can return yet",
+  "",
+  "Each row below has live = false in intake/STAGES.toml: no body returns it today (a STUB stage's rows are never live), so a run cannot show it and its absence says nothing.",
+  "",
+]
+all_live = "- none: every row is live (plan 1160 P6)"   # that section when every row is live
 ordering = [   # the ordering note of a report (information, never a refusal): (ordering atom, sentence); total over intake_seal.Ordering
   { code = "NOT_SEALED",            sentence = "There is no seal, so there is no ordering to report." },
   { code = "NO_DATA_READ_LOGGED",   sentence = "The access log holds no data read of this declaration." },

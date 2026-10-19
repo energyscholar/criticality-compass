@@ -1,9 +1,7 @@
-"""intake - the intake pipeline (plan 1136): its tables, the execution of each stage, the run fold, the two verdict tables, the report and
+"""intake - the intake pipeline: its tables, the execution of each stage, the run fold, the two verdict tables, the report and
 `bin/cc intake explain | lint | seal | run`. Invariant: every stage, reason and sentence comes from intake/STAGES.toml; a stage with no
 body is a STUB and a STUB is never a pass; a result is a value, never an exception; each dispatch below is a dict total over a named key."""
 import enum
-import json
-import re
 import tomllib
 from dataclasses import dataclass
 from pathlib import Path
@@ -52,7 +50,7 @@ class Primary(enum.Enum):
 
 class Robustness(enum.Enum):
     """The ROBUSTNESS verdict over (PRIMARY, the ROBUSTNESS stage). ATOMS: ROBUSTNESS_COMPLETE | ROBUSTNESS_NOT_EXAMINED | ROBUSTNESS_INCOMPLETE | ROBUSTNESS_REFUSED |
-    ROBUSTNESS_WITHHELD. Axiom: exactly one holds (the second lane passed; it passed with one lane, nothing examined (1160 A5); is not executed; refused; withheld)."""
+    ROBUSTNESS_WITHHELD. Axiom: exactly one holds (the second lane passed; it passed with one lane, nothing examined; is not executed; refused; withheld)."""
     ROBUSTNESS_COMPLETE = frozenset({"ROBUSTNESS_COMPLETE"})
     ROBUSTNESS_NOT_EXAMINED = frozenset({"ROBUSTNESS_NOT_EXAMINED"})
     ROBUSTNESS_INCOMPLETE = frozenset({"ROBUSTNESS_INCOMPLETE"})
@@ -69,11 +67,16 @@ class ReadsBytes(enum.Enum):
 
 class Scope(enum.Enum):
     """The verdict a stage counts toward (STAGES.toml verdict). ATOMS: PRIMARY | ROBUSTNESS | HANDOFF | ADVISORY. Axiom: exactly one holds per
-    stage (ADVISORY: the seal stage, outside every verdict; it reports the seal status and never refuses, amendment A3)."""
+    stage (ADVISORY: the seal stage, outside every verdict; it reports the seal status and never refuses)."""
     PRIMARY = frozenset({"PRIMARY"})
     ROBUSTNESS = frozenset({"ROBUSTNESS"})
     HANDOFF = frozenset({"HANDOFF"})
     ADVISORY = frozenset({"ADVISORY"})
+
+
+def scoped(t, *scopes):
+    """The ids of the stages whose verdict (STAGES.toml, an atom of Scope) is one of `scopes`, in table order."""
+    return [s["id"] for s in t["stages"]["stage"] if Scope[s["verdict"]] in scopes]
 
 
 @dataclass(frozen=True)
@@ -157,11 +160,11 @@ class Verdict:
     at: str = ""
 
 
-def _missing(ids, out):   # plan 1160 P6: WITHHELD_AFTER_REFUSAL too (a stage withheld after a refusal was not executed; A9: never after S9's)
+def _missing(ids, out):   # WITHHELD_AFTER_REFUSAL too: a stage withheld after a refusal was not executed
     return tuple(i for i in ids if out[i].mark in (Mark.STUB, Mark.WITHHELD_INPUT_ABSENT, Mark.WITHHELD_AFTER_REFUSAL))
 
 
-def _refused(ids, out):   # plan 1160 P6 (E9): no Missing list on a refusal (it named the stubs before the refusing stage)
+def _refused(ids, out):   # no Missing list on a refusal (it would name the stubs before the refusing stage)
     return Verdict(Primary.PRIMARY_REFUSED_AT, (), _first_refusal(ids, out))
 
 
@@ -169,18 +172,18 @@ def _first_refusal(ids, out):
     return [i for i in ids if out[i].mark is Mark.REFUSED][0]
 
 
-PRIMARY = {   # design Table 2 with amendment A2 Q6, total over (R some stage refused, U some stage not executed, C confirmed)
+PRIMARY = {   # design Table 2, total over (R some stage refused, U some stage not executed, C confirmed)
     (False, False, True): lambda ids, out: Verdict(Primary.PRIMARY_READY),
     (False, False, False): lambda ids, out: Verdict(Primary.PRIMARY_INCOMPLETE, ("confirmation",)),
     (False, True, True): lambda ids, out: Verdict(Primary.PRIMARY_INCOMPLETE, _missing(ids, out)),
     (False, True, False): lambda ids, out: Verdict(Primary.PRIMARY_INCOMPLETE, _missing(ids, out) + ("confirmation",)),
     (True, False, True): _refused, (True, False, False): _refused, (True, True, True): _refused, (True, True, False): _refused,
 }
-EXAMINED = {1: Robustness.ROBUSTNESS_NOT_EXAMINED, 2: Robustness.ROBUSTNESS_COMPLETE}   # plan 1160 A5: a passed ROBUSTNESS stage's lane count (FORMAT: PRIMARY | ALTERNATIVE)
+EXAMINED = {1: Robustness.ROBUSTNESS_NOT_EXAMINED, 2: Robustness.ROBUSTNESS_COMPLETE}   # a passed ROBUSTNESS stage's lane count (FORMAT: PRIMARY | ALTERNATIVE)
 ROBUSTNESS = {   # design Table 3, the reachable cells of (PRIMARY, the ROBUSTNESS stage's mark) -> (its execution -> the verdict)
     (Primary.PRIMARY_READY, Mark.STUB): lambda e: Robustness.ROBUSTNESS_INCOMPLETE,
     (Primary.PRIMARY_READY, Mark.PASSED): lambda e: EXAMINED[e.result.evidence.n_lanes],
-    (Primary.PRIMARY_READY, Mark.REFUSED): lambda e: Robustness.ROBUSTNESS_REFUSED,   # plan 1160 A9: it runs after the HANDOFF stage
+    (Primary.PRIMARY_READY, Mark.REFUSED): lambda e: Robustness.ROBUSTNESS_REFUSED,   # it runs after the HANDOFF stage
     (Primary.PRIMARY_INCOMPLETE, Mark.STUB): lambda e: Robustness.ROBUSTNESS_INCOMPLETE,
     (Primary.PRIMARY_INCOMPLETE, Mark.WITHHELD_INPUT_ABSENT): lambda e: Robustness.ROBUSTNESS_INCOMPLETE,
     (Primary.PRIMARY_INCOMPLETE, Mark.PASSED): lambda e: EXAMINED[e.result.evidence.n_lanes],
@@ -200,10 +203,10 @@ IMPOSSIBLE = {   # the other cells of the product; the fold never produces them 
 
 def verdicts(t, out):
     """(PRIMARY Verdict, ROBUSTNESS Verdict) of a fold over the whole table."""
-    ids = [s["id"] for s in t["stages"]["stage"] if s["verdict"] in ("PRIMARY", "HANDOFF")]   # plan 1160 P6: the HANDOFF stage (the terminal) counts toward PRIMARY
+    ids = scoped(t, Scope.PRIMARY, Scope.HANDOFF)   # the HANDOFF stage (the terminal) counts toward PRIMARY
     marks = {out[i].mark for i in ids}
     p = PRIMARY[(Mark.REFUSED in marks, len(_missing(ids, out)) > 0, out[t["stages"]["seal_stage"]].confirmed())](ids, out)
-    rob = [s["id"] for s in t["stages"]["stage"] if s["verdict"] == "ROBUSTNESS"][0]
+    rob = scoped(t, Scope.ROBUSTNESS)[0]
     r = ROBUSTNESS[(p.kind, out[rob].mark)](out[rob])
     return p, Verdict(r, {True: (rob,), False: ()}[r is Robustness.ROBUSTNESS_INCOMPLETE], {True: rob, False: ""}[r is Robustness.ROBUSTNESS_REFUSED])
 
@@ -216,7 +219,7 @@ def tables(root=ROOT):
              **{f"alphabet.{k}": v for k, v in cfg["alphabets"].items()}}
     sentences = {r["code"]: r["sentence"] for s in load["stages"]["stage"] for r in s["reason"]}
     roots = {k: str(Path(root) / Path(v).expanduser()) for k, v in tomllib.loads((Path(root) / "intake" / "ROOTS.toml").read_text())["root"].items()}
-    fields = {**cfg["interval_fields"], **load["format"]["interval_fields"]}   # plan 1160 P4: the intake's methods STATED and NONE (FORMAT.toml)
+    fields = {**cfg["interval_fields"], **load["format"]["interval_fields"]}   # the intake's methods STATED and NONE (FORMAT.toml)
     return {**load, "admit": admit, "interval_fields": fields, "sentences": sentences, "roots": roots}
 
 
@@ -228,29 +231,22 @@ LIVE = {True: "live", False: "NOT LIVE"}
 
 
 def not_live(t):
-    """The reason rows no body can return yet (live = false in intake/STAGES.toml, plan-1139 E8), as a Markdown section that explain and every
+    """The reason rows no body can return yet (live = false in intake/STAGES.toml), as a Markdown section that explain and every
     report carry: a refusal named there cannot be seen today, so its absence from a report says nothing."""
     rows = [f"- {s['id']} {r['code']}" for s in t["stages"]["stage"] for k in ("reason", "reader_reason") for r in blind.look(s, k, []) if not r["live"]]
-    return ["## Reasons no body can return yet", "", "Each row below has live = false in intake/STAGES.toml: no body returns it today (a STUB stage's rows "
-            "are never live), so a run cannot show it and its absence says nothing.", ""] + (rows or ["- none: every row is live (plan 1160 P6)"]) + [""]
+    return t["stages"]["report"]["not_live"] + (rows or [t["stages"]["report"]["all_live"]]) + [""]
+
+
+def unseen(t):
+    """The tail of explain and of every report: the reason rows no body can return yet, then what no stage can see."""
+    return not_live(t) + ["## What no stage can see", ""] + [f"- {u}" for u in t["stages"]["report"]["unenforced"]]
 
 
 def explain(t):
     """The stage table as Markdown: `bin/cc intake explain` prints it and docs/INTAKE.md is it, byte for byte (docs/gen-intake.py)."""
     st, po = t["stages"], t["policy"]
     out = [f"# The intake pipeline (stage table {st['version']}, policy {po['version']})", "",
-           "Generated from intake/STAGES.toml and intake/POLICY.toml by `bin/cc intake explain` (docs/gen-intake.py); never edit it by hand.",
-           "This is the intake's explain. `bin/cc explain <input> <point>` is a different command: it explains one point of a measured input.", "",
-           "A declaration `declarations/<id>/` (intake.toml and the CC transducer.toml) goes through the stages below in order. "
-           "Each stage is LIVE (it has a body) or a STUB (it has none, so nothing was checked; a stub is never a pass). "
-           "An executed stage gives PASS or REFUSE with a named reason; after a refusal every later stage is WITHHELD.", "",
-           "- **PRIMARY** verdict, over the PRIMARY stages and the HANDOFF stage (the terminal): PRIMARY_REFUSED_AT when one refused; else PRIMARY_INCOMPLETE when one is not "
-           "executed or no seal with a non-empty confirmed_by holds the declaration now; else PRIMARY_READY.",
-           "- **ROBUSTNESS** verdict, over the ROBUSTNESS stage: ROBUSTNESS_COMPLETE (it passed with two lanes declared), ROBUSTNESS_NOT_EXAMINED "
-           "(it passed with one lane declared: nothing was examined), ROBUSTNESS_INCOMPLETE, ROBUSTNESS_REFUSED, or ROBUSTNESS_WITHHELD after a PRIMARY refusal.",
-           "- The HANDOFF stage is the terminal (docs/INTAKE-COMPLETION.md): PRIMARY_READY needs it executed. It runs before the ROBUSTNESS stage, so a ROBUSTNESS refusal never withholds it (plan 1160 A9).",
-           "- The ADVISORY stage (the seal) is outside every verdict. It never refuses: every report carries its seal status, SEALED, UNSEALED or "
-           "SEALED_THEN_EDITED, and an ordering note.", "",
+           *st["report"]["explain"],
            f"**The seal.** {st['report']['seal_claim']}", "", "| id | name | state | reads data bytes | needs | verdict |", "|---|---|---|---|---|---|"]
     out += [f"| {s['id']} | {s['name']} | {state(s)} | {s['reads_bytes']} | {', '.join(s['needs']) or '-'} | {s['verdict']} |" for s in st["stage"]]
     for s in st["stage"]:
@@ -262,14 +258,13 @@ def explain(t):
     out += ["", f"## Policy ({po['status']}, {po['version']})", "", po["evidence_note"], ""]
     for link in ("projection", "bridge"):
         out += [f"- {link} **{k}**: " + "; ".join(f"{f} = {v}" for f, v in row.items()) for k, row in po[link].items()]
-    out += [f"- policy: " + "; ".join(f"{k} = {v}" for k, v in po["policy"].items()), ""] + not_live(t) + [
-            "## What no stage can see", ""] + [f"- {u}" for u in st["report"]["unenforced"]]
+    out += [f"- policy: " + "; ".join(f"{k} = {v}" for k, v in po["policy"].items()), ""] + unseen(t)
     return "\n".join(out) + "\n"
 
 
 def bodies(t, d, text, findings):
-    """The registered bodies of one run: S0 FORMAT, S1 CHOICES (cc/intake_choices.py, plan 1160 P4), S2 SEAL (verify, advisory), plus
-    intake_data.bodies (the data stages with a body) and intake_feasible.bodies (S7, S8, S9; plan 1160 P5) and intake_terminal.bodies (S10, P6). Invariant: its keys are exactly the stages whose implemented = true (tests/test_intake.py)."""
+    """The registered bodies of one run: S0 FORMAT, S1 CHOICES (cc/intake_choices.py), S2 SEAL (verify, advisory), plus
+    intake_data.bodies (the data stages with a body) and intake_feasible.bodies (S7, S8, S9) and intake_terminal.bodies (S10). Invariant: its keys are exactly the stages whose implemented = true (tests/test_intake.py)."""
     return {"S0": lambda: blind.format_stage(text, findings, t), "S1": lambda declaration: intake_choices.choices(declaration, t["policy"]),
             "S2": lambda declaration: intake_seal.verify(declaration, d, t),
             **intake_data.bodies(t, d), **intake_feasible.bodies(t, d), **intake_terminal.bodies(t, d)}
@@ -282,7 +277,7 @@ def report(t, ident, out, note):
     p, r = verdicts(t, out)
     names = {s["id"]: s["name"] for s in t["stages"]["stage"]}
     words = lambda v: ", ".join(f"{m} {blind.look(names, m, '')}".strip() for m in v.missing) or "none"
-    handoff = [s["id"] for s in t["stages"]["stage"] if s["verdict"] == "HANDOFF"][0]
+    handoff = scoped(t, Scope.HANDOFF)[0]
     lines = [f"# Intake report: {ident}", "", f"Written by `bin/cc intake run {ident}`. Stage table {t['stages']['version']}, policy {t['policy']['version']}.", "",
              f"- **Mode** (the declarer's sealed statement of what they had seen): {out['S0'].result.mode()}",
              f"- **PRIMARY verdict: {p.kind.name}**" + {True: f" at {p.at}", False: ""}[p.at != ""] + f". Missing: {words(p)}.",
@@ -296,11 +291,10 @@ def report(t, ident, out, note):
              "| stage | name | state | reads data bytes | execution |", "|---|---|---|---|---|"]
     lines += [f"| {s['id']} | {s['name']} | {state(s)} | {s['reads_bytes']} | {out[s['id']].atom.name} |" for s in t["stages"]["stage"]]
     lines += [""] + [f"- **{s['id']} {s['name']}** ({state(s)}): {out[s['id']].text(t)}" for s in t["stages"]["stage"]]
-    census = [s["id"] for s in t["stages"]["stage"] if s["name"] == "CENSUS"][0]   # the census section: only when the census passed (plan 1160 P0)
+    census = [s["id"] for s in t["stages"]["stage"] if s["name"] == "CENSUS"][0]   # the census section: only when the census passed
     lines += {True: lambda: ["", "## Census", "", f"The curves of {census} CENSUS, by ordinal and file name (never by slow value):", ""] + out[census].result.evidence.listing(),
               False: lambda: []}[out[census].mark is Mark.PASSED]()
-    lines += ["", "## What the seal proves", "", t["stages"]["report"]["seal_claim"], ""] + not_live(t) + [
-              "## What no stage can see", ""] + [f"- {u}" for u in t["stages"]["report"]["unenforced"]]
+    lines += ["", "## What the seal proves", "", t["stages"]["report"]["seal_claim"], ""] + unseen(t)
     return "\n".join(lines) + "\n"
 
 
@@ -312,13 +306,8 @@ def closure(t, sid):
 
 def before_data(t):
     """The stages of lint and seal: they read no data byte, no stage in their transitive needs reads one, and they are not the ADVISORY seal."""
-    reads = {s["id"] for s in t["stages"]["stage"] if s["reads_bytes"] != "NONE"}
-    return [s for s in t["stages"]["stage"] if s["verdict"] != "ADVISORY" and s["id"] not in reads and not closure(t, s["id"]) & reads]
-
-
-def _flag(args, name):
-    """The value after `name`, or "" when the flag is absent (a usage table below refuses a required flag that is "")."""
-    return {True: lambda: args[args.index(name) + 1], False: lambda: ""}[name in args and args.index(name) + 1 < len(args)]()
+    reads = {s["id"] for s in t["stages"]["stage"] if ReadsBytes[s["reads_bytes"]] is not ReadsBytes.NONE}
+    return [s for s in t["stages"]["stage"] if Scope[s["verdict"]] is not Scope.ADVISORY and s["id"] not in reads and not closure(t, s["id"]) & reads]
 
 
 def _findings(root, d, ident):
@@ -336,29 +325,32 @@ def _go(root, ident, pick):
     return t, d, fold(pick(t), bodies(t, d, text, _findings(root, d, ident)))
 
 
-def lint(root, ident, args):
+def _before(root, ident):
+    """(tables, declaration dir, fold, refused) of the stages before data (lint and seal), each execution printed."""
     t, d, out = _go(root, ident, before_data)
     print("\n".join(f"{k} {e.text(t)}" for k, e in out.items()))
-    return {True: 1, False: 0}[any(e.mark is Mark.REFUSED for e in out.values())]
+    return t, d, out, any(e.mark is Mark.REFUSED for e in out.values())
+
+
+def lint(root, ident, args):
+    return {True: 1, False: 0}[_before(root, ident)[3]]
 
 
 def _mint(root, ident, args, t, d, out):
-    who = {"author": _flag(args, "--author"), "author_kind": intake_seal.AUTHOR_KIND[_flag(args, "--as")], "confirmed_by": _flag(args, "--confirmed-by")}
-    res = intake_seal.mint(out["S0"].result.evidence, d, _flag(args, "--universe"), who, root, t)
+    who = {"author": blind.flag(args, "--author", ""), "author_kind": intake_seal.AUTHOR_KIND[blind.flag(args, "--as", "")], "confirmed_by": blind.flag(args, "--confirmed-by", "")}
+    res = intake_seal.mint(out["S0"].result.evidence, d, blind.flag(args, "--universe", ""), who, root, t)
     print(f"seal {ident}: " + res.text(t["sentences"]))
     return {Mark.PASSED: 0, Mark.REFUSED: 1}[res.mark]
 
 
 def seal(root, ident, args):
-    usage = [u for ok, u in ((_flag(args, "--author") != "", "--author NAME"), (_flag(args, "--as") in intake_seal.AUTHOR_KIND, "--as human|ai-draft"),
-                             ((_flag(args, "--confirmed-by") != "") != ("--unconfirmed" in args), "exactly one of --confirmed-by NAME | --unconfirmed")) if not ok]
+    usage = [u for ok, u in ((blind.flag(args, "--author", "") != "", "--author NAME"), (blind.flag(args, "--as", "") in intake_seal.AUTHOR_KIND, "--as human|ai-draft"),
+                             ((blind.flag(args, "--confirmed-by", "") != "") != ("--unconfirmed" in args), "exactly one of --confirmed-by NAME | --unconfirmed")) if not ok]
     return {True: lambda: _usage(f"seal needs {'; '.join(usage)}"), False: lambda: _seal(root, ident, args)}[len(usage) > 0]()
 
 
 def _seal(root, ident, args):
-    t, d, out = _go(root, ident, before_data)
-    print("\n".join(f"{k} {e.text(t)}" for k, e in out.items()))
-    refused = any(e.mark is Mark.REFUSED for e in out.values())
+    t, d, out, refused = _before(root, ident)
     return {True: lambda: 1, False: lambda: _mint(root, ident, args, t, d, out)}[refused]()
 
 
@@ -366,50 +358,9 @@ def run(root, ident, args):
     t, d, out = _go(root, ident, lambda t: t["stages"]["stage"])
     text = report(t, ident, out, intake_seal.ordering(d, t))
     (d / "intake-report.md").write_text(text)
-    intake_terminal.write(root, t, d, out, verdicts(t, out)[0].kind.name)   # plan 1160 P6: RESULT.json when S10 passed, else removed
+    intake_terminal.write(root, t, d, out, verdicts(t, out)[0].kind.name)   # RESULT.json when S10 passed, else removed
     print(text, end="")
     return {Primary.PRIMARY_READY: 0, Primary.PRIMARY_INCOMPLETE: 0, Primary.PRIMARY_REFUSED_AT: 1}[verdicts(t, out)[0].kind]
-
-
-def fill(text, values, dropped=frozenset()):
-    """The template text with each `key = "TODO"` line of a [section] whose "section.key" is a key of `values` set to that TOML value, and
-    without each line whose "section.key" is in `dropped`, or whose section is (its [section] line, its "# [section]:" comment line and every
-    line under it): the fields of a VARIANT row that was not chosen."""
-    out, sec = [], ""
-    for ln in text.splitlines():
-        sec, m, head = {True: ln.strip("[] "), False: sec}[ln.startswith("[")], re.match(r'(\w+) = "TODO"(.*)', ln), re.match(r"# \[([\w.]+)\]:", ln)
-        about = {True: lambda: [head[1]], False: lambda: [sec] + [f"{sec}.{x[1]}" for x in [m] if x is not None]}[head is not None]()
-        kept = {True: lambda: [], False: lambda: [{True: lambda: f"{m[1]} = {values[sec + '.' + m[1]]}{m[2]}", False: lambda: ln}[m is not None and f"{sec}.{m[1]}" in values]()]}
-        out += kept[any(n in dropped for n in about)]()
-    return "\n".join(out) + "\n"
-
-
-def _write_new(root, d, ident, values, dropped, trans):
-    d.mkdir(parents=True)
-    (d / "intake.toml").write_text(fill((Path(root) / "intake" / "TEMPLATE.intake.toml.in").read_text().replace("<ID>", ident), values, dropped))
-    (d / "transducer.toml").write_text(trans)
-    todo = [f"  declarations/{ident}/{n}:{i}: {ln}" for n in ("intake.toml", "transducer.toml") for i, ln in enumerate((d / n).read_text().splitlines(), 1) if '"TODO"' in ln]
-    print(f"wrote declarations/{ident}/intake.toml and transducer.toml; {len(todo)} TODO lines remain (yours to choose):\n" + "\n".join(todo)
-          + f"\n  Next: replace each TODO (docs/INTAKE-QUICKSTART.md shows a filled example), then bin/cc intake lint {ident}")
-    return 0
-
-
-def _from_synth(root, d, ident, sid, synth):
-    import intake_synth   # test infrastructure: it knows the MANIFEST it wrote
-    return _write_new(root, d, ident, *intake_synth.declare(json.loads(synth.read_text()), ident, sid))
-
-
-def new(root, ident, sid):
-    """bin/cc new intake <id> [--from-synth <sid>]: declarations/<id>/ from the committed templates; with --from-synth, the synth MANIFEST's
-    metadata filled in (intake_synth.declare) and every choice left TODO. Invariant: never overwrites; a refusal is a usage line with a Next."""
-    d, synth = Path(root) / "declarations" / ident, Path(root) / tomllib.loads((Path(root) / "intake" / "ROOTS.toml").read_text())["root"]["<intake-synth>"] / sid / "MANIFEST.json"
-    blank = lambda: _write_new(root, d, ident, {}, frozenset(), (Path(root) / "inputs" / "TEMPLATE.transducer.toml.in").read_text().replace("<ID>", ident))
-    filled = lambda: _from_synth(root, d, ident, sid, synth)
-    usage = [u for ok, u in ((re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]*", ident) is not None, f"an id (letters, digits, _ . -), not '{ident}'"),
-                             (not d.exists(), f"declarations/{ident} exists; a declaration is never overwritten (choose another id)"),
-                             (sid == "" or synth.is_file(), f"no synthetic bank '{sid}' (run bin/cc intake synth {sid} --seed N first)")) if not ok]
-    return {True: lambda: print(f"bin/cc new intake: refused, {'; '.join(usage)}\n  Next: bin/cc new intake <id> [--from-synth <synth-id>]") or 1,
-            False: {True: blank, False: filled}[sid == ""]}[len(usage) > 0]()
 
 
 def _usage(why):
