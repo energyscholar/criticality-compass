@@ -16,7 +16,7 @@ from pathlib import Path
 
 import intake_read
 import intake_seal
-from intake_blind import NUMBER, RESTARTS, SWEEP, Declaration, Pass, Refuse, detail, gate, numbered, shown
+from intake_blind import NUMBER, RESTARTS, SWEEP, Declaration, Pass, Refuse, detail, gate, numbered, shown, sweeps
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -367,7 +367,7 @@ def shape(pinned, t):
                  (lambda: g.readable, "READER_REFUSED", lambda: g.detail.within(f.name, g.reason)),
                  (lambda: g.columns == cols, "COLUMNS_DIFFER", lambda: detail(f.name, columns=numbered(g.columns) + cols, counts={"columns in the file": len(g.columns), "declared": len(cols)})),
                  (lambda: not units(), "UNIT_DIFFERS", lambda: detail(f.name, words=[f"{r} declared {w}" for r, u, w in units()], stated=[(r, u) for r, u, w in units()])),
-                 (lambda: not unordered(), "ROW_ORDER_DIFFERS", lambda: detail(words=unordered()[:3] + [f"not {d['acquisition']['row_order']} in {d['knobs']['fast']['name']}"], counts={"curves": len(unordered())}))],
+                 (lambda: not unordered(), "ROW_ORDER_DIFFERS", lambda: detail(words=unordered()[:3] + [f"not {d['acquisition']['row_order']} in {d['knobs']['fast']['name']}"], counts={"curves": len(unordered()), **sweeps([[r[0] for r in c.rows] for c in CURVES[d["selection"]["layout"]](d, pinned.files[:1], [g])], d["acquisition"]["row_order"], ORDER)}))],
                 lambda: Pass(Shaped(pinned, g.columns)))
 
 

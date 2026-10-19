@@ -57,6 +57,19 @@ def split_unit(cell, syntax):
     return {True: lambda: (m[1].strip(), m[2].strip()), False: lambda: (cell, "")}[m is not None]()
 
 
+OPPOSITE = {"ASCENDING": "DESCENDING", "DESCENDING": "ASCENDING", "ACQUISITION": "ACQUISITION"}   # [acquisition] row_order -> its reverse; total
+ORDER_CLASS = {   # (does a curve's fast sequence hold the declared row_order, does it hold the opposite) -> its class (plan 1160 A7); total over bool x bool
+    (True, True): "in the declared order", (True, False): "in the declared order",   # every fast value equal holds both: it is in the declared order
+    (False, True): "in the opposite order", (False, False): "in neither order (not monotone)"}
+
+
+def sweeps(seqs, row_order, order):
+    """(plan 1160 A7) S4 ROW_ORDER_DIFFERS's classification of the curves of the refused file, as COUNTS only (no value): how many hold the
+    declared row_order, how many the opposite one, how many neither. `order` is the row_order table (intake_data.ORDER); seqs are fast sequences."""
+    got = [ORDER_CLASS[(order[row_order](xs), order[OPPOSITE[row_order]](xs))] for xs in seqs]
+    return {k: got.count(k) for k in dict.fromkeys(ORDER_CLASS.values())}
+
+
 @dataclass(frozen=True)
 class Detail:
     """The detail of every refusal (plan 1160 P0). Invariant: it holds a file name, row numbers, columns (a name or a 1-based position), named

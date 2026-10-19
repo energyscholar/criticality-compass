@@ -73,6 +73,8 @@ shape = "TODO"          # SCALAR_PER_LOCUS | SERIES_PER_LOCUS | PICTURE | POSITI
 kind = "TODO"           # COLUMN (key) | NONE (no other field): the measured number's uncertainty column, if the file has one
 key = "TODO"            # COLUMN: its column, a name or a 1-based position
 
+# If the deposit does not state the order the rows were written in, declare `row_order = ACQUISITION` and `direction = UNORDERED`;
+# ASCENDING and DESCENDING assert a monotone sweep and S4 refuses a file that is not one (plan 1160 A7).
 [acquisition]
 mode = "TODO"           # how the points were taken: INDEPENDENT | SWEEP_CARRIED | RAMP_CONTINUOUS | REPEATED_FRAMES
 direction = "TODO"      # the order they were taken in along the fast knob: ASCENDING | DESCENDING | UNORDERED

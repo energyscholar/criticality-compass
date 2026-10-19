@@ -8,7 +8,7 @@ import enum
 import tomllib
 from dataclasses import dataclass
 
-from intake_names import NUMBER, Detail, Name, classify, detail, numbered, shown   # noqa: F401 - the classifier and Detail (plan 1160 P2: own role)
+from intake_names import NUMBER, Detail, Name, classify, detail, numbered, shown, sweeps   # noqa: F401 - the classifier and Detail (plan 1160 P2: own role)
 
 TODO = "TODO"
 

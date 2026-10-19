@@ -78,6 +78,15 @@ For a table, `[reader]` is `table-curve-v1`:
 Columns are named in `[knobs.fast]`, `[measured]` and `[measured.uncertainty]` (COLUMN or NONE): by NAME (a string) or by 1-based POSITION
 (an integer).
 
+`[acquisition]` says how the rows were taken and stored. `row_order` is how the rows are stored: `ASCENDING` or `DESCENDING` (sorted by
+the fast knob) or `ACQUISITION` (in the order they were taken). `direction` is the order they were taken in along the fast knob:
+`ASCENDING`, `DESCENDING` or `UNORDERED`. If the deposit does not state the order the rows were written in, declare `row_order =
+ACQUISITION` and `direction = UNORDERED`; ASCENDING and DESCENDING assert a monotone sweep and S4 refuses a file that is not one. When S4
+refuses ROW_ORDER_DIFFERS, its Detail counts the curves of the refused file that are in the declared order, in the opposite order, and in
+neither order (not monotone). These are counts only, never a value. A curve in the opposite order means the other direction fits it;
+a curve in neither order means no sorted order fits, and `ACQUISITION` with `UNORDERED` is the declaration that does.
+(A LONG_TABLE with block `FAST_RESTART` needs a direction; see below.)
+
 There are two layouts in `[selection]`:
 
 - `PER_FILE`: one curve per file. `files` lists them, in curve order. An empty `files` is refused SELECTION_EMPTY at S1. `[selection.slow]` says where each curve's slow-knob value comes

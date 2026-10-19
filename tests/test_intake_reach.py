@@ -23,7 +23,9 @@ made []: the BELOW_METHOD_FLOOR plant and the FLOOR block check FAIL; k_gamma re
 too many): the FLOOR chains check FAILS; HAS_FLOOR["iid"] True: the METHOD_HAS_NO_FLOOR plant FAILS; TIERING["STATED"] REPLICATES: the
 evidence check FAILS; with_slow >= 2: the two-curve TOO_FEW_CURVES plant FAILS; n < 2: the TOO_FEW_POINTS_IN_CURVE plant and totality
 FAIL; COVERED["VALIDATED_BRACKET"] True: the NO_COVERAGE_EVIDENCE plant and totality FAIL; ENDS["ARGMAX_FAST"] or PAIRS["PAIR_NEAREST_FAST"]
-made empty: that SECOND_LANE_INFEASIBLE plant FAILS (PASS)."""
+made empty: that SECOND_LANE_INFEASIBLE plant FAILS (PASS).
+Seen RED (1160 A7): intake_names.ORDER_CLASS[(False, True)] made "in neither order (not monotone)": the descending-blocks A7 check FAILS;
+intake_names.OPPOSITE["ASCENDING"] made "ASCENDING": the descending-blocks A7 check FAILS."""
 import importlib.util
 import json
 import re
@@ -315,6 +317,16 @@ with tempfile.TemporaryDirectory() as tmp:
         got = plant()
         reached |= {got}
         check(f"E2. {code}: {what}", got == code, got)
+    def s4(blocks):
+        """(1160 A7) The counts of S4 ROW_ORDER_DIFFERS's Detail on a LONG_TABLE of `blocks` declared row_order ASCENDING (or S4's mark)."""
+        ident = f"d{next(n)}"
+        got = run(T, tmp, ident, long_table(m, ident).replace("<long-test>/pf", f"<long-test>/{bank(blocks)}"))["S4"].result
+        return getattr(getattr(got, "evidence", None), "counts", got)
+    cls = lambda a, b, c: {"in the declared order": a, "in the opposite order": b, "in neither order (not monotone)": c}
+    check("E2. (1160 A7) ROW_ORDER_DIFFERS classifies the first file's curves by counts: one swapped pair in block 5 is 8 declared, 0 opposite, 1 neither",
+          s4([(h, rs[:3] + [rs[4], rs[3]] + rs[5:]) if i == 4 else (h, rs) for i, (h, rs) in enumerate(curves)]) == {"curves": 1, **cls(8, 0, 1)}, "")
+    check("E2. (1160 A7) every block written in descending T, declared ASCENDING: 0 declared, 9 opposite, 0 neither (a count, no value)",
+          s4([(h, rs[::-1]) for h, rs in curves]) == {"curves": 9, **cls(0, 9, 0)}, str(s4([(h, rs[::-1]) for h, rs in curves])))
     none = slow_label("pf", "NONE")
     check("E2. (1160 P1) slow source NONE reaches the census with curves_with_slow = 0, every curve formed",
           (getattr(none, "with_slow", None), getattr(none, "curves", None)) == (0, len(m["files"])), str(none))
