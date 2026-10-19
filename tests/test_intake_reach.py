@@ -106,6 +106,10 @@ with tempfile.TemporaryDirectory() as tmp:
         between(tmp / "declarations" / ident, banks / name, text)
         return first(run(T, tmp, ident, text))
 
+    def grow(text, name):
+        """(1160 P1) One more entry `name` in files and one more LISTED value, so S1 still passes."""
+        return text.replace("files = [", f'files = ["{name}", ', 1).replace("values = [", 'values = ["9.5", ', 1)
+
     def convert(text, root):
         """(1160 P1) The declaration with [source] kind CONVERTED, its root `root`, converted_from the deposit."""
         return re.sub(r'root = "[^"]*"', f'root = "{root}"', text.replace('kind = "DEPOSIT"', 'kind = "CONVERTED"\nconverted_from = "<cc-datasets>/pf/raw"', 1), count=1)
@@ -117,9 +121,9 @@ with tempfile.TemporaryDirectory() as tmp:
         got = outcome(run(T, tmp, ident, restate(per_file(m, ident).replace("<long-test>/pf", f"<long-test>/{name}"))), "S5")
         return getattr(got[1], "label", got[0])
 
-    def mint(universe, times=1):
+    def mint(universe, times=1, edit=lambda t: t):
         ident = f"d{next(n)}"
-        text = per_file(m, ident)
+        text = edit(per_file(m, ident))
         d = tmp / "declarations" / ident
         d.mkdir(parents=True)
         (d / "intake.toml").write_text(text)
@@ -173,6 +177,13 @@ with tempfile.TemporaryDirectory() as tmp:
         ("ALREADY_SEALED", "a second seal", lambda: mint(banks / "pf", 2)),
         ("UNIVERSE_ROOT_ABSENT", "a universe that is no directory", lambda: mint(tmp / "nowhere")),
         ("SELECTION_OUTSIDE_UNIVERSE", "an empty universe", lambda: mint([p for p in [tmp / "empty"] if p.mkdir() is None][0])),
+        ("SELECTION_OUTSIDE_UNIVERSE", "(1160) a files entry the universe does not hold", lambda: mint(banks / "pf", edit=lambda t: grow(t, "curve_999.csv"))),
+        ("SELECTION_DUPLICATE", "(1160) a file named twice in files", lambda: mint(banks / "pf", edit=lambda t: grow(t, m["files"][2]["name"]))),
+        ("UNIVERSE_NOT_PARTITIONED", "(1160) a universe file in no part", lambda: mint(banks / copy(lambda b: (b / "notes.txt").write_text("planted\n")))),
+        ("UNIVERSE_NOT_PARTITIONED", "(1160) a file both selected and excluded", lambda: mint(banks / "pf", edit=lambda t: t.replace('why = "metadata', f'why = "x" }}, {{ file = "{m["files"][1]["name"]}", why = "metadata', 1))),
+        ("UNIVERSE_NOT_PARTITIONED", "(1160) an excluded entry with an empty why", lambda: mint(banks / "pf", edit=lambda t: re.sub(r'why = "[^"]*"', 'why = ""', t, count=1))),
+        ("UNIVERSE_NOT_PARTITIONED", "(1160) an excluded file the universe does not hold", lambda: mint(banks / "pf", edit=lambda t: t.replace('file = "MANIFEST.json"', 'file = "MANIFEST.json", why = "x" }, { file = "README.md"', 1))),
+        ("PASS", "(1160) the partition holds: files, MANIFEST.json excluded (the truth sits outside the bank)", lambda: mint(banks / copy(lambda b: None))),
         # S3 SOURCE_INTEGRITY
         ("ROOT_UNRESOLVED", "a root name ROOTS.toml does not hold", lambda: pf("pf", lambda t: t.replace("<long-test>/pf", "<no-such-root>/pf"))),
         ("PATH_NOT_ADMITTED", "a selected file deleted", lambda: pf(copy(lambda b: (b / m["files"][3]["name"]).unlink()))),

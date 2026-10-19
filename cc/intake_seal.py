@@ -12,7 +12,7 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 
-from intake_blind import Pass, Refuse, detail
+from intake_blind import Pass, Refuse, detail, gate
 
 FILES = ("intake.toml", "transducer.toml")   # the declaration: the two files its sha256 covers, in this order
 AUTHOR_KIND = {"human": "HUMAN", "ai-draft": "AI_DRAFT"}   # the --as word -> the sealed author_kind; a word outside it is a usage refusal
@@ -123,17 +123,37 @@ def selected(sel):
     return SELECTED[sel["layout"]](sel)
 
 
-def _write(d, decl, universe, who, root, tables):
-    import schema
+def parts(decl, names):
+    """The three parts the universe must be (plan 1160 P1), each a LIST of names in declared or listing order (never a set, so a name given
+    twice is counted twice): selected (the selection's files), excluded (its excluded entries' files), truth_side (the universe names with a
+    path part in [source] truth_side)."""
     src, sel = decl.data["source"], decl.data["selection"]
-    have = listing(universe, src["universe"])
-    picked = selected(sel)
-    outside = sorted(set(picked) - {n for n, _ in have})
-    return {False: lambda: Refuse("SELECTION_OUTSIDE_UNIVERSE", detail(words=outside[:3], counts={"selected files not in the universe listing": len(outside)})),
-            True: lambda: _stamp(d, decl, universe, have, who, root, tables, schema)}[not outside]()
+    return {"selected": selected(sel), "excluded": [e["file"] for e in sel["excluded"]], "truth_side": [n for n in names if set(Path(n).parts) & set(src["truth_side"])]}
 
 
-def _stamp(d, decl, universe, have, who, root, tables, schema):
+def _write(d, decl, universe, who, root, tables):
+    """SELECTION_DUPLICATE (a name twice within one part) | SELECTION_OUTSIDE_UNIVERSE (a selected name not in the listing) |
+    UNIVERSE_NOT_PARTITIONED (universe != selected + excluded + truth_side with each name in exactly one part, or an excluded entry with an
+    empty why), else the stamp. Details carry names and counts, never a byte of a file."""
+    import schema
+    have = listing(universe, decl.data["source"]["universe"])
+    names = [n for n, _ in have]
+    part = parts(decl, names)
+    every = [x for p in part.values() for x in p]
+    twice = sorted({x for p in part.values() for x in p if p.count(x) > 1})
+    outside = sorted(set(part["selected"]) - set(names))
+    split = sorted({x for x in every if every.count(x) > 1} - set(twice))   # in two parts
+    loose = sorted(set(names) - set(every)) + sorted(set(every) - set(names) - set(outside))   # in no part | a part's name not in the universe
+    whyless = [e["file"] for e in decl.data["selection"]["excluded"] if e["why"].strip() == ""]
+    broken = lambda: {"names in no part": len(set(names) - set(every)), "names in two parts": len(split), "excluded names not in the universe": len(set(every) - set(names) - set(outside)),
+                      "excluded entries with no why": len(whyless)}
+    return gate([(lambda: not twice, "SELECTION_DUPLICATE", lambda: detail(words=twice[:3], counts={"names given more than once in one part": len(twice)})),
+                 (lambda: not outside, "SELECTION_OUTSIDE_UNIVERSE", lambda: detail(words=outside[:3], counts={"selected files not in the universe listing": len(outside)})),
+                 (lambda: not (split or loose or whyless), "UNIVERSE_NOT_PARTITIONED", lambda: detail(words=(split + loose + whyless)[:3], counts=broken()))],
+                lambda: _stamp(d, decl, universe, have, who, root, tables, schema, {k: len(v) for k, v in part.items()}))
+
+
+def _stamp(d, decl, universe, have, who, root, tables, schema, counts):
     sha = declaration_sha(d)
     t = time.time_ns()
     _append(Path(d) / "seal.log", {"t_ns": t, "sha256": sha, "file": "SEAL.json"})   # the seal time IS the log time
@@ -145,7 +165,8 @@ def _stamp(d, decl, universe, have, who, root, tables, schema):
                           "tree": {True: "CLEAN", False: "UNCOMMITTED_CHANGES"}[_git(root, "status", "--porcelain", "--", "cc", "bin/cc") == ""]},
         "protocol_identity": {n: {"sha256": hashlib.sha256((Path(root) / "intake" / n).read_bytes()).hexdigest(), "version": tables[k]["version"]}
                               for n, k in (("STAGES.toml", "stages"), ("POLICY.toml", "policy"), ("FORMAT.toml", "format"))},
-        "universe": {"root": decl.data["source"]["root"], "location_name": Path(universe).resolve().name, "glob": decl.data["source"]["universe"], "listing": have},
+        "universe": {"root": decl.data["source"]["root"], "location_name": Path(universe).resolve().name, "glob": decl.data["source"]["universe"], "listing": have,
+                     "partition": counts},   # plan 1160 P1: the count of names in each part, counted as lists
         "claim": tables["stages"]["report"]["seal_claim"],
     }
     (Path(d) / "SEAL.json").write_text(json.dumps(rec, indent=1) + "\n")
@@ -153,7 +174,7 @@ def _stamp(d, decl, universe, have, who, root, tables, schema):
 
 
 def mint(declaration, d, universe, who, root, tables):
-    """bin/cc intake seal, after S0 passed: ALREADY_SEALED | UNIVERSE_ROOT_ABSENT | SELECTION_OUTSIDE_UNIVERSE, or append the seal-log line and
+    """bin/cc intake seal, after S0 passed: ALREADY_SEALED | UNIVERSE_ROOT_ABSENT | _write's rows, or append the seal-log line and
     write SEAL.json. `who` = {author, author_kind, confirmed_by}; `universe` is the directory --universe names (a str; "" when not given)."""
     return {True: lambda: Refuse("ALREADY_SEALED", detail(words=["SEAL.json exists; a seal is never replaced"])),
             False: lambda: {False: lambda: Refuse("UNIVERSE_ROOT_ABSENT", detail(words=[f"'{universe}' is not a directory on this machine"])),

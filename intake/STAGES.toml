@@ -97,7 +97,9 @@ status = [   # the seal status a run reports (intake_seal.SealStatus); never a r
 reason = [   # refusals of `bin/cc intake seal` (the seal command); a run's S2 never refuses
   { code = "ALREADY_SEALED",             live = true,  sentence = "This declaration is already sealed; a seal is never replaced, so declare a new id." },
   { code = "UNIVERSE_ROOT_ABSENT",       live = true,  sentence = "The declared source universe root was not given or is not a directory on this machine; give its location with --universe." },
+  { code = "SELECTION_DUPLICATE",        live = true,  sentence = "A file name is given more than once in `files` (or in `excluded`); each file is one curve, named once." },
   { code = "SELECTION_OUTSIDE_UNIVERSE", live = true,  sentence = "A selected file is not in the source universe listing." },
+  { code = "UNIVERSE_NOT_PARTITIONED",   live = true,  sentence = "The universe is not exactly the selected files, the excluded files and the truth side, each file in one part: a file is in none or in two, an excluded file is not in the universe, or an excluded entry has no why." },
 ]
 
 [[stage]]

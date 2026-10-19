@@ -73,6 +73,7 @@ with tempfile.TemporaryDirectory() as tmp:
         (banks / name).mkdir(parents=True)
         for i, (_, rows) in enumerate(curves):
             (banks / name / f"curve_{i:03d}.csv").write_text("T,C,sigma\n" + "".join(r + "\n" for r in rows))
+        (banks / name / "MANIFEST.json").write_text('{"planted": "test_intake_leak"}\n')   # plan 1160 P1: the file the declaration excludes (the seal partitions the universe)
         edit(banks / name)
         return name
 
@@ -156,6 +157,8 @@ with tempfile.TemporaryDirectory() as tmp:
         ("ALREADY_SEALED", "a second seal", (pf(PF), PF, (SEAL(banks / PF), SEAL(banks / PF)))),
         ("UNIVERSE_ROOT_ABSENT", "a universe that is no directory", (pf(PF), PF, (SEAL(tmp / "nowhere"),))),
         ("SELECTION_OUTSIDE_UNIVERSE", "an empty universe", (pf(PF), PF, (lambda b: (tmp / "empty").mkdir(), SEAL(tmp / "empty")))),
+        ("SELECTION_DUPLICATE", "(1160) a file named twice in files", (pf(PF, lambda t: t.replace("files = [", 'files = ["curve_002.csv", ', 1).replace("values = [", f'values = ["{slow(2)}", ', 1)), PF, full(PF))),
+        ("UNIVERSE_NOT_PARTITIONED", "(1160) a universe file in no part", (pf(UP := pf_bank(lambda b: (b / "notes.txt").write_text("planted\n"))), UP, full(UP))),
         # S3 SOURCE_INTEGRITY
         ("ROOT_UNRESOLVED", "a root name ROOTS.toml does not hold", (pf(PF, lambda t: t.replace("<leak>/", "<no-such-root>/")), PF, full(PF))),
         ("PATH_NOT_ADMITTED", "a selected file deleted (unsealed: the seal would refuse it)", (pf(pf_bank(lambda b: (b / "curve_003.csv").unlink())), PF, unsealed)),

@@ -178,6 +178,8 @@ with tempfile.TemporaryDirectory() as tmp:
     check("4. mint refuses a universe that is not a directory", intake_seal.mint(decl, d, str(Path(tmp) / "none"), who, ROOT, T).reason == "UNIVERSE_ROOT_ABSENT", "")
     minted = intake_seal.mint(decl, d, str(FIXTURE), who, ROOT, T)
     check("4. mint seals the example against the fixture (63 names, sizes 0)", isinstance(minted, blind.Pass) and len(minted.evidence.record["universe"]["listing"]) == 63, str(minted)[:300])
+    check("4. (1160 P1) the seal counts each part of the universe as a list: 61 selected, 1 excluded, 1 truth side (63 names, each once)",
+          minted.evidence.record["universe"]["partition"] == {"selected": 61, "excluded": 1, "truth_side": 1}, str(minted.evidence.record["universe"].get("partition")))
     check("4. a second mint is ALREADY_SEALED", intake_seal.mint(decl, d, str(FIXTURE), who, ROOT, T).reason == "ALREADY_SEALED", "")
     check("4. S2 after the seal passes SEALED (unconfirmed: confirmed_by is empty)", status().evidence.status is intake_seal.SealStatus.SEALED and not status().confirmed(), str(status())[:200])
     check("4. the ordering note with no logged read is NO_DATA_READ_LOGGED", intake_seal.ordering(d, T)[0] is intake_seal.Ordering.NO_DATA_READ_LOGGED, "")

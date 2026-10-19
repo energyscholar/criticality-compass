@@ -76,7 +76,9 @@ Report the seal status: whether a seal (time, author, mode, code and protocol id
 |---|---|---|
 | ALREADY_SEALED | live | This declaration is already sealed; a seal is never replaced, so declare a new id. |
 | UNIVERSE_ROOT_ABSENT | live | The declared source universe root was not given or is not a directory on this machine; give its location with --universe. |
+| SELECTION_DUPLICATE | live | A file name is given more than once in `files` (or in `excluded`); each file is one curve, named once. |
 | SELECTION_OUTSIDE_UNIVERSE | live | A selected file is not in the source universe listing. |
+| UNIVERSE_NOT_PARTITIONED | live | The universe is not exactly the selected files, the excluded files and the truth side, each file in one part: a file is in none or in two, an excluded file is not in the universe, or an excluded entry has no why. |
 
 | seal status | what it means |
 |---|---|
