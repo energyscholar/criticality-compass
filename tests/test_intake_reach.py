@@ -208,7 +208,7 @@ with tempfile.TemporaryDirectory() as tmp:
         # S0 FORMAT, on the declaration text
         ("DECLARATION_FILE_ABSENT", "(1164) a declaration directory with no intake.toml (what S0 receives: intake.declared)", lambda: s0(intake.declared(tmp / "nowhere"))),
         ("TOML_INVALID", "not TOML", lambda: s0(base + "\n[[[")),
-        ("SCHEMA_UNSUPPORTED", "schema = 3, the format before 1160 A17 (was schema = 4 over a schema-3 format)", lambda: s0(base.replace("schema = 4", "schema = 3", 1))),
+        ("SCHEMA_UNSUPPORTED", "schema = 4, the format before 1160 A35 (1160 A35: was schema = 3, the format before A17; 1160 A17: was schema = 4 over a schema-3 format)", lambda: s0(base.replace("schema = 5", "schema = 4", 1))),
         ("COMMENT_PREFIX_EMPTY", "(1160) comment = [\"\"] on table-curve-v1", lambda: s0(long_table(m, "s0").replace('comment = ["#"]', 'comment = [""]', 1))),
         ("ROOT_NOT_UNDER_CC_BANKS", "(1160) a CONVERTED source whose root is the deposit's", lambda: s0(convert(base, "<long-test>/pf"))),
         ("FIELD_MISSING", "[knobs.fast] deleted", lambda: s0(re.sub(r"(?s)\[knobs\.fast\].*?(?=\[measured\])", "", base))),

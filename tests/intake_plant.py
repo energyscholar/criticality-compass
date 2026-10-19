@@ -76,6 +76,7 @@ CHOICE_PLANTS = [   # (1160 P4) one plant per live S1 CHOICES row, and the PASS 
     ("METHOD_NEEDS_UNCERTAINTY_COLUMN", "interval STATED, and [measured.uncertainty] kind NONE", lambda t: NO_SIGMA(t)),
     ("MEASURED_KNOB_HAS_NO_POINTS", "(1160 A17, T17.2) control MEASURED with identity SAME_FAST_VALUE", lambda t: MEASURED(SAME_FAST(t))),
     ("MEASURED_KNOB_HAS_NO_POINTS", "(1160 A17, T17.2) control MEASURED with interval iid", lambda t: MEASURED(IID(t))),
+    ("SLOW_KNOB_HAS_NO_METRIC", "(1160 A35) [knobs.slow] kind ORDINAL: the slow knob an index, not a quantity", lambda t: ORDINAL(t)),
     ("PASS", "interval STATED with the sigma column (per_file's default since 1160 P5)", lambda t: t.replace(IV, 'method = "STATED"', 1)),
     ("PASS", "interval NONE (no interval; the file's sigma column is still declared, S4 reads every column)", lambda t: t.replace(IV, 'method = "NONE"', 1)),
     ("PASS", "origin EXPERIMENT with two lanes that differ (ALTERNATIVE: C to T_star by ARGMAX_FAST, chained)",
@@ -85,6 +86,7 @@ CHOICE_PLANTS = [   # (1160 P4) one plant per live S1 CHOICES row, and the PASS 
 # (1160 P5) the S7, S8, S9 edits of a per_file or long_table declaration text, shared by tests/test_intake_reach.py and tests/test_intake_leak.py
 BLOCK = lambda mb: lambda t: t.replace(IV, f'method = "block"\nresamples = 1000\nlevel = 0.95\nseed = 1160\nb = 1\nmin_blocks = {mb}', 1)   # n // 1 >= mb per point
 BLOCK_NO_FLOOR = lambda t: BLOCK(2)(t).replace("\nmin_blocks = 2", "", 1)   # (1160 A4) a block interval without min_blocks: S0 FIELD_MISSING
+ORDINAL = lambda t: re.sub(r'(\[knobs\.slow\][^\[]*?\nkind = )"QUANTITY"', r'\1"ORDINAL"', t, count=1)   # (1160 A35) the slow knob declared ORDINAL
 IID = lambda t: t.replace(IV, 'method = "iid"\nresamples = 1000\nlevel = 0.95\nseed = 1160\ntau_declared = 1', 1)
 SAME_FAST = lambda t: t.replace('identity = "NONE"', 'identity = "SAME_FAST_VALUE"', 1)
 MEASURED = lambda t: t.replace('control = "SET"', 'control = "MEASURED"', 1)   # (1160 A17) [knobs.fast] control MEASURED: every row a point

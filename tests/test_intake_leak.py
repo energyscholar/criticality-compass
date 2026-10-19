@@ -247,7 +247,7 @@ with tempfile.TemporaryDirectory() as tmp:
         ("DECLARATION_FILE_ABSENT", "(1164) the declaration's intake.toml deleted before lint and run (the directory stays)",
          (lambda ident: GONE, PF, (lambda b: [f.unlink() for f in (w / "declarations").glob("*/intake.toml") if f.read_text() == GONE], ("lint",), ("run",)))),
         ("TOML_INVALID", "not TOML", S0(lambda t: t + "\n[[[")),
-        ("SCHEMA_UNSUPPORTED", "schema = 3, the format before 1160 A17 (was schema = 4 over a schema-3 format)", S0(lambda t: t.replace("schema = 4", "schema = 3", 1))),
+        ("SCHEMA_UNSUPPORTED", "schema = 4, the format before 1160 A35 (1160 A35: was schema = 3, the format before A17; 1160 A17: was schema = 4 over a schema-3 format)", S0(lambda t: t.replace("schema = 5", "schema = 4", 1))),
         ("COMMENT_PREFIX_EMPTY", "(1160) comment = [\"\"] on table-curve-v1", (lt(LT, lambda t: t.replace('comment = ["#"]', 'comment = [""]', 1)), LT, full(LT))),
         ("ROOT_NOT_UNDER_CC_BANKS", "(1160) a CONVERTED source whose root is the deposit's", S0(lambda t: convert(t, f"<leak>/{PF}"))),
         # S1 CHOICES

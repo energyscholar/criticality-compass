@@ -22,6 +22,7 @@ DIRECTED = {   # [selection] layout -> does the curve rule of the declaration ha
 SLOW_PATH = {   # (plan 1160 A24) [selection.slow] source -> can a curve carry a slow value (S8 counts curves_with_slow); total over FORMAT's sources (test)
     "LISTED": True, "FILE_KEY": True, "COLUMN": True, "NONE": False,   # NONE: curves_with_slow = 0 under every layout, so S8 refuses TOO_FEW_CURVES
 }
+METRIC = {"QUANTITY": True, "ORDINAL": False}   # (plan 1160 A35) [knobs.slow] kind -> has the slow knob a metric (a distance between two values); total over FORMAT's kinds (test)
 SELECTED = {   # [selection] layout -> how many files the declaration selects; total over FORMAT's layouts (test). Amendment A1 of plan 1160
     "PER_FILE": lambda sel: len(sel["files"]), "LONG_TABLE": lambda sel: 1,   # LONG_TABLE names its one `file`
 }
@@ -94,6 +95,7 @@ def choices(declaration, policy):
             (lambda: ONE_PER_FILE[sel["slow"]["source"]](sel), "SLOW_VALUES_NOT_ONE_PER_FILE",
              lambda: detail(counts={"files": len(sel["files"]), "slow values": len(sel["slow"]["values"])})),
             (lambda: SLOW_PATH[sel["slow"]["source"]], "SLOW_NONE_HAS_NO_PATH", lambda: detail(words=[f"layout {sel['layout']}", "slow source NONE"])),   # A24
+            (lambda: METRIC[d["knobs"]["slow"]["kind"]], "SLOW_KNOB_HAS_NO_METRIC", lambda: detail(words=[f"slow knob '{d['knobs']['slow']['name']}' kind ORDINAL"])),   # A35
             (lambda: DIRECTED[sel["layout"]](d), "BLOCK_RULE_HAS_NO_DIRECTION",   # plan 1160 P2: FAST_RESTART needs a direction
              lambda: detail(words=["block FAST_RESTART", "row_order ACQUISITION", f"direction {d['acquisition']['direction']}"])),
             (lambda: SCALAR[d["measured"]["shape"]] or not raw_bridges, "PROJECTION_REQUIRED",

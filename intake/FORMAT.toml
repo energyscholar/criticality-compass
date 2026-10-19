@@ -1,4 +1,4 @@
-# intake/FORMAT.toml - declaration format v4, schema 4 (plan 1160 A17; format v3 was schema 3) (plan 1136, amendment A2 ruling Q5; plan 1145; plan 1160 P1): the S0 FORMAT schema as DATA. S0
+# intake/FORMAT.toml - declaration format v5, schema 5 (plan 1160 A35; format v4 was schema 4, format v3 schema 3) (plan 1136, amendment A2 ruling Q5; plan 1145; plan 1160 P1): the S0 FORMAT schema as DATA. S0
 # (cc/intake_blind.py) walks this table and emits the reason codes of intake/STAGES.toml directly; it holds no per-field code. Every field is
 # required. A field that exists only for one reader, layout, kind or source is a field of that VARIANT row: never an optional field, and never
 # a field written "" or [] where it does not apply.
@@ -28,6 +28,9 @@
 # MEASURED (the knob was read, not set, as a ramp or a carried sweep reads its thermometer: every row is a point, keyed by its ordinal, and
 # S1 MEASURED_KNOB_HAS_NO_POINTS admits only replicate identity NONE with interval method STATED or NONE).
 # v10 against v9 (plan 1160 A21): [reader.format] XLSX `sheet` is a name or a 1-based position (type ref). Additive within schema 4.
+# v11 against v10 (plan 1160 A35, schema 5): [knobs.slow] states `kind`: QUANTITY (a physical quantity with a metric: a field, a temperature)
+# | ORDINAL (an index or a category: a run number, a cycle index, a sample label); S1 SLOW_KNOB_HAS_NO_METRIC refuses ORDINAL. A v4
+# declaration restated as v5 adds kind = "QUANTITY" (the v4 meaning).
 # A reader's `comment` prefixes are PREFIXES: an empty prefix marks every line a comment, so it is refused (COMMENT_PREFIX_EMPTY).
 # A field row: type = str | int | num | list | table | ref (cc/intake_blind.py TYPE); check = one of cc/intake_blind.py CHECK:
 #   TEXT      any text but the template's "TODO"
@@ -46,8 +49,8 @@
 # A key that is no field row is FIELD_IS_STAMPED when it is in `stamped`, FIELD_IS_DERIVED when in `derived`, else FIELD_UNKNOWN.
 schema = 1
 kind = "intake-format"
-version = "1160-v10"   # plan 1160 A21: [reader.format] XLSX sheet a name or a position; plan 1160 A17: [knobs.fast] control, schema 4
-header = { schema = 4, kind = "intake" }
+version = "1160-v11"   # plan 1160 A35: [knobs.slow] kind QUANTITY | ORDINAL, schema 5; plan 1160 A21: [reader.format] XLSX sheet a name or a position; plan 1160 A17: [knobs.fast] control, schema 4
+header = { schema = 5, kind = "intake" }
 stamped = ["sealed_at", "author", "author_kind", "confirmed_by", "declaration_sha256", "code_identity", "protocol_identity", "universe_listing", "sampling", "pins"]
 derived = ["correlated"]
 
@@ -161,6 +164,7 @@ check = "TABLE"
 [fields.knobs.fields.slow.fields]
 name = { type = "str", check = "TEXT" }
 unit = { type = "str", check = "TEXT" }
+kind = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { QUANTITY = "ADMIT", ORDINAL = "ADMIT" } }   # 1160 A35: ORDINAL is S1 SLOW_KNOB_HAS_NO_METRIC
 [fields.knobs.fields.fast]
 type = "table"
 check = "TABLE"

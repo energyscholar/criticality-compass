@@ -90,7 +90,7 @@ ST = T["stages"]["stage"]
 IDS = [s["id"] for s in ST]
 REASONS = {s["id"]: [r["code"] for r in s["reason"]] for s in ST}
 SEAL = T["stages"]["seal_stage"]
-EXAMPLE = ROOT / "declarations" / "dial1118-s1-v4"   # plan 1160 A17: the worked example restated in format v4 (dial1118-s1 is v1, -v2 is v2, -v3 is v3: history; was -v3)
+EXAMPLE = ROOT / "declarations" / "dial1118-s1-v5"   # plan 1160 A35: the worked example restated in format v5 (dial1118-s1 is v1, -v2 is v2, -v3 is v3, -v4 is v4: history; was -v4)
 FIXTURE = ROOT / "tests" / "planted" / "intake" / "p1118-bank-FIXTURE"
 
 # ---- 1. the stage table and the runner
@@ -150,6 +150,9 @@ check("1. (1160 P1) the PER_FILE slow sources are LISTED, FILE_KEY, NONE; SLOW a
       SLOWS["PER_FILE"] == {"LISTED", "FILE_KEY", "NONE"} and set(intake_census.SLOW) == set(intake_census.UNKEYED) == SLOWS["PER_FILE"], str(SLOWS))
 check("1. (1160 A24) SLOW_PATH (S1) is total over every slow source of every layout, and NONE alone has no path",
       set(intake_choices.SLOW_PATH) == set().union(*SLOWS.values()) and {k for k, v in intake_choices.SLOW_PATH.items() if not v} == {"NONE"}, str(intake_choices.SLOW_PATH))
+KINDS_SLOW = set(F["knobs"]["fields"]["slow"]["fields"]["kind"]["values"])   # (1160 A35) the [knobs.slow] kind alphabet
+check("1. (1160 A35) METRIC (S1 SLOW_KNOB_HAS_NO_METRIC) is total over the [knobs.slow] kinds QUANTITY and ORDINAL, and ORDINAL alone has no metric",
+      KINDS_SLOW == {"QUANTITY", "ORDINAL"} and set(intake_choices.METRIC) == KINDS_SLOW and {k for k, v in intake_choices.METRIC.items() if not v} == {"ORDINAL"}, str(intake_choices.METRIC))
 check("1. (1160 P1) ONE_PER_FILE (S1) is total over every slow source of every layout", set(intake_choices.ONE_PER_FILE) == set().union(*SLOWS.values()), str(sorted(intake_choices.ONE_PER_FILE)))
 check("1. (1160 P1) KEYS and CURVES are total over the layouts", set(intake_census.KEYS) == set(intake_census.CURVES) == set(F["selection"]["variants"]), "")
 check("1. (1160 P1) [source] admissibility is RAW | DECLARABLE | FIGURE_LEVEL | PROCESSED_UNDECLARABLE in every kind",
@@ -333,9 +336,10 @@ PLANTED = [
     ("(extra) a figure in the basis", base.replace('class = "PAPER_METHODS"', 'class = "FIGURE"'), "BASIS_NOT_METADATA"),
     ("(extra) a TODO left", base.replace('mode = "EXPLORATORY"', 'mode = "TODO"'), "VALUE_STILL_TODO"),
     ("(extra) not TOML", base + "\n[[[", "TOML_INVALID"),
-    ("(extra) another schema (5; 1160 A17: was 4, now the format)", base.replace("schema = 4", "schema = 5", 1), "SCHEMA_UNSUPPORTED"),
+    ("(extra) another schema (6; 1160 A35: was 5, now the format; 1160 A17: was 4)", base.replace("schema = 5", "schema = 6", 1), "SCHEMA_UNSUPPORTED"),
     ("(1160) a v2 declaration (format v2 is history)", (ROOT / "declarations" / "dial1118-s1-v2" / "intake.toml").read_text(), "SCHEMA_UNSUPPORTED"),
     ("(1160 A17) a v3 declaration (format v3 is history)", (ROOT / "declarations" / "dial1118-s1-v3" / "intake.toml").read_text(), "SCHEMA_UNSUPPORTED"),
+    ("(1160 A35) a v4 declaration (format v4 is history)", (ROOT / "declarations" / "dial1118-s1-v4" / "intake.toml").read_text(), "SCHEMA_UNSUPPORTED"),
     ("(1160) PATTERN is gone: a v2 pattern and index in a v3 file", base.replace("files = [", 'pattern = "S1/S1_c{index:03d}.npz"\nfiles = [', 1), "FIELD_UNKNOWN"),
     ("(1160) a LISTED value that is not a number written as text", base.replace('"-0.150"', '"minus 0.15"', 1), "FIELD_TYPE_WRONG"),
     ("(1160) a LISTED value written as a TOML number", base.replace('"-0.150"', '-0.150', 1), "FIELD_TYPE_WRONG"),

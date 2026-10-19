@@ -9,7 +9,7 @@
 # needs, and never the seal stage (test 1).
 schema = 1
 kind = "intake-stages"
-version = "1160-v9"   # plan 1160 A24: S1 SLOW_NONE_HAS_NO_PATH; plan 1160 A20: UNIVERSE_ROOT_ABSENT names the root (seal has no --universe); plan 1160 A17: S1 MEASURED_KNOB_HAS_NO_POINTS, schema 4; plan 1160 A9: S10 runs before S9 (a refused second lane never withholds the terminal); A13: conversion_read
+version = "1160-v10"   # plan 1160 A35: S1 SLOW_KNOB_HAS_NO_METRIC, schema 5; plan 1160 A24: S1 SLOW_NONE_HAS_NO_PATH; plan 1160 A20: UNIVERSE_ROOT_ABSENT names the root (seal has no --universe); plan 1160 A17: S1 MEASURED_KNOB_HAS_NO_POINTS, schema 4; plan 1160 A9: S10 runs before S9 (a refused second lane never withholds the terminal); A13: conversion_read
 seal_stage = "S2"
 
 [report]
@@ -62,8 +62,8 @@ verdict = "PRIMARY"
 reason = [
   { code = "DECLARATION_FILE_ABSENT", live = true,  sentence = "declarations/<id>/ holds no intake.toml, and a directory alone declares nothing; write the file (docs/INTAKE-QUICKSTART.md starts one with bin/cc new intake)." },
   { code = "TOML_INVALID",            live = true,  sentence = "The declaration is not valid TOML; fix the syntax at the line shown." },
-  { code = "SCHEMA_UNSUPPORTED",      live = true,  sentence = "The file does not say schema = 4 and kind = \"intake\"; this tool reads intake format v4 only (a v1, v2 or v3 declaration is history: restate it in v4 under a new id; v3 to v4 adds [knobs.fast] control = \"SET\", the v3 meaning)." },
-  { code = "FIELD_MISSING",           live = true,  sentence = "A required field is absent; every field of format v4 must be written, even when its honest value is a refusal value such as NONE_FITS." },
+  { code = "SCHEMA_UNSUPPORTED",      live = true,  sentence = "The file does not say schema = 5 and kind = \"intake\"; this tool reads intake format v5 only (a v1, v2, v3 or v4 declaration is history: restate it in v5 under a new id; v4 to v5 adds [knobs.slow] kind = \"QUANTITY\", the v4 meaning; v3 to v4 added [knobs.fast] control = \"SET\", the v3 meaning)." },
+  { code = "FIELD_MISSING",           live = true,  sentence = "A required field is absent; every field of format v5 must be written, even when its honest value is a refusal value such as NONE_FITS." },
   { code = "FIELD_UNKNOWN",           live = true,  sentence = "A field the format does not define is present; check its spelling against bin/cc intake explain." },
   { code = "FIELD_TYPE_WRONG",        live = true,  sentence = "A field holds the wrong kind of value (for example text where a list is required)." },
   { code = "VALUE_NOT_LISTED",        live = true,  sentence = "A closed-list field holds a value its list does not name; use one of the listed values." },
@@ -94,6 +94,7 @@ reason = [
   { code = "SELECTION_EMPTY",                live = true,  sentence = "The selection names no file (`files = []`); a census needs at least one curve file." },
   { code = "SLOW_VALUES_NOT_ONE_PER_FILE",   live = true,  sentence = "Slow-knob values are declared per file (LISTED), but `values` does not give exactly one value per file of `files`." },
   { code = "SLOW_NONE_HAS_NO_PATH",          live = true,  sentence = "The slow knob is declared NONE ([selection.slow] source NONE): no curve carries a slow value, so S8 would refuse TOO_FEW_CURVES and no declaration of any layout reaches S10. Declare the slow knob (LISTED, FILE_KEY or COLUMN), or report the deposit as one with no slow knob." },   # plan 1160 A24
+  { code = "SLOW_KNOB_HAS_NO_METRIC",        live = true,  sentence = "The slow knob is declared ORDINAL ([knobs.slow] kind ORDINAL): an index or a category (a run number, a cycle index, a sample label) has no metric, so no distance between two slow values, and a bracket on it would be a bracket on the order the curves were numbered in. Declare the physical quantity the curves differ by as the slow knob (QUANTITY), or report the deposit as one with no slow quantity." },   # plan 1160 A35
   { code = "BLOCK_RULE_HAS_NO_DIRECTION",    live = true,  sentence = "A LONG_TABLE declares block FAST_RESTART, but the fast knob has no declared direction (row_order ACQUISITION with direction UNORDERED), so no restart of a sweep can be seen." },
   { code = "PROJECTION_REQUIRED",            live = true,  sentence = "The raw observation is not one number per locus (a picture, positions, a series), and a bridge takes it with no projection to one number before it." },
   { code = "PROJECTION_ESTIMAND_MIXED",      live = true,  sentence = "One projection names two estimands (for example a location and a height); declare one projection per estimand." },

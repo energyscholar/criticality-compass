@@ -1,8 +1,8 @@
-# declarations/<ID>/intake.toml - written by `bin/cc new intake <ID>` from intake/TEMPLATE.intake.toml.in (intake format v4, intake/FORMAT.toml).
+# declarations/<ID>/intake.toml - written by `bin/cc new intake <ID>` from intake/TEMPLATE.intake.toml.in (intake format v5, intake/FORMAT.toml).
 # Replace every TODO. A closed field takes one of the words its comment lists; `bin/cc intake lint <id>` names each field still wrong.
 # Write only what you read from metadata (a README, a listing, a header, the reader code), never from the data values.
 # A section marked VARIANT holds exactly the fields of the value you choose for its first field: delete the lines of the other choices.
-schema = 4
+schema = 5
 kind = "intake"
 id = "<ID>"
 
@@ -56,6 +56,8 @@ values = "TODO"         # LISTED: one number per file of `files`, in that order,
 [knobs.slow]
 name = "TODO"           # the slow knob: one curve per value
 unit = "TODO"           # its unit
+kind = "QUANTITY"       # QUANTITY (a physical quantity: a field, a temperature) | ORDINAL (an index or a category: a run number, a cycle
+                        # index, a sample label; S1 refuses it, SLOW_KNOB_HAS_NO_METRIC)
 
 [knobs.fast]
 name = "TODO"           # the fast knob: the points along each curve
