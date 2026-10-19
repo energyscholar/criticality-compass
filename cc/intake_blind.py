@@ -72,7 +72,7 @@ class Declaration:
     data: dict
 
     def summary(self):
-        return f"The declaration '{self.id}' parses, and every field of format v1 is present, typed and listed (mode {self.mode})"
+        return f"The declaration '{self.id}' parses, and every field of format v2 is present, typed and listed (mode {self.mode})"
 
     def confirmed(self):
         return False
@@ -89,6 +89,7 @@ TYPE = {   # a FORMAT field's type word -> its membership test; total over the t
     "num": lambda v: isinstance(v, (int, float)) and not isinstance(v, bool),
     "list": lambda v: isinstance(v, list),
     "table": lambda v: isinstance(v, dict),
+    "ref": lambda v: isinstance(v, str) or (isinstance(v, int) and not isinstance(v, bool)),   # a column: a name, or a 1-based position
 }
 
 
@@ -113,6 +114,14 @@ def _interval(spec, v, loc, tables):
     return first + rest + unknown(v, {**rows, "method": None}, loc, tables)
 
 
+def _variant(spec, v, loc, tables):
+    """VARIANT: the `select` field first, CLOSED over the keys of `variants`; then exactly the fields of the row it names (none when it names
+    no row, so every other key is FIELD_UNKNOWN after the selector's own finding). Invariant: no field of another row is ever admitted."""
+    sel = spec["select"]
+    closed = {"type": "str", "check": "CLOSED", "admit": [], "absent": "VALUE_NOT_LISTED", "values": {k: "ADMIT" for k in spec["variants"]}}
+    return section({sel: closed, **look(spec["variants"], str(look(v, sel, "")), {})}, v, loc, tables)
+
+
 CHECK = {   # a FORMAT field's check word -> its findings for a value of the right type; total over FORMAT.toml's check words (test)
     "TEXT": lambda spec, v, loc, tables: {True: [Finding("VALUE_STILL_TODO", loc, "TODO")], False: []}[v == TODO],
     "NUMBER": lambda spec, v, loc, tables: [],   # SCALAR: a cc.toml [interval_fields] field (str, int or num), TODO refused
@@ -123,6 +132,8 @@ CHECK = {   # a FORMAT field's check word -> its findings for a value of the rig
     "TABLES": lambda spec, v, loc, tables: [f for i, x in enumerate(v) for f in {True: lambda: section(spec["fields"], x, f"{loc}[{i}]", tables),
                                                                                   False: lambda: [Finding("FIELD_TYPE_WRONG", f"{loc}[{i}]", "want a table")]}[TYPE["table"](x)]()],
     "INTERVAL": _interval,
+    "REF": lambda spec, v, loc, tables: [],   # a name or a position, typed by TYPE["ref"]; "TODO" is refused before any check (typed)
+    "VARIANT": _variant,
 }
 
 
@@ -142,7 +153,7 @@ def field(spec, d, key, loc, tables, required=True):
 def unknown(d, rows, loc, tables):
     """Keys that are no field row: STAMPED, DERIVED, or UNKNOWN, by a total lookup."""
     cls = {**{k: "FIELD_IS_STAMPED" for k in tables["format"]["stamped"]}, **{k: "FIELD_IS_DERIVED" for k in tables["format"]["derived"]}}
-    return [Finding(look(cls, k, "FIELD_UNKNOWN"), f"{loc}.{k}".lstrip("."), "not a field of format v1") for k in d if k not in rows]
+    return [Finding(look(cls, k, "FIELD_UNKNOWN"), f"{loc}.{k}".lstrip("."), "not a field of format v2") for k in d if k not in rows]
 
 
 def section(rows, d, loc, tables):

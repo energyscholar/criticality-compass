@@ -1,0 +1,22 @@
+# declarations/dial1118-s1-v2/transducer.toml - the CC transducer file of the worked example (declarations/dial1118-s1's, its id changed) (unchanged schema, checked by cc/transducer.py).
+# The update pin is sim.py at toolset commit 3a5f326 (plan 1118 T1, branch plan-1118-bank). UNCONFIRMED that the S1 bank was built from it:
+# the bank's MANIFEST.json code_sha256 was not read (plan 1136 reads no bank file). The stage plan of S3 confirms it.
+schema = 1
+kind = "transducer"
+id = "dial1118-s1-v2"
+
+[transducer]
+model = "square Ising in a field h, L = 27, periodic, 3-colour heat bath; one cooling sweep per h over 161 T in [1.5, 3.5], burn 200, 2000 measured sweeps"
+update = ["studies/DIAL1118/bank/sim.py sha256 8a88f3703f04eaffb1f6da064d26e525b218a97b0728563d93c5a2f8334bb5d1"]
+inputs = "plan 1118 phase 1 (bank), run_bank.py --system S1"
+output = "one configuration per recorded sweep; each configuration is one observation; the recorded sequence is NOT a process sequence (Phase 1 only)"
+
+[reduction]
+name = "per-locus heat capacity C = N Var(e) / T^2 over the 2000 measured sweeps, N = 729"
+keeps = "the energy fluctuation at one (h, T)"
+discards = "the sweep order and every moment of e beyond the variance"
+
+[interval]
+role = "projection C: places the reading's sign cell against its declared margin; never an operator input"
+keeps = "the position of the interval ends among the cuts -eps, 0, +eps"
+discards = "the shape of the resampled distribution"

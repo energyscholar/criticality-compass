@@ -46,7 +46,7 @@ ST = T["stages"]["stage"]
 IDS = [s["id"] for s in ST]
 REASONS = {s["id"]: [r["code"] for r in s["reason"]] for s in ST}
 SEAL = T["stages"]["seal_stage"]
-EXAMPLE = ROOT / "declarations" / "dial1118-s1"
+EXAMPLE = ROOT / "declarations" / "dial1118-s1-v2"   # plan 1145: the worked example restated in format v2 (dial1118-s1 is v1, history)
 FIXTURE = ROOT / "tests" / "planted" / "intake" / "p1118-bank-FIXTURE"
 
 # ---- 1. the stage table and the runner
@@ -80,6 +80,7 @@ def fmt_codes(rows):
     for spec in rows.values():
         out |= {v for v in spec.get("values", {}).values() if v != "ADMIT"} | ({spec["absent"]} if "absent" in spec else set())
         out |= fmt_codes(spec.get("fields", {})) | (fmt_codes({"m": spec["method"]}) if "method" in spec else set())
+        out |= {c for v in spec.get("variants", {}).values() for c in fmt_codes(v)}   # plan 1145: the fields of each VARIANT row
     return out
 
 
@@ -89,7 +90,8 @@ check("1. every reason S2 emits (intake_seal) is an S2 reason", emitted(intake_s
 
 
 def words(rows, key):
-    return {spec[key] for spec in rows.values() if key in spec} | {w for spec in rows.values() for w in words(spec.get("fields", {}), key) | words({"m": spec["method"]} if "method" in spec else {}, key)}
+    return ({spec[key] for spec in rows.values() if key in spec} | {w for spec in rows.values() for w in words(spec.get("fields", {}), key) | words({"m": spec["method"]} if "method" in spec else {}, key)}
+            | {w for spec in rows.values() for v in spec.get("variants", {}).values() for w in words(v, key)})   # plan 1145: VARIANT rows
 
 
 check("1. every check word of FORMAT.toml is a key of intake_blind.CHECK", words(T["format"]["fields"], "check") <= set(blind.CHECK), str(words(T["format"]["fields"], "check") - set(blind.CHECK)))
@@ -184,7 +186,13 @@ PLANTED = [
     ("(extra) a figure in the basis", base.replace('class = "PAPER_METHODS"', 'class = "FIGURE"'), "BASIS_NOT_METADATA"),
     ("(extra) a TODO left", base.replace('mode = "EXPLORATORY"', 'mode = "TODO"'), "VALUE_STILL_TODO"),
     ("(extra) not TOML", base + "\n[[[", "TOML_INVALID"),
-    ("(extra) another schema", base.replace("schema = 1", "schema = 2", 1), "SCHEMA_UNSUPPORTED"),
+    ("(extra) another schema", base.replace("schema = 2", "schema = 3", 1), "SCHEMA_UNSUPPORTED"),
+    ("(1145) a v1 declaration (format v1 is history)", (ROOT / "declarations" / "dial1118-s1" / "intake.toml").read_text(), "SCHEMA_UNSUPPORTED"),
+    ("(1145) a field of another VARIANT row (a table-curve-v1 field under npz-curve-v1)", base.replace('[reader]\n', '[reader]\ncomment = ["#"]\n'), "FIELD_UNKNOWN"),
+    ("(1145) a VARIANT selector naming no row (layout BY_ROW)", base.replace('layout = "PER_FILE"', 'layout = "BY_ROW"'), "VALUE_NOT_LISTED"),
+    ("(1145) a VARIANT row's field missing ([selection.slow] LISTED without per_file)", re.sub(r"(?s)per_file = \[.*?\]\n", "", base, count=1), "FIELD_MISSING"),
+    ("(1145) a column that is neither a name nor a position (a list)", base.replace('key = "T"', 'key = ["T"]', 1), "FIELD_TYPE_WRONG"),
+    ("(1145) a column that is a boolean", base.replace('key = "C"', 'key = true', 1), "FIELD_TYPE_WRONG"),
     ("(extra) an interval field of another method", base.replace("b = 100\n", "b = 100\nwindow_s = 1.0\n"), "FIELD_UNKNOWN"),
 ]
 for name, text, want in PLANTED:

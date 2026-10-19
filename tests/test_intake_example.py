@@ -1,4 +1,5 @@
-"""test_intake_example - plan 1136 phase 1, test 6: the worked example declarations/dial1118-s1 (the planted S1 bank of plan 1118, sealed
+"""test_intake_example - plan 1136 phase 1, test 6: the worked example declarations/dial1118-s1-v2 (plan 1145: dial1118-s1 restated in format
+v2; dial1118-s1 is format v1, kept as history, and refused SCHEMA_UNSUPPORTED by tests/test_intake.py test 5) (the planted S1 bank of plan 1118, sealed
 against the FIXTURE universe tests/planted/intake/p1118-bank-FIXTURE) reaches PRIMARY_INCOMPLETE, and its committed intake-report.md is the
 report a run writes now, byte for byte, listing every stub. Expected (design E11 with the A2 numbering, plus A2 Q6): PRIMARY_INCOMPLETE[S1, S3,
 S4, S5, S6, S7, S8, confirmation] (the seal is an unconfirmed AI draft), ROBUSTNESS_INCOMPLETE[S9], S10 a STUB.
@@ -22,7 +23,7 @@ def check(name, ok, why=""):
         bad.append(name)
 
 
-ID = "dial1118-s1"
+ID = "dial1118-s1-v2"
 D = ROOT / "declarations" / ID
 t, d, out = intake._go(ROOT, ID, lambda t: t["stages"]["stage"])
 p, r = intake.verdicts(t, out)

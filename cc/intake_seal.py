@@ -112,11 +112,22 @@ def listing(universe, glob):
     return sorted([q.relative_to(universe).as_posix(), q.stat().st_size] for q in Path(universe).glob(glob) if q.is_file())
 
 
+SELECTED = {   # [selection] layout -> the file names it selects, relative to the source root; total over FORMAT's layouts (plan 1145)
+    "PER_FILE": lambda sel: [sel["pattern"].format(index=i) for i in range(sel["index"]["first"], sel["index"]["last"] + 1)],
+    "LONG_TABLE": lambda sel: [sel["file"]],
+}
+
+
+def selected(sel):
+    """The selected file names of a declaration's [selection], in curve order (PER_FILE: index order; LONG_TABLE: its one file)."""
+    return SELECTED[sel["layout"]](sel)
+
+
 def _write(d, decl, universe, who, root, tables):
     import schema
     src, sel = decl.data["source"], decl.data["selection"]
     have = listing(universe, src["universe"])
-    picked = [sel["pattern"].format(index=i) for i in range(sel["index"]["first"], sel["index"]["last"] + 1)]
+    picked = selected(sel)
     outside = sorted(set(picked) - {n for n, _ in have})
     return {False: lambda: Refuse("SELECTION_OUTSIDE_UNIVERSE", f"{len(outside)} selected files are not in the universe listing, first {outside[:3]}"),
             True: lambda: _stamp(d, decl, universe, have, who, root, tables, schema)}[not outside]()

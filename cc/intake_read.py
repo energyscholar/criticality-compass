@@ -1,0 +1,215 @@
+"""intake_read - the readers of the intake: a file's bytes and the declaration to a Grid or an Unreadable (plan 1139 csv-curve-v1; plan 1145
+table-curve-v1). Invariant: a reader never opens a path (S3 SOURCE_INTEGRITY read the bytes once, through the logged loader); a value is a
+cell exactly as written (no unit conversion, no NaN, no filling, no skipped row); every way a file cannot be read is an Unreadable whose
+`reason` is a `reader_reason` code of S4 in intake/STAGES.toml, with the row and column in its detail. The one place a decode error or an
+xlsx parse error becomes a value is `_text` and `_xlsx_cells`.
+Reading, in order (table-curve-v1; csv-curve-v1 is the same reader with a fixed declaration, see CSV_CURVE):
+  1. cells: text formats are decoded as UTF-8 (a leading byte-order mark is not a cell) and split into lines; a line that starts with a
+     declared comment prefix is dropped; each other line is split into cells (COMMA and TAB as CSV fields, WHITESPACE on runs of white
+     space). XLSX: the declared sheet's rows; a row whose first cell is text starting with a comment prefix is dropped.
+  2. a row with no cell, or whose every cell is blank, is no row (a blank line holds no value);
+  3. the first `rows` rows are the header (HEADER_LINE_ABSENT when there are fewer, or the names or units line is not among them);
+  4. the width is the names line's when there is one, else the first data row's; every data row has that width (ROW_WIDTH_DIFFERS);
+  5. each declared column (a name, looked up in the names line; or a 1-based position) is resolved (COLUMN_NAME_ABSENT,
+     COLUMN_NAME_AMBIGUOUS, COLUMN_POSITION_OUT_OF_RANGE);
+  6. every cell of a declared column is a number (CELL_NOT_A_NUMBER): text that is a decimal number, or a numeric xlsx cell."""
+import csv
+import importlib.util
+import io
+import re
+from dataclasses import dataclass
+
+NUMBER = re.compile(r"[-+]?(\d+(\.\d*)?|\.\d+)([eE][-+]?\d+)?")   # a decimal number as written; "nan", "inf" and "" are not numbers
+
+
+@dataclass(frozen=True)
+class Grid:
+    """A file a reader could read. Invariant: `columns` is the column of each cell of a row (table-curve-v1: the declared column of each
+    role, in role order; csv-curve-v1: its header line); every row of `rows` holds one float per column, in file order; `units` holds the
+    (role, unit) pairs the file states (a NAMES_UNITS header), () when it states none."""
+    columns: tuple
+    units: tuple
+    rows: tuple
+    readable = True
+
+
+@dataclass(frozen=True)
+class Unreadable:
+    """A file a reader cannot read. Invariant: `reason` is a reader_reason code of S4 (intake/STAGES.toml); it holds no row, no column and no
+    unit, and `readable` is False, so S4 refuses READER_REFUSED and S5 FILE_DIFFERS_FROM_FIRST before any column is compared."""
+    reason: str
+    detail: str
+    columns = ()
+    units = ()
+    rows = ()
+    readable = False
+
+    @property
+    def why(self):
+        return f"{self.reason}: {self.detail}"
+
+
+def role_columns(d):
+    """The (role, declared column) pairs of a declaration, in role order: fast, measured, the uncertainty column when one is declared, the slow
+    column of a LONG_TABLE. Every reader's Grid holds its rows in this order (csv-curve-v1: S4 checks its header equals these columns)."""
+    unc = {"COLUMN": lambda u: (("uncertainty", u["key"]),), "NONE": lambda u: ()}[d["measured"]["uncertainty"]["kind"]](d["measured"]["uncertainty"])
+    slow = {"PER_FILE": lambda s: (), "LONG_TABLE": lambda s: (("slow", s["slow"]["key"]),)}[d["selection"]["layout"]](d["selection"])
+    return (("fast", d["knobs"]["fast"]["key"]), ("measured", d["measured"]["key"])) + unc + slow
+
+
+def first(checks, then):
+    """then() when every (holds, reason, detail) row holds, else Unreadable(reason, detail()) of the first row that does not; rows run lazily
+    and in order, so a row runs only when every row before it held (intake_data.gate, for readers)."""
+    for holds, reason, detail in checks:
+        if not holds():
+            return Unreadable(reason, detail())
+    return then()
+
+
+# ---- 1. cells
+def _text(data):
+    """(decoded, the text or the decode error): the one place a decode error becomes a value."""
+    try:
+        return True, data.decode("utf-8-sig")
+    except UnicodeDecodeError as e:
+        return False, str(e)
+
+
+SPLIT = {   # a text format -> one line to its cells; total over the text kinds of FORMAT [reader.format]
+    "COMMA": lambda ln: next(csv.reader([ln], delimiter=",")),
+    "TAB": lambda ln: next(csv.reader([ln], delimiter="\t")),
+    "WHITESPACE": lambda ln: ln.split(),
+}
+
+
+def _comment(cell, prefixes):
+    return isinstance(cell, str) and any(cell.startswith(p) for p in prefixes)
+
+
+def _text_cells(kind):
+    """A text format's cells: [(line number, cells)] of every line that is not a comment line, or Unreadable NOT_UTF8."""
+    def cells(data, spec):
+        ok, text = _text(data)
+        return {False: lambda: Unreadable("NOT_UTF8", text),
+                True: lambda: [(i, SPLIT[kind](ln)) for i, ln in enumerate(text.splitlines(), 1) if not _comment(ln, spec["comment"])]}[ok]()
+    return cells
+
+
+def _xlsx_cells(data, spec):
+    """XLSX through openpyxl (installed: the key of the XLSX table below): the declared sheet's rows, or Unreadable NOT_AN_XLSX | SHEET_ABSENT."""
+    import openpyxl
+    try:
+        book = openpyxl.load_workbook(io.BytesIO(data), read_only=True, data_only=True)
+    except Exception as e:   # openpyxl raises zipfile, KeyError, ValueError and its own errors for a file that is no workbook
+        return Unreadable("NOT_AN_XLSX", f"{type(e).__name__}: {e}")
+    sheet = spec["format"]["sheet"]
+    return {False: lambda: Unreadable("SHEET_ABSENT", f"sheet '{sheet}' (the workbook has {book.sheetnames})"),
+            True: lambda: [(i, list(r)) for i, r in enumerate(book[sheet].iter_rows(values_only=True), 1)
+                           if not (len(r) > 0 and _comment(r[0], spec["comment"]))]}[sheet in book.sheetnames]()
+
+
+XLSX = {   # is openpyxl installed -> the xlsx cell reader (plan 1145: xlsx is read with openpyxl or not at all)
+    True: _xlsx_cells,
+    False: lambda data, spec: Unreadable("XLSX_READER_ABSENT", "openpyxl is not installed on this machine, so an xlsx file cannot be read here"),
+}
+CELLS = {   # [reader.format] kind -> (bytes, the reader's declaration) -> [(row number, cells)] | Unreadable; total over FORMAT's kinds
+    "COMMA": _text_cells("COMMA"), "TAB": _text_cells("TAB"), "WHITESPACE": _text_cells("WHITESPACE"),
+    "XLSX": lambda data, spec: XLSX[importlib.util.find_spec("openpyxl") is not None](data, spec),
+}
+
+
+# ---- 2 to 6. rows, header, width, columns, numbers
+NUMERIC = {   # the exact type of a cell -> (is it a number, its value); total by `look` below: a type with no row is not a number
+    str: (lambda c: NUMBER.fullmatch(c.strip()) is not None, lambda c: float(c.strip())),
+    int: (lambda c: True, float),
+    float: (lambda c: c == c and abs(c) != float("inf"), float),
+}
+NOT_A_NUMBER = (lambda c: False, float)
+
+
+def _numeric(c):
+    return {True: lambda: NUMERIC[type(c)], False: lambda: NOT_A_NUMBER}[type(c) in NUMERIC]()
+
+
+def _blank(cell):
+    return cell is None or (isinstance(cell, str) and cell.strip() == "")
+
+
+def _name(cell):
+    return {True: lambda: cell.strip(), False: lambda: ""}[isinstance(cell, str)]()
+
+
+HEADER = {   # [reader.header] kind -> (the 1-based header lines it names: names, units); total over FORMAT's header kinds
+    "SKIP": lambda h: {},
+    "NAMES": lambda h: {"names": h["names"]},
+    "NAMES_UNITS": lambda h: {"names": h["names"], "units": h["units"]},
+}
+
+
+def _resolve(ref, names, width):
+    """A declared column to its 0-based index: a name looked up in the names line, or a 1-based position. (holds, reason, detail) rows."""
+    by = {str: lambda: [(lambda: names.count(ref) > 0, "COLUMN_NAME_ABSENT", lambda: f"column '{ref}' is not a name of the names line {names}"),
+                        (lambda: names.count(ref) < 2, "COLUMN_NAME_AMBIGUOUS", lambda: f"column '{ref}' names {names.count(ref)} columns")],
+          int: lambda: [(lambda: 1 <= ref <= width, "COLUMN_POSITION_OUT_OF_RANGE", lambda: f"column {ref}: the table has {width} columns")]}
+    return by[type(ref)]()
+
+
+def _index(ref, names):
+    return {str: lambda: names.index(ref), int: lambda: ref - 1}[type(ref)]()
+
+
+def table(cells, spec, roles):
+    """Steps 2 to 6 over [(row number, cells)]: Grid(declared columns, stated units, rows in role order) | Unreadable."""
+    rows = [(i, c) for i, c in cells if not all(_blank(x) for x in c)]
+    h, lines = spec["header"], HEADER[spec["header"]["kind"]](spec["header"])
+    head, body = rows[:h["rows"]], rows[h["rows"]:]
+    return first([(lambda: len(head) == h["rows"] and all(1 <= n <= h["rows"] for n in lines.values()), "HEADER_LINE_ABSENT",
+                   lambda: f"{len(head)} header lines of {h['rows']} declared, lines named {lines}"),
+                  (lambda: len(body) > 0, "NO_DATA_ROW", lambda: f"the file holds {len(head)} header lines and no data row")],
+                 lambda: _columns(head, body, lines, roles))
+
+
+def _columns(head, body, lines, roles):
+    named = {k: [_name(x) for x in head[n - 1][1]] for k, n in lines.items()}
+    names = {True: lambda: named["names"], False: lambda: []}["names" in named]()
+    width = {True: lambda: len(head[lines["names"] - 1][1]), False: lambda: len(body[0][1])}["names" in lines]()
+    short = [(i, len(c)) for i, c in body if len(c) != width]
+    checks = [(lambda: not short, "ROW_WIDTH_DIFFERS", lambda: f"row {short[0][0]} has {short[0][1]} cells, the table has {width}")]
+    checks += [row for _, ref in roles for row in _resolve(ref, names, width)]
+    return first(checks, lambda: _numbers(body, named, roles, names))
+
+
+def _numbers(body, named, roles, names):
+    at = [_index(ref, names) for _, ref in roles]
+    bad = [(i, ref) for i, c in body for (_, ref), k in zip(roles, at) if not _numeric(c[k])[0](c[k])]
+    units = {True: lambda: tuple((r, named["units"][k]) for (r, _), k in zip(roles, at)), False: lambda: ()}["units" in named]()
+    return first([(lambda: not bad, "CELL_NOT_A_NUMBER", lambda: f"row {bad[0][0]}, column {bad[0][1]!r}: {len(bad)} cells of declared columns are not numbers")],
+                 lambda: Grid(tuple(ref for _, ref in roles), units, tuple(tuple(_numeric(c[k])[1](c[k]) for k in at) for _, c in body)))
+
+
+def read_table(data, d):
+    """table-curve-v1: the declared format, comment prefixes, header and columns (role_columns) to a Grid | Unreadable."""
+    spec = d["reader"]
+    cells = CELLS[spec["format"]["kind"]](data, spec)
+    return {True: lambda: cells, False: lambda: table(cells, spec, role_columns(d))}[isinstance(cells, Unreadable)]()
+
+
+CSV_CURVE = {"comment": [], "format": {"kind": "COMMA"}, "header": {"kind": "NAMES", "rows": 1, "names": 1}}
+
+
+def read_csv(data, d):
+    """csv-curve-v1 (plan 1139): table-curve-v1 with a fixed declaration (comma, no comment prefix, one header line of names) whose columns are
+    the WHOLE header, in its order: its Grid's columns are the header, which S4 compares with the declared columns (COLUMNS_DIFFER)."""
+    cells = CELLS["COMMA"](data, CSV_CURVE)
+    whole = lambda: tuple(_name(x) for x in ([c for _, c in cells if c][:1] or [[]])[0])
+    return {True: lambda: cells, False: lambda: table(cells, CSV_CURVE, tuple((h, h) for h in whole()))}[isinstance(cells, Unreadable)]()
+
+
+def readers(t):
+    """The reader of each FORMAT [reader] name: csv-curve-v1 and table-curve-v1 are live; every other name reads to Unreadable
+    READER_NOT_LIVE (S4 refuses READER_NOT_LIVE first, from LIVE below). Total over FORMAT's reader names."""
+    return {**{r: (lambda data, d, r=r: Unreadable("READER_NOT_LIVE", f"reader '{r}' has no body yet")) for r in t["format"]["fields"]["reader"]["variants"]},
+            "csv-curve-v1": read_csv, "table-curve-v1": read_table}
+
+
+LIVE = ("csv-curve-v1", "table-curve-v1")

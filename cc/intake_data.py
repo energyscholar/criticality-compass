@@ -14,8 +14,10 @@ from dataclasses import dataclass
 from inspect import Parameter, Signature
 from pathlib import Path
 
+import intake_read
 import intake_seal
 from intake_blind import Declaration, Pass, Refuse
+from intake_read import NUMBER
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -29,9 +31,9 @@ class Alignment(enum.Enum):
 
 @dataclass(frozen=True)
 class File:
-    """One selected file as S3 read it. Invariant: sha256 is the sha256 of `data`, and equals the pin at its first logged loader read."""
+    """One selected file as S3 read it. Invariant: sha256 is the sha256 of `data`, and equals the pin at its first logged loader read. It holds
+    no slow value: a curve's slow value is the declaration's (PER_FILE) or a column of the file (LONG_TABLE), see CURVES."""
     name: str
-    slow: float
     sha256: str
     data: bytes
 
@@ -52,24 +54,6 @@ class Pinned:
 
 
 @dataclass(frozen=True)
-class Grid:
-    """A csv-curve-v1 file read from bytes. Invariant: `columns` is its header; every row of `rows` holds one float per column."""
-    columns: tuple
-    rows: tuple
-    readable = True
-
-
-@dataclass(frozen=True)
-class Unreadable:
-    """A file the csv-curve-v1 reader cannot read (not UTF-8, a cell that is not a number, a row of another width). Invariant: it holds no row,
-    and `readable` is False, so S4 refuses READER_REFUSED and S5 FILE_DIFFERS_FROM_FIRST before any column is compared."""
-    why: str
-    columns = ()
-    rows = ()
-    readable = False
-
-
-@dataclass(frozen=True)
 class Shaped:
     """S4 SHAPE: the first file's columns, equal to the declared ones, its rows in the declared order. Invariant: carries the Pinned."""
     pinned: Pinned
@@ -77,8 +61,8 @@ class Shaped:
 
     def summary(self):
         d = self.pinned.declaration.data
-        return (f"The first file's header is {','.join(self.columns)}, the declared columns, and its rows are stored {d['acquisition']['row_order']} "
-                f"in {d['knobs']['fast']['name']}")
+        return (f"The first file's columns are {','.join(map(str, self.columns))}, the declared columns, its stated units (if any) are the declared "
+                f"units, and its rows are stored {d['acquisition']['row_order']} in {d['knobs']['fast']['name']} within each curve")
 
     def confirmed(self):
         return False
@@ -104,7 +88,7 @@ class Census:
 
     def summary(self):
         x = self.label
-        return (f"Every file has the first file's columns; no slow value or fast value repeats. Sampling: {x.curves} curves; points per curve "
+        return (f"Every file has the first file's columns; no slow value or fast value repeats; no curve contradicts the declared direction. Sampling: {x.curves} curves; points per curve "
                 f"min {x.n_min}, median {x.n_median:g}, max {x.n_max}; {x.fast} span [{x.span[0]:g}, {x.span[1]:g}]; {x.alignment.name}")
 
     def confirmed(self):
@@ -188,12 +172,15 @@ def located(text, roots):
     return {True: lambda: str(Path(roots[m[1]]) / m[2].lstrip("/")), False: lambda: ""}[m is not None and m[1] in roots and ".." not in m[2].split("/")]()
 
 
-NUMBER = re.compile(r"[-+]?\d+(\.\d*)?([eE][-+]?\d+)?")
-SLOW = {   # [knobs.slow] source -> (resolves, value) per selected name, before any byte is read; total over FORMAT's sources
-    "PER_FILE": lambda k, names: {True: lambda: [(True, float(v)) for v in k["per_file"]], False: lambda: [(False, 0.0)] * len(names)}[len(k["per_file"]) == len(names)](),
+SLOW = {   # PER_FILE [selection.slow] source -> (resolves, value) per selected name, before any byte is read; total over FORMAT's PER_FILE sources
+    "LISTED": lambda k, names: {True: lambda: [(True, float(v)) for v in k["per_file"]], False: lambda: [(False, 0.0)] * len(names)}[len(k["per_file"]) == len(names)](),
     "PATH_PATTERN": lambda k, names: [(m is not None and NUMBER.fullmatch(m[1]) is not None, float({True: lambda: m[1], False: lambda: "0"}[m is not None and NUMBER.fullmatch(m[1]) is not None]()))
                                       for m in (re.fullmatch(k["pattern"], n) for n in names)],
     "FILE_KEY": lambda k, names: [(False, 0.0)] * len(names),   # a value inside the file cannot be resolved before the file is admitted
+}
+BEFORE_READ = {   # [selection] layout -> (resolves, value) of each selected name's slow value before any byte is read; total over FORMAT's layouts
+    "PER_FILE": lambda sel, names: SLOW[sel["slow"]["source"]](sel["slow"], names),
+    "LONG_TABLE": lambda sel, names: [(True, 0.0)] * len(names),   # the slow knob is a column, read with the file (S4, S5): nothing to resolve before
 }
 
 
@@ -209,23 +196,23 @@ def source_integrity(declaration, d, t):
     """S3 SOURCE_INTEGRITY. Invariant: ROOT_UNRESOLVED | UNIVERSE_CHANGED (names and sizes against the seal, only when a SEAL.json exists) |
     PATH_NOT_ADMITTED are decided before any byte is read; then each file is read once through the logged loader, and PIN_MISMATCH when its
     sha256 differs from the sha256 at its first logged loader read (the pin)."""
-    src, sel, k = declaration.data["source"], declaration.data["selection"], declaration.data["knobs"]["slow"]
+    src, sel = declaration.data["source"], declaration.data["selection"]
     loc, rec = located(src["root"], t["roots"]), intake_seal.record(d)
-    names = [sel["pattern"].format(index=i) for i in range(sel["index"]["first"], sel["index"]["last"] + 1)]
-    slow = SLOW[k["source"]](k, names)
+    names = intake_seal.selected(sel)
+    slow = BEFORE_READ[sel["layout"]](sel, names)
     turned = lambda: [(n, w) for n, s in zip(names, slow) for w in admit(loc, n, src["truth_side"], s)]
     return gate([(lambda: loc != "" and Path(loc).is_dir(), "ROOT_UNRESOLVED", lambda: f"root '{src['root']}' (names in intake/ROOTS.toml: {sorted(t['roots'])})"),
                  (lambda: rec == {} or intake_seal.listing(loc, src["universe"]) == rec["universe"]["listing"], "UNIVERSE_CHANGED",
                   lambda: f"{len(intake_seal.listing(loc, src['universe']))} names now, {len(rec['universe']['listing'])} sealed"),
                  (lambda: not turned(), "PATH_NOT_ADMITTED", lambda: "; ".join(f"{n}: {w}" for n, w in turned()[:3]))],
-                lambda: _read(declaration, d, loc, names, slow))
+                lambda: _read(declaration, d, loc, names))
 
 
-def _read(declaration, d, loc, names, slow):
+def _read(declaration, d, loc, names):
     """Each admitted file read once through the logged loader (the access log is declarations/<id>/access.log; the bank's parent directory is
     a declared partition too, so an in-process open of the truth side beside the bank is logged as a bypass); then each pin compared."""
     loader = _t23().Loader({loc: "universe", str(Path(loc).parent): "outside-universe"}, Path(d) / "access.log")
-    files = tuple(File(n, s[1], hashlib.sha256(b).hexdigest(), b) for n, s in zip(names, slow) for b in [loader.read(Path(loc) / n)])
+    files = tuple(File(n, hashlib.sha256(b).hexdigest(), b) for n in names for b in [loader.read(Path(loc) / n)])
     pins = {}
     for a in intake_seal.lines(Path(d) / "access.log"):
         pins.setdefault(a["path"], a["sha256"]) if a["route"] == "loader" else None
@@ -233,67 +220,91 @@ def _read(declaration, d, loc, names, slow):
     return gate([(lambda: not moved(), "PIN_MISMATCH", lambda: f"{len(moved())} files differ from their pins, first {moved()[:3]}")], lambda: Pass(Pinned(declaration, files)))
 
 
-def read_csv(data):
-    """csv-curve-v1: a header line, then rows of numbers, comma-separated. Grid | Unreadable; the one place a decode or float error becomes a value."""
-    try:
-        lines = data.decode().splitlines()
-        rows = tuple(tuple(float(x) for x in ln.split(",")) for ln in lines[1:])
-    except (UnicodeDecodeError, ValueError) as e:
-        return Unreadable(str(e))
-    head = tuple(",".join(lines[:1]).split(","))
-    return {True: lambda: Grid(head, rows), False: lambda: Unreadable(f"a row does not hold {len(head)} values")}[all(len(r) == len(head) for r in rows)]()
+def read(t, d, f):
+    """One pinned file through the declaration's reader: intake_read.Grid | intake_read.Unreadable (never an exception)."""
+    return intake_read.readers(t)[d["reader"]["name"]](f.data, d)
 
 
-def readers(t):
-    """The reader of each FORMAT [source] reader value: csv-curve-v1 is live; every other value reads to Unreadable (READER_NOT_LIVE)."""
-    return {**{r: (lambda data, r=r: Unreadable(f"READER_NOT_LIVE: reader '{r}' has no body yet")) for r in t["format"]["fields"]["source"]["fields"]["reader"]["values"]},
-            "csv-curve-v1": read_csv}
+@dataclass(frozen=True)
+class Curve:
+    """One curve of a census. Invariant: `rows` are the readable rows of one curve in file order, each in role order (fast first); `slow` is
+    its slow-knob value; `where` names the file (PER_FILE) or the file and its block of rows (LONG_TABLE)."""
+    where: str
+    slow: float
+    rows: tuple
 
 
+def _blocks(f, g):
+    """LONG_TABLE: the blocks of consecutive rows with one slow value (the last role column), in file order, each one Curve."""
+    return [Curve(f"{f.name} block {i} ({g.columns[-1]} = {h:g})", h, tuple(rows)) for i, (h, rows) in enumerate(((h, list(rs)) for h, rs in itertools.groupby(g.rows, key=lambda r: r[-1])), 1)]
+
+
+CURVES = {   # [selection] layout -> (declaration, files, their grids) -> the curves, in file order; total over FORMAT's layouts (plan 1145)
+    "PER_FILE": lambda d, files, grids: [Curve(f.name, s[1], g.rows) for f, g, s in zip(files, grids, BEFORE_READ["PER_FILE"](d["selection"], [x.name for x in files]))],
+    "LONG_TABLE": lambda d, files, grids: [c for f, g in zip(files, grids) for c in _blocks(f, g)],
+}
 ORDER = {   # [acquisition] row_order -> does a sequence of fast values hold it; total over FORMAT's row_order values
     "ASCENDING": lambda xs: all(a <= b for a, b in zip(xs, xs[1:])),
     "DESCENDING": lambda xs: all(a >= b for a, b in zip(xs, xs[1:])),
     "ACQUISITION": lambda xs: True,   # stored in acquisition order: no claim about the fast knob to check
 }
-COLUMNS = {"csv-curve-v1": lambda d: (d["knobs"]["fast"]["key"], d["measured"]["key"], "sigma")}   # the reader's declared columns (FORMAT v1 has no field for the third)
+DIRECTION = {   # (are rows stored in acquisition order, [acquisition] direction) -> does a curve's stored fast sequence hold it; total
+    **{(False, k): (lambda xs: True) for k in ("ASCENDING", "DESCENDING", "UNORDERED")},   # rows sorted: the file records no acquisition order
+    (True, "ASCENDING"): ORDER["ASCENDING"], (True, "DESCENDING"): ORDER["DESCENDING"], (True, "UNORDERED"): lambda xs: True,
+}
+UNIT = {   # a role of intake_read.role_columns -> its declared unit (the uncertainty is in the measured quantity's unit); total over the roles
+    "fast": lambda d: d["knobs"]["fast"]["unit"], "measured": lambda d: d["measured"]["unit"],
+    "uncertainty": lambda d: d["measured"]["unit"], "slow": lambda d: d["knobs"]["slow"]["unit"],
+}
 
 
 def shape(pinned, t):
-    """S4 SHAPE on the first file only. Invariant: READER_NOT_LIVE | READER_REFUSED | COLUMNS_DIFFER | ROW_ORDER_DIFFERS, in that order."""
-    d = pinned.declaration.data
-    g, live = readers(t)[d["source"]["reader"]](pinned.files[0].data), d["source"]["reader"] in COLUMNS
-    return gate([(lambda: live, "READER_NOT_LIVE", lambda: f"reader '{d['source']['reader']}'"),
-                 (lambda: g.readable, "READER_REFUSED", lambda: f"{pinned.files[0].name}: {g.why}"),
-                 (lambda: g.columns == COLUMNS[d["source"]["reader"]](d), "COLUMNS_DIFFER", lambda: f"{pinned.files[0].name} header {','.join(g.columns)}, declared {','.join(COLUMNS[d['source']['reader']](d))}"),
-                 (lambda: ORDER[d["acquisition"]["row_order"]]([r[0] for r in g.rows]), "ROW_ORDER_DIFFERS", lambda: f"{pinned.files[0].name} is not {d['acquisition']['row_order']} in {g.columns[0]}")],
+    """S4 SHAPE on the first file only. Invariant: READER_NOT_LIVE | READER_REFUSED | COLUMNS_DIFFER | UNIT_DIFFERS | ROW_ORDER_DIFFERS (within
+    each curve of the first file), in that order. The declared columns are intake_read.role_columns, in role order."""
+    d, f = pinned.declaration.data, pinned.files[0]
+    g, cols = read(t, d, f), tuple(ref for _, ref in intake_read.role_columns(d))
+    units = lambda: [(r, u, UNIT[r](d)) for r, u in g.units if u != UNIT[r](d)]
+    unordered = lambda: [c.where for c in CURVES[d["selection"]["layout"]](d, pinned.files[:1], [g]) if not ORDER[d["acquisition"]["row_order"]]([r[0] for r in c.rows])]
+    return gate([(lambda: d["reader"]["name"] in intake_read.LIVE, "READER_NOT_LIVE", lambda: f"reader '{d['reader']['name']}'"),
+                 (lambda: g.readable, "READER_REFUSED", lambda: f"{f.name}: {g.why}"),
+                 (lambda: g.columns == cols, "COLUMNS_DIFFER", lambda: f"{f.name} columns {','.join(map(str, g.columns))}, declared {','.join(map(str, cols))}"),
+                 (lambda: not units(), "UNIT_DIFFERS", lambda: "; ".join(f"{f.name} states {r} in '{u}', declared '{w}'" for r, u, w in units())),
+                 (lambda: not unordered(), "ROW_ORDER_DIFFERS", lambda: f"{unordered()[:3]} not {d['acquisition']['row_order']} in {d['knobs']['fast']['name']}")],
                 lambda: Pass(Shaped(pinned, g.columns)))
 
 
-REPLICATE = {   # [replicate] identity -> (may two curves share a slow value, can csv-curve-v1 read the identity); total over FORMAT's identities
-    "NONE": (False, True), "FILE": (True, True), "SEED": (False, False), "RUN": (False, False), "SAMPLE": (False, False),
+REPLICATE = {   # ([selection] layout, [replicate] identity) -> (may two curves share a slow value, can the reader resolve the identity); total
+    **{(lay, k): v for lay in ("PER_FILE", "LONG_TABLE") for k, v in (("NONE", (False, True)), ("SEED", (False, False)), ("RUN", (False, False)), ("SAMPLE", (False, False)))},
+    ("PER_FILE", "FILE"): (True, True),
+    ("LONG_TABLE", "FILE"): (False, False),   # one file holds every curve: the file tells no two curves apart
 }
 
 
 def census(pinned, shaped, t):
-    """S5 CENSUS over every file. Invariant: FILE_DIFFERS_FROM_FIRST | REPLICATE_KEY_UNRESOLVED | CURVE_REPEATED | FAST_VALUE_REPEATED, in that
-    order; then the sampling label (curves; points per curve min, median, max; the fast span; ALIGNED or MISALIGNED)."""
+    """S5 CENSUS over every file. Invariant: FILE_DIFFERS_FROM_FIRST | REPLICATE_KEY_UNRESOLVED | CURVE_REPEATED (a slow value on two curves:
+    two files, or two non-adjacent blocks of a LONG_TABLE) | FAST_VALUE_REPEATED | ACQUISITION_ORDER_DIFFERS, in that order; then the sampling
+    label (curves; points per curve min, median, max; the fast span; ALIGNED or MISALIGNED), the same for every layout."""
     d = pinned.declaration.data
-    grids = [readers(t)[d["source"]["reader"]](f.data) for f in pinned.files]
-    rep, hs = REPLICATE[d["replicate"]["identity"]], [f.slow for f in pinned.files]
+    grids = [read(t, d, f) for f in pinned.files]
+    rep, acq = REPLICATE[(d["selection"]["layout"], d["replicate"]["identity"])], d["acquisition"]
     other = [f.name for f, g in zip(pinned.files, grids) if g.columns != shaped.columns]
-    twice = lambda: [f.name for f, g in zip(pinned.files, grids) if len({r[0] for r in g.rows}) != len(g.rows)]
+    curves = lambda: CURVES[d["selection"]["layout"]](d, pinned.files, grids)
+    hs = lambda: [c.slow for c in curves()]
+    twice = lambda: [c.where for c in curves() if len({r[0] for r in c.rows}) != len(c.rows)]
+    against = lambda: [c.where for c in curves() if not DIRECTION[(acq["row_order"] == "ACQUISITION", acq["direction"])]([r[0] for r in c.rows])]
     return gate([(lambda: not other, "FILE_DIFFERS_FROM_FIRST", lambda: f"{len(other)} files, first {other[:3]}"),
-                 (lambda: rep[1], "REPLICATE_KEY_UNRESOLVED", lambda: f"identity {d['replicate']['identity']}: csv-curve-v1 carries no replicate key"),
-                 (lambda: rep[0] or len(set(hs)) == len(hs), "CURVE_REPEATED", lambda: f"{d['knobs']['slow']['name']} values repeated: {sorted({h for h in hs if hs.count(h) > 1})}"),
-                 (lambda: not twice(), "FAST_VALUE_REPEATED", lambda: f"{len(twice())} curves, first {twice()[:3]}")],
-                lambda: Pass(Census(pinned, label(grids, d["knobs"]["fast"]["name"]))))
+                 (lambda: rep[1], "REPLICATE_KEY_UNRESOLVED", lambda: f"identity {d['replicate']['identity']}: reader {d['reader']['name']} with layout {d['selection']['layout']} carries no replicate key"),
+                 (lambda: rep[0] or len(set(hs())) == len(hs()), "CURVE_REPEATED", lambda: f"{d['knobs']['slow']['name']} values on two curves: {sorted({h for h in hs() if hs().count(h) > 1})}"),
+                 (lambda: not twice(), "FAST_VALUE_REPEATED", lambda: f"{len(twice())} curves, first {twice()[:3]}"),
+                 (lambda: not against(), "ACQUISITION_ORDER_DIFFERS", lambda: f"{len(against())} curves stored in acquisition order are not {acq['direction']}, first {against()[:3]}")],
+                lambda: Pass(Census(pinned, label(curves(), d["knobs"]["fast"]["name"]))))
 
 
-def label(grids, fast):
-    """The sampling label of readable grids whose first column is the fast knob."""
-    ns, xs = [len(g.rows) for g in grids], [r[0] for g in grids for r in g.rows]
-    seqs = {tuple(r[0] for r in g.rows) for g in grids}
-    return Sampling(len(grids), min(ns), statistics.median(ns), max(ns), fast, (min(xs), max(xs)), {True: Alignment.ALIGNED, False: Alignment.MISALIGNED}[len(seqs) == 1])
+def label(curves, fast):
+    """The sampling label of curves whose rows hold the fast knob first."""
+    ns, xs = [len(c.rows) for c in curves], [r[0] for c in curves for r in c.rows]
+    seqs = {tuple(r[0] for r in c.rows) for c in curves}
+    return Sampling(len(curves), min(ns), statistics.median(ns), max(ns), fast, (min(xs), max(xs)), {True: Alignment.ALIGNED, False: Alignment.MISALIGNED}[len(seqs) == 1])
 
 
 def bodies(t, d):

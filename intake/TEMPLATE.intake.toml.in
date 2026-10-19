@@ -1,7 +1,8 @@
-# declarations/<ID>/intake.toml - written by `bin/cc new intake <ID>` from intake/TEMPLATE.intake.toml.in (intake format v1, intake/FORMAT.toml).
+# declarations/<ID>/intake.toml - written by `bin/cc new intake <ID>` from intake/TEMPLATE.intake.toml.in (intake format v2, intake/FORMAT.toml).
 # Replace every TODO. A closed field takes one of the words its comment lists; `bin/cc intake lint <id>` names each field still wrong.
 # Write only what you read from metadata (a README, a listing, a header, the reader code), never from the data values.
-schema = 1
+# A section marked VARIANT holds exactly the fields of the value you choose for its first field: delete the lines of the other choices.
+schema = 2
 kind = "intake"
 id = "<ID>"
 
@@ -17,33 +18,50 @@ deposit = "TODO"        # where the data came from, one line
 root = "TODO"           # <name>/<path>: a name of intake/ROOTS.toml, then the bank's directory under it
 universe = "TODO"       # a glob, relative to root, of every file the deposit holds (the seal lists their names and sizes)
 truth_side = "TODO"     # a list of file names on the truth side of a planted deposit; no stage may read them ([] for an experiment)
-reader = "TODO"         # csv-curve-v1 (live) | P1 | L5 | F1 | C1 | C4 | npz-curve-v1 (not live yet)
-layout = "TODO"         # positional | named | points | channels | keys
 
+# [reader]: VARIANT on name
+[reader]
+name = "TODO"           # csv-curve-v1 (live; no other field) | table-curve-v1 (live; the three fields below) | P1 | L5 | F1 | C1 | C4 | npz-curve-v1 (not live yet; no other field)
+comment = "TODO"        # table-curve-v1: a list of line prefixes that mark a comment line, e.g. ["#"] ([] for none)
+# [reader.format]: table-curve-v1, VARIANT on kind
+[reader.format]
+kind = "TODO"           # COMMA | TAB | WHITESPACE | XLSX (then also: sheet = "<sheet name>")
+# [reader.header]: table-curve-v1, VARIANT on kind
+[reader.header]
+kind = "TODO"           # SKIP (rows) | NAMES (rows, names) | NAMES_UNITS (rows, names, units): header line counts, after comment lines are dropped
+rows = "TODO"           # how many header lines precede the data
+names = "TODO"          # NAMES, NAMES_UNITS: the 1-based header line that holds the column names
+
+# [selection]: VARIANT on layout
 [selection]
-pattern = "TODO"        # the file name under root, with {index}, e.g. "curve_{index:03d}.csv"
-index = "TODO"          # { first = <int>, last = <int> }: the indices the pattern selects
+layout = "TODO"         # PER_FILE (one file per curve: pattern, index, excluded) | LONG_TABLE (one file holds every curve: file, excluded)
+pattern = "TODO"        # PER_FILE: the file name under root, with {index}, e.g. "curve_{index:03d}.csv"
+index = "TODO"          # PER_FILE: { first = <int>, last = <int> }: the indices the pattern selects
 excluded = "TODO"       # a list of { file = "...", why = "..." }: files in the universe that are not curves ([] when none)
+# [selection.slow]: VARIANT on source: where the slow knob's value of each curve comes from
+[selection.slow]
+source = "TODO"         # PER_FILE: LISTED (per_file) | PATH_PATTERN (pattern) | FILE_KEY (key); LONG_TABLE: COLUMN (key, a column name or position)
+per_file = "TODO"       # LISTED: one number per selected file, in index order
 
 [knobs.slow]
 name = "TODO"           # the slow knob: one curve per value
 unit = "TODO"           # its unit
-source = "TODO"         # PER_FILE (values listed below) | PATH_PATTERN (read from the file name) | FILE_KEY
-pattern = "TODO"        # PATH_PATTERN: a regular expression with one group; "" otherwise
-per_file = "TODO"       # PER_FILE: one number per selected file, in index order; [] otherwise
-key = "TODO"            # FILE_KEY: the key; "" otherwise
 
 [knobs.fast]
 name = "TODO"           # the fast knob: the points along each curve
 unit = "TODO"           # its unit
 source = "TODO"         # COLUMN | FILE_KEY
-key = "TODO"            # its column name or key
+key = "TODO"            # its column: a name ("T") or a 1-based position (1), or its key
 
 [measured]
 name = "TODO"           # the measured quantity
 unit = "TODO"           # its unit
-key = "TODO"            # its column name or key
+key = "TODO"            # its column: a name or a 1-based position, or its key
 shape = "TODO"          # SCALAR_PER_LOCUS | SERIES_PER_LOCUS | PICTURE | POSITIONS
+# [measured.uncertainty]: VARIANT on kind
+[measured.uncertainty]
+kind = "TODO"           # COLUMN (key) | NONE (no other field): the measured number's uncertainty column, if the file has one
+key = "TODO"            # COLUMN: its column, a name or a 1-based position
 
 [acquisition]
 mode = "TODO"           # how the points were taken: INDEPENDENT | SWEEP_CARRIED | RAMP_CONTINUOUS | REPEATED_FRAMES

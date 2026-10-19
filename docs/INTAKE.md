@@ -1,4 +1,4 @@
-# The intake pipeline (stage table 1139-v1, policy 1136-v1)
+# The intake pipeline (stage table 1145-v1, policy 1136-v1)
 
 Generated from intake/STAGES.toml and intake/POLICY.toml by `bin/cc intake explain` (docs/gen-intake.py); never edit it by hand.
 This is the intake's explain. `bin/cc explain <input> <point>` is a different command: it explains one point of a measured input.
@@ -33,8 +33,8 @@ The declaration parses, holds every required field with the right type, and ever
 | reason | what it means |
 |---|---|
 | TOML_INVALID | The declaration is not valid TOML; fix the syntax at the line shown. |
-| SCHEMA_UNSUPPORTED | The file does not say schema = 1 and kind = "intake"; this tool reads intake format v1 only. |
-| FIELD_MISSING | A required field is absent; every field of format v1 must be written, even when its honest value is a refusal value such as NONE_FITS. |
+| SCHEMA_UNSUPPORTED | The file does not say schema = 2 and kind = "intake"; this tool reads intake format v2 only (a v1 declaration is history: restate it in v2 under a new id). |
+| FIELD_MISSING | A required field is absent; every field of format v2 must be written, even when its honest value is a refusal value such as NONE_FITS. |
 | FIELD_UNKNOWN | A field the format does not define is present; check its spelling against bin/cc intake explain. |
 | FIELD_TYPE_WRONG | A field holds the wrong kind of value (for example text where a list is required). |
 | VALUE_NOT_LISTED | A closed-list field holds a value its list does not name; use one of the listed values. |
@@ -99,11 +99,11 @@ The first selected file has the declared columns or keys, units and axes, as its
 
 | reason | what it means |
 |---|---|
-| READER_NOT_LIVE | The declared reader has no body in the Compass yet (only csv-curve-v1 is live); the file cannot be read. |
+| READER_NOT_LIVE | The declared reader has no body in the Compass yet (csv-curve-v1 and table-curve-v1 are live); the file cannot be read. |
 | READER_REFUSED | The declared reader refused the file; its own reason is shown. |
-| COLUMNS_DIFFER | The file's columns or keys differ from the declared ones (count, names or order). |
+| COLUMNS_DIFFER | The file's columns or keys differ from the declared ones (count, names or order; the declared columns are fast, measured, the uncertainty column if declared, and the slow column of a long table). |
 | UNIT_DIFFERS | The file states a unit that differs from the declared unit. |
-| ROW_ORDER_DIFFERS | The rows are not stored in the declared order of the fast knob. |
+| ROW_ORDER_DIFFERS | The rows of a curve are not stored in the declared order of the fast knob. |
 
 ## S5 CENSUS (LIVE)
 
@@ -112,10 +112,10 @@ Every selected file matches the first, and the sampling label is recorded: curve
 | reason | what it means |
 |---|---|
 | FILE_DIFFERS_FROM_FIRST | A selected file's shape, columns or keys differ from the first file's. |
-| CURVE_REPEATED | Two files carry the same slow-knob value and are not declared replicates. |
+| CURVE_REPEATED | Two curves carry the same slow-knob value (two files; or, in a long table, two blocks that are not adjacent) and are not declared replicates. |
 | FAST_VALUE_REPEATED | A curve holds two points at the same fast-knob value and they are not declared replicates. |
 | REPLICATE_KEY_UNRESOLVED | The declared replicate identity cannot be read for a file or point. |
-| ACQUISITION_ORDER_DIFFERS | The recorded acquisition order contradicts the declared direction. |
+| ACQUISITION_ORDER_DIFFERS | A curve stored in acquisition order (row_order ACQUISITION) does not run in the declared direction along the fast knob. |
 
 ## S6 ADMISSIBILITY (STUB)
 
