@@ -36,8 +36,9 @@ What each line does:
 7. `run` runs every stage. SOURCE_INTEGRITY, SHAPE and CENSUS read the bank through the logged loader. ADMISSIBILITY then checks the
    access log: every file read has a loader line with its sha256, and no in-process read went around the loader. Then (plan 1160 P5)
    INTERVAL_FEASIBILITY checks the interval method against the readings per point, RESOLUTION_AND_IDENTIFIABILITY counts the curves and the
-   points per curve and states the bracket the census permits, and ALTERNATIVE_INTAKE checks a second lane when one is declared. HANDOFF
-   is still a STUB.
+   points per curve and states the bracket the census permits, and ALTERNATIVE_INTAKE checks a second lane when one is declared. Last,
+   (plan 1160 P6) KERNEL_HANDOFF, the terminal, brackets the maximum over the chain of curves and writes `declarations/demo1/RESULT.json`;
+   docs/INTAKE-COMPLETION.md says what its result means.
 
 ## A filled example
 
@@ -82,6 +83,11 @@ c = 0.0
 - S7 INTERVAL_FEASIBILITY, S8 RESOLUTION_AND_IDENTIFIABILITY and S9 ALTERNATIVE_INTAKE `EXECUTED, PASS`: tiering `STATED`, max_bracket
   `CANDIDATE_BRACKET`, identifiability `TRANSITION_TOPOLOGY_NOT_IDENTIFIABLE_FROM_AVAILABLE_OBSERVABLES`, and no ALTERNATIVE lane to check.
 - Seal status `SEALED`, or `UNSEALED` if you skipped the seal. If you edit the declaration after sealing, the status is `SEALED_THEN_EDITED`.
-- `PRIMARY verdict: PRIMARY_INCOMPLETE`, missing only `confirmation`: every PRIMARY stage passed, and none is confirmed. S10 HANDOFF is a STUB.
+- S10 KERNEL_HANDOFF `EXECUTED, PASS`: `Located, span ranks 4..6 (maximum at rank 5), tier RESOLVED, n_tied 1 of 9 curves`, and the
+  identifiability value. The report prints ranks only; `declarations/demo1/RESULT.json` holds the slow values of the span, and says why
+  RESOLVED here is no coverage claim (CANDIDATE_BRACKET).
+- `PRIMARY verdict: PRIMARY_INCOMPLETE`, missing only `confirmation`: every PRIMARY stage and the terminal passed, and the seal is not
+  confirmed. RESULT.json is written with `confirmation = UNCONFIRMED`. To reach `PRIMARY_READY`, a human confirms the seal: see
+  "From INCOMPLETE to READY" in docs/INTAKE-COMPLETION.md.
 
 To start again: `rm -r scratch/intake-synth/demo1 scratch/intake-synth/demo1-TRUTH declarations/demo1`.
