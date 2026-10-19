@@ -2,7 +2,7 @@
 Counts non-blank lines of every plumbing file in checks.toml, minus the verbatim copies; CAP = 5000. Tests are
 printed, never capped. Raising CAP is the Auditor's planned edit, never the Generator's.
 Plan 1145: the intake pipeline (checks.toml [roles] intake) has its own role and its own cap, INTAKE_CAP = 1200 non-blank lines
-(1145 measured 1021 at the end of phase 1); it is no longer counted in plumbing."""
+(1145 measured 1023 at the end of phase 1); it is no longer counted in plumbing."""
 import tomllib
 from pathlib import Path
 
