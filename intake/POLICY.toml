@@ -38,3 +38,4 @@ fails_when = "the ridge moves between neighbouring curves by more than the grid 
 [policy]
 real_data_lanes = 2                   # D5 / A1.11: real data are taken in through two lanes
 primary_projection = "MAX_MEASURED"   # the plan 1118 choice of REDUCE
+tier_z = 2.0                          # plan 1160 P6: the terminal's tier boundary Z (plan 1118 M: RESOLVED iff both flanking edges exceed Z sigma); its only constant

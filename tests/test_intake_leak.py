@@ -11,6 +11,10 @@
  K4. The report's census section lists the curves by ordinal and file name.
  K5. (1160 P2) A FAST_RESTART drift bank (22 sweeps, 579 rows, every slow value a distinct sentinel) forms 22 curves and its report gives
      distinct_slow_in_block max = 27, a count.
+ K7. (1160 P6) RESULT.json (the terminal's record, written when S10 passed) holds numbers ONLY in these fields: the ranks and counts
+     (schema, m, lo_rank, hi_rank, end, n_tied, n_curves), the declared Z (tier_z) and the slow values of the span (span_slow, end_slow; a
+     sentinel there is the declared slow value of a curve, as the declaration itself states it). Every other byte of RESULT.json is in K3's
+     scan; the S10 report line (the COMPLETION output: result type, ranks, tier, n_tied, n_curves, identifiability) is in intake-report.md.
  K6. (1160 P3) No byte of `bin/cc intake convert` stdout (convert and --verify), CONVERSION-MANIFEST.json, conversion-access.log, `bin/cc
      intake peek` stdout or peek.log holds a sentinel: the sentinel PER_FILE files converted as they are, and a WIDE sentinel file (its
      names line h + sentinel numeric names) peeked and converted by WIDE_TO_LONG. The copy's <cc-datasets> and <cc-banks> name <tmp>.
@@ -54,7 +58,7 @@ import intake  # noqa: E402
 import intake_blind as blind  # noqa: E402
 import intake_seal  # noqa: E402
 import intake_synth  # noqa: E402
-from intake_plant import BLOCK, BLOCK_NO_FLOOR, IID, PAIR_LANE, SAME_FAST, VALIDATED, CHOICE_PLANTS, conversion, long_table, per_file, slow_source, write_long, xlsx  # noqa: E402
+from intake_plant import ALL_ALTERNATIVE, PRIMARY_PAIR, SHIFT, BLOCK, BLOCK_NO_FLOOR, IID, PAIR_LANE, SAME_FAST, VALIDATED, CHOICE_PLANTS, conversion, long_table, per_file, slow_source, write_long, xlsx  # noqa: E402
 
 bad = []
 
@@ -142,9 +146,28 @@ with tempfile.TemporaryDirectory() as tmp:
         step = {tuple: lambda s: cli(s[0], ident, *s[1:]), types.FunctionType: lambda s: (s(banks / bank), "")[1], AtS6: lambda s: at_s6(ident, bank, s.edit)}   # total over the step kinds
         said = "".join(step[type(s)](s) for s in steps)
         wrote = "".join((d / x).read_text() for x in ("intake-report.md", "SEAL.json", "seal.log", "access.log") if (d / x).is_file())
+        wrote += {True: lambda: scrubbed(d / "RESULT.json", ident), False: lambda: ""}[(d / "RESULT.json").is_file()]()   # 1160 P6 (K7)
         m = re.search(r"REFUSE (\w+)\. [^\n]*?Detail: (?:[^;\n]*; )?(\w*)", said)
         code = {True: lambda: "PASS", False: lambda: {True: lambda: m[2], False: lambda: m[1]}[m[1] == "READER_REFUSED"]()}[m is None]()
         return code, said + wrote, ident
+
+    NUMBERS = {"schema", "m", "lo_rank", "hi_rank", "end", "n_tied", "n_curves", "tier_z", "span_slow", "end_slow"}   # (1160 P6, K7) RESULT.json's numeric fields
+    SLOW_FIELDS = {"span_slow", "end_slow"}   # the only ones that hold a data value: the declared slow values of the span
+    RESULTS, MISPLACED = {}, []
+
+    def numbers(x, key=""):
+        """Every (field, number) of a JSON value; a number inside a list belongs to the list's field."""
+        walk = {dict: lambda: [p for k, v in x.items() for p in numbers(v, k)], list: lambda: [p for v in x for p in numbers(v, key)]}
+        return walk.get(type(x), lambda: [(key, x)] * (type(x) in (int, float)))()
+
+    def scrubbed(path, ident):
+        """(1160 P6, K7) RESULT.json as K3 scans it: the text with the slow-value fields removed (their numbers are exempt, declared above);
+        a number in any field outside NUMBERS is recorded as MISPLACED."""
+        rec = json.loads(path.read_text())
+        RESULTS[ident] = path.read_text()
+        MISPLACED.extend((ident, k) for k, _ in numbers(rec) if k not in NUMBERS)
+        drop = lambda x: {dict: lambda: {k: drop(v) for k, v in x.items() if k not in SLOW_FIELDS}, list: lambda: [drop(v) for v in x]}.get(type(x), lambda: x)()
+        return json.dumps(drop(rec))
 
     def at_s6(ident, bank, edit):
         """(1160 P4) The run of an AtS6 step: intake.run's fold, with S6's body called after edit(bank dir, declaration dir)."""
@@ -296,6 +319,10 @@ with tempfile.TemporaryDirectory() as tmp:
         ("TOO_FEW_POINTS_IN_CURVE", "(1160 P5) block 4 cut to its first two rows", (lt(TP := lt_bank([(h, rs[:2] if i == 3 else rs) for i, (h, rs) in enumerate(CURVES)])), TP, full(TP))),
         ("NO_COVERAGE_EVIDENCE", "(1160 P5) [bracket] required VALIDATED_BRACKET", S0(VALIDATED)),
         ("SECOND_LANE_INFEASIBLE", "(1160 P5) PAIR_NEAREST_FAST on C: each curve's T span is disjoint from its neighbours'", S0(PAIR_LANE)),
+        # S10 KERNEL_HANDOFF (plan 1160 P6), sealed and run
+        ("NO_KERNEL_ROUTE", "(1160 P6) the PRIMARY bridge PAIR_NEAREST_FAST on raw C", S0(PRIMARY_PAIR)),
+        ("NO_KERNEL_ROUTE", "(1160 P6) no PRIMARY bridge (the projection and the bridge both ALTERNATIVE)", S0(ALL_ALTERNATIVE)),
+        ("DOOR_REFUSED", "(1160 P6) [shift] c = nan", S0(SHIFT("nan"))),
         # S4 reader reasons (table-curve-v1), each the detail of READER_REFUSED
         ("NOT_UTF8", "a byte that is not UTF-8", (lt(B1 := lt_bank(raw=f"T,C,sigma,h\n{cell(0, 0, 1)},{cell(0, 0, 2)}\xff,{cell(0, 0, 3)},{slow(0)}\n".encode("latin-1"))), B1, full(B1))),
         ("HEADER_LINE_ABSENT", "two header lines declared, one present", (lt(B2 := lt_bank(raw=b"T,C,sigma,h\n"), header=nu), B2, full(B2))),
@@ -335,6 +362,14 @@ with tempfile.TemporaryDirectory() as tmp:
     print(f"  openpyxl {'installed' if HAS_XLSX else 'NOT installed'} on this machine; NOT REACHED HERE: {NOT_HERE}")
     check("K2. the codes the plants reach are exactly the live rows (with the machine's NOT REACHED rows)", (reached - {"PASS"}) | set(NOT_HERE) == live,
           f"live, never reached: {sorted(live - reached - set(NOT_HERE))}; reached, not live: {sorted(reached - live - {'PASS'})}")
+
+    # ---- K7. (1160 P6) RESULT.json: written on the PASS runs, its numbers only in the declared fields, the slow values there the only data values
+    check("K7. RESULT.json was written on the two sentinel PASS runs (S10 passed)", len(RESULTS) >= 2, str(sorted(RESULTS)))
+    check("K7. every number of every RESULT.json is in a declared numeric field", not MISPLACED and all(numbers(json.loads(r)) for r in RESULTS.values()), str(MISPLACED[:5]))
+    check("K7. the exemption is needed and no wider: each RESULT.json's raw text holds a sentinel, and only inside span_slow or end_slow",
+          all(hit(r) and not hit(json.dumps({k: v for k, v in json.loads(r).items() if k != "results"})) for r in RESULTS.values())
+          and all({f for f in every if f in json.dumps(x)} <= {f for f in every if f in json.dumps([x.get(k) for k in SLOW_FIELDS])} for r in RESULTS.values() for x in json.loads(r)["results"]),
+          str([hit(r)[:3] for r in RESULTS.values()])[:300])
 
     # ---- K6. (1160 P3) convert, its manifest and peek print and write no sentinel
     wide = (f"h,{cell(0, 0, 1)},{cell(0, 1, 1)},{cell(0, 2, 1)}\n" + "".join(f"{slow(k)},{cell(k, 0, 2)},{cell(k, 1, 2)},{cell(k, 2, 2)}\n" for k in range(K))).encode()

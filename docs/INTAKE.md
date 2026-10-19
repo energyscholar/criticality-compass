@@ -5,9 +5,9 @@ This is the intake's explain. `bin/cc explain <input> <point>` is a different co
 
 A declaration `declarations/<id>/` (intake.toml and the CC transducer.toml) goes through the stages below in order. Each stage is LIVE (it has a body) or a STUB (it has none, so nothing was checked; a stub is never a pass). An executed stage gives PASS or REFUSE with a named reason; after a refusal every later stage is WITHHELD.
 
-- **PRIMARY** verdict, over the PRIMARY stages: PRIMARY_REFUSED_AT when one refused; else PRIMARY_INCOMPLETE when one is not executed or no seal with a non-empty confirmed_by holds the declaration now; else PRIMARY_READY.
+- **PRIMARY** verdict, over the PRIMARY stages and the HANDOFF stage (the terminal): PRIMARY_REFUSED_AT when one refused; else PRIMARY_INCOMPLETE when one is not executed or no seal with a non-empty confirmed_by holds the declaration now; else PRIMARY_READY.
 - **ROBUSTNESS** verdict, over the ROBUSTNESS stage: ROBUSTNESS_COMPLETE (it passed with two lanes declared), ROBUSTNESS_NOT_EXAMINED (it passed with one lane declared: nothing was examined), ROBUSTNESS_INCOMPLETE, ROBUSTNESS_REFUSED, or ROBUSTNESS_WITHHELD after a PRIMARY refusal.
-- The HANDOFF stage is outside both verdicts.
+- The HANDOFF stage is the terminal (docs/INTAKE-COMPLETION.md): PRIMARY_READY needs it executed, and a ROBUSTNESS refusal withholds it.
 - The ADVISORY stage (the seal) is outside every verdict. It never refuses: every report carries its seal status, SEALED, UNSEALED or SEALED_THEN_EDITED, and an ordering note.
 
 **The seal.** Sealing is recommended and not enforced. It records what you declared and when; it is an integrity practice, like a lab notebook. A seal proves INTEGRITY (the declaration's sha256) and ORDERING (the seal time against the first logged data read). It never proves ignorance: mode is the declarer's sealed statement of what they had seen.
@@ -24,7 +24,7 @@ A declaration `declarations/<id>/` (intake.toml and the CC transducer.toml) goes
 | S7 | INTERVAL_FEASIBILITY | LIVE | NONE | S5 | PRIMARY |
 | S8 | RESOLUTION_AND_IDENTIFIABILITY | LIVE | NONE | S5 | PRIMARY |
 | S9 | ALTERNATIVE_INTAKE | LIVE | ALL_FILES | S5 | ROBUSTNESS |
-| S10 | KERNEL_HANDOFF | STUB | ALL_FILES | S6, S7, S8 | HANDOFF |
+| S10 | KERNEL_HANDOFF | LIVE | ALL_FILES | S6, S7, S8 | HANDOFF |
 
 ## S0 FORMAT (LIVE)
 
@@ -178,14 +178,14 @@ The second declared lane passes the same census-level checks as the first, so th
 |---|---|---|
 | SECOND_LANE_INFEASIBLE | live | The census does not support the second lane: its projection ARGMAX_FAST finds a curve's maximum at a fast end, or its bridge PAIR_NEAREST_FAST finds a curve's anchor outside a slow neighbour's fast span. |
 
-## S10 KERNEL_HANDOFF (STUB)
+## S10 KERNEL_HANDOFF (LIVE)
 
 Mint the kernel input (NodeField and Relations) through the provenance route and the door, applying x + c only here.
 
 | reason | live | what it means |
 |---|---|---|
-| NO_KERNEL_ROUTE | NOT LIVE | A column's provenance class and evidence have no kernel route. |
-| DOOR_REFUSED | NOT LIVE | The door refused the declared relations or values (cycle, endpoint, missing provenance, a non-finite value). |
+| NO_KERNEL_ROUTE | live | The PRIMARY lane has no bridge, or a PRIMARY bridge's template has no door template in CC (PAIR_NEAREST_FAST, plan 1118's PAIR, is not yet one), so no value reaches the kernel. |
+| DOOR_REFUSED | live | The door refused a value of the kernel input: a curve's value at its maximum (after x + c) or its sigma is not finite (door.nodefield's Null). The chain relation itself cannot be refused: it is acyclic by construction. |
 
 ## Policy (POLICY, 1136-v1)
 
@@ -195,14 +195,13 @@ The plan 1118 banks were used to CHOOSE these rows; they cannot validate them (A
 - projection **MAX_MEASURED**: estimand = height of the curve's maximum measured value; measured_by = plan 1118 (REDUCE's r_k), choosing banks only; cannot = tell a critical POINT from a LINE; correct for a grid that misses the peak (the height is biased low); depends_on = where the points sit around each curve's peak; fails_when = neighbouring curves' differences are inside the noise width
 - bridge **CHAIN_SLOW**: relation = consecutive curves in slow-knob order; measured_by = plan 1118 (REDUCE path), choosing banks only; cannot = relate non-adjacent curves; depends_on = slow-knob spacing; fails_when = the maximum is at either end of the path
 - bridge **PAIR_NEAREST_FAST**: relation = per adjacent curve pair, the measured fast-knob point on the neighbour nearest to each curve's argmax (ties to the lower value); measured_by = plan 1118 (PAIR), choosing banks only; cannot = compare points at equal fast-knob values when the grids are misaligned; depends_on = per-curve grid alignment; fails_when = the ridge moves between neighbouring curves by more than the grid step
-- policy: real_data_lanes = 2; primary_projection = MAX_MEASURED
+- policy: real_data_lanes = 2; primary_projection = MAX_MEASURED; tier_z = 2.0
 
 ## Reasons no body can return yet
 
 Each row below has live = false in intake/STAGES.toml: no body returns it today (a STUB stage's rows are never live), so a run cannot show it and its absence says nothing.
 
-- S10 NO_KERNEL_ROUTE
-- S10 DOOR_REFUSED
+- none: every row is live (plan 1160 P6)
 
 ## What no stage can see
 

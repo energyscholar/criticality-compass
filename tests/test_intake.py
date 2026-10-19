@@ -19,7 +19,8 @@ Seen RED (1160 P5, A3): a LINEAGE_OFF_GRAPH row (live = false) put back in S6, o
 A3 check (no row of an implemented stage is live = false, neither deleted code is a row) FAILS.
 Seen RED (1160 P5, S7-S9): REPLICATED without NONE: the S7-tables totality check FAILS; TIERING[STATED] made REPLICATES: the same check
 FAILS (TIERING's values); COVERED without CANDIDATE_BRACKET: the COVERED/ENDS/PAIRS totality check FAILS; TOO_FEW_CURVES renamed in
-cc/intake_feasible.py: the S7-S9 codes check FAILS."""
+cc/intake_feasible.py: the S7-S9 codes check FAILS.
+Seen RED (1160 P6, S10): see the P6 lines of $S/p6-seenred.txt (the terminal tables' totality, its codes, its signature, the 3-way S10 enumeration)."""
 import ast
 import dataclasses
 import enum
@@ -150,6 +151,16 @@ check("1. (1160 P5) COVERED (S8) is total over [bracket] required's values; ENDS
 FEAS = {n.value for n in ast.walk(ast.parse(Path(intake_feasible.__file__).read_text())) if isinstance(n, ast.Constant) and n.value in set(codes)}
 check("1. (1160 P5) every reason code cc/intake_feasible.py names is a row of S7, S8 or S9, and every row of S7, S8 and S9 is named there",
       FEAS == set(REASONS["S7"]) | set(REASONS["S8"]) | set(REASONS["S9"]), str(sorted(FEAS ^ (set(REASONS["S7"]) | set(REASONS["S8"]) | set(REASONS["S9"])))))
+import intake_terminal  # noqa: E402  (plan 1160 P6: S10 and the terminal)
+TIERINGS = set(intake_feasible.TIERING.values())
+check("1. (1160 P6) the terminal tables are total: ROUTE over POLICY's bridges, VALUE and LOCATE over its projections, SIGMA over (projection x tiering), "
+      "HONEST over [bracket] required's values, WRITE over the marks",
+      set(intake_terminal.ROUTE) == set(T["policy"]["bridge"]) and set(intake_terminal.VALUE) == set(intake_terminal.LOCATE) == set(T["policy"]["projection"])
+      and set(intake_terminal.SIGMA) == set(itertools.product(T["policy"]["projection"], TIERINGS)) and set(intake_terminal.HONEST) == set(intake_feasible.COVERED)
+      and set(intake_terminal.WRITE) == set(blind.Mark) and set(intake_terminal.SD) == {True, False} and set(intake_terminal.TIER) == {True, False}, "")
+check("1. (1160 P6) POLICY declares the tier boundary Z as a finite positive number", isinstance(T["policy"]["policy"].get("tier_z"), float) and 0 < T["policy"]["policy"]["tier_z"] < float("inf"), "")
+TERM = {n.value for n in ast.walk(ast.parse(Path(intake_terminal.__file__).read_text())) if isinstance(n, ast.Constant) and n.value in set(codes)}
+check("1. (1160 P6) every reason code cc/intake_terminal.py names is a row of S10, and every row of S10 is named there", TERM == set(REASONS["S10"]), str(sorted(TERM ^ set(REASONS["S10"]))))
 FM = T["format"]["fields"]
 check("1. (1160 P4) the S1 tables are total: SLOW_IDS over the slow sources, SCALAR over the shapes, LANES over the origins, NEIGHBOUR over the "
       "identities, ROUTE over the admissibility classes, HAS_COLUMN over the uncertainty kinds; SEEN (S2) over the modes",
@@ -205,11 +216,11 @@ SEAL_CHOICE = {"pass": CHOICE["pass"], "pass-confirmed": lambda *a: blind.Pass(E
 ROB = [s["id"] for s in ST if s["verdict"] == "ROBUSTNESS"][0]
 ROB_CHOICE = {**CHOICE, "pass-one-lane": lambda *a: blind.Pass(Ev(False, 1))}   # (1160 A5) the ROBUSTNESS stage passed with one lane declared
 hit_p, hit_r, stub_ready, body_on_stub, folds = set(), set(), [], [], 0
-prim = [s["id"] for s in ST if s["verdict"] == "PRIMARY"]
-axes = [{SEAL: SEAL_CHOICE, ROB: ROB_CHOICE}.get(i, CHOICE) for i in IDS[:-1]]
+prim = [s["id"] for s in ST if s["verdict"] in ("PRIMARY", "HANDOFF")]   # (1160 P6) the HANDOFF stage counts toward PRIMARY
+axes = [{SEAL: SEAL_CHOICE, ROB: ROB_CHOICE}.get(i, CHOICE) for i in IDS]   # (1160 P6) every stage, S10 among them (it was a stub: IDS[:-1])
 hit_rv, refused_missing = set(), []
 for combo in itertools.product(*[list(a) for a in axes]):
-    pick = dict(zip(IDS[:-1], combo))
+    pick = dict(zip(IDS, combo))
     rows = [{**s, "implemented": pick.get(s["id"], "stub") != "stub"} for s in ST]
     bodies = {i: {**CHOICE, **SEAL_CHOICE, **ROB_CHOICE}[c] for i, c in pick.items() if c != "stub"}
     t = {**T, "stages": {**T["stages"], "stage": rows}}
@@ -218,7 +229,7 @@ for combo in itertools.product(*[list(a) for a in axes]):
     folds += 1
     marks = {out[i].mark for i in prim}
     hit_p.add((blind.Mark.REFUSED in marks, len(intake._missing(prim, out)) > 0, out[SEAL].confirmed()))
-    hit_r.add((p.kind, out[IDS[-2]].mark))
+    hit_r.add((p.kind, out[ROB].mark))
     hit_rv.add(r.kind)
     refused_missing += [pick] * (p.kind is intake.Primary.PRIMARY_REFUSED_AT and p.missing != ())
     stub_ready += [pick] * (p.kind is intake.Primary.PRIMARY_READY and any(not s["implemented"] for s in rows if s["id"] in prim))
@@ -237,7 +248,8 @@ for sid, sig in intake_data.SIGNATURE.items():
     ann = [p.annotation for p in sig.parameters.values()]
     need = [intake_data.EVIDENCE[n] for n in next(s for s in ST if s["id"] == sid)["needs"]]
     check(f"4. {sid}'s signature takes the evidence of its needs and no seal", ann == need and not any("Seal" in a.__name__ for a in ann), f"{ann} against {need}")
-check("4. every registered data-stage body has its SIGNATURE row", all(inspect.signature(b) == intake_data.SIGNATURE[k] for k, b in intake_data.bodies(T, EXAMPLE).items()), "")
+check("4. every registered data-stage body has its SIGNATURE row (1160 P5, P6: the S7-S9 and S10 bodies too)", all(inspect.signature(b) == intake_data.SIGNATURE[k]
+      for k, b in {**intake_data.bodies(T, EXAMPLE), **intake_feasible.bodies(T, EXAMPLE), **intake_terminal.bodies(T, EXAMPLE)}.items()), "")
 with tempfile.TemporaryDirectory() as tmp:
     d = Path(tmp) / "decl"
     d.mkdir()

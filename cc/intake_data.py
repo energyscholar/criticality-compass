@@ -173,9 +173,17 @@ class SecondLane:
 
 @dataclass(frozen=True)
 class KernelInput:
-    """S10 KERNEL_HANDOFF: the kernel columns and relations. Invariant: carries the Lineage that admitted them."""
+    """S10 KERNEL_HANDOFF (plan 1160 P6, cc/intake_terminal.py): one Handoff per PRIMARY bridge (its kernel input's result). Invariant: carries
+    the Lineage that admitted them; its summary prints result types, ranks, tiers and counts (never a value) and the identifiability value."""
     lineage: Lineage
     columns: tuple
+    identifiability: str
+
+    def summary(self):
+        return "; ".join(h.words() for h in self.columns) + f". Identifiability: {self.identifiability}"
+
+    def confirmed(self):
+        return False
 
 
 def sig(**params):

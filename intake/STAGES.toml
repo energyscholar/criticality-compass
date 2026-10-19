@@ -233,9 +233,9 @@ name = "KERNEL_HANDOFF"
 purpose = "Mint the kernel input (NodeField and Relations) through the provenance route and the door, applying x + c only here."
 reads_bytes = "ALL_FILES"
 needs = ["S6", "S7", "S8"]
-implemented = false
+implemented = true   # plan 1160 P6 (cc/intake_terminal.py): every row live; the terminal is plan 1118's REDUCE as A over the declared chain (docs/INTAKE-COMPLETION.md)
 verdict = "HANDOFF"
 reason = [
-  { code = "NO_KERNEL_ROUTE", live = false, sentence = "A column's provenance class and evidence have no kernel route." },
-  { code = "DOOR_REFUSED",    live = false, sentence = "The door refused the declared relations or values (cycle, endpoint, missing provenance, a non-finite value)." },
+  { code = "NO_KERNEL_ROUTE", live = true, sentence = "The PRIMARY lane has no bridge, or a PRIMARY bridge's template has no door template in CC (PAIR_NEAREST_FAST, plan 1118's PAIR, is not yet one), so no value reaches the kernel." },
+  { code = "DOOR_REFUSED",    live = true, sentence = "The door refused a value of the kernel input: a curve's value at its maximum (after x + c) or its sigma is not finite (door.nodefield's Null). The chain relation itself cannot be refused: it is acyclic by construction." },
 ]

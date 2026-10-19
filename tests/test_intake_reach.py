@@ -43,7 +43,7 @@ import readout  # noqa: E402
 import intake_read as rd  # noqa: E402
 import intake_seal  # noqa: E402
 import intake_synth  # noqa: E402
-from intake_plant import ARGMAX_LANE, BLOCK, BLOCK_NO_FLOOR, IID, PAIR_LANE, SAME_FAST, VALIDATED, CHOICE_PLANTS, converted, key_lines, long_table, outcome, per_file, rooted, run, slow_source, write_long, xlsx  # noqa: E402
+from intake_plant import ALL_ALTERNATIVE, PRIMARY_PAIR, SHIFT, ARGMAX_LANE, BLOCK, BLOCK_NO_FLOOR, IID, PAIR_LANE, SAME_FAST, VALIDATED, CHOICE_PLANTS, converted, key_lines, long_table, outcome, per_file, rooted, run, slow_source, write_long, xlsx  # noqa: E402
 
 bad = []
 
@@ -197,6 +197,7 @@ with tempfile.TemporaryDirectory() as tmp:
     asc = lambda t: t.replace('row_order = "ASCENDING"', 'row_order = "ACQUISITION"')
     tripled = [(h, [r for r in rs for _ in range(3)]) for h, rs in curves]   # 1160 P5
     top = max(range(len(curves[2][1])), key=lambda i: float(curves[2][1][i].split(",")[1]))
+    top4 = max(range(len(curves[4][1])), key=lambda i: float(curves[4][1][i].split(",")[1]))   # 1160 P6: block 5's maximum row
     cut = [(h, rs[:top + 1] if i == 2 else rs) for i, (h, rs) in enumerate(curves)]   # 1160 P5: block 3 ends at its maximum
     moved = [(h, [",".join([str(float(r.split(",")[0]) + 1000)] + r.split(",")[1:]) for r in rs] if i == 4 else rs) for i, (h, rs) in enumerate(curves)]   # 1160 P5
     PLANTS = [
@@ -267,6 +268,13 @@ with tempfile.TemporaryDirectory() as tmp:
         ("PASS", "(1160 P5) ARGMAX_FAST on the uncut bank (every maximum interior)", lambda: lt(bank(), ARGMAX_LANE)),
         ("SECOND_LANE_INFEASIBLE", "(1160 P5) PAIR_NEAREST_FAST on C, block 5's T moved beyond every neighbour's span", lambda: lt(bank(moved), PAIR_LANE)),
         ("PASS", "(1160 P5) PAIR_NEAREST_FAST on C on the unmoved bank", lambda: lt(bank(), PAIR_LANE)),
+        # S10 KERNEL_HANDOFF (plan 1160 P6)
+        ("NO_KERNEL_ROUTE", "(1160 P6) the PRIMARY bridge PAIR_NEAREST_FAST on raw C (plan 1118's PAIR: no door template in CC)", lambda: pf("pf", PRIMARY_PAIR)),
+        ("NO_KERNEL_ROUTE", "(1160 P6) the projection and the bridge both ALTERNATIVE: no PRIMARY bridge", lambda: pf("pf", ALL_ALTERNATIVE)),
+        ("DOOR_REFUSED", "(1160 P6) [shift] c = nan: every r_k + c is not finite", lambda: pf("pf", SHIFT("nan"))),
+        ("DOOR_REFUSED", "(1160 P6) block 5's sigma cell at its maximum is '1e400' (a decimal number S4 admits; it overflows to inf)",
+         lambda: lt(bank([(h, [",".join(r.split(",")[:2] + ["1e400"]) if (i == 4 and j == top4) else r for j, r in enumerate(rs)]) for i, (h, rs) in enumerate(curves)]))),
+        ("PASS", "(1160 P6) [shift] c = -1000.5 (x + c, applied at S10 only)", lambda: pf("pf", SHIFT("-1000.5"))),
         # S4 SHAPE
         ("READER_NOT_LIVE", "reader P1", lambda: pf("pf", lambda t: t.replace('name = "csv-curve-v1"', 'name = "P1"'))),
         ("COLUMNS_DIFFER", "csv-curve-v1, the first file's header T,Q,sigma", lambda: pf(copy(lambda b: (b / m["files"][0]["name"]).write_text((b / m["files"][0]["name"]).read_text().replace("T,C,sigma", "T,Q,sigma", 1))))),
@@ -344,7 +352,7 @@ with tempfile.TemporaryDirectory() as tmp:
     dead = [f"- {s['id']} {r['code']}" for s, _, r in ROWS if not r["live"]]
     doc = (ROOT / "docs" / "INTAKE.md").read_text()
     check("E4. docs/INTAKE.md (explain) lists every row that is not live, and marks it NOT LIVE in its stage table",
-          bool(dead) and all(x in doc for x in dead) and all(f"| {r['code']} | NOT LIVE |" in doc for _, _, r in ROWS if not r["live"]), str([x for x in dead if x not in doc][:3]))
+          (bool(dead) or "- none: every row is live (plan 1160 P6)" in doc) and all(x in doc for x in dead) and all(f"| {r['code']} | NOT LIVE |" in doc for _, _, r in ROWS if not r["live"]), str([x for x in dead if x not in doc][:3]))
     rep = intake.report(rooted(T, tmp), "pf", run(T, tmp, "rep", per_file(m, "rep")), (intake_seal.Ordering.NO_DATA_READ_LOGGED, "planted"))
     check("E4. a run's report lists every row that is not live", all(x in rep for x in dead), str([x for x in dead if x not in rep][:3]))
 

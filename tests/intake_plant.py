@@ -86,6 +86,10 @@ VALIDATED = lambda t: t.replace('required = "CANDIDATE_BRACKET"', 'required = "V
 ARGMAX_LANE = lambda t: t.replace('origin = "PLANTED"', 'origin = "EXPERIMENT"', 1) + ALT.format(to="T_star", bias="ARGMAX_FAST") + ALT_BRIDGE.format(on="T_star")
 PAIR_LANE = lambda t: (t.replace('origin = "PLANTED"', 'origin = "EXPERIMENT"', 1)
                        + '\n[[bridge]]\nlane = "ALTERNATIVE"\non = "C"\ntemplate = "PAIR_NEAREST_FAST"\nbias = "PAIR_NEAREST_FAST"\n')
+PRIMARY_PAIR = lambda t: re.sub(r'(\[\[bridge\]\]\nlane = "PRIMARY"[^\n]*\non = )"[^"]*"([^\n]*\ntemplate = )"CHAIN_SLOW"([^\n]*\nbias = )"CHAIN_SLOW"',
+                                r'\1"C"\2"PAIR_NEAREST_FAST"\3"PAIR_NEAREST_FAST"', t, count=1)   # (1160 P6) the PRIMARY bridge PAIR_NEAREST_FAST on raw C: S10 NO_KERNEL_ROUTE
+ALL_ALTERNATIVE = lambda t: t.replace('lane = "PRIMARY"', 'lane = "ALTERNATIVE"')   # (1160 P6) the projection and the bridge both ALTERNATIVE: no PRIMARY bridge, S10 NO_KERNEL_ROUTE
+SHIFT = lambda c: lambda t: re.sub(r"(\[shift\][^\[]*?\nc = )[^\n#]*", lambda m: m.group(1) + c + " ", t, count=1)   # (1160 P6) [shift] c restated (nan, inf: S10 DOOR_REFUSED)
 LONG = '''# [reader]: VARIANT on name
 [reader]
 name = "table-curve-v1"

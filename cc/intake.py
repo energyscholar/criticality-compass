@@ -12,6 +12,7 @@ import intake_blind as blind
 import intake_choices
 import intake_data
 import intake_feasible
+import intake_terminal
 import intake_seal
 from intake_blind import Mark
 
@@ -156,8 +157,8 @@ class Verdict:
     at: str = ""
 
 
-def _missing(ids, out):
-    return tuple(i for i in ids if out[i].mark in (Mark.STUB, Mark.WITHHELD_INPUT_ABSENT))
+def _missing(ids, out):   # plan 1160 P6: WITHHELD_AFTER_REFUSAL too: the HANDOFF stage withheld after a ROBUSTNESS refusal was not executed
+    return tuple(i for i in ids if out[i].mark in (Mark.STUB, Mark.WITHHELD_INPUT_ABSENT, Mark.WITHHELD_AFTER_REFUSAL))
 
 
 def _refused(ids, out):   # plan 1160 P6 (E9): no Missing list on a refusal (it named the stubs before the refusing stage)
@@ -179,27 +180,27 @@ EXAMINED = {1: Robustness.ROBUSTNESS_NOT_EXAMINED, 2: Robustness.ROBUSTNESS_COMP
 ROBUSTNESS = {   # design Table 3, the reachable cells of (PRIMARY, the ROBUSTNESS stage's mark) -> (its execution -> the verdict)
     (Primary.PRIMARY_READY, Mark.STUB): lambda e: Robustness.ROBUSTNESS_INCOMPLETE,
     (Primary.PRIMARY_READY, Mark.PASSED): lambda e: EXAMINED[e.result.evidence.n_lanes],
-    (Primary.PRIMARY_READY, Mark.REFUSED): lambda e: Robustness.ROBUSTNESS_REFUSED,
     (Primary.PRIMARY_INCOMPLETE, Mark.STUB): lambda e: Robustness.ROBUSTNESS_INCOMPLETE,
     (Primary.PRIMARY_INCOMPLETE, Mark.WITHHELD_INPUT_ABSENT): lambda e: Robustness.ROBUSTNESS_INCOMPLETE,
     (Primary.PRIMARY_INCOMPLETE, Mark.PASSED): lambda e: EXAMINED[e.result.evidence.n_lanes],
     (Primary.PRIMARY_INCOMPLETE, Mark.REFUSED): lambda e: Robustness.ROBUSTNESS_REFUSED,
     (Primary.PRIMARY_REFUSED_AT, Mark.WITHHELD_AFTER_REFUSAL): lambda e: Robustness.ROBUSTNESS_WITHHELD,
+    (Primary.PRIMARY_REFUSED_AT, Mark.STUB): lambda e: Robustness.ROBUSTNESS_INCOMPLETE,   # plan 1160 P6: the HANDOFF stage, after this one, refused
+    (Primary.PRIMARY_REFUSED_AT, Mark.PASSED): lambda e: EXAMINED[e.result.evidence.n_lanes],   # plan 1160 P6: as above; this stage had run
 }
 IMPOSSIBLE = {   # the other cells of the product; the fold never produces them (tests/test_intake.py enumerates every fold of the table)
+    (Primary.PRIMARY_READY, Mark.REFUSED): "READY means the HANDOFF stage executed; it runs after the ROBUSTNESS stage, so that refusal withholds it (plan 1160 P6)",
     (Primary.PRIMARY_READY, Mark.WITHHELD_INPUT_ABSENT): "READY means every PRIMARY stage passed, and those include the stage's needs",
     (Primary.PRIMARY_READY, Mark.WITHHELD_AFTER_REFUSAL): "READY means no PRIMARY stage refused, and the stage runs right after them",
     (Primary.PRIMARY_INCOMPLETE, Mark.WITHHELD_AFTER_REFUSAL): "INCOMPLETE means no PRIMARY stage refused",
-    (Primary.PRIMARY_REFUSED_AT, Mark.STUB): "after a refusal every later stage is WITHHELD(AFTER_REFUSAL), whether or not it has a body",
-    (Primary.PRIMARY_REFUSED_AT, Mark.WITHHELD_INPUT_ABSENT): "after a refusal the upstream state is REFUSED_EARLIER, never SOME_ABSENT",
-    (Primary.PRIMARY_REFUSED_AT, Mark.PASSED): "after a refusal no body runs",
-    (Primary.PRIMARY_REFUSED_AT, Mark.REFUSED): "after a refusal no body runs",
+    (Primary.PRIMARY_REFUSED_AT, Mark.WITHHELD_INPUT_ABSENT): "after a refusal the upstream state is REFUSED_EARLIER, never SOME_ABSENT; and the HANDOFF stage's needs include this stage's, so it cannot run to refuse",
+    (Primary.PRIMARY_REFUSED_AT, Mark.REFUSED): "a refusal here withholds the HANDOFF stage, so the PRIMARY refusal is before it, and after that no body runs",
 }
 
 
 def verdicts(t, out):
     """(PRIMARY Verdict, ROBUSTNESS Verdict) of a fold over the whole table."""
-    ids = [s["id"] for s in t["stages"]["stage"] if s["verdict"] == "PRIMARY"]
+    ids = [s["id"] for s in t["stages"]["stage"] if s["verdict"] in ("PRIMARY", "HANDOFF")]   # plan 1160 P6: the HANDOFF stage (the terminal) counts toward PRIMARY
     marks = {out[i].mark for i in ids}
     p = PRIMARY[(Mark.REFUSED in marks, len(_missing(ids, out)) > 0, out[t["stages"]["seal_stage"]].confirmed())](ids, out)
     rob = [s["id"] for s in t["stages"]["stage"] if s["verdict"] == "ROBUSTNESS"][0]
@@ -231,7 +232,7 @@ def not_live(t):
     report carry: a refusal named there cannot be seen today, so its absence from a report says nothing."""
     rows = [f"- {s['id']} {r['code']}" for s in t["stages"]["stage"] for k in ("reason", "reader_reason") for r in blind.look(s, k, []) if not r["live"]]
     return ["## Reasons no body can return yet", "", "Each row below has live = false in intake/STAGES.toml: no body returns it today (a STUB stage's rows "
-            "are never live), so a run cannot show it and its absence says nothing.", ""] + rows + [""]
+            "are never live), so a run cannot show it and its absence says nothing.", ""] + (rows or ["- none: every row is live (plan 1160 P6)"]) + [""]
 
 
 def explain(t):
@@ -243,11 +244,11 @@ def explain(t):
            "A declaration `declarations/<id>/` (intake.toml and the CC transducer.toml) goes through the stages below in order. "
            "Each stage is LIVE (it has a body) or a STUB (it has none, so nothing was checked; a stub is never a pass). "
            "An executed stage gives PASS or REFUSE with a named reason; after a refusal every later stage is WITHHELD.", "",
-           "- **PRIMARY** verdict, over the PRIMARY stages: PRIMARY_REFUSED_AT when one refused; else PRIMARY_INCOMPLETE when one is not "
+           "- **PRIMARY** verdict, over the PRIMARY stages and the HANDOFF stage (the terminal): PRIMARY_REFUSED_AT when one refused; else PRIMARY_INCOMPLETE when one is not "
            "executed or no seal with a non-empty confirmed_by holds the declaration now; else PRIMARY_READY.",
            "- **ROBUSTNESS** verdict, over the ROBUSTNESS stage: ROBUSTNESS_COMPLETE (it passed with two lanes declared), ROBUSTNESS_NOT_EXAMINED "
            "(it passed with one lane declared: nothing was examined), ROBUSTNESS_INCOMPLETE, ROBUSTNESS_REFUSED, or ROBUSTNESS_WITHHELD after a PRIMARY refusal.",
-           "- The HANDOFF stage is outside both verdicts.",
+           "- The HANDOFF stage is the terminal (docs/INTAKE-COMPLETION.md): PRIMARY_READY needs it executed, and a ROBUSTNESS refusal withholds it.",
            "- The ADVISORY stage (the seal) is outside every verdict. It never refuses: every report carries its seal status, SEALED, UNSEALED or "
            "SEALED_THEN_EDITED, and an ordering note.", "",
            f"**The seal.** {st['report']['seal_claim']}", "", "| id | name | state | reads data bytes | needs | verdict |", "|---|---|---|---|---|---|"]
@@ -268,10 +269,10 @@ def explain(t):
 
 def bodies(t, d, text, findings):
     """The registered bodies of one run: S0 FORMAT, S1 CHOICES (cc/intake_choices.py, plan 1160 P4), S2 SEAL (verify, advisory), plus
-    intake_data.bodies (the data stages with a body) and intake_feasible.bodies (S7, S8, S9; plan 1160 P5). Invariant: its keys are exactly the stages whose implemented = true (tests/test_intake.py)."""
+    intake_data.bodies (the data stages with a body) and intake_feasible.bodies (S7, S8, S9; plan 1160 P5) and intake_terminal.bodies (S10, P6). Invariant: its keys are exactly the stages whose implemented = true (tests/test_intake.py)."""
     return {"S0": lambda: blind.format_stage(text, findings, t), "S1": lambda declaration: intake_choices.choices(declaration, t["policy"]),
             "S2": lambda declaration: intake_seal.verify(declaration, d, t),
-            **intake_data.bodies(t, d), **intake_feasible.bodies(t, d)}
+            **intake_data.bodies(t, d), **intake_feasible.bodies(t, d), **intake_terminal.bodies(t, d)}
 
 
 def report(t, ident, out, note):
@@ -286,7 +287,7 @@ def report(t, ident, out, note):
              f"- **Mode** (the declarer's sealed statement of what they had seen): {out['S0'].result.mode()}",
              f"- **PRIMARY verdict: {p.kind.name}**" + {True: f" at {p.at}", False: ""}[p.at != ""] + f". Missing: {words(p)}.",
              f"- **ROBUSTNESS verdict: {r.kind.name}**" + {True: f" at {r.at}", False: ""}[r.at != ""] + f". Missing: {words(r)}.",
-             f"- **{handoff} {names[handoff]}** (outside both verdicts): {out[handoff].atom.name}.",
+             f"- **{handoff} {names[handoff]}** (the terminal; it counts toward PRIMARY): {out[handoff].atom.name}.",
              "- **Seal status** (advisory; sealing is recommended and not enforced): " + {True: lambda: out[seal].result.evidence.summary(),
                                                                                            False: lambda: "not reported: " + out[seal].text(t)}[out[seal].mark is Mark.PASSED](),
              f"- **Ordering** (information, never a refusal): {note[0].name}. {note[1]}"]
@@ -365,6 +366,7 @@ def run(root, ident, args):
     t, d, out = _go(root, ident, lambda t: t["stages"]["stage"])
     text = report(t, ident, out, intake_seal.ordering(d, t))
     (d / "intake-report.md").write_text(text)
+    intake_terminal.write(root, t, d, out, verdicts(t, out)[0].kind.name)   # plan 1160 P6: RESULT.json when S10 passed, else removed
     print(text, end="")
     return {Primary.PRIMARY_READY: 0, Primary.PRIMARY_INCOMPLETE: 0, Primary.PRIMARY_REFUSED_AT: 1}[verdicts(t, out)[0].kind]
 
