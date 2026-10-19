@@ -44,7 +44,8 @@ note counts the conversion's reads (plan 1160 A13).
    never as a row. Peek decodes as the default DECODE does (utf-8-sig), so a byte-order mark is no part of the first name.
 3. You write `declarations/<id>/CONVERSION.toml`.
 4. `convert` writes the bank to `<cc-banks>/<id>/bank` (`~/scratch/cc-banks` on the data host). It never overwrites a bank: remove the
-   old one, or use a new id (BANK_EXISTS). A conversion takes seconds; one that runs for minutes is a defect, report it. A killed
+   old one, or use a new id (BANK_EXISTS). Its summary lists each output's columns as names are printed everywhere: a numeral in a
+   text name as `#`, a numeric name never (plan 1160 A31). A conversion takes seconds; one that runs for minutes is a defect, report it. A killed
    conversion writes no bank; `declarations/<id>/conversion-access.log` lists the files it had read (plan 1160 A23). It writes nothing unless the identity test passes on the exact bytes it is about to write.
 5. In the intake declaration, `[source]` says `kind = "CONVERTED"`, `converted_from = "<cc-datasets>/<name>/raw"` (the deposit you converted) and
    `root = "<cc-banks>/<id>/bank"`, and `[selection]` excludes `CONVERSION-MANIFEST.json`. At S3 the intake checks the chain from the raw
@@ -108,13 +109,18 @@ TEXT to TABLE: each line cut into cells at `from`. `COMMA`, `SEMICOLON` and `TAB
 `WHITESPACE` cuts at runs of blanks. A cell's text is never changed.
 `T⇥C` / `1.5⇥0.25` with `{op = "DELIMITER", from = "TAB"}` is written as `T,C` / `1.5,0.25`.
 `T   C` / `  1.5  0.25` / (blank) / `1.6 0.5` with `from = "WHITESPACE"` is written as `T,C` / `1.5,0.25` / `1.6,0.5` (the blank line is recorded as blank).
+`WHITESPACE` has no empty cell: a run of blanks is one separator, so an empty cell vanishes and its row comes out narrower. A row
+narrower than the names line is refused EMPTY_CELL_UNDER_WHITESPACE. If cells can be empty, declare `TAB` or `COMMA`, which keep the
+empty cell, and DROP_ROWS_NOT_NUMERIC can then drop the row (plan 1160 A32).
 
 ### SHEET_TO_CSV
 
 RAW to TABLE: the rows of one sheet of an xlsx workbook. A number cell is written as Python writes it, and an empty cell as nothing.
 A workbook with sheets `notes` and `data`, where `data` holds `T`,`C` / 1.5,0.25: `steps = [{op = "SHEET_TO_CSV", sheet = "data"}]`
 writes `T,C` / `1.5,0.25`. This needs openpyxl (without it the refusal is XLSX_READER_ABSENT; run it on the data host). If the workbook
-has no such sheet, the refusal is SHEET_ABSENT. Bytes that are no workbook are refused CONTAINER_UNREADABLE.
+has no such sheet, the refusal is SHEET_ABSENT. Bytes that are no workbook are refused CONTAINER_UNREADABLE. After SHEET_TO_CSV the file is
+already a TABLE, so DROP_LINES (a TEXT op) is STEP_OUT_OF_ORDER: write NAMES_LINE WRITE for every column and remove the label rows with
+DROP_ROWS_NOT_NUMERIC (plan 1160 S11.9 W2).
 
 ### NAMES_LINE
 
@@ -123,7 +129,8 @@ TABLE to NAMED: which row is the names line.
 - `rule = {kind = "FIRST"}`: the first row (the default).
 - `rule = {kind = "WRITE", names = ["T", "C"]}`: the file has no names line, and these names are written. `1.5,0.25` / `1.6,0.5` is
   written as `T,C` / `1.5,0.25` / `1.6,0.5`. No row is taken from the file. SELECT_COLUMNS then NAMES_LINE WRITE: every converted file
-  of one declaration must carry identical names, so write them in each file's steps (plan 1160 A26).
+  of one declaration must carry identical names, so write them in each file's steps (plan 1160 A26). Write one name per column: a
+  names list of another length than a row's cells is refused NAMES_COUNT_MISMATCH, never written as a partial header (plan 1160 A29).
 - `rule = {kind = "REPLACE_PREFIXED", prefix = "##"}`: the first row must begin with `##` (MARKER_LINE_ABSENT otherwise). It is the
   names line without the prefix: `##T,C` / `1.5,0.25` is written as `T,C` / `1.5,0.25`.
 
@@ -235,6 +242,8 @@ others are:
 | COLUMN_ABSENT | a named column is missing or ambiguous, or a row is too short for it |
 | ENCODING_INVALID | the bytes are not the declared encoding: peek's `decodes as:` line names those that decode; choose one |
 | NAMES_NOT_NUMERIC | WIDE_TO_LONG met a text name besides the key; SELECT_COLUMNS it away first |
+| NAMES_COUNT_MISMATCH | NAMES_LINE WRITE names a different number of columns than a row holds: write one name per column |
+| EMPTY_CELL_UNDER_WHITESPACE | a row is narrower than the names line under WHITESPACE: declare DELIMITER TAB or COMMA |
 | CELL_MAP_NOT_A_PERMUTATION, IDENTITY_FAILED | the steps would lose, repeat, reorder or change a cell; this is the rule at the top |
 | CONVERSION_CHAIN_BROKEN | the raw files or the bank changed after the conversion; convert again under a new id |
 

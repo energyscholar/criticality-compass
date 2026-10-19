@@ -199,7 +199,8 @@ Then:
 ```
 
 S1 refusals appear at lint and at seal: a seal refused for an S1 reason makes no run and no intake-report.md, and the refusal is the
-answer (plan 1160 A26). Sealing is recommended and not enforced. The seal lists the universe under the declared `[source] root`, the directory S3 reads; it takes
+answer (plan 1160 A26): do not run unsealed to get past it, since an unsealed run is not a reportable result (plan 1160 S11.9 W1).
+Sealing is recommended and not enforced. The seal lists the universe under the declared `[source] root`, the directory S3 reads; it takes
 no `--universe`. If `seal` refuses, fix the declaration and seal again; do not run. Seal before the first run: `run` reads the data through the logged loader, and the report's
 ordering note compares the seal time with the first logged read. A conversion reads the raw files before you seal; that is the designed
 order, so the ordering note reports it as information and never as a refusal: when declarations/<id>/conversion-access.log holds reads of

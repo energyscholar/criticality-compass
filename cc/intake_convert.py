@@ -30,7 +30,7 @@ import intake_bytes
 import intake_census
 import intake_read
 import schema
-from intake_blind import NUMBER, Name, Pass, Refuse, classify, detail, flag, gate, look, parse, shown
+from intake_blind import NUMBER, Name, Pass, Refuse, classify, detail, flag, gate, look, parse
 from intake_names import masked
 
 MANIFEST = "CONVERSION-MANIFEST.json"
@@ -75,6 +75,7 @@ class Frame:
     named: tuple = ()
     broadcast: frozenset = frozenset()
     not_numeric: tuple = ()
+    cut: str = "NONE"   # (plan 1160 A32) the DELIMITER that cut the lines into cells (NONE: an xlsx sheet's cells, never cut from text)
 
 
 def _decoded(raw, encoding):
@@ -149,7 +150,7 @@ def _tabled(fr, cut):
 
 
 def _delimit(fr, step, k):
-    return _tabled(fr, [(n, SPLIT[step["from"]](t)) for n, t in fr.lines])
+    return replace(_tabled(fr, [(n, SPLIT[step["from"]](t)) for n, t in fr.lines]), cut=step["from"])
 
 
 CELL_TEXT = {type(None): lambda v: "", str: lambda v: v, int: repr, float: repr}   # an xlsx cell as openpyxl returns it -> its text (repr: a number)
@@ -186,8 +187,23 @@ NAMES = {   # NAMES_LINE rule kind -> (rule, frame) -> the frame with its names 
 }
 
 
+COLLAPSES = {"WHITESPACE": True, "COMMA": False, "SEMICOLON": False, "TAB": False, "NONE": False}   # (A32) Frame.cut -> does a run of white space
+# swallow an empty cell (so a row narrower than the names line has lost one); total over SPLIT's delimiters and NONE (test)
+WIDTH = {   # (A29) NAMES_LINE rule kind -> does the names line state the column count of every row; total over NAMES' kinds (test)
+    "WRITE": lambda f: all(len(cs) == len(f.names) for _, cs in f.rows),   # written names are the declared header of every row
+    "FIRST": lambda f: True, "REPLACE_PREFIXED": lambda f: True,   # the file's own names line: a short row is COLUMN_ABSENT where a column is used
+}
+
+
 def _named(fr, step, k):
-    return NAMES[step["rule"]["kind"]](step["rule"], fr)
+    """The names line (NAMES), then (A32) no row narrower than it under WHITESPACE, then (A29) a written names line as wide as every row."""
+    narrow = lambda f: [n for n, cs in f.rows if len(cs) < len(f.names)]
+    wide = lambda f: [n for n, cs in f.rows if len(cs) != len(f.names)]
+    return _bind(NAMES[step["rule"]["kind"]](step["rule"], fr), lambda f: gate([
+        (lambda: not (COLLAPSES[f.cut] and narrow(f)), "EMPTY_CELL_UNDER_WHITESPACE", lambda: detail(rows=narrow(f)[:3], counts={"rows narrower than the names line": len(narrow(f)),
+            "names": len(f.names)}, words=["DELIMITER WHITESPACE has no empty cell: if the file is delimited by tabs or commas, declare DELIMITER TAB or COMMA"])),
+        (lambda: WIDTH[step["rule"]["kind"]](f), "NAMES_COUNT_MISMATCH", lambda: detail(rows=wide(f)[:3], counts={"names written": len(f.names),
+            "rows with another number of cells": len(wide(f))}))], lambda: f))
 
 
 def _mark(fr, step, k):
@@ -402,7 +418,7 @@ class Converted:
 
     def summary(self):
         return (f"wrote {len(self.listing)} output files and {MANIFEST} to {self.out}; {self.verified.summary()}.\n"
-                + "\n".join(f"  {n}: {r} rows, {len(cs)} columns ({', '.join(shown(cs))})" for n, r, cs in self.listing))
+                + "\n".join(f"  {n}: {r} rows, {len(cs)} columns ({', '.join(NAME_SHOWN[classify(c)](c) for c in cs)})" for n, r, cs in self.listing))   # (A31) masked
 
 
 def declared(text, ct):
@@ -607,13 +623,13 @@ def _book_names(raw):
         return None
 
 
-SHEET_NAME = {Name.TEXT: lambda n: f"'{masked(n)}'", Name.NUMERIC: lambda n: "a numeric name"}   # (plan 1160 A21) a sheet name beside its position
+NAME_SHOWN = {Name.TEXT: lambda n: f"'{masked(n)}'", Name.NUMERIC: lambda n: "a numeric name"}   # (A21, A31) a name a file states: a numeral in it as #
 
 
 def _addressed(names):
     """(plan 1160 A21) The sheets as addresses: each by its 1-based position, which --sheet and `sheet =` take, then its name as a column's
     is printed by peek (a TEXT name masked, a numeric name never)."""
-    return ", ".join(f"#{k} {SHEET_NAME[classify(n)](n)}" for k, n in enumerate(names, 1))
+    return ", ".join(f"#{k} {NAME_SHOWN[classify(n)](n)}" for k, n in enumerate(names, 1))
 
 
 SHEET_WORDS = {   # (is openpyxl installed, the names it read or None) -> the words of SHEET_REQUIRED's Detail (plan 1160 A10); the names as _addressed (A21)

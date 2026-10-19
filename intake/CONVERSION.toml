@@ -19,7 +19,7 @@
 # total over them).
 schema = 1
 kind = "intake-conversion"
-version = "1160-v3"   # plan 1160 A21 (a sheet by name or position), A23 (CONVERSION_CHAIN_BROKEN Next); plan 1160 A10 (SHEET_REQUIRED) and A11 (DROP_ROWS_NOT_NUMERIC)
+version = "1160-v4"   # plan 1160 A29 (NAMES_COUNT_MISMATCH), A32 (EMPTY_CELL_UNDER_WHITESPACE); A21 (a sheet by name or position), A23 (CONVERSION_CHAIN_BROKEN Next); plan 1160 A10 (SHEET_REQUIRED) and A11 (DROP_ROWS_NOT_NUMERIC)
 header = { schema = 1, kind = "conversion" }
 stamped = []
 derived = []
@@ -172,6 +172,14 @@ sentence = "The bytes are not text in the declared (or the default utf-8) encodi
 code = "NAMES_NOT_NUMERIC"
 live = true
 sentence = "WIDE_TO_LONG needs every name but the key's to be a number (a value of the fast knob), and one is not."
+[[reason]]
+code = "NAMES_COUNT_MISMATCH"
+live = true
+sentence = "NAMES_LINE WRITE declares a different number of names than a row has cells; a written names line is the header of every row, so write one name per column (after SELECT_COLUMNS, one per selected column)."
+[[reason]]
+code = "EMPTY_CELL_UNDER_WHITESPACE"
+live = true
+sentence = "Under DELIMITER WHITESPACE a run of white space is one separator, so an empty cell cannot be seen: a row narrower than the names line has lost one. If the file is delimited by tabs or commas, declare DELIMITER TAB or COMMA."
 [[reason]]
 code = "CELL_MAP_NOT_A_PERMUTATION"
 live = true

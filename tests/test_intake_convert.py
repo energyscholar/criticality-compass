@@ -303,6 +303,8 @@ with tempfile.TemporaryDirectory() as tmp:
         ("NAMES_NOT_NUMERIC", lambda: conv({"a.csv": b"h,1.5,note\n0.1,2,x\n"}, [("a.csv", "a.csv", '{op = "WIDE_TO_LONG", key = "h", fast = "T", measured = "C"}')])),
         ("CELL_MAP_NOT_A_PERMUTATION", lambda: conv({"a.csv": b"T\n1\n2\n3\n"}, [("a.csv", "a.csv", '{op = "SPLIT_ROWS", rule = {kind = "RANGES", parts = [{name = "a.csv", first = 1, last = 1}, {name = "b.csv", first = 3, last = 3}]}}')])),
         ("CELL_MAP_NOT_A_PERMUTATION", lambda: conv({"a.csv": b"T\n1\n2\n3\n"}, [("a.csv", "a.csv", '{op = "SPLIT_ROWS", rule = {kind = "RANGES", parts = [{name = "a.csv", first = 1, last = 2}, {name = "b.csv", first = 2, last = 3}]}}')])),
+        ("NAMES_COUNT_MISMATCH", lambda: conv({"a.csv": b"1,2,3\n"}, [("a.csv", "a.csv", '{op = "NAMES_LINE", rule = {kind = "WRITE", names = ["T", "C"]}}')])),   # 1160 A29
+        ("EMPTY_CELL_UNDER_WHITESPACE", lambda: conv({"a.txt": b"T C\n1\n"}, [("a.txt", "a.csv", '{op = "DELIMITER", from = "WHITESPACE"}')])),   # 1160 A32
         ("XLSX_READER_ABSENT", lambda: conv({"a.xlsx": workbook({"data": [["T"], [1.5]]})}, [("a.xlsx", "a.csv", '{op = "SHEET_TO_CSV", sheet = "data"}')])),
         ("SHEET_REQUIRED", lambda: REACHED.add(code(ic._head(workbook({"data": [["T"], [1.5]]}), "", "utf-8-sig")))),   # (1160 A22: _head takes the encoding)   # (1160 A10) peek's refusal
         ("SHEET_ABSENT", lambda: conv({"a.xlsx": workbook({"data": [["T"], [1.5]]})}, [("a.xlsx", "a.csv", '{op = "SHEET_TO_CSV", sheet = "Sheet9"}')])),

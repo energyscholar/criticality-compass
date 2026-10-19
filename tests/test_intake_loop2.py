@@ -216,5 +216,39 @@ with tempfile.TemporaryDirectory() as tmp:
     rc3, said3 = peek(lt, f"<cc-datasets>/{lt}/raw/l.csv", "--encoding", "koi8-r")
     check("T22.2 (A22) --encoding outside DECODE's alphabet is VALUE_NOT_LISTED", rc3 == 1 and "VALUE_NOT_LISTED" in said3, said3)
 
+    # ---- A29: NAMES_LINE WRITE over rows of another width is NAMES_COUNT_MISMATCH, never a partial header
+    two = '{op = "NAMES_LINE", rule = {kind = "WRITE", names = ["T", "C"]}}'
+    got, _, _ = conv({"w.csv": b"1.5,0.25,7\n1.6,0.5,8\n"}, [("w.csv", "w.csv", two)])
+    check("T29.1 (A29) 2 names written over a 3-column file: NAMES_COUNT_MISMATCH", code(got) == "NAMES_COUNT_MISMATCH", str(got))
+    got, _, _ = conv({"w.csv": b"1.5,0.25\n1.6,0.5\n"}, [("w.csv", "w.csv", two)])
+    check("T29.2 (A29) 2 names written over a 2-column file: PASS", code(got) == "PASS", str(got))
+
+    check("T29.3 / T32.4 (A29, A32) WIDTH is total over NAMES_LINE's kinds and COLLAPSES over the delimiters (and NONE); WHITESPACE alone collapses",
+          set(ic.WIDTH) == set(ic.NAMES) and set(ic.COLLAPSES) == set(ic.SPLIT) | {"NONE"} and {k for k, v in ic.COLLAPSES.items() if v} == {"WHITESPACE"},
+          f"{sorted(ic.WIDTH)} {sorted(ic.COLLAPSES)}")
+
+    # ---- A31: the convert summary prints a column name through the masking (a numeral in a name as #)
+    hd = f"h{next(n)}"
+    (tmp / "cc-datasets" / hd / "raw").mkdir(parents=True)
+    (tmp / "cc-datasets" / hd / "raw" / "h.csv").write_bytes(b"T,C at 7357.25 K\n1.5,0.25\n")
+    (tmp / "declarations" / hd).mkdir(parents=True)
+    (tmp / "declarations" / hd / "CONVERSION.toml").write_text(conversion(f"<cc-datasets>/{hd}/raw", f"<cc-banks>/{hd}/bank", [("h.csv", "h.csv", "")]))
+    out = io.StringIO()
+    with contextlib.redirect_stdout(out):
+        rc = ic.convert_cli(tmp, hd, [], RT)
+    said = out.getvalue()
+    check("T31.1 (A31) bin/cc intake convert's summary does not print the value a names-line cell carries, and names the column masked",
+          rc == 0 and "7357" not in said and "'C at # K'" in said, said)
+
+    # ---- A32: DELIMITER WHITESPACE collapses an empty cell, so a row narrower than the names line is EMPTY_CELL_UNDER_WHITESPACE
+    ws = '{op = "DELIMITER", from = "WHITESPACE"}'
+    got, _, _ = conv({"s.txt": b"T C D\n1.5 0.25 7\n1.6 0.5\n"}, [("s.txt", "s.csv", ws)])
+    check("T32.1 (A32) WHITESPACE, a row narrower than the names line: EMPTY_CELL_UNDER_WHITESPACE naming TAB and COMMA",
+          code(got) == "EMPTY_CELL_UNDER_WHITESPACE" and "TAB" in str(got.evidence) and "COMMA" in str(got.evidence), str(got))
+    got, _, _ = conv({"s.txt": b"T C D\n1.5 0.25 7\n1.6 0.5 8\n"}, [("s.txt", "s.csv", ws)])
+    check("T32.2 (A32) WHITESPACE, every row as wide as the names line: PASS", code(got) == "PASS", str(got))
+    got, _, _ = conv({"s.csv": b"T,C,D\n1.5,0.25,7\n1.6,0.5,\n"}, [("s.csv", "s.csv", "")])
+    check("T32.3 (A32) the same row under COMMA keeps its empty cell (no refusal of this kind)", code(got) != "EMPTY_CELL_UNDER_WHITESPACE", str(got))
+
 print("test_intake_loop2: " + ("FAILED " + "; ".join(bad) if bad else "all passed"))
 sys.exit(1 if bad else 0)
