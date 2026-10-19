@@ -8,7 +8,9 @@ row is returnable. Planted inputs only; each check was seen RED under a stated m
      the reader table's no-openpyxl row (intake_read.XLSX[False]); without it, XLSX_READER_ABSENT is reached through S4 and the two others
      cannot be reached here: the test names them on a NOT REACHED line (they are reached on the data host, docs/INTAKE-ON-A-DATA-HOST.md).
  E3. UNIT_DIFFERS is reached through a file whose header states units (header kind NAMES_UNITS).
- E4. explain (docs/INTAKE.md) and every report carry the rows that are not live."""
+ E4. explain (docs/INTAKE.md) and every report carry the rows that are not live.
+Seen RED (1160 P3): intake_convert.s3 returning then() without the chain check: both CONVERSION_CHAIN_BROKEN plants FAIL (PASS) and E2's
+totality FAILS (CONVERSION_CHAIN_BROKEN live, never reached)."""
 import importlib.util
 import json
 import re
@@ -25,7 +27,7 @@ import intake_blind as blind  # noqa: E402
 import intake_read as rd  # noqa: E402
 import intake_seal  # noqa: E402
 import intake_synth  # noqa: E402
-from intake_plant import key_lines, long_table, outcome, per_file, rooted, run, slow_source, write_long, xlsx  # noqa: E402
+from intake_plant import converted, key_lines, long_table, outcome, per_file, rooted, run, slow_source, write_long, xlsx  # noqa: E402
 
 bad = []
 
@@ -110,9 +112,19 @@ with tempfile.TemporaryDirectory() as tmp:
         """(1160 P1) One more entry `name` in files and one more LISTED value, so S1 still passes."""
         return text.replace("files = [", f'files = ["{name}", ', 1).replace("values = [", 'values = ["9.5", ', 1)
 
-    def convert(text, root):
-        """(1160 P1) The declaration with [source] kind CONVERTED, its root `root`, converted_from the deposit."""
-        return re.sub(r'root = "[^"]*"', f'root = "{root}"', text.replace('kind = "DEPOSIT"', 'kind = "CONVERTED"\nconverted_from = "<cc-datasets>/pf/raw"', 1), count=1)
+    def convert(text, root, frm="<cc-datasets>/pf/raw"):
+        """(1160 P1) The declaration with [source] kind CONVERTED, its root `root`, converted_from `frm` (1160 P3: CONVERSION-MANIFEST.json
+        excluded where MANIFEST.json was)."""
+        return re.sub(r'root = "[^"]*"', f'root = "{root}"', text.replace('kind = "DEPOSIT"', f'kind = "CONVERTED"\nconverted_from = "{frm}"', 1)
+                      .replace('file = "MANIFEST.json"', 'file = "CONVERSION-MANIFEST.json"', 1), count=1)
+
+    def conv(edit=lambda raw, bank: None):
+        """(1160 P3) The PER_FILE declaration of a bank `bin/cc intake convert` wrote from pf's curve files (each converted as it is), after
+        `edit` (on the raw directory and the bank directory): its first code."""
+        name = f"cv{next(n)}"
+        converted(T, tmp, name, [(f["name"], f["name"], "") for f in m["files"]], {f["name"]: (banks / "pf" / f["name"]).read_bytes() for f in m["files"]})
+        edit(tmp / "cc-datasets" / name / "raw", tmp / "cc-banks" / name / "bank")
+        return pf("pf", lambda t: convert(t, f"<cc-banks>/{name}/bank", f"<cc-datasets>/{name}/raw"))
 
     def slow_label(name, source):
         """(1160 P1) The S5 census label of a PER_FILE declaration of bank `name` with slow source `source`."""
@@ -194,7 +206,10 @@ with tempfile.TemporaryDirectory() as tmp:
         ("PATH_NOT_A_FILE", "(1160) a selected name that is a directory", lambda: pf(copy(lambda b: ((b / m["files"][3]["name"]).unlink(), (b / m["files"][3]["name"]).mkdir())))),
         ("PIN_MISMATCH", "a file's bytes changed after its first logged read", lambda: twice(copy(lambda b: None), lambda d, b, t: (b / m["files"][2]["name"]).write_text((b / m["files"][2]["name"]).read_text() + "3.5,0.5,0.03\n"))),
         ("UNIVERSE_CHANGED", "a file added to the universe after the seal", lambda: sealed_then(lambda b: (b / "late.csv").write_text("T,C,sigma\n"))),
-        ("CONVERSION_NOT_LIVE", "(1160) a CONVERTED source (its S3 body has no conversion until P3)", lambda: pf("pf", lambda t: convert(t, "<cc-banks>/pf/bank"))),
+        ("CONVERSION_CHAIN_BROKEN", "(1160 P3) a converted bank whose CONVERSION-MANIFEST.json was deleted (was CONVERSION_NOT_LIVE)", lambda: conv(lambda raw, bank: (bank / "CONVERSION-MANIFEST.json").unlink())),
+        ("CONVERSION_CHAIN_BROKEN", "(1160 P3) one byte of a raw file changed after the conversion", lambda: conv(lambda raw, bank: (raw / m["files"][2]["name"]).write_bytes(
+            (raw / m["files"][2]["name"]).read_bytes().replace(b"T", b"t", 1)))),
+        ("PASS", "(1160 P3) a converted bank passes S3 and reads as a DEPOSIT", lambda: conv()),
         # S4 SHAPE
         ("READER_NOT_LIVE", "reader P1", lambda: pf("pf", lambda t: t.replace('name = "csv-curve-v1"', 'name = "P1"'))),
         ("COLUMNS_DIFFER", "csv-curve-v1, the first file's header T,Q,sigma", lambda: pf(copy(lambda b: (b / m["files"][0]["name"]).write_text((b / m["files"][0]["name"]).read_text().replace("T,C,sigma", "T,Q,sigma", 1))))),

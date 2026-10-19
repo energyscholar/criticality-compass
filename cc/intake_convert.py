@@ -422,7 +422,7 @@ def _frames_ok(frames, then):
     return {True: lambda: bad[0], False: then}[len(bad) > 0]()
 
 
-def _write(root, conv, out, raws, units, outputs, verified, listing):
+def _write(conv, out, raws, units, outputs, verified, listing):
     out.mkdir(parents=True, exist_ok=True)
     for r, b in outputs:
         (out / r["path"]).write_bytes(b)
@@ -430,8 +430,8 @@ def _write(root, conv, out, raws, units, outputs, verified, listing):
     (out / MANIFEST).write_text(json.dumps({
         "schema": 1, "kind": "conversion-manifest", "source": conv["source"], "out": conv["out"], "files": conv["file"],
         "sources": [{"path": s, "sha256": _sha(raws[s]), "bytes": len(raws[s])} for s in srcs], "units": units, "outputs": [r for r, _ in outputs],
-        "code_hash": schema.code_hash(root), "converter_sha256": _sha(Path(__file__).read_bytes()),
-        "format_sha256": _sha((Path(root) / "intake" / "CONVERSION.toml").read_bytes()), "time": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}) + "\n")
+        "code_hash": schema.code_hash(intake_data.ROOT), "converter_sha256": _sha(Path(__file__).read_bytes()),
+        "format_sha256": _sha((intake_data.ROOT / "intake" / "CONVERSION.toml").read_bytes()), "time": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}) + "\n")
     return Pass(Converted(conv["out"], verified, tuple(listing)))
 
 
@@ -446,7 +446,7 @@ def convert(root, ident, t, ct):
             def built(raws, b):
                 units, outputs, frames, listing = _records(conv, ct, raws, b)
                 return _bind(_named_ok(outputs), lambda o: _frames_ok(frames, lambda: _bind(verify(conv["file"], units, o, [f for f in frames]),
-                                                                                             lambda v: _write(root, conv, out, raws, units, o, v.evidence, listing))))
+                                                                                             lambda v: _write(conv, out, raws, units, o, v.evidence, listing))))
             return gate([(lambda: not (out.is_dir() and any(out.iterdir())), "BANK_EXISTS", lambda: detail(words=[f"out '{conv['out']}'"]))],
                         lambda: _bind(_sources(conv, src, loader), lambda raws: _bind(_built(conv, ct, raws), lambda b: built(raws, b))))
         return _bind(_where(conv, t), placed)

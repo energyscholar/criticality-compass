@@ -11,6 +11,9 @@
  K4. The report's census section lists the curves by ordinal and file name.
  K5. (1160 P2) A FAST_RESTART drift bank (22 sweeps, 579 rows, every slow value a distinct sentinel) forms 22 curves and its report gives
      distinct_slow_in_block max = 27, a count.
+ K6. (1160 P3) No byte of `bin/cc intake convert` stdout (convert and --verify), CONVERSION-MANIFEST.json, conversion-access.log, `bin/cc
+     intake peek` stdout or peek.log holds a sentinel: the sentinel PER_FILE files converted as they are, and a WIDE sentinel file (its
+     names line h + sentinel numeric names) peeked and converted by WIDE_TO_LONG. The copy's <cc-datasets> and <cc-banks> name <tmp>.
 Seen RED (each mutation applied by hand, the test run, the mutation reverted):
  - the fast-span summary reinstated in cc/intake_data.py Census.summary (`{x.fast} span [{lo:g}, {hi:g}]`): K3 FAILS on the two PASS runs;
  - _blocks' where reinstated as f"{f.name} block {i} ({g.columns[-1]} = {h:g})": K3 FAILS (the LONG_TABLE census section and CURVE_REPEATED);
@@ -19,7 +22,9 @@ Seen RED (each mutation applied by hand, the test run, the mutation reverted):
  - (1160 P2, A1) intake_blind.SELECTED["PER_FILE"] made 1: the SELECTION_EMPTY plant passes S1 and the run crashes at S4 (files[0]);
  - (1160 P2) BREAK["FAST_RESTART"] made the EXACT rule: K2 FAILS on the two-sweep FAST_RESTART PASS plant (CURVE_REPEATED) and K5 FAILS (579 one-point curves);
  - (1160 P2) intake_names.masked returning the stated text unmasked: K3 FAILS on both UNIT_DIFFERS plants whose unit holds a sentinel
-   (NAMES_UNITS 'K -7357.15', NAMES_UNITS_IN_NAMES 'T/K -7357.25')."""
+   (NAMES_UNITS 'K -7357.15', NAMES_UNITS_IN_NAMES 'T/K -7357.25').;
+ - (1160 P3) intake_convert._said printing every head cell unmasked (numeric names included): K6 FAILS (peek stdout and peek.log);
+ - (1160 P3) intake_convert._records adding each output's first data line to its manifest record: K6 FAILS on all four conversions."""
 import contextlib
 import hashlib
 import io
@@ -36,7 +41,7 @@ import importlib.util  # noqa: E402
 import intake  # noqa: E402
 import intake_blind as blind  # noqa: E402
 import intake_synth  # noqa: E402
-from intake_plant import long_table, per_file, slow_source, write_long, xlsx  # noqa: E402
+from intake_plant import conversion, long_table, per_file, slow_source, write_long, xlsx  # noqa: E402
 
 bad = []
 
@@ -70,8 +75,9 @@ with tempfile.TemporaryDirectory() as tmp:
     tmp = Path(tmp)
     w, banks = tmp / "cc", tmp / "banks"
     shutil.copytree(ROOT, w, ignore=shutil.ignore_patterns(".git", "__pycache__", "results", "benchmark", "fixtures", "data", "scratch"))
-    with open(w / "intake" / "ROOTS.toml", "a") as f:
-        f.write(f'"<leak>" = "{banks}"   # test_intake_leak: the sentinel banks\n')
+    roots = [ln for ln in (w / "intake" / "ROOTS.toml").read_text().splitlines() if not ln.startswith(('"<cc-datasets>"', '"<cc-banks>"'))]   # 1160 P3: both under tmp
+    (w / "intake" / "ROOTS.toml").write_text("\n".join(roots) + f'\n"<leak>" = "{banks}"   # test_intake_leak: the sentinel banks\n'
+                                             f'"<cc-datasets>" = "{tmp / "cc-datasets"}"\n"<cc-banks>" = "{tmp / "cc-banks"}"\n')
     n = iter(range(1000))
 
     def pf_bank(edit=lambda b: None, curves=CURVES):
@@ -121,9 +127,31 @@ with tempfile.TemporaryDirectory() as tmp:
 
     PF, LT = pf_bank(), lt_bank()
 
-    def convert(text, root):
-        """(1160 P1) [source] kind CONVERTED, its root `root`, converted_from a deposit name."""
-        return re.sub(r'root = "[^"]*"', f'root = "{root}"', text.replace('kind = "DEPOSIT"', 'kind = "CONVERTED"\nconverted_from = "<cc-datasets>/leak/raw"', 1), count=1)
+    def convert(text, root, frm="<cc-datasets>/leak/raw"):
+        """(1160 P1) [source] kind CONVERTED, its root `root`, converted_from `frm` (1160 P3: CONVERSION-MANIFEST.json excluded where
+        MANIFEST.json was)."""
+        return re.sub(r'root = "[^"]*"', f'root = "{root}"', text.replace('kind = "DEPOSIT"', f'kind = "CONVERTED"\nconverted_from = "{frm}"', 1)
+                      .replace('file = "MANIFEST.json"', 'file = "CONVERSION-MANIFEST.json"', 1), count=1)
+
+    CONVERTED = {}   # (1160 P3) K6: what each conversion printed and wrote
+
+    def conv_bank(raws, files, edit=lambda raw, bank: None):
+        """(1160 P3) <tmp>/cc-datasets/<name>/raw holding `raws` ({file: bytes}), converted by `bin/cc intake convert` (and --verify) per
+        `files` ([(from, to, steps)]), then `edit` (on the raw and bank directories): the name."""
+        name = cid = f"cv{next(n)}"   # one id: declarations/<id>/CONVERSION.toml converts <cc-datasets>/<id>/raw, where peek <id> looks
+        raw, bank, d = tmp / "cc-datasets" / name / "raw", tmp / "cc-banks" / name / "bank", w / "declarations" / cid
+        raw.mkdir(parents=True)
+        d.mkdir(parents=True)
+        [(raw / f).write_bytes(b) for f, b in raws.items()]
+        (d / "CONVERSION.toml").write_text(conversion(f"<cc-datasets>/{name}/raw", f"<cc-banks>/{name}/bank", files))
+        said = cli("convert", cid) + cli("convert", cid, "--verify")
+        CONVERTED[name] = said + "".join(q.read_text() for q in (bank / "CONVERSION-MANIFEST.json", d / "conversion-access.log") if q.is_file())
+        edit(raw, bank)
+        return name
+
+    curve_files = {f"curve_{i:03d}.csv": (banks / PF / f"curve_{i:03d}.csv").read_bytes() for i in range(K)}
+    as_is = [(f, f, "") for f in curve_files]
+    cv = lambda name: (pf(PF, lambda t: convert(t, f"<cc-banks>/{name}/bank", f"<cc-datasets>/{name}/raw")), PF)
 
     def keyed(line):
         """(1160 P1) A bank edit: each curve file i gets `line(i)` above its names line (a FILE_KEY header line)."""
@@ -181,7 +209,11 @@ with tempfile.TemporaryDirectory() as tmp:
         ("PIN_MISMATCH", "a file's bytes changed after its first logged read (unsealed: the seal would see the size)",
          (pf(PIN := pf_bank()), PIN, unsealed + (append("curve_002.csv", f"{cell(2, 50, 1)},{cell(2, 50, 2)},{cell(2, 50, 3)}\n"), ("run",)))),
         ("UNIVERSE_CHANGED", "a file added after the seal", (pf(UC := pf_bank()), UC, full(UC)[:2] + (lambda b: (b / "late.csv").write_text("T,C,sigma\n"), ("run",)))),
-        ("CONVERSION_NOT_LIVE", "(1160) a CONVERTED source (no conversion body until P3)", (pf(PF, lambda t: convert(t, f"<cc-banks>/{PF}/bank")), PF, unsealed)),
+        ("CONVERSION_CHAIN_BROKEN", "(1160 P3) a converted sentinel bank whose CONVERSION-MANIFEST.json was deleted (was CONVERSION_NOT_LIVE)",
+         (*cv(conv_bank(curve_files, as_is, lambda raw, bank: (bank / "CONVERSION-MANIFEST.json").unlink())), unsealed)),
+        ("CONVERSION_CHAIN_BROKEN", "(1160 P3) one byte of a raw sentinel file changed after the conversion",
+         (*cv(conv_bank(curve_files, as_is, lambda raw, bank: (raw / "curve_001.csv").write_bytes((raw / "curve_001.csv").read_bytes().replace(b"T", b"t", 1)))), unsealed)),
+        ("PASS", "(1160 P3) the converted PER_FILE sentinel bank, sealed", (*cv(CV := conv_bank(curve_files, as_is)), (("lint",), SEAL(tmp / "cc-banks" / CV / "bank"), ("run",)))),
         # S4 SHAPE
         ("READER_NOT_LIVE", "reader P1", (pf(PF, lambda t: t.replace('name = "csv-curve-v1"', 'name = "P1"')), PF, full(PF))),
         ("COLUMNS_DIFFER", "csv-curve-v1, the first file's names line holds a NUMERIC name",
@@ -253,6 +285,18 @@ with tempfile.TemporaryDirectory() as tmp:
     print(f"  openpyxl {'installed' if HAS_XLSX else 'NOT installed'} on this machine; NOT REACHED HERE: {NOT_HERE}")
     check("K2. the codes the plants reach are exactly the live rows (with the machine's NOT REACHED rows)", (reached - {"PASS"}) | set(NOT_HERE) == live,
           f"live, never reached: {sorted(live - reached - set(NOT_HERE))}; reached, not live: {sorted(reached - live - {'PASS'})}")
+
+    # ---- K6. (1160 P3) convert, its manifest and peek print and write no sentinel
+    wide = (f"h,{cell(0, 0, 1)},{cell(0, 1, 1)},{cell(0, 2, 1)}\n" + "".join(f"{slow(k)},{cell(k, 0, 2)},{cell(k, 1, 2)},{cell(k, 2, 2)}\n" for k in range(K))).encode()
+    WD = conv_bank({"wide.csv": wide}, [("wide.csv", "long.csv", '{op = "WIDE_TO_LONG", key = "h", fast = "T", measured = "C"}')])
+    peeked = "".join(cli("peek", WD, "wide.csv", "--depth", str(k)) for k in (0, 1, 5)) + cli("peek", CV, "curve_000.csv", "--depth", "3")
+    peeked += (w / "declarations" / WD / "peek.log").read_text() + (w / "declarations" / CV / "peek.log").read_text()
+    check("K6. the WIDE sentinel file converts (WIDE_TO_LONG) and verifies", CONVERTED[WD].count("PASS.") == 2, CONVERTED[WD][:400])
+    check("K6. peek on the WIDE sentinel file prints '1 text name + 3 numeric names' and stops before the first line of numbers",
+          "1 text name + 3 numeric names: 'h'" in peeked and "stopped: a line of numbers (not printed)" in peeked, peeked[:400])
+    for name, out in CONVERTED.items():
+        check(f"K6. {name}: no sentinel in convert's stdout, CONVERSION-MANIFEST.json or conversion-access.log", not hit(out), str(hit(out)[:5]))
+    check("K6. no sentinel in peek's stdout or peek.log", not hit(peeked), str(hit(peeked)[:5]))
 
     # ---- K4. the census section: curves by ordinal and file name
     for key, want in (("PASS the PER_FILE sentinel bank, sealed", [f"{i + 1}. curve_{i:03d}.csv: {6 + i} points" for i in range(K)]),

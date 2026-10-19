@@ -193,14 +193,20 @@ def admission(loc, names, src):
 
 SOURCE = {   # [source] kind -> the S3 body of that kind; total over FORMAT's [source] kinds (plan 1160 P1)
     "DEPOSIT": lambda declaration, d, t: _deposit(declaration, d, t),
-    "CONVERTED": lambda declaration, d, t: Refuse("CONVERSION_NOT_LIVE", detail(words=[f"converted from '{declaration.data['source']['converted_from']}'", "the conversion has no body yet (plan 1160 P3)"])),
+    "CONVERTED": lambda declaration, d, t: _converted(declaration, d, t),
 }
 
 
 def source_integrity(declaration, d, t):
-    """S3 SOURCE_INTEGRITY: its body for the declared [source] kind (SOURCE). A CONVERTED source refuses CONVERSION_NOT_LIVE until plan 1160
-    P3 gives the conversion a body, so a stub is never a pass."""
+    """S3 SOURCE_INTEGRITY: its body for the declared [source] kind (SOURCE). A CONVERTED source (plan 1160 P3) first proves the chain from
+    converted_from to the bank (CONVERSION_CHAIN_BROKEN), then its bank is read exactly as a DEPOSIT."""
     return SOURCE[declaration.data["source"]["kind"]](declaration, d, t)
+
+
+def _converted(declaration, d, t):
+    """S3 for a CONVERTED source: cc/intake_convert.py's chain check (imported here: it imports this module), then _deposit."""
+    import intake_convert
+    return intake_convert.s3(declaration, d, t, lambda: _deposit(declaration, d, t))
 
 
 def _deposit(declaration, d, t):

@@ -1,4 +1,4 @@
-# The intake pipeline (stage table 1160-v2, policy 1136-v1)
+# The intake pipeline (stage table 1160-v3, policy 1136-v1)
 
 Generated from intake/STAGES.toml and intake/POLICY.toml by `bin/cc intake explain` (docs/gen-intake.py); never edit it by hand.
 This is the intake's explain. `bin/cc explain <input> <point>` is a different command: it explains one point of a measured input.
@@ -94,7 +94,7 @@ Each selected file is admitted before it is read, read once through the logged l
 
 | reason | live | what it means |
 |---|---|---|
-| CONVERSION_NOT_LIVE | live | The source is CONVERTED, and the conversion has no body in the Compass yet (plan 1160 P3); nothing was read. |
+| CONVERSION_CHAIN_BROKEN | live | The source is CONVERTED, and its bank is not what `bin/cc intake convert` wrote from converted_from: the bank has no CONVERSION-MANIFEST.json, a raw or bank file's sha256 is not the manifest's, or the identity test fails on those bytes (plan 1160 P3). |
 | ROOT_UNRESOLVED | live | The declared source root is not a name of intake/ROOTS.toml followed by a relative path, or it names no directory on this machine. |
 | PATH_OUTSIDE_ROOT | live | A selected name resolves outside the source root (a .. part or a link); the loader reads nothing outside the root. |
 | PATH_ON_TRUTH_SIDE | live | A selected name has a path part on the truth side of the deposit ([source] truth_side); no stage reads the truth. |

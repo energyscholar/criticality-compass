@@ -9,7 +9,7 @@
 # needs, and never the seal stage (test 1).
 schema = 1
 kind = "intake-stages"
-version = "1160-v2"
+version = "1160-v3"
 seal_stage = "S2"
 
 [report]
@@ -113,7 +113,7 @@ needs = ["S0"]
 implemented = true
 verdict = "PRIMARY"
 reason = [
-  { code = "CONVERSION_NOT_LIVE", live = true, sentence = "The source is CONVERTED, and the conversion has no body in the Compass yet (plan 1160 P3); nothing was read." },
+  { code = "CONVERSION_CHAIN_BROKEN", live = true, sentence = "The source is CONVERTED, and its bank is not what `bin/cc intake convert` wrote from converted_from: the bank has no CONVERSION-MANIFEST.json, a raw or bank file's sha256 is not the manifest's, or the identity test fails on those bytes (plan 1160 P3)." },
   { code = "ROOT_UNRESOLVED",   live = true,  sentence = "The declared source root is not a name of intake/ROOTS.toml followed by a relative path, or it names no directory on this machine." },
   { code = "PATH_OUTSIDE_ROOT",  live = true,  sentence = "A selected name resolves outside the source root (a .. part or a link); the loader reads nothing outside the root." },
   { code = "PATH_ON_TRUTH_SIDE", live = true,  sentence = "A selected name has a path part on the truth side of the deposit ([source] truth_side); no stage reads the truth." },

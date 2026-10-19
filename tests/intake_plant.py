@@ -12,27 +12,35 @@ ROOT = Path(__file__).resolve().parent.parent
 
 
 def xlsx(rows, sheet="data"):
-    """A minimal xlsx workbook (inline strings, numbers as numbers), written with zipfile only: the planted xlsx file. A bytes value is
-    written as a number cell's raw text (a workbook whose number cell does not parse); None is an empty cell."""
+    """A minimal xlsx workbook of one sheet (workbook, below)."""
+    return workbook({sheet: rows})
+
+
+def workbook(sheets):
+    """A minimal xlsx workbook (inline strings, numbers as numbers), written with zipfile only: the planted xlsx file, one worksheet per
+    {name: rows} entry in order (plan 1160 P3: a two-sheet workbook). A bytes value is written as a number cell's raw text (a workbook whose
+    number cell does not parse); None is an empty cell."""
     def cell(i, j, v):
         ref = f"{'ABCDEFGH'[j]}{i}"
         return {str: lambda: f'<c r="{ref}" t="inlineStr"><is><t>{v}</t></is></c>', bytes: lambda: f'<c r="{ref}"><v>{v.decode()}</v></c>',
                 int: lambda: f'<c r="{ref}"><v>{v!r}</v></c>', float: lambda: f'<c r="{ref}"><v>{v!r}</v></c>'}[type(v)]()
-    data = "".join(f'<row r="{i}">' + "".join(cell(i, j, v) for j, v in enumerate(r) if v is not None) + "</row>" for i, r in enumerate(rows, 1))   # None: an empty cell
+    data = lambda rows: "".join(f'<row r="{i}">' + "".join(cell(i, j, v) for j, v in enumerate(r) if v is not None) + "</row>" for i, r in enumerate(rows, 1))   # None: an empty cell
+    ks = range(1, len(sheets) + 1)
     parts = {
         "[Content_Types].xml": '<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
                                '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/>'
                                '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>'
-                               '<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>',
+                               + "".join(f'<Override PartName="/xl/worksheets/sheet{k}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>' for k in ks) + '</Types>',
         "_rels/.rels": '<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
                        '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>',
         "xl/workbook.xml": '<?xml version="1.0" encoding="UTF-8"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" '
                            'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>'
-                           f'<sheet name="{sheet}" sheetId="1" r:id="rId1"/></sheets></workbook>',
+                           + "".join(f'<sheet name="{n}" sheetId="{k}" r:id="rId{k}"/>' for k, n in zip(ks, sheets)) + '</sheets></workbook>',
         "xl/_rels/workbook.xml.rels": '<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
-                                      '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/></Relationships>',
-        "xl/worksheets/sheet1.xml": '<?xml version="1.0" encoding="UTF-8"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
-                                    f'<sheetData>{data}</sheetData></worksheet>',
+                                      + "".join(f'<Relationship Id="rId{k}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet{k}.xml"/>' for k in ks)
+                                      + '</Relationships>',
+        **{f"xl/worksheets/sheet{k}.xml": '<?xml version="1.0" encoding="UTF-8"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
+                                          f'<sheetData>{data(rows)}</sheetData></worksheet>' for k, rows in zip(ks, sheets.values())},
     }
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w") as z:
@@ -123,8 +131,27 @@ def run(T, tmp, ident, text, findings=()):
 
 
 def rooted(T, tmp):
-    """The tables with the root name <long-test> naming <tmp>/banks."""
-    return {**T, "roots": {**T["roots"], "<long-test>": str(Path(tmp) / "banks")}}
+    """The tables with the root name <long-test> naming <tmp>/banks (plan 1160 P3: and <cc-datasets>, <cc-banks> naming <tmp>/cc-datasets,
+    <tmp>/cc-banks, so a CONVERTED plant never reaches the machine's data roots)."""
+    return {**T, "roots": {**T["roots"], "<long-test>": str(Path(tmp) / "banks"), "<cc-datasets>": str(Path(tmp) / "cc-datasets"), "<cc-banks>": str(Path(tmp) / "cc-banks")}}
+
+
+def conversion(source, out, files):
+    """(plan 1160 P3) A declarations/<id>/CONVERSION.toml: files is [(from, to, steps as TOML inline-table text)]."""
+    return f'schema = 1\nkind = "conversion"\nsource = "{source}"\nout = "{out}"\n' + "".join(f'\n[[file]]\nfrom = "{a}"\nto = "{b}"\nsteps = [{st}]\n' for a, b, st in files)
+
+
+def converted(T, tmp, name, files, raws):
+    """(plan 1160 P3) Plant <tmp>/cc-datasets/<name>/raw (raws: {file: bytes}) and declarations/c-<name>/CONVERSION.toml, and convert it to
+    <cc-banks>/<name>/bank: the converter's result."""
+    import intake_convert
+    raw = Path(tmp) / "cc-datasets" / name / "raw"
+    raw.mkdir(parents=True)
+    [(raw / f).write_bytes(b) for f, b in raws.items()]
+    d = Path(tmp) / "declarations" / f"c-{name}"
+    d.mkdir(parents=True)
+    (d / "CONVERSION.toml").write_text(conversion(f"<cc-datasets>/{name}/raw", f"<cc-banks>/{name}/bank", files))
+    return intake_convert.convert(tmp, f"c-{name}", rooted(T, tmp), intake_convert.ctables(ROOT))
 
 
 def outcome(out, sid):

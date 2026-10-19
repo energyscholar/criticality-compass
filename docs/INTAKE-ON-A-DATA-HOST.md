@@ -55,8 +55,10 @@ so restate it in v3 under a new id.
 `[source]` says what the files are:
 
 - `kind`: `DEPOSIT` (the files as deposited, read directly) or `CONVERTED` (a bank written by a declared conversion; it also carries
-  `converted_from`, and its `root` is under `<cc-banks>/`). A CONVERTED source is refused CONVERSION_NOT_LIVE at S3 until the conversion
-  has a body.
+  `converted_from`, and its `root` is under `<cc-banks>/`). `bin/cc intake convert <id>` writes that bank
+  from the raw files and declarations/<id>/CONVERSION.toml (docs/INTAKE-CONVERSION.md); S3 refuses CONVERSION_CHAIN_BROKEN unless the
+  bank's CONVERSION-MANIFEST.json still matches the raw files and the bank, then reads the bank as a DEPOSIT. Exclude
+  CONVERSION-MANIFEST.json from `[selection]`, as MANIFEST.json is.
 - `admissibility`: `RAW`, `DECLARABLE`, `FIGURE_LEVEL` or `PROCESSED_UNDECLARABLE`, read from the deposit's metadata. It is sealed with the
   declaration.
 
