@@ -71,7 +71,7 @@ c = 0.0
 
 - lint: `S0 EXECUTED, PASS` (FORMAT) and `S1 EXECUTED, PASS` (CHOICES).
 - run: S3 SOURCE_INTEGRITY, S4 SHAPE and S5 CENSUS `EXECUTED, PASS`. The census reads
-  `Sampling: 9 curves; points per curve min 44, median 78, max 116; 159 distinct T values; MISALIGNED; curves_with_slow = 9`, and the report's
+  `Sampling: 9 curves; points per curve min 44, median 78, max 116; 159 distinct T values; MISALIGNED; curves_with_slow = 9; readings per point min 1, max 1`, and the report's
   `## Census` section lists the nine curves by ordinal and file name. No report prints a data value (a span, a slow value or a cell).
 - Seal status `SEALED`, or `UNSEALED` if you skipped the seal. If you edit the declaration after sealing, the status is `SEALED_THEN_EDITED`.
 - `PRIMARY verdict: PRIMARY_INCOMPLETE`, listing the STUB stages it is missing.

@@ -10,6 +10,8 @@
 # its [selection.slow] is LISTED (`values`: one numeral TEXT per file, in `files` order) | FILE_KEY (`key`: a header line of each file) |
 # NONE (no slow knob); PATH_PATTERN is deleted. [source] is a VARIANT on `kind` (DEPOSIT: the files as deposited | CONVERTED: a bank written
 # by a declared conversion, with `converted_from`) and states `admissibility`, the deposit's class as the declarer reads it from metadata.
+# v4 against v3 (plan 1160 P2): [replicate] identity SAME_FAST_VALUE (consecutive rows of one curve with an equal fast value are the
+# readings of one point). Additive within schema 3: every v3 declaration is a v4 declaration.
 # A reader's `comment` prefixes are PREFIXES: an empty prefix marks every line a comment, so it is refused (COMMENT_PREFIX_EMPTY).
 # A field row: type = str | int | num | list | table | ref (cc/intake_blind.py TYPE); check = one of cc/intake_blind.py CHECK:
 #   TEXT      any text but the template's "TODO"
@@ -27,7 +29,7 @@
 # A key that is no field row is FIELD_IS_STAMPED when it is in `stamped`, FIELD_IS_DERIVED when in `derived`, else FIELD_UNKNOWN.
 schema = 1
 kind = "intake-format"
-version = "1160-v3"
+version = "1160-v4"
 header = { schema = 3, kind = "intake" }
 stamped = ["sealed_at", "author", "author_kind", "confirmed_by", "declaration_sha256", "code_identity", "protocol_identity", "universe_listing", "sampling", "pins"]
 derived = ["correlated"]
@@ -168,7 +170,7 @@ row_order = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LI
 type = "table"
 check = "TABLE"
 [fields.replicate.fields]
-identity = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { NONE = "ADMIT", SEED = "ADMIT", RUN = "ADMIT", SAMPLE = "ADMIT", FILE = "ADMIT" } }
+identity = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { NONE = "ADMIT", SEED = "ADMIT", RUN = "ADMIT", SAMPLE = "ADMIT", FILE = "ADMIT", SAME_FAST_VALUE = "ADMIT" } }   # SAME_FAST_VALUE (1160 P2): consecutive rows of a curve with one fast value are readings of one point
 key = { type = "str", check = "TEXT" }
 
 [fields.interval]

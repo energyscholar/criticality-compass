@@ -74,7 +74,8 @@ direction = "TODO"      # the order they were taken in along the fast knob: ASCE
 row_order = "TODO"      # the order the rows are stored in: ASCENDING | DESCENDING | ACQUISITION
 
 [replicate]
-identity = "TODO"       # what makes two curves at one slow value replicates: NONE | SEED | RUN | SAMPLE | FILE
+identity = "TODO"       # what makes two curves at one slow value replicates: NONE | SEED | RUN | SAMPLE | FILE; or SAME_FAST_VALUE:
+                        # consecutive rows of one curve with an equal fast value are readings of one point
 key = "TODO"            # the key that names a replicate; "" for NONE
 
 [interval]

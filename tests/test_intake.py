@@ -113,6 +113,9 @@ check("1. (1160 P1) PATH_NOT_ADMITTED is gone from STAGES.toml and the code; its
       "PATH_NOT_ADMITTED" not in codes and "PATH_NOT_ADMITTED" not in Path(intake_data.__file__).read_text()
       and [c for c, _, _ in intake_data.ADMIT] == [c for c in REASONS["S3"] if c.startswith("PATH_")] == ["PATH_OUTSIDE_ROOT", "PATH_ON_TRUTH_SIDE", "PATH_NOT_A_FILE"], str(REASONS["S3"]))
 check("1. (1160 P1) S1's live rows are exactly the rows its body checks", [r["code"] for s in ST if s["id"] == "S1" for r in s["reason"] if r["live"]] == ["SLOW_VALUES_NOT_ONE_PER_FILE"], "")
+IDENT = set(F["replicate"]["fields"]["identity"]["values"])
+check("1. (1160 P2) the replicate identities hold SAME_FAST_VALUE; POINTS is total over them and REPLICATE over (layout, identity)",
+      "SAME_FAST_VALUE" in IDENT and set(intake_data.POINTS) == IDENT and set(intake_data.REPLICATE) == set(itertools.product(F["selection"]["variants"], IDENT)), str(sorted(IDENT)))
 check("1. every admit source of FORMAT.toml is a source the tables provide", all(src in T["admit"] for spec in [T["format"]["fields"]["interval"]["method"]] for src in spec["admit"]), "")
 
 # ---- 2. the generated docs page

@@ -70,9 +70,10 @@ class Shaped:
 
 @dataclass(frozen=True)
 class Sampling:
-    """The sampling label of a census: counts and structure, never a value (plan 1160 P0). Invariant: n_min <= n_median <= n_max over `curves`
-    curves; `distinct` is the count of distinct fast values over every curve; `with_slow` is the count of curves that carry a slow value (0
-    under [selection.slow] source NONE, plan 1160 P1; else every curve)."""
+    """The sampling label of a census: counts and structure, never a value (plan 1160 P0). Invariant: n_min <= n_median <= n_max points over
+    `curves` curves; `distinct` is the count of distinct fast values over every curve; `with_slow` is the count of curves that carry a slow value
+    (0 under [selection.slow] source NONE, plan 1160 P1; else every curve); `readings` is (min, max) readings per point (plan 1160 P2: more
+    than 1 only under [replicate] identity SAME_FAST_VALUE)."""
     curves: int
     with_slow: int
     n_min: int
@@ -81,6 +82,7 @@ class Sampling:
     fast: str
     distinct: int
     alignment: Alignment
+    readings: tuple
 
 
 @dataclass(frozen=True)
@@ -94,7 +96,8 @@ class Census:
     def summary(self):
         x = self.label
         return (f"Every file has the first file's columns; no slow value or fast value repeats; no curve contradicts the declared direction. Sampling: {x.curves} curves; points per curve "
-                f"min {x.n_min}, median {x.n_median:g}, max {x.n_max}; {x.distinct} distinct {x.fast} values; {x.alignment.name}; curves_with_slow = {x.with_slow}")
+                f"min {x.n_min}, median {x.n_median:g}, max {x.n_max}; {x.distinct} distinct {x.fast} values; {x.alignment.name}; curves_with_slow = {x.with_slow}; "
+                f"readings per point min {x.readings[0]}, max {x.readings[1]}")
 
     def listing(self):
         """The report's census section: each curve by ordinal and file name (a LONG_TABLE block by its ordinal), never by its slow value."""
@@ -294,9 +297,15 @@ def shape(pinned, t):
 
 
 REPLICATE = {   # ([selection] layout, [replicate] identity) -> (may two curves share a slow value, can the reader resolve the identity); total
-    **{(lay, k): v for lay in ("PER_FILE", "LONG_TABLE") for k, v in (("NONE", (False, True)), ("SEED", (False, False)), ("RUN", (False, False)), ("SAMPLE", (False, False)))},
+    **{(lay, k): v for lay in ("PER_FILE", "LONG_TABLE") for k, v in (("NONE", (False, True)), ("SEED", (False, False)), ("RUN", (False, False)), ("SAMPLE", (False, False)),
+                                                                     ("SAME_FAST_VALUE", (False, True)))},   # 1160 P2: replicate readings of a point, inside one curve
     ("PER_FILE", "FILE"): (True, True),
     ("LONG_TABLE", "FILE"): (False, False),   # one file holds every curve: the file tells no two curves apart
+}
+
+POINTS = {   # [replicate] identity -> a curve's rows -> its points as (fast value, readings); total over FORMAT's identities (plan 1160 P2)
+    **{k: (lambda rows: [(r[0], 1) for r in rows]) for k in ("NONE", "SEED", "RUN", "SAMPLE", "FILE")},   # every row is one point
+    "SAME_FAST_VALUE": lambda rows: [(x, len(list(rs))) for x, rs in itertools.groupby(rows, key=lambda r: r[0])],   # a run of one fast value is one point
 }
 
 
@@ -311,7 +320,8 @@ def census(pinned, shaped, t):
     curves = lambda: CURVES[d["selection"]["layout"]](d, pinned.files, grids)
     hs = lambda: [v for c in curves() for v in c.slow]   # the slow values of every curve that has one (none under NONE)
     unkeyed = lambda: KEYS[d["selection"]["layout"]](d, pinned.files, grids)
-    twice = lambda: [c.where for c in curves() if len({r[0] for r in c.rows}) != len(c.rows)]
+    points = lambda c: POINTS[d["replicate"]["identity"]](c.rows)   # grouped BEFORE the repeat check: a run of readings is never a repeat
+    twice = lambda: [c.where for c in curves() if len({x for x, _ in points(c)}) != len(points(c))]
     against = lambda: [c.where for c in curves() if not DIRECTION[(acq["row_order"] == "ACQUISITION", acq["direction"])]([r[0] for r in c.rows])]
     again = lambda: [c.where for c in curves() if any(hs().count(v) > 1 for v in c.slow)]
     return gate([(lambda: not other, "FILE_DIFFERS_FROM_FIRST", lambda: detail(words=other[:3], counts={"files": len(other)})),
@@ -320,14 +330,15 @@ def census(pinned, shaped, t):
                  (lambda: rep[0] or len(set(hs())) == len(hs()), "CURVE_REPEATED", lambda: detail(words=again()[:3], counts={"curves whose slow value another curve has": len(again())})),
                  (lambda: not twice(), "FAST_VALUE_REPEATED", lambda: detail(words=twice()[:3], counts={"curves": len(twice())})),
                  (lambda: not against(), "ACQUISITION_ORDER_DIFFERS", lambda: detail(words=against()[:3] + [f"stored in acquisition order, not {acq['direction']}"], counts={"curves": len(against())}))],
-                lambda: Pass(Census(pinned, label(curves(), d["knobs"]["fast"]["name"]), tuple((c.where, len(c.rows)) for c in curves()))))
+                lambda: Pass(Census(pinned, label(curves(), [points(c) for c in curves()], d["knobs"]["fast"]["name"]), tuple((c.where, len(points(c))) for c in curves()))))
 
 
-def label(curves, fast):
-    """The sampling label of curves whose rows hold the fast knob first."""
-    ns, xs = [len(c.rows) for c in curves], [r[0] for c in curves for r in c.rows]
-    seqs = {tuple(r[0] for r in c.rows) for c in curves}
-    return Sampling(len(curves), sum(len(c.slow) for c in curves), min(ns), statistics.median(ns), max(ns), fast, len(set(xs)), {True: Alignment.ALIGNED, False: Alignment.MISALIGNED}[len(seqs) == 1])
+def label(curves, points, fast):
+    """The sampling label of curves and their points (fast value, readings), counted per point (plan 1160 P2)."""
+    ns, xs, rs = [len(p) for p in points], [x for p in points for x, _ in p], [n for p in points for _, n in p]
+    seqs = {tuple(x for x, _ in p) for p in points}
+    return Sampling(len(curves), sum(len(c.slow) for c in curves), min(ns), statistics.median(ns), max(ns), fast, len(set(xs)),
+                    {True: Alignment.ALIGNED, False: Alignment.MISALIGNED}[len(seqs) == 1], (min(rs), max(rs)))
 
 
 def bodies(t, d):

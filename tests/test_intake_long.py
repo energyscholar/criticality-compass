@@ -11,7 +11,11 @@ here (tests/test_intake_cli.py runs it on the command line).
      ASCENDING; one swapped pair inside a block refuses S4 ROW_ORDER_DIFFERS.
  L4. UNIT_DIFFERS (S4) is live: a NAMES_UNITS header that states the declared units passes; one that states another unit refuses.
  L5. ACQUISITION_ORDER_DIFFERS (S5) is live: rows stored in acquisition order that do not run in the declared direction refuse; rows that do
-     pass; direction UNORDERED makes no claim."""
+     pass; direction UNORDERED makes no claim.
+ L6. (plan 1160 P2) [replicate] identity SAME_FAST_VALUE: a curve with consecutive rows of one T (three readings of a point) passes S5,
+     its points counted once and its readings per point min 1, max 3; the same bank under NONE refuses FAST_VALUE_REPEATED; a
+     NON-consecutive repeat refuses S4 ROW_ORDER_DIFFERS under both (row_order ASCENDING). Seen RED: POINTS["SAME_FAST_VALUE"] made one
+     point per row (as NONE) fails the PASS check (FAST_VALUE_REPEATED)."""
 import sys
 import tempfile
 from pathlib import Path
@@ -88,6 +92,19 @@ with tempfile.TemporaryDirectory() as tmp:
     check("L5. direction UNORDERED makes no claim: S5 passes", un[0] == "PASS", str(un)[:300])
     pfd = outcome(run(tmp, "a4", per_file(m, "a4").replace('row_order = "ASCENDING"', 'row_order = "ACQUISITION"').replace('direction = "UNORDERED"', 'direction = "DESCENDING"')), "S5")
     check("L5. the same holds for PER_FILE: ascending files in acquisition order, declared DESCENDING, refuse", pfd[0] == "ACQUISITION_ORDER_DIFFERS", str(pfd)[:300])
+
+    # ---- L6. (1160 P2) SAME_FAST_VALUE: consecutive readings of one point
+    tripled = [(h, [x for j, r in enumerate(rs) for x in [r] * (1 + 2 * (i == 2 and j % 2 == 0))]) for i, (h, rs) in enumerate(curves)]
+    apart = [(h, rs[:5] + [rs[2]] + rs[5:]) if i == 2 else (h, rs) for i, (h, rs) in enumerate(curves)]
+    ident = lambda name, b, who: long_table(m, name).replace("<long-test>/pf", "<long-test>/" + b).replace('identity = "NONE"', f'identity = "{who}"')
+    sf = outcome(run(tmp, "sf", ident("sf", bank("sf", tripled), "SAME_FAST_VALUE")), "S5")
+    check("L6. consecutive equal T under SAME_FAST_VALUE pass S5: the points are those of the plain bank, readings per point min 1, max 3",
+          sf[0] == "PASS" and sf[1].label.readings == (1, 3) and sf[1].curves == lt[1].curves and sf[1].label.n_max == lt[1].label.n_max, str(sf)[:300])
+    sn = outcome(run(tmp, "sn", ident("sn", "sf", "NONE")), "S5")
+    check("L6. the same bank under identity NONE refuses S5 FAST_VALUE_REPEATED", sn[0] == "FAST_VALUE_REPEATED", str(sn)[:300])
+    for who in ("SAME_FAST_VALUE", "NONE"):
+        na = outcome(run(tmp, "na" + who, ident("na" + who, {True: lambda: bank("na", apart), False: lambda: "na"}[who == "SAME_FAST_VALUE"](), who)), "S5")
+        check(f"L6. a NON-consecutive repeat of T refuses S4 ROW_ORDER_DIFFERS under {who}", na[0] == "ROW_ORDER_DIFFERS", str(na)[:300])
 
 print("test_intake_long: " + ("FAILED " + "; ".join(bad) if bad else "all passed"))
 sys.exit(1 if bad else 0)

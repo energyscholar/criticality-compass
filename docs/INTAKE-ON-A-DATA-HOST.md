@@ -84,6 +84,11 @@ There are two layouts in `[selection]`:
   - `NONE`: the deposit has no slow knob. The census forms the curves with no slow value (`curves_with_slow = 0`).
 - `LONG_TABLE`: one `file` holds every curve, and `[selection.slow]` is `COLUMN` with its `key`.
 
+When a deposit repeats a point (several readings at one fast value, one after another), declare `[replicate] identity =
+"SAME_FAST_VALUE"`: consecutive rows of one curve with an equal fast value are then the readings of one point, and the census reports
+readings per point (min, max). Under any other identity such rows are refused FAST_VALUE_REPEATED. A repeat that is not consecutive is
+refused ROW_ORDER_DIFFERS (rows declared ASCENDING or DESCENDING).
+
 `excluded` lists the files of the universe that are not curves, each with a `why`. The seal checks that the universe is exactly the
 selected files, the excluded files and the truth side, each file in one part. Otherwise it refuses UNIVERSE_NOT_PARTITIONED, or
 SELECTION_DUPLICATE when a name is given twice.
