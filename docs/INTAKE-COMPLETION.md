@@ -24,7 +24,7 @@ Nothing between two measured curves is ever formed. There is no interpolation, n
 
 | Result | When | What it says |
 |---|---|---|
-| `Located(m, lo_rank, hi_rank, tier, n_tied)` | The maximum is at an interior node m. For ARGMAX_FAST, the first interior local maximum, taking the largest r first. | The peak lies between the curves at ranks `lo_rank` and `hi_rank`. That span is the chain neighbourhood of the tied curves. RESULT.json gives their slow values (`span_slow`). |
+| `MaxLocated(m, lo_rank, hi_rank, tier, n_tied)` | The maximum is at an interior node m. For ARGMAX_FAST, the first interior local maximum, taking the largest r first. | The peak lies between the curves at ranks `lo_rank` and `hi_rank`. That span is the chain neighbourhood of the tied curves. RESULT.json gives their slow values (`span_slow`). |
 | `MaxAtPathEnd(end)` | The largest r is the first or last curve. | No bracket exists, because only one side of the maximum has a curve. The scan may not reach the peak, so extend the slow range. |
 | `NoInteriorMaximum` | Only the `ARGMAX_FAST` lane can give this: no interior node has a rising edge in and a falling edge out. | Along this projection there is no interior maximum to bracket. |
 
@@ -59,11 +59,19 @@ S8 states the largest bracket the evidence permits (`max_bracket`). Without froz
 `CANDIDATE_BRACKET`. In that case RESULT.json's `why_this_tier` says so: RESOLVED means only that both flanking edges exceed Z σ on this
 bank. Read every such bracket as EXPLORATORY until coverage evidence is frozen.
 
+## Reading a result
+
+RESULT.json leads with what to read: `tiering`, then `primary_verdict`, then `reading`. Read those three before `results`, and never
+read a result's `type` alone. `reading` is one sentence per result kind (a table in cc/intake_terminal.py, total over the kinds). For
+`MaxLocated` it says that a located maximum is not, by itself, evidence of a transition, and that `tiering` and `primary_verdict` say how
+far it was tested: a `tiering` of `NONE` gives an UNTIERED result with no confidence claim, and `PRIMARY_INCOMPLETE` names what was not
+checked.
+
 ## A single observable cannot tell a crossover from a transition
 
 S8's identifiability value, `TRANSITION_TOPOLOGY_NOT_IDENTIFIABLE_FROM_AVAILABLE_OBSERVABLES`, appears in the report and in RESULT.json.
 
-A maximum of one observable along one slow knob looks the same whether a phase transition causes it or a smooth crossover does. **A Located result is not a transition.** A Located
+A maximum of one observable along one slow knob looks the same whether a phase transition causes it or a smooth crossover does. **A MaxLocated result is not a transition.** A MaxLocated
 result says *where* the observable peaks among the measured curves. It does not say *what kind* of change happens there. That needs a
 second, independent observable (a second lane), finite-size evidence, or both.
 

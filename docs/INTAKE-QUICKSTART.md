@@ -86,12 +86,15 @@ c = 0.0
 - S7 INTERVAL_FEASIBILITY and S8 RESOLUTION_AND_IDENTIFIABILITY `EXECUTED, PASS`: tiering `STATED`, max_bracket `CANDIDATE_BRACKET`,
   and identifiability `TRANSITION_TOPOLOGY_NOT_IDENTIFIABLE_FROM_AVAILABLE_OBSERVABLES`.
 - Seal status `SEALED`, or `UNSEALED` if you skipped the seal. If you edit the declaration after sealing, the status is `SEALED_THEN_EDITED`.
-- S10 KERNEL_HANDOFF `EXECUTED, PASS`: `Located, span ranks 4..6 (maximum at rank 5), tier RESOLVED, n_tied 1 of 9 curves`, and the
+- S10 KERNEL_HANDOFF `EXECUTED, PASS`: `MaxLocated, span ranks 4..6 (maximum at rank 5), tier RESOLVED, n_tied 1 of 9 curves`, and the
   identifiability value. The report prints ranks only; `declarations/demo1/RESULT.json` holds the slow values of the span, and says why
   RESOLVED here is no coverage claim (CANDIDATE_BRACKET).
 - S9 ALTERNATIVE_INTAKE, after S10 (plan 1160 A9), `EXECUTED, PASS`: there is no ALTERNATIVE lane to check.
 - `PRIMARY verdict: PRIMARY_INCOMPLETE`, missing only `confirmation`: every PRIMARY stage and the terminal passed, and the seal is not
   confirmed. RESULT.json is written with `confirmation = UNCONFIRMED`. To reach `PRIMARY_READY`, a human confirms the seal: see
   "From INCOMPLETE to READY" in docs/INTAKE-COMPLETION.md.
+- Reading a result: RESULT.json's first keys are `tiering`, `primary_verdict` and `reading`. Read them first, never `type` alone. A
+  located maximum (`MaxLocated`) is not, by itself, evidence of a transition; `tiering` and `primary_verdict` say how far it was tested
+  ("Reading a result" in docs/INTAKE-COMPLETION.md).
 
 To start again: `rm -r scratch/intake-synth/demo1 scratch/intake-synth/demo1-TRUTH declarations/demo1`.

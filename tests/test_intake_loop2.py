@@ -18,6 +18,11 @@ Seen RED (each mutation applied by hand, the test run, the mutation reverted):
    never reached).
  - T17.5: POINTS' MEASURED rows dropping the first row (rows[1:]): the census labels differ (FAIL). S10's records do NOT differ under that
    mutation: the terminal re-reads each curve's rows (intake_terminal, CURVES), not the census points (plan error, reported).
+Plan 1160 loop 5 (S11.5b):
+ T15.1 (A15) READING (RESULT.json's `reading`) is total over the result kinds: KINDS, and every class of intake_terminal with a
+       record(slows, wheres). Seen RED: NoInteriorMaximum's row deleted from READING (FAIL).
+ T15.2 (A15) RESULT.json's first keys are tiering, primary_verdict, reading, and a MaxLocated result reads READING[MaxLocated]. Seen RED:
+       the record's key order reversed before it is written (FAIL).
 """
 import json
 import shutil
@@ -28,7 +33,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "tests")]
+import inspect  # noqa: E402
 import intake  # noqa: E402
+import intake_terminal  # noqa: E402
 import intake_synth  # noqa: E402
 from intake_plant import MEASURED, outcome, per_file, run  # noqa: E402
 
@@ -90,6 +97,19 @@ with tempfile.TemporaryDirectory() as tmp:
         same[what] = (s["S10"].mark is intake.Mark.PASSED and rec(s) == rec(ms) and rec(s) != [], outcome(s, "S5")[1].label == outcome(ms, "S5")[1].label)
     check("T17.5 MAX_MEASURED and ARGMAX_FAST: S10's records and the census label are the same under MEASURED as under SET",
           same == {"MAX_MEASURED": (True, True), "ARGMAX_FAST": (True, True)}, str(same))
+
+    # ---- A15: RESULT.json leads with tiering, primary_verdict, reading; reading is READING's sentence of the result's kind
+    ident = f"d{next(n)}"
+    out = run(T, tmp, ident, per_file(m, ident))
+    intake_terminal.write(ROOT, T, tmp / "declarations" / ident, out, intake.verdicts(T, out)[0].kind.name)
+    res = json.loads((tmp / "declarations" / ident / "RESULT.json").read_text())
+    check("T15.2 (A15) RESULT.json's first keys are tiering, primary_verdict, reading; a MaxLocated result reads READING[MaxLocated]",
+          list(res)[:3] == ["tiering", "primary_verdict", "reading"] and [r["type"] for r in res["results"]] == ["MaxLocated"]
+          and res["reading"] == intake_terminal.READING[intake_terminal.MaxLocated], str(list(res)[:4]) + " " + str([r["type"] for r in res["results"]]))
+
+kinds = {c for c in vars(intake_terminal).values() if isinstance(c, type) and c.__module__ == "intake_terminal" and "record" in vars(c) and list(inspect.signature(vars(c)["record"]).parameters)[1:] == ["slows", "wheres"]}
+check("T15.1 (A15) READING is total over the result kinds: its keys are KINDS, and KINDS is every class of intake_terminal with record(slows, wheres)",
+      set(intake_terminal.READING) == set(intake_terminal.KINDS) == kinds and len(kinds) == 3, f"{sorted(c.__name__ for c in intake_terminal.READING)} {sorted(c.__name__ for c in kinds)}")
 
 # ---- A18-A22: the converter, peek and the seal (planted raw files under <tmp>/cc-datasets; rooted tables)
 import contextlib  # noqa: E402

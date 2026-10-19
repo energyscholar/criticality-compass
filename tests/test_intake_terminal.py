@@ -1,5 +1,5 @@
 """test_intake_terminal - plan 1160 P6: S10 KERNEL_HANDOFF and the terminal (cc/intake_terminal.py), plan 1118's REDUCE as A over a declared chain.
- T1. The synthetic quickstart bank (intake_synth, seed 1, 9 curves) reaches Located, and its span holds h*. The truth is read HERE, from the
+ T1. The synthetic quickstart bank (intake_synth, seed 1, 9 curves) reaches MaxLocated (1160 A15: was Located), and its span holds h*. The truth is read HERE, from the
      truth file intake_synth writes beside the bank, never by a stage.
  T2. Planted chains through the terminal's own path (door.nodefield, the chain relation, kernel.A, the result): RESOLVED; EXPLORATORY when
      sigma is made 100 times larger; UNTIERED when no sigma is given (tiering NONE), n_tied NOT_EVALUATED and the span the flanking ranks; a
@@ -10,7 +10,7 @@
      c = 0 (x + c is applied at S10 only, and A takes differences).
  T4. Port equality: on 60 seeded random banks (5 to 12 curves, 20 to 60 points each, some monotone), the terminal's MAX_MEASURED result equals
      plan 1118's reduce_ (studies/DIAL1118/dial/methods.py, run in a subprocess, read only: -B, no bytecode written there): a Bracket is a
-     Located with the same flanking ranks and tier when n_tied = 1 (the same m and tier, and a span that holds 1118's, when n_tied > 1);
+     MaxLocated (1160 A15: was Located) with the same flanking ranks and tier when n_tied = 1 (the same m and tier, and a span that holds 1118's, when n_tied > 1);
      Refuse("max at path end") is MaxAtPathEnd.
 Seen RED: see the P6.2 lines of the scratchpad's p6-seenred.txt (each mutation applied, the test run, the mutation reverted)."""
 import json
@@ -53,17 +53,17 @@ def chain(r, s=None, bias="MAX_MEASURED"):
 
 # ---- T2. planted chains
 pk = [0.0, 1.0, 3.0, 1.0, 0.0]
-check("T2. a clear interior peak, sigma 0.1: Located at rank 2, span 1..3, RESOLVED, n_tied 1", chain(pk, [0.1] * 5) == term.Located(2, 1, 3, "RESOLVED", 1), str(chain(pk, [0.1] * 5)))
-check("T2. the same peak, sigma x 100: EXPLORATORY (every curve tied, n_tied 5, the span the whole chain)", chain(pk, [10.0] * 5) == term.Located(2, 0, 4, "EXPLORATORY", 5), str(chain(pk, [10.0] * 5)))
-check("T2. the same peak, no sigma (tiering NONE): UNTIERED, n_tied NOT_EVALUATED, the span the flanking ranks", chain(pk) == term.Located(2, 1, 3, "UNTIERED", "NOT_EVALUATED"), str(chain(pk)))
+check("T2. a clear interior peak, sigma 0.1: MaxLocated (1160 A15: was Located) at rank 2, span 1..3, RESOLVED, n_tied 1", chain(pk, [0.1] * 5) == term.MaxLocated(2, 1, 3, "RESOLVED", 1), str(chain(pk, [0.1] * 5)))
+check("T2. the same peak, sigma x 100: EXPLORATORY (every curve tied, n_tied 5, the span the whole chain) (1160 A15: was term.Located)", chain(pk, [10.0] * 5) == term.MaxLocated(2, 0, 4, "EXPLORATORY", 5), str(chain(pk, [10.0] * 5)))
+check("T2. the same peak, no sigma (tiering NONE): UNTIERED, n_tied NOT_EVALUATED, the span the flanking ranks (1160 A15: was term.Located)", chain(pk) == term.MaxLocated(2, 1, 3, "UNTIERED", "NOT_EVALUATED"), str(chain(pk)))
 plateau = [0.0, 1.0, 3.0, 3.0, 3.0, 1.0, 0.0]
-check("T2. a plateau of three equal maxima: n_tied 3, the span their chain neighbourhood 1..5 (EXPLORATORY: the edge out of rank 2 is 0)",
-      chain(plateau, [0.1] * 7) == term.Located(2, 1, 5, "EXPLORATORY", 3), str(chain(plateau, [0.1] * 7)))
+check("T2. a plateau of three equal maxima: n_tied 3, the span their chain neighbourhood 1..5 (EXPLORATORY: the edge out of rank 2 is 0) (1160 A15: was term.Located)",
+      chain(plateau, [0.1] * 7) == term.MaxLocated(2, 1, 5, "EXPLORATORY", 3), str(chain(plateau, [0.1] * 7)))
 check("T2. a rising chain: MaxAtPathEnd at the last rank", chain([0.0, 1.0, 2.0, 3.0, 4.0], [0.1] * 5) == term.MaxAtPathEnd(4), str(chain([0.0, 1.0, 2.0, 3.0, 4.0], [0.1] * 5)))
 check("T2. a falling chain: MaxAtPathEnd at rank 0", chain([4.0, 3.0, 2.0, 1.0, 0.0], [0.1] * 5) == term.MaxAtPathEnd(0), "")
 check("T2. ARGMAX_FAST on a monotone chain: NoInteriorMaximum", chain([0.0, 1.0, 2.0, 3.0, 4.0], bias="ARGMAX_FAST") == term.NoInteriorMaximum(), "")
-check("T2. ARGMAX_FAST takes local maxima (plan 1118 PAIR): an interior local maximum at rank 1 is Located while the global maximum is at the end",
-      chain([0.0, 2.0, 1.0, 3.0, 4.0], bias="ARGMAX_FAST") == term.Located(1, 0, 2, "UNTIERED", "NOT_EVALUATED"), str(chain([0.0, 2.0, 1.0, 3.0, 4.0], bias="ARGMAX_FAST")))
+check("T2. ARGMAX_FAST takes local maxima (plan 1118 PAIR): an interior local maximum at rank 1 is MaxLocated (1160 A15: was Located) while the global maximum is at the end",
+      chain([0.0, 2.0, 1.0, 3.0, 4.0], bias="ARGMAX_FAST") == term.MaxLocated(1, 0, 2, "UNTIERED", "NOT_EVALUATED"), str(chain([0.0, 2.0, 1.0, 3.0, 4.0], bias="ARGMAX_FAST")))
 check("T2. the words of a result carry no value (only the type, ranks, tier and n_tied)", not re.search(r"\d\.\d", chain(pk, [0.1] * 5).words()), chain(pk, [0.1] * 5).words())
 
 with tempfile.TemporaryDirectory() as tmp:
@@ -90,9 +90,9 @@ with tempfile.TemporaryDirectory() as tmp:
     # ---- T1. the quickstart bank
     q = got(per_file(m, "q"), "q")
     res = getattr(q, "result", None)
-    span = {True: lambda: (q.slows[res.lo_rank][0], q.slows[res.hi_rank][0]), False: lambda: None}[isinstance(res, term.Located)]()
-    check("T1. the synthetic quickstart bank reaches Located over its 9 curves", isinstance(res, term.Located) and len(q.slows) == 9, str(res or q))
-    check("T1. the Located span holds h* (read from the truth file by this test)", span is not None and span[0] <= h_star <= span[1], f"span {span}, h* {h_star}")
+    span = {True: lambda: (q.slows[res.lo_rank][0], q.slows[res.hi_rank][0]), False: lambda: None}[isinstance(res, term.MaxLocated)]()
+    check("T1. the synthetic quickstart bank reaches MaxLocated (1160 A15: was Located) over its 9 curves", isinstance(res, term.MaxLocated) and len(q.slows) == 9, str(res or q))
+    check("T1. the MaxLocated (1160 A15: was Located) span holds h* (read from the truth file by this test)", span is not None and span[0] <= h_star <= span[1], f"span {span}, h* {h_star}")
     rec = getattr(q, "record", lambda: {})()
     check("T1. the RESULT.json record's span_slow is the slow values at lo_rank and hi_rank, and holds h*",
           span is not None and rec.get("span_slow") == [list(q.slows[res.lo_rank]), list(q.slows[res.hi_rank])] and rec["span_slow"][0][0] <= h_star <= rec["span_slow"][1][0], str(rec)[:300])
@@ -108,8 +108,8 @@ with tempfile.TemporaryDirectory() as tmp:
     syn = got(fast(per_file(m, "as")), "as")
     print(f"  (information) ARGMAX_FAST on the noisy synthetic bank: {getattr(getattr(syn, 'result', None), 'words', lambda: syn)()}")
     un = got(per_file(m, "un").replace('method = "STATED"', 'method = "NONE"', 1), "un")
-    check("T3. interval NONE (tiering NONE): Located, UNTIERED, n_tied NOT_EVALUATED, the span the flanking ranks",
-          isinstance(getattr(un, "result", None), term.Located) and (un.result.tier, un.result.n_tied, un.result.hi_rank - un.result.lo_rank) == ("UNTIERED", "NOT_EVALUATED", 2), str(getattr(un, "result", un)))
+    check("T3. interval NONE (tiering NONE): MaxLocated (1160 A15: was Located), UNTIERED, n_tied NOT_EVALUATED, the span the flanking ranks",
+          isinstance(getattr(un, "result", None), term.MaxLocated) and (un.result.tier, un.result.n_tied, un.result.hi_rank - un.result.lo_rank) == ("UNTIERED", "NOT_EVALUATED", 2), str(getattr(un, "result", un)))
     sh = got(SHIFT("-1000.5")(per_file(m, "sh")), "sh")
     check("T3. [shift] c = -1000.5 gives the result of c = 0 (x + c at S10 only; A takes differences)", getattr(sh, "result", None) == res, f"{getattr(sh, 'result', sh)} against {res}")
 
@@ -147,8 +147,8 @@ for cs in BANKS:
     xs = [door.nodefield(v, None) for v in term.values(cv, "MAX_MEASURED", "STATED", 0.0)]
     ours.append(term.reduce(xs, "MAX_MEASURED", Z, term.chain(len(cv))))
 SAME = {   # (1118's kind, ours' type) -> are they the same result; total over the pairs the two can produce
-    ("Bracket", "Located"): lambda a, o: o.tier == a[3] and {True: (o.lo_rank, o.hi_rank) == (a[1], a[2]), False: o.lo_rank <= a[1] and a[2] <= o.hi_rank and o.m == a[1] + 1}[o.n_tied == 1],
-    ("Bracket", "MaxAtPathEnd"): lambda a, o: False, ("Refuse", "Located"): lambda a, o: False,
+    ("Bracket", "MaxLocated"): lambda a, o: o.tier == a[3] and {True: (o.lo_rank, o.hi_rank) == (a[1], a[2]), False: o.lo_rank <= a[1] and a[2] <= o.hi_rank and o.m == a[1] + 1}[o.n_tied == 1],
+    ("Bracket", "MaxAtPathEnd"): lambda a, o: False, ("Refuse", "MaxLocated"): lambda a, o: False,   # 1160 A15: the keys were ("Bracket"|"Refuse", "Located")
     ("Refuse", "MaxAtPathEnd"): lambda a, o: a[1] == "max at path end",
 }
 diff = [(i, a, o) for i, (a, o) in enumerate(zip(theirs["out"], ours)) if not SAME[(a[0], type(o).__name__)](a, o)]

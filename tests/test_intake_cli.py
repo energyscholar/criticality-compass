@@ -10,7 +10,7 @@ plan-1139 report lists them).
     by applying the quickstart's filled example.
     Plan 1160 P5: the run now passes S7, S8 and S9 (interval STATED, tiering STATED; CANDIDATE_BRACKET) and is PRIMARY_INCOMPLETE missing
     only confirmation. Seen RED: TIERING["STATED"] made REPLICATES in cc/intake_feasible.py: the S7-S9 check FAILS.
- 6. (plan 1160 P6) The terminal from the command line: S10 passes Located on the quickstart bank, its report line carries ranks and no value,
+ 6. (plan 1160 P6) The terminal from the command line: S10 passes MaxLocated (1160 A15: was Located) on the quickstart bank, its report line carries ranks and no value,
     RESULT.json is written on the INCOMPLETE run (confirmation UNCONFIRMED, the E8 sentence); docs/INTAKE-COMPLETION.md's command block
     (remove the seal, seal --as human --confirmed-by, run) then gives PRIMARY_READY and RESULT.json confirmation CONFIRMED; a run whose S10
     refuses removes RESULT.json. Seen RED: see the P6.2 lines of the scratchpad's p6-seenred.txt.
@@ -130,11 +130,11 @@ with tempfile.TemporaryDirectory() as tmp:
     dd = w / "declarations" / "demo1"
     res = json.loads(slurp(dd / "RESULT.json") or "{}")
     s10 = [ln for ln in report.splitlines() if ln.startswith("- **S10 KERNEL_HANDOFF** (LIVE)")]
-    check("6. S10 EXECUTED PASS: Located, its ranks, tier and n_tied of 9 curves, and the identifiability value; no value in that line",
-          len(s10) == 1 and "EXECUTED, PASS. PRIMARY CHAIN_SLOW on 'C_max' (MAX_MEASURED): Located, span ranks " in s10[0] and "of 9 curves. Identifiability: " in s10[0]
+    check("6. S10 EXECUTED PASS: MaxLocated (1160 A15: was Located), its ranks, tier and n_tied of 9 curves, and the identifiability value; no value in that line",
+          len(s10) == 1 and "EXECUTED, PASS. PRIMARY CHAIN_SLOW on 'C_max' (MAX_MEASURED): MaxLocated, span ranks " in s10[0] and "of 9 curves. Identifiability: " in s10[0]
           and not re.search(r"\d\.\d", s10[0]), str(s10)[:400])
-    check("6. RESULT.json is written on the INCOMPLETE run: Located, UNCONFIRMED, PRIMARY_INCOMPLETE, CANDIDATE_BRACKET and why its tier is no coverage claim",
-          [r.get("type") for r in res.get("results", [])] == ["Located"] and (res.get("confirmation"), res.get("primary_verdict"), res.get("max_bracket")) == ("UNCONFIRMED", "PRIMARY_INCOMPLETE", "CANDIDATE_BRACKET")
+    check("6. RESULT.json is written on the INCOMPLETE run: MaxLocated (1160 A15: was Located), UNCONFIRMED, PRIMARY_INCOMPLETE, CANDIDATE_BRACKET and why its tier is no coverage claim",
+          [r.get("type") for r in res.get("results", [])] == ["MaxLocated"] and (res.get("confirmation"), res.get("primary_verdict"), res.get("max_bracket")) == ("UNCONFIRMED", "PRIMARY_INCOMPLETE", "CANDIDATE_BRACKET")
           and "no tier here is a coverage claim" in res.get("why_this_tier", "") and res.get("seal_identity", {}).get("status") == "SEALED", json.dumps(res)[:600])
     DONE = [b for lang, b in re.findall(r"```(\w*)\n(.*?)\n```", (w / "docs" / "INTAKE-COMPLETION.md").read_text(), re.S) if "--confirmed-by" in b]
     check("6. docs/INTAKE-COMPLETION.md has one command block that confirms the seal", len(DONE) == 1, str(len(DONE)))

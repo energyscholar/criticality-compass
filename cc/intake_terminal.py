@@ -75,7 +75,7 @@ class Untiered:
 
 
 @dataclass(frozen=True)
-class Located:
+class MaxLocated:
     """An interior maximum at rank m; the span [lo_rank, hi_rank] is the chain neighbourhood of the tied curves (ranks are 0-based slow order)."""
     m: int
     lo_rank: int
@@ -84,10 +84,10 @@ class Located:
     n_tied: object
 
     def words(self):
-        return f"Located, span ranks {self.lo_rank}..{self.hi_rank} (maximum at rank {self.m}), tier {self.tier}, n_tied {self.n_tied}"
+        return f"MaxLocated, span ranks {self.lo_rank}..{self.hi_rank} (maximum at rank {self.m}), tier {self.tier}, n_tied {self.n_tied}"
 
     def record(self, slows, wheres):
-        return {"type": "Located", "m": self.m, "lo_rank": self.lo_rank, "hi_rank": self.hi_rank, "tier": self.tier, "n_tied": self.n_tied,
+        return {"type": "MaxLocated", "m": self.m, "lo_rank": self.lo_rank, "hi_rank": self.hi_rank, "tier": self.tier, "n_tied": self.n_tied,
                 "span_slow": [list(slows[self.lo_rank]), list(slows[self.hi_rank])], "span_curves": [wheres[self.lo_rank], wheres[self.hi_rank]]}
 
 
@@ -113,6 +113,14 @@ class NoInteriorMaximum:
         return {"type": "NoInteriorMaximum"}
 
 
+KINDS = (MaxLocated, MaxAtPathEnd, NoInteriorMaximum)   # every result kind of result() (plan 1160 A15; tests/test_intake_loop2.py T15.1)
+READING = {   # result kind -> RESULT.json's `reading`: what the result is and is not evidence of (plan 1160 A15, A38); total over KINDS (test)
+    MaxLocated: "A located maximum is not, by itself, evidence of a transition: `tiering` and `primary_verdict` say how far it was tested.",
+    MaxAtPathEnd: "The maximum is at an end of the chain, so no bracket exists: the slow range may not reach a peak.",
+    NoInteriorMaximum: "No curve between the ends has a rising edge in and a falling edge out: there is no interior maximum to locate.",
+}
+
+
 @dataclass(frozen=True)
 class Handoff:
     """One PRIMARY bridge's kernel input and result. Invariant: `slows` and `wheres` are the curves' slow values and names in slow order
@@ -131,11 +139,11 @@ class Handoff:
 
 
 def result(e, r, cands, tiers, rel):
-    """The result of one chain: the first interior candidate's Located, else MaxAtPathEnd (a REDUCE maximum at an end) or NoInteriorMaximum."""
+    """The result of one chain: the first interior candidate's MaxLocated, else MaxAtPathEnd (a REDUCE maximum at an end) or NoInteriorMaximum."""
     n = len(r)
     inner = [m for m in cands if 0 < m < n - 1]
     near = lambda tied: sorted(set(tied) | {int(a) for a, b in zip(rel.src, rel.tgt) if b in tied} | {int(b) for a, b in zip(rel.src, rel.tgt) if a in tied})
-    loc = lambda m, tied: Located(m, near(tied)[0], near(tied)[-1], tiers.tier(e, m), tiers.count(tied))
+    loc = lambda m, tied: MaxLocated(m, near(tied)[0], near(tied)[-1], tiers.tier(e, m), tiers.count(tied))
     return {True: lambda: loc(inner[0], tiers.tied(r, inner[0])), False: lambda: {True: lambda: MaxAtPathEnd(cands[0]), False: NoInteriorMaximum}[len(cands) > 0]()}[len(inner) > 0]()
 
 
@@ -205,14 +213,16 @@ def identity(seal):
 
 
 def _record(root, t, d, out, primary):
-    """RESULT.json of a run whose S10 passed: every PRIMARY bridge's result, the tiering, the identifiability, the bracket and why its tier
+    """RESULT.json of a run whose S10 passed. It leads with what to read (plan 1160 A15): `tiering`, `primary_verdict`, then `reading`
+    (READING's sentence of each distinct result kind, in result order); then every PRIMARY bridge's result, the identifiability, the bracket and why its tier
     claims no coverage, the confirmation, and the code and seal identity. Its only numbers are ranks, counts, Z and the span's slow values."""
     k, seal = out["S10"].result.evidence, out[t["stages"]["seal_stage"]].result.evidence
-    rec = {"schema": 1, "kind": "intake-result", "id": Path(d).name, "results": [h.record() for h in k.columns],
+    rec = {"tiering": out["S7"].result.evidence.tiering, "primary_verdict": primary, "reading": " ".join(dict.fromkeys(READING[type(h.result)] for h in k.columns)),
+           "schema": 1, "kind": "intake-result", "id": Path(d).name, "results": [h.record() for h in k.columns],
            "ranks": "0-based positions of the curves in slow order: the nodes of the declared chain (CHAIN_SLOW)",
-           "tiering": out["S7"].result.evidence.tiering, "tier_z": t["policy"]["policy"]["tier_z"], "identifiability": k.identifiability,
+           "tier_z": t["policy"]["policy"]["tier_z"], "identifiability": k.identifiability,
            "max_bracket": out["S8"].result.evidence.max_bracket, "why_this_tier": HONEST[out["S8"].result.evidence.max_bracket],
-           "confirmation": {True: "CONFIRMED", False: "UNCONFIRMED"}[out[t["stages"]["seal_stage"]].confirmed()], "primary_verdict": primary,
+           "confirmation": {True: "CONFIRMED", False: "UNCONFIRMED"}[out[t["stages"]["seal_stage"]].confirmed()],
            "code_identity": {"commit": intake_seal._git(root, "rev-parse", "HEAD"), "code_hash": schema.code_hash(root),
                              "terminal_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest()},
            "seal_identity": identity(seal)}
