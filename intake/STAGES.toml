@@ -126,6 +126,19 @@ reason = [
   { code = "UNIT_DIFFERS",      sentence = "The file states a unit that differs from the declared unit." },
   { code = "ROW_ORDER_DIFFERS", sentence = "The rows of a curve are not stored in the declared order of the fast knob." },
 ]
+reader_reason = [   # plan 1145: the reasons a live reader gives for a file it cannot read (cc/intake_read.py Unreadable); S4 shows one as READER_REFUSED
+  { code = "NOT_UTF8",                     sentence = "A text file's bytes are not UTF-8." },
+  { code = "HEADER_LINE_ABSENT",           sentence = "The file holds fewer header lines than declared, or the declared names or units line is not among them." },
+  { code = "NO_DATA_ROW",                  sentence = "After the header the file holds no data row." },
+  { code = "ROW_WIDTH_DIFFERS",            sentence = "A data row holds another number of cells than the names line (or the first data row); its row is shown." },
+  { code = "COLUMN_NAME_ABSENT",           sentence = "A column declared by name is not in the names line (or the header declares no names line)." },
+  { code = "COLUMN_NAME_AMBIGUOUS",        sentence = "A column declared by name names two or more columns of the names line." },
+  { code = "COLUMN_POSITION_OUT_OF_RANGE", sentence = "A column declared by 1-based position is not a column of the table." },
+  { code = "CELL_NOT_A_NUMBER",            sentence = "A cell of a declared column is not a number as written (an empty cell, nan and text are not numbers); its row and column are shown." },
+  { code = "XLSX_READER_ABSENT",           sentence = "The file is declared xlsx and openpyxl is not installed on this machine, so it cannot be read here." },
+  { code = "NOT_AN_XLSX",                  sentence = "The file is declared xlsx and its bytes are not a workbook openpyxl can open." },
+  { code = "SHEET_ABSENT",                 sentence = "The declared sheet is not a sheet of the workbook." },
+]
 
 [[stage]]
 id = "S5"
