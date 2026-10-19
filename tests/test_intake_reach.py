@@ -327,6 +327,23 @@ with tempfile.TemporaryDirectory() as tmp:
           s4([(h, rs[:3] + [rs[4], rs[3]] + rs[5:]) if i == 4 else (h, rs) for i, (h, rs) in enumerate(curves)]) == {"curves": 1, **cls(8, 0, 1)}, "")
     check("E2. (1160 A7) every block written in descending T, declared ASCENDING: 0 declared, 9 opposite, 0 neither (a count, no value)",
           s4([(h, rs[::-1]) for h, rs in curves]) == {"curves": 9, **cls(0, 9, 0)}, str(s4([(h, rs[::-1]) for h, rs in curves])))
+    def folded(text_of, blocks=None):
+        """(1160 A9) The fold of a declaration (a PER_FILE of pf, or a LONG_TABLE of `blocks`), edited by text_of."""
+        ident = f"d{next(n)}"
+        base = {True: lambda: per_file(m, ident), False: lambda: long_table(m, ident).replace("<long-test>/pf", f"<long-test>/{bank(blocks)}")}[blocks is None]()
+        return run(T, tmp, ident, text_of(base))
+    for what, blocks, lane in (("ARGMAX_FAST, block 3 cut after its maximum", cut, ARGMAX_LANE), ("PAIR_NEAREST_FAST on C, block 5's T moved", moved, PAIR_LANE)):
+        out9 = folded(lane, blocks)
+        p9, r9 = intake.verdicts(T, out9)
+        check(f"E2. (1160 A9) {what}: S9 refuses SECOND_LANE_INFEASIBLE, S10 still EXECUTES and passes, PRIMARY misses only confirmation, ROBUSTNESS_REFUSED at S9",
+              outcome(out9, "S9")[0] == "SECOND_LANE_INFEASIBLE" and out9["S10"].mark is intake.Mark.PASSED and p9.missing == ("confirmation",)
+              and (r9.kind, r9.at) == (intake.Robustness.ROBUSTNESS_REFUSED, "S9"), str((out9["S10"].mark, p9, r9)))
+    words = lambda edit: " | ".join(getattr(getattr(folded(edit)["S1"], "result", None), "evidence", blind.detail()).words)
+    check("E2. (1160 A9) OPERATION_NOT_PERMITTED names the link the step is permitted on: PAIR_NEAREST_FAST on C_max wants RAW (the measured name)",
+          "PAIR_NEAREST_FAST on 'C_max' (DERIVED_OBSERVABLE; it is permitted on RAW (the measured name))" in words(CHOICE_PLANTS[7][2]), words(CHOICE_PLANTS[7][2]))
+    check("E2. (1160 A9) ... and CHAIN_SLOW on the raw C wants the `to` of a projection of the same lane",
+          "CHAIN_SLOW on 'C' (RAW; it is permitted on DERIVED_OBSERVABLE (the `to` of a projection of the same lane))" in words(lambda t: t.replace('on = "C_max"', 'on = "C"', 1)),
+          words(lambda t: t.replace('on = "C_max"', 'on = "C"', 1)))
     none = slow_label("pf", "NONE")
     check("E2. (1160 P1) slow source NONE reaches the census with curves_with_slow = 0, every curve formed",
           (getattr(none, "with_slow", None), getattr(none, "curves", None)) == (0, len(m["files"])), str(none))

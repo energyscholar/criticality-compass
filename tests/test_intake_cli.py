@@ -17,6 +17,8 @@ plan-1139 report lists them).
  7. (plan 1160 A8) docs/INTAKE-ON-A-DATA-HOST.md holds D2's sentence and one worked kind = "record" transducer.toml that the transducer
     check passes; the transducer template's comments name every required table. Seen RED: the worked file's [interval] role reworded;
     its [record] source line deleted; the D2 sentence's "[reduction]" dropped from the doc.
+ 8. (plan 1160 P8 loop 1) The sentences RUN-REPORT-P7a names as missing (D1-D10, adapted where an amendment says so) are in the docs, and
+    the stale A9 sentence is gone. Seen RED: each sentence's doc edited (scratchpad seenred-loop1.txt).
 Tests 2 to 5 run in one copy of the Compass (its code, tables and docs; not .git, results, benchmark, fixtures, data), never in this tree."""
 import json
 import os
@@ -221,6 +223,21 @@ check("7. (1160 A8) the doc holds one worked kind = \"record\" transducer.toml, 
       len(REC) == 1 and 'kind = "record"' in REC[0] and found == [], str((len(REC), found))[:600])
 check("7. (1160 A8) the template as `new intake` writes it is refused (its TODOs), and its comments name [record], [reduction] and [interval]",
       blank != [] and all(x in (ROOT / "inputs" / "TEMPLATE.transducer.toml.in").read_text().split("\nschema")[0] for x in ("[record]", "[reduction]", "[interval]")), str(blank)[:300])
+
+# ---- 8. (1160 P8 loop 1) the missing sentences of RUN-REPORT-P7a D1-D10 are in the docs (whitespace-normalised), and a stale one is gone
+flat = lambda name: " ".join((ROOT / "docs" / name).read_text().split())
+SENTENCES = [   # (doc, sentence, the defect it answers)
+    ("INTAKE-ON-A-DATA-HOST.md", "If the deposit does not state the order the rows were written in, declare `row_order = ACQUISITION` and `direction = UNORDERED`; "
+     "ASCENDING and DESCENDING assert a monotone sweep and S4 refuses a file that is not one.", "D1"),
+    ("INTAKE-COMPLETION.md", "A second lane must differ from the first; ARGMAX_FAST needs each curve's maximum to be interior; PAIR_NEAREST_FAST is declared `on` "
+     "the measured quantity, not a derived one.", "D4"),
+    ("INTAKE-COMPLETION.md", "A refused second lane does not withhold the result", "D4"),
+]
+GONE = [("INTAKE-COMPLETION.md", "A ROBUSTNESS refusal at S9 withholds S10", "D4 (plan 1160 A9: S10 runs before S9)")]
+for doc, text, why in SENTENCES:
+    check(f"8. {why}: docs/{doc} holds '{text[:60]}...'", text in flat(doc))
+for doc, text, why in GONE:
+    check(f"8. {why}: docs/{doc} no longer says '{text}'", text not in flat(doc))
 
 print("test_intake_cli: " + ("FAILED " + "; ".join(bad) if bad else "all passed"))
 sys.exit(1 if bad else 0)

@@ -20,7 +20,10 @@ A3 check (no row of an implemented stage is live = false, neither deleted code i
 Seen RED (1160 P5, S7-S9): REPLICATED without NONE: the S7-tables totality check FAILS; TIERING[STATED] made REPLICATES: the same check
 FAILS (TIERING's values); COVERED without CANDIDATE_BRACKET: the COVERED/ENDS/PAIRS totality check FAILS; TOO_FEW_CURVES renamed in
 cc/intake_feasible.py: the S7-S9 codes check FAILS.
-Seen RED (1160 P6, S10): see the P6 lines of $S/p6-seenred.txt (the terminal tables' totality, its codes, its signature, the 3-way S10 enumeration)."""
+Seen RED (1160 P6, S10): see the P6 lines of $S/p6-seenred.txt (the terminal tables' totality, its codes, its signature, the 3-way S10 enumeration).
+Seen RED (1160 A9): S9's block moved back before S10 in intake/STAGES.toml: the run-order check, the ROBUSTNESS-after check and test 3's
+reached-cells check FAIL ((READY, REFUSED) unreached; (REFUSED_AT, STUB) and (REFUSED_AT, PASSED) reached); the (READY, REFUSED) row
+deleted from cc/intake.py ROBUSTNESS: test 3's partition check FAILS."""
 import ast
 import dataclasses
 import enum
@@ -65,7 +68,9 @@ FIXTURE = ROOT / "tests" / "planted" / "intake" / "p1118-bank-FIXTURE"
 # ---- 1. the stage table and the runner
 check("1. the bodies are exactly the stages with implemented = true", set(intake.bodies(T, EXAMPLE, "", [])) == {s["id"] for s in ST if s["implemented"]},
       f"{sorted(intake.bodies(T, EXAMPLE, '', []))} against {[s['id'] for s in ST if s['implemented']]}")
-check("1. the stages are S0..S10 in run order (amendment A2 Q13)", IDS == [f"S{i}" for i in range(11)], str(IDS))
+check("1. the stages are S0..S8, S10, S9 in run order (amendment A2 Q13; plan 1160 A9: S10 before S9, was S0..S10)", IDS == [f"S{i}" for i in range(9)] + ["S10", "S9"], str(IDS))
+check("1. (1160 A9) the ROBUSTNESS stage runs after every PRIMARY and HANDOFF stage, so its refusal can withhold none of them",
+      all(IDS.index(s["id"]) < IDS.index(next(r["id"] for r in ST if r["verdict"] == "ROBUSTNESS")) for s in ST if s["verdict"] in ("PRIMARY", "HANDOFF")), str(IDS))
 check("1. every need names an earlier stage", all(n in IDS[:IDS.index(s["id"])] for s in ST for n in s["needs"]), "")
 check("1. every stage that reads data bytes has S0 and never the seal stage in its transitive needs (amendment A3)",
       all("S0" in intake.closure(T, s["id"]) and SEAL not in intake.closure(T, s["id"]) for s in ST if s["reads_bytes"] != "NONE"), "")

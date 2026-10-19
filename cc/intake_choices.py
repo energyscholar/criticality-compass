@@ -35,6 +35,8 @@ PERMITTED = {   # (a step's op, the link of the chain its input is in) -> may it
     ("CHAIN_SLOW", "RAW"): False, ("CHAIN_SLOW", "DERIVED_OBSERVABLE"): True, ("CHAIN_SLOW", "NO_LINK"): False,   # chains one number per curve
     ("PAIR_NEAREST_FAST", "RAW"): True, ("PAIR_NEAREST_FAST", "DERIVED_OBSERVABLE"): False, ("PAIR_NEAREST_FAST", "NO_LINK"): False,   # joins locus values
 }
+LINK_WORDS = {"RAW": "RAW (the measured name)", "DERIVED_OBSERVABLE": "DERIVED_OBSERVABLE (the `to` of a projection of the same lane)", "NO_LINK": "NO_LINK"}   # total
+WANTS = lambda op: " or ".join(LINK_WORDS[k] for (o, k), ok in PERMITTED.items() if o == op and ok)   # (plan 1160 A9) the link(s) PERMITTED lets an op take
 LANES = {"PLANTED": lambda policy: 1, "EXPERIMENT": lambda policy: policy["policy"]["real_data_lanes"]}   # [source] origin -> lanes required; total
 NEIGHBOUR = {   # [replicate] identity -> the declaration -> does the replicate key name the fast knob (a neighbouring point of one sweep); total
     "NONE": lambda d: False, "SAME_FAST_VALUE": lambda d: False,   # 1160 P2: readings at one fast value are one point, never neighbours
@@ -98,7 +100,7 @@ def choices(declaration, policy):
              lambda: detail(words=[f"{lane}: projection {', '.join(form(lane)[0]) or 'none'}; bridge {', '.join(form(lane)[1])}" for lane in lanes])),
             (lambda: not NEIGHBOUR[d["replicate"]["identity"]](d), "REPLICATE_IS_SWEEP_NEIGHBOUR",
              lambda: detail(words=[f"identity {d['replicate']['identity']}", f"key '{d['replicate']['key']}' is the fast knob {d['knobs']['fast']['name']}"])),
-            (lambda: not barred, "OPERATION_NOT_PERMITTED", lambda: detail(words=[f"{s[1]} {s[0]} {s[2]} on '{s[3]}' ({s[4]})" for s in barred][:3], counts={"steps not permitted": len(barred)})),
+            (lambda: not barred, "OPERATION_NOT_PERMITTED", lambda: detail(words=[f"{s[1]} {s[0]} {s[2]} on '{s[3]}' ({s[4]}; it is permitted on {WANTS(s[2])})" for s in barred][:3], counts={"steps not permitted": len(barred)})),
             (lambda: ROUTE[d["source"]["admissibility"]], "PROVENANCE_HAS_NO_KERNEL_ROUTE", lambda: detail(words=[f"admissibility {d['source']['admissibility']}"])),
             (lambda: not NEEDS_COLUMN[method] or HAS_COLUMN[kind], "METHOD_NEEDS_UNCERTAINTY_COLUMN", lambda: detail(words=[f"interval method {method}", f"uncertainty {kind}"]))]
     return gate(rows, lambda: Pass(Chosen(declaration, tuple(r[1] for r in rows))))

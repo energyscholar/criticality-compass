@@ -157,7 +157,7 @@ class Verdict:
     at: str = ""
 
 
-def _missing(ids, out):   # plan 1160 P6: WITHHELD_AFTER_REFUSAL too: the HANDOFF stage withheld after a ROBUSTNESS refusal was not executed
+def _missing(ids, out):   # plan 1160 P6: WITHHELD_AFTER_REFUSAL too (a stage withheld after a refusal was not executed; A9: never after S9's)
     return tuple(i for i in ids if out[i].mark in (Mark.STUB, Mark.WITHHELD_INPUT_ABSENT, Mark.WITHHELD_AFTER_REFUSAL))
 
 
@@ -180,21 +180,21 @@ EXAMINED = {1: Robustness.ROBUSTNESS_NOT_EXAMINED, 2: Robustness.ROBUSTNESS_COMP
 ROBUSTNESS = {   # design Table 3, the reachable cells of (PRIMARY, the ROBUSTNESS stage's mark) -> (its execution -> the verdict)
     (Primary.PRIMARY_READY, Mark.STUB): lambda e: Robustness.ROBUSTNESS_INCOMPLETE,
     (Primary.PRIMARY_READY, Mark.PASSED): lambda e: EXAMINED[e.result.evidence.n_lanes],
+    (Primary.PRIMARY_READY, Mark.REFUSED): lambda e: Robustness.ROBUSTNESS_REFUSED,   # plan 1160 A9: it runs after the HANDOFF stage
     (Primary.PRIMARY_INCOMPLETE, Mark.STUB): lambda e: Robustness.ROBUSTNESS_INCOMPLETE,
     (Primary.PRIMARY_INCOMPLETE, Mark.WITHHELD_INPUT_ABSENT): lambda e: Robustness.ROBUSTNESS_INCOMPLETE,
     (Primary.PRIMARY_INCOMPLETE, Mark.PASSED): lambda e: EXAMINED[e.result.evidence.n_lanes],
     (Primary.PRIMARY_INCOMPLETE, Mark.REFUSED): lambda e: Robustness.ROBUSTNESS_REFUSED,
     (Primary.PRIMARY_REFUSED_AT, Mark.WITHHELD_AFTER_REFUSAL): lambda e: Robustness.ROBUSTNESS_WITHHELD,
-    (Primary.PRIMARY_REFUSED_AT, Mark.STUB): lambda e: Robustness.ROBUSTNESS_INCOMPLETE,   # plan 1160 P6: the HANDOFF stage, after this one, refused
-    (Primary.PRIMARY_REFUSED_AT, Mark.PASSED): lambda e: EXAMINED[e.result.evidence.n_lanes],   # plan 1160 P6: as above; this stage had run
 }
 IMPOSSIBLE = {   # the other cells of the product; the fold never produces them (tests/test_intake.py enumerates every fold of the table)
-    (Primary.PRIMARY_READY, Mark.REFUSED): "READY means the HANDOFF stage executed; it runs after the ROBUSTNESS stage, so that refusal withholds it (plan 1160 P6)",
     (Primary.PRIMARY_READY, Mark.WITHHELD_INPUT_ABSENT): "READY means every PRIMARY stage passed, and those include the stage's needs",
-    (Primary.PRIMARY_READY, Mark.WITHHELD_AFTER_REFUSAL): "READY means no PRIMARY stage refused, and the stage runs right after them",
-    (Primary.PRIMARY_INCOMPLETE, Mark.WITHHELD_AFTER_REFUSAL): "INCOMPLETE means no PRIMARY stage refused",
-    (Primary.PRIMARY_REFUSED_AT, Mark.WITHHELD_INPUT_ABSENT): "after a refusal the upstream state is REFUSED_EARLIER, never SOME_ABSENT; and the HANDOFF stage's needs include this stage's, so it cannot run to refuse",
-    (Primary.PRIMARY_REFUSED_AT, Mark.REFUSED): "a refusal here withholds the HANDOFF stage, so the PRIMARY refusal is before it, and after that no body runs",
+    (Primary.PRIMARY_READY, Mark.WITHHELD_AFTER_REFUSAL): "READY means no PRIMARY stage refused, and the seal stage never refuses",
+    (Primary.PRIMARY_INCOMPLETE, Mark.WITHHELD_AFTER_REFUSAL): "INCOMPLETE means no PRIMARY stage refused, and the seal stage never refuses",
+    (Primary.PRIMARY_REFUSED_AT, Mark.WITHHELD_INPUT_ABSENT): "after a refusal the upstream state is REFUSED_EARLIER, never SOME_ABSENT",
+    (Primary.PRIMARY_REFUSED_AT, Mark.STUB): "plan 1160 A9: the stage runs after every PRIMARY and HANDOFF stage, so a PRIMARY refusal is earlier and a stub after it is WITHHELD",
+    (Primary.PRIMARY_REFUSED_AT, Mark.PASSED): "plan 1160 A9: as above; after the PRIMARY refusal no body runs",
+    (Primary.PRIMARY_REFUSED_AT, Mark.REFUSED): "plan 1160 A9: as above; after the PRIMARY refusal no body runs, so this stage cannot refuse",
 }
 
 
@@ -248,7 +248,7 @@ def explain(t):
            "executed or no seal with a non-empty confirmed_by holds the declaration now; else PRIMARY_READY.",
            "- **ROBUSTNESS** verdict, over the ROBUSTNESS stage: ROBUSTNESS_COMPLETE (it passed with two lanes declared), ROBUSTNESS_NOT_EXAMINED "
            "(it passed with one lane declared: nothing was examined), ROBUSTNESS_INCOMPLETE, ROBUSTNESS_REFUSED, or ROBUSTNESS_WITHHELD after a PRIMARY refusal.",
-           "- The HANDOFF stage is the terminal (docs/INTAKE-COMPLETION.md): PRIMARY_READY needs it executed, and a ROBUSTNESS refusal withholds it.",
+           "- The HANDOFF stage is the terminal (docs/INTAKE-COMPLETION.md): PRIMARY_READY needs it executed. It runs before the ROBUSTNESS stage, so a ROBUSTNESS refusal never withholds it (plan 1160 A9).",
            "- The ADVISORY stage (the seal) is outside every verdict. It never refuses: every report carries its seal status, SEALED, UNSEALED or "
            "SEALED_THEN_EDITED, and an ordering note.", "",
            f"**The seal.** {st['report']['seal_claim']}", "", "| id | name | state | reads data bytes | needs | verdict |", "|---|---|---|---|---|---|"]

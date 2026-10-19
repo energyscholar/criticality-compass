@@ -1,6 +1,6 @@
 # Intake report: dial1118-s1-v3
 
-Written by `bin/cc intake run dial1118-s1-v3`. Stage table 1160-v4, policy 1136-v1.
+Written by `bin/cc intake run dial1118-s1-v3`. Stage table 1160-v5, policy 1136-v1.
 
 - **Mode** (the declarer's sealed statement of what they had seen): EXPLORATORY
 - **PRIMARY verdict: PRIMARY_REFUSED_AT** at S3. Missing: none.
@@ -20,8 +20,8 @@ Written by `bin/cc intake run dial1118-s1-v3`. Stage table 1160-v4, policy 1136-
 | S6 | ADMISSIBILITY | LIVE | NONE | WITHHELD |
 | S7 | INTERVAL_FEASIBILITY | LIVE | NONE | WITHHELD |
 | S8 | RESOLUTION_AND_IDENTIFIABILITY | LIVE | NONE | WITHHELD |
-| S9 | ALTERNATIVE_INTAKE | LIVE | ALL_FILES | WITHHELD |
 | S10 | KERNEL_HANDOFF | LIVE | ALL_FILES | WITHHELD |
+| S9 | ALTERNATIVE_INTAKE | LIVE | ALL_FILES | WITHHELD |
 
 - **S0 FORMAT** (LIVE): EXECUTED, PASS. The declaration 'dial1118-s1-v3' parses, and every field of format v3 is present, typed and listed (mode EXPLORATORY)
 - **S1 CHOICES** (LIVE): EXECUTED, PASS. Checked: KNOBS_SAME_QUANTITY, MEASURED_IS_A_KNOB, SELECTION_EMPTY, SLOW_VALUES_NOT_ONE_PER_FILE, BLOCK_RULE_HAS_NO_DIRECTION, PROJECTION_REQUIRED, PROJECTION_ESTIMAND_MIXED, SECOND_LANE_MISSING, LANES_IDENTICAL, REPLICATE_IS_SWEEP_NEIGHBOUR, OPERATION_NOT_PERMITTED, PROVENANCE_HAS_NO_KERNEL_ROUTE, METHOD_NEEDS_UNCERTAINTY_COLUMN. The S1 rows that are not live are listed under the reasons no body can return yet
@@ -32,8 +32,8 @@ Written by `bin/cc intake run dial1118-s1-v3`. Stage table 1160-v4, policy 1136-
 - **S6 ADMISSIBILITY** (LIVE): WITHHELD AFTER_REFUSAL (S3). Not run: an earlier stage refused, and no later check can redeem a refusal.
 - **S7 INTERVAL_FEASIBILITY** (LIVE): WITHHELD AFTER_REFUSAL (S3). Not run: an earlier stage refused, and no later check can redeem a refusal.
 - **S8 RESOLUTION_AND_IDENTIFIABILITY** (LIVE): WITHHELD AFTER_REFUSAL (S3). Not run: an earlier stage refused, and no later check can redeem a refusal.
-- **S9 ALTERNATIVE_INTAKE** (LIVE): WITHHELD AFTER_REFUSAL (S3). Not run: an earlier stage refused, and no later check can redeem a refusal.
 - **S10 KERNEL_HANDOFF** (LIVE): WITHHELD AFTER_REFUSAL (S3). Not run: an earlier stage refused, and no later check can redeem a refusal.
+- **S9 ALTERNATIVE_INTAKE** (LIVE): WITHHELD AFTER_REFUSAL (S3). Not run: an earlier stage refused, and no later check can redeem a refusal.
 
 ## What the seal proves
 

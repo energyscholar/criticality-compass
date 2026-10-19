@@ -9,7 +9,7 @@
 # needs, and never the seal stage (test 1).
 schema = 1
 kind = "intake-stages"
-version = "1160-v4"
+version = "1160-v5"   # plan 1160 A9: S10 runs before S9 (a refused second lane never withholds the terminal)
 seal_stage = "S2"
 
 [report]
@@ -216,18 +216,6 @@ reason = [
 ]
 
 [[stage]]
-id = "S9"
-name = "ALTERNATIVE_INTAKE"
-purpose = "The second declared lane passes the same census-level checks as the first, so that both lanes can be run; concordance is measured later, from values."
-reads_bytes = "ALL_FILES"   # plan 1160 P5: the bytes S3 pinned, through the reader (a maximum's place on a curve is a value; no file is opened)
-needs = ["S5"]
-implemented = true   # plan 1160 P5 (cc/intake_feasible.py). With no ALTERNATIVE lane (origin PLANTED, one lane) nothing is checked, and its summary says so
-verdict = "ROBUSTNESS"
-reason = [
-  { code = "SECOND_LANE_INFEASIBLE", live = true,  sentence = "The census does not support the second lane: its projection ARGMAX_FAST finds a curve's maximum at a fast end, or its bridge PAIR_NEAREST_FAST finds a curve's anchor outside a slow neighbour's fast span." },
-]
-
-[[stage]]
 id = "S10"
 name = "KERNEL_HANDOFF"
 purpose = "Mint the kernel input (NodeField and Relations) through the provenance route and the door, applying x + c only here."
@@ -238,4 +226,16 @@ verdict = "HANDOFF"
 reason = [
   { code = "NO_KERNEL_ROUTE", live = true, sentence = "The PRIMARY lane has no bridge, or a PRIMARY bridge's template has no door template in CC (PAIR_NEAREST_FAST, plan 1118's PAIR, is not yet one), so no value reaches the kernel." },
   { code = "DOOR_REFUSED",    live = true, sentence = "The door refused a value of the kernel input: a curve's value at its maximum (after x + c) or its sigma is not finite (door.nodefield's Null). The chain relation itself cannot be refused: it is acyclic by construction." },
+]
+
+[[stage]]
+id = "S9"
+name = "ALTERNATIVE_INTAKE"
+purpose = "The second declared lane passes the same census-level checks as the first, so that both lanes can be run; concordance is measured later, from values."
+reads_bytes = "ALL_FILES"   # plan 1160 P5: the bytes S3 pinned, through the reader (a maximum's place on a curve is a value; no file is opened)
+needs = ["S5"]   # plan 1160 A9: it runs AFTER S10 (table order is run order), so its refusal feeds the ROBUSTNESS verdict only and never withholds S10
+implemented = true   # plan 1160 P5 (cc/intake_feasible.py). With no ALTERNATIVE lane (origin PLANTED, one lane) nothing is checked, and its summary says so
+verdict = "ROBUSTNESS"
+reason = [
+  { code = "SECOND_LANE_INFEASIBLE", live = true,  sentence = "The census does not support the second lane: its projection ARGMAX_FAST finds a curve's maximum at a fast end, or its bridge PAIR_NEAREST_FAST finds a curve's anchor outside a slow neighbour's fast span." },
 ]

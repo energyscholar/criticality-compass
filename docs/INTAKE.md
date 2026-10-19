@@ -1,4 +1,4 @@
-# The intake pipeline (stage table 1160-v4, policy 1136-v1)
+# The intake pipeline (stage table 1160-v5, policy 1136-v1)
 
 Generated from intake/STAGES.toml and intake/POLICY.toml by `bin/cc intake explain` (docs/gen-intake.py); never edit it by hand.
 This is the intake's explain. `bin/cc explain <input> <point>` is a different command: it explains one point of a measured input.
@@ -7,7 +7,7 @@ A declaration `declarations/<id>/` (intake.toml and the CC transducer.toml) goes
 
 - **PRIMARY** verdict, over the PRIMARY stages and the HANDOFF stage (the terminal): PRIMARY_REFUSED_AT when one refused; else PRIMARY_INCOMPLETE when one is not executed or no seal with a non-empty confirmed_by holds the declaration now; else PRIMARY_READY.
 - **ROBUSTNESS** verdict, over the ROBUSTNESS stage: ROBUSTNESS_COMPLETE (it passed with two lanes declared), ROBUSTNESS_NOT_EXAMINED (it passed with one lane declared: nothing was examined), ROBUSTNESS_INCOMPLETE, ROBUSTNESS_REFUSED, or ROBUSTNESS_WITHHELD after a PRIMARY refusal.
-- The HANDOFF stage is the terminal (docs/INTAKE-COMPLETION.md): PRIMARY_READY needs it executed, and a ROBUSTNESS refusal withholds it.
+- The HANDOFF stage is the terminal (docs/INTAKE-COMPLETION.md): PRIMARY_READY needs it executed. It runs before the ROBUSTNESS stage, so a ROBUSTNESS refusal never withholds it (plan 1160 A9).
 - The ADVISORY stage (the seal) is outside every verdict. It never refuses: every report carries its seal status, SEALED, UNSEALED or SEALED_THEN_EDITED, and an ordering note.
 
 **The seal.** Sealing is recommended and not enforced. It records what you declared and when; it is an integrity practice, like a lab notebook. A seal proves INTEGRITY (the declaration's sha256) and ORDERING (the seal time against the first logged data read). It never proves ignorance: mode is the declarer's sealed statement of what they had seen.
@@ -23,8 +23,8 @@ A declaration `declarations/<id>/` (intake.toml and the CC transducer.toml) goes
 | S6 | ADMISSIBILITY | LIVE | NONE | S5 | PRIMARY |
 | S7 | INTERVAL_FEASIBILITY | LIVE | NONE | S5 | PRIMARY |
 | S8 | RESOLUTION_AND_IDENTIFIABILITY | LIVE | NONE | S5 | PRIMARY |
-| S9 | ALTERNATIVE_INTAKE | LIVE | ALL_FILES | S5 | ROBUSTNESS |
 | S10 | KERNEL_HANDOFF | LIVE | ALL_FILES | S6, S7, S8 | HANDOFF |
+| S9 | ALTERNATIVE_INTAKE | LIVE | ALL_FILES | S5 | ROBUSTNESS |
 
 ## S0 FORMAT (LIVE)
 
@@ -170,14 +170,6 @@ The census makes the declared lanes feasible to attempt, and the evidence record
 | TOO_FEW_POINTS_IN_CURVE | live | A curve holds fewer than three fast-knob points: no interior maximum can be formed on it. |
 | NO_COVERAGE_EVIDENCE | live | The declaration requires a validated bracket ([bracket] required = "VALIDATED_BRACKET"), and no frozen planted coverage evidence exists for this lane at this density (none exists under intake/coverage/PRIMARY/ yet, so this always refuses today: declare CANDIDATE_BRACKET). |
 
-## S9 ALTERNATIVE_INTAKE (LIVE)
-
-The second declared lane passes the same census-level checks as the first, so that both lanes can be run; concordance is measured later, from values.
-
-| reason | live | what it means |
-|---|---|---|
-| SECOND_LANE_INFEASIBLE | live | The census does not support the second lane: its projection ARGMAX_FAST finds a curve's maximum at a fast end, or its bridge PAIR_NEAREST_FAST finds a curve's anchor outside a slow neighbour's fast span. |
-
 ## S10 KERNEL_HANDOFF (LIVE)
 
 Mint the kernel input (NodeField and Relations) through the provenance route and the door, applying x + c only here.
@@ -186,6 +178,14 @@ Mint the kernel input (NodeField and Relations) through the provenance route and
 |---|---|---|
 | NO_KERNEL_ROUTE | live | The PRIMARY lane has no bridge, or a PRIMARY bridge's template has no door template in CC (PAIR_NEAREST_FAST, plan 1118's PAIR, is not yet one), so no value reaches the kernel. |
 | DOOR_REFUSED | live | The door refused a value of the kernel input: a curve's value at its maximum (after x + c) or its sigma is not finite (door.nodefield's Null). The chain relation itself cannot be refused: it is acyclic by construction. |
+
+## S9 ALTERNATIVE_INTAKE (LIVE)
+
+The second declared lane passes the same census-level checks as the first, so that both lanes can be run; concordance is measured later, from values.
+
+| reason | live | what it means |
+|---|---|---|
+| SECOND_LANE_INFEASIBLE | live | The census does not support the second lane: its projection ARGMAX_FAST finds a curve's maximum at a fast end, or its bridge PAIR_NEAREST_FAST finds a curve's anchor outside a slow neighbour's fast span. |
 
 ## Policy (POLICY, 1136-v1)
 

@@ -1,6 +1,6 @@
 # The intake's terminal: what a completed run says
 
-Plan 1160 P6. Stage S10 KERNEL_HANDOFF is the terminal of the intake. It runs after S0 to S9 have passed. It turns the census into one
+Plan 1160 P6. Stage S10 KERNEL_HANDOFF is the terminal of the intake. It runs after S0 to S8 have passed; S9 ALTERNATIVE_INTAKE (the second lane) runs after it (plan 1160 A9). It turns the census into one
 result per PRIMARY bridge and writes `declarations/<id>/RESULT.json`. The code is `cc/intake_terminal.py`.
 
 ## What the terminal computes
@@ -63,7 +63,7 @@ bank. Read every such bracket as EXPLORATORY until coverage evidence is frozen.
 
 S8's identifiability value, `TRANSITION_TOPOLOGY_NOT_IDENTIFIABLE_FROM_AVAILABLE_OBSERVABLES`, appears in the report and in RESULT.json.
 
-A maximum of one observable along one slow knob looks the same whether a phase transition causes it or a smooth crossover does. A Located
+A maximum of one observable along one slow knob looks the same whether a phase transition causes it or a smooth crossover does. **A Located result is not a transition.** A Located
 result says *where* the observable peaks among the measured curves. It does not say *what kind* of change happens there. That needs a
 second, independent observable (a second lane), finite-size evidence, or both.
 
@@ -84,7 +84,35 @@ S10 counts toward PRIMARY, which the run reports as one of three verdicts:
 | **PRIMARY_INCOMPLETE[confirmation]** | S10 executed, but the seal is not confirmed. RESULT.json is still written, with `confirmation = UNCONFIRMED`. |
 | **PRIMARY_REFUSED_AT S10** | S10 refused. No RESULT.json is written, and a stale one is removed. |
 
-A ROBUSTNESS refusal at S9 withholds S10. PRIMARY is then INCOMPLETE, with S10 missing.
+S9 ALTERNATIVE_INTAKE runs after S10 (plan 1160 A9). A refused second lane does not withhold the result: S10 still runs, the PRIMARY
+verdict is what S0 to S8 and S10 make it, RESULT.json is written when S10 passed, and the ROBUSTNESS verdict is ROBUSTNESS_REFUSED at S9
+with S9's code (SECOND_LANE_INFEASIBLE). Fix the second lane and run again to examine robustness.
+
+## Choosing a second lane
+
+A real data set (`[source] origin = "EXPERIMENT"`) needs two lanes, PRIMARY and ALTERNATIVE. A second lane must differ from the first; ARGMAX_FAST needs each curve's maximum to be interior; PAIR_NEAREST_FAST is declared `on` the measured quantity, not a derived one.
+
+Each step of a lane takes one input, and S1 refuses OPERATION_NOT_PERMITTED when the input is in the wrong link of the chain. Its Detail
+names the link the step is permitted on. A name is RAW when it is `[measured] name`, and DERIVED_OBSERVABLE when it is the `to` of a
+projection of the same lane.
+
+| Step | Declare it on | What the data must hold | Refused when they do not |
+|---|---|---|---|
+| projection `MAX_MEASURED` | `from` = the measured quantity (RAW) | nothing beyond the census | - |
+| projection `ARGMAX_FAST` | `from` = the measured quantity (RAW) | each curve's largest reading is interior: not at the first or last fast point of its curve | S9 SECOND_LANE_INFEASIBLE |
+| bridge `CHAIN_SLOW` | `on` = the `to` of a projection of the same lane (DERIVED_OBSERVABLE) | three or more curves (S8) | S8 TOO_FEW_CURVES |
+| bridge `PAIR_NEAREST_FAST` | `on` = the measured quantity (RAW), not a projection's `to` | each curve's anchor inside a slow neighbour's fast span | S9 SECOND_LANE_INFEASIBLE |
+
+`PAIR_NEAREST_FAST` has no door template in CC, so declare it in the ALTERNATIVE lane only: as the PRIMARY bridge, S10 refuses
+NO_KERNEL_ROUTE. The two lanes differ when their projections or their bridges differ (else S1 refuses LANES_IDENTICAL). Two pairs that
+differ, for example:
+
+- PRIMARY: `MAX_MEASURED` from the measured quantity to `X_max`, then `CHAIN_SLOW` on `X_max`.
+- ALTERNATIVE: a bridge `PAIR_NEAREST_FAST` on the measured quantity itself (no projection); or a projection `ARGMAX_FAST` from the
+  measured quantity to `X_star`, then `CHAIN_SLOW` on `X_star`, when every curve's maximum is interior.
+
+`peek` and the census cannot tell you whether a maximum is interior (that is a value). If S9 refuses, the result of S10 stands; the
+second lane is what was refused.
 
 ## RESULT.json
 
