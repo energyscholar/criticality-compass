@@ -8,6 +8,7 @@ from pathlib import Path
 
 CAP = 5000
 INTAKE_CAP = 1200
+HANDOFF_CAP = 900   # plan 1160 P3: checks.toml [roles] intake_handoff, the conversion and peek (cc/intake_convert.py)
 NAMES_CAP = 120   # plan 1160 P2: checks.toml [roles] intake_names, the name classifier and Detail, moved out of the intake so INTAKE_CAP is not raised
 VERBATIM = [
     "cc/admit.py", "cc/reduce.py", "cc/gamma.py", "tests/test_kernel.py", "tests/test_sign.py", "tests/test_resample.py",
@@ -27,15 +28,19 @@ tests = {f: lines(f) for f in roles["tests"] if f not in VERBATIM}
 maths = {f: lines(f) for f in roles["maths"]}
 intake = {f: lines(f) for f in roles["intake"]}
 names = {f: lines(f) for f in roles["intake_names"]}
+handoff = {f: lines(f) for f in roles["intake_handoff"]}
 for f, n in {**counts, **intake, **names, **tests, **maths}.items():
     print(f"  {f}: {n}")
 total = sum(counts.values())
 print(f"plumbing total {total} of {CAP}; tests (reported, not capped) {sum(tests.values())}; maths (reported, not capped) {sum(maths.values())}")
 print(f"intake total {sum(intake.values())} of {INTAKE_CAP}")
 print(f"intake_names total {sum(names.values())} of {NAMES_CAP}")
+print(f"intake_handoff total {sum(handoff.values())} of {HANDOFF_CAP}")
 assert not set(intake) & set(roles["plumbing"]), f"a file in both plumbing and intake: {sorted(set(intake) & set(roles['plumbing']))}"
 assert sum(intake.values()) <= INTAKE_CAP, f"intake line budget exceeded: {sum(intake.values())} > {INTAKE_CAP}; stop and report which files grew"
 assert sum(names.values()) <= NAMES_CAP, f"intake_names line budget exceeded: {sum(names.values())} > {NAMES_CAP}"
 assert not set(names) & (set(intake) | set(roles["plumbing"])), "intake_names shares a file with another capped role"
+assert sum(handoff.values()) <= HANDOFF_CAP, f"intake_handoff line budget exceeded: {sum(handoff.values())} > {HANDOFF_CAP}"
+assert not set(handoff) & (set(intake) | set(names) | set(roles["plumbing"])), "intake_handoff shares a file with another capped role"
 assert total <= CAP, f"line budget exceeded: {total} > {CAP}; stop and report which files grew"
 print("test_budget: all passed")
