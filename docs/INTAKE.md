@@ -21,9 +21,9 @@ A declaration `declarations/<id>/` (intake.toml and the CC transducer.toml) goes
 | S4 | SHAPE | LIVE | FIRST_FILE | S3 | PRIMARY |
 | S5 | CENSUS | LIVE | ALL_FILES | S3, S4 | PRIMARY |
 | S6 | ADMISSIBILITY | LIVE | NONE | S5 | PRIMARY |
-| S7 | INTERVAL_FEASIBILITY | STUB | NONE | S5 | PRIMARY |
-| S8 | RESOLUTION_AND_IDENTIFIABILITY | STUB | NONE | S5 | PRIMARY |
-| S9 | ALTERNATIVE_INTAKE | STUB | NONE | S5 | ROBUSTNESS |
+| S7 | INTERVAL_FEASIBILITY | LIVE | NONE | S5 | PRIMARY |
+| S8 | RESOLUTION_AND_IDENTIFIABILITY | LIVE | NONE | S5 | PRIMARY |
+| S9 | ALTERNATIVE_INTAKE | LIVE | ALL_FILES | S5 | ROBUSTNESS |
 | S10 | KERNEL_HANDOFF | STUB | ALL_FILES | S6, S7, S8 | HANDOFF |
 
 ## S0 FORMAT (LIVE)
@@ -150,33 +150,33 @@ The actual lineage obeys the sealed operation graph: every value reached the int
 | READ_NOT_LOGGED | live | A record exists whose bytes have no loader line in the access log. |
 | BYPASS_READ_LOGGED | live | The access log holds an in-process read of a data path that did not go through the loader. |
 
-## S7 INTERVAL_FEASIBILITY (STUB)
+## S7 INTERVAL_FEASIBILITY (LIVE)
 
 The sampling admits the declared interval method's floor at every point, for every method (the iid gap, plan 1134).
 
 | reason | live | what it means |
 |---|---|---|
-| ONE_READING_PER_POINT | NOT LIVE | Each point holds one reading (a continuous ramp); there is nothing to put an interval on. |
-| BELOW_METHOD_FLOOR | NOT LIVE | Some point holds fewer samples than the declared interval method's floor requires; the Next line names the routes. |
-| METHOD_HAS_NO_FLOOR | NOT LIVE | The declared interval method has no floor in CC yet; an interval method without a floor is not admitted. |
+| ONE_READING_PER_POINT | live | Each point holds one reading (a continuous ramp); there is nothing to put an interval on. |
+| BELOW_METHOD_FLOOR | live | Some point holds fewer samples than the declared interval method's floor requires; the Next line names the routes. |
+| METHOD_HAS_NO_FLOOR | live | The declared interval method has no floor in CC yet; an interval method without a floor is not admitted. |
 
-## S8 RESOLUTION_AND_IDENTIFIABILITY (STUB)
+## S8 RESOLUTION_AND_IDENTIFIABILITY (LIVE)
 
 The census makes the declared lanes feasible to attempt, and the evidence records what the available observables can and cannot identify.
 
 | reason | live | what it means |
 |---|---|---|
-| TOO_FEW_CURVES | NOT LIVE | Fewer than three slow-knob values: no interior node exists, so no bracket can be formed. |
-| TOO_FEW_POINTS_IN_CURVE | NOT LIVE | A curve holds fewer than three fast-knob points: no interior maximum can be formed on it. |
-| NO_COVERAGE_EVIDENCE | NOT LIVE | The declaration requires a validated bracket ([bracket] required = "VALIDATED_BRACKET"), and no frozen planted coverage evidence exists for this lane at this density. |
+| TOO_FEW_CURVES | live | Fewer than three slow-knob values: no interior node exists, so no bracket can be formed. |
+| TOO_FEW_POINTS_IN_CURVE | live | A curve holds fewer than three fast-knob points: no interior maximum can be formed on it. |
+| NO_COVERAGE_EVIDENCE | live | The declaration requires a validated bracket ([bracket] required = "VALIDATED_BRACKET"), and no frozen planted coverage evidence exists for this lane at this density (none exists under intake/coverage/PRIMARY/ yet, so this always refuses today: declare CANDIDATE_BRACKET). |
 
-## S9 ALTERNATIVE_INTAKE (STUB)
+## S9 ALTERNATIVE_INTAKE (LIVE)
 
 The second declared lane passes the same census-level checks as the first, so that both lanes can be run; concordance is measured later, from values.
 
 | reason | live | what it means |
 |---|---|---|
-| SECOND_LANE_INFEASIBLE | NOT LIVE | The census does not support the second lane (for example a pairing finds no neighbouring point). |
+| SECOND_LANE_INFEASIBLE | live | The census does not support the second lane: its projection ARGMAX_FAST finds a curve's maximum at a fast end, or its bridge PAIR_NEAREST_FAST finds a curve's anchor outside a slow neighbour's fast span. |
 
 ## S10 KERNEL_HANDOFF (STUB)
 
@@ -201,13 +201,6 @@ The plan 1118 banks were used to CHOOSE these rows; they cannot validate them (A
 
 Each row below has live = false in intake/STAGES.toml: no body returns it today (a STUB stage's rows are never live), so a run cannot show it and its absence says nothing.
 
-- S7 ONE_READING_PER_POINT
-- S7 BELOW_METHOD_FLOOR
-- S7 METHOD_HAS_NO_FLOOR
-- S8 TOO_FEW_CURVES
-- S8 TOO_FEW_POINTS_IN_CURVE
-- S8 NO_COVERAGE_EVIDENCE
-- S9 SECOND_LANE_INFEASIBLE
 - S10 NO_KERNEL_ROUTE
 - S10 DOOR_REFUSED
 

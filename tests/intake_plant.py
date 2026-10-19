@@ -51,10 +51,10 @@ def workbook(sheets):
 
 CHOICES = {"intake.mode": '"RETROSPECTIVE_PREDECLARED"',   # plan 1160 P4: PROSPECTIVE with the files present is S2 MODE_CONTRADICTS_SOURCE
            "source.admissibility": '"RAW"', "acquisition.mode": '"INDEPENDENT"', "acquisition.direction": '"UNORDERED"', "acquisition.row_order": '"ASCENDING"',
-           "interval.method": '"iid"', "bracket.required": '"CANDIDATE_BRACKET"', "projection.lane": '"PRIMARY"', "projection.from": '"C"', "projection.to": '"C_max"',
+           "interval.method": '"STATED"', "bracket.required": '"CANDIDATE_BRACKET"', "projection.lane": '"PRIMARY"', "projection.from": '"C"', "projection.to": '"C_max"',
            "projection.bias": '"MAX_MEASURED"', "projection.keeps": '"the largest C on each curve"', "projection.discards": '"every other point"',
            "bridge.lane": '"PRIMARY"', "bridge.on": '"C_max"', "bridge.template": '"CHAIN_SLOW"', "bridge.bias": '"CHAIN_SLOW"', "shift.c": "0.0"}
-IID = 'method = "iid"\nresamples = 1000\nlevel = 0.95\nseed = 1145\ntau_declared = 1'   # per_file's interval block
+IV = 'method = "STATED"'   # per_file's interval block. Plan 1160 P5: was iid, which S7 now refuses on a bank of one reading per point (ONE_READING_PER_POINT); the banks carry sigma
 ALT = '\n[[projection]]\nlane = "ALTERNATIVE"\nfrom = "C"\nto = "{to}"\nbias = "{bias}"\nkeeps = "planted"\ndiscards = "planted"\n'
 ALT_BRIDGE = '\n[[bridge]]\nlane = "ALTERNATIVE"\non = "{on}"\ntemplate = "CHAIN_SLOW"\nbias = "CHAIN_SLOW"\n'
 NO_SIGMA = lambda t: re.sub(r'kind = "COLUMN"([^\n]*)\nkey = "sigma"[^\n]*\n', r'kind = "NONE"\1\n', t, count=1)   # [measured.uncertainty] kind NONE
@@ -71,12 +71,20 @@ CHOICE_PLANTS = [   # (1160 P4) one plant per live S1 CHOICES row, and the PASS 
      lambda t: t.replace('template = "CHAIN_SLOW"', 'template = "PAIR_NEAREST_FAST"', 1).replace('bias = "CHAIN_SLOW"', 'bias = "PAIR_NEAREST_FAST"', 1)),
     ("OPERATION_NOT_PERMITTED", "a bridge on C_maxx, a name the chain does not hold", lambda t: t.replace('on = "C_max"', 'on = "C_maxx"', 1)),
     ("PROVENANCE_HAS_NO_KERNEL_ROUTE", "admissibility FIGURE_LEVEL", lambda t: t.replace('admissibility = "RAW"', 'admissibility = "FIGURE_LEVEL"', 1)),
-    ("METHOD_NEEDS_UNCERTAINTY_COLUMN", "interval STATED, and [measured.uncertainty] kind NONE", lambda t: NO_SIGMA(t.replace(IID, 'method = "STATED"', 1))),
-    ("PASS", "interval STATED with the sigma column", lambda t: t.replace(IID, 'method = "STATED"', 1)),
-    ("PASS", "interval NONE (no interval; the file's sigma column is still declared, S4 reads every column)", lambda t: t.replace(IID, 'method = "NONE"', 1)),
+    ("METHOD_NEEDS_UNCERTAINTY_COLUMN", "interval STATED, and [measured.uncertainty] kind NONE", lambda t: NO_SIGMA(t)),
+    ("PASS", "interval STATED with the sigma column (per_file's default since 1160 P5)", lambda t: t.replace(IV, 'method = "STATED"', 1)),
+    ("PASS", "interval NONE (no interval; the file's sigma column is still declared, S4 reads every column)", lambda t: t.replace(IV, 'method = "NONE"', 1)),
     ("PASS", "origin EXPERIMENT with two lanes that differ (ALTERNATIVE: C to T_star by ARGMAX_FAST, chained)",
      lambda t: t.replace('origin = "PLANTED"', 'origin = "EXPERIMENT"', 1) + ALT.format(to="T_star", bias="ARGMAX_FAST") + ALT_BRIDGE.format(on="T_star")),
 ]
+# (1160 P5) the S7, S8, S9 edits of a per_file or long_table declaration text, shared by tests/test_intake_reach.py and tests/test_intake_leak.py
+BLOCK = lambda mb: lambda t: t.replace(IV, f'method = "block"\nresamples = 1000\nlevel = 0.95\nseed = 1160\nb = 1\nmin_blocks = {mb}', 1)   # n // 1 >= mb per point
+IID = lambda t: t.replace(IV, 'method = "iid"\nresamples = 1000\nlevel = 0.95\nseed = 1160\ntau_declared = 1', 1)
+SAME_FAST = lambda t: t.replace('identity = "NONE"', 'identity = "SAME_FAST_VALUE"', 1)
+VALIDATED = lambda t: t.replace('required = "CANDIDATE_BRACKET"', 'required = "VALIDATED_BRACKET"', 1)
+ARGMAX_LANE = lambda t: t.replace('origin = "PLANTED"', 'origin = "EXPERIMENT"', 1) + ALT.format(to="T_star", bias="ARGMAX_FAST") + ALT_BRIDGE.format(on="T_star")
+PAIR_LANE = lambda t: (t.replace('origin = "PLANTED"', 'origin = "EXPERIMENT"', 1)
+                       + '\n[[bridge]]\nlane = "ALTERNATIVE"\non = "C"\ntemplate = "PAIR_NEAREST_FAST"\nbias = "PAIR_NEAREST_FAST"\n')
 LONG = '''# [reader]: VARIANT on name
 [reader]
 name = "table-curve-v1"
@@ -102,7 +110,7 @@ def per_file(m, ident):
     """The PER_FILE declaration text of a synth bank: the template filled by --from-synth's values and the choices above."""
     values, dropped, _ = intake_synth.declare(m, ident, "pf")   # the root names bank pf; a test re-points it
     text = intake.fill((ROOT / "intake" / "TEMPLATE.intake.toml.in").read_text().replace("<ID>", ident), {**values, **CHOICES}, dropped)
-    return text.replace('method = "iid"', 'method = "iid"\nresamples = 1000\nlevel = 0.95\nseed = 1145\ntau_declared = 1').replace("<intake-synth>/", "<long-test>/")
+    return text.replace("<intake-synth>/", "<long-test>/")
 
 
 def long_table(m, ident, header='kind = "NAMES"\nrows = 1\nnames = 1', slow='"h"', block='"EXACT"'):

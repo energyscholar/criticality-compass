@@ -17,7 +17,13 @@ PROVENANCE_HAS_NO_KERNEL_ROUTE, METHOD_NEEDS_UNCERTAINTY_COLUMN), one at a time:
 and E2's totality FAILS (the row live, never reached); intake_seal.SEEN["PROSPECTIVE"] made True: the MODE_CONTRADICTS_SOURCE plant FAILS
 (PASS) and E2's totality FAILS; S6's READ_NOT_LOGGED or BYPASS_READ_LOGGED holds made True: that plant FAILS (PASS: the deleted loader
 lines, the direct open()) and E2's totality FAILS; a CONVERTED source's bank read through a second loader (P3's two loaders): the converted
-PASS plant FAILS (BYPASS_READ_LOGGED: the chain loader's audit hook logged the bank loader's reads)."""
+PASS plant FAILS (BYPASS_READ_LOGGED: the chain loader's audit hook logged the bank loader's reads).
+Seen RED (1160 P5, cc/intake_feasible.py, one at a time): REPLICATED["block"] False: the ONE_READING_PER_POINT plant FAILS; FLOOR["block"]
+made []: the BELOW_METHOD_FLOOR plant and the FLOOR block check FAIL; k_gamma replaced by 1: the FLOOR gamma check FAILS; chains 0..n (one
+too many): the FLOOR chains check FAILS; HAS_FLOOR["iid"] True: the METHOD_HAS_NO_FLOOR plant FAILS; TIERING["STATED"] REPLICATES: the
+evidence check FAILS; with_slow >= 2: the two-curve TOO_FEW_CURVES plant FAILS; n < 2: the TOO_FEW_POINTS_IN_CURVE plant and totality
+FAIL; COVERED["VALIDATED_BRACKET"] True: the NO_COVERAGE_EVIDENCE plant and totality FAIL; ENDS["ARGMAX_FAST"] or PAIRS["PAIR_NEAREST_FAST"]
+made empty: that SECOND_LANE_INFEASIBLE plant FAILS (PASS)."""
 import importlib.util
 import json
 import re
@@ -32,10 +38,12 @@ sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "tests")]
 import intake  # noqa: E402
 import intake_blind as blind  # noqa: E402
 import intake_data  # noqa: E402
+import intake_feasible  # noqa: E402
+import readout  # noqa: E402
 import intake_read as rd  # noqa: E402
 import intake_seal  # noqa: E402
 import intake_synth  # noqa: E402
-from intake_plant import CHOICE_PLANTS, converted, key_lines, long_table, outcome, per_file, rooted, run, slow_source, write_long, xlsx  # noqa: E402
+from intake_plant import ARGMAX_LANE, BLOCK, IID, PAIR_LANE, SAME_FAST, VALIDATED, CHOICE_PLANTS, converted, key_lines, long_table, outcome, per_file, rooted, run, slow_source, write_long, xlsx  # noqa: E402
 
 bad = []
 
@@ -187,6 +195,10 @@ with tempfile.TemporaryDirectory() as tmp:
     xl = lambda sheet: lambda t: t.replace('[reader.format]\nkind = "COMMA"', f'[reader.format]\nkind = "XLSX"\nsheet = "{sheet}"')
     rows = [[float(x) for x in r.split(",")] + [h] for h, rs in curves for r in rs]
     asc = lambda t: t.replace('row_order = "ASCENDING"', 'row_order = "ACQUISITION"')
+    tripled = [(h, [r for r in rs for _ in range(3)]) for h, rs in curves]   # 1160 P5
+    top = max(range(len(curves[2][1])), key=lambda i: float(curves[2][1][i].split(",")[1]))
+    cut = [(h, rs[:top + 1] if i == 2 else rs) for i, (h, rs) in enumerate(curves)]   # 1160 P5: block 3 ends at its maximum
+    moved = [(h, [",".join([str(float(r.split(",")[0]) + 1000)] + r.split(",")[1:]) for r in rs] if i == 4 else rs) for i, (h, rs) in enumerate(curves)]   # 1160 P5
     PLANTS = [
         # S0 FORMAT, on the declaration text
         ("TOML_INVALID", "not TOML", lambda: s0(base + "\n[[[")),
@@ -239,6 +251,21 @@ with tempfile.TemporaryDirectory() as tmp:
         ("PASS", "(1160 P4) the access log as the run wrote it", lambda: at_s6(lambda d, b: None)),
         ("READ_NOT_LOGGED", "(1160 P4) the loader lines of one pinned file deleted from the access log", lambda: at_s6(lambda d, b: unlog(d, m["files"][4]["name"]))),
         ("BYPASS_READ_LOGGED", "(1160 P4) a bank file opened directly in the test process (open(), not the loader)", lambda: at_s6(lambda d, b: (b / m["files"][1]["name"]).read_bytes())),
+        # S7 INTERVAL_FEASIBILITY (plan 1160 P5): `tripled` holds every row three times in a row (three readings per point under SAME_FAST_VALUE)
+        ("ONE_READING_PER_POINT", "(1160 P5) block, b 1, min_blocks 2, on a bank of one reading per point", lambda: pf("pf", BLOCK(2))),
+        ("BELOW_METHOD_FLOOR", "(1160 P5) block, b 1, min_blocks 30, three readings per point", lambda: lt(bank(tripled), lambda t: BLOCK(30)(SAME_FAST(t)))),
+        ("PASS", "(1160 P5) block, b 1, min_blocks 3, three readings per point", lambda: lt(bank(tripled), lambda t: BLOCK(3)(SAME_FAST(t)))),
+        ("METHOD_HAS_NO_FLOOR", "(1160 P5) iid, three readings per point", lambda: lt(bank(tripled), lambda t: IID(SAME_FAST(t)))),
+        ("PASS", "(1160 P5) interval NONE on a bank of one reading per point", lambda: pf("pf", lambda t: t.replace('method = "STATED"', 'method = "NONE"', 1))),
+        # S8 RESOLUTION_AND_IDENTIFIABILITY (plan 1160 P5)
+        ("TOO_FEW_CURVES", "(1160 P5) a LONG_TABLE of two curves", lambda: lt(bank(curves[:2]))),
+        ("TOO_FEW_POINTS_IN_CURVE", "(1160 P5) block 5 cut to its first two rows", lambda: lt(bank([(h, rs[:2] if i == 4 else rs) for i, (h, rs) in enumerate(curves)]))),
+        ("NO_COVERAGE_EVIDENCE", "(1160 P5) [bracket] required VALIDATED_BRACKET (no coverage evidence exists)", lambda: pf("pf", VALIDATED)),
+        # S9 ALTERNATIVE_INTAKE (plan 1160 P5)
+        ("SECOND_LANE_INFEASIBLE", "(1160 P5) ARGMAX_FAST, block 3 cut after its maximum (its maximum at its fast end)", lambda: lt(bank(cut), ARGMAX_LANE)),
+        ("PASS", "(1160 P5) ARGMAX_FAST on the uncut bank (every maximum interior)", lambda: lt(bank(), ARGMAX_LANE)),
+        ("SECOND_LANE_INFEASIBLE", "(1160 P5) PAIR_NEAREST_FAST on C, block 5's T moved beyond every neighbour's span", lambda: lt(bank(moved), PAIR_LANE)),
+        ("PASS", "(1160 P5) PAIR_NEAREST_FAST on C on the unmoved bank", lambda: lt(bank(), PAIR_LANE)),
         # S4 SHAPE
         ("READER_NOT_LIVE", "reader P1", lambda: pf("pf", lambda t: t.replace('name = "csv-curve-v1"', 'name = "P1"'))),
         ("COLUMNS_DIFFER", "csv-curve-v1, the first file's header T,Q,sigma", lambda: pf(copy(lambda b: (b / m["files"][0]["name"]).write_text((b / m["files"][0]["name"]).read_text().replace("T,C,sigma", "T,Q,sigma", 1))))),
@@ -254,7 +281,7 @@ with tempfile.TemporaryDirectory() as tmp:
                                                                                                          lambda t: slow_source(t, "FILE_KEY"))),
         ("SLOW_KEY_UNRESOLVED", "(1160) FILE_KEY h, a key line whose value is not a number", lambda: pf(copy(lambda b: key_lines(b, m, lambda h: f"h,{h}x\n")), lambda t: slow_source(t, "FILE_KEY"))),
         ("PASS", "(1160) FILE_KEY h, every file's key line a number", lambda: pf(copy(lambda b: key_lines(b, m)), lambda t: slow_source(t, "FILE_KEY"))),
-        ("PASS", "(1160) slow source NONE", lambda: pf("pf", lambda t: slow_source(t, "NONE"))),
+        ("TOO_FEW_CURVES", "(1160) slow source NONE (1160 P5: was PASS; no curve carries a slow value, S8)", lambda: pf("pf", lambda t: slow_source(t, "NONE"))),
         ("REPLICATE_KEY_UNRESOLVED", "a FILE identity on a LONG_TABLE", lambda: lt(bank(curves + curves[:1]), lambda t: t.replace('identity = "NONE"', 'identity = "FILE"'))),
         ("ACQUISITION_ORDER_DIFFERS", "ascending rows in acquisition order, declared DESCENDING", lambda: lt(bank(), lambda t: asc(t).replace('direction = "UNORDERED"', 'direction = "DESCENDING"'))),
         # S4 reader reasons (table-curve-v1), each the detail of READER_REFUSED
@@ -285,6 +312,24 @@ with tempfile.TemporaryDirectory() as tmp:
     keyed = slow_label(copy(lambda b: key_lines(b, m)), "FILE_KEY")
     check("E2. (1160 P1) FILE_KEY reaches the census with every curve's slow value, as LISTED does", (getattr(keyed, "with_slow", None), getattr(keyed, "curves", None)) == (len(m["files"]),) * 2
           and keyed == slow_label("pf", "LISTED"), str(keyed))
+    # ---- (1160 P5) the S7 floors are CC's (cc/declare.py), on counts; the evidence of a run that passes S7, S8 and S9
+    pts = lambda n: (("curve_a", 1, n), ("curve_a", 2, n))
+    gam, ch = {"method": "gamma", "tau_declared": 1}, {"method": "chains", "m": 3, "r": readout.rank(3, 0.25), "alpha": 0.25}
+    k = T["interval_fields"]["gamma"]["k_gamma"]
+    check("E2. (1160 P5) FLOOR gamma is CC's gamma_floor: n = k_gamma * tau_declared readings meet it, one fewer does not",
+          not intake_feasible.FLOOR["gamma"](gam, pts(k), T) and bool(intake_feasible.FLOOR["gamma"](gam, pts(k - 1), T)), str(k))
+    check("E2. (1160 P5) FLOOR chains is CC's chain_cells: m = 3 readings per point (chains 0..2) meet it, 2 do not",
+          not intake_feasible.FLOOR["chains"](ch, pts(3), T) and bool(intake_feasible.FLOOR["chains"](ch, pts(2), T)), str(ch))
+    check("E2. (1160 P5) FLOOR block is CC's block_floor: b 1, min_blocks 3 is met by 3 readings, not by 2",
+          not intake_feasible.FLOOR["block"]({"method": "block", "b": 1, "min_blocks": 3}, pts(3), T) and bool(intake_feasible.FLOOR["block"]({"method": "block", "b": 1, "min_blocks": 3}, pts(2), T)), "")
+    ev = run(T, tmp, "p5", per_file(m, "p5"))
+    s7, s8, s9 = (outcome(ev, x)[1] for x in ("S7", "S8", "S9"))
+    check("E2. (1160 P5) the plant's run passes S7 with tiering STATED, S8 with CANDIDATE_BRACKET and the identifiability value, S9 with no ALTERNATIVE lane",
+          (getattr(s7, "tiering", None), getattr(s8, "max_bracket", None), getattr(s8, "identifiability", None), getattr(s9, "lanes", None))
+          == ("STATED", "CANDIDATE_BRACKET", intake_feasible.IDENTIFIABILITY, ()), str((s7, s8, s9))[:400])
+    tiers = {meth: getattr(outcome(run(T, tmp, f"t{meth}", edit(per_file(m, f"t{meth}"))), "S7")[1], "tiering", None)
+             for meth, edit in (("NONE", lambda t: t.replace('method = "STATED"', 'method = "NONE"', 1)),)}
+    check("E2. (1160 P5) interval NONE passes S7 with tiering NONE", tiers == {"NONE": "NONE"}, str(tiers))
     check("E2. READER_REFUSED: the reader-reason plants arrived through S4 READER_REFUSED", "READER_REFUSED" in SEEN, str(sorted(SEEN)))
     reached |= SEEN & {"READER_REFUSED"}
     print(f"  openpyxl {'installed' if HAS_XLSX else 'NOT installed'} on this machine; NOT REACHED HERE: {NOT_HERE or 'none'}")

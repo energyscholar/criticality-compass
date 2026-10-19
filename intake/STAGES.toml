@@ -193,12 +193,12 @@ name = "INTERVAL_FEASIBILITY"
 purpose = "The sampling admits the declared interval method's floor at every point, for every method (the iid gap, plan 1134)."
 reads_bytes = "NONE"
 needs = ["S5"]
-implemented = false
+implemented = true   # plan 1160 P5 (cc/intake_feasible.py): every row live, on the census's readings per point; the floors are CC's (cc/declare.py)
 verdict = "PRIMARY"
 reason = [
-  { code = "ONE_READING_PER_POINT", live = false, sentence = "Each point holds one reading (a continuous ramp); there is nothing to put an interval on." },
-  { code = "BELOW_METHOD_FLOOR",    live = false, sentence = "Some point holds fewer samples than the declared interval method's floor requires; the Next line names the routes." },
-  { code = "METHOD_HAS_NO_FLOOR",   live = false, sentence = "The declared interval method has no floor in CC yet; an interval method without a floor is not admitted." },
+  { code = "ONE_READING_PER_POINT", live = true,  sentence = "Each point holds one reading (a continuous ramp); there is nothing to put an interval on." },
+  { code = "BELOW_METHOD_FLOOR",    live = true,  sentence = "Some point holds fewer samples than the declared interval method's floor requires; the Next line names the routes." },
+  { code = "METHOD_HAS_NO_FLOOR",   live = true,  sentence = "The declared interval method has no floor in CC yet; an interval method without a floor is not admitted." },
 ]
 
 [[stage]]
@@ -207,24 +207,24 @@ name = "RESOLUTION_AND_IDENTIFIABILITY"
 purpose = "The census makes the declared lanes feasible to attempt, and the evidence records what the available observables can and cannot identify."
 reads_bytes = "NONE"
 needs = ["S5"]
-implemented = false
+implemented = true   # plan 1160 P5 (cc/intake_feasible.py): every row live. NO_COVERAGE_EVIDENCE always refuses today: no file exists under intake/coverage/PRIMARY/
 verdict = "PRIMARY"
 reason = [
-  { code = "TOO_FEW_CURVES",          live = false, sentence = "Fewer than three slow-knob values: no interior node exists, so no bracket can be formed." },
-  { code = "TOO_FEW_POINTS_IN_CURVE", live = false, sentence = "A curve holds fewer than three fast-knob points: no interior maximum can be formed on it." },
-  { code = "NO_COVERAGE_EVIDENCE",    live = false, sentence = "The declaration requires a validated bracket ([bracket] required = \"VALIDATED_BRACKET\"), and no frozen planted coverage evidence exists for this lane at this density." },
+  { code = "TOO_FEW_CURVES",          live = true,  sentence = "Fewer than three slow-knob values: no interior node exists, so no bracket can be formed." },
+  { code = "TOO_FEW_POINTS_IN_CURVE", live = true,  sentence = "A curve holds fewer than three fast-knob points: no interior maximum can be formed on it." },
+  { code = "NO_COVERAGE_EVIDENCE",    live = true,  sentence = "The declaration requires a validated bracket ([bracket] required = \"VALIDATED_BRACKET\"), and no frozen planted coverage evidence exists for this lane at this density (none exists under intake/coverage/PRIMARY/ yet, so this always refuses today: declare CANDIDATE_BRACKET)." },
 ]
 
 [[stage]]
 id = "S9"
 name = "ALTERNATIVE_INTAKE"
 purpose = "The second declared lane passes the same census-level checks as the first, so that both lanes can be run; concordance is measured later, from values."
-reads_bytes = "NONE"
+reads_bytes = "ALL_FILES"   # plan 1160 P5: the bytes S3 pinned, through the reader (a maximum's place on a curve is a value; no file is opened)
 needs = ["S5"]
-implemented = false
+implemented = true   # plan 1160 P5 (cc/intake_feasible.py). With no ALTERNATIVE lane (origin PLANTED, one lane) nothing is checked, and its summary says so
 verdict = "ROBUSTNESS"
 reason = [
-  { code = "SECOND_LANE_INFEASIBLE", live = false, sentence = "The census does not support the second lane (for example a pairing finds no neighbouring point)." },
+  { code = "SECOND_LANE_INFEASIBLE", live = true,  sentence = "The census does not support the second lane: its projection ARGMAX_FAST finds a curve's maximum at a fast end, or its bridge PAIR_NEAREST_FAST finds a curve's anchor outside a slow neighbour's fast span." },
 ]
 
 [[stage]]

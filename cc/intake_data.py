@@ -88,11 +88,13 @@ class Sampling:
 
 @dataclass(frozen=True)
 class Census:
-    """S5 CENSUS: the sampling label (curves, points per curve, distinct fast values, alignment) and the curves as (where, points) in census
-    order. Invariant: carries the Pinned it counted; it holds counts and names, never a value (plan 1160 P0)."""
+    """S5 CENSUS: the sampling label (curves, points per curve, distinct fast values, alignment), the curves as (where, points) in census
+    order, and per curve the readings of each point in row order (plan 1160 P5, S7's floor). Invariant: carries the Pinned it counted; it holds
+    counts and names, never a value (plan 1160 P0)."""
     pinned: Pinned
     label: Sampling
     curves: tuple
+    readings: tuple
 
     def summary(self):
         x = self.label
@@ -126,9 +128,18 @@ class Lineage:
 
 @dataclass(frozen=True)
 class IntervalPlan:
-    """S7 INTERVAL_FEASIBILITY: per point the method, n and the floor margin. Invariant: carries the Census it was planned on."""
+    """S7 INTERVAL_FEASIBILITY (plan 1160 P5, cc/intake_feasible.py): the method, the tiering it gives the terminal (STATED | REPLICATES | NONE)
+    and the points (curve, ordinal, readings) its floor was checked on. Invariant: carries the Census it was planned on."""
     census: Census
+    method: str
+    tiering: str
     floors: tuple
+
+    def summary(self):
+        return f"interval method {self.method}: {len(self.floors)} points meet its floor; tiering = {self.tiering}"
+
+    def confirmed(self):
+        return False
 
 
 @dataclass(frozen=True)
@@ -138,12 +149,25 @@ class Feasibility:
     max_bracket: str
     identifiability: str
 
+    def summary(self):
+        return f"at least 3 curves with a slow value and 3 points per curve; max_bracket = {self.max_bracket}; identifiability = {self.identifiability}"
+
+    def confirmed(self):
+        return False
+
 
 @dataclass(frozen=True)
 class SecondLane:
-    """S9 ALTERNATIVE_INTAKE: the second lane's feasibility. Invariant: carries the Census."""
+    """S9 ALTERNATIVE_INTAKE: the ALTERNATIVE lane's steps checked on the census, as words (plan 1160 P5: was a Feasibility, which only S8
+    builds). Invariant: carries the Census."""
     census: Census
-    feasibility: Feasibility
+    lanes: tuple
+
+    def summary(self):
+        return f"ALTERNATIVE lane steps feasible on the census: {', '.join(self.lanes) or 'none declared (one lane: nothing for S9 to check)'}"
+
+    def confirmed(self):
+        return False
 
 
 @dataclass(frozen=True)
@@ -372,7 +396,8 @@ def census(pinned, shaped, t):
                  (lambda: rep[0] or len(set(hs())) == len(hs()), "CURVE_REPEATED", lambda: detail(words=again()[:3], counts={"curves whose slow value another curve has": len(again())})),
                  (lambda: not twice(), "FAST_VALUE_REPEATED", lambda: detail(words=twice()[:3], counts={"curves": len(twice())})),
                  (lambda: not against(), "ACQUISITION_ORDER_DIFFERS", lambda: detail(words=against()[:3] + [f"stored in acquisition order, not {acq['direction']}"], counts={"curves": len(against())}))],
-                lambda: Pass(Census(pinned, label(curves(), [points(c) for c in curves()], d["knobs"]["fast"]["name"]), tuple((c.where, len(points(c))) for c in curves()))))
+                lambda: Pass(Census(pinned, label(curves(), [points(c) for c in curves()], d["knobs"]["fast"]["name"]), tuple((c.where, len(points(c))) for c in curves()),
+                                     tuple(tuple(n for _, n in points(c)) for c in curves()))))
 
 
 def label(curves, points, fast):

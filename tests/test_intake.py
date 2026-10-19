@@ -16,7 +16,10 @@ and intake_seal.SEEN without EXPLORATORY: the S1-tables totality check FAILS; ST
 check FAILS (and the INTAKE.md checks); S1's first two rows swapped in intake_choices.choices: the in-order check FAILS; `import os` in
 cc/intake_choices.py: its blindness check FAILS.
 Seen RED (1160 P5, A3): a LINEAGE_OFF_GRAPH row (live = false) put back in S6, or a SHIFT_BEFORE_KERNEL_INPUT row put back in S1: the
-A3 check (no row of an implemented stage is live = false, neither deleted code is a row) FAILS."""
+A3 check (no row of an implemented stage is live = false, neither deleted code is a row) FAILS.
+Seen RED (1160 P5, S7-S9): REPLICATED without NONE: the S7-tables totality check FAILS; TIERING[STATED] made REPLICATES: the same check
+FAILS (TIERING's values); COVERED without CANDIDATE_BRACKET: the COVERED/ENDS/PAIRS totality check FAILS; TOO_FEW_CURVES renamed in
+cc/intake_feasible.py: the S7-S9 codes check FAILS."""
 import ast
 import dataclasses
 import enum
@@ -133,6 +136,16 @@ check("1. (1160 P5, A3) no row of an implemented stage is live = false, and SHIF
 ALPHA = set(T["format"]["fields"]["interval"]["method"]["values"]) | set(tomllib.loads((ROOT / "cc.toml").read_text())["alphabets"]["interval_method"])
 check("1. (1160 P4) the intake's interval alphabet is cc.toml's with STATED and NONE; NEEDS_COLUMN is total over it and every method has its fields",
       ALPHA == set(intake_choices.NEEDS_COLUMN) and {"STATED", "NONE"} < ALPHA and ALPHA <= set(T["interval_fields"]), str(sorted(ALPHA)))
+import intake_feasible  # noqa: E402  (plan 1160 P5: S7, S8, S9)
+check("1. (1160 P5) the S7 tables REPLICATED, TIERING, HAS_FLOOR and FLOOR are total over the interval alphabet; TIERING says STATED | REPLICATES | NONE",
+      all(set(tab) == ALPHA for tab in (intake_feasible.REPLICATED, intake_feasible.TIERING, intake_feasible.HAS_FLOOR, intake_feasible.FLOOR))
+      and set(intake_feasible.TIERING.values()) == {"STATED", "REPLICATES", "NONE"}, "")
+check("1. (1160 P5) COVERED (S8) is total over [bracket] required's values; ENDS and PAIRS (S9) over POLICY's projections and bridges",
+      set(intake_feasible.COVERED) == set(T["format"]["fields"]["bracket"]["fields"]["required"]["values"]) and set(intake_feasible.ENDS) == set(T["policy"]["projection"])
+      and set(intake_feasible.PAIRS) == set(T["policy"]["bridge"]), "")
+FEAS = {n.value for n in ast.walk(ast.parse(Path(intake_feasible.__file__).read_text())) if isinstance(n, ast.Constant) and n.value in set(codes)}
+check("1. (1160 P5) every reason code cc/intake_feasible.py names is a row of S7, S8 or S9, and every row of S7, S8 and S9 is named there",
+      FEAS == set(REASONS["S7"]) | set(REASONS["S8"]) | set(REASONS["S9"]), str(sorted(FEAS ^ (set(REASONS["S7"]) | set(REASONS["S8"]) | set(REASONS["S9"])))))
 FM = T["format"]["fields"]
 check("1. (1160 P4) the S1 tables are total: SLOW_IDS over the slow sources, SCALAR over the shapes, LANES over the origins, NEIGHBOUR over the "
       "identities, ROUTE over the admissibility classes, HAS_COLUMN over the uncertainty kinds; SEEN (S2) over the modes",

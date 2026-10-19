@@ -8,6 +8,8 @@ plan-1139 report lists them).
  4. An unsealed run reaches the data stages and reports UNSEALED; a run after an edit that follows the seal reports SEALED_THEN_EDITED.
  5. docs/INTAKE-QUICKSTART.md's command block is the plan's sequence, and it runs clean in a copy of the Compass with the edit step done
     by applying the quickstart's filled example.
+    Plan 1160 P5: the run now passes S7, S8 and S9 (interval STATED, tiering STATED; CANDIDATE_BRACKET) and is PRIMARY_INCOMPLETE missing
+    only confirmation. Seen RED: TIERING["STATED"] made REPLICATES in cc/intake_feasible.py: the S7-S9 check FAILS.
 Tests 2 to 5 run in one copy of the Compass (its code, tables and docs; not .git, results, benchmark, fixtures, data), never in this tree."""
 import json
 import os
@@ -103,8 +105,10 @@ with tempfile.TemporaryDirectory() as tmp:
     check("5. S3, S4, S5 and (plan 1160 P4) S6 EXECUTED PASS", all(f"- **{s}** (LIVE): EXECUTED, PASS." in report for s in ("S3 SOURCE_INTEGRITY", "S4 SHAPE", "S5 CENSUS", "S6 ADMISSIBILITY"))
           and "S6 ADMISSIBILITY** (LIVE): EXECUTED, PASS. ADMITTED_ON_LOGGED_PATHS_ONLY" in report, report[:600])
     check("5. the census label says 9 curves, MISALIGNED", "Sampling: 9 curves;" in report and report.count("MISALIGNED") == 1 and "MISALIGNED; curves_with_slow = 9" in report, report[:300])
-    check("5. seal status SEALED and PRIMARY_INCOMPLETE listing the stubs", "Seal status** (advisory; sealing is recommended and not enforced): SEALED." in report
-          and "PRIMARY verdict: PRIMARY_INCOMPLETE**. Missing: S7 INTERVAL_FEASIBILITY, S8 RESOLUTION_AND_IDENTIFIABILITY" in report, report[:900])
+    check("5. (plan 1160 P5) S7, S8 and S9 EXECUTED PASS", all(f"- **{s}** (LIVE): EXECUTED, PASS." in report for s in ("S7 INTERVAL_FEASIBILITY", "S8 RESOLUTION_AND_IDENTIFIABILITY", "S9 ALTERNATIVE_INTAKE"))
+          and "tiering = STATED" in report and "max_bracket = CANDIDATE_BRACKET" in report, report[:1500])
+    check("5. seal status SEALED and PRIMARY_INCOMPLETE missing only confirmation (plan 1160 P5: was the S7..S9 stubs)", "Seal status** (advisory; sealing is recommended and not enforced): SEALED." in report
+          and "PRIMARY verdict: PRIMARY_INCOMPLETE**. Missing: confirmation" in report, report[:900])
 
     # ---- 2. the truth stays outside: the bank holds none, and every logged access is a loader read of a bank file
     bank, log = w / "scratch" / "intake-synth" / "demo1", w / "declarations" / "demo1" / "access.log"

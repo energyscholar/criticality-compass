@@ -18,9 +18,9 @@ Written by `bin/cc intake run dial1118-s1-v3`. Stage table 1160-v4, policy 1136-
 | S4 | SHAPE | LIVE | FIRST_FILE | WITHHELD |
 | S5 | CENSUS | LIVE | ALL_FILES | WITHHELD |
 | S6 | ADMISSIBILITY | LIVE | NONE | WITHHELD |
-| S7 | INTERVAL_FEASIBILITY | STUB | NONE | WITHHELD |
-| S8 | RESOLUTION_AND_IDENTIFIABILITY | STUB | NONE | WITHHELD |
-| S9 | ALTERNATIVE_INTAKE | STUB | NONE | WITHHELD |
+| S7 | INTERVAL_FEASIBILITY | LIVE | NONE | WITHHELD |
+| S8 | RESOLUTION_AND_IDENTIFIABILITY | LIVE | NONE | WITHHELD |
+| S9 | ALTERNATIVE_INTAKE | LIVE | ALL_FILES | WITHHELD |
 | S10 | KERNEL_HANDOFF | STUB | ALL_FILES | WITHHELD |
 
 - **S0 FORMAT** (LIVE): EXECUTED, PASS. The declaration 'dial1118-s1-v3' parses, and every field of format v3 is present, typed and listed (mode EXPLORATORY)
@@ -30,9 +30,9 @@ Written by `bin/cc intake run dial1118-s1-v3`. Stage table 1160-v4, policy 1136-
 - **S4 SHAPE** (LIVE): WITHHELD AFTER_REFUSAL (S3). Not run: an earlier stage refused, and no later check can redeem a refusal.
 - **S5 CENSUS** (LIVE): WITHHELD AFTER_REFUSAL (S3). Not run: an earlier stage refused, and no later check can redeem a refusal.
 - **S6 ADMISSIBILITY** (LIVE): WITHHELD AFTER_REFUSAL (S3). Not run: an earlier stage refused, and no later check can redeem a refusal.
-- **S7 INTERVAL_FEASIBILITY** (STUB): WITHHELD AFTER_REFUSAL (S3). Not run: an earlier stage refused, and no later check can redeem a refusal.
-- **S8 RESOLUTION_AND_IDENTIFIABILITY** (STUB): WITHHELD AFTER_REFUSAL (S3). Not run: an earlier stage refused, and no later check can redeem a refusal.
-- **S9 ALTERNATIVE_INTAKE** (STUB): WITHHELD AFTER_REFUSAL (S3). Not run: an earlier stage refused, and no later check can redeem a refusal.
+- **S7 INTERVAL_FEASIBILITY** (LIVE): WITHHELD AFTER_REFUSAL (S3). Not run: an earlier stage refused, and no later check can redeem a refusal.
+- **S8 RESOLUTION_AND_IDENTIFIABILITY** (LIVE): WITHHELD AFTER_REFUSAL (S3). Not run: an earlier stage refused, and no later check can redeem a refusal.
+- **S9 ALTERNATIVE_INTAKE** (LIVE): WITHHELD AFTER_REFUSAL (S3). Not run: an earlier stage refused, and no later check can redeem a refusal.
 - **S10 KERNEL_HANDOFF** (STUB): WITHHELD AFTER_REFUSAL (S3). Not run: an earlier stage refused, and no later check can redeem a refusal.
 
 ## What the seal proves
@@ -43,13 +43,6 @@ Sealing is recommended and not enforced. It records what you declared and when; 
 
 Each row below has live = false in intake/STAGES.toml: no body returns it today (a STUB stage's rows are never live), so a run cannot show it and its absence says nothing.
 
-- S7 ONE_READING_PER_POINT
-- S7 BELOW_METHOD_FLOOR
-- S7 METHOD_HAS_NO_FLOOR
-- S8 TOO_FEW_CURVES
-- S8 TOO_FEW_POINTS_IN_CURVE
-- S8 NO_COVERAGE_EVIDENCE
-- S9 SECOND_LANE_INFEASIBLE
 - S10 NO_KERNEL_ROUTE
 - S10 DOOR_REFUSED
 

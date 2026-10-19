@@ -29,7 +29,11 @@ Seen RED (each mutation applied by hand, the test run, the mutation reverted):
    that row's K2 plant(s) FAIL (PASS, or a later stage's code) and K2's totality FAILS; intake_seal.SEEN["PROSPECTIVE"] made True: the
    MODE_CONTRADICTS_SOURCE plant and K2's totality FAIL; S6's READ_NOT_LOGGED or BYPASS_READ_LOGGED holds made True: that plant (the
    deleted loader lines; the direct open()) and K2's totality FAIL; a CONVERTED bank read through a second loader: the converted PASS plant
-   FAILS (BYPASS_READ_LOGGED)."""
+   FAILS (BYPASS_READ_LOGGED).
+ - (1160 P5) ENDS["ARGMAX_FAST"] or PAIRS["PAIR_NEAREST_FAST"] made empty in cc/intake_feasible.py: that K2 SECOND_LANE_INFEASIBLE plant
+   FAILS (PASS); S9's PASS evidence given the first curve's anchor as a word (f"anchor {v!r}"): K3 FAILS on every PASS run; S9's refusal
+   detail given the anchor inside a word: K3 FAILS on both SECOND_LANE_INFEASIBLE plants. (The anchor as a bare-number word did NOT go
+   red: intake_names.detail prints it as "a numeric word", the structural mask.)"""
 import contextlib
 import hashlib
 import io
@@ -50,7 +54,7 @@ import intake  # noqa: E402
 import intake_blind as blind  # noqa: E402
 import intake_seal  # noqa: E402
 import intake_synth  # noqa: E402
-from intake_plant import CHOICE_PLANTS, conversion, long_table, per_file, slow_source, write_long, xlsx  # noqa: E402
+from intake_plant import BLOCK, IID, PAIR_LANE, SAME_FAST, VALIDATED, CHOICE_PLANTS, conversion, long_table, per_file, slow_source, write_long, xlsx  # noqa: E402
 
 bad = []
 
@@ -200,6 +204,8 @@ with tempfile.TemporaryDirectory() as tmp:
     drift22 = ("T,C,sigma,h\n" + "".join(f"-7357.{99 - j:02d}1,-7357.{b:02d}{j:02d}3,-7357.{b:02d}{j:02d}9,-7357.{b:02d}{j:02d}7\n"
                                           for b in range(22) for j in range(27 - (b >= 7)))).encode()   # 7 sweeps of 27 rows, 15 of 26: 579 rows
     S0 = lambda edit, trans=TRANS: (pf(PF, edit), PF, full(PF), trans)
+    ON_SENTINEL = {   # (1160 P5) a CHOICE_PLANTS PASS control the sentinel banks carry past S1 to a later refusal, and why
+        "origin EXPERIMENT with two lanes that differ (ALTERNATIVE: C to T_star by ARGMAX_FAST, chained)": "SECOND_LANE_INFEASIBLE"}   # C ascends with T: every maximum at the fast end
     PLANTS = [
         ("PASS", "the PER_FILE sentinel bank, sealed", (pf(PF), PF, full(PF))),
         ("PASS", "the LONG_TABLE sentinel bank, sealed", (lt(LT), LT, full(LT))),
@@ -224,7 +230,7 @@ with tempfile.TemporaryDirectory() as tmp:
         ("BRIDGE_NONE_FITS", "no bridge fits", S0(lambda t: t.replace('template = "CHAIN_SLOW"', 'template = "NONE_FITS"'))),
         ("BASIS_NOT_METADATA", "a figure in the basis", S0(lambda t: re.sub(r'class = "[A-Z_]+"', 'class = "FIGURE"', t, count=1))),
         ("TRANSDUCER_FILE_REFUSED", "a transducer.toml with no [reduction]", S0(lambda t: t, re.sub(r"(?s)\[reduction\].*?(?=\[interval\])", "", TRANS))),
-        *[(code, f"(1160 P4) {what}", S0(edit)) for code, what, edit in CHOICE_PLANTS],   # every live S1 row (and its PASS controls), linted, sealed, run
+        *[(ON_SENTINEL.get(what, code), f"(1160 P4) {what}", S0(edit)) for code, what, edit in CHOICE_PLANTS],   # every live S1 row (and its PASS controls), linted, sealed, run
         ("BLOCK_RULE_HAS_NO_DIRECTION", "(1160 P2) block FAST_RESTART, rows in acquisition order, direction UNORDERED", (lt(LT, asc, block='"FAST_RESTART"'), LT, full(LT))),
         # S2 SEAL
         ("ALREADY_SEALED", "a second seal", (pf(PF), PF, (SEAL(banks / PF), SEAL(banks / PF)))),
@@ -272,15 +278,23 @@ with tempfile.TemporaryDirectory() as tmp:
              lambda t: t.replace('identity = "NONE"', 'identity = "SAME_FAST_VALUE"')), SF, full(SF))),
         ("FAST_VALUE_REPEATED", "(1160 P2) the same bank under identity NONE (row_order ASCENDING)", (lt(SF), SF, full(SF))),
         ("CURVE_REPEATED", "(1160 P2) block EXACT: two sweeps whose slow column drifts (b, c, d; e, b, c) repeat b and c non-adjacently", (lt(DR := lt_bank(SWEEPS)), DR, full(DR))),
-        ("PASS", "(1160 P2) the same file under block FAST_RESTART: two curves, sealed", (lt(DR, block='"FAST_RESTART"'), DR, full(DR))),
+        ("TOO_FEW_CURVES", "(1160 P2) the same file under block FAST_RESTART: two curves, sealed (1160 P5: was PASS; S8 needs three)", (lt(DR, block='"FAST_RESTART"'), DR, full(DR))),
         ("PASS", "(1160 P2) block FAST_RESTART on a drift bank: 22 sweeps, 579 distinct slow values, sealed", (lt(D22 := lt_bank(raw=drift22), block='"FAST_RESTART"'), D22, full(D22))),
         ("SLOW_KEY_UNRESOLVED", "(1160) FILE_KEY h, each key line's value a sentinel followed by 'x'",
          (pf(SK := pf_bank(keyed(lambda i: f"h,{slow(i)}x\n")), lambda t: slow_source(t, "FILE_KEY")), SK, full(SK))),
         ("PASS", "(1160) FILE_KEY h on the PER_FILE sentinel bank, sealed", (pf(FK := pf_bank(keyed(lambda i: f"h,{slow(i)}\n")), lambda t: slow_source(t, "FILE_KEY")), FK, full(FK))),
-        ("PASS", "(1160) slow source NONE on the PER_FILE sentinel bank, sealed", (pf(PF, lambda t: slow_source(t, "NONE")), PF, full(PF))),
+        ("TOO_FEW_CURVES", "(1160) slow source NONE on the PER_FILE sentinel bank, sealed (1160 P5: was PASS; no curve carries a slow value, S8)", (pf(PF, lambda t: slow_source(t, "NONE")), PF, full(PF))),
         ("REPLICATE_KEY_UNRESOLVED", "a FILE identity on a LONG_TABLE", (lt(RK := lt_bank(CURVES + CURVES[:1]), lambda t: t.replace('identity = "NONE"', 'identity = "FILE"')), RK, full(RK))),
         ("ACQUISITION_ORDER_DIFFERS", "ascending rows in acquisition order, declared DESCENDING",
          (lt(AO := lt_bank(), lambda t: asc(t).replace('direction = "UNORDERED"', 'direction = "DESCENDING"')), AO, full(AO))),
+        # S7 INTERVAL_FEASIBILITY, S8 RESOLUTION_AND_IDENTIFIABILITY, S9 ALTERNATIVE_INTAKE (plan 1160 P5), sealed and run
+        ("ONE_READING_PER_POINT", "(1160 P5) block, b 1, min_blocks 2, on the PER_FILE sentinel bank (one reading per point)", S0(BLOCK(2))),
+        ("BELOW_METHOD_FLOOR", "(1160 P5) the SAME_FAST_VALUE bank (three readings at block 3's even points), block, b 1, min_blocks 30",
+         (lt(SF, lambda t: BLOCK(30)(SAME_FAST(t))), SF, full(SF))),
+        ("METHOD_HAS_NO_FLOOR", "(1160 P5) the SAME_FAST_VALUE bank, iid", (lt(SF, lambda t: IID(SAME_FAST(t))), SF, full(SF))),
+        ("TOO_FEW_POINTS_IN_CURVE", "(1160 P5) block 4 cut to its first two rows", (lt(TP := lt_bank([(h, rs[:2] if i == 3 else rs) for i, (h, rs) in enumerate(CURVES)])), TP, full(TP))),
+        ("NO_COVERAGE_EVIDENCE", "(1160 P5) [bracket] required VALIDATED_BRACKET", S0(VALIDATED)),
+        ("SECOND_LANE_INFEASIBLE", "(1160 P5) PAIR_NEAREST_FAST on C: each curve's T span is disjoint from its neighbours'", S0(PAIR_LANE)),
         # S4 reader reasons (table-curve-v1), each the detail of READER_REFUSED
         ("NOT_UTF8", "a byte that is not UTF-8", (lt(B1 := lt_bank(raw=f"T,C,sigma,h\n{cell(0, 0, 1)},{cell(0, 0, 2)}\xff,{cell(0, 0, 3)},{slow(0)}\n".encode("latin-1"))), B1, full(B1))),
         ("HEADER_LINE_ABSENT", "two header lines declared, one present", (lt(B2 := lt_bank(raw=b"T,C,sigma,h\n"), header=nu), B2, full(B2))),

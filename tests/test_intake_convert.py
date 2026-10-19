@@ -173,7 +173,8 @@ with tempfile.TemporaryDirectory() as tmp:
     Ts = [f"{1.5 + 0.0125 * j:.4f}" for j in range(40)]
     WIDE = ("h," + ",".join(Ts) + "\n" + "".join(f"{f['h']}," + ",".join(f"{0.1 + 0.01 * k + 0.001 * j:.6f}" for j in range(40)) + "\n" for k, f in enumerate(m["files"]))).encode()
     got, bank, WD = conv({"wide.csv": WIDE}, [("wide.csv", "bank.csv", '{op = "WIDE_TO_LONG", key = "h", fast = "T", measured = "C"}')])
-    nosigma = lambda t: re.sub(r'\[measured\.uncertainty\]\nkind = "COLUMN"[^\n]*\nkey = "[^"]*"[^\n]*', '[measured.uncertainty]\nkind = "NONE"', t, count=1)
+    nosigma = lambda t: re.sub(r'\[measured\.uncertainty\]\nkind = "COLUMN"[^\n]*\nkey = "[^"]*"[^\n]*', '[measured.uncertainty]\nkind = "NONE"', t, count=1).replace(
+        'method = "STATED"', 'method = "NONE"', 1)   # plan 1160 P5: the plant's interval is STATED (was iid), which needs the sigma column a WIDE file lacks
     label = census(nosigma(converted_decl(long_table(m, "wd"), WD)), "wd")
     check("V3. a WIDE file through WIDE_TO_LONG reaches a LONG_TABLE census of one curve per row", code(got) == "PASS" and getattr(label, "curves", None) == len(m["files"]), f"{code(got)} {label}")
     rows = [["T", "C", "sigma", "note"]] + [[float(x) for x in ln.split(",")] + ["planted"] for f in list(curves)[:2] for ln in curves[f].decode().splitlines()[1:]]

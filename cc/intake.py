@@ -11,6 +11,7 @@ from pathlib import Path
 import intake_blind as blind
 import intake_choices
 import intake_data
+import intake_feasible
 import intake_seal
 from intake_blind import Mark
 
@@ -265,10 +266,10 @@ def explain(t):
 
 def bodies(t, d, text, findings):
     """The registered bodies of one run: S0 FORMAT, S1 CHOICES (cc/intake_choices.py, plan 1160 P4), S2 SEAL (verify, advisory), plus
-    intake_data.bodies (the data stages with a body). Invariant: its keys are exactly the stages whose implemented = true (tests/test_intake.py)."""
+    intake_data.bodies (the data stages with a body) and intake_feasible.bodies (S7, S8, S9; plan 1160 P5). Invariant: its keys are exactly the stages whose implemented = true (tests/test_intake.py)."""
     return {"S0": lambda: blind.format_stage(text, findings, t), "S1": lambda declaration: intake_choices.choices(declaration, t["policy"]),
             "S2": lambda declaration: intake_seal.verify(declaration, d, t),
-            **intake_data.bodies(t, d)}
+            **intake_data.bodies(t, d), **intake_feasible.bodies(t, d)}
 
 
 def report(t, ident, out, note):
