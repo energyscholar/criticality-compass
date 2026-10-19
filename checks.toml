@@ -7,7 +7,8 @@ maths = [
   "cc/instruments/two_start.py", "cc/instruments/along.py", "cc/instruments/fluct.py", "cc/instruments/report.py", "cc/instruments/needle_chain.py", "cc/instruments/across_delta.py", "cc/instruments/stability_delta.py", "cc/instruments/transform.py", "cc/fingerprint.py", "cc/reduce.py", "cc/gamma.py",
 ]
 plumbing = ["bin/cc", "cc/admit.py", "cc/schema.py", "cc/declare.py", "cc/author.py", "cc/door.py", "cc/formats.py", "cc/detect.py", "cc/resources.py", "cc/view.py", "cc/score.py", "cc/reverdict.py", "cc/family.py", "cc/registry.py", "cc/transducer.py", "tests/reference/verdict_x.py", "tests/trace/sitecustomize.py", "docs/gen-verdicts.py",
-  ".githooks/pre-commit", "cc/intake.py", "cc/intake_blind.py", "cc/intake_seal.py", "cc/intake_data.py", "cc/intake_read.py", "docs/gen-intake.py"]   # plan 1136: the intake pipeline (plan 1145: its readers)
+  ".githooks/pre-commit"]
+intake = ["cc/intake.py", "cc/intake_blind.py", "cc/intake_seal.py", "cc/intake_data.py", "cc/intake_read.py", "docs/gen-intake.py"]   # plan 1136: the intake pipeline (plan 1145: its own role and line cap, tests/test_budget.py INTAKE_CAP; was in plumbing)
 benchmark = []
 test_infrastructure = ["cc/intake_synth.py", "tests/intake_plant.py"]   # plan 1139: the planted synthetic bank of `bin/cc intake synth`; plan 1145: the planted inputs of the intake tests; outside the measurement closure
 methods = ["cc/detect.py"]
