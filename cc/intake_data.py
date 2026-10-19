@@ -162,6 +162,7 @@ class SecondLane:
     builds). Invariant: carries the Census."""
     census: Census
     lanes: tuple
+    n_lanes: int   # plan 1160 A5: the lanes with a bridge, 1 or 2 (S1 SECOND_LANE_MISSING needs one; FORMAT's lane alphabet has two); NOT_EXAMINED at 1
 
     def summary(self):
         return f"ALTERNATIVE lane steps feasible on the census: {', '.join(self.lanes) or 'none declared (one lane: nothing for S9 to check)'}"

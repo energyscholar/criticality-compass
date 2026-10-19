@@ -136,6 +136,10 @@ check("1. (1160 P5, A3) no row of an implemented stage is live = false, and SHIF
 ALPHA = set(T["format"]["fields"]["interval"]["method"]["values"]) | set(tomllib.loads((ROOT / "cc.toml").read_text())["alphabets"]["interval_method"])
 check("1. (1160 P4) the intake's interval alphabet is cc.toml's with STATED and NONE; NEEDS_COLUMN is total over it and every method has its fields",
       ALPHA == set(intake_choices.NEEDS_COLUMN) and {"STATED", "NONE"} < ALPHA and ALPHA <= set(T["interval_fields"]), str(sorted(ALPHA)))
+CCB, FB = tomllib.loads((ROOT / "cc.toml").read_text())["interval_fields"]["block"], T["format"]["interval_fields"]["block"]
+check("1. (1160 A4) FORMAT's [interval_fields.block] is cc.toml's with min_blocks moved from optional to required (no other drift)",
+      FB == {"required": {**CCB["required"], "min_blocks": CCB["optional"]["min_blocks"]}, "optional": {k: v for k, v in CCB["optional"].items() if k != "min_blocks"}}
+      and T["interval_fields"]["block"] == FB, str(FB))
 import intake_feasible  # noqa: E402  (plan 1160 P5: S7, S8, S9)
 check("1. (1160 P5) the S7 tables REPLICATED, TIERING, HAS_FLOOR and FLOOR are total over the interval alphabet; TIERING says STATED | REPLICATES | NONE",
       all(set(tab) == ALPHA for tab in (intake_feasible.REPLICATED, intake_feasible.TIERING, intake_feasible.HAS_FLOOR, intake_feasible.FLOOR))
@@ -187,6 +191,7 @@ check("3. EXEC is total over (implemented, Upstream)", set(intake.EXEC) == set(i
 @dataclasses.dataclass(frozen=True)
 class Ev:
     conf: bool
+    n_lanes: int = 2   # (1160 A5) the lanes declared, read by ROBUSTNESS's PASSED cells (cc/intake.py EXAMINED)
 
     def summary(self):
         return "planted"
@@ -197,13 +202,16 @@ class Ev:
 
 CHOICE = {"stub": None, "pass": lambda *a: blind.Pass(Ev(False)), "refuse": lambda *a: blind.Refuse(REASONS["S0"][0], "planted")}
 SEAL_CHOICE = {"pass": CHOICE["pass"], "pass-confirmed": lambda *a: blind.Pass(Ev(True))}   # the ADVISORY seal is LIVE and never refuses (A3)
+ROB = [s["id"] for s in ST if s["verdict"] == "ROBUSTNESS"][0]
+ROB_CHOICE = {**CHOICE, "pass-one-lane": lambda *a: blind.Pass(Ev(False, 1))}   # (1160 A5) the ROBUSTNESS stage passed with one lane declared
 hit_p, hit_r, stub_ready, body_on_stub, folds = set(), set(), [], [], 0
 prim = [s["id"] for s in ST if s["verdict"] == "PRIMARY"]
-axes = [{True: SEAL_CHOICE, False: CHOICE}[i == SEAL] for i in IDS[:-1]]
+axes = [{SEAL: SEAL_CHOICE, ROB: ROB_CHOICE}.get(i, CHOICE) for i in IDS[:-1]]
+hit_rv, refused_missing = set(), []
 for combo in itertools.product(*[list(a) for a in axes]):
     pick = dict(zip(IDS[:-1], combo))
     rows = [{**s, "implemented": pick.get(s["id"], "stub") != "stub"} for s in ST]
-    bodies = {i: {**CHOICE, **SEAL_CHOICE}[c] for i, c in pick.items() if c != "stub"}
+    bodies = {i: {**CHOICE, **SEAL_CHOICE, **ROB_CHOICE}[c] for i, c in pick.items() if c != "stub"}
     t = {**T, "stages": {**T["stages"], "stage": rows}}
     out = intake.fold(rows, bodies)
     p, r = intake.verdicts(t, out)
@@ -211,6 +219,8 @@ for combo in itertools.product(*[list(a) for a in axes]):
     marks = {out[i].mark for i in prim}
     hit_p.add((blind.Mark.REFUSED in marks, len(intake._missing(prim, out)) > 0, out[SEAL].confirmed()))
     hit_r.add((p.kind, out[IDS[-2]].mark))
+    hit_rv.add(r.kind)
+    refused_missing += [pick] * (p.kind is intake.Primary.PRIMARY_REFUSED_AT and p.missing != ())
     stub_ready += [pick] * (p.kind is intake.Primary.PRIMARY_READY and any(not s["implemented"] for s in rows if s["id"] in prim))
     body_on_stub += [pick] * any(isinstance(out[s["id"]], intake.Executed) for s in rows if not s["implemented"])
 print(f"  {folds} folds of the stage table enumerated")
@@ -218,6 +228,9 @@ check("3. a stub never produces PRIMARY_READY (over every fold)", not stub_ready
 check("3. a stage with no body is never EXECUTED (over every fold)", not body_on_stub, str(body_on_stub[:1]))
 check("3. every PRIMARY cell is reached", hit_p == set(intake.PRIMARY), str(set(intake.PRIMARY) - hit_p))
 check("3. the reached ROBUSTNESS cells are exactly the table's, and no IMPOSSIBLE cell is reached", hit_r == set(intake.ROBUSTNESS), str(hit_r ^ set(intake.ROBUSTNESS)))
+check("3. (1160 P6, E9) a PRIMARY_REFUSED_AT verdict lists no Missing stage (over every fold)", not refused_missing, str(refused_missing[:1]))
+check("3. (1160 A5) every ROBUSTNESS verdict is reached, NOT_EXAMINED (one lane) and COMPLETE (two) among them", hit_rv == set(intake.Robustness), str(set(intake.Robustness) - hit_rv))
+check("3. (1160 A5) EXAMINED is total over FORMAT's lane counts (1 and 2: PRIMARY | ALTERNATIVE)", set(intake.EXAMINED) == set(range(1, 1 + len(FM["projection"]["fields"]["lane"]["values"]))), str(intake.EXAMINED))
 
 # ---- 4. the seal is advisory (plan 1139, A3): a status value, never a refusal; plan 1136's test 4 (Sealed-carrying signatures) is retired
 for sid, sig in intake_data.SIGNATURE.items():

@@ -17,7 +17,7 @@ REPLICATED = {"block": True, "iid": True, "gamma": True, "chains": True, "STATED
 TIERING = {"block": "REPLICATES", "iid": "REPLICATES", "gamma": "REPLICATES", "chains": "REPLICATES", "STATED": "STATED", "NONE": "NONE"}   # method -> the terminal's tiering; total
 HAS_FLOOR = {"block": True, "iid": False, "gamma": True, "chains": True, "STATED": True, "NONE": True}   # iid: k* undefined (plans 1134, 1117); STATED, NONE need none; total
 FLOOR = {   # method -> (its [interval] table, the points as (curve, ordinal, readings), the tables) -> CC's floor findings on the readings per point; total
-    "block": lambda iv, pts, t: declare.block_floor(AT, iv, pts),   # n // b >= min_blocks per point (no finding when min_blocks is not declared)
+    "block": lambda iv, pts, t: declare.block_floor(AT, iv, pts),   # n // b >= min_blocks per point (min_blocks is REQUIRED at S0 since plan 1160 A4, so the "not declared" case is unreachable here)
     "gamma": lambda iv, pts, t: declare.gamma_floor(AT, iv, pts, t["interval_fields"]["gamma"]["k_gamma"]),   # n >= k_gamma * tau_declared per point
     "chains": lambda iv, pts, t: declare.chain_cells(AT, iv, {(w, k, 0) for w, k, _ in pts}, {(w, k, 0, c) for w, k, n in pts for c in range(n)}),   # reading c is chain c
     "iid": lambda iv, pts, t: [],   # no floor: METHOD_HAS_NO_FLOOR, the row after
@@ -85,7 +85,7 @@ def second(census, t):
     cs = sorted(intake_data.CURVES[d["selection"]["layout"]](d, files, [intake_data.read(t, d, f) for f in files]), key=lambda c: c.slow)
     empty = [(what, f(cs)) for what, f in alt if f(cs)]
     return gate([(lambda: not empty, "SECOND_LANE_INFEASIBLE", lambda: detail(words=[empty[0][0]] + empty[0][1][:3], counts={"curves": len(empty[0][1])}))],
-                lambda: Pass(SecondLane(census, tuple(what for what, _ in alt))))
+                lambda: Pass(SecondLane(census, tuple(what for what, _ in alt), len({b["lane"] for b in d["bridge"]}))))
 
 
 def bodies(t, d):

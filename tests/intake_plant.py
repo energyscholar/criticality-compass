@@ -79,6 +79,7 @@ CHOICE_PLANTS = [   # (1160 P4) one plant per live S1 CHOICES row, and the PASS 
 ]
 # (1160 P5) the S7, S8, S9 edits of a per_file or long_table declaration text, shared by tests/test_intake_reach.py and tests/test_intake_leak.py
 BLOCK = lambda mb: lambda t: t.replace(IV, f'method = "block"\nresamples = 1000\nlevel = 0.95\nseed = 1160\nb = 1\nmin_blocks = {mb}', 1)   # n // 1 >= mb per point
+BLOCK_NO_FLOOR = lambda t: BLOCK(2)(t).replace("\nmin_blocks = 2", "", 1)   # (1160 A4) a block interval without min_blocks: S0 FIELD_MISSING
 IID = lambda t: t.replace(IV, 'method = "iid"\nresamples = 1000\nlevel = 0.95\nseed = 1160\ntau_declared = 1', 1)
 SAME_FAST = lambda t: t.replace('identity = "NONE"', 'identity = "SAME_FAST_VALUE"', 1)
 VALIDATED = lambda t: t.replace('required = "CANDIDATE_BRACKET"', 'required = "VALIDATED_BRACKET"', 1)

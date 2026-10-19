@@ -43,7 +43,7 @@ import readout  # noqa: E402
 import intake_read as rd  # noqa: E402
 import intake_seal  # noqa: E402
 import intake_synth  # noqa: E402
-from intake_plant import ARGMAX_LANE, BLOCK, IID, PAIR_LANE, SAME_FAST, VALIDATED, CHOICE_PLANTS, converted, key_lines, long_table, outcome, per_file, rooted, run, slow_source, write_long, xlsx  # noqa: E402
+from intake_plant import ARGMAX_LANE, BLOCK, BLOCK_NO_FLOOR, IID, PAIR_LANE, SAME_FAST, VALIDATED, CHOICE_PLANTS, converted, key_lines, long_table, outcome, per_file, rooted, run, slow_source, write_long, xlsx  # noqa: E402
 
 bad = []
 
@@ -206,6 +206,7 @@ with tempfile.TemporaryDirectory() as tmp:
         ("COMMENT_PREFIX_EMPTY", "(1160) comment = [\"\"] on table-curve-v1", lambda: s0(long_table(m, "s0").replace('comment = ["#"]', 'comment = [""]', 1))),
         ("ROOT_NOT_UNDER_CC_BANKS", "(1160) a CONVERTED source whose root is the deposit's", lambda: s0(convert(base, "<long-test>/pf"))),
         ("FIELD_MISSING", "[knobs.fast] deleted", lambda: s0(re.sub(r"(?s)\[knobs\.fast\].*?(?=\[measured\])", "", base))),
+        ("FIELD_MISSING", "(1160 A4) a block interval without min_blocks (FORMAT [interval_fields.block] requires it)", lambda: s0(BLOCK_NO_FLOOR(base))),
         ("FIELD_UNKNOWN", "a field the format does not define", lambda: s0(base.replace("[intake]\n", "[intake]\ncolour = \"red\"\n"))),
         ("FIELD_TYPE_WRONG", "a column key that is a boolean", lambda: s0(base.replace('key = "C"', "key = true", 1))),
         ("VALUE_NOT_LISTED", "layout BY_ROW", lambda: s0(base.replace('layout = "PER_FILE"', 'layout = "BY_ROW"'))),
@@ -327,6 +328,9 @@ with tempfile.TemporaryDirectory() as tmp:
     check("E2. (1160 P5) the plant's run passes S7 with tiering STATED, S8 with CANDIDATE_BRACKET and the identifiability value, S9 with no ALTERNATIVE lane",
           (getattr(s7, "tiering", None), getattr(s8, "max_bracket", None), getattr(s8, "identifiability", None), getattr(s9, "lanes", None))
           == ("STATED", "CANDIDATE_BRACKET", intake_feasible.IDENTIFIABILITY, ()), str((s7, s8, s9))[:400])
+    lanes = {k: intake.verdicts(T, run(T, tmp, f"rl{k}", e(per_file(m, f"rl{k}"))))[1].kind for k, e in ((1, lambda t: t), (2, ARGMAX_LANE))}
+    check("E2. (1160 A5) ROBUSTNESS is NOT_EXAMINED on the one-lane plant's run and COMPLETE on its ARGMAX_FAST two-lane run",
+          lanes == {1: intake.Robustness.ROBUSTNESS_NOT_EXAMINED, 2: intake.Robustness.ROBUSTNESS_COMPLETE}, str(lanes))
     tiers = {meth: getattr(outcome(run(T, tmp, f"t{meth}", edit(per_file(m, f"t{meth}"))), "S7")[1], "tiering", None)
              for meth, edit in (("NONE", lambda t: t.replace('method = "STATED"', 'method = "NONE"', 1)),)}
     check("E2. (1160 P5) interval NONE passes S7 with tiering NONE", tiers == {"NONE": "NONE"}, str(tiers))

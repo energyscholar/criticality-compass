@@ -50,9 +50,10 @@ class Primary(enum.Enum):
 
 
 class Robustness(enum.Enum):
-    """The ROBUSTNESS verdict over (PRIMARY, the ROBUSTNESS stage). ATOMS: ROBUSTNESS_COMPLETE | ROBUSTNESS_INCOMPLETE | ROBUSTNESS_REFUSED |
-    ROBUSTNESS_WITHHELD. Axiom: exactly one holds (the second lane passed; is not executed; refused; or was withheld after a refusal)."""
+    """The ROBUSTNESS verdict over (PRIMARY, the ROBUSTNESS stage). ATOMS: ROBUSTNESS_COMPLETE | ROBUSTNESS_NOT_EXAMINED | ROBUSTNESS_INCOMPLETE | ROBUSTNESS_REFUSED |
+    ROBUSTNESS_WITHHELD. Axiom: exactly one holds (the second lane passed; it passed with one lane, nothing examined (1160 A5); is not executed; refused; withheld)."""
     ROBUSTNESS_COMPLETE = frozenset({"ROBUSTNESS_COMPLETE"})
+    ROBUSTNESS_NOT_EXAMINED = frozenset({"ROBUSTNESS_NOT_EXAMINED"})
     ROBUSTNESS_INCOMPLETE = frozenset({"ROBUSTNESS_INCOMPLETE"})
     ROBUSTNESS_REFUSED = frozenset({"ROBUSTNESS_REFUSED"})
     ROBUSTNESS_WITHHELD = frozenset({"ROBUSTNESS_WITHHELD"})
@@ -159,8 +160,8 @@ def _missing(ids, out):
     return tuple(i for i in ids if out[i].mark in (Mark.STUB, Mark.WITHHELD_INPUT_ABSENT))
 
 
-def _refused(ids, out):
-    return Verdict(Primary.PRIMARY_REFUSED_AT, _missing(ids[:ids.index(_first_refusal(ids, out))], out), _first_refusal(ids, out))
+def _refused(ids, out):   # plan 1160 P6 (E9): no Missing list on a refusal (it named the stubs before the refusing stage)
+    return Verdict(Primary.PRIMARY_REFUSED_AT, (), _first_refusal(ids, out))
 
 
 def _first_refusal(ids, out):
@@ -174,15 +175,16 @@ PRIMARY = {   # design Table 2 with amendment A2 Q6, total over (R some stage re
     (False, True, False): lambda ids, out: Verdict(Primary.PRIMARY_INCOMPLETE, _missing(ids, out) + ("confirmation",)),
     (True, False, True): _refused, (True, False, False): _refused, (True, True, True): _refused, (True, True, False): _refused,
 }
-ROBUSTNESS = {   # design Table 3, the reachable cells of (PRIMARY, the ROBUSTNESS stage's mark)
-    (Primary.PRIMARY_READY, Mark.STUB): Robustness.ROBUSTNESS_INCOMPLETE,
-    (Primary.PRIMARY_READY, Mark.PASSED): Robustness.ROBUSTNESS_COMPLETE,
-    (Primary.PRIMARY_READY, Mark.REFUSED): Robustness.ROBUSTNESS_REFUSED,
-    (Primary.PRIMARY_INCOMPLETE, Mark.STUB): Robustness.ROBUSTNESS_INCOMPLETE,
-    (Primary.PRIMARY_INCOMPLETE, Mark.WITHHELD_INPUT_ABSENT): Robustness.ROBUSTNESS_INCOMPLETE,
-    (Primary.PRIMARY_INCOMPLETE, Mark.PASSED): Robustness.ROBUSTNESS_COMPLETE,
-    (Primary.PRIMARY_INCOMPLETE, Mark.REFUSED): Robustness.ROBUSTNESS_REFUSED,
-    (Primary.PRIMARY_REFUSED_AT, Mark.WITHHELD_AFTER_REFUSAL): Robustness.ROBUSTNESS_WITHHELD,
+EXAMINED = {1: Robustness.ROBUSTNESS_NOT_EXAMINED, 2: Robustness.ROBUSTNESS_COMPLETE}   # plan 1160 A5: a passed ROBUSTNESS stage's lane count (FORMAT: PRIMARY | ALTERNATIVE)
+ROBUSTNESS = {   # design Table 3, the reachable cells of (PRIMARY, the ROBUSTNESS stage's mark) -> (its execution -> the verdict)
+    (Primary.PRIMARY_READY, Mark.STUB): lambda e: Robustness.ROBUSTNESS_INCOMPLETE,
+    (Primary.PRIMARY_READY, Mark.PASSED): lambda e: EXAMINED[e.result.evidence.n_lanes],
+    (Primary.PRIMARY_READY, Mark.REFUSED): lambda e: Robustness.ROBUSTNESS_REFUSED,
+    (Primary.PRIMARY_INCOMPLETE, Mark.STUB): lambda e: Robustness.ROBUSTNESS_INCOMPLETE,
+    (Primary.PRIMARY_INCOMPLETE, Mark.WITHHELD_INPUT_ABSENT): lambda e: Robustness.ROBUSTNESS_INCOMPLETE,
+    (Primary.PRIMARY_INCOMPLETE, Mark.PASSED): lambda e: EXAMINED[e.result.evidence.n_lanes],
+    (Primary.PRIMARY_INCOMPLETE, Mark.REFUSED): lambda e: Robustness.ROBUSTNESS_REFUSED,
+    (Primary.PRIMARY_REFUSED_AT, Mark.WITHHELD_AFTER_REFUSAL): lambda e: Robustness.ROBUSTNESS_WITHHELD,
 }
 IMPOSSIBLE = {   # the other cells of the product; the fold never produces them (tests/test_intake.py enumerates every fold of the table)
     (Primary.PRIMARY_READY, Mark.WITHHELD_INPUT_ABSENT): "READY means every PRIMARY stage passed, and those include the stage's needs",
@@ -201,7 +203,7 @@ def verdicts(t, out):
     marks = {out[i].mark for i in ids}
     p = PRIMARY[(Mark.REFUSED in marks, len(_missing(ids, out)) > 0, out[t["stages"]["seal_stage"]].confirmed())](ids, out)
     rob = [s["id"] for s in t["stages"]["stage"] if s["verdict"] == "ROBUSTNESS"][0]
-    r = ROBUSTNESS[(p.kind, out[rob].mark)]
+    r = ROBUSTNESS[(p.kind, out[rob].mark)](out[rob])
     return p, Verdict(r, {True: (rob,), False: ()}[r is Robustness.ROBUSTNESS_INCOMPLETE], {True: rob, False: ""}[r is Robustness.ROBUSTNESS_REFUSED])
 
 
@@ -243,8 +245,8 @@ def explain(t):
            "An executed stage gives PASS or REFUSE with a named reason; after a refusal every later stage is WITHHELD.", "",
            "- **PRIMARY** verdict, over the PRIMARY stages: PRIMARY_REFUSED_AT when one refused; else PRIMARY_INCOMPLETE when one is not "
            "executed or no seal with a non-empty confirmed_by holds the declaration now; else PRIMARY_READY.",
-           "- **ROBUSTNESS** verdict, over the ROBUSTNESS stage: ROBUSTNESS_COMPLETE, ROBUSTNESS_INCOMPLETE, ROBUSTNESS_REFUSED, or "
-           "ROBUSTNESS_WITHHELD after a PRIMARY refusal.",
+           "- **ROBUSTNESS** verdict, over the ROBUSTNESS stage: ROBUSTNESS_COMPLETE (it passed with two lanes declared), ROBUSTNESS_NOT_EXAMINED "
+           "(it passed with one lane declared: nothing was examined), ROBUSTNESS_INCOMPLETE, ROBUSTNESS_REFUSED, or ROBUSTNESS_WITHHELD after a PRIMARY refusal.",
            "- The HANDOFF stage is outside both verdicts.",
            "- The ADVISORY stage (the seal) is outside every verdict. It never refuses: every report carries its seal status, SEALED, UNSEALED or "
            "SEALED_THEN_EDITED, and an ordering note.", "",

@@ -21,7 +21,7 @@
 # v8 against v7 (plan 1160 P4): the intake's interval alphabet is cc.toml alphabets.interval_method | STATED | NONE (intake-owned; cc.toml
 # is not touched). STATED: the declared uncertainty column is each point's interval (S1 METHOD_NEEDS_UNCERTAINTY_COLUMN refuses it without
 # one); NONE: the declarer pre-registers that no interval exists. Their fields are [interval_fields.STATED] and [interval_fields.NONE] below,
-# merged over cc.toml's by cc/intake.py tables(): no field beyond `method` (each table holds required and optional, both empty, the shape
+# merged over cc.toml's by cc/intake.py tables() ([interval_fields.block] too, plan 1160 A4: min_blocks required): no field beyond `method` (each table holds required and optional, both empty, the shape
 # the INTERVAL check reads).
 # A reader's `comment` prefixes are PREFIXES: an empty prefix marks every line a comment, so it is refused (COMMENT_PREFIX_EMPTY).
 # A field row: type = str | int | num | list | table | ref (cc/intake_blind.py TYPE); check = one of cc/intake_blind.py CHECK:
@@ -241,3 +241,7 @@ optional = {}
 [interval_fields.NONE]     # plan 1160 P4: no field beyond method; no interval exists (pre-registered)
 required = {}
 optional = {}
+[interval_fields.block]    # plan 1160 P6.0 A4: cc.toml's block row with min_blocks moved from optional to REQUIRED, so S0 refuses a block
+#                            interval without its floor (FIELD_MISSING); tests/test_intake.py checks it differs from cc.toml's in that one field
+required = { method = "str", resamples = "int", level = "num", seed = "int", b = "int", min_blocks = "int" }
+optional = { tau_declared = "int" }
