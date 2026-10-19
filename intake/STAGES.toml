@@ -9,7 +9,7 @@
 # needs, and never the seal stage (test 1).
 schema = 1
 kind = "intake-stages"
-version = "1160-v3"
+version = "1160-v4"
 seal_stage = "S2"
 
 [report]
@@ -64,23 +64,26 @@ name = "CHOICES"
 purpose = "The declared choices are consistent with each other, and the declared operation graph uses only permitted operations (static admissibility)."
 reads_bytes = "NONE"
 needs = ["S0"]
-implemented = true   # plan 1160 P1: one live row (SLOW_VALUES_NOT_ONE_PER_FILE), so a LISTED count never reaches the loader; P2 adds SELECTION_EMPTY (amendment A1) and BLOCK_RULE_HAS_NO_DIRECTION; the other rows are P4's (live = false until then)
+implemented = true   # plan 1160 P1-P2: SLOW_VALUES_NOT_ONE_PER_FILE, SELECTION_EMPTY (A1), BLOCK_RULE_HAS_NO_DIRECTION; plan 1160 P4 (cc/intake_choices.py): every other row live but
+# SHIFT_BEFORE_KERNEL_INPUT, which no body can return: the format's one shift is [shift] c, the KernelInput boundary's own field, and a shift written
+# anywhere else is a field the format does not define (S0 FIELD_UNKNOWN), so no declaration that reaches S1 holds a shift upstream of the kernel input.
+# MODE_CONTRADICTS_SOURCE moved to S2 (P4): whether the selected files exist is seen only in the universe listing, which bin/cc intake seal takes.
 verdict = "PRIMARY"
 reason = [
-  { code = "KNOBS_SAME_QUANTITY",            live = false, sentence = "The slow and fast knob name the same quantity or column; the Compass needs two distinct knobs." },
-  { code = "MEASURED_IS_A_KNOB",             live = false, sentence = "The measured number is one of the knobs." },
+  { code = "KNOBS_SAME_QUANTITY",            live = true,  sentence = "The slow and fast knob name the same quantity or column; the Compass needs two distinct knobs." },
+  { code = "MEASURED_IS_A_KNOB",             live = true,  sentence = "The measured number is one of the knobs." },
   { code = "SELECTION_EMPTY",                live = true,  sentence = "The selection names no file (`files = []`); a census needs at least one curve file." },
   { code = "SLOW_VALUES_NOT_ONE_PER_FILE",   live = true,  sentence = "Slow-knob values are declared per file (LISTED), but `values` does not give exactly one value per file of `files`." },
   { code = "BLOCK_RULE_HAS_NO_DIRECTION",    live = true,  sentence = "A LONG_TABLE declares block FAST_RESTART, but the fast knob has no declared direction (row_order ACQUISITION with direction UNORDERED), so no restart of a sweep can be seen." },
-  { code = "PROJECTION_REQUIRED",            live = false, sentence = "The raw observation is not one number per locus (a picture, positions, a series), and no projection to one number is declared before the bridge." },
-  { code = "PROJECTION_ESTIMAND_MIXED",      live = false, sentence = "One projection names two estimands (for example a location and a height); declare one projection per estimand." },
-  { code = "SECOND_LANE_MISSING",            live = false, sentence = "The source is real data and only one intake lane is declared; real data are taken in through two declared lanes (policy, intake/POLICY.toml)." },
-  { code = "LANES_IDENTICAL",                live = false, sentence = "The two declared lanes use the same projection and bridge; the alternative must differ." },
-  { code = "REPLICATE_IS_SWEEP_NEIGHBOUR",   live = false, sentence = "Replicates are declared as adjacent points of one sweep; a replicate is a repeated preparation, never a neighbouring point." },
-  { code = "OPERATION_NOT_PERMITTED",        live = false, sentence = "A declared step is not a permitted operation for its link of the chain (Raw, Projection, DerivedObservable, Bridge, KernelInput)." },
+  { code = "PROJECTION_REQUIRED",            live = true,  sentence = "The raw observation is not one number per locus (a picture, positions, a series), and a bridge takes it with no projection to one number before it." },
+  { code = "PROJECTION_ESTIMAND_MIXED",      live = true,  sentence = "One projection names two estimands (for example a location and a height); declare one projection per estimand." },
+  { code = "SECOND_LANE_MISSING",            live = true,  sentence = "The source is real data and only one intake lane is declared; real data are taken in through two declared lanes (policy, intake/POLICY.toml)." },
+  { code = "LANES_IDENTICAL",                live = true,  sentence = "The two declared lanes use the same projection and bridge; the alternative must differ." },
+  { code = "REPLICATE_IS_SWEEP_NEIGHBOUR",   live = true,  sentence = "Replicates are declared as adjacent points of one sweep (the replicate key is the fast knob); a replicate is a repeated preparation, never a neighbouring point." },
+  { code = "OPERATION_NOT_PERMITTED",        live = true,  sentence = "A declared step is not a permitted operation for its link of the chain (Raw, Projection, DerivedObservable, Bridge, KernelInput)." },
   { code = "SHIFT_BEFORE_KERNEL_INPUT",      live = false, sentence = "A constant shift x + c is declared upstream of the kernel input; x + c applies only at the KernelInput boundary." },
-  { code = "PROVENANCE_HAS_NO_KERNEL_ROUTE", live = false, sentence = "The deposit's admissibility record (raw-admissibility.toml) gives the component carrying the measured number no kernel route." },
-  { code = "MODE_CONTRADICTS_SOURCE",        live = false, sentence = "The declared mode is PROSPECTIVE, but the selected files already exist, or the source is a published set whose figures have been seen." },
+  { code = "PROVENANCE_HAS_NO_KERNEL_ROUTE", live = true,  sentence = "The source's admissibility ([source] admissibility, the deposit's class as the declarer read it from metadata) is FIGURE_LEVEL or PROCESSED_UNDECLARABLE, which has no kernel route." },
+  { code = "METHOD_NEEDS_UNCERTAINTY_COLUMN", live = true,  sentence = "The interval method is STATED (each point's interval is the declared uncertainty column), and [measured.uncertainty] declares none (kind NONE)." },
 ]
 
 [[stage]]
@@ -100,6 +103,7 @@ reason = [   # refusals of `bin/cc intake seal` (the seal command); a run's S2 n
   { code = "ALREADY_SEALED",             live = true,  sentence = "This declaration is already sealed; a seal is never replaced, so declare a new id." },
   { code = "UNIVERSE_ROOT_ABSENT",       live = true,  sentence = "The declared source universe root was not given or is not a directory on this machine; give its location with --universe." },
   { code = "SELECTION_DUPLICATE",        live = true,  sentence = "A file name is given more than once in `files` (or in `excluded`); each file is one curve, named once." },
+  { code = "MODE_CONTRADICTS_SOURCE",    live = true,  sentence = "The declared mode is PROSPECTIVE, but a selected file is already in the source universe listing at the seal (plan 1160 P4: moved here from S1, which sees no listing)." },
   { code = "SELECTION_OUTSIDE_UNIVERSE", live = true,  sentence = "A selected file is not in the source universe listing." },
   { code = "UNIVERSE_NOT_PARTITIONED",   live = true,  sentence = "The universe is not exactly the selected files, the excluded files and the truth side, each file in one part: a file is in none or in two, an excluded file is not in the universe, or an excluded entry has no why." },
 ]

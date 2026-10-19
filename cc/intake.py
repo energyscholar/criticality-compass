@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import intake_blind as blind
+import intake_choices
 import intake_data
 import intake_seal
 from intake_blind import Mark
@@ -204,14 +205,15 @@ def verdicts(t, out):
 
 
 def tables(root=ROOT):
-    """The intake's tables as plain values: STAGES, POLICY and FORMAT, cc.toml's alphabets and interval fields, and every reason's sentence."""
+    """The intake's tables as plain values: STAGES, POLICY and FORMAT, cc.toml's alphabets and interval fields (with FORMAT's own), every sentence."""
     load = {n: tomllib.loads((Path(root) / "intake" / f"{n.upper()}.toml").read_text()) for n in ("stages", "policy", "format")}
     cfg = tomllib.loads((Path(root) / "cc.toml").read_text())
     admit = {"policy.projection": load["policy"]["projection"], "policy.bridge": load["policy"]["bridge"],
              **{f"alphabet.{k}": v for k, v in cfg["alphabets"].items()}}
     sentences = {r["code"]: r["sentence"] for s in load["stages"]["stage"] for r in s["reason"]}
     roots = {k: str(Path(root) / Path(v).expanduser()) for k, v in tomllib.loads((Path(root) / "intake" / "ROOTS.toml").read_text())["root"].items()}
-    return {**load, "admit": admit, "interval_fields": cfg["interval_fields"], "sentences": sentences, "roots": roots}
+    fields = {**cfg["interval_fields"], **load["format"]["interval_fields"]}   # plan 1160 P4: the intake's methods STATED and NONE (FORMAT.toml)
+    return {**load, "admit": admit, "interval_fields": fields, "sentences": sentences, "roots": roots}
 
 
 def state(s):
@@ -262,9 +264,10 @@ def explain(t):
 
 
 def bodies(t, d, text, findings):
-    """The registered bodies of one run: S0 FORMAT, S1 CHOICES (plan 1160 P1: its live rows), S2 SEAL (verify, advisory), plus intake_data.bodies
-    (S3, S4, S5). Invariant: its keys are exactly the stages whose implemented = true (tests/test_intake.py)."""
-    return {"S0": lambda: blind.format_stage(text, findings, t), "S1": blind.choices, "S2": lambda declaration: intake_seal.verify(declaration, d, t),
+    """The registered bodies of one run: S0 FORMAT, S1 CHOICES (cc/intake_choices.py, plan 1160 P4), S2 SEAL (verify, advisory), plus
+    intake_data.bodies (the data stages with a body). Invariant: its keys are exactly the stages whose implemented = true (tests/test_intake.py)."""
+    return {"S0": lambda: blind.format_stage(text, findings, t), "S1": lambda declaration: intake_choices.choices(declaration, t["policy"]),
+            "S2": lambda declaration: intake_seal.verify(declaration, d, t),
             **intake_data.bodies(t, d)}
 
 

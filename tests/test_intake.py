@@ -29,6 +29,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path[:0] = [str(ROOT / "cc")]
 import intake  # noqa: E402
 import intake_blind as blind  # noqa: E402
+import intake_choices  # noqa: E402
 import intake_data  # noqa: E402
 import intake_names  # noqa: E402
 import intake_seal  # noqa: E402
@@ -103,7 +104,7 @@ SLOWS = {lay: set(F["selection"]["variants"][lay]["slow"]["variants"]) for lay i
 check("1. (1160 P1) the [source] kinds are DEPOSIT and CONVERTED, and SOURCE (the S3 body per kind) is total over them", KINDS == {"DEPOSIT", "CONVERTED"} and set(intake_data.SOURCE) == KINDS, str(KINDS))
 check("1. (1160 P1) the PER_FILE slow sources are LISTED, FILE_KEY, NONE; SLOW and UNKEYED are total over them",
       SLOWS["PER_FILE"] == {"LISTED", "FILE_KEY", "NONE"} and set(intake_data.SLOW) == set(intake_data.UNKEYED) == SLOWS["PER_FILE"], str(SLOWS))
-check("1. (1160 P1) ONE_PER_FILE (S1) is total over every slow source of every layout", set(blind.ONE_PER_FILE) == set().union(*SLOWS.values()), str(sorted(blind.ONE_PER_FILE)))
+check("1. (1160 P1) ONE_PER_FILE (S1) is total over every slow source of every layout", set(intake_choices.ONE_PER_FILE) == set().union(*SLOWS.values()), str(sorted(intake_choices.ONE_PER_FILE)))
 check("1. (1160 P1) KEYS and CURVES are total over the layouts", set(intake_data.KEYS) == set(intake_data.CURVES) == set(F["selection"]["variants"]), "")
 check("1. (1160 P1) [source] admissibility is RAW | DECLARABLE | FIGURE_LEVEL | PROCESSED_UNDECLARABLE in every kind",
       all(set(F["source"]["variants"][k]["admissibility"]["values"]) == {"RAW", "DECLARABLE", "FIGURE_LEVEL", "PROCESSED_UNDECLARABLE"} for k in KINDS), "")
@@ -112,12 +113,29 @@ check("1. (1160 P1) PATH_PATTERN, pattern and index are gone", "PATH_PATTERN" no
 check("1. (1160 P1) PATH_NOT_ADMITTED is gone from STAGES.toml and the code; its three causes are three S3 rows, in ADMIT order",
       "PATH_NOT_ADMITTED" not in codes and "PATH_NOT_ADMITTED" not in Path(intake_data.__file__).read_text()
       and [c for c, _, _ in intake_data.ADMIT] == [c for c in REASONS["S3"] if c.startswith("PATH_")] == ["PATH_OUTSIDE_ROOT", "PATH_ON_TRUTH_SIDE", "PATH_NOT_A_FILE"], str(REASONS["S3"]))
-S1_LIVE = ["SLOW_VALUES_NOT_ONE_PER_FILE", "BLOCK_RULE_HAS_NO_DIRECTION", "SELECTION_EMPTY"]   # plan 1160 P1; P2 (SELECTION_EMPTY: amendment A1)
-check("1. (1160 P1, P2) S1's live rows are exactly the rows its body checks", sorted(r["code"] for s in ST if s["id"] == "S1" for r in s["reason"] if r["live"]) == sorted(S1_LIVE), "")
+S1_ROWS = [r for s in ST if s["id"] == "S1" for r in s["reason"]]
+NOT_LIVE_S1 = ["SHIFT_BEFORE_KERNEL_INPUT"]   # plan 1160 P4: no body can return it (its reason is in STAGES.toml's comment and the P4 report)
+CHOSEN = intake_choices.choices(blind.format_stage((EXAMPLE / "intake.toml").read_text(), [], T).evidence, T["policy"])
+check("1. (1160 P4) S1's live rows are every S1 row but SHIFT_BEFORE_KERNEL_INPUT, and the rows its body checks are exactly them, in STAGES.toml order",
+      [r["code"] for r in S1_ROWS if not r["live"]] == NOT_LIVE_S1 and isinstance(CHOSEN, blind.Pass) and list(CHOSEN.evidence.checked) == [r["code"] for r in S1_ROWS if r["live"]],
+      str(CHOSEN)[:300])
+ALPHA = set(T["format"]["fields"]["interval"]["method"]["values"]) | set(tomllib.loads((ROOT / "cc.toml").read_text())["alphabets"]["interval_method"])
+check("1. (1160 P4) the intake's interval alphabet is cc.toml's with STATED and NONE; NEEDS_COLUMN is total over it and every method has its fields",
+      ALPHA == set(intake_choices.NEEDS_COLUMN) and {"STATED", "NONE"} < ALPHA and ALPHA <= set(T["interval_fields"]), str(sorted(ALPHA)))
+FM = T["format"]["fields"]
+check("1. (1160 P4) the S1 tables are total: SLOW_IDS over the slow sources, SCALAR over the shapes, LANES over the origins, NEIGHBOUR over the "
+      "identities, ROUTE over the admissibility classes, HAS_COLUMN over the uncertainty kinds; SEEN (S2) over the modes",
+      set(intake_choices.SLOW_IDS) == set().union(*SLOWS.values()) and set(intake_choices.SCALAR) == set(FM["measured"]["fields"]["shape"]["values"])
+      and all(set(intake_choices.LANES) == set(FM["source"]["variants"][k]["origin"]["values"]) for k in FM["source"]["variants"])
+      and set(intake_choices.NEIGHBOUR) == set(FM["replicate"]["fields"]["identity"]["values"])
+      and all(set(intake_choices.ROUTE) == set(FM["source"]["variants"][k]["admissibility"]["values"]) for k in FM["source"]["variants"])
+      and set(intake_choices.HAS_COLUMN) == set(FM["measured"]["fields"]["uncertainty"]["variants"]) and set(intake_seal.SEEN) == set(FM["intake"]["fields"]["mode"]["values"]), "")
+check("1. (1160 P4) PERMITTED is total over ({PROJECTION} | POLICY's bridges) x (RAW, DERIVED_OBSERVABLE, NO_LINK)",
+      set(intake_choices.PERMITTED) == set(itertools.product({"PROJECTION"} | set(T["policy"]["bridge"]), ("RAW", "DERIVED_OBSERVABLE", "NO_LINK"))), "")
 BLOCKS = set(F["selection"]["variants"]["LONG_TABLE"]["block"]["values"])
-check("1. (1160 P2, A1) SELECTED (S1 SELECTION_EMPTY) is total over the layouts", set(blind.SELECTED) == set(F["selection"]["variants"]), "")
+check("1. (1160 P2, A1) SELECTED (S1 SELECTION_EMPTY) is total over the layouts", set(intake_choices.SELECTED) == set(F["selection"]["variants"]), "")
 check("1. (1160 P2) the LONG_TABLE blocks are EXACT and FAST_RESTART; BREAK is total over them, DIRECTED over the layouts, SWEEP over row_order",
-      BLOCKS == {"EXACT", "FAST_RESTART"} and set(intake_data.BREAK) == BLOCKS and set(blind.DIRECTED) == set(F["selection"]["variants"])
+      BLOCKS == {"EXACT", "FAST_RESTART"} and set(intake_data.BREAK) == BLOCKS and set(intake_choices.DIRECTED) == set(F["selection"]["variants"])
       and set(blind.SWEEP) == set(F["acquisition"]["fields"]["row_order"]["values"]), str(BLOCKS))
 HEADS = F["reader"]["variants"]["table-curve-v1"]["header"]["variants"]
 import intake_read  # noqa: E402
@@ -244,7 +262,7 @@ for name, text, want in PLANTED:
 for name, text, want in [("(1160) the same file count and values count", base, None),
                          ("(1160) one LISTED value short of the files", base.replace('"-0.150", ', "", 1), "SLOW_VALUES_NOT_ONE_PER_FILE"),
                          ("(1160) one file more than the LISTED values", base.replace('"S1/S1_c000.npz", ', '"S1/S1_c000.npz", "S1/S1_c000b.npz", ', 1), "SLOW_VALUES_NOT_ONE_PER_FILE")]:
-    got = blind.choices(blind.format_stage(text, [], T).evidence)
+    got = intake_choices.choices(blind.format_stage(text, [], T).evidence, T["policy"])
     check(f"5. S1 {name}: {want or 'PASS'}", {True: lambda: isinstance(got, blind.Pass), False: lambda: isinstance(got, blind.Refuse) and got.reason == want}[want is None](), str(got)[:300])
 got = blind.format_stage(base, ["transducer.update[0]: planted"], T)
 check("5. (extra) a transducer finding: refused TRANSDUCER_FILE_REFUSED", isinstance(got, blind.Refuse) and got.reason == "TRANSDUCER_FILE_REFUSED", str(got)[:200])
@@ -273,8 +291,10 @@ for E in ENUMS:
     check(f"binding: {E.__name__} declares ATOMS and an axiom, and its values partition them", bool(atoms) and "Axiom" in E.__doc__ and set().union(*vals) == atoms and sum(map(len, vals)) == len(atoms), str(atoms))
     check(f"binding: every {E.__name__} name parses to its set", all(parse(x.name, atoms) == x.value for x in E), str([x.name for x in E if parse(x.name, atoms) != x.value]))
 
-# ---- blindness of S0: imports and calls of cc/intake_blind.py and of cc/intake_names.py (plan 1160 P2: the classifier moved there)
-ALLOWED = {blind: {"tomllib", "enum", "dataclasses", "typing", "intake_names"}, intake_names: {"re", "enum", "dataclasses"}}
+# ---- blindness of S0 and S1: imports and calls of cc/intake_blind.py, cc/intake_names.py (plan 1160 P2: the classifier moved there) and
+# cc/intake_choices.py (plan 1160 P4: S1 moved there)
+ALLOWED = {blind: {"tomllib", "enum", "dataclasses", "typing", "intake_names"}, intake_names: {"re", "enum", "dataclasses"},
+           intake_choices: {"dataclasses", "intake_blind", "intake_names"}}
 for mod, allowed in ALLOWED.items():
     tree = ast.parse(Path(mod.__file__).read_text())
     mods = {a.name.split(".")[0] for n in ast.walk(tree) if isinstance(n, ast.Import) for a in n.names} | {(n.module or "").split(".")[0] for n in ast.walk(tree) if isinstance(n, ast.ImportFrom)}

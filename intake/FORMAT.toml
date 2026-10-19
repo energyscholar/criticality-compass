@@ -18,6 +18,11 @@
 # v6 against v5 (plan 1160 P2): [reader.header] kind NAMES_UNITS_IN_NAMES (rows, names, unit_syntax PAREN | SLASH): the units are inside
 # the names cells, "T (K)" or "T/K"; a column is declared by its bare name ("T"), and a names cell with no unit states none. Additive.
 # v7 against v6 (plan 1160 P3): every VARIANT states its selector's `absent` reason (VALUE_NOT_LISTED, as the code held it). No field changes.
+# v8 against v7 (plan 1160 P4): the intake's interval alphabet is cc.toml alphabets.interval_method | STATED | NONE (intake-owned; cc.toml
+# is not touched). STATED: the declared uncertainty column is each point's interval (S1 METHOD_NEEDS_UNCERTAINTY_COLUMN refuses it without
+# one); NONE: the declarer pre-registers that no interval exists. Their fields are [interval_fields.STATED] and [interval_fields.NONE] below,
+# merged over cc.toml's by cc/intake.py tables(): no field beyond `method` (each table holds required and optional, both empty, the shape
+# the INTERVAL check reads).
 # A reader's `comment` prefixes are PREFIXES: an empty prefix marks every line a comment, so it is refused (COMMENT_PREFIX_EMPTY).
 # A field row: type = str | int | num | list | table | ref (cc/intake_blind.py TYPE); check = one of cc/intake_blind.py CHECK:
 #   TEXT      any text but the template's "TODO"
@@ -29,14 +34,14 @@
 #   PREFIXES  a list of line prefixes: every item a str, and none of them "" (COMMENT_PREFIX_EMPTY)
 #   TABLE     a table with its own `fields`
 #   TABLES    a list of tables, each with `fields`
-#   INTERVAL  a table whose fields are cc.toml [interval_fields.<method>] for its `method` (required and optional)
+#   INTERVAL  a table whose fields are [interval_fields.<method>] (cc.toml's, and this file's for STATED and NONE) for its `method`
 #   VARIANT   a table whose `select` field holds one key of `variants` (a closed list: another value is the `absent` reason, here always
 #             VALUE_NOT_LISTED; plan 1160 P3 moved it from the code to this table); its other fields are exactly that row's
 #   VARIANTS  a list of VARIANT tables (plan 1160 P3; intake/CONVERSION.toml's steps, unused here)
 # A key that is no field row is FIELD_IS_STAMPED when it is in `stamped`, FIELD_IS_DERIVED when in `derived`, else FIELD_UNKNOWN.
 schema = 1
 kind = "intake-format"
-version = "1160-v7"
+version = "1160-v8"
 header = { schema = 3, kind = "intake" }
 stamped = ["sealed_at", "author", "author_kind", "confirmed_by", "declaration_sha256", "code_identity", "protocol_identity", "universe_listing", "sampling", "pins"]
 derived = ["correlated"]
@@ -193,7 +198,7 @@ key = { type = "str", check = "TEXT" }
 [fields.interval]
 type = "table"
 check = "INTERVAL"
-method = { type = "str", check = "CLOSED", admit = ["alphabet.interval_method"], absent = "VALUE_NOT_LISTED", values = {} }
+method = { type = "str", check = "CLOSED", admit = ["alphabet.interval_method"], absent = "VALUE_NOT_LISTED", values = { STATED = "ADMIT", NONE = "ADMIT" } }   # 1160 P4
 
 [fields.bracket]   # amendment A2 ruling Q8: the most a declaration requires of a bracket; VALIDATED_BRACKET needs frozen coverage evidence (S8)
 type = "table"
@@ -226,3 +231,10 @@ type = "table"
 check = "TABLE"
 [fields.shift.fields]
 c = { type = "num", check = "NUMBER" }
+
+[interval_fields.STATED]   # plan 1160 P4: no field beyond method; the interval of each point is the declared uncertainty column
+required = {}
+optional = {}
+[interval_fields.NONE]     # plan 1160 P4: no field beyond method; no interval exists (pre-registered)
+required = {}
+optional = {}

@@ -1,4 +1,4 @@
-# The intake pipeline (stage table 1160-v3, policy 1136-v1)
+# The intake pipeline (stage table 1160-v4, policy 1136-v1)
 
 Generated from intake/STAGES.toml and intake/POLICY.toml by `bin/cc intake explain` (docs/gen-intake.py); never edit it by hand.
 This is the intake's explain. `bin/cc explain <input> <point>` is a different command: it explains one point of a measured input.
@@ -55,20 +55,20 @@ The declared choices are consistent with each other, and the declared operation 
 
 | reason | live | what it means |
 |---|---|---|
-| KNOBS_SAME_QUANTITY | NOT LIVE | The slow and fast knob name the same quantity or column; the Compass needs two distinct knobs. |
-| MEASURED_IS_A_KNOB | NOT LIVE | The measured number is one of the knobs. |
+| KNOBS_SAME_QUANTITY | live | The slow and fast knob name the same quantity or column; the Compass needs two distinct knobs. |
+| MEASURED_IS_A_KNOB | live | The measured number is one of the knobs. |
 | SELECTION_EMPTY | live | The selection names no file (`files = []`); a census needs at least one curve file. |
 | SLOW_VALUES_NOT_ONE_PER_FILE | live | Slow-knob values are declared per file (LISTED), but `values` does not give exactly one value per file of `files`. |
 | BLOCK_RULE_HAS_NO_DIRECTION | live | A LONG_TABLE declares block FAST_RESTART, but the fast knob has no declared direction (row_order ACQUISITION with direction UNORDERED), so no restart of a sweep can be seen. |
-| PROJECTION_REQUIRED | NOT LIVE | The raw observation is not one number per locus (a picture, positions, a series), and no projection to one number is declared before the bridge. |
-| PROJECTION_ESTIMAND_MIXED | NOT LIVE | One projection names two estimands (for example a location and a height); declare one projection per estimand. |
-| SECOND_LANE_MISSING | NOT LIVE | The source is real data and only one intake lane is declared; real data are taken in through two declared lanes (policy, intake/POLICY.toml). |
-| LANES_IDENTICAL | NOT LIVE | The two declared lanes use the same projection and bridge; the alternative must differ. |
-| REPLICATE_IS_SWEEP_NEIGHBOUR | NOT LIVE | Replicates are declared as adjacent points of one sweep; a replicate is a repeated preparation, never a neighbouring point. |
-| OPERATION_NOT_PERMITTED | NOT LIVE | A declared step is not a permitted operation for its link of the chain (Raw, Projection, DerivedObservable, Bridge, KernelInput). |
+| PROJECTION_REQUIRED | live | The raw observation is not one number per locus (a picture, positions, a series), and a bridge takes it with no projection to one number before it. |
+| PROJECTION_ESTIMAND_MIXED | live | One projection names two estimands (for example a location and a height); declare one projection per estimand. |
+| SECOND_LANE_MISSING | live | The source is real data and only one intake lane is declared; real data are taken in through two declared lanes (policy, intake/POLICY.toml). |
+| LANES_IDENTICAL | live | The two declared lanes use the same projection and bridge; the alternative must differ. |
+| REPLICATE_IS_SWEEP_NEIGHBOUR | live | Replicates are declared as adjacent points of one sweep (the replicate key is the fast knob); a replicate is a repeated preparation, never a neighbouring point. |
+| OPERATION_NOT_PERMITTED | live | A declared step is not a permitted operation for its link of the chain (Raw, Projection, DerivedObservable, Bridge, KernelInput). |
 | SHIFT_BEFORE_KERNEL_INPUT | NOT LIVE | A constant shift x + c is declared upstream of the kernel input; x + c applies only at the KernelInput boundary. |
-| PROVENANCE_HAS_NO_KERNEL_ROUTE | NOT LIVE | The deposit's admissibility record (raw-admissibility.toml) gives the component carrying the measured number no kernel route. |
-| MODE_CONTRADICTS_SOURCE | NOT LIVE | The declared mode is PROSPECTIVE, but the selected files already exist, or the source is a published set whose figures have been seen. |
+| PROVENANCE_HAS_NO_KERNEL_ROUTE | live | The source's admissibility ([source] admissibility, the deposit's class as the declarer read it from metadata) is FIGURE_LEVEL or PROCESSED_UNDECLARABLE, which has no kernel route. |
+| METHOD_NEEDS_UNCERTAINTY_COLUMN | live | The interval method is STATED (each point's interval is the declared uncertainty column), and [measured.uncertainty] declares none (kind NONE). |
 
 ## S2 SEAL (LIVE)
 
@@ -79,6 +79,7 @@ Report the seal status: whether a seal (time, author, mode, code and protocol id
 | ALREADY_SEALED | live | This declaration is already sealed; a seal is never replaced, so declare a new id. |
 | UNIVERSE_ROOT_ABSENT | live | The declared source universe root was not given or is not a directory on this machine; give its location with --universe. |
 | SELECTION_DUPLICATE | live | A file name is given more than once in `files` (or in `excluded`); each file is one curve, named once. |
+| MODE_CONTRADICTS_SOURCE | live | The declared mode is PROSPECTIVE, but a selected file is already in the source universe listing at the seal (plan 1160 P4: moved here from S1, which sees no listing). |
 | SELECTION_OUTSIDE_UNIVERSE | live | A selected file is not in the source universe listing. |
 | UNIVERSE_NOT_PARTITIONED | live | The universe is not exactly the selected files, the excluded files and the truth side, each file in one part: a file is in none or in two, an excluded file is not in the universe, or an excluded entry has no why. |
 
@@ -202,17 +203,7 @@ The plan 1118 banks were used to CHOOSE these rows; they cannot validate them (A
 
 Each row below has live = false in intake/STAGES.toml: no body returns it today (a STUB stage's rows are never live), so a run cannot show it and its absence says nothing.
 
-- S1 KNOBS_SAME_QUANTITY
-- S1 MEASURED_IS_A_KNOB
-- S1 PROJECTION_REQUIRED
-- S1 PROJECTION_ESTIMAND_MIXED
-- S1 SECOND_LANE_MISSING
-- S1 LANES_IDENTICAL
-- S1 REPLICATE_IS_SWEEP_NEIGHBOUR
-- S1 OPERATION_NOT_PERMITTED
 - S1 SHIFT_BEFORE_KERNEL_INPUT
-- S1 PROVENANCE_HAS_NO_KERNEL_ROUTE
-- S1 MODE_CONTRADICTS_SOURCE
 - S6 READ_NOT_LOGGED
 - S6 BYPASS_READ_LOGGED
 - S6 LINEAGE_OFF_GRAPH

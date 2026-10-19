@@ -212,58 +212,15 @@ def format_stage(text, transducer_findings, tables):
 def gate(checks, then):
     """then() (a Pass or a Refuse) when every (holds, reason, detail) row holds, else Refuse(reason, detail()) of the first row that does not.
     Rows are evaluated in order and lazily (each `holds` and `detail` is a function): zip with range(1) draws at most one failing row, so no
-    row after it runs. (Moved here from intake_data by plan 1160 P1, so S1 uses it within this module's import allow-list.)"""
+    row after it runs. (Moved here from intake_data by plan 1160 P1, so S1, cc/intake_choices.py, uses it within the blind import allow-list.)"""
     failed = [c for _, c in zip(range(1), (c for c in checks if not c[0]()))]
     return {True: then, False: lambda: Refuse(failed[0][1], failed[0][2]())}[not failed]()
 
 
-ONE_PER_FILE = {   # [selection.slow] source -> does the declaration give one slow value per selected file; total over FORMAT's sources (test)
-    "LISTED": lambda sel: len(sel["slow"]["values"]) == len(sel["files"]),
-    "FILE_KEY": lambda sel: True,   # each file states its own value in a header line (S5 reads it there, or refuses SLOW_KEY_UNRESOLVED)
-    "NONE": lambda sel: True,       # no slow knob: no value is declared, so none is missing or extra
-    "COLUMN": lambda sel: True,     # LONG_TABLE: the slow knob is a column of the one file
-}
-
 SWEEP = {   # [acquisition] row_order -> (the [acquisition] table) -> the direction the fast knob runs within a curve (plan 1160 P2); total
     "ASCENDING": lambda acq: "ASCENDING", "DESCENDING": lambda acq: "DESCENDING", "ACQUISITION": lambda acq: acq["direction"],
 }
-RESTARTS = {   # a direction a curve runs in -> (previous fast value, fast value) -> does a new sweep begin (the fast knob turns back)
+RESTARTS = {   # a direction a curve runs in -> (previous fast value, fast value) -> does a new sweep begin (the fast knob turns back); S1's tables
+    # (cc/intake_choices.py since plan 1160 P4) and S5's (intake_data.BREAK) both read SWEEP and RESTARTS
     "ASCENDING": lambda a, b: b < a, "DESCENDING": lambda a, b: b > a,   # UNORDERED has no row: S1 refuses BLOCK_RULE_HAS_NO_DIRECTION first
 }
-DIRECTED = {   # [selection] layout -> does the curve rule of the declaration have the direction it needs; total over FORMAT's layouts (test)
-    "PER_FILE": lambda d: True,   # a file is a curve
-    "LONG_TABLE": lambda d: {"EXACT": True, "FAST_RESTART": SWEEP[d["acquisition"]["row_order"]](d["acquisition"]) in RESTARTS}[d["selection"]["block"]],
-}
-
-SELECTED = {   # [selection] layout -> how many files the declaration selects; total over FORMAT's layouts (test). Amendment A1 of plan 1160
-    "PER_FILE": lambda sel: len(sel["files"]), "LONG_TABLE": lambda sel: 1,   # LONG_TABLE names its one `file`
-}
-
-
-@dataclass(frozen=True)
-class Chosen:
-    """S1 CHOICES' PASS evidence (plan 1160 P1). Invariant: built only from a Declaration for which every row in `checked` held; `checked` is
-    exactly the rows the body runs (tests/test_intake.py: the S1 rows with live = true), and the summary says the other rows were not checked."""
-    declaration: Declaration
-    checked: tuple
-
-    def summary(self):
-        return (f"Checked: {', '.join(self.checked)}. The other S1 rows have no body yet (plan 1160 P4), so they were not checked; the report "
-                f"lists them under the reasons no body can return yet")
-
-    def confirmed(self):
-        return False
-
-
-def choices(declaration):
-    """S1 CHOICES (reads no byte). Plan 1160 P1 makes one row live, SLOW_VALUES_NOT_ONE_PER_FILE, so that a LISTED count that differs from the
-    files count is refused before the loader and never zipped short; plan 1160 P2 adds SELECTION_EMPTY (amendment A1: an empty `files` would
-    crash S4, which reads the first file) and BLOCK_RULE_HAS_NO_DIRECTION, so a FAST_RESTART block rule
-    always has a direction (RESTARTS has a row for it); plan 1160 P4 adds the other rows."""
-    sel = declaration.data["selection"]
-    rows = [(lambda: SELECTED[sel["layout"]](sel) > 0, "SELECTION_EMPTY", lambda: detail(words=[f"layout {sel['layout']}"], counts={"files selected": 0})),   # A1: S4 reads files[0]
-            (lambda: ONE_PER_FILE[sel["slow"]["source"]](sel), "SLOW_VALUES_NOT_ONE_PER_FILE",
-             lambda: detail(counts={"files": len(sel["files"]), "slow values": len(sel["slow"]["values"])})),
-            (lambda: DIRECTED[sel["layout"]](declaration.data), "BLOCK_RULE_HAS_NO_DIRECTION",   # plan 1160 P2: FAST_RESTART needs a direction
-             lambda: detail(words=["block FAST_RESTART", "row_order ACQUISITION", f"direction {declaration.data['acquisition']['direction']}"]))]
-    return gate(rows, lambda: Pass(Chosen(declaration, tuple(r[1] for r in rows))))

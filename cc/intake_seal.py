@@ -123,6 +123,9 @@ def selected(sel):
     return SELECTED[sel["layout"]](sel)
 
 
+SEEN = {"PROSPECTIVE": False, "RETROSPECTIVE_PREDECLARED": True, "EXPLORATORY": True}   # [intake] mode -> may a selected file exist at the seal; total (test)
+
+
 def parts(decl, names):
     """The three parts the universe must be (plan 1160 P1), each a LIST of names in declared or listing order (never a set, so a name given
     twice is counted twice): selected (the selection's files), excluded (its excluded entries' files), truth_side (the universe names with a
@@ -132,7 +135,8 @@ def parts(decl, names):
 
 
 def _write(d, decl, universe, who, root, tables):
-    """SELECTION_DUPLICATE (a name twice within one part) | SELECTION_OUTSIDE_UNIVERSE (a selected name not in the listing) |
+    """SELECTION_DUPLICATE (a name twice within one part) | MODE_CONTRADICTS_SOURCE (plan 1160 P4: PROSPECTIVE, and a selected name is in
+    the listing) | SELECTION_OUTSIDE_UNIVERSE (a selected name not in the listing) |
     UNIVERSE_NOT_PARTITIONED (universe != selected + excluded + truth_side with each name in exactly one part, or an excluded entry with an
     empty why), else the stamp. Details carry names and counts, never a byte of a file."""
     import schema
@@ -142,12 +146,15 @@ def _write(d, decl, universe, who, root, tables):
     every = [x for p in part.values() for x in p]
     twice = sorted({x for p in part.values() for x in p if p.count(x) > 1})
     outside = sorted(set(part["selected"]) - set(names))
+    seen = sorted(set(part["selected"]) & set(names))
     split = sorted({x for x in every if every.count(x) > 1} - set(twice))   # in two parts
     loose = sorted(set(names) - set(every)) + sorted(set(every) - set(names) - set(outside))   # in no part | a part's name not in the universe
     whyless = [e["file"] for e in decl.data["selection"]["excluded"] if e["why"].strip() == ""]
     broken = lambda: {"names in no part": len(set(names) - set(every)), "names in two parts": len(split), "excluded names not in the universe": len(set(every) - set(names) - set(outside)),
                       "excluded entries with no why": len(whyless)}
     return gate([(lambda: not twice, "SELECTION_DUPLICATE", lambda: detail(words=twice[:3], counts={"names given more than once in one part": len(twice)})),
+                 (lambda: SEEN[decl.mode] or not seen, "MODE_CONTRADICTS_SOURCE",
+                  lambda: detail(words=[f"mode {decl.mode}"] + seen[:3], counts={"selected files already in the universe listing": len(seen)})),
                  (lambda: not outside, "SELECTION_OUTSIDE_UNIVERSE", lambda: detail(words=outside[:3], counts={"selected files not in the universe listing": len(outside)})),
                  (lambda: not (split or loose or whyless), "UNIVERSE_NOT_PARTITIONED", lambda: detail(words=(split + loose + whyless)[:3], counts=broken()))],
                 lambda: _stamp(d, decl, universe, have, who, root, tables, schema, {k: len(v) for k, v in part.items()}))

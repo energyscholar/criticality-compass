@@ -23,8 +23,12 @@ What each line does:
 3. `new intake --from-synth` writes `declarations/demo1/intake.toml` and `transducer.toml`. It fills what the bank's MANIFEST states
    as metadata and prints the TODO lines left. Those are the choices, and they are yours.
 4. You replace each TODO. The method `iid` also needs its fields (cc.toml `[interval_fields.iid]`); lint names any that are missing.
-5. `lint` runs the stages that read no data. It should pass FORMAT and CHOICES (S1 checks three rows so far: a selection that names a file, one slow value per
-   file, and a direction for a FAST_RESTART block).
+5. `lint` runs the stages that read no data. It should pass FORMAT and CHOICES. CHOICES checks the choices against each other: two distinct
+   knobs and a measured number that is neither, a selection that names a file with one slow value per file, a direction for a FAST_RESTART
+   block, the projections and bridges (a permitted step at each link, one estimand per projection, the lanes the source needs and lanes that
+   differ), replicates that are not neighbouring points, a source class with a kernel route, and an uncertainty column for interval method
+   STATED. `bin/cc intake explain` lists every row. The mode `RETROSPECTIVE_PREDECLARED` below says the files exist and you declare before
+   looking at their values; `PROSPECTIVE` (no file exists yet) cannot be sealed over files that exist (MODE_CONTRADICTS_SOURCE).
 6. `seal` is optional. Sealing is recommended and not enforced. It records what you declared and when; it is an integrity practice, like a
    lab notebook. Write your own name for `<name>`.
 7. `run` runs every stage. SOURCE_INTEGRITY, SHAPE and CENSUS read the bank through the logged loader. The other stages are STUBs, so the
@@ -37,7 +41,7 @@ These are the TODO lines of `declarations/demo1/intake.toml` and one choice for 
 
 ```toml
 [intake]
-mode = "PROSPECTIVE"
+mode = "RETROSPECTIVE_PREDECLARED"
 [source]
 admissibility = "RAW"
 [acquisition]

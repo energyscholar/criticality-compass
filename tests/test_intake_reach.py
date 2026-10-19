@@ -175,7 +175,7 @@ with tempfile.TemporaryDirectory() as tmp:
         ("FIELD_UNKNOWN", "a field the format does not define", lambda: s0(base.replace("[intake]\n", "[intake]\ncolour = \"red\"\n"))),
         ("FIELD_TYPE_WRONG", "a column key that is a boolean", lambda: s0(base.replace('key = "C"', "key = true", 1))),
         ("VALUE_NOT_LISTED", "layout BY_ROW", lambda: s0(base.replace('layout = "PER_FILE"', 'layout = "BY_ROW"'))),
-        ("VALUE_STILL_TODO", "intake.mode TODO", lambda: s0(base.replace('mode = "PROSPECTIVE"', 'mode = "TODO"', 1))),
+        ("VALUE_STILL_TODO", "intake.mode TODO (1160 P4: the plant's mode is RETROSPECTIVE_PREDECLARED)", lambda: s0(base.replace('mode = "RETROSPECTIVE_PREDECLARED"', 'mode = "TODO"', 1))),
         ("BIAS_KEY_UNDECLARED", "a free-text bias", lambda: s0(base.replace('bias = "MAX_MEASURED"', 'bias = "the largest C"'))),
         ("FIELD_IS_STAMPED", "a typed timestamp", lambda: s0(base.replace("[intake]\n", '[intake]\nsealed_at = "2026-10-18T09:00:00Z"\n'))),
         ("FIELD_IS_DERIVED", "a derived field typed", lambda: s0(base.replace("[acquisition]\n", "[acquisition]\ncorrelated = true\n"))),
