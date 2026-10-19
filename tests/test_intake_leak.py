@@ -161,7 +161,9 @@ with tempfile.TemporaryDirectory() as tmp:
         ("UNIVERSE_NOT_PARTITIONED", "(1160) a universe file in no part", (pf(UP := pf_bank(lambda b: (b / "notes.txt").write_text("planted\n"))), UP, full(UP))),
         # S3 SOURCE_INTEGRITY
         ("ROOT_UNRESOLVED", "a root name ROOTS.toml does not hold", (pf(PF, lambda t: t.replace("<leak>/", "<no-such-root>/")), PF, full(PF))),
-        ("PATH_NOT_ADMITTED", "a selected file deleted (unsealed: the seal would refuse it)", (pf(pf_bank(lambda b: (b / "curve_003.csv").unlink())), PF, unsealed)),
+        ("PATH_OUTSIDE_ROOT", "(1160) a files entry naming a file of another bank (unsealed)", (pf(PO := pf_bank(), lambda t: t.replace('files = ["curve_000.csv"', f'files = ["../{PF}/curve_000.csv"', 1)), PO, unsealed)),
+        ("PATH_ON_TRUTH_SIDE", "(1160) truth_side names a selected file (unsealed)", (pf(PF, lambda t: t.replace('truth_side = ["truth.json"]', 'truth_side = ["truth.json", "curve_003.csv"]', 1)), PF, unsealed)),
+        ("PATH_NOT_A_FILE", "a selected file deleted (unsealed: the seal would refuse it; 1160: was PATH_NOT_ADMITTED)", (pf(pf_bank(lambda b: (b / "curve_003.csv").unlink())), PF, unsealed)),
         ("PIN_MISMATCH", "a file's bytes changed after its first logged read (unsealed: the seal would see the size)",
          (pf(PIN := pf_bank()), PIN, unsealed + (append("curve_002.csv", f"{cell(2, 50, 1)},{cell(2, 50, 2)},{cell(2, 50, 3)}\n"), ("run",)))),
         ("UNIVERSE_CHANGED", "a file added after the seal", (pf(UC := pf_bank()), UC, full(UC)[:2] + (lambda b: (b / "late.csv").write_text("T,C,sigma\n"), ("run",)))),

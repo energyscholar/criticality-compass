@@ -174,12 +174,17 @@ def located(text, roots):
     return {True: lambda: str(Path(roots[m[1]]) / m[2].lstrip("/")), False: lambda: ""}[m is not None and m[1] in roots and ".." not in m[2].split("/")]()
 
 
-def admit(loc, name, truth_side):
-    """Admission of one selected name before it is read: inside the source root, no path part on the truth side, a file. Returns the parts
-    that fail (empty: admitted)."""
-    path = Path(loc) / name
-    return [w for ok, w in ((path.resolve().is_relative_to(Path(loc).resolve()), "outside the source root"), (not set(Path(name).parts) & set(truth_side), "on the truth side"),
-                            (path.is_file(), "not a file")) if not ok]
+ADMIT = (   # plan 1160 P1: the loader's admission of one selected name before any byte is read, one row per reason, in this order
+    ("PATH_OUTSIDE_ROOT", "names that resolve outside the source root", lambda loc, n, src: (Path(loc) / n).resolve().is_relative_to(Path(loc).resolve())),
+    ("PATH_ON_TRUTH_SIDE", "names with a path part on the truth side", lambda loc, n, src: not set(Path(n).parts) & set(src["truth_side"])),
+    ("PATH_NOT_A_FILE", "names that are not a file", lambda loc, n, src: (Path(loc) / n).is_file()),
+)
+
+
+def admission(loc, names, src):
+    """One gate row per ADMIT row: (holds, reason, detail) over every selected name; the detail names the first three that fail."""
+    failing = lambda ok: [n for n in names if not ok(loc, n, src)]
+    return [(lambda ok=ok: not failing(ok), code, lambda ok=ok, what=what: detail(words=failing(ok)[:3], counts={what: len(failing(ok))})) for code, what, ok in ADMIT]
 
 
 SOURCE = {   # [source] kind -> the S3 body of that kind; total over FORMAT's [source] kinds (plan 1160 P1)
@@ -196,16 +201,15 @@ def source_integrity(declaration, d, t):
 
 def _deposit(declaration, d, t):
     """S3 for a DEPOSIT. Invariant: ROOT_UNRESOLVED | UNIVERSE_CHANGED (names and sizes against the seal, only when a SEAL.json exists) |
-    PATH_NOT_ADMITTED are decided before any byte is read; then each file is read once through the logged loader, and PIN_MISMATCH when its
+    PATH_OUTSIDE_ROOT | PATH_ON_TRUTH_SIDE | PATH_NOT_A_FILE (ADMIT) are decided before any byte is read; then each file is read once through the logged loader, and PIN_MISMATCH when its
     sha256 differs from the sha256 at its first logged loader read (the pin)."""
     src, sel = declaration.data["source"], declaration.data["selection"]
     loc, rec = located(src["root"], t["roots"]), intake_seal.record(d)
     names = intake_seal.selected(sel)
-    turned = lambda: [(n, w) for n in names for w in admit(loc, n, src["truth_side"])]
     return gate([(lambda: loc != "" and Path(loc).is_dir(), "ROOT_UNRESOLVED", lambda: detail(words=[f"root '{src['root']}' (names in intake/ROOTS.toml: {sorted(t['roots'])})"])),
                  (lambda: rec == {} or intake_seal.listing(loc, src["universe"]) == rec["universe"]["listing"], "UNIVERSE_CHANGED",
                   lambda: detail(counts={"names now": len(intake_seal.listing(loc, src["universe"])), "names sealed": len(rec["universe"]["listing"])})),
-                 (lambda: not turned(), "PATH_NOT_ADMITTED", lambda: detail(words=[f"{n}: {w}" for n, w in turned()[:3]], counts={"names not admitted": len(turned())}))],
+                 *admission(loc, names, src)],
                 lambda: _read(declaration, d, loc, names))
 
 

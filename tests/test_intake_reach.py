@@ -186,7 +186,10 @@ with tempfile.TemporaryDirectory() as tmp:
         ("PASS", "(1160) the partition holds: files, MANIFEST.json excluded (the truth sits outside the bank)", lambda: mint(banks / copy(lambda b: None))),
         # S3 SOURCE_INTEGRITY
         ("ROOT_UNRESOLVED", "a root name ROOTS.toml does not hold", lambda: pf("pf", lambda t: t.replace("<long-test>/pf", "<no-such-root>/pf"))),
-        ("PATH_NOT_ADMITTED", "a selected file deleted", lambda: pf(copy(lambda b: (b / m["files"][3]["name"]).unlink()))),
+        ("PATH_OUTSIDE_ROOT", "(1160) a files entry ../pf/<a curve file>: a file of another bank, outside this root", lambda: pf(copy(lambda b: None), lambda t: t.replace(f'files = ["{m["files"][0]["name"]}"', f'files = ["../pf/{m["files"][0]["name"]}"', 1))),
+        ("PATH_ON_TRUTH_SIDE", "(1160) truth_side names a selected file (unsealed: the seal would refuse the partition)", lambda: pf("pf", lambda t: t.replace('truth_side = ["truth.json"]', f'truth_side = ["truth.json", "{m["files"][3]["name"]}"]', 1))),
+        ("PATH_NOT_A_FILE", "a selected file deleted (1160: was PATH_NOT_ADMITTED)", lambda: pf(copy(lambda b: (b / m["files"][3]["name"]).unlink()))),
+        ("PATH_NOT_A_FILE", "(1160) a selected name that is a directory", lambda: pf(copy(lambda b: ((b / m["files"][3]["name"]).unlink(), (b / m["files"][3]["name"]).mkdir())))),
         ("PIN_MISMATCH", "a file's bytes changed after its first logged read", lambda: twice(copy(lambda b: None), lambda d, b, t: (b / m["files"][2]["name"]).write_text((b / m["files"][2]["name"]).read_text() + "3.5,0.5,0.03\n"))),
         ("UNIVERSE_CHANGED", "a file added to the universe after the seal", lambda: sealed_then(lambda b: (b / "late.csv").write_text("T,C,sigma\n"))),
         ("CONVERSION_NOT_LIVE", "(1160) a CONVERTED source (its S3 body has no conversion until P3)", lambda: pf("pf", lambda t: convert(t, "<cc-banks>/pf/bank"))),

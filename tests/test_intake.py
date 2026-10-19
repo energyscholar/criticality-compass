@@ -108,6 +108,9 @@ check("1. (1160 P1) [source] admissibility is RAW | DECLARABLE | FIGURE_LEVEL | 
       all(set(F["source"]["variants"][k]["admissibility"]["values"]) == {"RAW", "DECLARABLE", "FIGURE_LEVEL", "PROCESSED_UNDECLARABLE"} for k in KINDS), "")
 check("1. (1160 P1) converted_from is a field of the CONVERTED row only", ["converted_from" in F["source"]["variants"][k] for k in ("DEPOSIT", "CONVERTED")] == [False, True], "")
 check("1. (1160 P1) PATH_PATTERN, pattern and index are gone", "PATH_PATTERN" not in str(F) and not {"pattern", "index"} & set(F["selection"]["variants"]["PER_FILE"]), "")
+check("1. (1160 P1) PATH_NOT_ADMITTED is gone from STAGES.toml and the code; its three causes are three S3 rows, in ADMIT order",
+      "PATH_NOT_ADMITTED" not in codes and "PATH_NOT_ADMITTED" not in Path(intake_data.__file__).read_text()
+      and [c for c, _, _ in intake_data.ADMIT] == [c for c in REASONS["S3"] if c.startswith("PATH_")] == ["PATH_OUTSIDE_ROOT", "PATH_ON_TRUTH_SIDE", "PATH_NOT_A_FILE"], str(REASONS["S3"]))
 check("1. (1160 P1) S1's live rows are exactly the rows its body checks", [r["code"] for s in ST if s["id"] == "S1" for r in s["reason"] if r["live"]] == ["SLOW_VALUES_NOT_ONE_PER_FILE"], "")
 check("1. every admit source of FORMAT.toml is a source the tables provide", all(src in T["admit"] for spec in [T["format"]["fields"]["interval"]["method"]] for src in spec["admit"]), "")
 

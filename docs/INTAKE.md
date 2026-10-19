@@ -94,7 +94,9 @@ Each selected file is admitted before it is read, read once through the logged l
 |---|---|---|
 | CONVERSION_NOT_LIVE | live | The source is CONVERTED, and the conversion has no body in the Compass yet (plan 1160 P3); nothing was read. |
 | ROOT_UNRESOLVED | live | The declared source root is not a name of intake/ROOTS.toml followed by a relative path, or it names no directory on this machine. |
-| PATH_NOT_ADMITTED | live | The loader's admission refused this path before reading it (outside the source root, on the truth side of the deposit, or not a file). |
+| PATH_OUTSIDE_ROOT | live | A selected name resolves outside the source root (a .. part or a link); the loader reads nothing outside the root. |
+| PATH_ON_TRUTH_SIDE | live | A selected name has a path part on the truth side of the deposit ([source] truth_side); no stage reads the truth. |
+| PATH_NOT_A_FILE | live | A selected name is not a file under the source root (absent, or a directory); nothing was read. |
 | PIN_MISMATCH | live | The file's bytes do not match their pinned sha256; the data changed since they were pinned. |
 | UNIVERSE_CHANGED | live | The source universe now lists files that differ from the sealed listing (added, removed, or resized). |
 

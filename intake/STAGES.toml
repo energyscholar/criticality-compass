@@ -113,7 +113,9 @@ verdict = "PRIMARY"
 reason = [
   { code = "CONVERSION_NOT_LIVE", live = true, sentence = "The source is CONVERTED, and the conversion has no body in the Compass yet (plan 1160 P3); nothing was read." },
   { code = "ROOT_UNRESOLVED",   live = true,  sentence = "The declared source root is not a name of intake/ROOTS.toml followed by a relative path, or it names no directory on this machine." },
-  { code = "PATH_NOT_ADMITTED", live = true,  sentence = "The loader's admission refused this path before reading it (outside the source root, on the truth side of the deposit, or not a file)." },
+  { code = "PATH_OUTSIDE_ROOT",  live = true,  sentence = "A selected name resolves outside the source root (a .. part or a link); the loader reads nothing outside the root." },
+  { code = "PATH_ON_TRUTH_SIDE", live = true,  sentence = "A selected name has a path part on the truth side of the deposit ([source] truth_side); no stage reads the truth." },
+  { code = "PATH_NOT_A_FILE",    live = true,  sentence = "A selected name is not a file under the source root (absent, or a directory); nothing was read." },
   { code = "PIN_MISMATCH",      live = true,  sentence = "The file's bytes do not match their pinned sha256; the data changed since they were pinned." },
   { code = "UNIVERSE_CHANGED",  live = true,  sentence = "The source universe now lists files that differ from the sealed listing (added, removed, or resized)." },
 ]
