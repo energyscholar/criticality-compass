@@ -26,7 +26,7 @@ Written by `bin/cc intake run dial1118-s1-v2`. Stage table 1145-v1, policy 1136-
 - **S0 FORMAT** (LIVE): EXECUTED, PASS. The declaration 'dial1118-s1-v2' parses, and every field of format v2 is present, typed and listed (mode EXPLORATORY)
 - **S1 CHOICES** (STUB): STUB. This stage has no body yet, so nothing was checked; a stub is never a pass.
 - **S2 SEAL** (LIVE): EXECUTED, PASS. SEALED. A seal holds this declaration exactly as it is now. Sealed at 2026-10-19T06:06:59Z (seal-log t_ns 1792390019508853690) by Claude (plan 1145 phase 1) (AI_DRAFT), confirmed_by '', mode EXPLORATORY; declaration sha256 be591dee86fda4819472fc9c4f48676f7334f74bd53405fbc63c6081dc72b3cd; universe '<p1118-bank>' (located at a directory named 'p1118-bank-FIXTURE'): 63 files, names and sizes in SEAL.json
-- **S3 SOURCE_INTEGRITY** (LIVE): EXECUTED, REFUSE ROOT_UNRESOLVED. The declared source root is not a name of intake/ROOTS.toml followed by a relative path, or it names no directory on this machine. Detail: root '<p1118-bank>' (names in intake/ROOTS.toml: ['<intake-synth>'])
+- **S3 SOURCE_INTEGRITY** (LIVE): EXECUTED, REFUSE ROOT_UNRESOLVED. The declared source root is not a name of intake/ROOTS.toml followed by a relative path, or it names no directory on this machine. Detail: root '<p1118-bank>' (names in intake/ROOTS.toml: ['<cc-datasets>', '<intake-synth>'])
 - **S4 SHAPE** (LIVE): WITHHELD AFTER_REFUSAL (S3). Not run: an earlier stage refused, and no later check can redeem a refusal.
 - **S5 CENSUS** (LIVE): WITHHELD AFTER_REFUSAL (S3). Not run: an earlier stage refused, and no later check can redeem a refusal.
 - **S6 ADMISSIBILITY** (STUB): WITHHELD AFTER_REFUSAL (S3). Not run: an earlier stage refused, and no later check can redeem a refusal.
