@@ -17,6 +17,7 @@
 # LONG_TABLE declaration adds `block = "EXACT"`; schema stays 3 (no committed declaration is a LONG_TABLE).
 # v6 against v5 (plan 1160 P2): [reader.header] kind NAMES_UNITS_IN_NAMES (rows, names, unit_syntax PAREN | SLASH): the units are inside
 # the names cells, "T (K)" or "T/K"; a column is declared by its bare name ("T"), and a names cell with no unit states none. Additive.
+# v7 against v6 (plan 1160 P3): every VARIANT states its selector's `absent` reason (VALUE_NOT_LISTED, as the code held it). No field changes.
 # A reader's `comment` prefixes are PREFIXES: an empty prefix marks every line a comment, so it is refused (COMMENT_PREFIX_EMPTY).
 # A field row: type = str | int | num | list | table | ref (cc/intake_blind.py TYPE); check = one of cc/intake_blind.py CHECK:
 #   TEXT      any text but the template's "TODO"
@@ -29,12 +30,13 @@
 #   TABLE     a table with its own `fields`
 #   TABLES    a list of tables, each with `fields`
 #   INTERVAL  a table whose fields are cc.toml [interval_fields.<method>] for its `method` (required and optional)
-#   VARIANT   a table whose `select` field holds one key of `variants` (a closed list: another value is VALUE_NOT_LISTED); its other fields
-#             are exactly that row's
+#   VARIANT   a table whose `select` field holds one key of `variants` (a closed list: another value is the `absent` reason, here always
+#             VALUE_NOT_LISTED; plan 1160 P3 moved it from the code to this table); its other fields are exactly that row's
+#   VARIANTS  a list of VARIANT tables (plan 1160 P3; intake/CONVERSION.toml's steps, unused here)
 # A key that is no field row is FIELD_IS_STAMPED when it is in `stamped`, FIELD_IS_DERIVED when in `derived`, else FIELD_UNKNOWN.
 schema = 1
 kind = "intake-format"
-version = "1160-v6"
+version = "1160-v7"
 header = { schema = 3, kind = "intake" }
 stamped = ["sealed_at", "author", "author_kind", "confirmed_by", "declaration_sha256", "code_identity", "protocol_identity", "universe_listing", "sampling", "pins"]
 derived = ["correlated"]
@@ -64,6 +66,7 @@ class = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED
 type = "table"
 check = "VARIANT"
 select = "kind"
+absent = "VALUE_NOT_LISTED"
 [fields.source.variants.DEPOSIT]   # the files as deposited, read directly
 origin = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { PLANTED = "ADMIT", EXPERIMENT = "ADMIT" } }
 deposit = { type = "str", check = "TEXT" }
@@ -84,6 +87,7 @@ converted_from = { type = "str", check = "TEXT" }   # "<cc-datasets>/<id>/raw": 
 type = "table"
 check = "VARIANT"
 select = "name"
+absent = "VALUE_NOT_LISTED"
 [fields.reader.variants."csv-curve-v1"]     # the synthetic bank's reader: one header line that IS the declared columns in role order, then rows of numbers
 [fields.reader.variants."table-curve-v1"]   # a text or Excel table; columns by name or by 1-based position
 comment = { type = "list", check = "PREFIXES", item = "str" }   # line prefixes that mark a comment line, dropped before the header is counted ([] for none; never "")
@@ -91,11 +95,13 @@ comment = { type = "list", check = "PREFIXES", item = "str" }   # line prefixes 
 type = "table"
 check = "VARIANT"
 select = "kind"
+absent = "VALUE_NOT_LISTED"
 variants = { COMMA = {}, TAB = {}, WHITESPACE = {}, XLSX = { sheet = { type = "str", check = "TEXT" } } }
 [fields.reader.variants."table-curve-v1".header]
 type = "table"
 check = "VARIANT"
 select = "kind"
+absent = "VALUE_NOT_LISTED"
 [fields.reader.variants."table-curve-v1".header.variants]
 SKIP = { rows = { type = "int", check = "NUMBER" } }   # `rows` header lines, none of them names: columns by position only
 NAMES = { rows = { type = "int", check = "NUMBER" }, names = { type = "int", check = "NUMBER" } }   # `names`: the 1-based header line of column names
@@ -112,6 +118,7 @@ NAMES_UNITS_IN_NAMES = { rows = { type = "int", check = "NUMBER" }, names = { ty
 type = "table"
 check = "VARIANT"
 select = "layout"
+absent = "VALUE_NOT_LISTED"
 [fields.selection.variants.PER_FILE]
 files = { type = "list", check = "ITEMS", item = "str" }   # the curve files under root, one curve each, in curve order (plan 1160 P1: the only way to name them)
 excluded = { type = "list", check = "TABLES", fields = { file = { type = "str", check = "TEXT" }, why = { type = "str", check = "TEXT" } } }
@@ -119,6 +126,7 @@ excluded = { type = "list", check = "TABLES", fields = { file = { type = "str", 
 type = "table"
 check = "VARIANT"
 select = "source"
+absent = "VALUE_NOT_LISTED"
 [fields.selection.variants.PER_FILE.slow.variants]
 LISTED = { values = { type = "list", check = "ITEMS", item = "numeral" } }   # one decimal number as TEXT per listed file, in `files` order (S1 counts them)
 FILE_KEY = { key = { type = "str", check = "TEXT" } }                         # each file's header line whose first cell is `key`; its second cell is the value (read at S5)
@@ -131,6 +139,7 @@ excluded = { type = "list", check = "TABLES", fields = { file = { type = "str", 
 type = "table"
 check = "VARIANT"
 select = "source"
+absent = "VALUE_NOT_LISTED"
 variants = { COLUMN = { key = { type = "ref", check = "REF" } } }
 
 [fields.knobs]
@@ -163,6 +172,7 @@ shape = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED
 type = "table"
 check = "VARIANT"
 select = "kind"
+absent = "VALUE_NOT_LISTED"
 variants = { COLUMN = { key = { type = "ref", check = "REF" } }, NONE = {} }
 
 [fields.acquisition]

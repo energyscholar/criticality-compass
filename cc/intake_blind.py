@@ -119,10 +119,11 @@ def _interval(spec, v, loc, tables):
 
 
 def _variant(spec, v, loc, tables):
-    """VARIANT: the `select` field first, CLOSED over the keys of `variants`; then exactly the fields of the row it names (none when it names
-    no row, so every other key is FIELD_UNKNOWN after the selector's own finding). Invariant: no field of another row is ever admitted."""
+    """VARIANT: the `select` field first, CLOSED over the keys of `variants` (a value of no row is the spec's `absent` reason, plan 1160 P3);
+    then exactly the fields of the row it names (none when it names no row, so every other key is FIELD_UNKNOWN after the selector's own
+    finding). Invariant: no field of another row is ever admitted."""
     sel = spec["select"]
-    closed = {"type": "str", "check": "CLOSED", "admit": [], "absent": "VALUE_NOT_LISTED", "values": {k: "ADMIT" for k in spec["variants"]}}
+    closed = {"type": "str", "check": "CLOSED", "admit": [], "absent": spec["absent"], "values": {k: "ADMIT" for k in spec["variants"]}}
     return section({sel: closed, **look(spec["variants"], str(look(v, sel, "")), {})}, v, loc, tables)
 
 
@@ -141,6 +142,8 @@ CHECK = {   # a FORMAT field's check word -> its findings for a value of the rig
     "INTERVAL": _interval,
     "REF": lambda spec, v, loc, tables: [],   # a name or a position, typed by TYPE["ref"]; "TODO" is refused before any check (typed)
     "VARIANT": _variant,
+    "VARIANTS": lambda spec, v, loc, tables: [f for i, x in enumerate(v) for f in {True: lambda: _variant(spec, x, f"{loc}[{i}]", tables),   # 1160 P3: a list of
+                                                                                   False: lambda: [Finding("FIELD_TYPE_WRONG", f"{loc}[{i}]", "want a table")]}[TYPE["table"](x)]()],   # VARIANT tables
 }
 
 

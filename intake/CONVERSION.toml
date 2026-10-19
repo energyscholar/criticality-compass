@@ -1,0 +1,178 @@
+# intake/CONVERSION.toml - the conversion format and its closed operation alphabet (plan 1160 P3), as DATA. A conversion is a declared,
+# logged, re-derivable rewrite of a deposit's bytes into a canonical bank that the strict intake reads (docs/INTAKE-CONVERSION.md). Its
+# declaration is declarations/<id>/CONVERSION.toml; `bin/cc intake convert <id>` walks this table with the S0 walker (cc/intake_blind.py
+# section: the same field rows, check words and reason codes as intake/FORMAT.toml) and then runs cc/intake_convert.py.
+# Every operation is a function from text cells to text cells: the converter's cell type is str end to end, so no arithmetic on a value is
+# reachable. A conversion is not allowed to change a number; a step that would (interpolate, smooth, resample, change a unit, average,
+# round, sort rows, fill a NaN, drop a data row) has no row here, and S0 of the conversion refuses it OPERATION_NOT_LISTED.
+# The declaration (schema 1, kind "conversion"):
+#   source  "<cc-datasets>/<id>/raw": the deposit, a root name of intake/ROOTS.toml and a path under it
+#   out     "<cc-banks>/<id>/bank": the bank the converter writes (it never overwrites one: BANK_EXISTS)
+#   [[file]] one per output file: `from` (a file under source), `to` (the output's name in the bank), `steps` (applied in order)
+# A step meets the file at a stage, RAW (bytes) < TEXT (lines) < TABLE (rows of cells) < NAMED (a names line and rows). A step that needs a
+# later stage than the file holds is preceded by the default step of each stage between (DECODE utf-8-sig; DELIMITER COMMA; NAMES_LINE
+# FIRST), and every output ends NAMED; a step that needs an earlier stage than the file holds is refused STEP_OUT_OF_ORDER.
+# Each op row below: `stage` (what it needs), `gives` (what it leaves) and its fields; [fields.file.fields.steps] is the VARIANT the walker
+# reads, the [op] table is what the converter reads (tests/test_intake_convert.py: the two name the same ops, and cc/intake_convert.OPS is
+# total over them).
+schema = 1
+kind = "intake-conversion"
+version = "1160-v1"
+header = { schema = 1, kind = "conversion" }
+stamped = []
+derived = []
+
+[fields]
+schema = { type = "int", check = "NUMBER" }
+kind = { type = "str", check = "TEXT" }
+source = { type = "str", check = "TEXT" }                                    # "<cc-datasets>/<id>/raw"
+out = { type = "str", check = "UNDER", under = "<cc-banks>/" }               # "<cc-banks>/<id>/bank"
+
+[fields.file]
+type = "list"
+check = "TABLES"
+[fields.file.fields]
+from = { type = "str", check = "TEXT" }   # a file under source, e.g. "run1.dat" or "archive.zip" (UNPACK names its member)
+to = { type = "str", check = "TEXT" }     # the output file's name in the bank, e.g. "curve_000.csv" (letters, digits, _ . -)
+[fields.file.fields.steps]
+type = "list"
+check = "VARIANTS"
+select = "op"
+absent = "OPERATION_NOT_LISTED"
+[fields.file.fields.steps.variants]
+UNPACK = { member = { type = "str", check = "TEXT" } }   # RAW -> RAW: the bytes of one zip member
+DECODE = { encoding = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { "utf-8" = "ADMIT", "utf-8-sig" = "ADMIT", "latin-1" = "ADMIT", "cp1252" = "ADMIT", "utf-16" = "ADMIT" } } }
+DELIMITER = { from = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { COMMA = "ADMIT", SEMICOLON = "ADMIT", TAB = "ADMIT", WHITESPACE = "ADMIT" } } }
+DECIMAL_MARK = { mark = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { "," = "ADMIT" } } }
+SHEET_TO_CSV = { sheet = { type = "str", check = "TEXT" } }
+SELECT_COLUMNS = { columns = { type = "list", check = "ITEMS", item = "ref" } }
+RENAME = { pairs = { type = "list", check = "TABLES", fields = { from = { type = "str", check = "TEXT" }, to = { type = "str", check = "TEXT" } } } }
+WIDE_TO_LONG = { key = { type = "ref", check = "REF" }, fast = { type = "str", check = "TEXT" }, measured = { type = "str", check = "TEXT" } }
+[fields.file.fields.steps.variants.DROP_LINES.rule]
+type = "table"
+check = "VARIANT"
+select = "kind"
+absent = "VALUE_NOT_LISTED"
+variants = { MARKER = { marker = { type = "str", check = "TEXT" } }, FIRST = { count = { type = "int", check = "NUMBER" } }, PREFIX = { prefix = { type = "str", check = "TEXT" } } }
+[fields.file.fields.steps.variants.NAMES_LINE.rule]
+type = "table"
+check = "VARIANT"
+select = "kind"
+absent = "VALUE_NOT_LISTED"
+variants = { FIRST = {}, WRITE = { names = { type = "list", check = "ITEMS", item = "str" } }, REPLACE_PREFIXED = { prefix = { type = "str", check = "TEXT" } } }
+[fields.file.fields.steps.variants.SPLIT_ROWS.rule]
+type = "table"
+check = "VARIANT"
+select = "kind"
+absent = "VALUE_NOT_LISTED"
+variants = { RANGES = { parts = { type = "list", check = "TABLES", fields = { name = { type = "str", check = "TEXT" }, first = { type = "int", check = "NUMBER" }, last = { type = "int", check = "NUMBER" } } } }, CHANGE = { column = { type = "ref", check = "REF" } } }
+
+[op]   # the alphabet: op -> (the stage it needs, the stage it leaves, what it does). Closed: no other op is reachable.
+UNPACK = { stage = "RAW", gives = "RAW", does = "the bytes of the zip member `member` (SOURCE_FILE_ABSENT when the archive has none; CONTAINER_UNREADABLE when it is no zip)" }
+DECODE = { stage = "RAW", gives = "TEXT", does = "the bytes decoded from `encoding` into lines (ENCODING_INVALID when they are not that encoding)" }
+DROP_LINES = { stage = "TEXT", gives = "TEXT", does = "rule MARKER: every line up to and including the first line that is `marker` (MARKER_LINE_ABSENT when none is); FIRST: the first `count` lines; PREFIX: every line that begins with `prefix`. Each dropped line is recorded in the manifest with its step" }
+DELIMITER = { stage = "TEXT", gives = "TABLE", does = "each line cut into cells at `from` (COMMA, SEMICOLON, TAB: a csv dialect; WHITESPACE: runs of blanks); a cell's text is unchanged; a line with no text in any cell is recorded as blank" }
+SHEET_TO_CSV = { stage = "RAW", gives = "TABLE", does = "the rows of one xlsx sheet, each cell as openpyxl returns it, a number written by Python repr and an empty cell as \"\" (SHEET_ABSENT; XLSX_READER_ABSENT without openpyxl)" }
+NAMES_LINE = { stage = "TABLE", gives = "NAMED", does = "rule FIRST: the first row is the names line; WRITE: `names` is written as the names line (no row is taken); REPLACE_PREFIXED: the first row, which must begin with `prefix` (MARKER_LINE_ABSENT otherwise), is the names line without the prefix" }
+DECIMAL_MARK = { stage = "NAMED", gives = "NAMED", does = "in every data cell, the declared decimal mark `,` becomes `.`; the identity test compares the source cell with the same mark replaced" }
+SELECT_COLUMNS = { stage = "NAMED", gives = "NAMED", does = "the columns named (a name, or a 1-based position), in the declared order (COLUMN_ABSENT for a name no column or two columns hold, or a position out of range)" }
+RENAME = { stage = "NAMED", gives = "NAMED", does = "each names cell `from` becomes `to` (COLUMN_ABSENT when no single column holds `from`)" }
+SPLIT_ROWS = { stage = "NAMED", gives = "NAMED", does = "rule RANGES: one output per part `name`, data rows `first`..`last` (1-based, inclusive); CHANGE: a new output where the text of `column` changes, named <to stem>_000.csv, _001.csv, ... Rows are copied verbatim, in order" }
+WIDE_TO_LONG = { stage = "NAMED", gives = "NAMED", does = "a names line whose every name but the `key` column's is a number (NAMES_NOT_NUMERIC otherwise): each source row becomes one block of rows (`fast` = the names cell, verbatim; `measured` = the row's cell; then the key column, the row's key cell); the names line is fast, measured, the key's name" }
+
+[[reason]]
+code = "TOML_INVALID"
+live = true
+sentence = "The conversion declaration is not valid TOML; fix the syntax at the line shown."
+[[reason]]
+code = "SCHEMA_UNSUPPORTED"
+live = true
+sentence = "The conversion declaration does not say schema = 1 and kind = \"conversion\"."
+[[reason]]
+code = "FIELD_MISSING"
+live = true
+sentence = "A field the conversion format requires is absent."
+[[reason]]
+code = "FIELD_TYPE_WRONG"
+live = true
+sentence = "A field of the conversion has the wrong type."
+[[reason]]
+code = "FIELD_UNKNOWN"
+live = true
+sentence = "A key is no field of the conversion format, or no field of the op (or rule) its step names."
+[[reason]]
+code = "VALUE_NOT_LISTED"
+live = true
+sentence = "A closed field of a step holds a value its list does not hold."
+[[reason]]
+code = "VALUE_STILL_TODO"
+live = true
+sentence = "A field still holds TODO."
+[[reason]]
+code = "ROOT_NOT_UNDER_CC_BANKS"
+live = true
+sentence = "The conversion's out is not under <cc-banks>; a converted bank lives at <cc-banks>/<id>/bank."
+[[reason]]
+code = "OPERATION_NOT_LISTED"
+live = true
+sentence = "A step names an operation the closed alphabet of intake/CONVERSION.toml does not hold; a conversion may only do what the alphabet lists, and nothing that changes a number."
+[[reason]]
+code = "ROOT_UNRESOLVED"
+live = true
+sentence = "The conversion's source or out does not name a root of intake/ROOTS.toml, or the source directory does not exist."
+[[reason]]
+code = "OUTPUT_NAME_REFUSED"
+live = true
+sentence = "An output name is not letters, digits, _ . - only, names CONVERSION-MANIFEST.json, or is written by two outputs."
+[[reason]]
+code = "BANK_EXISTS"
+live = true
+sentence = "The out directory exists and is not empty; a bank is never overwritten (remove it, or convert under a new id)."
+[[reason]]
+code = "STEP_OUT_OF_ORDER"
+live = true
+sentence = "A step needs an earlier stage than the file has reached (for example DROP_LINES after DELIMITER); reorder the steps."
+[[reason]]
+code = "SOURCE_FILE_ABSENT"
+live = true
+sentence = "A file's `from`, or an UNPACK member, is not in the deposit."
+[[reason]]
+code = "CONTAINER_UNREADABLE"
+live = true
+sentence = "The bytes UNPACK or SHEET_TO_CSV opens are not a zip archive or an xlsx workbook."
+[[reason]]
+code = "XLSX_READER_ABSENT"
+live = true
+sentence = "SHEET_TO_CSV needs openpyxl, which is not installed here; convert on the data host."
+[[reason]]
+code = "SHEET_ABSENT"
+live = true
+sentence = "The workbook holds no sheet of the declared name."
+[[reason]]
+code = "MARKER_LINE_ABSENT"
+live = true
+sentence = "No line is the declared marker (DROP_LINES MARKER), or the first row does not begin with the declared prefix (NAMES_LINE REPLACE_PREFIXED)."
+[[reason]]
+code = "COLUMN_ABSENT"
+live = true
+sentence = "A declared column (SELECT_COLUMNS, RENAME, SPLIT_ROWS CHANGE, WIDE_TO_LONG key) is not one column of the names line, or a position is out of range."
+[[reason]]
+code = "ENCODING_INVALID"
+live = true
+sentence = "The bytes are not text in the declared (or the default utf-8) encoding."
+[[reason]]
+code = "NAMES_NOT_NUMERIC"
+live = true
+sentence = "WIDE_TO_LONG needs every name but the key's to be a number (a value of the fast knob), and one is not."
+[[reason]]
+code = "CELL_MAP_NOT_A_PERMUTATION"
+live = true
+sentence = "The cell map is not a permutation: an output cell has no source cell, a source cell feeds two outputs, the map's shape is not the output's, or a source line is neither written, dropped by a declared step, blank nor a names line."
+[[reason]]
+code = "IDENTITY_FAILED"
+live = true
+sentence = "An output cell is not its source cell (a number not bitwise equal as a float, a text not equal), or the rows of an output are not in source order."
+[[reason]]
+code = "CONVERSION_CHAIN_BROKEN"
+live = true
+sentence = "The bank has no CONVERSION-MANIFEST.json, or the manifest's steps are not the declaration's, or a raw file's or a bank file's sha256 is not the manifest's."
