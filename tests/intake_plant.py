@@ -41,7 +41,7 @@ def xlsx(rows, sheet="data"):
     return buf.getvalue()
 
 
-CHOICES = {"intake.mode": '"PROSPECTIVE"', "acquisition.mode": '"INDEPENDENT"', "acquisition.direction": '"UNORDERED"', "acquisition.row_order": '"ASCENDING"',
+CHOICES = {"intake.mode": '"PROSPECTIVE"', "source.admissibility": '"RAW"', "acquisition.mode": '"INDEPENDENT"', "acquisition.direction": '"UNORDERED"', "acquisition.row_order": '"ASCENDING"',
            "interval.method": '"iid"', "bracket.required": '"CANDIDATE_BRACKET"', "projection.lane": '"PRIMARY"', "projection.from": '"C"', "projection.to": '"C_max"',
            "projection.bias": '"MAX_MEASURED"', "projection.keeps": '"the largest C on each curve"', "projection.discards": '"every other point"',
            "bridge.lane": '"PRIMARY"', "bridge.on": '"C_max"', "bridge.template": '"CHAIN_SLOW"', "bridge.bias": '"CHAIN_SLOW"', "shift.c": "0.0"}
@@ -76,6 +76,34 @@ def long_table(m, ident, header='kind = "NAMES"\nrows = 1\nnames = 1', slow='"h"
     """The same declaration as a LONG_TABLE of bank.csv: [reader] table-curve-v1 and [selection] LONG_TABLE replace their PER_FILE blocks."""
     text = per_file(m, ident)
     return re.sub(r"(?s)# \[reader\]:.*?(?=\[knobs\.slow\])", lambda _: LONG.format(header=header, slow=slow), text)
+
+
+KEYED = '''# [reader]: VARIANT on name
+[reader]
+name = "table-curve-v1"
+comment = ["#"]
+[reader.format]
+kind = "COMMA"
+[reader.header]
+kind = "NAMES"
+rows = 2
+names = 2
+'''
+
+
+def slow_source(text, source):
+    """A PER_FILE declaration with [selection.slow] restated: FILE_KEY (key "h"; the reader table-curve-v1 with a key line above the names
+    line, see key_lines) or NONE (no slow knob), in place of LISTED values (plan 1160 P1)."""
+    body = {"FILE_KEY": 'source = "FILE_KEY"\nkey = "h"\n', "NONE": 'source = "NONE"\n'}[source]
+    text = re.sub(r"(?s)source = \"LISTED\".*?\nvalues = \[.*?\].*?\n", lambda _: body, text, count=1)
+    reader = {"FILE_KEY": lambda t: re.sub(r"(?s)# \[reader\]:.*?(?=# \[selection\]:)", lambda _: KEYED, t), "NONE": lambda t: t}[source]
+    return reader(text)
+
+
+def key_lines(bank, m, line=lambda h: f"h,{h}\n"):
+    """Each curve file of a copied PER_FILE bank with a key line above its names line: `line(h)` (FILE_KEY's header line, plan 1160 P1)."""
+    for f in m["files"]:
+        (bank / f["name"]).write_text(line(f["h"]) + (bank / f["name"]).read_text())
 
 
 def write_long(bank, blocks, head="T,C,sigma,h\n"):

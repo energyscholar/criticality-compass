@@ -262,9 +262,10 @@ def explain(t):
 
 
 def bodies(t, d, text, findings):
-    """The registered bodies of one run: S0 FORMAT and S2 SEAL (verify, advisory), plus intake_data.bodies (S3, S4, S5). Invariant: its keys are exactly the
-    stages whose implemented = true (tests/test_intake.py)."""
-    return {"S0": lambda: blind.format_stage(text, findings, t), "S2": lambda declaration: intake_seal.verify(declaration, d, t), **intake_data.bodies(t, d)}
+    """The registered bodies of one run: S0 FORMAT, S1 CHOICES (plan 1160 P1: its live rows), S2 SEAL (verify, advisory), plus intake_data.bodies
+    (S3, S4, S5). Invariant: its keys are exactly the stages whose implemented = true (tests/test_intake.py)."""
+    return {"S0": lambda: blind.format_stage(text, findings, t), "S1": blind.choices, "S2": lambda declaration: intake_seal.verify(declaration, d, t),
+            **intake_data.bodies(t, d)}
 
 
 def report(t, ident, out, note):

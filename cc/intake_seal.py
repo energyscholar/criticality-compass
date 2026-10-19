@@ -113,13 +113,13 @@ def listing(universe, glob):
 
 
 SELECTED = {   # [selection] layout -> the file names it selects, relative to the source root; total over FORMAT's layouts (plan 1145)
-    "PER_FILE": lambda sel: [sel["pattern"].format(index=i) for i in range(sel["index"]["first"], sel["index"]["last"] + 1)],
+    "PER_FILE": lambda sel: list(sel["files"]),   # format v3 (plan 1160 P1): the declared list, as written (a duplicate stays a duplicate)
     "LONG_TABLE": lambda sel: [sel["file"]],
 }
 
 
 def selected(sel):
-    """The selected file names of a declaration's [selection], in curve order (PER_FILE: index order; LONG_TABLE: its one file)."""
+    """The selected file names of a declaration's [selection], in curve order (PER_FILE: its `files`; LONG_TABLE: its one file)."""
     return SELECTED[sel["layout"]](sel)
 
 

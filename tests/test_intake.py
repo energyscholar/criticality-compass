@@ -46,7 +46,7 @@ ST = T["stages"]["stage"]
 IDS = [s["id"] for s in ST]
 REASONS = {s["id"]: [r["code"] for r in s["reason"]] for s in ST}
 SEAL = T["stages"]["seal_stage"]
-EXAMPLE = ROOT / "declarations" / "dial1118-s1-v2"   # plan 1145: the worked example restated in format v2 (dial1118-s1 is v1, history)
+EXAMPLE = ROOT / "declarations" / "dial1118-s1-v3"   # plan 1160 P1: the worked example restated in format v3 (dial1118-s1 is v1, -v2 is v2: history)
 FIXTURE = ROOT / "tests" / "planted" / "intake" / "p1118-bank-FIXTURE"
 
 # ---- 1. the stage table and the runner
@@ -96,6 +96,19 @@ def words(rows, key):
 
 check("1. every check word of FORMAT.toml is a key of intake_blind.CHECK", words(T["format"]["fields"], "check") <= set(blind.CHECK), str(words(T["format"]["fields"], "check") - set(blind.CHECK)))
 check("1. every type word of FORMAT.toml is a key of intake_blind.TYPE", words(T["format"]["fields"], "type") | words(T["format"]["fields"], "item") <= set(blind.TYPE), "")
+F = T["format"]["fields"]
+KINDS = set(F["source"]["variants"])
+SLOWS = {lay: set(F["selection"]["variants"][lay]["slow"]["variants"]) for lay in F["selection"]["variants"]}
+check("1. (1160 P1) the [source] kinds are DEPOSIT and CONVERTED, and SOURCE (the S3 body per kind) is total over them", KINDS == {"DEPOSIT", "CONVERTED"} and set(intake_data.SOURCE) == KINDS, str(KINDS))
+check("1. (1160 P1) the PER_FILE slow sources are LISTED, FILE_KEY, NONE; SLOW and UNKEYED are total over them",
+      SLOWS["PER_FILE"] == {"LISTED", "FILE_KEY", "NONE"} and set(intake_data.SLOW) == set(intake_data.UNKEYED) == SLOWS["PER_FILE"], str(SLOWS))
+check("1. (1160 P1) ONE_PER_FILE (S1) is total over every slow source of every layout", set(blind.ONE_PER_FILE) == set().union(*SLOWS.values()), str(sorted(blind.ONE_PER_FILE)))
+check("1. (1160 P1) KEYS and CURVES are total over the layouts", set(intake_data.KEYS) == set(intake_data.CURVES) == set(F["selection"]["variants"]), "")
+check("1. (1160 P1) [source] admissibility is RAW | DECLARABLE | FIGURE_LEVEL | PROCESSED_UNDECLARABLE in every kind",
+      all(set(F["source"]["variants"][k]["admissibility"]["values"]) == {"RAW", "DECLARABLE", "FIGURE_LEVEL", "PROCESSED_UNDECLARABLE"} for k in KINDS), "")
+check("1. (1160 P1) converted_from is a field of the CONVERTED row only", ["converted_from" in F["source"]["variants"][k] for k in ("DEPOSIT", "CONVERTED")] == [False, True], "")
+check("1. (1160 P1) PATH_PATTERN, pattern and index are gone", "PATH_PATTERN" not in str(F) and not {"pattern", "index"} & set(F["selection"]["variants"]["PER_FILE"]), "")
+check("1. (1160 P1) S1's live rows are exactly the rows its body checks", [r["code"] for s in ST if s["id"] == "S1" for r in s["reason"] if r["live"]] == ["SLOW_VALUES_NOT_ONE_PER_FILE"], "")
 check("1. every admit source of FORMAT.toml is a source the tables provide", all(src in T["admit"] for spec in [T["format"]["fields"]["interval"]["method"]] for src in spec["admit"]), "")
 
 # ---- 2. the generated docs page
@@ -186,11 +199,21 @@ PLANTED = [
     ("(extra) a figure in the basis", base.replace('class = "PAPER_METHODS"', 'class = "FIGURE"'), "BASIS_NOT_METADATA"),
     ("(extra) a TODO left", base.replace('mode = "EXPLORATORY"', 'mode = "TODO"'), "VALUE_STILL_TODO"),
     ("(extra) not TOML", base + "\n[[[", "TOML_INVALID"),
-    ("(extra) another schema", base.replace("schema = 2", "schema = 3", 1), "SCHEMA_UNSUPPORTED"),
+    ("(extra) another schema (4)", base.replace("schema = 3", "schema = 4", 1), "SCHEMA_UNSUPPORTED"),
+    ("(1160) a v2 declaration (format v2 is history)", (ROOT / "declarations" / "dial1118-s1-v2" / "intake.toml").read_text(), "SCHEMA_UNSUPPORTED"),
+    ("(1160) PATTERN is gone: a v2 pattern and index in a v3 file", base.replace("files = [", 'pattern = "S1/S1_c{index:03d}.npz"\nfiles = [', 1), "FIELD_UNKNOWN"),
+    ("(1160) a LISTED value that is not a number written as text", base.replace('"-0.150"', '"minus 0.15"', 1), "FIELD_TYPE_WRONG"),
+    ("(1160) a LISTED value written as a TOML number", base.replace('"-0.150"', '-0.150', 1), "FIELD_TYPE_WRONG"),
+    ("(1160) a [source] kind naming no row", base.replace('kind = "DEPOSIT"', 'kind = "COPIED"', 1), "VALUE_NOT_LISTED"),
+    ("(1160) converted_from on a DEPOSIT", base.replace('kind = "DEPOSIT"', 'kind = "DEPOSIT"\nconverted_from = "<cc-datasets>/x/raw"', 1), "FIELD_UNKNOWN"),
+    ("(1160) a CONVERTED source without converted_from", base.replace('kind = "DEPOSIT"', 'kind = "CONVERTED"', 1).replace('root = "<p1118-bank>"', 'root = "<cc-banks>/dial1118-s1/bank"', 1), "FIELD_MISSING"),
+    ("(1160) a CONVERTED source whose root is not under <cc-banks>", base.replace('kind = "DEPOSIT"', 'kind = "CONVERTED"\nconverted_from = "<cc-datasets>/x/raw"', 1), "ROOT_NOT_UNDER_CC_BANKS"),
+    ("(1160) an admissibility naming no class", base.replace('admissibility = "RAW"', 'admissibility = "CLEAN"', 1), "VALUE_NOT_LISTED"),
+    ("(1160) no admissibility", re.sub(r"admissibility = \"RAW\".*\n", "", base, count=1), "FIELD_MISSING"),
     ("(1145) a v1 declaration (format v1 is history)", (ROOT / "declarations" / "dial1118-s1" / "intake.toml").read_text(), "SCHEMA_UNSUPPORTED"),
     ("(1145) a field of another VARIANT row (a table-curve-v1 field under npz-curve-v1)", base.replace('[reader]\n', '[reader]\ncomment = ["#"]\n'), "FIELD_UNKNOWN"),
     ("(1145) a VARIANT selector naming no row (layout BY_ROW)", base.replace('layout = "PER_FILE"', 'layout = "BY_ROW"'), "VALUE_NOT_LISTED"),
-    ("(1145) a VARIANT row's field missing ([selection.slow] LISTED without per_file)", re.sub(r"(?s)per_file = \[.*?\]\n", "", base, count=1), "FIELD_MISSING"),
+    ("(1145) a VARIANT row's field missing ([selection.slow] LISTED without values; 1160: was per_file)", re.sub(r"(?s)values = \[.*?\]\n", "", base, count=1), "FIELD_MISSING"),
     ("(1145) a column that is neither a name nor a position (a list)", base.replace('key = "T"', 'key = ["T"]', 1), "FIELD_TYPE_WRONG"),
     ("(1145) a column that is a boolean", base.replace('key = "C"', 'key = true', 1), "FIELD_TYPE_WRONG"),
     ("(extra) an interval field of another method", base.replace("b = 100\n", "b = 100\nwindow_s = 1.0\n"), "FIELD_UNKNOWN"),
@@ -198,6 +221,11 @@ PLANTED = [
 for name, text, want in PLANTED:
     got = blind.format_stage(text, [], T)
     check(f"5. {name}: refused {want}", text != base and isinstance(got, blind.Refuse) and got.reason == want, str(got)[:300])
+for name, text, want in [("(1160) the same file count and values count", base, None),
+                         ("(1160) one LISTED value short of the files", base.replace('"-0.150", ', "", 1), "SLOW_VALUES_NOT_ONE_PER_FILE"),
+                         ("(1160) one file more than the LISTED values", base.replace('"S1/S1_c000.npz", ', '"S1/S1_c000.npz", "S1/S1_c000b.npz", ', 1), "SLOW_VALUES_NOT_ONE_PER_FILE")]:
+    got = blind.choices(blind.format_stage(text, [], T).evidence)
+    check(f"5. S1 {name}: {want or 'PASS'}", {True: lambda: isinstance(got, blind.Pass), False: lambda: isinstance(got, blind.Refuse) and got.reason == want}[want is None](), str(got)[:300])
 got = blind.format_stage(base, ["transducer.update[0]: planted"], T)
 check("5. (extra) a transducer finding: refused TRANSDUCER_FILE_REFUSED", isinstance(got, blind.Refuse) and got.reason == "TRANSDUCER_FILE_REFUSED", str(got)[:200])
 

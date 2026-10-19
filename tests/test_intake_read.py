@@ -53,7 +53,7 @@ def aligned():
 
 
 NU = {"kind": "NAMES_UNITS", "rows": 2, "names": 1, "units": 2}
-WANT = rd.Grid(("T", "C", "sigma"), (("fast", "K"), ("measured", "J/K"), ("uncertainty", "J/K")), tuple(ROWS))
+WANT = rd.Grid(("T", "C", "sigma"), (("fast", "K"), ("measured", "J/K"), ("uncertainty", "J/K")), tuple(ROWS), ())   # plan 1160 P1: head takes no part in ==
 
 # ---- R1. each format reads one planted table to the same Grid
 got = {

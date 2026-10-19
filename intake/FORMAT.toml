@@ -1,18 +1,24 @@
-# intake/FORMAT.toml - declaration format v2 (plan 1136, amendment A2 ruling Q5; plan 1145): the S0 FORMAT schema as DATA. S0
+# intake/FORMAT.toml - declaration format v3 (plan 1136, amendment A2 ruling Q5; plan 1145; plan 1160 P1): the S0 FORMAT schema as DATA. S0
 # (cc/intake_blind.py) walks this table and emits the reason codes of intake/STAGES.toml directly; it holds no per-field code. Every field is
-# required. A field that exists only for one reader, layout or kind is a field of that VARIANT row: never an optional field, and never a
-# field written "" or [] where it does not apply.
+# required. A field that exists only for one reader, layout, kind or source is a field of that VARIANT row: never an optional field, and never
+# a field written "" or [] where it does not apply.
 # v2 against v1 (plan 1145): [source] reader and layout leave [source]; [reader] is a VARIANT on its name (a table per reader); [selection]
 # is a VARIANT on its layout (PER_FILE | LONG_TABLE) and holds the slow knob's source ([selection.slow], a VARIANT per layout, the v1 value
 # PER_FILE renamed LISTED); [knobs.slow] keeps its name and unit; [measured.uncertainty] declares an uncertainty column or NONE (plan-1139
 # E4); a column (REF) is a name or a 1-based position.
+# v3 against v2 (plan 1160 P1): PER_FILE names its files as an explicit list `files`, in curve order (`pattern` and `index` are deleted);
+# its [selection.slow] is LISTED (`values`: one numeral TEXT per file, in `files` order) | FILE_KEY (`key`: a header line of each file) |
+# NONE (no slow knob); PATH_PATTERN is deleted. [source] is a VARIANT on `kind` (DEPOSIT: the files as deposited | CONVERTED: a bank written
+# by a declared conversion, with `converted_from`) and states `admissibility`, the deposit's class as the declarer reads it from metadata.
+# A reader's `comment` prefixes are PREFIXES: an empty prefix marks every line a comment, so it is refused (COMMENT_PREFIX_EMPTY).
 # A field row: type = str | int | num | list | table | ref (cc/intake_blind.py TYPE); check = one of cc/intake_blind.py CHECK:
 #   TEXT      any text but the template's "TODO"
 #   NUMBER    any number
 #   REF       a column: a name (text) or a 1-based position (an integer); "TODO" is VALUE_STILL_TODO
 #   CLOSED    `values` (value -> ADMIT or a reason code) plus every key of each `admit` source (policy.projection | policy.bridge |
 #             alphabet.<name> of cc.toml); a value in neither is the `absent` reason; "TODO" is VALUE_STILL_TODO
-#   ITEMS     a list whose every item has type `item`
+#   ITEMS     a list whose every item has type `item` (an item type is a TYPE row: numeral is text that is a decimal number as written)
+#   PREFIXES  a list of line prefixes: every item a str, and none of them "" (COMMENT_PREFIX_EMPTY)
 #   TABLE     a table with its own `fields`
 #   TABLES    a list of tables, each with `fields`
 #   INTERVAL  a table whose fields are cc.toml [interval_fields.<method>] for its `method` (required and optional)
@@ -21,8 +27,8 @@
 # A key that is no field row is FIELD_IS_STAMPED when it is in `stamped`, FIELD_IS_DERIVED when in `derived`, else FIELD_UNKNOWN.
 schema = 1
 kind = "intake-format"
-version = "1145-v2"
-header = { schema = 2, kind = "intake" }
+version = "1160-v3"
+header = { schema = 3, kind = "intake" }
 stamped = ["sealed_at", "author", "author_kind", "confirmed_by", "declaration_sha256", "code_identity", "protocol_identity", "universe_listing", "sampling", "pins"]
 derived = ["correlated"]
 
@@ -47,15 +53,25 @@ check = "TABLES"
 what = { type = "str", check = "TEXT" }
 class = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { README = "ADMIT", LISTING = "ADMIT", HEADER = "ADMIT", UNITS_NOTE = "ADMIT", ACQUISITION_NOTE = "ADMIT", PAPER_METHODS = "ADMIT", READER_CODE = "ADMIT", ANALYSIS_CODE = "BASIS_NOT_METADATA", DATA_VALUES = "BASIS_NOT_METADATA", FIGURE = "BASIS_NOT_METADATA" } }
 
-[fields.source]
+[fields.source]   # a VARIANT on kind (plan 1160 P1): the deposit's files read as they are, or a bank written from them by a declared conversion
 type = "table"
-check = "TABLE"
-[fields.source.fields]
+check = "VARIANT"
+select = "kind"
+[fields.source.variants.DEPOSIT]   # the files as deposited, read directly
 origin = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { PLANTED = "ADMIT", EXPERIMENT = "ADMIT" } }
 deposit = { type = "str", check = "TEXT" }
 root = { type = "str", check = "TEXT" }
 universe = { type = "str", check = "TEXT" }
 truth_side = { type = "list", check = "ITEMS", item = "str" }
+admissibility = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { RAW = "ADMIT", DECLARABLE = "ADMIT", FIGURE_LEVEL = "ADMIT", PROCESSED_UNDECLARABLE = "ADMIT" } }
+[fields.source.variants.CONVERTED]   # a bank under <cc-banks> written by the declared conversion of the deposit at converted_from (plan 1160 P3)
+origin = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { PLANTED = "ADMIT", EXPERIMENT = "ADMIT" } }
+deposit = { type = "str", check = "TEXT" }
+root = { type = "str", check = "UNDER", under = "<cc-banks>/" }   # a converted bank lives under <cc-banks> (ROOTS.toml, plan 1160 P3)
+universe = { type = "str", check = "TEXT" }
+truth_side = { type = "list", check = "ITEMS", item = "str" }
+admissibility = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { RAW = "ADMIT", DECLARABLE = "ADMIT", FIGURE_LEVEL = "ADMIT", PROCESSED_UNDECLARABLE = "ADMIT" } }
+converted_from = { type = "str", check = "TEXT" }   # "<cc-datasets>/<id>/raw": the deposit the conversion read
 
 [fields.reader]   # a table per reader (plan 1145): `name` selects the row; the reader's own fields are exactly that row's
 type = "table"
@@ -63,7 +79,7 @@ check = "VARIANT"
 select = "name"
 [fields.reader.variants."csv-curve-v1"]     # the synthetic bank's reader: one header line that IS the declared columns in role order, then rows of numbers
 [fields.reader.variants."table-curve-v1"]   # a text or Excel table; columns by name or by 1-based position
-comment = { type = "list", check = "ITEMS", item = "str" }   # line prefixes that mark a comment line, dropped before the header is counted ([] for none)
+comment = { type = "list", check = "PREFIXES", item = "str" }   # line prefixes that mark a comment line, dropped before the header is counted ([] for none; never "")
 [fields.reader.variants."table-curve-v1".format]
 type = "table"
 check = "VARIANT"
@@ -89,20 +105,16 @@ type = "table"
 check = "VARIANT"
 select = "layout"
 [fields.selection.variants.PER_FILE]
-pattern = { type = "str", check = "TEXT" }
+files = { type = "list", check = "ITEMS", item = "str" }   # the curve files under root, one curve each, in curve order (plan 1160 P1: the only way to name them)
 excluded = { type = "list", check = "TABLES", fields = { file = { type = "str", check = "TEXT" }, why = { type = "str", check = "TEXT" } } }
-[fields.selection.variants.PER_FILE.index]
-type = "table"
-check = "TABLE"
-fields = { first = { type = "int", check = "NUMBER" }, last = { type = "int", check = "NUMBER" } }
-[fields.selection.variants.PER_FILE.slow]   # where each file's slow-knob value comes from, before any byte is read
+[fields.selection.variants.PER_FILE.slow]   # where each file's slow-knob value comes from
 type = "table"
 check = "VARIANT"
 select = "source"
 [fields.selection.variants.PER_FILE.slow.variants]
-LISTED = { per_file = { type = "list", check = "ITEMS", item = "num" } }   # one number per selected file, in index order
-PATH_PATTERN = { pattern = { type = "str", check = "TEXT" } }              # a regular expression with one group, matched against the file name
-FILE_KEY = { key = { type = "str", check = "TEXT" } }                      # a key inside the file (never resolvable before the file is read)
+LISTED = { values = { type = "list", check = "ITEMS", item = "numeral" } }   # one decimal number as TEXT per listed file, in `files` order (S1 counts them)
+FILE_KEY = { key = { type = "str", check = "TEXT" } }                         # each file's header line whose first cell is `key`; its second cell is the value (read at S5)
+NONE = {}                                                                     # the deposit has no slow knob: the curves carry no slow value
 [fields.selection.variants.LONG_TABLE]
 file = { type = "str", check = "TEXT" }   # the one file, under root, that holds every curve
 excluded = { type = "list", check = "TABLES", fields = { file = { type = "str", check = "TEXT" }, why = { type = "str", check = "TEXT" } } }

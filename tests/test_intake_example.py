@@ -1,5 +1,5 @@
-"""test_intake_example - plan 1136 phase 1, test 6: the worked example declarations/dial1118-s1-v2 (plan 1145: dial1118-s1 restated in format
-v2; dial1118-s1 is format v1, kept as history, and refused SCHEMA_UNSUPPORTED by tests/test_intake.py test 5) (the planted S1 bank of plan 1118, sealed
+"""test_intake_example - plan 1136 phase 1, test 6: the worked example declarations/dial1118-s1-v3 (plan 1160 P1: dial1118-s1-v2 restated in
+format v3; dial1118-s1 (v1) and dial1118-s1-v2 (v2) are kept as history, and refused SCHEMA_UNSUPPORTED by tests/test_intake.py test 5) (the planted S1 bank of plan 1118, sealed
 against the FIXTURE universe tests/planted/intake/p1118-bank-FIXTURE) reaches PRIMARY_INCOMPLETE, and its committed intake-report.md is the
 report a run writes now, byte for byte, listing every stub. Expected (design E11 with the A2 numbering, plus A2 Q6): PRIMARY_INCOMPLETE[S1, S3,
 S4, S5, S6, S7, S8, confirmation] (the seal is an unconfirmed AI draft), ROBUSTNESS_INCOMPLETE[S9], S10 a STUB.
@@ -23,7 +23,7 @@ def check(name, ok, why=""):
         bad.append(name)
 
 
-ID = "dial1118-s1-v2"
+ID = "dial1118-s1-v3"
 D = ROOT / "declarations" / ID
 t, d, out = intake._go(ROOT, ID, lambda t: t["stages"]["stage"])
 p, r = intake.verdicts(t, out)
@@ -38,10 +38,12 @@ check("6. S10 KERNEL_HANDOFF is withheld after S3's refusal", isinstance(out["S1
 text = intake.report(t, ID, out, intake.intake_seal.ordering(D, t))
 check("6. the committed intake-report.md is the report of a run now, byte for byte", text == (D / "intake-report.md").read_text(), "")
 stubs = [f"- **{s['id']} {s['name']}** (STUB): STUB. " for s in t["stages"]["stage"] if not s["implemented"]]
-check("6. the report lists S1, the one stub no refusal withholds, as a STUB", len(stubs) == 6 and stubs[0] in text and all(ln not in text for ln in stubs[1:]), str([ln for ln in stubs if ln not in text]))
+# plan 1160 P1: S1 has a body now (was: the one stub no refusal withholds), so every stub (S6..S10) is withheld after S3's refusal
+check("6. S1 CHOICES passes (one slow value per file), and no stub is listed as a STUB: each is withheld after S3", out["S1"].mark is intake.Mark.PASSED
+      and len(stubs) == 5 and all(ln not in text for ln in stubs), str([ln for ln in stubs if ln in text]))
 check("6. the report carries the seal claim and the UNENFORCED list", t["stages"]["report"]["seal_claim"] in text and all(u in text for u in t["stages"]["report"]["unenforced"]), "")
 cli = subprocess.run([str(ROOT / "bin" / "cc"), "intake", "lint", ID], capture_output=True, text=True)
-check("6. bin/cc intake lint passes S0 and shows S1 as a STUB", cli.returncode == 0 and "S1 STUB." in cli.stdout, cli.stdout[-300:])
+check("6. bin/cc intake lint passes S0 and S1 (plan 1160 P1: was S1 STUB)", cli.returncode == 0 and "S1 EXECUTED, PASS." in cli.stdout, cli.stdout[-300:])
 again = subprocess.run([str(ROOT / "bin" / "cc"), "intake", "seal", ID, "--universe", str(ROOT / "tests/planted/intake/p1118-bank-FIXTURE"), "--author", "x", "--as", "human", "--unconfirmed"],
                        capture_output=True, text=True)
 check("6. sealing it again is refused ALREADY_SEALED and writes nothing", again.returncode == 1 and "ALREADY_SEALED" in again.stdout, again.stdout[-300:])

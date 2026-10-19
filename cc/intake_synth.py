@@ -83,11 +83,11 @@ def declare(m, ident, sid):
     q, cmd = (lambda v: json.dumps(v)), f"bin/cc intake synth {sid} --seed {m['seed']}"
     values = {
         "basis.read": f'[ {{ what = {q(f"<intake-synth>/{sid}/MANIFEST.json: file names, h, n, size and sha256 per file; the seed; the generator sha256")}, class = "LISTING" }} ]',
-        "source.origin": q("PLANTED"), "source.deposit": q(cmd + " (cc/intake_synth.py)"), "source.root": q(f"<intake-synth>/{sid}"),
+        "source.kind": q("DEPOSIT"), "source.origin": q("PLANTED"), "source.deposit": q(cmd + " (cc/intake_synth.py)"), "source.root": q(f"<intake-synth>/{sid}"),
         "source.universe": q("*"), "source.truth_side": q(["truth.json"]), "reader.name": q(m["reader"]),
-        "selection.layout": q("PER_FILE"), "selection.pattern": q(m["pattern"]), "selection.index": f"{{ first = 0, last = {len(m['files']) - 1} }}",
+        "selection.layout": q("PER_FILE"), "selection.files": q([f["name"] for f in m["files"]]),
         "selection.excluded": '[ { file = "MANIFEST.json", why = "metadata (in basis), not a curve" } ]',
-        "selection.slow.source": q("LISTED"), "selection.slow.per_file": q([f["h"] for f in m["files"]]),
+        "selection.slow.source": q("LISTED"), "selection.slow.values": q([repr(float(f["h"])) for f in m["files"]]),
         "knobs.slow.name": q(m["slow"]["name"]), "knobs.slow.unit": q(m["slow"]["unit"]),
         "knobs.fast.name": q(m["fast"]["name"]), "knobs.fast.unit": q(m["fast"]["unit"]), "knobs.fast.source": q("COLUMN"), "knobs.fast.key": q(m["fast"]["column"]),
         "measured.name": q(m["measured"]["name"]), "measured.unit": q(m["measured"]["unit"]), "measured.key": q(m["measured"]["column"]), "measured.shape": q("SCALAR_PER_LOCUS"),
@@ -103,5 +103,5 @@ def declare(m, ident, sid):
              f'inputs = {q(cmd)}\noutput = {q(cfg["phase1_output"])}\n\n'
              f'[reduction]\nname = "none in the Compass: the bank stores one value of C per (h, T) point"\nkeeps = "the planted value of C at each kept point, with its noise"\n'
              f'discards = "nothing the bank holds"\n\n[interval]\nrole = {q(cfg["interval_role"])}\nkeeps = "the planted noise sigma written on every row"\ndiscards = "the noise draw itself"\n')
-    dropped = frozenset({"reader.comment", "reader.format", "reader.header"})   # csv-curve-v1 has no other field
+    dropped = frozenset({"reader.comment", "reader.format", "reader.header", "source.converted_from"})   # csv-curve-v1 has no other field; a DEPOSIT has no converted_from
     return values, dropped, trans

@@ -30,7 +30,7 @@ import importlib.util  # noqa: E402
 import intake  # noqa: E402
 import intake_blind as blind  # noqa: E402
 import intake_synth  # noqa: E402
-from intake_plant import long_table, per_file, write_long, xlsx  # noqa: E402
+from intake_plant import long_table, per_file, slow_source, write_long, xlsx  # noqa: E402
 
 bad = []
 
@@ -49,7 +49,7 @@ slow = lambda k: f"-7357.{k + 1}5"
 CURVES = [(slow(k), [f"{cell(k, j, 1)},{cell(k, j, 2)},{cell(k, j, 3)}" for j in range(6 + k)]) for k in range(K)]
 M = {"seed": 7357, "reader": "csv-curve-v1", "pattern": "curve_{index:03d}.csv", "columns": ["T", "C", "sigma"], "replicate": "NONE",
      "slow": {"name": "h", "unit": "dimensionless"}, "fast": {"name": "T", "unit": "dimensionless", "column": "T"},
-     "measured": {"name": "C", "unit": "dimensionless", "column": "C"}, "files": [{"h": float(h)} for h, _ in CURVES],
+     "measured": {"name": "C", "unit": "dimensionless", "column": "C"}, "files": [{"name": f"curve_{i:03d}.csv", "h": float(h)} for i, (h, _) in enumerate(CURVES)],
      "generator": {"path": "cc/intake_synth.py", "sha256": hashlib.sha256((ROOT / "cc" / "intake_synth.py").read_bytes()).hexdigest()}}
 TRANS = intake_synth.declare(M, "x", "pf")[2]
 
@@ -113,6 +113,14 @@ with tempfile.TemporaryDirectory() as tmp:
         return code, said + wrote, ident
 
     PF, LT = pf_bank(), lt_bank()
+
+    def convert(text, root):
+        """(1160 P1) [source] kind CONVERTED, its root `root`, converted_from a deposit name."""
+        return re.sub(r'root = "[^"]*"', f'root = "{root}"', text.replace('kind = "DEPOSIT"', 'kind = "CONVERTED"\nconverted_from = "<cc-datasets>/leak/raw"', 1), count=1)
+
+    def keyed(line):
+        """(1160 P1) A bank edit: each curve file i gets `line(i)` above its names line (a FILE_KEY header line)."""
+        return lambda b: [(b / f"curve_{i:03d}.csv").write_text(line(i) + (b / f"curve_{i:03d}.csv").read_text()) for i in range(K)]
     full = lambda bank: (("lint",), SEAL(banks / bank), ("run",))
     unsealed = (("lint",), ("run",))
     append = lambda name, text: lambda b: (b / name).write_text((b / name).read_text() + text)
@@ -127,7 +135,11 @@ with tempfile.TemporaryDirectory() as tmp:
         ("PASS", "the LONG_TABLE sentinel bank, sealed", (lt(LT), LT, full(LT))),
         # S0 FORMAT
         ("TOML_INVALID", "not TOML", S0(lambda t: t + "\n[[[")),
-        ("SCHEMA_UNSUPPORTED", "schema = 3", S0(lambda t: t.replace("schema = 2", "schema = 3", 1))),
+        ("SCHEMA_UNSUPPORTED", "schema = 4 (1160: was schema = 3, now the format)", S0(lambda t: t.replace("schema = 3", "schema = 4", 1))),
+        ("COMMENT_PREFIX_EMPTY", "(1160) comment = [\"\"] on table-curve-v1", (lt(LT, lambda t: t.replace('comment = ["#"]', 'comment = [""]', 1)), LT, full(LT))),
+        ("ROOT_NOT_UNDER_CC_BANKS", "(1160) a CONVERTED source whose root is the deposit's", S0(lambda t: convert(t, f"<leak>/{PF}"))),
+        # S1 CHOICES
+        ("SLOW_VALUES_NOT_ONE_PER_FILE", "(1160) one LISTED value fewer than the files", S0(lambda t: re.sub(r'values = \["[^"]*", ', 'values = [', t, count=1))),
         ("FIELD_MISSING", "[knobs.fast] deleted", S0(lambda t: re.sub(r"(?s)\[knobs\.fast\].*?(?=\[measured\])", "", t))),
         ("FIELD_UNKNOWN", "a field the format does not define", S0(lambda t: t.replace("[intake]\n", '[intake]\ncolour = "red"\n'))),
         ("FIELD_TYPE_WRONG", "a column key that is a boolean", S0(lambda t: t.replace('key = "C"', "key = true", 1))),
@@ -150,6 +162,7 @@ with tempfile.TemporaryDirectory() as tmp:
         ("PIN_MISMATCH", "a file's bytes changed after its first logged read (unsealed: the seal would see the size)",
          (pf(PIN := pf_bank()), PIN, unsealed + (append("curve_002.csv", f"{cell(2, 50, 1)},{cell(2, 50, 2)},{cell(2, 50, 3)}\n"), ("run",)))),
         ("UNIVERSE_CHANGED", "a file added after the seal", (pf(UC := pf_bank()), UC, full(UC)[:2] + (lambda b: (b / "late.csv").write_text("T,C,sigma\n"), ("run",)))),
+        ("CONVERSION_NOT_LIVE", "(1160) a CONVERTED source (no conversion body until P3)", (pf(PF, lambda t: convert(t, f"<cc-banks>/{PF}/bank")), PF, unsealed)),
         # S4 SHAPE
         ("READER_NOT_LIVE", "reader P1", (pf(PF, lambda t: t.replace('name = "csv-curve-v1"', 'name = "P1"')), PF, full(PF))),
         ("COLUMNS_DIFFER", "csv-curve-v1, the first file's names line holds a NUMERIC name",
@@ -162,6 +175,10 @@ with tempfile.TemporaryDirectory() as tmp:
          (pf(FD := pf_bank(lambda b: (b / "curve_004.csv").write_text((b / "curve_004.csv").read_text().replace("T,C,sigma", "T,C,err", 1)))), FD, full(FD))),
         ("CURVE_REPEATED", "a slow value in two non-adjacent blocks", (lt(CR := lt_bank(CURVES + CURVES[:1])), CR, full(CR))),
         ("FAST_VALUE_REPEATED", "two adjacent runs of one slow value", (lt(FV := lt_bank(CURVES[:1] + CURVES), asc), FV, full(FV))),
+        ("SLOW_KEY_UNRESOLVED", "(1160) FILE_KEY h, each key line's value a sentinel followed by 'x'",
+         (pf(SK := pf_bank(keyed(lambda i: f"h,{slow(i)}x\n")), lambda t: slow_source(t, "FILE_KEY")), SK, full(SK))),
+        ("PASS", "(1160) FILE_KEY h on the PER_FILE sentinel bank, sealed", (pf(FK := pf_bank(keyed(lambda i: f"h,{slow(i)}\n")), lambda t: slow_source(t, "FILE_KEY")), FK, full(FK))),
+        ("PASS", "(1160) slow source NONE on the PER_FILE sentinel bank, sealed", (pf(PF, lambda t: slow_source(t, "NONE")), PF, full(PF))),
         ("REPLICATE_KEY_UNRESOLVED", "a FILE identity on a LONG_TABLE", (lt(RK := lt_bank(CURVES + CURVES[:1]), lambda t: t.replace('identity = "NONE"', 'identity = "FILE"')), RK, full(RK))),
         ("ACQUISITION_ORDER_DIFFERS", "ascending rows in acquisition order, declared DESCENDING",
          (lt(AO := lt_bank(), lambda t: asc(t).replace('direction = "UNORDERED"', 'direction = "DESCENDING"')), AO, full(AO))),

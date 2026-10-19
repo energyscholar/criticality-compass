@@ -25,7 +25,7 @@ import intake_blind as blind  # noqa: E402
 import intake_read as rd  # noqa: E402
 import intake_seal  # noqa: E402
 import intake_synth  # noqa: E402
-from intake_plant import long_table, outcome, per_file, rooted, run, write_long, xlsx  # noqa: E402
+from intake_plant import key_lines, long_table, outcome, per_file, rooted, run, slow_source, write_long, xlsx  # noqa: E402
 
 bad = []
 
@@ -106,6 +106,17 @@ with tempfile.TemporaryDirectory() as tmp:
         between(tmp / "declarations" / ident, banks / name, text)
         return first(run(T, tmp, ident, text))
 
+    def convert(text, root):
+        """(1160 P1) The declaration with [source] kind CONVERTED, its root `root`, converted_from the deposit."""
+        return re.sub(r'root = "[^"]*"', f'root = "{root}"', text.replace('kind = "DEPOSIT"', 'kind = "CONVERTED"\nconverted_from = "<cc-datasets>/pf/raw"', 1), count=1)
+
+    def slow_label(name, source):
+        """(1160 P1) The S5 census label of a PER_FILE declaration of bank `name` with slow source `source`."""
+        ident = f"d{next(n)}"
+        restate = {"LISTED": lambda t: t, "FILE_KEY": lambda t: slow_source(t, "FILE_KEY"), "NONE": lambda t: slow_source(t, "NONE")}[source]
+        got = outcome(run(T, tmp, ident, restate(per_file(m, ident).replace("<long-test>/pf", f"<long-test>/{name}"))), "S5")
+        return getattr(got[1], "label", got[0])
+
     def mint(universe, times=1):
         ident = f"d{next(n)}"
         text = per_file(m, ident)
@@ -141,7 +152,9 @@ with tempfile.TemporaryDirectory() as tmp:
     PLANTS = [
         # S0 FORMAT, on the declaration text
         ("TOML_INVALID", "not TOML", lambda: s0(base + "\n[[[")),
-        ("SCHEMA_UNSUPPORTED", "schema = 3", lambda: s0(base.replace("schema = 2", "schema = 3", 1))),
+        ("SCHEMA_UNSUPPORTED", "schema = 4 (1160: was schema = 3, now the format)", lambda: s0(base.replace("schema = 3", "schema = 4", 1))),
+        ("COMMENT_PREFIX_EMPTY", "(1160) comment = [\"\"] on table-curve-v1", lambda: s0(long_table(m, "s0").replace('comment = ["#"]', 'comment = [""]', 1))),
+        ("ROOT_NOT_UNDER_CC_BANKS", "(1160) a CONVERTED source whose root is the deposit's", lambda: s0(convert(base, "<long-test>/pf"))),
         ("FIELD_MISSING", "[knobs.fast] deleted", lambda: s0(re.sub(r"(?s)\[knobs\.fast\].*?(?=\[measured\])", "", base))),
         ("FIELD_UNKNOWN", "a field the format does not define", lambda: s0(base.replace("[intake]\n", "[intake]\ncolour = \"red\"\n"))),
         ("FIELD_TYPE_WRONG", "a column key that is a boolean", lambda: s0(base.replace('key = "C"', "key = true", 1))),
@@ -154,6 +167,8 @@ with tempfile.TemporaryDirectory() as tmp:
         ("BRIDGE_NONE_FITS", "no bridge fits", lambda: s0(base.replace('template = "CHAIN_SLOW"', 'template = "NONE_FITS"'))),
         ("BASIS_NOT_METADATA", "a figure in the basis", lambda: s0(re.sub(r'class = "[A-Z_]+"', 'class = "FIGURE"', base, count=1))),
         ("TRANSDUCER_FILE_REFUSED", "a planted transducer finding", lambda: s0(base, ["transducer.update[0]: planted"])),
+        # S1 CHOICES (plan 1160 P1: one live row)
+        ("SLOW_VALUES_NOT_ONE_PER_FILE", "(1160) one LISTED value fewer than the files", lambda: pf("pf", lambda t: re.sub(r'values = \["[^"]*", ', 'values = [', t, count=1))),
         # S2 SEAL (bin/cc intake seal)
         ("ALREADY_SEALED", "a second seal", lambda: mint(banks / "pf", 2)),
         ("UNIVERSE_ROOT_ABSENT", "a universe that is no directory", lambda: mint(tmp / "nowhere")),
@@ -163,6 +178,7 @@ with tempfile.TemporaryDirectory() as tmp:
         ("PATH_NOT_ADMITTED", "a selected file deleted", lambda: pf(copy(lambda b: (b / m["files"][3]["name"]).unlink()))),
         ("PIN_MISMATCH", "a file's bytes changed after its first logged read", lambda: twice(copy(lambda b: None), lambda d, b, t: (b / m["files"][2]["name"]).write_text((b / m["files"][2]["name"]).read_text() + "3.5,0.5,0.03\n"))),
         ("UNIVERSE_CHANGED", "a file added to the universe after the seal", lambda: sealed_then(lambda b: (b / "late.csv").write_text("T,C,sigma\n"))),
+        ("CONVERSION_NOT_LIVE", "(1160) a CONVERTED source (its S3 body has no conversion until P3)", lambda: pf("pf", lambda t: convert(t, "<cc-banks>/pf/bank"))),
         # S4 SHAPE
         ("READER_NOT_LIVE", "reader P1", lambda: pf("pf", lambda t: t.replace('name = "csv-curve-v1"', 'name = "P1"'))),
         ("COLUMNS_DIFFER", "csv-curve-v1, the first file's header T,Q,sigma", lambda: pf(copy(lambda b: (b / m["files"][0]["name"]).write_text((b / m["files"][0]["name"]).read_text().replace("T,C,sigma", "T,Q,sigma", 1))))),
@@ -172,6 +188,11 @@ with tempfile.TemporaryDirectory() as tmp:
         ("FILE_DIFFERS_FROM_FIRST", "a later file's header T,C,err", lambda: pf(copy(lambda b: (b / m["files"][5]["name"]).write_text((b / m["files"][5]["name"]).read_text().replace("T,C,sigma", "T,C,err", 1))))),
         ("CURVE_REPEATED", "a slow value in two non-adjacent blocks", lambda: lt(bank(curves + curves[:1]))),
         ("FAST_VALUE_REPEATED", "two adjacent runs of one slow value (one block, its T repeated)", lambda: lt(bank(curves[:1] + curves), asc)),
+        ("SLOW_KEY_UNRESOLVED", "(1160) FILE_KEY h, one file's key line names another key", lambda: pf(copy(lambda b: (key_lines(b, m), (b / m["files"][4]["name"]).write_text("g" + (b / m["files"][4]["name"]).read_text()[1:]))),
+                                                                                                         lambda t: slow_source(t, "FILE_KEY"))),
+        ("SLOW_KEY_UNRESOLVED", "(1160) FILE_KEY h, a key line whose value is not a number", lambda: pf(copy(lambda b: key_lines(b, m, lambda h: f"h,{h}x\n")), lambda t: slow_source(t, "FILE_KEY"))),
+        ("PASS", "(1160) FILE_KEY h, every file's key line a number", lambda: pf(copy(lambda b: key_lines(b, m)), lambda t: slow_source(t, "FILE_KEY"))),
+        ("PASS", "(1160) slow source NONE", lambda: pf("pf", lambda t: slow_source(t, "NONE"))),
         ("REPLICATE_KEY_UNRESOLVED", "a FILE identity on a LONG_TABLE", lambda: lt(bank(curves + curves[:1]), lambda t: t.replace('identity = "NONE"', 'identity = "FILE"'))),
         ("ACQUISITION_ORDER_DIFFERS", "ascending rows in acquisition order, declared DESCENDING", lambda: lt(bank(), lambda t: asc(t).replace('direction = "UNORDERED"', 'direction = "DESCENDING"'))),
         # S4 reader reasons (table-curve-v1), each the detail of READER_REFUSED
@@ -196,11 +217,17 @@ with tempfile.TemporaryDirectory() as tmp:
         got = plant()
         reached |= {got}
         check(f"E2. {code}: {what}", got == code, got)
+    none = slow_label("pf", "NONE")
+    check("E2. (1160 P1) slow source NONE reaches the census with curves_with_slow = 0, every curve formed",
+          (getattr(none, "with_slow", None), getattr(none, "curves", None)) == (0, len(m["files"])), str(none))
+    keyed = slow_label(copy(lambda b: key_lines(b, m)), "FILE_KEY")
+    check("E2. (1160 P1) FILE_KEY reaches the census with every curve's slow value, as LISTED does", (getattr(keyed, "with_slow", None), getattr(keyed, "curves", None)) == (len(m["files"]),) * 2
+          and keyed == slow_label("pf", "LISTED"), str(keyed))
     check("E2. READER_REFUSED: the reader-reason plants arrived through S4 READER_REFUSED", "READER_REFUSED" in SEEN, str(sorted(SEEN)))
     reached |= SEEN & {"READER_REFUSED"}
     print(f"  openpyxl {'installed' if HAS_XLSX else 'NOT installed'} on this machine; NOT REACHED HERE: {NOT_HERE or 'none'}")
     check("E2. the codes the plants reach are exactly the live rows (with the machine's NOT REACHED rows)",
-          (reached - {"XLSX_GRID"}) | set(NOT_HERE) == LIVE, f"live, never reached: {sorted(LIVE - reached - set(NOT_HERE))}; reached, not live: {sorted(reached - LIVE - {'XLSX_GRID'})}")
+          (reached - {"XLSX_GRID", "PASS"}) | set(NOT_HERE) == LIVE, f"live, never reached: {sorted(LIVE - reached - set(NOT_HERE))}; reached, not live: {sorted(reached - LIVE - {'XLSX_GRID', 'PASS'})}")   # 1160: PASS plants (FILE_KEY, NONE)
 
     # ---- E4. explain and the report carry the rows that are not live
     dead = [f"- {s['id']} {r['code']}" for s, _, r in ROWS if not r["live"]]

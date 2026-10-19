@@ -131,7 +131,7 @@ class Declaration:
     data: dict
 
     def summary(self):
-        return f"The declaration '{self.id}' parses, and every field of format v2 is present, typed and listed (mode {self.mode})"
+        return f"The declaration '{self.id}' parses, and every field of format v3 is present, typed and listed (mode {self.mode})"
 
     def confirmed(self):
         return False
@@ -149,6 +149,7 @@ TYPE = {   # a FORMAT field's type word -> its membership test; total over the t
     "list": lambda v: isinstance(v, list),
     "table": lambda v: isinstance(v, dict),
     "ref": lambda v: isinstance(v, str) or (isinstance(v, int) and not isinstance(v, bool)),   # a column: a name, or a 1-based position
+    "numeral": lambda v: isinstance(v, str) and NUMBER.fullmatch(v.strip()) is not None,   # a decimal number written as TEXT (plan 1160 P1: LISTED values)
 }
 
 
@@ -183,10 +184,13 @@ def _variant(spec, v, loc, tables):
 
 CHECK = {   # a FORMAT field's check word -> its findings for a value of the right type; total over FORMAT.toml's check words (test)
     "TEXT": lambda spec, v, loc, tables: {True: [Finding("VALUE_STILL_TODO", loc, "TODO")], False: []}[v == TODO],
+    "UNDER": lambda spec, v, loc, tables: {True: [], False: [Finding("ROOT_NOT_UNDER_CC_BANKS", loc, f"want '{spec['under']}<id>/bank'")]}[v.startswith(spec["under"])],   # TODO: refused by typed
     "NUMBER": lambda spec, v, loc, tables: [],   # SCALAR: a cc.toml [interval_fields] field (str, int or num), TODO refused
     "SCALAR": lambda spec, v, loc, tables: {True: [Finding("VALUE_STILL_TODO", loc, "TODO")], False: []}[v == TODO],
     "CLOSED": _closed,
     "ITEMS": lambda spec, v, loc, tables: [Finding("FIELD_TYPE_WRONG", f"{loc}[{i}]", f"want {spec['item']}") for i, x in enumerate(v) if not TYPE[spec["item"]](x)],
+    "PREFIXES": lambda spec, v, loc, tables: CHECK["ITEMS"](spec, v, loc, tables) + [Finding("COMMENT_PREFIX_EMPTY", f"{loc}[{i}]", "an empty prefix marks every line a comment")
+                                                                                     for i, x in enumerate(v) if x == ""],   # plan-1145 E8
     "TABLE": lambda spec, v, loc, tables: section(spec["fields"], v, loc, tables),
     "TABLES": lambda spec, v, loc, tables: [f for i, x in enumerate(v) for f in {True: lambda: section(spec["fields"], x, f"{loc}[{i}]", tables),
                                                                                   False: lambda: [Finding("FIELD_TYPE_WRONG", f"{loc}[{i}]", "want a table")]}[TYPE["table"](x)]()],
@@ -212,7 +216,7 @@ def field(spec, d, key, loc, tables, required=True):
 def unknown(d, rows, loc, tables):
     """Keys that are no field row: STAMPED, DERIVED, or UNKNOWN, by a total lookup."""
     cls = {**{k: "FIELD_IS_STAMPED" for k in tables["format"]["stamped"]}, **{k: "FIELD_IS_DERIVED" for k in tables["format"]["derived"]}}
-    return [Finding(look(cls, k, "FIELD_UNKNOWN"), f"{loc}.{k}".lstrip("."), "not a field of format v2") for k in d if k not in rows]
+    return [Finding(look(cls, k, "FIELD_UNKNOWN"), f"{loc}.{k}".lstrip("."), "not a field of format v3") for k in d if k not in rows]
 
 
 def section(rows, d, loc, tables):
@@ -256,3 +260,43 @@ def format_stage(text, transducer_findings, tables):
     found = p.findings(tuple(transducer_findings), tables)
     return {True: lambda: Pass(Declaration(p.data["id"], p.data["intake"]["mode"], p.data)),
             False: lambda: Refuse(found[0].reason, detail(words=[f"{f.reason} at {f.loc or 'the file'}: {f.detail}" for f in found]))}[not found]()
+
+
+def gate(checks, then):
+    """then() (a Pass or a Refuse) when every (holds, reason, detail) row holds, else Refuse(reason, detail()) of the first row that does not.
+    Rows are evaluated in order and lazily (each `holds` and `detail` is a function): zip with range(1) draws at most one failing row, so no
+    row after it runs. (Moved here from intake_data by plan 1160 P1, so S1 uses it within this module's import allow-list.)"""
+    failed = [c for _, c in zip(range(1), (c for c in checks if not c[0]()))]
+    return {True: then, False: lambda: Refuse(failed[0][1], failed[0][2]())}[not failed]()
+
+
+ONE_PER_FILE = {   # [selection.slow] source -> does the declaration give one slow value per selected file; total over FORMAT's sources (test)
+    "LISTED": lambda sel: len(sel["slow"]["values"]) == len(sel["files"]),
+    "FILE_KEY": lambda sel: True,   # each file states its own value in a header line (S5 reads it there, or refuses SLOW_KEY_UNRESOLVED)
+    "NONE": lambda sel: True,       # no slow knob: no value is declared, so none is missing or extra
+    "COLUMN": lambda sel: True,     # LONG_TABLE: the slow knob is a column of the one file
+}
+
+
+@dataclass(frozen=True)
+class Chosen:
+    """S1 CHOICES' PASS evidence (plan 1160 P1). Invariant: built only from a Declaration for which every row in `checked` held; `checked` is
+    exactly the rows the body runs (tests/test_intake.py: the S1 rows with live = true), and the summary says the other rows were not checked."""
+    declaration: Declaration
+    checked: tuple
+
+    def summary(self):
+        return (f"Checked: {', '.join(self.checked)}. The other S1 rows have no body yet (plan 1160 P4), so they were not checked; the report "
+                f"lists them under the reasons no body can return yet")
+
+    def confirmed(self):
+        return False
+
+
+def choices(declaration):
+    """S1 CHOICES (reads no byte). Plan 1160 P1 makes one row live, SLOW_VALUES_NOT_ONE_PER_FILE, so that a LISTED count that differs from the
+    files count is refused before the loader and never zipped short; plan 1160 P4 adds the other rows."""
+    sel = declaration.data["selection"]
+    rows = [(lambda: ONE_PER_FILE[sel["slow"]["source"]](sel), "SLOW_VALUES_NOT_ONE_PER_FILE",
+             lambda: detail(counts={"files": len(sel["files"]), "slow values": len(sel["slow"]["values"])}))]
+    return gate(rows, lambda: Pass(Chosen(declaration, tuple(r[1] for r in rows))))

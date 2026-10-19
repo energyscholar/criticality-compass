@@ -1,4 +1,4 @@
-# The intake pipeline (stage table 1145-v1, policy 1136-v1)
+# The intake pipeline (stage table 1160-v1, policy 1136-v1)
 
 Generated from intake/STAGES.toml and intake/POLICY.toml by `bin/cc intake explain` (docs/gen-intake.py); never edit it by hand.
 This is the intake's explain. `bin/cc explain <input> <point>` is a different command: it explains one point of a measured input.
@@ -15,7 +15,7 @@ A declaration `declarations/<id>/` (intake.toml and the CC transducer.toml) goes
 | id | name | state | reads data bytes | needs | verdict |
 |---|---|---|---|---|---|
 | S0 | FORMAT | LIVE | NONE | - | PRIMARY |
-| S1 | CHOICES | STUB | NONE | S0 | PRIMARY |
+| S1 | CHOICES | LIVE | NONE | S0 | PRIMARY |
 | S2 | SEAL | LIVE | NONE | S0 | ADVISORY |
 | S3 | SOURCE_INTEGRITY | LIVE | ALL_FILES | S0 | PRIMARY |
 | S4 | SHAPE | LIVE | FIRST_FILE | S3 | PRIMARY |
@@ -33,8 +33,8 @@ The declaration parses, holds every required field with the right type, and ever
 | reason | live | what it means |
 |---|---|---|
 | TOML_INVALID | live | The declaration is not valid TOML; fix the syntax at the line shown. |
-| SCHEMA_UNSUPPORTED | live | The file does not say schema = 2 and kind = "intake"; this tool reads intake format v2 only (a v1 declaration is history: restate it in v2 under a new id). |
-| FIELD_MISSING | live | A required field is absent; every field of format v2 must be written, even when its honest value is a refusal value such as NONE_FITS. |
+| SCHEMA_UNSUPPORTED | live | The file does not say schema = 3 and kind = "intake"; this tool reads intake format v3 only (a v1 or v2 declaration is history: restate it in v3 under a new id). |
+| FIELD_MISSING | live | A required field is absent; every field of format v3 must be written, even when its honest value is a refusal value such as NONE_FITS. |
 | FIELD_UNKNOWN | live | A field the format does not define is present; check its spelling against bin/cc intake explain. |
 | FIELD_TYPE_WRONG | live | A field holds the wrong kind of value (for example text where a list is required). |
 | VALUE_NOT_LISTED | live | A closed-list field holds a value its list does not name; use one of the listed values. |
@@ -45,9 +45,11 @@ The declaration parses, holds every required field with the right type, and ever
 | STEP_IS_INTERPOLATION | live | A projection or bridge forms a value between measured points; interpolation is not admissible in any form. |
 | BRIDGE_NONE_FITS | live | The declaration says no bridge fits these data; this is an honest answer, and such an intake cannot be sealed. |
 | BASIS_NOT_METADATA | live | The declaration lists a source read before sealing that is not metadata (data values, a figure, or analysis code); the choice was made after seeing values. |
+| ROOT_NOT_UNDER_CC_BANKS | live | A CONVERTED source's root is not under <cc-banks>/: a converted bank is written there by its declared conversion, never beside the deposit. |
+| COMMENT_PREFIX_EMPTY | live | A reader's comment list holds an empty prefix ""; every line starts with it, so every line would be dropped as a comment. Use [] for no comment lines. |
 | TRANSDUCER_FILE_REFUSED | live | The declaration's transducer.toml is refused by the CC transducer check; its findings are listed with their Next lines. |
 
-## S1 CHOICES (STUB)
+## S1 CHOICES (LIVE)
 
 The declared choices are consistent with each other, and the declared operation graph uses only permitted operations (static admissibility).
 
@@ -55,7 +57,7 @@ The declared choices are consistent with each other, and the declared operation 
 |---|---|---|
 | KNOBS_SAME_QUANTITY | NOT LIVE | The slow and fast knob name the same quantity or column; the Compass needs two distinct knobs. |
 | MEASURED_IS_A_KNOB | NOT LIVE | The measured number is one of the knobs. |
-| SLOW_VALUES_NOT_ONE_PER_FILE | NOT LIVE | Slow-knob values are declared per file, but the list does not give exactly one value per selected file. |
+| SLOW_VALUES_NOT_ONE_PER_FILE | live | Slow-knob values are declared per file (LISTED), but `values` does not give exactly one value per file of `files`. |
 | PROJECTION_REQUIRED | NOT LIVE | The raw observation is not one number per locus (a picture, positions, a series), and no projection to one number is declared before the bridge. |
 | PROJECTION_ESTIMAND_MIXED | NOT LIVE | One projection names two estimands (for example a location and a height); declare one projection per estimand. |
 | SECOND_LANE_MISSING | NOT LIVE | The source is real data and only one intake lane is declared; real data are taken in through two declared lanes (policy, intake/POLICY.toml). |
@@ -88,8 +90,9 @@ Each selected file is admitted before it is read, read once through the logged l
 
 | reason | live | what it means |
 |---|---|---|
+| CONVERSION_NOT_LIVE | live | The source is CONVERTED, and the conversion has no body in the Compass yet (plan 1160 P3); nothing was read. |
 | ROOT_UNRESOLVED | live | The declared source root is not a name of intake/ROOTS.toml followed by a relative path, or it names no directory on this machine. |
-| PATH_NOT_ADMITTED | live | The loader's admission refused this path before reading it (truth side of the deposit, the slow-knob source does not resolve, or the file is absent). |
+| PATH_NOT_ADMITTED | live | The loader's admission refused this path before reading it (outside the source root, on the truth side of the deposit, or not a file). |
 | PIN_MISMATCH | live | The file's bytes do not match their pinned sha256; the data changed since they were pinned. |
 | UNIVERSE_CHANGED | live | The source universe now lists files that differ from the sealed listing (added, removed, or resized). |
 
@@ -128,6 +131,7 @@ Every selected file matches the first, and the sampling label is recorded: curve
 | FILE_DIFFERS_FROM_FIRST | live | A selected file's shape, columns or keys differ from the first file's. |
 | CURVE_REPEATED | live | Two curves carry the same slow-knob value (two files; or, in a long table, two blocks that are not adjacent) and are not declared replicates. |
 | FAST_VALUE_REPEATED | live | A curve holds two points at the same fast-knob value and they are not declared replicates. |
+| SLOW_KEY_UNRESOLVED | live | The slow knob is declared FILE_KEY, and a file's header does not hold exactly one line whose first cell is the key and whose second cell is a number. |
 | REPLICATE_KEY_UNRESOLVED | live | The declared replicate identity cannot be read for a file or point. |
 | ACQUISITION_ORDER_DIFFERS | live | A curve stored in acquisition order (row_order ACQUISITION) does not run in the declared direction along the fast knob. |
 
@@ -194,7 +198,6 @@ Each row below has live = false in intake/STAGES.toml: no body returns it today 
 
 - S1 KNOBS_SAME_QUANTITY
 - S1 MEASURED_IS_A_KNOB
-- S1 SLOW_VALUES_NOT_ONE_PER_FILE
 - S1 PROJECTION_REQUIRED
 - S1 PROJECTION_ESTIMAND_MIXED
 - S1 SECOND_LANE_MISSING

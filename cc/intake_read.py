@@ -16,7 +16,7 @@ Reading, in order (table-curve-v1; csv-curve-v1 is the same reader with a fixed 
 import csv
 import importlib.util
 import io
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from intake_blind import NUMBER, Detail, detail
 
@@ -25,10 +25,12 @@ from intake_blind import NUMBER, Detail, detail
 class Grid:
     """A file a reader could read. Invariant: `columns` is the column of each cell of a row (table-curve-v1: the declared column of each
     role, in role order; csv-curve-v1: its header line); every row of `rows` holds one float per column, in file order; `units` holds the
-    (role, unit) pairs the file states (a NAMES_UNITS header), () when it states none."""
+    (role, unit) pairs the file states (a NAMES_UNITS header), () when it states none; `head` holds the header lines as read, each a tuple of
+    cell texts (plan 1160 P1: the one place a FILE_KEY slow value is found, see keyed), and takes no part in comparing two Grids."""
     columns: tuple
     units: tuple
     rows: tuple
+    head: tuple = field(compare=False)
     readable = True
 
 
@@ -41,6 +43,7 @@ class Unreadable:
     columns = ()
     units = ()
     rows = ()
+    head = ()
     readable = False
 
 
@@ -136,6 +139,19 @@ def _name(cell):
     return {True: lambda: cell.strip(), False: lambda: ""}[isinstance(cell, str)]()
 
 
+SAID = {str: lambda c: c.strip(), int: repr, float: repr}   # a header cell's type -> its text as written (an xlsx number by repr); others: ""
+
+
+def _said(cell):
+    return {True: lambda: SAID[type(cell)](cell), False: lambda: ""}[type(cell) in SAID]()
+
+
+def keyed(grid, key):
+    """FILE_KEY (plan 1160 P1): the second cell of each header line of a Grid whose first cell is `key`, as text. The census refuses
+    SLOW_KEY_UNRESOLVED unless this is exactly one decimal number as written."""
+    return [c[1] for c in grid.head if len(c) > 1 and c[0] == key]
+
+
 HEADER = {   # [reader.header] kind -> (the 1-based header lines it names: names, units); total over FORMAT's header kinds
     "SKIP": lambda h: {},
     "NAMES": lambda h: {"names": h["names"]},
@@ -173,15 +189,15 @@ def _columns(head, body, lines, roles):
     short = [(i, len(c)) for i, c in body if len(c) != width]
     checks = [(lambda: not short, "ROW_WIDTH_DIFFERS", lambda: detail(rows=[short[0][0]], counts={"cells in the row": short[0][1], "table width": width}))]
     checks += [row for _, ref in roles for row in _resolve(ref, names, width)]
-    return first(checks, lambda: _numbers(body, named, roles, names))
+    return first(checks, lambda: _numbers(body, named, roles, names, tuple(tuple(_said(x) for x in c) for _, c in head)))
 
 
-def _numbers(body, named, roles, names):
+def _numbers(body, named, roles, names, head):
     at = [_index(ref, names) for _, ref in roles]
     bad = [(i, ref) for i, c in body for (_, ref), k in zip(roles, at) if not _numeric(c[k])[0](c[k])]
     units = {True: lambda: tuple((r, named["units"][k]) for (r, _), k in zip(roles, at)), False: lambda: ()}["units" in named]()
     return first([(lambda: not bad, "CELL_NOT_A_NUMBER", lambda: detail(rows=[bad[0][0]], columns=[bad[0][1]], counts={"cells of declared columns that are not numbers": len(bad)}))],
-                 lambda: Grid(tuple(ref for _, ref in roles), units, tuple(tuple(_numeric(c[k])[1](c[k]) for k in at) for _, c in body)))
+                 lambda: Grid(tuple(ref for _, ref in roles), units, tuple(tuple(_numeric(c[k])[1](c[k]) for k in at) for _, c in body), head))
 
 
 def read_table(data, d):

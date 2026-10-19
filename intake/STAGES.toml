@@ -9,7 +9,7 @@
 # needs, and never the seal stage (test 1).
 schema = 1
 kind = "intake-stages"
-version = "1145-v1"
+version = "1160-v1"
 seal_stage = "S2"
 
 [report]
@@ -41,8 +41,8 @@ implemented = true
 verdict = "PRIMARY"
 reason = [
   { code = "TOML_INVALID",            live = true,  sentence = "The declaration is not valid TOML; fix the syntax at the line shown." },
-  { code = "SCHEMA_UNSUPPORTED",      live = true,  sentence = "The file does not say schema = 2 and kind = \"intake\"; this tool reads intake format v2 only (a v1 declaration is history: restate it in v2 under a new id)." },
-  { code = "FIELD_MISSING",           live = true,  sentence = "A required field is absent; every field of format v2 must be written, even when its honest value is a refusal value such as NONE_FITS." },
+  { code = "SCHEMA_UNSUPPORTED",      live = true,  sentence = "The file does not say schema = 3 and kind = \"intake\"; this tool reads intake format v3 only (a v1 or v2 declaration is history: restate it in v3 under a new id)." },
+  { code = "FIELD_MISSING",           live = true,  sentence = "A required field is absent; every field of format v3 must be written, even when its honest value is a refusal value such as NONE_FITS." },
   { code = "FIELD_UNKNOWN",           live = true,  sentence = "A field the format does not define is present; check its spelling against bin/cc intake explain." },
   { code = "FIELD_TYPE_WRONG",        live = true,  sentence = "A field holds the wrong kind of value (for example text where a list is required)." },
   { code = "VALUE_NOT_LISTED",        live = true,  sentence = "A closed-list field holds a value its list does not name; use one of the listed values." },
@@ -53,6 +53,8 @@ reason = [
   { code = "STEP_IS_INTERPOLATION",   live = true,  sentence = "A projection or bridge forms a value between measured points; interpolation is not admissible in any form." },
   { code = "BRIDGE_NONE_FITS",        live = true,  sentence = "The declaration says no bridge fits these data; this is an honest answer, and such an intake cannot be sealed." },
   { code = "BASIS_NOT_METADATA",      live = true,  sentence = "The declaration lists a source read before sealing that is not metadata (data values, a figure, or analysis code); the choice was made after seeing values." },
+  { code = "ROOT_NOT_UNDER_CC_BANKS", live = true,  sentence = "A CONVERTED source's root is not under <cc-banks>/: a converted bank is written there by its declared conversion, never beside the deposit." },
+  { code = "COMMENT_PREFIX_EMPTY",    live = true,  sentence = "A reader's comment list holds an empty prefix \"\"; every line starts with it, so every line would be dropped as a comment. Use [] for no comment lines." },
   { code = "TRANSDUCER_FILE_REFUSED", live = true,  sentence = "The declaration's transducer.toml is refused by the CC transducer check; its findings are listed with their Next lines." },
 ]
 
@@ -62,12 +64,12 @@ name = "CHOICES"
 purpose = "The declared choices are consistent with each other, and the declared operation graph uses only permitted operations (static admissibility)."
 reads_bytes = "NONE"
 needs = ["S0"]
-implemented = false
+implemented = true   # plan 1160 P1: one live row (SLOW_VALUES_NOT_ONE_PER_FILE), so a LISTED count never reaches the loader; the other rows are P4's (live = false until then)
 verdict = "PRIMARY"
 reason = [
   { code = "KNOBS_SAME_QUANTITY",            live = false, sentence = "The slow and fast knob name the same quantity or column; the Compass needs two distinct knobs." },
   { code = "MEASURED_IS_A_KNOB",             live = false, sentence = "The measured number is one of the knobs." },
-  { code = "SLOW_VALUES_NOT_ONE_PER_FILE",   live = false, sentence = "Slow-knob values are declared per file, but the list does not give exactly one value per selected file." },
+  { code = "SLOW_VALUES_NOT_ONE_PER_FILE",   live = true,  sentence = "Slow-knob values are declared per file (LISTED), but `values` does not give exactly one value per file of `files`." },
   { code = "PROJECTION_REQUIRED",            live = false, sentence = "The raw observation is not one number per locus (a picture, positions, a series), and no projection to one number is declared before the bridge." },
   { code = "PROJECTION_ESTIMAND_MIXED",      live = false, sentence = "One projection names two estimands (for example a location and a height); declare one projection per estimand." },
   { code = "SECOND_LANE_MISSING",            live = false, sentence = "The source is real data and only one intake lane is declared; real data are taken in through two declared lanes (policy, intake/POLICY.toml)." },
@@ -107,8 +109,9 @@ needs = ["S0"]
 implemented = true
 verdict = "PRIMARY"
 reason = [
+  { code = "CONVERSION_NOT_LIVE", live = true, sentence = "The source is CONVERTED, and the conversion has no body in the Compass yet (plan 1160 P3); nothing was read." },
   { code = "ROOT_UNRESOLVED",   live = true,  sentence = "The declared source root is not a name of intake/ROOTS.toml followed by a relative path, or it names no directory on this machine." },
-  { code = "PATH_NOT_ADMITTED", live = true,  sentence = "The loader's admission refused this path before reading it (truth side of the deposit, the slow-knob source does not resolve, or the file is absent)." },
+  { code = "PATH_NOT_ADMITTED", live = true,  sentence = "The loader's admission refused this path before reading it (outside the source root, on the truth side of the deposit, or not a file)." },
   { code = "PIN_MISMATCH",      live = true,  sentence = "The file's bytes do not match their pinned sha256; the data changed since they were pinned." },
   { code = "UNIVERSE_CHANGED",  live = true,  sentence = "The source universe now lists files that differ from the sealed listing (added, removed, or resized)." },
 ]
@@ -154,6 +157,7 @@ reason = [
   { code = "FILE_DIFFERS_FROM_FIRST",   live = true,  sentence = "A selected file's shape, columns or keys differ from the first file's." },
   { code = "CURVE_REPEATED",            live = true,  sentence = "Two curves carry the same slow-knob value (two files; or, in a long table, two blocks that are not adjacent) and are not declared replicates." },
   { code = "FAST_VALUE_REPEATED",       live = true,  sentence = "A curve holds two points at the same fast-knob value and they are not declared replicates." },
+  { code = "SLOW_KEY_UNRESOLVED",       live = true,  sentence = "The slow knob is declared FILE_KEY, and a file's header does not hold exactly one line whose first cell is the key and whose second cell is a number." },
   { code = "REPLICATE_KEY_UNRESOLVED",  live = true,  sentence = "The declared replicate identity cannot be read for a file or point." },
   { code = "ACQUISITION_ORDER_DIFFERS", live = true,  sentence = "A curve stored in acquisition order (row_order ACQUISITION) does not run in the declared direction along the fast knob." },
 ]

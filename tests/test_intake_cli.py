@@ -99,11 +99,11 @@ with tempfile.TemporaryDirectory() as tmp:
     runs = {ln: r for ln, r in seq if r is not None}
     check("5. every command of the sequence exits 0", all(r.returncode == 0 for r in runs.values()), str({k: r.stdout[-300:] + r.stderr[-300:] for k, r in runs.items() if r.returncode})[:900])
     lint, report = runs["bin/cc intake lint demo1"].stdout, runs["cat declarations/demo1/intake-report.md"].stdout
-    check("5. lint passes FORMAT", lint.startswith("S0 EXECUTED, PASS."), lint[:300])
+    check("5. lint passes FORMAT and (plan 1160 P1) CHOICES", lint.startswith("S0 EXECUTED, PASS.") and "\nS1 EXECUTED, PASS." in lint, lint[:300])
     check("5. S3, S4 and S5 EXECUTED PASS", all(f"- **{s}** (LIVE): EXECUTED, PASS." in report for s in ("S3 SOURCE_INTEGRITY", "S4 SHAPE", "S5 CENSUS")), report[:600])
-    check("5. the census label says 9 curves, MISALIGNED", "Sampling: 9 curves;" in report and report.count("MISALIGNED") == 1, report[:300])
+    check("5. the census label says 9 curves, MISALIGNED", "Sampling: 9 curves;" in report and report.count("MISALIGNED") == 1 and "MISALIGNED; curves_with_slow = 9" in report, report[:300])
     check("5. seal status SEALED and PRIMARY_INCOMPLETE listing the stubs", "Seal status** (advisory; sealing is recommended and not enforced): SEALED." in report
-          and "PRIMARY verdict: PRIMARY_INCOMPLETE**. Missing: S1 CHOICES, S6 ADMISSIBILITY, S7 INTERVAL_FEASIBILITY, S8 RESOLUTION_AND_IDENTIFIABILITY" in report, report[:900])
+          and "PRIMARY verdict: PRIMARY_INCOMPLETE**. Missing: S6 ADMISSIBILITY, S7 INTERVAL_FEASIBILITY, S8 RESOLUTION_AND_IDENTIFIABILITY" in report, report[:900])
 
     # ---- 2. the truth stays outside: the bank holds none, and every logged access is a loader read of a bank file
     bank, log = w / "scratch" / "intake-synth" / "demo1", w / "declarations" / "demo1" / "access.log"
