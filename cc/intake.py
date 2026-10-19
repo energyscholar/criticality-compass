@@ -210,7 +210,7 @@ def tables(root=ROOT):
     admit = {"policy.projection": load["policy"]["projection"], "policy.bridge": load["policy"]["bridge"],
              **{f"alphabet.{k}": v for k, v in cfg["alphabets"].items()}}
     sentences = {r["code"]: r["sentence"] for s in load["stages"]["stage"] for r in s["reason"]}
-    roots = {k: str(Path(root) / v) for k, v in tomllib.loads((Path(root) / "intake" / "ROOTS.toml").read_text())["root"].items()}
+    roots = {k: str(Path(root) / Path(v).expanduser()) for k, v in tomllib.loads((Path(root) / "intake" / "ROOTS.toml").read_text())["root"].items()}
     return {**load, "admit": admit, "interval_fields": cfg["interval_fields"], "sentences": sentences, "roots": roots}
 
 

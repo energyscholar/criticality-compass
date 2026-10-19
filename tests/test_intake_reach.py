@@ -46,6 +46,8 @@ check("E1. every reason and reader_reason row carries live = true | false", all(
       str([r["code"] for _, _, r in ROWS if type(blind.look(r, "live", None)) is not bool]))
 check("E1. no row of a STUB stage is live", not [r for s, _, r in ROWS if not s["implemented"] and r["live"]], str([r["code"] for s, _, r in ROWS if not s["implemented"] and r["live"]]))
 LIVE = {r["code"] for _, _, r in ROWS if r["live"] is True}
+check("E2. the root name <cc-datasets> resolves under the home directory (~/scratch/cc-datasets), never under the Compass root",
+      T["roots"]["<cc-datasets>"] == str(Path.home() / "scratch" / "cc-datasets"), T["roots"]["<cc-datasets>"])
 
 
 SEEN = set()   # every stage reason a run returned, READER_REFUSED among them (first() reports its detail's reader reason instead)
