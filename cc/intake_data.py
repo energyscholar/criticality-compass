@@ -16,8 +16,7 @@ from pathlib import Path
 
 import intake_read
 import intake_seal
-from intake_blind import Declaration, Pass, Refuse
-from intake_read import NUMBER
+from intake_blind import NUMBER, Declaration, Pass, Refuse, detail, numbered
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -201,10 +200,10 @@ def source_integrity(declaration, d, t):
     names = intake_seal.selected(sel)
     slow = BEFORE_READ[sel["layout"]](sel, names)
     turned = lambda: [(n, w) for n, s in zip(names, slow) for w in admit(loc, n, src["truth_side"], s)]
-    return gate([(lambda: loc != "" and Path(loc).is_dir(), "ROOT_UNRESOLVED", lambda: f"root '{src['root']}' (names in intake/ROOTS.toml: {sorted(t['roots'])})"),
+    return gate([(lambda: loc != "" and Path(loc).is_dir(), "ROOT_UNRESOLVED", lambda: detail(words=[f"root '{src['root']}' (names in intake/ROOTS.toml: {sorted(t['roots'])})"])),
                  (lambda: rec == {} or intake_seal.listing(loc, src["universe"]) == rec["universe"]["listing"], "UNIVERSE_CHANGED",
-                  lambda: f"{len(intake_seal.listing(loc, src['universe']))} names now, {len(rec['universe']['listing'])} sealed"),
-                 (lambda: not turned(), "PATH_NOT_ADMITTED", lambda: "; ".join(f"{n}: {w}" for n, w in turned()[:3]))],
+                  lambda: detail(counts={"names now": len(intake_seal.listing(loc, src["universe"])), "names sealed": len(rec["universe"]["listing"])})),
+                 (lambda: not turned(), "PATH_NOT_ADMITTED", lambda: detail(words=[f"{n}: {w}" for n, w in turned()[:3]], counts={"names not admitted": len(turned())}))],
                 lambda: _read(declaration, d, loc, names))
 
 
@@ -217,7 +216,7 @@ def _read(declaration, d, loc, names):
     for a in intake_seal.lines(Path(d) / "access.log"):
         pins.setdefault(a["path"], a["sha256"]) if a["route"] == "loader" else None
     moved = lambda: [f.name for f in files if pins[str((Path(loc) / f.name).resolve())] != f.sha256]
-    return gate([(lambda: not moved(), "PIN_MISMATCH", lambda: f"{len(moved())} files differ from their pins, first {moved()[:3]}")], lambda: Pass(Pinned(declaration, files)))
+    return gate([(lambda: not moved(), "PIN_MISMATCH", lambda: detail(words=moved()[:3], counts={"files that differ from their pins": len(moved())}))], lambda: Pass(Pinned(declaration, files)))
 
 
 def read(t, d, f):
@@ -228,7 +227,7 @@ def read(t, d, f):
 @dataclass(frozen=True)
 class Curve:
     """One curve of a census. Invariant: `rows` are the readable rows of one curve in file order, each in role order (fast first); `slow` is
-    its slow-knob value; `where` names the file (PER_FILE) or the file and its block of rows (LONG_TABLE)."""
+    its slow-knob value; `where` names the file (PER_FILE) or the file and its block's ordinal (LONG_TABLE), never a value (plan 1160 P0)."""
     where: str
     slow: float
     rows: tuple
@@ -236,7 +235,7 @@ class Curve:
 
 def _blocks(f, g):
     """LONG_TABLE: the blocks of consecutive rows with one slow value (the last role column), in file order, each one Curve."""
-    return [Curve(f"{f.name} block {i} ({g.columns[-1]} = {h:g})", h, tuple(rows)) for i, (h, rows) in enumerate(((h, list(rs)) for h, rs in itertools.groupby(g.rows, key=lambda r: r[-1])), 1)]
+    return [Curve(f"{f.name} block {i}", h, tuple(rows)) for i, (h, rows) in enumerate(((h, list(rs)) for h, rs in itertools.groupby(g.rows, key=lambda r: r[-1])), 1)]
 
 
 CURVES = {   # [selection] layout -> (declaration, files, their grids) -> the curves, in file order; total over FORMAT's layouts (plan 1145)
@@ -265,11 +264,11 @@ def shape(pinned, t):
     g, cols = read(t, d, f), tuple(ref for _, ref in intake_read.role_columns(d))
     units = lambda: [(r, u, UNIT[r](d)) for r, u in g.units if u != UNIT[r](d)]
     unordered = lambda: [c.where for c in CURVES[d["selection"]["layout"]](d, pinned.files[:1], [g]) if not ORDER[d["acquisition"]["row_order"]]([r[0] for r in c.rows])]
-    return gate([(lambda: d["reader"]["name"] in intake_read.LIVE, "READER_NOT_LIVE", lambda: f"reader '{d['reader']['name']}'"),
-                 (lambda: g.readable, "READER_REFUSED", lambda: f"{f.name}: {g.why}"),
-                 (lambda: g.columns == cols, "COLUMNS_DIFFER", lambda: f"{f.name} columns {','.join(map(str, g.columns))}, declared {','.join(map(str, cols))}"),
-                 (lambda: not units(), "UNIT_DIFFERS", lambda: "; ".join(f"{f.name} states {r} in '{u}', declared '{w}'" for r, u, w in units())),
-                 (lambda: not unordered(), "ROW_ORDER_DIFFERS", lambda: f"{unordered()[:3]} not {d['acquisition']['row_order']} in {d['knobs']['fast']['name']}")],
+    return gate([(lambda: d["reader"]["name"] in intake_read.LIVE, "READER_NOT_LIVE", lambda: detail(words=[f"reader '{d['reader']['name']}'"])),
+                 (lambda: g.readable, "READER_REFUSED", lambda: g.detail.within(f.name, g.reason)),
+                 (lambda: g.columns == cols, "COLUMNS_DIFFER", lambda: detail(f.name, columns=numbered(g.columns) + cols, counts={"columns in the file": len(g.columns), "declared": len(cols)})),
+                 (lambda: not units(), "UNIT_DIFFERS", lambda: detail(f.name, words=[x for r, u, w in units() for x in (f"{r} stated in", u, f"declared {w}")])),
+                 (lambda: not unordered(), "ROW_ORDER_DIFFERS", lambda: detail(words=unordered()[:3] + [f"not {d['acquisition']['row_order']} in {d['knobs']['fast']['name']}"], counts={"curves": len(unordered())}))],
                 lambda: Pass(Shaped(pinned, g.columns)))
 
 
@@ -292,11 +291,12 @@ def census(pinned, shaped, t):
     hs = lambda: [c.slow for c in curves()]
     twice = lambda: [c.where for c in curves() if len({r[0] for r in c.rows}) != len(c.rows)]
     against = lambda: [c.where for c in curves() if not DIRECTION[(acq["row_order"] == "ACQUISITION", acq["direction"])]([r[0] for r in c.rows])]
-    return gate([(lambda: not other, "FILE_DIFFERS_FROM_FIRST", lambda: f"{len(other)} files, first {other[:3]}"),
-                 (lambda: rep[1], "REPLICATE_KEY_UNRESOLVED", lambda: f"identity {d['replicate']['identity']}: reader {d['reader']['name']} with layout {d['selection']['layout']} carries no replicate key"),
-                 (lambda: rep[0] or len(set(hs())) == len(hs()), "CURVE_REPEATED", lambda: f"{d['knobs']['slow']['name']} values on two curves: {sorted({h for h in hs() if hs().count(h) > 1})}"),
-                 (lambda: not twice(), "FAST_VALUE_REPEATED", lambda: f"{len(twice())} curves, first {twice()[:3]}"),
-                 (lambda: not against(), "ACQUISITION_ORDER_DIFFERS", lambda: f"{len(against())} curves stored in acquisition order are not {acq['direction']}, first {against()[:3]}")],
+    again = lambda: [c.where for c in curves() if hs().count(c.slow) > 1]
+    return gate([(lambda: not other, "FILE_DIFFERS_FROM_FIRST", lambda: detail(words=other[:3], counts={"files": len(other)})),
+                 (lambda: rep[1], "REPLICATE_KEY_UNRESOLVED", lambda: detail(words=[f"identity {d['replicate']['identity']}: reader {d['reader']['name']} with layout {d['selection']['layout']} carries no replicate key"])),
+                 (lambda: rep[0] or len(set(hs())) == len(hs()), "CURVE_REPEATED", lambda: detail(words=again()[:3], counts={"curves whose slow value another curve has": len(again())})),
+                 (lambda: not twice(), "FAST_VALUE_REPEATED", lambda: detail(words=twice()[:3], counts={"curves": len(twice())})),
+                 (lambda: not against(), "ACQUISITION_ORDER_DIFFERS", lambda: detail(words=against()[:3] + [f"stored in acquisition order, not {acq['direction']}"], counts={"curves": len(against())}))],
                 lambda: Pass(Census(pinned, label(curves(), d["knobs"]["fast"]["name"]))))
 
 

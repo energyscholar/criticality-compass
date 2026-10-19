@@ -84,7 +84,7 @@ check("R1. uncertainty NONE: the Grid holds fast and measured only", isinstance(
 # ---- R2. each Unreadable case refuses with its reason and names its row and column
 def refused(name, g, reason, *where):
     check(f"R2. {name}: Unreadable {reason}" + (f", naming {where}" if where else ""),
-          isinstance(g, rd.Unreadable) and g.reason == reason and all(w in g.detail for w in where) and g.rows == (), str(g)[:300])
+          isinstance(g, rd.Unreadable) and g.reason == reason and all(w in str(g.detail) for w in where) and g.rows == (), str(g)[:300])
 
 
 c = lambda **k: decl({"kind": "COMMA"}, NU, **k)
@@ -93,15 +93,15 @@ refused("a cell 'nan' (no NaN filling)", rd.read_table(text(",").replace(b"0.025
 refused("an empty cell of a declared column (no filling, no skipped row)", rd.read_table(text(",").replace(b"2.25,1.125", b"2.25,"), c()), "CELL_NOT_A_NUMBER", "row 6", "'C'")
 refused("a short row", rd.read_table(text(",").replace(b",0.03\n2.25", b"\n2.25"), c()), "ROW_WIDTH_DIFFERS", "row 5")
 refused("a missing column name", rd.read_table(text(","), c(cols=("T", "Cp", "sigma"))), "COLUMN_NAME_ABSENT", "'Cp'")
-refused("a position out of range", rd.read_table(text(","), c(cols=("T", 4, "sigma"))), "COLUMN_POSITION_OUT_OF_RANGE", "column 4", "3 columns")
-refused("position 0 (positions are 1-based)", rd.read_table(text(","), c(cols=(0, "C", "sigma"))), "COLUMN_POSITION_OUT_OF_RANGE", "column 0")
+refused("a position out of range", rd.read_table(text(","), c(cols=("T", 4, "sigma"))), "COLUMN_POSITION_OUT_OF_RANGE", "column #4", "columns in the table = 3")
+refused("position 0 (positions are 1-based)", rd.read_table(text(","), c(cols=(0, "C", "sigma"))), "COLUMN_POSITION_OUT_OF_RANGE", "column #0")
 refused("a name that names two columns", rd.read_table(text(",", head=(["T", "C", "C"], UNITS)), c()), "COLUMN_NAME_AMBIGUOUS", "'C'")
 refused("a name with no names line (SKIP)", rd.read_table(text(","), decl({"kind": "COMMA"}, {"kind": "SKIP", "rows": 2})), "COLUMN_NAME_ABSENT", "'T'")
-refused("fewer header lines than declared", rd.read_table(text(",", rows=[]), decl({"kind": "COMMA"}, {**NU, "rows": 3})), "HEADER_LINE_ABSENT", "2 header lines of 3")
+refused("fewer header lines than declared", rd.read_table(text(",", rows=[]), decl({"kind": "COMMA"}, {**NU, "rows": 3})), "HEADER_LINE_ABSENT", "header lines = 2", "header lines declared = 3")
 refused("a names line outside the header", rd.read_table(text(","), decl({"kind": "COMMA"}, {**NU, "names": 3})), "HEADER_LINE_ABSENT")
 refused("a header and no data row", rd.read_table(text(",", rows=[]), c()), "NO_DATA_ROW")
 refused("bytes that are not UTF-8", rd.read_table(b"T,C,sigma\n\xff\xfe2.0,1.0,0.1\n", c()), "NOT_UTF8")
-refused("a comment line not declared as one (it becomes header line 1: the names line is one cell wide)", rd.read_table(text(","), c(comment=())), "ROW_WIDTH_DIFFERS", "the table has 1")
+refused("a comment line not declared as one (it becomes header line 1: the names line is one cell wide)", rd.read_table(text(","), c(comment=())), "ROW_WIDTH_DIFFERS", "table width = 1")
 xl_ok = {True: lambda: None, False: lambda: print("  (the xlsx SHEET_ABSENT and NOT_AN_XLSX cases need openpyxl: not run on this machine)")}[HAS_XLSX]()
 {True: lambda: [refused("an xlsx sheet that is absent", rd.read_table(xlsx([NAMES, UNITS] + [list(r) for r in ROWS], sheet="other"), decl({"kind": "XLSX", "sheet": "data"}, NU)), "SHEET_ABSENT", "'data'"),
                 refused("bytes that are no workbook", rd.read_table(b"PK not a zip", decl({"kind": "XLSX", "sheet": "data"}, NU)), "NOT_AN_XLSX"),

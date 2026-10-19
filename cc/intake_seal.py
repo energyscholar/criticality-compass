@@ -12,7 +12,7 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 
-from intake_blind import Pass, Refuse
+from intake_blind import Pass, Refuse, detail
 
 FILES = ("intake.toml", "transducer.toml")   # the declaration: the two files its sha256 covers, in this order
 AUTHOR_KIND = {"human": "HUMAN", "ai-draft": "AI_DRAFT"}   # the --as word -> the sealed author_kind; a word outside it is a usage refusal
@@ -129,7 +129,7 @@ def _write(d, decl, universe, who, root, tables):
     have = listing(universe, src["universe"])
     picked = selected(sel)
     outside = sorted(set(picked) - {n for n, _ in have})
-    return {False: lambda: Refuse("SELECTION_OUTSIDE_UNIVERSE", f"{len(outside)} selected files are not in the universe listing, first {outside[:3]}"),
+    return {False: lambda: Refuse("SELECTION_OUTSIDE_UNIVERSE", detail(words=outside[:3], counts={"selected files not in the universe listing": len(outside)})),
             True: lambda: _stamp(d, decl, universe, have, who, root, tables, schema)}[not outside]()
 
 
@@ -155,6 +155,6 @@ def _stamp(d, decl, universe, have, who, root, tables, schema):
 def mint(declaration, d, universe, who, root, tables):
     """bin/cc intake seal, after S0 passed: ALREADY_SEALED | UNIVERSE_ROOT_ABSENT | SELECTION_OUTSIDE_UNIVERSE, or append the seal-log line and
     write SEAL.json. `who` = {author, author_kind, confirmed_by}; `universe` is the directory --universe names (a str; "" when not given)."""
-    return {True: lambda: Refuse("ALREADY_SEALED", "SEAL.json exists; a seal is never replaced"),
-            False: lambda: {False: lambda: Refuse("UNIVERSE_ROOT_ABSENT", f"'{universe}' is not a directory on this machine"),
+    return {True: lambda: Refuse("ALREADY_SEALED", detail(words=["SEAL.json exists; a seal is never replaced"])),
+            False: lambda: {False: lambda: Refuse("UNIVERSE_ROOT_ABSENT", detail(words=[f"'{universe}' is not a directory on this machine"])),
                             True: lambda: _write(d, declaration, Path(universe), who, root, tables)}[universe != "" and Path(universe).is_dir()]()}[(Path(d) / "SEAL.json").is_file()]()

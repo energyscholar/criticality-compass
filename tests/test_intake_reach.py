@@ -54,11 +54,11 @@ SEEN = set()   # every stage reason a run returned, READER_REFUSED among them (f
 
 
 def first(out):
-    """The code of the first refusal of a run, a reader reason for S4 READER_REFUSED (its detail is '<file>: <REASON>: <detail>'), else 'PASS'."""
+    """The code of the first refusal of a run, a reader reason for S4 READER_REFUSED (its Detail's first word, plan 1160 P0), else 'PASS'."""
     ref = [e.result for e in out.values() if e.mark is intake.Mark.REFUSED]
     code = {True: lambda: ref[0].reason, False: lambda: "PASS"}[bool(ref)]()
     SEEN.add(code)
-    return {True: lambda: ref[0].evidence.split(": ")[1], False: lambda: code}[code == "READER_REFUSED"]()
+    return {True: lambda: ref[0].evidence.words[0], False: lambda: code}[code == "READER_REFUSED"]()
 
 
 with tempfile.TemporaryDirectory() as tmp:
