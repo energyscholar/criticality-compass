@@ -5,13 +5,18 @@ Plan 1145: the intake pipeline (checks.toml [roles] intake) has its own role and
 (1145 measured 1023 at the end of phase 1); it is no longer counted in plumbing.
 Plan 1160 P5: S7, S8 and S9 (cc/intake_feasible.py) are the role intake_feasible, FEASIBLE_CAP = 120 (83 at P5). Seen RED: FEASIBLE_CAP
 made 80 (the cap assert FAILS); cc/intake_feasible.py also listed under plumbing (the disjointness assert FAILS).
+Plan 1164: the intake core is split by invariant (Layout C): each module is its own role with its own cap (CORE below), and CORE_CAP = 1200,
+the old INTAKE_CAP, still bounds the sum of the split core, so no line cap is raised. Seen RED: FOLD_CAP made 100 (the cap assert FAILS); the sum
+bound made 1000 (CORE_CAP FAILS); cc/intake_fold.py also listed under intake (the disjointness assert FAILS).
 Plan 1160 P6: S10 and the terminal (cc/intake_terminal.py) are the role intake_terminal, TERMINAL_CAP = 200 (see its line). Seen RED: TERMINAL_CAP
 made 100 (the cap assert FAILS); cc/intake_terminal.py also listed under intake (the disjointness assert FAILS)."""
 import tomllib
 from pathlib import Path
 
 CAP = 5000
-INTAKE_CAP = 1200
+CORE_CAP = 1200   # plan 1164: was INTAKE_CAP over the one role intake; now the sum over the roles of CORE, the core split by invariant
+CORE = {"intake": 100, "intake_fold": 160, "intake_evidence": 150, "intake_bytes": 100, "intake_census": 140, "intake_say": 100,   # plan 1164: role -> cap
+        "intake_blind": 200, "intake_seal": 160, "intake_read": 200}   # (BLOAT-REVIEW 1160 section 4, Layout C)
 HANDOFF_CAP = 900   # plan 1160 P3: checks.toml [roles] intake_handoff, the conversion and peek (cc/intake_convert.py)
 CHOICES_CAP = 120   # plan 1160 P4: checks.toml [roles] intake_choices, S1 CHOICES (every row), moved out of intake_blind so INTAKE_CAP is not raised
 NAMES_CAP = 120
@@ -34,7 +39,8 @@ capped = [f for f in roles["plumbing"] if f not in VERBATIM]
 counts = {f: lines(f) for f in capped}
 tests = {f: lines(f) for f in roles["tests"] if f not in VERBATIM}
 maths = {f: lines(f) for f in roles["maths"]}
-intake = {f: lines(f) for f in roles["intake"]}
+core = {r: {f: lines(f) for f in roles[r]} for r in CORE}
+intake = {f: n for r in CORE for f, n in core[r].items()}   # every file of the split core
 names = {f: lines(f) for f in roles["intake_names"]}
 choices = {f: lines(f) for f in roles["intake_choices"]}
 feasible = {f: lines(f) for f in roles["intake_feasible"]}
@@ -45,7 +51,7 @@ for f, n in {**counts, **intake, **names, **choices, **tests, **maths}.items():
     print(f"  {f}: {n}")
 total = sum(counts.values())
 print(f"plumbing total {total} of {CAP}; tests (reported, not capped) {sum(tests.values())}; maths (reported, not capped) {sum(maths.values())}")
-print(f"intake total {sum(intake.values())} of {INTAKE_CAP}")
+print(f"intake core total {sum(intake.values())} of {CORE_CAP}: " + ", ".join(f"{r} {sum(core[r].values())} of {c}" for r, c in CORE.items()))
 print(f"intake_names total {sum(names.values())} of {NAMES_CAP}")
 print(f"intake_choices total {sum(choices.values())} of {CHOICES_CAP}")
 print(f"intake_feasible total {sum(feasible.values())} of {FEASIBLE_CAP}")
@@ -53,7 +59,10 @@ print(f"intake_handoff total {sum(handoff.values())} of {HANDOFF_CAP}")
 print(f"intake_terminal total {sum(terminal.values())} of {TERMINAL_CAP}")
 print(f"intake_new total {sum(new.values())} of {NEW_CAP}")
 assert not set(intake) & set(roles["plumbing"]), f"a file in both plumbing and intake: {sorted(set(intake) & set(roles['plumbing']))}"
-assert sum(intake.values()) <= INTAKE_CAP, f"intake line budget exceeded: {sum(intake.values())} > {INTAKE_CAP}; stop and report which files grew"
+assert sum(intake.values()) <= CORE_CAP, f"intake line budget exceeded: {sum(intake.values())} > {CORE_CAP}; stop and report which files grew"
+for r, c in CORE.items():
+    assert sum(core[r].values()) <= c, f"{r} line budget exceeded: {sum(core[r].values())} > {c}"
+    assert not set(core[r]) & {f for q in CORE if q != r for f in core[q]}, f"{r} shares a file with another role of the core"
 assert sum(names.values()) <= NAMES_CAP, f"intake_names line budget exceeded: {sum(names.values())} > {NAMES_CAP}"
 assert not set(names) & (set(intake) | set(roles["plumbing"])), "intake_names shares a file with another capped role"
 assert sum(choices.values()) <= CHOICES_CAP, f"intake_choices line budget exceeded: {sum(choices.values())} > {CHOICES_CAP}"

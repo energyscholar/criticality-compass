@@ -7,9 +7,9 @@ A Detail holds counts, words and curve names (plan 1160 P0), never a value."""
 from pathlib import Path
 
 import declare
-import intake_data
+import intake_census
 from intake_blind import Pass, Refuse, detail, gate
-from intake_data import Census, Feasibility, IntervalPlan, SecondLane
+from intake_evidence import Census, Feasibility, IntervalPlan, SecondLane
 
 ROOT = Path(__file__).resolve().parent.parent
 AT = "intake.toml [interval]"   # where CC's floor findings are located
@@ -82,7 +82,7 @@ def second(census, t):
     alt = [(f"projection {p['bias']}", ENDS[p["bias"]]) for p in d["projection"] if p["lane"] == "ALTERNATIVE"] + [
         (f"bridge {b['template']}", PAIRS[b["template"]]) for b in d["bridge"] if b["lane"] == "ALTERNATIVE"]
     files = census.pinned.files
-    cs = sorted(intake_data.CURVES[d["selection"]["layout"]](d, files, [intake_data.read(t, d, f) for f in files]), key=lambda c: c.slow)
+    cs = sorted(intake_census.CURVES[d["selection"]["layout"]](d, files, [intake_census.read(t, d, f) for f in files]), key=lambda c: c.slow)
     empty = [(what, f(cs)) for what, f in alt if f(cs)]
     return gate([(lambda: not empty, "SECOND_LANE_INFEASIBLE", lambda: detail(words=[empty[0][0]] + empty[0][1][:3], counts={"curves": len(empty[0][1])}))],
                 lambda: Pass(SecondLane(census, tuple(what for what, _ in alt), len({b["lane"] for b in d["bridge"]}))))

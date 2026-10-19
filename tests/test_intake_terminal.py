@@ -28,7 +28,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "tests")]
 import door  # noqa: E402
 import intake  # noqa: E402
-import intake_data  # noqa: E402
+import intake_evidence  # noqa: E402
 import intake_synth  # noqa: E402
 import intake_terminal as term  # noqa: E402
 from intake_plant import SHIFT, long_table, per_file, run, write_long  # noqa: E402
@@ -143,7 +143,7 @@ theirs = {True: lambda: json.loads(p.stdout), False: lambda: {"Z": None, "out": 
 check("T4. plan 1118's Z is POLICY's tier_z", theirs["Z"] == Z, str(theirs["Z"]))
 ours = []
 for cs in BANKS:
-    cv = [intake_data.Curve(f"c{k}", (c["x"],), tuple(zip(c["T"], c["C"], c["sigma"])), 1) for k, c in enumerate(cs)]
+    cv = [intake_evidence.Curve(f"c{k}", (c["x"],), tuple(zip(c["T"], c["C"], c["sigma"])), 1) for k, c in enumerate(cs)]
     xs = [door.nodefield(v, None) for v in term.values(cv, "MAX_MEASURED", "STATED", 0.0)]
     ours.append(term.reduce(xs, "MAX_MEASURED", Z, term.chain(len(cv))))
 SAME = {   # (1118's kind, ours' type) -> are they the same result; total over the pairs the two can produce

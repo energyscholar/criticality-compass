@@ -65,7 +65,7 @@ ORDER_CLASS = {   # (does a curve's fast sequence hold the declared row_order, d
 
 def sweeps(seqs, row_order, order):
     """(plan 1160 A7) S4 ROW_ORDER_DIFFERS's classification of the curves of the refused file, as COUNTS only (no value): how many hold the
-    declared row_order, how many the opposite one, how many neither. `order` is the row_order table (intake_data.ORDER); seqs are fast sequences."""
+    declared row_order, how many the opposite one, how many neither. `order` is the row_order table (intake_census.ORDER); seqs are fast sequences."""
     got = [ORDER_CLASS[(order[row_order](xs), order[OPPOSITE[row_order]](xs))] for xs in seqs]
     return {k: got.count(k) for k in dict.fromkeys(ORDER_CLASS.values())}
 

@@ -39,7 +39,8 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "tests")]
 import intake  # noqa: E402
 import intake_blind as blind  # noqa: E402
-import intake_data  # noqa: E402
+import intake_fold  # noqa: E402
+import intake_say  # noqa: E402
 import intake_feasible  # noqa: E402
 import readout  # noqa: E402
 import intake_read as rd  # noqa: E402
@@ -185,7 +186,7 @@ with tempfile.TemporaryDirectory() as tmp:
         d.mkdir(parents=True)
         (d / "intake.toml").write_text(text)
         b = intake.bodies(rooted(T, tmp), d, text, [])
-        return first(intake.fold(T["stages"]["stage"], {**b, "S6": lambda census: (edit(d, banks / "pf"), b["S6"](census))[1]}))
+        return first(intake_fold.fold(T["stages"]["stage"], {**b, "S6": lambda census: (edit(d, banks / "pf"), b["S6"](census))[1]}))
 
     def unlog(d, name):
         """(1160 P4) The access log without the loader lines of file `name`."""
@@ -334,10 +335,10 @@ with tempfile.TemporaryDirectory() as tmp:
         return run(T, tmp, ident, text_of(base))
     for what, blocks, lane in (("ARGMAX_FAST, block 3 cut after its maximum", cut, ARGMAX_LANE), ("PAIR_NEAREST_FAST on C, block 5's T moved", moved, PAIR_LANE)):
         out9 = folded(lane, blocks)
-        p9, r9 = intake.verdicts(T, out9)
+        p9, r9 = intake_fold.verdicts(T, out9)
         check(f"E2. (1160 A9) {what}: S9 refuses SECOND_LANE_INFEASIBLE, S10 still EXECUTES and passes, PRIMARY misses only confirmation, ROBUSTNESS_REFUSED at S9",
               outcome(out9, "S9")[0] == "SECOND_LANE_INFEASIBLE" and out9["S10"].mark is intake.Mark.PASSED and p9.missing == ("confirmation",)
-              and (r9.kind, r9.at) == (intake.Robustness.ROBUSTNESS_REFUSED, "S9"), str((out9["S10"].mark, p9, r9)))
+              and (r9.kind, r9.at) == (intake_fold.Robustness.ROBUSTNESS_REFUSED, "S9"), str((out9["S10"].mark, p9, r9)))
     words = lambda edit: " | ".join(getattr(getattr(folded(edit)["S1"], "result", None), "evidence", blind.detail()).words)
     check("E2. (1160 A9) OPERATION_NOT_PERMITTED names the link the step is permitted on: PAIR_NEAREST_FAST on C_max wants RAW (the measured name)",
           "PAIR_NEAREST_FAST on 'C_max' (DERIVED_OBSERVABLE; it is permitted on RAW (the measured name))" in words(CHOICE_PLANTS[7][2]), words(CHOICE_PLANTS[7][2]))
@@ -365,9 +366,9 @@ with tempfile.TemporaryDirectory() as tmp:
     check("E2. (1160 P5) the plant's run passes S7 with tiering STATED, S8 with CANDIDATE_BRACKET and the identifiability value, S9 with no ALTERNATIVE lane",
           (getattr(s7, "tiering", None), getattr(s8, "max_bracket", None), getattr(s8, "identifiability", None), getattr(s9, "lanes", None))
           == ("STATED", "CANDIDATE_BRACKET", intake_feasible.IDENTIFIABILITY, ()), str((s7, s8, s9))[:400])
-    lanes = {k: intake.verdicts(T, run(T, tmp, f"rl{k}", e(per_file(m, f"rl{k}"))))[1].kind for k, e in ((1, lambda t: t), (2, ARGMAX_LANE))}
+    lanes = {k: intake_fold.verdicts(T, run(T, tmp, f"rl{k}", e(per_file(m, f"rl{k}"))))[1].kind for k, e in ((1, lambda t: t), (2, ARGMAX_LANE))}
     check("E2. (1160 A5) ROBUSTNESS is NOT_EXAMINED on the one-lane plant's run and COMPLETE on its ARGMAX_FAST two-lane run",
-          lanes == {1: intake.Robustness.ROBUSTNESS_NOT_EXAMINED, 2: intake.Robustness.ROBUSTNESS_COMPLETE}, str(lanes))
+          lanes == {1: intake_fold.Robustness.ROBUSTNESS_NOT_EXAMINED, 2: intake_fold.Robustness.ROBUSTNESS_COMPLETE}, str(lanes))
     tiers = {meth: getattr(outcome(run(T, tmp, f"t{meth}", edit(per_file(m, f"t{meth}"))), "S7")[1], "tiering", None)
              for meth, edit in (("NONE", lambda t: t.replace('method = "STATED"', 'method = "NONE"', 1)),)}
     check("E2. (1160 P5) interval NONE passes S7 with tiering NONE", tiers == {"NONE": "NONE"}, str(tiers))
@@ -382,7 +383,7 @@ with tempfile.TemporaryDirectory() as tmp:
     doc = (ROOT / "docs" / "INTAKE.md").read_text()
     check("E4. docs/INTAKE.md (explain) lists every row that is not live, and marks it NOT LIVE in its stage table",
           (bool(dead) or "- none: every row is live (plan 1160 P6)" in doc) and all(x in doc for x in dead) and all(f"| {r['code']} | NOT LIVE |" in doc for _, _, r in ROWS if not r["live"]), str([x for x in dead if x not in doc][:3]))
-    rep = intake.report(rooted(T, tmp), "pf", run(T, tmp, "rep", per_file(m, "rep")), (intake_seal.Ordering.NO_DATA_READ_LOGGED, "planted"))
+    rep = intake_say.report(rooted(T, tmp), "pf", run(T, tmp, "rep", per_file(m, "rep")), (intake_seal.Ordering.NO_DATA_READ_LOGGED, "planted"))
     check("E4. a run's report lists every row that is not live", all(x in rep for x in dead), str([x for x in dead if x not in rep][:3]))
 
 print("test_intake_reach: " + ("FAILED " + "; ".join(bad) if bad else "all passed"))

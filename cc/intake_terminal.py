@@ -15,12 +15,12 @@ import numpy as np
 
 import admit
 import door
-import intake_data
+import intake_census
 import intake_seal
 import kernel
 import schema
 from intake_blind import Mark, Pass, Refuse, detail, gate
-from intake_data import Feasibility, IntervalPlan, KernelInput, Lineage
+from intake_evidence import Feasibility, IntervalPlan, KernelInput, Lineage
 
 ROUTE = {"CHAIN_SLOW": "chain", "PAIR_NEAREST_FAST": "pair-nearest-fast"}   # POLICY bridge -> its door template name; total (test). Only "chain" is in door.TEMPLATES
 VALUE = {"MAX_MEASURED": lambda c, i: c.rows[i][1], "ARGMAX_FAST": lambda c, i: c.rows[i][0]}   # POLICY projection -> (curve, its max row) -> r_k; total
@@ -164,7 +164,7 @@ def handoff(lineage, plan, feasibility, t):
     door.nodefield's Null on a non-finite r_k or sigma), in that order; else the KernelInput of every PRIMARY bridge."""
     census = lineage.census
     d, files = census.pinned.declaration.data, census.pinned.files
-    cs = sorted(intake_data.CURVES[d["selection"]["layout"]](d, files, [intake_data.read(t, d, f) for f in files]), key=lambda c: c.slow)
+    cs = sorted(intake_census.CURVES[d["selection"]["layout"]](d, files, [intake_census.read(t, d, f) for f in files]), key=lambda c: c.slow)
     primary = [b for b in d["bridge"] if b["lane"] == "PRIMARY"]
     unrouted = [b for b in primary if ROUTE[b["template"]] not in door.TEMPLATES]
     bias = lambda b: [p["bias"] for p in d["projection"] if p["lane"] == "PRIMARY" and p["to"] == b["on"]][0]   # CHAIN_SLOW takes a projection's `to` (S1)

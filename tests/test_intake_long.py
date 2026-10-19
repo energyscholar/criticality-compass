@@ -1,5 +1,5 @@
 """test_intake_long - plan 1145 phase 1: the layout LONG_TABLE, and the S4/S5 reasons plan 1139 left without a body (E8), on planted banks
-only. Each check was seen RED under a stated mutation (the plan-1145 report lists them). The stages run in-process (intake.fold over the
+only. Each check was seen RED under a stated mutation (the plan-1145 report lists them). The stages run in-process (intake_fold.fold over the
 stage table) on declarations written from the template, with a temporary ROOTS name for the planted bank; S0's transducer check is not run
 here (tests/test_intake_cli.py runs it on the command line).
  L1. The synthetic bank (seed 1, 9 curves) written as ONE file, the slow knob h a column, read with table-curve-v1 as a LONG_TABLE, gives the
@@ -33,6 +33,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "tests")]
 import intake  # noqa: E402
+import intake_fold  # noqa: E402
 import intake_synth  # noqa: E402
 from intake_plant import long_table, outcome, per_file, write_long  # noqa: E402
 import intake_plant  # noqa: E402

@@ -231,6 +231,6 @@ SWEEP = {   # [acquisition] row_order -> (the [acquisition] table) -> the direct
     "ASCENDING": lambda acq: "ASCENDING", "DESCENDING": lambda acq: "DESCENDING", "ACQUISITION": lambda acq: acq["direction"],
 }
 RESTARTS = {   # a direction a curve runs in -> (previous fast value, fast value) -> does a new sweep begin (the fast knob turns back); S1's tables
-    # (cc/intake_choices.py) and S5's (intake_data.BREAK) both read SWEEP and RESTARTS
+    # (cc/intake_choices.py) and S5's (intake_census.BREAK) both read SWEEP and RESTARTS
     "ASCENDING": lambda a, b: b < a, "DESCENDING": lambda a, b: b > a,   # UNORDERED has no row: S1 refuses BLOCK_RULE_HAS_NO_DIRECTION first
 }

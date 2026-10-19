@@ -26,7 +26,8 @@ import zipfile
 from dataclasses import dataclass, replace
 from pathlib import Path
 
-import intake_data
+import intake_bytes
+import intake_census
 import intake_read
 import schema
 from intake_blind import NUMBER, Name, Pass, Refuse, classify, detail, flag, gate, look, parse, shown
@@ -39,7 +40,7 @@ OUT_NAME = re.compile(r"\w[\w.-]*")
 
 def ctables():
     """intake/CONVERSION.toml of this code's own tree (as S3 reads it, and the manifest hashes it) and its sentences."""
-    ct = tomllib.loads((intake_data.ROOT / "intake" / "CONVERSION.toml").read_text())
+    ct = tomllib.loads((intake_bytes.ROOT / "intake" / "CONVERSION.toml").read_text())
     return {**ct, "sentences": {r["code"]: r["sentence"] for r in ct["reason"]}}
 
 
@@ -408,7 +409,7 @@ def _inside(base, rel):
 
 
 def _where(conv, t):
-    src, out = intake_data.located(conv["source"], t["roots"]), intake_data.located(conv["out"], t["roots"])
+    src, out = intake_bytes.located(conv["source"], t["roots"]), intake_bytes.located(conv["out"], t["roots"])
     return gate([(lambda: src != "" and Path(src).is_dir() and out != "", "ROOT_UNRESOLVED", lambda: detail(words=[f"source '{conv['source']}'", f"out '{conv['out']}'"]))],
                 lambda: (Path(src), Path(out)))
 
@@ -462,8 +463,8 @@ def _write(conv, out, raws, units, outputs, verified, listing):
     (out / MANIFEST).write_text(json.dumps({
         "schema": 1, "kind": "conversion-manifest", "source": conv["source"], "out": conv["out"], "files": conv["file"],
         "sources": [{"path": s, "sha256": _sha(raws[s]), "bytes": len(raws[s])} for s in srcs], "units": units, "outputs": [r for r, _ in outputs],
-        "code_hash": schema.code_hash(intake_data.ROOT), "converter_sha256": _sha(Path(__file__).read_bytes()),
-        "format_sha256": _sha((intake_data.ROOT / "intake" / "CONVERSION.toml").read_bytes()), "time": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}) + "\n")
+        "code_hash": schema.code_hash(intake_bytes.ROOT), "converter_sha256": _sha(Path(__file__).read_bytes()),
+        "format_sha256": _sha((intake_bytes.ROOT / "intake" / "CONVERSION.toml").read_bytes()), "time": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}) + "\n")
     return Pass(Converted(conv["out"], verified, tuple(listing)))
 
 
@@ -474,7 +475,7 @@ def convert(root, ident, t, ct):
     def go(conv):
         def placed(where):
             src, out = where
-            loader = intake_data._t23().Loader({str(src): "converted-from"}, d / "conversion-access.log")
+            loader = intake_bytes._t23().Loader({str(src): "converted-from"}, d / "conversion-access.log")
             def built(raws, b):
                 units, outputs, frames, listing = _records(conv, ct, raws, b)
                 return _bind(_named_ok(outputs), lambda o: _frames_ok(frames, lambda: _bind(verify(conv["file"], units, o, [f for f in frames]),
@@ -523,7 +524,7 @@ def verified(root, ident, t, ct):
     def go(conv):
         def placed(where):
             src, out = where
-            loader = intake_data._t23().Loader({str(src): "converted-from", str(out): "bank"}, d / "conversion-access.log")
+            loader = intake_bytes._t23().Loader({str(src): "converted-from", str(out): "bank"}, d / "conversion-access.log")
             m = _manifest_in(_reader(out, loader))
             return chained(m, _reader(src, loader), _reader(out, loader), ct, {"files": conv["file"], "source": conv["source"], "out": conv["out"]})
         return _bind(_where(conv, t), placed)
@@ -534,9 +535,9 @@ def s3(declaration, d, t, then):
     """S3 SOURCE_INTEGRITY for a CONVERTED source: the chain from converted_from to the bank (CONVERSION_CHAIN_BROKEN, every read through
     the logged loader into declarations/<id>/access.log), then then(loader) (the bank read exactly as a DEPOSIT, through the same loader: plan 1160 P4)."""
     src = declaration.data["source"]
-    bank, raw = intake_data.located(src["root"], t["roots"]), intake_data.located(src["converted_from"], t["roots"])
+    bank, raw = intake_bytes.located(src["root"], t["roots"]), intake_bytes.located(src["converted_from"], t["roots"])
     def go():
-        loader = intake_data._t23().Loader({raw: "converted-from", bank: "universe", str(Path(bank).parent): "outside-universe"}, Path(d) / "access.log")
+        loader = intake_bytes._t23().Loader({raw: "converted-from", bank: "universe", str(Path(bank).parent): "outside-universe"}, Path(d) / "access.log")
         m = _manifest_in(_reader(bank, loader))
         got = chained(m, _reader(raw, loader), _reader(bank, loader), ctables(), {"source": src["converted_from"], "out": src["root"]})
         broken = {True: lambda: got, False: lambda: Refuse("CONVERSION_CHAIN_BROKEN", got.evidence.within(got.evidence.file, got.reason))}
@@ -625,10 +626,10 @@ def peek_cli(root, ident, args, t):
     appended to declarations/<id>/peek.log (what was asked and how many lines were printed, never a line)."""
     d, ct = Path(root) / "declarations" / ident, ctables()
     rel, sheet, depth = {True: lambda: args[0], False: lambda: ""}[len(args) > 0](), flag(args, "--sheet", ""), flag(args, "--depth", "1")
-    base = intake_data.located(f"<cc-datasets>/{ident}/raw", t["roots"])
+    base = intake_bytes.located(f"<cc-datasets>/{ident}/raw", t["roots"])
     ok = rel != "" and not rel.startswith("--") and re.fullmatch(r"\d+", depth) is not None
     def go():
-        loader = intake_data._t23().Loader({base: "converted-from"}, d / "conversion-access.log")
+        loader = intake_bytes._t23().Loader({base: "converted-from"}, d / "conversion-access.log")
         raw = _reader(base, loader)(rel)
         got = {True: lambda: Refuse("SOURCE_FILE_ABSENT", detail(words=[f"'{rel}' under <cc-datasets>/{ident}/raw"])), False: lambda: _in(f"file '{rel}'", peek(raw, sheet, int(depth)))}[raw is None]()
         with open(d / "peek.log", "a") as f:

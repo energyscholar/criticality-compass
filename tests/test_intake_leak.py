@@ -22,7 +22,7 @@
      names line h + sentinel numeric names) peeked and converted by WIDE_TO_LONG. The copy's <cc-datasets> and <cc-banks> name <tmp>.
 Seen RED (each mutation applied by hand, the test run, the mutation reverted):
  - (1160 A13) intake_seal.ordering's conversion clause keyed always False: K4 "(1160 A13)" FAILS.
- - the fast-span summary reinstated in cc/intake_data.py Census.summary (`{x.fast} span [{lo:g}, {hi:g}]`): K3 FAILS on the two PASS runs;
+ - the fast-span summary reinstated in cc/intake_evidence.py Census.summary (`{x.fast} span [{lo:g}, {hi:g}]`): K3 FAILS on the two PASS runs;
  - _blocks' where reinstated as f"{f.name} block {i} ({g.columns[-1]} = {h:g})": K3 FAILS (the LONG_TABLE census section and CURVE_REPEATED);
  - _resolve's COLUMN_NAME_ABSENT detail printing the names line (f"... {names}"): K3 FAILS on the numeric-names plant;
  - Census.listing printing the slow value instead of the where: K4 and K3 FAIL;
@@ -62,6 +62,8 @@ import importlib.util  # noqa: E402
 
 import intake  # noqa: E402
 import intake_blind as blind  # noqa: E402
+import intake_fold  # noqa: E402
+import intake_say  # noqa: E402
 import intake_seal  # noqa: E402
 import intake_synth  # noqa: E402
 from intake_plant import ALL_ALTERNATIVE, PRIMARY_PAIR, SHIFT, BLOCK, BLOCK_NO_FLOOR, IID, PAIR_LANE, SAME_FAST, VALIDATED, CHOICE_PLANTS, conversion, long_table, per_file, slow_source, workbook, write_long, xlsx  # noqa: E402
@@ -180,8 +182,8 @@ with tempfile.TemporaryDirectory() as tmp:
         """(1160 P4) The run of an AtS6 step: intake.run's fold, with S6's body called after edit(bank dir, declaration dir)."""
         t, d = intake.tables(w), w / "declarations" / ident
         b = intake.bodies(t, d, (d / "intake.toml").read_text(), intake._findings(w, d, ident))
-        out = intake.fold(t["stages"]["stage"], {**b, "S6": lambda census: (edit(banks / bank, d), b["S6"](census))[1]})
-        text = intake.report(t, ident, out, intake_seal.ordering(d, t))
+        out = intake_fold.fold(t["stages"]["stage"], {**b, "S6": lambda census: (edit(banks / bank, d), b["S6"](census))[1]})
+        text = intake_say.report(t, ident, out, intake_seal.ordering(d, t))
         (d / "intake-report.md").write_text(text)
         return text
 

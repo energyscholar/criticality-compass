@@ -8,7 +8,15 @@ maths = [
 ]
 plumbing = ["bin/cc", "cc/admit.py", "cc/schema.py", "cc/declare.py", "cc/author.py", "cc/door.py", "cc/formats.py", "cc/detect.py", "cc/resources.py", "cc/view.py", "cc/score.py", "cc/reverdict.py", "cc/family.py", "cc/registry.py", "cc/transducer.py", "tests/reference/verdict_x.py", "tests/trace/sitecustomize.py", "docs/gen-verdicts.py",
   ".githooks/pre-commit"]
-intake = ["cc/intake.py", "cc/intake_blind.py", "cc/intake_seal.py", "cc/intake_data.py", "cc/intake_read.py", "docs/gen-intake.py"]   # plan 1136: the intake pipeline (plan 1145: its own role and line cap, tests/test_budget.py INTAKE_CAP; was in plumbing)
+intake = ["cc/intake.py"]   # plan 1164 (Layout C): the command-line surface, the only intake module that prints or exits (tests/test_budget.py INTAKE_CAP; the split core stays within CORE_CAP 1200)
+intake_fold = ["cc/intake_fold.py"]   # plan 1164: the run fold and the verdict tables, total and blind (FOLD_CAP)
+intake_evidence = ["cc/intake_evidence.py"]   # plan 1164: the evidence types of S3-S10, value-free and blind (EVIDENCE_CAP)
+intake_bytes = ["cc/intake_bytes.py"]   # plan 1164: S3 and S6, the only stage module that opens a data byte, through the t23 loader (BYTES_CAP)
+intake_census = ["cc/intake_census.py"]   # plan 1164: S4 and S5, reads bytes only from a Pinned (CENSUS_CAP)
+intake_say = ["cc/intake_say.py", "docs/gen-intake.py"]   # plan 1164: explain and the report, every sentence from STAGES.toml (SAY_CAP)
+intake_blind = ["cc/intake_blind.py"]   # plan 1164: S0 FORMAT and the shared values (BLIND_CAP)
+intake_seal = ["cc/intake_seal.py"]   # plan 1164: S2 SEAL (SEAL_CAP)
+intake_read = ["cc/intake_read.py"]   # plan 1164: the readers (READ_CAP)
 benchmark = []
 intake_handoff = ["cc/intake_convert.py"]   # plan 1160 P3: the conversion of a deposit into a canonical bank, and peek; its own cap (tests/test_budget.py HANDOFF_CAP), so INTAKE_CAP stays 1200
 intake_choices = ["cc/intake_choices.py"]   # plan 1160 P4: S1 CHOICES, every row (moved out of intake_blind with its own cap, tests/test_budget.py CHOICES_CAP), so INTAKE_CAP stays 1200
@@ -47,4 +55,4 @@ numpy = [
 
 [closure.measure]               # plan 0886: the measurement closure, declared. Membership is COMPUTED (schema.import_closure); only these two lists are data.
 entries = ["cc/detect.py", "cc/door.py"]        # + each input's instrument modules (seeded at measure time: schema.MEASURE_SEEDED)
-outside = ["cc/declare.py", "cc/author.py", "cc/view.py", "cc/score.py", "cc/family.py", "cc/transducer.py", "cc/fingerprint.py", "bin/cc", "cc/intake.py", "cc/intake_blind.py", "cc/intake_seal.py", "cc/intake_data.py", "cc/intake_read.py", "cc/intake_names.py", "cc/intake_choices.py", "cc/intake_feasible.py", "cc/intake_terminal.py", "cc/intake_synth.py", "cc/intake_convert.py", "cc/intake_new.py"]
+outside = ["cc/declare.py", "cc/author.py", "cc/view.py", "cc/score.py", "cc/family.py", "cc/transducer.py", "cc/fingerprint.py", "bin/cc", "cc/intake.py", "cc/intake_fold.py", "cc/intake_evidence.py", "cc/intake_bytes.py", "cc/intake_census.py", "cc/intake_say.py", "cc/intake_blind.py", "cc/intake_seal.py", "cc/intake_read.py", "cc/intake_names.py", "cc/intake_choices.py", "cc/intake_feasible.py", "cc/intake_terminal.py", "cc/intake_synth.py", "cc/intake_convert.py", "cc/intake_new.py"]

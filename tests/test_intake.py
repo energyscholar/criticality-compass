@@ -45,13 +45,16 @@ sys.path[:0] = [str(ROOT / "cc")]
 import intake  # noqa: E402
 import intake_blind as blind  # noqa: E402
 import intake_choices  # noqa: E402
-import intake_data  # noqa: E402
+import intake_bytes  # noqa: E402
+import intake_census  # noqa: E402
+import intake_evidence  # noqa: E402
+import intake_fold  # noqa: E402
 import intake_names  # noqa: E402
 import intake_seal  # noqa: E402
 
-# The stage-signature oracle (it was SIGNATURE/EVIDENCE/sig, production code only this test read): every data stage -> the
+# The stage-signature oracle (it was cc/intake_data.py's SIGNATURE/EVIDENCE/sig until plan 1164, production code only this test read): every data stage -> the
 # evidence of its needs, in needs order.
-D = intake_data
+D = intake_evidence
 
 
 def sig(**params):
@@ -98,15 +101,15 @@ check("1. (1160 A9) the ROBUSTNESS stage runs after every PRIMARY and HANDOFF st
       all(IDS.index(s["id"]) < IDS.index(next(r["id"] for r in ST if r["verdict"] == "ROBUSTNESS")) for s in ST if s["verdict"] in ("PRIMARY", "HANDOFF")), str(IDS))
 check("1. every need names an earlier stage", all(n in IDS[:IDS.index(s["id"])] for s in ST for n in s["needs"]), "")
 check("1. every stage that reads data bytes has S0 and never the seal stage in its transitive needs (amendment A3)",
-      all("S0" in intake.closure(T, s["id"]) and SEAL not in intake.closure(T, s["id"]) for s in ST if s["reads_bytes"] != "NONE"), "")
-check("1. the seal stage is ADVISORY and in no stage's transitive needs", [s["verdict"] for s in ST if s["id"] == SEAL] == ["ADVISORY"] and all(SEAL not in intake.closure(T, i) for i in IDS), "")
+      all("S0" in intake_fold.closure(T, s["id"]) and SEAL not in intake_fold.closure(T, s["id"]) for s in ST if s["reads_bytes"] != "NONE"), "")
+check("1. the seal stage is ADVISORY and in no stage's transitive needs", [s["verdict"] for s in ST if s["id"] == SEAL] == ["ADVISORY"] and all(SEAL not in intake_fold.closure(T, i) for i in IDS), "")
 READS = {s["id"] for s in ST if s["reads_bytes"] != "NONE"}
 check("1. SIGNATURE has a row for exactly the data stages (they read bytes, or a stage they need does)",
-      set(SIGNATURE) == {s["id"] for s in ST if s["id"] in READS or intake.closure(T, s["id"]) & READS}, str(sorted(SIGNATURE)))
+      set(SIGNATURE) == {s["id"] for s in ST if s["id"] in READS or intake_fold.closure(T, s["id"]) & READS}, str(sorted(SIGNATURE)))
 check("1. the seal status and ordering rows are exactly the atoms of SealStatus and Ordering",
       [r["code"] for s in ST if s["id"] == SEAL for r in s["status"]] == [x.name for x in intake_seal.SealStatus]
       and [r["code"] for r in T["stages"]["report"]["ordering"]] == [x.name for x in intake_seal.Ordering], "")
-check("1. reads_bytes and verdict hold atoms of ReadsBytes and Scope", all(s["reads_bytes"] in intake.ReadsBytes.__members__ and s["verdict"] in intake.Scope.__members__ for s in ST), "")
+check("1. reads_bytes and verdict hold atoms of ReadsBytes and Scope", all(s["reads_bytes"] in intake_fold.ReadsBytes.__members__ and s["verdict"] in intake_fold.Scope.__members__ for s in ST), "")
 check("1. one ROBUSTNESS stage and one HANDOFF stage", [s["verdict"] for s in ST].count("ROBUSTNESS") == 1 and [s["verdict"] for s in ST].count("HANDOFF") == 1, "")
 codes = [c for v in REASONS.values() for c in v]
 check("1. reason codes are unique across the table", len(codes) == len(set(codes)), str([c for c in codes if codes.count(c) > 1]))
@@ -142,18 +145,18 @@ check("1. every type word of FORMAT.toml is a key of intake_blind.TYPE", words(T
 F = T["format"]["fields"]
 KINDS = set(F["source"]["variants"])
 SLOWS = {lay: set(F["selection"]["variants"][lay]["slow"]["variants"]) for lay in F["selection"]["variants"]}
-check("1. (1160 P1) the [source] kinds are DEPOSIT and CONVERTED, and SOURCE (the S3 body per kind) is total over them", KINDS == {"DEPOSIT", "CONVERTED"} and set(intake_data.SOURCE) == KINDS, str(KINDS))
+check("1. (1160 P1) the [source] kinds are DEPOSIT and CONVERTED, and SOURCE (the S3 body per kind) is total over them", KINDS == {"DEPOSIT", "CONVERTED"} and set(intake_bytes.SOURCE) == KINDS, str(KINDS))
 check("1. (1160 P1) the PER_FILE slow sources are LISTED, FILE_KEY, NONE; SLOW and UNKEYED are total over them",
-      SLOWS["PER_FILE"] == {"LISTED", "FILE_KEY", "NONE"} and set(intake_data.SLOW) == set(intake_data.UNKEYED) == SLOWS["PER_FILE"], str(SLOWS))
+      SLOWS["PER_FILE"] == {"LISTED", "FILE_KEY", "NONE"} and set(intake_census.SLOW) == set(intake_census.UNKEYED) == SLOWS["PER_FILE"], str(SLOWS))
 check("1. (1160 P1) ONE_PER_FILE (S1) is total over every slow source of every layout", set(intake_choices.ONE_PER_FILE) == set().union(*SLOWS.values()), str(sorted(intake_choices.ONE_PER_FILE)))
-check("1. (1160 P1) KEYS and CURVES are total over the layouts", set(intake_data.KEYS) == set(intake_data.CURVES) == set(F["selection"]["variants"]), "")
+check("1. (1160 P1) KEYS and CURVES are total over the layouts", set(intake_census.KEYS) == set(intake_census.CURVES) == set(F["selection"]["variants"]), "")
 check("1. (1160 P1) [source] admissibility is RAW | DECLARABLE | FIGURE_LEVEL | PROCESSED_UNDECLARABLE in every kind",
       all(set(F["source"]["variants"][k]["admissibility"]["values"]) == {"RAW", "DECLARABLE", "FIGURE_LEVEL", "PROCESSED_UNDECLARABLE"} for k in KINDS), "")
 check("1. (1160 P1) converted_from is a field of the CONVERTED row only", ["converted_from" in F["source"]["variants"][k] for k in ("DEPOSIT", "CONVERTED")] == [False, True], "")
 check("1. (1160 P1) PATH_PATTERN, pattern and index are gone", "PATH_PATTERN" not in str(F) and not {"pattern", "index"} & set(F["selection"]["variants"]["PER_FILE"]), "")
 check("1. (1160 P1) PATH_NOT_ADMITTED is gone from STAGES.toml and the code; its three causes are three S3 rows, in ADMIT order",
-      "PATH_NOT_ADMITTED" not in codes and "PATH_NOT_ADMITTED" not in Path(intake_data.__file__).read_text()
-      and [c for c, _, _ in intake_data.ADMIT] == [c for c in REASONS["S3"] if c.startswith("PATH_")] == ["PATH_OUTSIDE_ROOT", "PATH_ON_TRUTH_SIDE", "PATH_NOT_A_FILE"], str(REASONS["S3"]))
+      "PATH_NOT_ADMITTED" not in codes and "PATH_NOT_ADMITTED" not in Path(intake_bytes.__file__).read_text()
+      and [c for c, _, _ in intake_bytes.ADMIT] == [c for c in REASONS["S3"] if c.startswith("PATH_")] == ["PATH_OUTSIDE_ROOT", "PATH_ON_TRUTH_SIDE", "PATH_NOT_A_FILE"], str(REASONS["S3"]))
 S1_ROWS = [r for s in ST if s["id"] == "S1" for r in s["reason"]]
 NOT_LIVE_S1 = []   # plan 1160 P5 (A3): SHIFT_BEFORE_KERNEL_INPUT is deleted, unreachable by construction (was: ["SHIFT_BEFORE_KERNEL_INPUT"], P4)
 CHOSEN = intake_choices.choices(blind.format_stage((EXAMPLE / "intake.toml").read_text(), [], T).evidence, T["policy"])
@@ -204,7 +207,7 @@ check("1. (1160 P4) PERMITTED is total over ({PROJECTION} | POLICY's bridges) x 
 BLOCKS = set(F["selection"]["variants"]["LONG_TABLE"]["block"]["values"])
 check("1. (1160 P2, A1) SELECTED (S1 SELECTION_EMPTY) is total over the layouts", set(intake_choices.SELECTED) == set(F["selection"]["variants"]), "")
 check("1. (1160 P2) the LONG_TABLE blocks are EXACT and FAST_RESTART; BREAK is total over them, DIRECTED over the layouts, SWEEP over row_order",
-      BLOCKS == {"EXACT", "FAST_RESTART"} and set(intake_data.BREAK) == BLOCKS and set(intake_choices.DIRECTED) == set(F["selection"]["variants"])
+      BLOCKS == {"EXACT", "FAST_RESTART"} and set(intake_census.BREAK) == BLOCKS and set(intake_choices.DIRECTED) == set(F["selection"]["variants"])
       and set(blind.SWEEP) == set(F["acquisition"]["fields"]["row_order"]["values"]), str(BLOCKS))
 HEADS = F["reader"]["variants"]["table-curve-v1"]["header"]["variants"]
 import intake_read  # noqa: E402
@@ -213,7 +216,7 @@ check("1. (1160 P2) the header kinds hold NAMES_UNITS_IN_NAMES; HEADER and NAMED
       and set(intake_names.UNIT_SYNTAX) == set(HEADS["NAMES_UNITS_IN_NAMES"]["unit_syntax"]["values"]), str(sorted(HEADS)))
 IDENT = set(F["replicate"]["fields"]["identity"]["values"])
 check("1. (1160 P2) the replicate identities hold SAME_FAST_VALUE; POINTS is total over them and REPLICATE over (layout, identity)",
-      "SAME_FAST_VALUE" in IDENT and set(intake_data.POINTS) == IDENT and set(intake_data.REPLICATE) == set(itertools.product(F["selection"]["variants"], IDENT)), str(sorted(IDENT)))
+      "SAME_FAST_VALUE" in IDENT and set(intake_census.POINTS) == IDENT and set(intake_census.REPLICATE) == set(itertools.product(F["selection"]["variants"], IDENT)), str(sorted(IDENT)))
 check("1. every admit source of FORMAT.toml is a source the tables provide", all(src in T["admit"] for spec in [T["format"]["fields"]["interval"]["method"]] for src in spec["admit"]), "")
 
 # ---- 2. the generated docs page
@@ -223,10 +226,10 @@ exp = subprocess.run([str(ROOT / "bin" / "cc"), "intake", "explain"], capture_ou
 check("2. bin/cc intake explain prints docs/INTAKE.md", exp.returncode == 0 and exp.stdout == (ROOT / "docs" / "INTAKE.md").read_text(), exp.stderr[-300:])
 
 # ---- 3. the verdict tables are total, every cell is reached or IMPOSSIBLE, and a stub never produces READY
-product = set(itertools.product(intake.Primary, blind.Mark))
-check("3. ROBUSTNESS and IMPOSSIBLE partition (PRIMARY x Mark)", set(intake.ROBUSTNESS) | set(intake.IMPOSSIBLE) == product and not set(intake.ROBUSTNESS) & set(intake.IMPOSSIBLE), "")
-check("3. PRIMARY is total over (R, U, C)", set(intake.PRIMARY) == set(itertools.product((False, True), repeat=3)), "")
-check("3. EXEC is total over (implemented, Upstream)", set(intake.EXEC) == set(itertools.product((False, True), intake.Upstream)), "")
+product = set(itertools.product(intake_fold.Primary, blind.Mark))
+check("3. ROBUSTNESS and IMPOSSIBLE partition (PRIMARY x Mark)", set(intake_fold.ROBUSTNESS) | set(intake_fold.IMPOSSIBLE) == product and not set(intake_fold.ROBUSTNESS) & set(intake_fold.IMPOSSIBLE), "")
+check("3. PRIMARY is total over (R, U, C)", set(intake_fold.PRIMARY) == set(itertools.product((False, True), repeat=3)), "")
+check("3. EXEC is total over (implemented, Upstream)", set(intake_fold.EXEC) == set(itertools.product((False, True), intake_fold.Upstream)), "")
 
 
 @dataclasses.dataclass(frozen=True)
@@ -254,24 +257,24 @@ for combo in itertools.product(*[list(a) for a in axes]):
     rows = [{**s, "implemented": pick.get(s["id"], "stub") != "stub"} for s in ST]
     bodies = {i: {**CHOICE, **SEAL_CHOICE, **ROB_CHOICE}[c] for i, c in pick.items() if c != "stub"}
     t = {**T, "stages": {**T["stages"], "stage": rows}}
-    out = intake.fold(rows, bodies)
-    p, r = intake.verdicts(t, out)
+    out = intake_fold.fold(rows, bodies)
+    p, r = intake_fold.verdicts(t, out)
     folds += 1
     marks = {out[i].mark for i in prim}
-    hit_p.add((blind.Mark.REFUSED in marks, len(intake._missing(prim, out)) > 0, out[SEAL].confirmed()))
+    hit_p.add((blind.Mark.REFUSED in marks, len(intake_fold._missing(prim, out)) > 0, out[SEAL].confirmed()))
     hit_r.add((p.kind, out[ROB].mark))
     hit_rv.add(r.kind)
-    refused_missing += [pick] * (p.kind is intake.Primary.PRIMARY_REFUSED_AT and p.missing != ())
-    stub_ready += [pick] * (p.kind is intake.Primary.PRIMARY_READY and any(not s["implemented"] for s in rows if s["id"] in prim))
-    body_on_stub += [pick] * any(isinstance(out[s["id"]], intake.Executed) for s in rows if not s["implemented"])
+    refused_missing += [pick] * (p.kind is intake_fold.Primary.PRIMARY_REFUSED_AT and p.missing != ())
+    stub_ready += [pick] * (p.kind is intake_fold.Primary.PRIMARY_READY and any(not s["implemented"] for s in rows if s["id"] in prim))
+    body_on_stub += [pick] * any(isinstance(out[s["id"]], intake_fold.Executed) for s in rows if not s["implemented"])
 print(f"  {folds} folds of the stage table enumerated")
 check("3. a stub never produces PRIMARY_READY (over every fold)", not stub_ready, str(stub_ready[:1]))
 check("3. a stage with no body is never EXECUTED (over every fold)", not body_on_stub, str(body_on_stub[:1]))
-check("3. every PRIMARY cell is reached", hit_p == set(intake.PRIMARY), str(set(intake.PRIMARY) - hit_p))
-check("3. the reached ROBUSTNESS cells are exactly the table's, and no IMPOSSIBLE cell is reached", hit_r == set(intake.ROBUSTNESS), str(hit_r ^ set(intake.ROBUSTNESS)))
+check("3. every PRIMARY cell is reached", hit_p == set(intake_fold.PRIMARY), str(set(intake_fold.PRIMARY) - hit_p))
+check("3. the reached ROBUSTNESS cells are exactly the table's, and no IMPOSSIBLE cell is reached", hit_r == set(intake_fold.ROBUSTNESS), str(hit_r ^ set(intake_fold.ROBUSTNESS)))
 check("3. (1160 P6, E9) a PRIMARY_REFUSED_AT verdict lists no Missing stage (over every fold)", not refused_missing, str(refused_missing[:1]))
-check("3. (1160 A5) every ROBUSTNESS verdict is reached, NOT_EXAMINED (one lane) and COMPLETE (two) among them", hit_rv == set(intake.Robustness), str(set(intake.Robustness) - hit_rv))
-check("3. (1160 A5) EXAMINED is total over FORMAT's lane counts (1 and 2: PRIMARY | ALTERNATIVE)", set(intake.EXAMINED) == set(range(1, 1 + len(FM["projection"]["fields"]["lane"]["values"]))), str(intake.EXAMINED))
+check("3. (1160 A5) every ROBUSTNESS verdict is reached, NOT_EXAMINED (one lane) and COMPLETE (two) among them", hit_rv == set(intake_fold.Robustness), str(set(intake_fold.Robustness) - hit_rv))
+check("3. (1160 A5) EXAMINED is total over FORMAT's lane counts (1 and 2: PRIMARY | ALTERNATIVE)", set(intake_fold.EXAMINED) == set(range(1, 1 + len(FM["projection"]["fields"]["lane"]["values"]))), str(intake_fold.EXAMINED))
 
 # ---- 4. the seal is advisory (plan 1139, A3): a status value, never a refusal; plan 1136's test 4 (Sealed-carrying signatures) is retired
 for sid, sig in SIGNATURE.items():
@@ -279,7 +282,7 @@ for sid, sig in SIGNATURE.items():
     need = [EVIDENCE[n] for n in next(s for s in ST if s["id"] == sid)["needs"]]
     check(f"4. {sid}'s signature takes the evidence of its needs and no seal", ann == need and not any("Seal" in a.__name__ for a in ann), f"{ann} against {need}")
 check("4. every registered data-stage body has its SIGNATURE row (1160 P5, P6: the S7-S9 and S10 bodies too)", all(inspect.signature(b) == SIGNATURE[k]
-      for k, b in {**intake_data.bodies(T, EXAMPLE), **intake_feasible.bodies(T, EXAMPLE), **intake_terminal.bodies(T, EXAMPLE)}.items()), "")
+      for k, b in {**intake_bytes.bodies(T, EXAMPLE), **intake_census.bodies(T, EXAMPLE), **intake_feasible.bodies(T, EXAMPLE), **intake_terminal.bodies(T, EXAMPLE)}.items()), "")
 with tempfile.TemporaryDirectory() as tmp:
     d = Path(tmp) / "decl"
     d.mkdir()
@@ -353,7 +356,7 @@ got = blind.format_stage(base, ["transducer.update[0]: planted"], T)
 check("5. (extra) a transducer finding: refused TRANSDUCER_FILE_REFUSED", isinstance(got, blind.Refuse) and got.reason == "TRANSDUCER_FILE_REFUSED", str(got)[:200])
 
 # ---- binding rule: enum names are Boolean formulas
-ENUMS = [intake.Execution, intake.Cause, intake.Upstream, intake.Primary, intake.Robustness, intake.ReadsBytes, intake.Scope, blind.Mark, intake_seal.SealStatus, intake_seal.Ordering]
+ENUMS = [intake_fold.Execution, intake_fold.Cause, intake_fold.Upstream, intake_fold.Primary, intake_fold.Robustness, intake_fold.ReadsBytes, intake_fold.Scope, blind.Mark, intake_seal.SealStatus, intake_seal.Ordering]
 
 
 def parse(name, atoms):
@@ -386,6 +389,41 @@ for mod, allowed in ALLOWED.items():
     check(f"blind: {Path(mod.__file__).name} imports only {', '.join(sorted(allowed))}", mods <= allowed, str(mods))
     calls = {n.func.id for n in ast.walk(tree) if isinstance(n, ast.Call) and isinstance(n.func, ast.Name)} & {"open", "exec", "eval", "compile", "__import__", "getattr", "globals"}
     check(f"blind: {Path(mod.__file__).name} calls no open, exec, eval, compile or __import__", not calls, str(calls))
+
+# ---- plan 1164: the core split by invariant (Layout C); each module is checked for the one thing it must never do. Seen RED: `import os`
+# added to cc/intake_fold.py (its imports check FAILS); `open("x")` added to cc/intake_say.py (its no-open check and the reader check FAIL);
+# `def _x(): return Path("x")` added to cc/intake_evidence.py (its no-Path check FAILS); `def _x(): print("x")` added to
+# cc/intake_census.py (the printer check FAILS); an empty cc/intake_data.py (the retired check FAILS).
+import intake_say  # noqa: E402
+FENCED = {intake_fold: {"enum", "dataclasses", "intake_blind"}, intake_evidence: {"enum", "dataclasses", "intake_blind"},
+          intake_say: {"intake_blind", "intake_fold"}}
+
+
+def called(tree):
+    """The names a module calls: f(...) and x.f(...)."""
+    return ({n.func.id for n in ast.walk(tree) if isinstance(n, ast.Call) and isinstance(n.func, ast.Name)}
+            | {n.func.attr for n in ast.walk(tree) if isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute)})
+
+
+for mod, allowed in FENCED.items():
+    tree = ast.parse(Path(mod.__file__).read_text())
+    mods = {a.name.split(".")[0] for n in ast.walk(tree) if isinstance(n, ast.Import) for a in n.names} | {(n.module or "").split(".")[0] for n in ast.walk(tree) if isinstance(n, ast.ImportFrom)}
+    check(f"split: {Path(mod.__file__).name} imports only {', '.join(sorted(allowed))}", mods <= allowed, str(mods))
+    check(f"split: {Path(mod.__file__).name} calls no open, read_bytes or read_text", not called(tree) & {"open", "read_bytes", "read_text"}, str(called(tree) & {"open", "read_bytes", "read_text"}))
+    named = {n.id for n in ast.walk(tree) if isinstance(n, ast.Name)} | {n.attr for n in ast.walk(tree) if isinstance(n, ast.Attribute)}
+    check(f"split: {Path(mod.__file__).name} names no Path (it constructs none)", "Path" not in named, "")
+INTAKE_MODULES = {f.stem: ast.parse(f.read_text()) for f in sorted((ROOT / "cc").glob("intake*.py"))}
+READS = {"intake_bytes", "intake_seal",   # the two modules of the split that may open a file (the data bytes through the t23 loader; the seal files)
+         "intake",   # declared exception: the tables and the declaration's text, never a data byte
+         "intake_new",   # declared exception: the two templates and the synth MANIFEST
+         "intake_convert", "intake_terminal", "intake_synth"}   # outside the split: the conversion, RESULT.json's code hash, the planted bank
+readers = {m for m, tr in INTAKE_MODULES.items() if called(tr) & {"open", "read_bytes", "read_text"}}
+check("split: open, read_bytes and read_text are called only in intake_bytes, intake_seal and the declared exceptions", readers <= READS, str(sorted(readers - READS)))
+PRINTS = {"intake",   # the only module of the split that prints or exits
+          "intake_convert", "intake_synth"}   # outside the split: they print already (convert and peek; the planted bank)
+printers = {m for m, tr in INTAKE_MODULES.items() if called(tr) & {"print", "exit"}}
+check("split: print and sys.exit are called only in intake.py and the declared modules outside the split", printers <= PRINTS, str(sorted(printers - PRINTS)))
+check("split: cc/intake_data.py is retired (its parts are intake_evidence, intake_bytes and intake_census)", "intake_data" not in INTAKE_MODULES, "")
 
 # ---- the copied loader is the toolset's, byte for byte (amendment A2 Q1)
 pin = tomllib.loads((ROOT / "vendor" / "toolset" / "PIN.toml").read_text())

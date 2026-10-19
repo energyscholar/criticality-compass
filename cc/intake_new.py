@@ -1,5 +1,6 @@
 """intake_new - `bin/cc new intake <id> [--from-synth <sid>]`. Invariant: it never overwrites; it writes only declarations/<id>/, from the
-two committed templates (and, with --from-synth, the synth MANIFEST's metadata); a refusal is a usage line with a Next."""
+two committed templates (and, with --from-synth, the synth MANIFEST's metadata); it prints nothing: `new` returns (exit code, text) and
+bin/cc prints it; a refusal is a usage line with a Next."""
 import json
 import re
 import tomllib
@@ -24,9 +25,8 @@ def _write_new(root, d, ident, values, dropped, trans):
     (d / "intake.toml").write_text(fill((Path(root) / "intake" / "TEMPLATE.intake.toml.in").read_text().replace("<ID>", ident), values, dropped))
     (d / "transducer.toml").write_text(trans)
     todo = [f"  declarations/{ident}/{n}:{i}: {ln}" for n in ("intake.toml", "transducer.toml") for i, ln in enumerate((d / n).read_text().splitlines(), 1) if '"TODO"' in ln]
-    print(f"wrote declarations/{ident}/intake.toml and transducer.toml; {len(todo)} TODO lines remain (yours to choose):\n" + "\n".join(todo)
-          + f"\n  Next: replace each TODO (docs/INTAKE-QUICKSTART.md shows a filled example), then bin/cc intake lint {ident}")
-    return 0
+    return 0, (f"wrote declarations/{ident}/intake.toml and transducer.toml; {len(todo)} TODO lines remain (yours to choose):\n" + "\n".join(todo)
+               + f"\n  Next: replace each TODO (docs/INTAKE-QUICKSTART.md shows a filled example), then bin/cc intake lint {ident}")
 
 
 def _from_synth(root, d, ident, sid, synth):
@@ -36,12 +36,12 @@ def _from_synth(root, d, ident, sid, synth):
 
 def new(root, ident, sid):
     """bin/cc new intake <id> [--from-synth <sid>]: declarations/<id>/ from the committed templates; with --from-synth, the synth MANIFEST's
-    metadata filled in (intake_synth.declare) and every choice left TODO."""
+    metadata filled in (intake_synth.declare) and every choice left TODO. (exit code, the text bin/cc prints)."""
     d, synth = Path(root) / "declarations" / ident, Path(root) / tomllib.loads((Path(root) / "intake" / "ROOTS.toml").read_text())["root"]["<intake-synth>"] / sid / "MANIFEST.json"
     blank = lambda: _write_new(root, d, ident, {}, frozenset(), (Path(root) / "inputs" / "TEMPLATE.transducer.toml.in").read_text().replace("<ID>", ident))
     filled = lambda: _from_synth(root, d, ident, sid, synth)
     usage = [u for ok, u in ((re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]*", ident) is not None, f"an id (letters, digits, _ . -), not '{ident}'"),
                              (not d.exists(), f"declarations/{ident} exists; a declaration is never overwritten (choose another id)"),
                              (sid == "" or synth.is_file(), f"no synthetic bank '{sid}' (run bin/cc intake synth {sid} --seed N first)")) if not ok]
-    return {True: lambda: print(f"bin/cc new intake: refused, {'; '.join(usage)}\n  Next: bin/cc new intake <id> [--from-synth <synth-id>]") or 1,
+    return {True: lambda: (1, f"bin/cc new intake: refused, {'; '.join(usage)}\n  Next: bin/cc new intake <id> [--from-synth <synth-id>]"),
             False: {True: blank, False: filled}[sid == ""]}[len(usage) > 0]()

@@ -6,6 +6,7 @@ import zipfile
 from pathlib import Path
 
 import intake
+import intake_fold
 import intake_new
 import intake_synth
 
@@ -165,7 +166,7 @@ def run(T, tmp, ident, text, findings=()):
     d = Path(tmp) / "declarations" / ident
     d.mkdir(parents=True, exist_ok=True)
     (d / "intake.toml").write_text(text)
-    return intake.fold(T["stages"]["stage"], intake.bodies(rooted(T, tmp), d, text, list(findings)))
+    return intake_fold.fold(T["stages"]["stage"], intake.bodies(rooted(T, tmp), d, text, list(findings)))
 
 
 def rooted(T, tmp):

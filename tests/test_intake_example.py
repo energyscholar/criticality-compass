@@ -13,6 +13,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path[:0] = [str(ROOT / "cc")]
 import intake  # noqa: E402
+import intake_fold  # noqa: E402
+import intake_say  # noqa: E402
 
 bad = []
 
@@ -26,16 +28,16 @@ def check(name, ok, why=""):
 ID = "dial1118-s1-v3"
 D = ROOT / "declarations" / ID
 t, d, out = intake._go(ROOT, ID, lambda t: t["stages"]["stage"])
-p, r = intake.verdicts(t, out)
+p, r = intake_fold.verdicts(t, out)
 check("6. S0 FORMAT passes (needs the toolset through CC_DATA_ROOT for the transducer pin)", out["S0"].mark is intake.Mark.PASSED, out["S0"].text(t)[:400])
 check("6. S2 SEAL passes SEALED: the committed SEAL.json and seal.log hold the declaration's sha (plan 1139: the seal is advisory)", out["S2"].mark is intake.Mark.PASSED and out["S2"].result.evidence.status.name == "SEALED", out["S2"].text(t)[:300])
 # plan 1139: S3 is LIVE; the bank '<p1118-bank>' is not a name of intake/ROOTS.toml on this machine, so S3 refuses ROOT_UNRESOLVED (its
 # reader npz-curve-v1 is not live either: S4 would refuse READER_NOT_LIVE) and every stage that needs it is withheld.
 check("6. S3 refuses ROOT_UNRESOLVED", out["S3"].mark is intake.Mark.REFUSED and out["S3"].result.reason == "ROOT_UNRESOLVED", out["S3"].text(t)[:300])
-check("6. PRIMARY_REFUSED_AT S3", p.kind is intake.Primary.PRIMARY_REFUSED_AT and p.at == "S3", f"{p}")
-check("6. ROBUSTNESS_WITHHELD", r.kind is intake.Robustness.ROBUSTNESS_WITHHELD, f"{r}")
-check("6. S10 KERNEL_HANDOFF is withheld after S3's refusal", isinstance(out["S10"], intake.Withheld) and out["S10"].stage == "S3", str(out["S10"]))
-text = intake.report(t, ID, out, intake.intake_seal.ordering(D, t))
+check("6. PRIMARY_REFUSED_AT S3", p.kind is intake_fold.Primary.PRIMARY_REFUSED_AT and p.at == "S3", f"{p}")
+check("6. ROBUSTNESS_WITHHELD", r.kind is intake_fold.Robustness.ROBUSTNESS_WITHHELD, f"{r}")
+check("6. S10 KERNEL_HANDOFF is withheld after S3's refusal", isinstance(out["S10"], intake_fold.Withheld) and out["S10"].stage == "S3", str(out["S10"]))
+text = intake_say.report(t, ID, out, intake.intake_seal.ordering(D, t))
 check("6. the committed intake-report.md is the report of a run now, byte for byte", text == (D / "intake-report.md").read_text(), "")
 stubs = [f"- **{s['id']} {s['name']}** (STUB): STUB. " for s in t["stages"]["stage"] if not s["implemented"]]
 # plan 1160 P1: S1 has a body now (was: the one stub no refusal withholds), so every stub is withheld after S3's refusal; plan 1160 P4: S6
