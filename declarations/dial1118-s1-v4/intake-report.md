@@ -3,11 +3,11 @@
 Written by `bin/cc intake run dial1118-s1-v4`. Stage table 1160-v9, policy 1136-v1.
 
 - **Mode** (the declarer's sealed statement of what they had seen): EXPLORATORY
-- **PRIMARY verdict: PRIMARY_REFUSED_AT** at S3. Missing: none.
+- **PRIMARY verdict: PRIMARY_REFUSED_AT** at S4. Missing: none.
 - **ROBUSTNESS verdict: ROBUSTNESS_WITHHELD**. Missing: none.
 - **S10 KERNEL_HANDOFF** (the terminal; it counts toward PRIMARY): WITHHELD.
 - **Seal status** (advisory; sealing is recommended and not enforced): SEALED. A seal holds this declaration exactly as it is now. Sealed at 2026-10-19T21:49:44Z (seal-log t_ns 1792446584342638366) by Claude (plan 1160 E4) (AI_DRAFT), confirmed_by '', mode EXPLORATORY; declaration sha256 2bc4eac3dbf791fe7cca38f6dfa759b6288d159015b435bb59540676ed24d7b7; universe '<p1118-bank>' (located at a directory named 'p1118-bank-FIXTURE'): 63 files, names and sizes in SEAL.json
-- **Ordering** (information, never a refusal): NO_DATA_READ_LOGGED. The access log holds no data read of this declaration.
+- **Ordering** (information, never a refusal): READS_FOLLOW_SEAL. Every logged data read of this declaration came after its seal.
 
 | stage | name | state | reads data bytes | execution |
 |---|---|---|---|---|
@@ -15,7 +15,7 @@ Written by `bin/cc intake run dial1118-s1-v4`. Stage table 1160-v9, policy 1136-
 | S1 | CHOICES | LIVE | NONE | EXECUTED |
 | S2 | SEAL | LIVE | NONE | EXECUTED |
 | S3 | SOURCE_INTEGRITY | LIVE | ALL_FILES | EXECUTED |
-| S4 | SHAPE | LIVE | FIRST_FILE | WITHHELD |
+| S4 | SHAPE | LIVE | FIRST_FILE | EXECUTED |
 | S5 | CENSUS | LIVE | ALL_FILES | WITHHELD |
 | S6 | ADMISSIBILITY | LIVE | NONE | WITHHELD |
 | S7 | INTERVAL_FEASIBILITY | LIVE | NONE | WITHHELD |
@@ -26,14 +26,14 @@ Written by `bin/cc intake run dial1118-s1-v4`. Stage table 1160-v9, policy 1136-
 - **S0 FORMAT** (LIVE): EXECUTED, PASS. The declaration 'dial1118-s1-v4' parses, and every field of format v4 is present, typed and listed (mode EXPLORATORY)
 - **S1 CHOICES** (LIVE): EXECUTED, PASS. Checked: KNOBS_SAME_QUANTITY, MEASURED_IS_A_KNOB, SELECTION_EMPTY, SLOW_VALUES_NOT_ONE_PER_FILE, SLOW_NONE_HAS_NO_PATH, BLOCK_RULE_HAS_NO_DIRECTION, PROJECTION_REQUIRED, PROJECTION_ESTIMAND_MIXED, SECOND_LANE_MISSING, LANES_IDENTICAL, REPLICATE_IS_SWEEP_NEIGHBOUR, MEASURED_KNOB_HAS_NO_POINTS, OPERATION_NOT_PERMITTED, PROVENANCE_HAS_NO_KERNEL_ROUTE, METHOD_NEEDS_UNCERTAINTY_COLUMN. The S1 rows that are not live are listed under the reasons no body can return yet
 - **S2 SEAL** (LIVE): EXECUTED, PASS. SEALED. A seal holds this declaration exactly as it is now. Sealed at 2026-10-19T21:49:44Z (seal-log t_ns 1792446584342638366) by Claude (plan 1160 E4) (AI_DRAFT), confirmed_by '', mode EXPLORATORY; declaration sha256 2bc4eac3dbf791fe7cca38f6dfa759b6288d159015b435bb59540676ed24d7b7; universe '<p1118-bank>' (located at a directory named 'p1118-bank-FIXTURE'): 63 files, names and sizes in SEAL.json
-- **S3 SOURCE_INTEGRITY** (LIVE): EXECUTED, REFUSE ROOT_UNRESOLVED. The declared source root is not a name of intake/ROOTS.toml followed by a relative path, or it names no directory on this machine. Detail: root '<p1118-bank>' (names in intake/ROOTS.toml: ['<cc-banks>', '<cc-datasets>', '<intake-synth>'])
-- **S4 SHAPE** (LIVE): WITHHELD AFTER_REFUSAL (S3). Not run: an earlier stage refused, and no later check can redeem a refusal.
-- **S5 CENSUS** (LIVE): WITHHELD AFTER_REFUSAL (S3). Not run: an earlier stage refused, and no later check can redeem a refusal.
-- **S6 ADMISSIBILITY** (LIVE): WITHHELD AFTER_REFUSAL (S3). Not run: an earlier stage refused, and no later check can redeem a refusal.
-- **S7 INTERVAL_FEASIBILITY** (LIVE): WITHHELD AFTER_REFUSAL (S3). Not run: an earlier stage refused, and no later check can redeem a refusal.
-- **S8 RESOLUTION_AND_IDENTIFIABILITY** (LIVE): WITHHELD AFTER_REFUSAL (S3). Not run: an earlier stage refused, and no later check can redeem a refusal.
-- **S10 KERNEL_HANDOFF** (LIVE): WITHHELD AFTER_REFUSAL (S3). Not run: an earlier stage refused, and no later check can redeem a refusal.
-- **S9 ALTERNATIVE_INTAKE** (LIVE): WITHHELD AFTER_REFUSAL (S3). Not run: an earlier stage refused, and no later check can redeem a refusal.
+- **S3 SOURCE_INTEGRITY** (LIVE): EXECUTED, PASS. 61 files admitted, read once each through the logged loader (declarations/dial1118-s1-v4/access.log) and each sha256 equal to its pin at the first logged read
+- **S4 SHAPE** (LIVE): EXECUTED, REFUSE READER_NOT_LIVE. The declared reader has no body in the Compass yet (csv-curve-v1 and table-curve-v1 are live); the file cannot be read. Detail: reader 'npz-curve-v1'
+- **S5 CENSUS** (LIVE): WITHHELD AFTER_REFUSAL (S4). Not run: an earlier stage refused, and no later check can redeem a refusal.
+- **S6 ADMISSIBILITY** (LIVE): WITHHELD AFTER_REFUSAL (S4). Not run: an earlier stage refused, and no later check can redeem a refusal.
+- **S7 INTERVAL_FEASIBILITY** (LIVE): WITHHELD AFTER_REFUSAL (S4). Not run: an earlier stage refused, and no later check can redeem a refusal.
+- **S8 RESOLUTION_AND_IDENTIFIABILITY** (LIVE): WITHHELD AFTER_REFUSAL (S4). Not run: an earlier stage refused, and no later check can redeem a refusal.
+- **S10 KERNEL_HANDOFF** (LIVE): WITHHELD AFTER_REFUSAL (S4). Not run: an earlier stage refused, and no later check can redeem a refusal.
+- **S9 ALTERNATIVE_INTAKE** (LIVE): WITHHELD AFTER_REFUSAL (S4). Not run: an earlier stage refused, and no later check can redeem a refusal.
 
 ## What the seal proves
 

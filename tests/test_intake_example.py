@@ -6,8 +6,12 @@ S4, S5, S6, S7, S8, confirmation] (the seal is an unconfirmed AI draft), ROBUSTN
 S0 runs the CC transducer check, whose update pin is looked up in the toolset's git history at the data root's parent (cc/transducer.py), so
 this test needs CC_DATA_ROOT (or --data-root) to name the toolset's data/ directory, like test_transducer; without it S0 refuses
 TRANSDUCER_FILE_REFUSED and this test says so. It reads no data file: the fixture's files are empty and every data stage is a STUB."""
+import json
+import os
+import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -27,17 +31,27 @@ def check(name, ok, why=""):
 
 ID = "dial1118-s1-v4"   # plan 1160 A17 (was dial1118-s1-v3, format v3: history)
 D = ROOT / "declarations" / ID
-t, d, out = intake._go(ROOT, ID, lambda t: t["stages"]["stage"])
+# (1160 A40: was intake._go(ROOT, ID, ...) on D itself) the root '<p1118-bank>' is a name of intake/ROOTS.toml now, so S3 reads the fixture's
+# files and appends to the declaration's access.log: the run is made on a copy of D in a temporary directory, so the test writes nothing
+# under declarations/.
+TMP = tempfile.TemporaryDirectory()
+C = Path(TMP.name) / ID
+shutil.copytree(D, C)
+t = intake.tables(ROOT)
+out = intake.fold(t["stages"]["stage"], intake.bodies(t, C, intake.declared(C), intake._findings(ROOT, D, ID)))
 p, r = intake_fold.verdicts(t, out)
 check("6. S0 FORMAT passes (needs the toolset through CC_DATA_ROOT for the transducer pin)", out["S0"].mark is intake.Mark.PASSED, out["S0"].text(t)[:400])
 check("6. S2 SEAL passes SEALED: the committed SEAL.json and seal.log hold the declaration's sha (plan 1139: the seal is advisory)", out["S2"].mark is intake.Mark.PASSED and out["S2"].result.evidence.status.name == "SEALED", out["S2"].text(t)[:300])
-# plan 1139: S3 is LIVE; the bank '<p1118-bank>' is not a name of intake/ROOTS.toml on this machine, so S3 refuses ROOT_UNRESOLVED (its
-# reader npz-curve-v1 is not live either: S4 would refuse READER_NOT_LIVE) and every stage that needs it is withheld.
-check("6. S3 refuses ROOT_UNRESOLVED", out["S3"].mark is intake.Mark.REFUSED and out["S3"].result.reason == "ROOT_UNRESOLVED", out["S3"].text(t)[:300])
-check("6. PRIMARY_REFUSED_AT S3", p.kind is intake_fold.Primary.PRIMARY_REFUSED_AT and p.at == "S3", f"{p}")
+# plan 1160 A40 (was: S3 refuses ROOT_UNRESOLVED, PRIMARY_REFUSED_AT S3, S10 withheld after S3): the bank '<p1118-bank>' is a name of
+# intake/ROOTS.toml (the committed fixture), so S3 admits the 61 empty files and S4 refuses READER_NOT_LIVE (npz-curve-v1 is not live);
+# every stage that needs it is withheld.
+check("6. (1160 A40) S3 passes on the fixture (61 files, each 0 bytes)", out["S3"].mark is intake.Mark.PASSED and len(out["S3"].result.evidence.files) == 61
+      and all(f.data == b"" for f in out["S3"].result.evidence.files), out["S3"].text(t)[:300])
+check("6. (1160 A40) S4 refuses READER_NOT_LIVE", out["S4"].mark is intake.Mark.REFUSED and out["S4"].result.reason == "READER_NOT_LIVE", out["S4"].text(t)[:300])
+check("6. PRIMARY_REFUSED_AT S4 (1160 A40: was S3)", p.kind is intake_fold.Primary.PRIMARY_REFUSED_AT and p.at == "S4", f"{p}")
 check("6. ROBUSTNESS_WITHHELD", r.kind is intake_fold.Robustness.ROBUSTNESS_WITHHELD, f"{r}")
-check("6. S10 KERNEL_HANDOFF is withheld after S3's refusal", isinstance(out["S10"], intake_fold.Withheld) and out["S10"].stage == "S3", str(out["S10"]))
-text = intake_say.report(t, ID, out, intake.intake_seal.ordering(D, t))
+check("6. S10 KERNEL_HANDOFF is withheld after S4's refusal (1160 A40: was S3's)", isinstance(out["S10"], intake_fold.Withheld) and out["S10"].stage == "S4", str(out["S10"]))
+text = intake_say.report(t, ID, out, intake.intake_seal.ordering(C, t))
 check("6. the committed intake-report.md is the report of a run now, byte for byte", text == (D / "intake-report.md").read_text(), "")
 stubs = [f"- **{s['id']} {s['name']}** (STUB): STUB. " for s in t["stages"]["stage"] if not s["implemented"]]
 # plan 1160 P1: S1 has a body now (was: the one stub no refusal withholds), so every stub is withheld after S3's refusal; plan 1160 P4: S6
@@ -53,6 +67,21 @@ check("6. bin/cc intake lint passes S0 and S1 (plan 1160 P1: was S1 STUB)", cli.
 again = subprocess.run([str(ROOT / "bin" / "cc"), "intake", "seal", ID, "--author", "x", "--as", "human", "--unconfirmed"],   # plan 1160 A20: no --universe (was the fixture)
                        capture_output=True, text=True)
 check("6. sealing it again is refused ALREADY_SEALED and writes nothing", again.returncode == 1 and "ALREADY_SEALED" in again.stdout, again.stdout[-300:])
+# plan 1160 A40: the example is reproducible with the CLI alone. A fresh copy of the tool and the example (bin, cc, intake, the top-level files, the fixture,
+# the declaration without its SEAL.json and seal.log) is sealed by that copy's bin/cc: the seal passes, and lists the universe the committed seal lists.
+with tempfile.TemporaryDirectory() as fresh:
+    F = Path(fresh)
+    for part in ("bin", "cc", "intake", "tests/planted/intake/p1118-bank-FIXTURE"):
+        shutil.copytree(ROOT / part, F / part, ignore=shutil.ignore_patterns("__pycache__"))
+    [shutil.copyfile(q, F / q.name) for q in ROOT.iterdir() if q.is_file()]   # cc.toml, checks.toml and the other top-level files
+    (F / "declarations" / ID).mkdir(parents=True)
+    for n in intake.intake_seal.FILES:
+        shutil.copyfile(D / n, F / "declarations" / ID / n)
+    sealed = subprocess.run([str(F / "bin" / "cc"), "intake", "seal", ID, "--author", "x", "--as", "ai-draft", "--unconfirmed"], capture_output=True, text=True,
+                            env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"})
+    listing = lambda q: json.loads((q / "SEAL.json").read_text())["universe"]["listing"] if (q / "SEAL.json").is_file() else None
+    check("6. (1160 A40) bin/cc intake seal on a fresh copy passes, and its universe listing is the committed seal's",
+          sealed.returncode == 0 and listing(F / "declarations" / ID) == listing(D) and listing(D), sealed.stdout[-400:] + sealed.stderr[-400:])
 usage = subprocess.run([str(ROOT / "bin" / "cc"), "intake", "fold"], capture_output=True, text=True)
 check("6. an unknown subcommand is a usage refusal with a Next line", usage.returncode == 1 and "Next: bin/cc intake explain" in usage.stdout, usage.stdout)
 print("test_intake_example: " + ("FAILED " + "; ".join(bad) if bad else "all passed"))
