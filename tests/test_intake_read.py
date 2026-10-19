@@ -10,15 +10,14 @@ stated mutation (the plan-1145 report lists them).
  R4. Every reason an Unreadable can carry is a reader_reason row of S4 in intake/STAGES.toml, and every reader is a FORMAT [reader] row."""
 import ast
 import importlib.util
-import io
 import sys
-import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path[:0] = [str(ROOT / "cc")]
+sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "tests")]
 import intake  # noqa: E402
 import intake_read as rd  # noqa: E402
+from intake_plant import xlsx  # noqa: E402
 
 bad = []
 
@@ -51,34 +50,6 @@ def aligned():
     """The planted table as a .dat file: columns padded to width 10, a leading indent, a tab in one line (runs of white space of any length)."""
     lines = [NAMES, UNITS] + [[f"{x:g}" for x in r] for r in ROWS]
     return ("# a planted table (plan 1145)\n" + "".join("  " + "".join(c.ljust(10) for c in ln).rstrip() + "\n" for ln in lines).replace("  2.25", "\t2.25")).encode()
-
-
-def xlsx(rows, sheet="data"):
-    """A minimal xlsx workbook (inline strings, numbers as numbers), written with zipfile only: the planted xlsx file."""
-    def cell(i, j, v):
-        ref = f"{'ABCDEFGH'[j]}{i}"
-        return {True: f'<c r="{ref}" t="inlineStr"><is><t>{v}</t></is></c>', False: f'<c r="{ref}"><v>{v!r}</v></c>'}[isinstance(v, str)]
-    data = "".join(f'<row r="{i}">' + "".join(cell(i, j, v) for j, v in enumerate(r)) + "</row>" for i, r in enumerate(rows, 1))
-    parts = {
-        "[Content_Types].xml": '<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
-                               '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/>'
-                               '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>'
-                               '<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>',
-        "_rels/.rels": '<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
-                       '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>',
-        "xl/workbook.xml": '<?xml version="1.0" encoding="UTF-8"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" '
-                           'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>'
-                           f'<sheet name="{sheet}" sheetId="1" r:id="rId1"/></sheets></workbook>',
-        "xl/_rels/workbook.xml.rels": '<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
-                                      '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/></Relationships>',
-        "xl/worksheets/sheet1.xml": '<?xml version="1.0" encoding="UTF-8"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
-                                    f'<sheetData>{data}</sheetData></worksheet>',
-    }
-    buf = io.BytesIO()
-    with zipfile.ZipFile(buf, "w") as z:
-        for n, s in parts.items():
-            z.writestr(n, s)
-    return buf.getvalue()
 
 
 NU = {"kind": "NAMES_UNITS", "rows": 2, "names": 1, "units": 2}

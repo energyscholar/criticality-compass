@@ -218,6 +218,17 @@ def state(s):
     return {True: "LIVE", False: "STUB"}[s["implemented"]]
 
 
+LIVE = {True: "live", False: "NOT LIVE"}
+
+
+def not_live(t):
+    """The reason rows no body can return yet (live = false in intake/STAGES.toml, plan-1139 E8), as a Markdown section that explain and every
+    report carry: a refusal named there cannot be seen today, so its absence from a report says nothing."""
+    rows = [f"- {s['id']} {r['code']}" for s in t["stages"]["stage"] for k in ("reason", "reader_reason") for r in blind.look(s, k, []) if not r["live"]]
+    return ["## Reasons no body can return yet", "", "Each row below has live = false in intake/STAGES.toml: no body returns it today (a STUB stage's rows "
+            "are never live), so a run cannot show it and its absence says nothing.", ""] + rows + [""]
+
+
 def explain(t):
     """The stage table as Markdown: `bin/cc intake explain` prints it and docs/INTAKE.md is it, byte for byte (docs/gen-intake.py)."""
     st, po = t["stages"], t["policy"]
@@ -237,13 +248,15 @@ def explain(t):
            f"**The seal.** {st['report']['seal_claim']}", "", "| id | name | state | reads data bytes | needs | verdict |", "|---|---|---|---|---|---|"]
     out += [f"| {s['id']} | {s['name']} | {state(s)} | {s['reads_bytes']} | {', '.join(s['needs']) or '-'} | {s['verdict']} |" for s in st["stage"]]
     for s in st["stage"]:
-        out += ["", f"## {s['id']} {s['name']} ({state(s)})", "", s["purpose"], "", "| reason | what it means |", "|---|---|"]
-        out += [f"| {r['code']} | {r['sentence']} |" for r in s["reason"]]
+        out += ["", f"## {s['id']} {s['name']} ({state(s)})", "", s["purpose"], "", "| reason | live | what it means |", "|---|---|---|"]
+        out += [f"| {r['code']} | {LIVE[r['live']]} | {r['sentence']} |" for r in s["reason"]]
+        out += {True: lambda: ["", "| reader reason (READER_REFUSED) | live | what it means |", "|---|---|---|"] + [f"| {r['code']} | {LIVE[r['live']]} | {r['sentence']} |" for r in s["reader_reason"]],
+                False: lambda: []}["reader_reason" in s]()
         out += {True: lambda: ["", "| seal status | what it means |", "|---|---|"] + [f"| {r['code']} | {r['sentence']} |" for r in s["status"]], False: lambda: []}["status" in s]()
     out += ["", f"## Policy ({po['status']}, {po['version']})", "", po["evidence_note"], ""]
     for link in ("projection", "bridge"):
         out += [f"- {link} **{k}**: " + "; ".join(f"{f} = {v}" for f, v in row.items()) for k, row in po[link].items()]
-    out += [f"- policy: " + "; ".join(f"{k} = {v}" for k, v in po["policy"].items()), "",
+    out += [f"- policy: " + "; ".join(f"{k} = {v}" for k, v in po["policy"].items()), ""] + not_live(t) + [
             "## What no stage can see", ""] + [f"- {u}" for u in st["report"]["unenforced"]]
     return "\n".join(out) + "\n"
 
@@ -275,7 +288,7 @@ def report(t, ident, out, note):
              "| stage | name | state | reads data bytes | execution |", "|---|---|---|---|---|"]
     lines += [f"| {s['id']} | {s['name']} | {state(s)} | {s['reads_bytes']} | {out[s['id']].atom.name} |" for s in t["stages"]["stage"]]
     lines += [""] + [f"- **{s['id']} {s['name']}** ({state(s)}): {out[s['id']].text(t)}" for s in t["stages"]["stage"]]
-    lines += ["", "## What the seal proves", "", t["stages"]["report"]["seal_claim"], "",
+    lines += ["", "## What the seal proves", "", t["stages"]["report"]["seal_claim"], ""] + not_live(t) + [
               "## What no stage can see", ""] + [f"- {u}" for u in t["stages"]["report"]["unenforced"]]
     return "\n".join(lines) + "\n"
 

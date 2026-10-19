@@ -2,6 +2,8 @@
 # explain`, docs/INTAKE.md and the tests are generated from or checked against this file; no stage, reason or sentence exists anywhere else.
 # Fields: reads_bytes NONE | FIRST_FILE | ALL_FILES (the data bytes the stage reads); needs = the stages whose PASS evidence is its argument;
 # implemented = a body is registered for this id (LIVE) or not (STUB; a STUB is never a pass); verdict PRIMARY | ROBUSTNESS | HANDOFF | ADVISORY.
+# Each reason row (and each S4 reader_reason row) carries live = true when a body can return it, false when none can yet (plan-1139 E8, plan 1145):
+# a row of a STUB stage is never live, and tests/test_intake_reach.py plants a case that reaches every live row on this machine.
 # The seal stage is ADVISORY (plan 1136 amendment A3): it never refuses, it is in no stage's needs, and its outcome is a seal status VALUE
 # (its `status` rows) that every report carries. Every stage that reads data bytes has S0 FORMAT (the parsed declaration) in its transitive
 # needs, and never the seal stage (test 1).
@@ -38,20 +40,20 @@ needs = []
 implemented = true
 verdict = "PRIMARY"
 reason = [
-  { code = "TOML_INVALID",            sentence = "The declaration is not valid TOML; fix the syntax at the line shown." },
-  { code = "SCHEMA_UNSUPPORTED",      sentence = "The file does not say schema = 2 and kind = \"intake\"; this tool reads intake format v2 only (a v1 declaration is history: restate it in v2 under a new id)." },
-  { code = "FIELD_MISSING",           sentence = "A required field is absent; every field of format v2 must be written, even when its honest value is a refusal value such as NONE_FITS." },
-  { code = "FIELD_UNKNOWN",           sentence = "A field the format does not define is present; check its spelling against bin/cc intake explain." },
-  { code = "FIELD_TYPE_WRONG",        sentence = "A field holds the wrong kind of value (for example text where a list is required)." },
-  { code = "VALUE_NOT_LISTED",        sentence = "A closed-list field holds a value its list does not name; use one of the listed values." },
-  { code = "VALUE_STILL_TODO",        sentence = "A field still holds the template's TODO; declare it, or write the field's refusal value if nothing honest fits." },
-  { code = "BIAS_KEY_UNDECLARED",     sentence = "A bias key is not a row of intake/POLICY.toml for this projection or bridge; free text is never a bias." },
-  { code = "FIELD_IS_STAMPED",        sentence = "A field the seal writes (a time, a hash, the author, the source universe listing, the sampling label) is typed in the declaration; delete it, the seal stamps it." },
-  { code = "FIELD_IS_DERIVED",        sentence = "A field that is derived from another (correlated, from acquisition.mode) is typed; delete it." },
-  { code = "STEP_IS_INTERPOLATION",   sentence = "A projection or bridge forms a value between measured points; interpolation is not admissible in any form." },
-  { code = "BRIDGE_NONE_FITS",        sentence = "The declaration says no bridge fits these data; this is an honest answer, and such an intake cannot be sealed." },
-  { code = "BASIS_NOT_METADATA",      sentence = "The declaration lists a source read before sealing that is not metadata (data values, a figure, or analysis code); the choice was made after seeing values." },
-  { code = "TRANSDUCER_FILE_REFUSED", sentence = "The declaration's transducer.toml is refused by the CC transducer check; its findings are listed with their Next lines." },
+  { code = "TOML_INVALID",            live = true,  sentence = "The declaration is not valid TOML; fix the syntax at the line shown." },
+  { code = "SCHEMA_UNSUPPORTED",      live = true,  sentence = "The file does not say schema = 2 and kind = \"intake\"; this tool reads intake format v2 only (a v1 declaration is history: restate it in v2 under a new id)." },
+  { code = "FIELD_MISSING",           live = true,  sentence = "A required field is absent; every field of format v2 must be written, even when its honest value is a refusal value such as NONE_FITS." },
+  { code = "FIELD_UNKNOWN",           live = true,  sentence = "A field the format does not define is present; check its spelling against bin/cc intake explain." },
+  { code = "FIELD_TYPE_WRONG",        live = true,  sentence = "A field holds the wrong kind of value (for example text where a list is required)." },
+  { code = "VALUE_NOT_LISTED",        live = true,  sentence = "A closed-list field holds a value its list does not name; use one of the listed values." },
+  { code = "VALUE_STILL_TODO",        live = true,  sentence = "A field still holds the template's TODO; declare it, or write the field's refusal value if nothing honest fits." },
+  { code = "BIAS_KEY_UNDECLARED",     live = true,  sentence = "A bias key is not a row of intake/POLICY.toml for this projection or bridge; free text is never a bias." },
+  { code = "FIELD_IS_STAMPED",        live = true,  sentence = "A field the seal writes (a time, a hash, the author, the source universe listing, the sampling label) is typed in the declaration; delete it, the seal stamps it." },
+  { code = "FIELD_IS_DERIVED",        live = true,  sentence = "A field that is derived from another (correlated, from acquisition.mode) is typed; delete it." },
+  { code = "STEP_IS_INTERPOLATION",   live = true,  sentence = "A projection or bridge forms a value between measured points; interpolation is not admissible in any form." },
+  { code = "BRIDGE_NONE_FITS",        live = true,  sentence = "The declaration says no bridge fits these data; this is an honest answer, and such an intake cannot be sealed." },
+  { code = "BASIS_NOT_METADATA",      live = true,  sentence = "The declaration lists a source read before sealing that is not metadata (data values, a figure, or analysis code); the choice was made after seeing values." },
+  { code = "TRANSDUCER_FILE_REFUSED", live = true,  sentence = "The declaration's transducer.toml is refused by the CC transducer check; its findings are listed with their Next lines." },
 ]
 
 [[stage]]
@@ -63,18 +65,18 @@ needs = ["S0"]
 implemented = false
 verdict = "PRIMARY"
 reason = [
-  { code = "KNOBS_SAME_QUANTITY",            sentence = "The slow and fast knob name the same quantity or column; the Compass needs two distinct knobs." },
-  { code = "MEASURED_IS_A_KNOB",             sentence = "The measured number is one of the knobs." },
-  { code = "SLOW_VALUES_NOT_ONE_PER_FILE",   sentence = "Slow-knob values are declared per file, but the list does not give exactly one value per selected file." },
-  { code = "PROJECTION_REQUIRED",            sentence = "The raw observation is not one number per locus (a picture, positions, a series), and no projection to one number is declared before the bridge." },
-  { code = "PROJECTION_ESTIMAND_MIXED",      sentence = "One projection names two estimands (for example a location and a height); declare one projection per estimand." },
-  { code = "SECOND_LANE_MISSING",            sentence = "The source is real data and only one intake lane is declared; real data are taken in through two declared lanes (policy, intake/POLICY.toml)." },
-  { code = "LANES_IDENTICAL",                sentence = "The two declared lanes use the same projection and bridge; the alternative must differ." },
-  { code = "REPLICATE_IS_SWEEP_NEIGHBOUR",   sentence = "Replicates are declared as adjacent points of one sweep; a replicate is a repeated preparation, never a neighbouring point." },
-  { code = "OPERATION_NOT_PERMITTED",        sentence = "A declared step is not a permitted operation for its link of the chain (Raw, Projection, DerivedObservable, Bridge, KernelInput)." },
-  { code = "SHIFT_BEFORE_KERNEL_INPUT",      sentence = "A constant shift x + c is declared upstream of the kernel input; x + c applies only at the KernelInput boundary." },
-  { code = "PROVENANCE_HAS_NO_KERNEL_ROUTE", sentence = "The deposit's admissibility record (raw-admissibility.toml) gives the component carrying the measured number no kernel route." },
-  { code = "MODE_CONTRADICTS_SOURCE",        sentence = "The declared mode is PROSPECTIVE, but the selected files already exist, or the source is a published set whose figures have been seen." },
+  { code = "KNOBS_SAME_QUANTITY",            live = false, sentence = "The slow and fast knob name the same quantity or column; the Compass needs two distinct knobs." },
+  { code = "MEASURED_IS_A_KNOB",             live = false, sentence = "The measured number is one of the knobs." },
+  { code = "SLOW_VALUES_NOT_ONE_PER_FILE",   live = false, sentence = "Slow-knob values are declared per file, but the list does not give exactly one value per selected file." },
+  { code = "PROJECTION_REQUIRED",            live = false, sentence = "The raw observation is not one number per locus (a picture, positions, a series), and no projection to one number is declared before the bridge." },
+  { code = "PROJECTION_ESTIMAND_MIXED",      live = false, sentence = "One projection names two estimands (for example a location and a height); declare one projection per estimand." },
+  { code = "SECOND_LANE_MISSING",            live = false, sentence = "The source is real data and only one intake lane is declared; real data are taken in through two declared lanes (policy, intake/POLICY.toml)." },
+  { code = "LANES_IDENTICAL",                live = false, sentence = "The two declared lanes use the same projection and bridge; the alternative must differ." },
+  { code = "REPLICATE_IS_SWEEP_NEIGHBOUR",   live = false, sentence = "Replicates are declared as adjacent points of one sweep; a replicate is a repeated preparation, never a neighbouring point." },
+  { code = "OPERATION_NOT_PERMITTED",        live = false, sentence = "A declared step is not a permitted operation for its link of the chain (Raw, Projection, DerivedObservable, Bridge, KernelInput)." },
+  { code = "SHIFT_BEFORE_KERNEL_INPUT",      live = false, sentence = "A constant shift x + c is declared upstream of the kernel input; x + c applies only at the KernelInput boundary." },
+  { code = "PROVENANCE_HAS_NO_KERNEL_ROUTE", live = false, sentence = "The deposit's admissibility record (raw-admissibility.toml) gives the component carrying the measured number no kernel route." },
+  { code = "MODE_CONTRADICTS_SOURCE",        live = false, sentence = "The declared mode is PROSPECTIVE, but the selected files already exist, or the source is a published set whose figures have been seen." },
 ]
 
 [[stage]]
@@ -91,9 +93,9 @@ status = [   # the seal status a run reports (intake_seal.SealStatus); never a r
   { code = "SEALED_THEN_EDITED", sentence = "This declaration was sealed and has been edited since; the seal records an earlier text. Declare a new id to seal the new text." },
 ]
 reason = [   # refusals of `bin/cc intake seal` (the seal command); a run's S2 never refuses
-  { code = "ALREADY_SEALED",             sentence = "This declaration is already sealed; a seal is never replaced, so declare a new id." },
-  { code = "UNIVERSE_ROOT_ABSENT",       sentence = "The declared source universe root was not given or is not a directory on this machine; give its location with --universe." },
-  { code = "SELECTION_OUTSIDE_UNIVERSE", sentence = "A selected file is not in the source universe listing." },
+  { code = "ALREADY_SEALED",             live = true,  sentence = "This declaration is already sealed; a seal is never replaced, so declare a new id." },
+  { code = "UNIVERSE_ROOT_ABSENT",       live = true,  sentence = "The declared source universe root was not given or is not a directory on this machine; give its location with --universe." },
+  { code = "SELECTION_OUTSIDE_UNIVERSE", live = true,  sentence = "A selected file is not in the source universe listing." },
 ]
 
 [[stage]]
@@ -105,10 +107,10 @@ needs = ["S0"]
 implemented = true
 verdict = "PRIMARY"
 reason = [
-  { code = "ROOT_UNRESOLVED",   sentence = "The declared source root is not a name of intake/ROOTS.toml followed by a relative path, or it names no directory on this machine." },
-  { code = "PATH_NOT_ADMITTED", sentence = "The loader's admission refused this path before reading it (truth side of the deposit, the slow-knob source does not resolve, or the file is absent)." },
-  { code = "PIN_MISMATCH",      sentence = "The file's bytes do not match their pinned sha256; the data changed since they were pinned." },
-  { code = "UNIVERSE_CHANGED",  sentence = "The source universe now lists files that differ from the sealed listing (added, removed, or resized)." },
+  { code = "ROOT_UNRESOLVED",   live = true,  sentence = "The declared source root is not a name of intake/ROOTS.toml followed by a relative path, or it names no directory on this machine." },
+  { code = "PATH_NOT_ADMITTED", live = true,  sentence = "The loader's admission refused this path before reading it (truth side of the deposit, the slow-knob source does not resolve, or the file is absent)." },
+  { code = "PIN_MISMATCH",      live = true,  sentence = "The file's bytes do not match their pinned sha256; the data changed since they were pinned." },
+  { code = "UNIVERSE_CHANGED",  live = true,  sentence = "The source universe now lists files that differ from the sealed listing (added, removed, or resized)." },
 ]
 
 [[stage]]
@@ -120,24 +122,24 @@ needs = ["S3"]
 implemented = true
 verdict = "PRIMARY"
 reason = [
-  { code = "READER_NOT_LIVE",   sentence = "The declared reader has no body in the Compass yet (csv-curve-v1 and table-curve-v1 are live); the file cannot be read." },
-  { code = "READER_REFUSED",    sentence = "The declared reader refused the file; its own reason is shown." },
-  { code = "COLUMNS_DIFFER",    sentence = "The file's columns or keys differ from the declared ones (count, names or order; the declared columns are fast, measured, the uncertainty column if declared, and the slow column of a long table)." },
-  { code = "UNIT_DIFFERS",      sentence = "The file states a unit that differs from the declared unit." },
-  { code = "ROW_ORDER_DIFFERS", sentence = "The rows of a curve are not stored in the declared order of the fast knob." },
+  { code = "READER_NOT_LIVE",   live = true,  sentence = "The declared reader has no body in the Compass yet (csv-curve-v1 and table-curve-v1 are live); the file cannot be read." },
+  { code = "READER_REFUSED",    live = true,  sentence = "The declared reader refused the file; its own reason is shown." },
+  { code = "COLUMNS_DIFFER",    live = true,  sentence = "The file's columns or keys differ from the declared ones (count, names or order; the declared columns are fast, measured, the uncertainty column if declared, and the slow column of a long table)." },
+  { code = "UNIT_DIFFERS",      live = true,  sentence = "The file states a unit that differs from the declared unit." },
+  { code = "ROW_ORDER_DIFFERS", live = true,  sentence = "The rows of a curve are not stored in the declared order of the fast knob." },
 ]
 reader_reason = [   # plan 1145: the reasons a live reader gives for a file it cannot read (cc/intake_read.py Unreadable); S4 shows one as READER_REFUSED
-  { code = "NOT_UTF8",                     sentence = "A text file's bytes are not UTF-8." },
-  { code = "HEADER_LINE_ABSENT",           sentence = "The file holds fewer header lines than declared, or the declared names or units line is not among them." },
-  { code = "NO_DATA_ROW",                  sentence = "After the header the file holds no data row." },
-  { code = "ROW_WIDTH_DIFFERS",            sentence = "A data row holds another number of cells than the names line (or the first data row); its row is shown." },
-  { code = "COLUMN_NAME_ABSENT",           sentence = "A column declared by name is not in the names line (or the header declares no names line)." },
-  { code = "COLUMN_NAME_AMBIGUOUS",        sentence = "A column declared by name names two or more columns of the names line." },
-  { code = "COLUMN_POSITION_OUT_OF_RANGE", sentence = "A column declared by 1-based position is not a column of the table." },
-  { code = "CELL_NOT_A_NUMBER",            sentence = "A cell of a declared column is not a number as written (an empty cell, nan and text are not numbers); its row and column are shown." },
-  { code = "XLSX_READER_ABSENT",           sentence = "The file is declared xlsx and openpyxl is not installed on this machine, so it cannot be read here." },
-  { code = "NOT_AN_XLSX",                  sentence = "The file is declared xlsx and its bytes are not a workbook openpyxl can open." },
-  { code = "SHEET_ABSENT",                 sentence = "The declared sheet is not a sheet of the workbook." },
+  { code = "NOT_UTF8",                     live = true,  sentence = "A text file's bytes are not UTF-8." },
+  { code = "HEADER_LINE_ABSENT",           live = true,  sentence = "The file holds fewer header lines than declared, or the declared names or units line is not among them." },
+  { code = "NO_DATA_ROW",                  live = true,  sentence = "After the header the file holds no data row." },
+  { code = "ROW_WIDTH_DIFFERS",            live = true,  sentence = "A data row holds another number of cells than the names line (or the first data row); its row is shown." },
+  { code = "COLUMN_NAME_ABSENT",           live = true,  sentence = "A column declared by name is not in the names line (or the header declares no names line)." },
+  { code = "COLUMN_NAME_AMBIGUOUS",        live = true,  sentence = "A column declared by name names two or more columns of the names line." },
+  { code = "COLUMN_POSITION_OUT_OF_RANGE", live = true,  sentence = "A column declared by 1-based position is not a column of the table." },
+  { code = "CELL_NOT_A_NUMBER",            live = true,  sentence = "A cell of a declared column is not a number as written (an empty cell, nan and text are not numbers); its row and column are shown." },
+  { code = "XLSX_READER_ABSENT",           live = true,  sentence = "The file is declared xlsx and openpyxl is not installed on this machine, so it cannot be read here." },
+  { code = "NOT_AN_XLSX",                  live = true,  sentence = "The file is declared xlsx and its bytes are not a workbook openpyxl can open." },
+  { code = "SHEET_ABSENT",                 live = true,  sentence = "The declared sheet is not a sheet of the workbook." },
 ]
 
 [[stage]]
@@ -149,11 +151,11 @@ needs = ["S3", "S4"]
 implemented = true
 verdict = "PRIMARY"
 reason = [
-  { code = "FILE_DIFFERS_FROM_FIRST",   sentence = "A selected file's shape, columns or keys differ from the first file's." },
-  { code = "CURVE_REPEATED",            sentence = "Two curves carry the same slow-knob value (two files; or, in a long table, two blocks that are not adjacent) and are not declared replicates." },
-  { code = "FAST_VALUE_REPEATED",       sentence = "A curve holds two points at the same fast-knob value and they are not declared replicates." },
-  { code = "REPLICATE_KEY_UNRESOLVED",  sentence = "The declared replicate identity cannot be read for a file or point." },
-  { code = "ACQUISITION_ORDER_DIFFERS", sentence = "A curve stored in acquisition order (row_order ACQUISITION) does not run in the declared direction along the fast knob." },
+  { code = "FILE_DIFFERS_FROM_FIRST",   live = true,  sentence = "A selected file's shape, columns or keys differ from the first file's." },
+  { code = "CURVE_REPEATED",            live = true,  sentence = "Two curves carry the same slow-knob value (two files; or, in a long table, two blocks that are not adjacent) and are not declared replicates." },
+  { code = "FAST_VALUE_REPEATED",       live = true,  sentence = "A curve holds two points at the same fast-knob value and they are not declared replicates." },
+  { code = "REPLICATE_KEY_UNRESOLVED",  live = true,  sentence = "The declared replicate identity cannot be read for a file or point." },
+  { code = "ACQUISITION_ORDER_DIFFERS", live = true,  sentence = "A curve stored in acquisition order (row_order ACQUISITION) does not run in the declared direction along the fast knob." },
 ]
 
 [[stage]]
@@ -165,9 +167,9 @@ needs = ["S5"]
 implemented = false
 verdict = "PRIMARY"
 reason = [
-  { code = "READ_NOT_LOGGED",    sentence = "A record exists whose bytes have no loader line in the access log." },
-  { code = "BYPASS_READ_LOGGED", sentence = "The access log holds an in-process read of a data path that did not go through the loader." },
-  { code = "LINEAGE_OFF_GRAPH",  sentence = "A value's lineage includes a step that the sealed operation graph does not declare." },
+  { code = "READ_NOT_LOGGED",    live = false, sentence = "A record exists whose bytes have no loader line in the access log." },
+  { code = "BYPASS_READ_LOGGED", live = false, sentence = "The access log holds an in-process read of a data path that did not go through the loader." },
+  { code = "LINEAGE_OFF_GRAPH",  live = false, sentence = "A value's lineage includes a step that the sealed operation graph does not declare." },
 ]
 
 [[stage]]
@@ -179,9 +181,9 @@ needs = ["S5"]
 implemented = false
 verdict = "PRIMARY"
 reason = [
-  { code = "ONE_READING_PER_POINT", sentence = "Each point holds one reading (a continuous ramp); there is nothing to put an interval on." },
-  { code = "BELOW_METHOD_FLOOR",    sentence = "Some point holds fewer samples than the declared interval method's floor requires; the Next line names the routes." },
-  { code = "METHOD_HAS_NO_FLOOR",   sentence = "The declared interval method has no floor in CC yet; an interval method without a floor is not admitted." },
+  { code = "ONE_READING_PER_POINT", live = false, sentence = "Each point holds one reading (a continuous ramp); there is nothing to put an interval on." },
+  { code = "BELOW_METHOD_FLOOR",    live = false, sentence = "Some point holds fewer samples than the declared interval method's floor requires; the Next line names the routes." },
+  { code = "METHOD_HAS_NO_FLOOR",   live = false, sentence = "The declared interval method has no floor in CC yet; an interval method without a floor is not admitted." },
 ]
 
 [[stage]]
@@ -193,9 +195,9 @@ needs = ["S5"]
 implemented = false
 verdict = "PRIMARY"
 reason = [
-  { code = "TOO_FEW_CURVES",          sentence = "Fewer than three slow-knob values: no interior node exists, so no bracket can be formed." },
-  { code = "TOO_FEW_POINTS_IN_CURVE", sentence = "A curve holds fewer than three fast-knob points: no interior maximum can be formed on it." },
-  { code = "NO_COVERAGE_EVIDENCE",    sentence = "The declaration requires a validated bracket ([bracket] required = \"VALIDATED_BRACKET\"), and no frozen planted coverage evidence exists for this lane at this density." },
+  { code = "TOO_FEW_CURVES",          live = false, sentence = "Fewer than three slow-knob values: no interior node exists, so no bracket can be formed." },
+  { code = "TOO_FEW_POINTS_IN_CURVE", live = false, sentence = "A curve holds fewer than three fast-knob points: no interior maximum can be formed on it." },
+  { code = "NO_COVERAGE_EVIDENCE",    live = false, sentence = "The declaration requires a validated bracket ([bracket] required = \"VALIDATED_BRACKET\"), and no frozen planted coverage evidence exists for this lane at this density." },
 ]
 
 [[stage]]
@@ -207,7 +209,7 @@ needs = ["S5"]
 implemented = false
 verdict = "ROBUSTNESS"
 reason = [
-  { code = "SECOND_LANE_INFEASIBLE", sentence = "The census does not support the second lane (for example a pairing finds no neighbouring point)." },
+  { code = "SECOND_LANE_INFEASIBLE", live = false, sentence = "The census does not support the second lane (for example a pairing finds no neighbouring point)." },
 ]
 
 [[stage]]
@@ -219,6 +221,6 @@ needs = ["S6", "S7", "S8"]
 implemented = false
 verdict = "HANDOFF"
 reason = [
-  { code = "NO_KERNEL_ROUTE", sentence = "A column's provenance class and evidence have no kernel route." },
-  { code = "DOOR_REFUSED",    sentence = "The door refused the declared relations or values (cycle, endpoint, missing provenance, a non-finite value)." },
+  { code = "NO_KERNEL_ROUTE", live = false, sentence = "A column's provenance class and evidence have no kernel route." },
+  { code = "DOOR_REFUSED",    live = false, sentence = "The door refused the declared relations or values (cycle, endpoint, missing provenance, a non-finite value)." },
 ]

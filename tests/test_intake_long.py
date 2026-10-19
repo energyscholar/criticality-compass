@@ -12,15 +12,16 @@ here (tests/test_intake_cli.py runs it on the command line).
  L4. UNIT_DIFFERS (S4) is live: a NAMES_UNITS header that states the declared units passes; one that states another unit refuses.
  L5. ACQUISITION_ORDER_DIFFERS (S5) is live: rows stored in acquisition order that do not run in the declared direction refuse; rows that do
      pass; direction UNORDERED makes no claim."""
-import re
 import sys
 import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path[:0] = [str(ROOT / "cc")]
+sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "tests")]
 import intake  # noqa: E402
 import intake_synth  # noqa: E402
+from intake_plant import long_table, outcome, per_file, write_long  # noqa: E402
+import intake_plant  # noqa: E402
 
 bad = []
 
@@ -31,63 +32,8 @@ def check(name, ok, why=""):
         bad.append(name)
 
 
-CHOICES = {"intake.mode": '"PROSPECTIVE"', "acquisition.mode": '"INDEPENDENT"', "acquisition.direction": '"UNORDERED"', "acquisition.row_order": '"ASCENDING"',
-           "interval.method": '"iid"', "bracket.required": '"CANDIDATE_BRACKET"', "projection.lane": '"PRIMARY"', "projection.from": '"C"', "projection.to": '"C_max"',
-           "projection.bias": '"MAX_MEASURED"', "projection.keeps": '"the largest C on each curve"', "projection.discards": '"every other point"',
-           "bridge.lane": '"PRIMARY"', "bridge.on": '"C_max"', "bridge.template": '"CHAIN_SLOW"', "bridge.bias": '"CHAIN_SLOW"', "shift.c": "0.0"}
-LONG = '''# [reader]: VARIANT on name
-[reader]
-name = "table-curve-v1"
-comment = ["#"]
-[reader.format]
-kind = "COMMA"
-[reader.header]
-{header}
-
-[selection]
-layout = "LONG_TABLE"
-file = "bank.csv"
-excluded = []
-[selection.slow]
-source = "COLUMN"
-key = {slow}
-
-'''
-
-
-def per_file(m, ident):
-    """The PER_FILE declaration text of a synth bank: the template filled by --from-synth's values and the choices above."""
-    values, dropped, _ = intake_synth.declare(m, ident, "pf")   # the root names bank pf; a test re-points it
-    text = intake.fill((ROOT / "intake" / "TEMPLATE.intake.toml.in").read_text().replace("<ID>", ident), {**values, **CHOICES}, dropped)
-    return text.replace('method = "iid"', 'method = "iid"\nresamples = 1000\nlevel = 0.95\nseed = 1145\ntau_declared = 1').replace("<intake-synth>/", "<long-test>/")
-
-
-def long_table(m, ident, header='kind = "NAMES"\nrows = 1\nnames = 1', slow='"h"'):
-    """The same declaration as a LONG_TABLE of bank.csv: [reader] table-curve-v1 and [selection] LONG_TABLE replace their PER_FILE blocks."""
-    text = per_file(m, ident)
-    return re.sub(r"(?s)# \[reader\]:.*?(?=\[knobs\.slow\])", lambda _: LONG.format(header=header, slow=slow), text)
-
-
-def write_long(bank, blocks, head="T,C,sigma,h\n"):
-    """One long file: each (h, rows) block's rows with h appended, in the given order."""
-    (bank / "bank.csv").write_text("# the synthetic bank as one long table (plan 1145 test)\n" + head + "".join(f"{r},{h}\n" for h, rows in blocks for r in rows))
-
-
-def run(tmp, ident, text):
-    d = Path(tmp) / "declarations" / ident
-    d.mkdir(parents=True)
-    (d / "intake.toml").write_text(text)
-    t = {**T, "roots": {**T["roots"], "<long-test>": str(Path(tmp) / "banks")}}
-    return intake.fold(t["stages"]["stage"], intake.bodies(t, d, text, []))
-
-
-def outcome(out, sid):
-    """("PASS", the evidence) when stage `sid` passed; else (the reason of the first refused stage, its result as text)."""
-    first = [e.result for e in out.values() if e.mark is intake.Mark.REFUSED] + [None]
-    return {True: lambda: ("PASS", out[sid].result.evidence), False: lambda: (getattr(first[0], "reason", out[sid].mark.name), str(first[0])[:300])}[out[sid].mark is intake.Mark.PASSED]()
-
-
 T = intake.tables(ROOT)
+run = lambda tmp, ident, text: intake_plant.run(T, tmp, ident, text)
 with tempfile.TemporaryDirectory() as tmp:
     banks = Path(tmp) / "banks"
     intake_synth.write(banks / "pf", Path(tmp) / "pf-TRUTH", "pf", 1, 9)
