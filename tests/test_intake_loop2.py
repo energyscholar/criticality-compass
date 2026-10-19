@@ -26,6 +26,8 @@ Plan 1160 loop 5 (S11.5b):
  T16.1 (A16) a converted file with 2 EMPTY and 3 TEXT rows dropped by DROP_ROWS_NOT_NUMERIC: the manifest's not_numeric_split and the convert
        summary say EMPTY 2 / TEXT 3. Seen RED: every dropped row classed TEXT (FAIL).
  T16.2 (A16) no dropped cell's text (a sentinel) appears in the summary, the manifest or the bank's files.
+ T18.5 (A18b) a manifest unit without not_numeric_count is CONVERSION_CHAIN_BROKEN at verify. Seen RED: the requirement removed from
+       intake_convert._manifest (verify PASSES).
 """
 import json
 import shutil
@@ -179,6 +181,16 @@ with tempfile.TemporaryDirectory() as tmp:
     (bank / ic.MANIFEST).write_text(json.dumps(man))
     v = ic.verified(tmp, name, RT, CT)
     check("T18.4 (A18) a manifest unit without not_numeric: verify is CONVERSION_CHAIN_BROKEN", code(v) == "CONVERSION_CHAIN_BROKEN", code(v))
+
+    # ---- T18.5 (A18b): a manifest unit with no not_numeric_count is CONVERSION_CHAIN_BROKEN (S3 reads it for the census)
+    got, b5, n5 = conv({"a.csv": b"T,C\n1.5,0.5\n1.6,n/a\n"}, [("a.csv", "a.csv", '{op = "DROP_ROWS_NOT_NUMERIC", columns = ["C"]}')])
+    before = code(ic.verified(tmp, n5, RT, CT))
+    man = json.loads((b5 / ic.MANIFEST).read_text())
+    del man["units"][0]["not_numeric_count"]
+    (b5 / ic.MANIFEST).write_text(json.dumps(man))
+    v = ic.verified(tmp, n5, RT, CT)
+    check("T18.5 (A18b) a manifest unit without not_numeric_count: verify is CONVERSION_CHAIN_BROKEN (PASS before the key is removed)",
+          (code(got), before, code(v)) == ("PASS", "PASS", "CONVERSION_CHAIN_BROKEN"), f"{code(got)} {before} {code(v)}")
 
     # ---- T19.1 / T19.2: peek names its file by the root-named path; the id names only declarations/<id>/
     got, _, a = conv({"f.csv": b"T,C\n1.5,0.25\n"}, [("f.csv", "f.csv", "")])

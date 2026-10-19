@@ -536,7 +536,7 @@ def _manifest(text):
     try:
         m = json.loads(text)
         ok = (all(isinstance(m[k], list) for k in ("files", "sources", "units", "outputs")) and all(isinstance(r["cells"], list) for r in m["outputs"])
-              and all(isinstance(u["not_numeric"], list) for u in m["units"]))   # plan 1160 A18: not_numeric is required (no default)
+              and all(isinstance(u["not_numeric"], list) and isinstance(u["not_numeric_count"], int) for u in m["units"]))   # plan 1160 A18, A18b: both required (no default)
         return {True: m, False: None}[ok]
     except (ValueError, KeyError, TypeError):
         return None
