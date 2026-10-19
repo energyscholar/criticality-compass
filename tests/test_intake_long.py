@@ -15,7 +15,13 @@ here (tests/test_intake_cli.py runs it on the command line).
  L6. (plan 1160 P2) [replicate] identity SAME_FAST_VALUE: a curve with consecutive rows of one T (three readings of a point) passes S5,
      its points counted once and its readings per point min 1, max 3; the same bank under NONE refuses FAST_VALUE_REPEATED; a
      NON-consecutive repeat refuses S4 ROW_ORDER_DIFFERS under both (row_order ASCENDING). Seen RED: POINTS["SAME_FAST_VALUE"] made one
-     point per row (as NONE) fails the PASS check (FAST_VALUE_REPEATED)."""
+     point per row (as NONE) fails the PASS check (FAST_VALUE_REPEATED).
+ L7. (plan 1160 P2) [selection] block: two sweeps in T, each restarting at the low end, the slow column drifting within each (a, b, c then
+     d, a, b): EXACT refuses CURVE_REPEATED (a and b recur non-adjacently); FAST_RESTART forms two curves, each with its first row's slow
+     value and distinct_slow_in_block max = 3. Two sweeps with one slow value each pass under both rules with the same label. FAST_RESTART
+     with rows in acquisition order needs a direction: UNORDERED refuses S1 BLOCK_RULE_HAS_NO_DIRECTION, ASCENDING passes. Seen RED:
+     BREAK["FAST_RESTART"] made the EXACT rule fails the FAST_RESTART PASS check (CURVE_REPEATED); DIRECTED["LONG_TABLE"] made always True
+     makes the S1 check unreachable: the run passes S1 and crashes at S4 (RESTARTS has no UNORDERED row), the crash S1 now refuses."""
 import sys
 import tempfile
 from pathlib import Path
@@ -105,6 +111,26 @@ with tempfile.TemporaryDirectory() as tmp:
     for who in ("SAME_FAST_VALUE", "NONE"):
         na = outcome(run(tmp, "na" + who, ident("na" + who, {True: lambda: bank("na", apart), False: lambda: "na"}[who == "SAME_FAST_VALUE"](), who)), "S5")
         check(f"L6. a NON-consecutive repeat of T refuses S4 ROW_ORDER_DIFFERS under {who}", na[0] == "ROW_ORDER_DIFFERS", str(na)[:300])
+
+    # ---- L7. (1160 P2) the LONG_TABLE block rule: EXACT | FAST_RESTART
+    (a, r0), (b, r1), (c, _), (e, _) = curves[:4]
+    k0, k1 = len(r0) // 3, len(r1) // 3
+    drift = [(a, r0[:k0]), (b, r0[k0:2 * k0]), (c, r0[2 * k0:]), (e, r1[:k1]), (a, r1[k1:2 * k1]), (b, r1[2 * k1:])]
+    blk = lambda name, b, rule, edit=lambda t: t: edit(long_table(m, name, block=f'"{rule}"').replace("<long-test>/pf", "<long-test>/" + b))
+    ex = outcome(run(tmp, "bx", blk("bx", bank("dr", drift), "EXACT")), "S5")
+    check("L7. two sweeps whose slow column drifts (a, b, c; d, a, b) under block EXACT refuse S5 CURVE_REPEATED", ex[0] == "CURVE_REPEATED", str(ex)[:300])
+    fr = outcome(run(tmp, "bf", blk("bf", "dr", "FAST_RESTART")), "S5")
+    check("L7. the same file under FAST_RESTART passes S5: two curves, the first rows' slow values, distinct_slow_in_block max = 3",
+          fr[0] == "PASS" and [n for _, n in fr[1].curves] == [len(r0), len(r1)] and fr[1].label.drift == 3 and fr[1].label.with_slow == 2
+          and "distinct_slow_in_block max = 3" in fr[1].summary(), str(fr)[:300])
+    two = {rule: outcome(run(tmp, "b2" + rule, blk("b2" + rule, {True: lambda: bank("two", curves[:2]), False: lambda: "two"}[rule == "EXACT"](), rule)), "S5") for rule in ("EXACT", "FAST_RESTART")}
+    check("L7. two sweeps with one slow value each pass under EXACT and FAST_RESTART with the same label (2 curves, drift 1)",
+          [x[0] for x in two.values()] == ["PASS", "PASS"] and two["EXACT"][1].label == two["FAST_RESTART"][1].label and two["EXACT"][1].label.curves == 2, str(two)[:300])
+    acq_dir = lambda direction: lambda t: t.replace('row_order = "ASCENDING"', 'row_order = "ACQUISITION"').replace('direction = "UNORDERED"', f'direction = "{direction}"')
+    nd = outcome(run(tmp, "bn", blk("bn", "dr", "FAST_RESTART", acq_dir("UNORDERED"))), "S5")
+    check("L7. FAST_RESTART with rows in acquisition order and direction UNORDERED refuses S1 BLOCK_RULE_HAS_NO_DIRECTION", nd[0] == "BLOCK_RULE_HAS_NO_DIRECTION", str(nd)[:300])
+    ad = outcome(run(tmp, "ba", blk("ba", "dr", "FAST_RESTART", acq_dir("ASCENDING"))), "S5")
+    check("L7. the same with direction ASCENDING passes S5 with two curves", ad[0] == "PASS" and ad[1].label.curves == 2, str(ad)[:300])
 
 print("test_intake_long: " + ("FAILED " + "; ".join(bad) if bad else "all passed"))
 sys.exit(1 if bad else 0)

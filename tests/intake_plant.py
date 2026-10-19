@@ -57,6 +57,7 @@ kind = "COMMA"
 [selection]
 layout = "LONG_TABLE"
 file = "bank.csv"
+block = {block}
 excluded = []
 [selection.slow]
 source = "COLUMN"
@@ -72,10 +73,11 @@ def per_file(m, ident):
     return text.replace('method = "iid"', 'method = "iid"\nresamples = 1000\nlevel = 0.95\nseed = 1145\ntau_declared = 1').replace("<intake-synth>/", "<long-test>/")
 
 
-def long_table(m, ident, header='kind = "NAMES"\nrows = 1\nnames = 1', slow='"h"'):
-    """The same declaration as a LONG_TABLE of bank.csv: [reader] table-curve-v1 and [selection] LONG_TABLE replace their PER_FILE blocks."""
+def long_table(m, ident, header='kind = "NAMES"\nrows = 1\nnames = 1', slow='"h"', block='"EXACT"'):
+    """The same declaration as a LONG_TABLE of bank.csv: [reader] table-curve-v1 and [selection] LONG_TABLE replace their PER_FILE blocks
+    (plan 1160 P2: with its block rule, EXACT unless stated)."""
     text = per_file(m, ident)
-    return re.sub(r"(?s)# \[reader\]:.*?(?=\[knobs\.slow\])", lambda _: LONG.format(header=header, slow=slow), text)
+    return re.sub(r"(?s)# \[reader\]:.*?(?=\[knobs\.slow\])", lambda _: LONG.format(header=header, slow=slow, block=block), text)
 
 
 KEYED = '''# [reader]: VARIANT on name

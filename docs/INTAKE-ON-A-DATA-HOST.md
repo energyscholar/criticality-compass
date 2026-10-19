@@ -82,7 +82,12 @@ There are two layouts in `[selection]`:
   - `FILE_KEY` with `key`: each file has a header line whose first cell is the key and whose second cell is the value. Declare that
     line among the header rows. A file without exactly one such line holding a number is refused SLOW_KEY_UNRESOLVED.
   - `NONE`: the deposit has no slow knob. The census forms the curves with no slow value (`curves_with_slow = 0`).
-- `LONG_TABLE`: one `file` holds every curve, and `[selection.slow]` is `COLUMN` with its `key`.
+- `LONG_TABLE`: one `file` holds every curve, and `[selection.slow]` is `COLUMN` with its `key`. `block` says where a curve begins:
+  - `EXACT`: a curve is a run of consecutive rows with one slow value. A slow value in two runs that are not adjacent is refused
+    CURVE_REPEATED.
+  - `FAST_RESTART`: a curve ends where the fast knob turns back against its direction (`row_order`, or `direction` when the rows are
+    stored in acquisition order). The curve's slow value is its first row's, and the census reports `distinct_slow_in_block max = N`,
+    a count. Rows in acquisition order with direction `UNORDERED` give no direction, so S1 refuses BLOCK_RULE_HAS_NO_DIRECTION.
 
 When a deposit repeats a point (several readings at one fast value, one after another), declare `[replicate] identity =
 "SAME_FAST_VALUE"`: consecutive rows of one curve with an equal fast value are then the readings of one point, and the census reports

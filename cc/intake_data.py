@@ -16,7 +16,7 @@ from pathlib import Path
 
 import intake_read
 import intake_seal
-from intake_blind import NUMBER, Declaration, Pass, Refuse, detail, gate, numbered, shown
+from intake_blind import NUMBER, RESTARTS, SWEEP, Declaration, Pass, Refuse, detail, gate, numbered, shown
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -73,7 +73,7 @@ class Sampling:
     """The sampling label of a census: counts and structure, never a value (plan 1160 P0). Invariant: n_min <= n_median <= n_max points over
     `curves` curves; `distinct` is the count of distinct fast values over every curve; `with_slow` is the count of curves that carry a slow value
     (0 under [selection.slow] source NONE, plan 1160 P1; else every curve); `readings` is (min, max) readings per point (plan 1160 P2: more
-    than 1 only under [replicate] identity SAME_FAST_VALUE)."""
+    than 1 only under [replicate] identity SAME_FAST_VALUE); `drift` is the most distinct slow values in one curve (a FAST_RESTART block)."""
     curves: int
     with_slow: int
     n_min: int
@@ -83,6 +83,7 @@ class Sampling:
     distinct: int
     alignment: Alignment
     readings: tuple
+    drift: int
 
 
 @dataclass(frozen=True)
@@ -97,7 +98,7 @@ class Census:
         x = self.label
         return (f"Every file has the first file's columns; no slow value or fast value repeats; no curve contradicts the declared direction. Sampling: {x.curves} curves; points per curve "
                 f"min {x.n_min}, median {x.n_median:g}, max {x.n_max}; {x.distinct} distinct {x.fast} values; {x.alignment.name}; curves_with_slow = {x.with_slow}; "
-                f"readings per point min {x.readings[0]}, max {x.readings[1]}")
+                f"readings per point min {x.readings[0]}, max {x.readings[1]}; distinct_slow_in_block max = {x.drift}")
 
     def listing(self):
         """The report's census section: each curve by ordinal and file name (a LONG_TABLE block by its ordinal), never by its slow value."""
@@ -237,15 +238,27 @@ def read(t, d, f):
 class Curve:
     """One curve of a census. Invariant: `rows` are the readable rows of one curve in file order, each in role order (fast first); `slow` is
     the tuple of slow-knob values its source gives it (plan 1160 P1): after S5's SLOW_KEY_UNRESOLVED row holds, one value, or none under
-    [selection.slow] source NONE; `where` names the file (PER_FILE) or the file and its block's ordinal (LONG_TABLE), never a value (plan 1160 P0)."""
+    [selection.slow] source NONE; `where` names the file (PER_FILE) or the file and its block's ordinal (LONG_TABLE), never a value (plan 1160 P0);
+    `drift` is the count of distinct slow values its rows hold (plan 1160 P2: more than 1 only in a FAST_RESTART block; a count, never a value)."""
     where: str
     slow: tuple
     rows: tuple
+    drift: int
 
 
-def _blocks(f, g):
-    """LONG_TABLE: the blocks of consecutive rows with one slow value (the last role column), in file order, each one Curve."""
-    return [Curve(f"{f.name} block {i}", (h,), tuple(rows)) for i, (h, rows) in enumerate(((h, list(rs)) for h, rs in itertools.groupby(g.rows, key=lambda r: r[-1])), 1)]
+BREAK = {   # LONG_TABLE [selection] block -> (the declaration) -> (previous row, row) -> does a new curve begin at row; total over FORMAT's blocks
+    "EXACT": lambda d: lambda p, r: p[-1] != r[-1],   # the slow value (the last role column) changes
+    "FAST_RESTART": lambda d: lambda p, r: RESTARTS[SWEEP[d["acquisition"]["row_order"]](d["acquisition"])](p[0], r[0]),   # the fast knob turns back (S1: it has a direction)
+}
+
+
+def _blocks(f, g, d):
+    """LONG_TABLE: the blocks of consecutive rows the declared block rule (BREAK) cuts the file into, in file order, each one Curve whose slow
+    value is its FIRST row's (a value as measured, never a mean; plan 1160 P2)."""
+    brk, rows = BREAK[d["selection"]["block"]](d), tuple(g.rows)
+    ids = itertools.accumulate(int(brk(p, r)) for p, r in zip(rows[:1] + rows[:-1], rows))
+    runs = [[r for _, r in rs] for _, rs in itertools.groupby(zip(ids, rows), key=lambda x: x[0])]
+    return [Curve(f"{f.name} block {i}", (rs[0][-1],), tuple(rs), len({r[-1] for r in rs})) for i, rs in enumerate(runs, 1)]
 
 
 SLOW = {   # PER_FILE [selection.slow] source -> (its row, the files' grids) -> each curve's slow values (a tuple); total over FORMAT's PER_FILE sources
@@ -263,8 +276,8 @@ KEYS = {   # [selection] layout -> (declaration, files, grids) -> the files whos
     "LONG_TABLE": lambda d, files, grids: [],   # the slow knob is a column, every cell a number (S4, the reader)
 }
 CURVES = {   # [selection] layout -> (declaration, files, their grids) -> the curves, in file order; total over FORMAT's layouts (plan 1145)
-    "PER_FILE": lambda d, files, grids: [Curve(f.name, s, g.rows) for f, g, s in zip(files, grids, SLOW[d["selection"]["slow"]["source"]](d["selection"]["slow"], grids))],
-    "LONG_TABLE": lambda d, files, grids: [c for f, g in zip(files, grids) for c in _blocks(f, g)],
+    "PER_FILE": lambda d, files, grids: [Curve(f.name, s, g.rows, len(s)) for f, g, s in zip(files, grids, SLOW[d["selection"]["slow"]["source"]](d["selection"]["slow"], grids))],
+    "LONG_TABLE": lambda d, files, grids: [c for f, g in zip(files, grids) for c in _blocks(f, g, d)],
 }
 ORDER = {   # [acquisition] row_order -> does a sequence of fast values hold it; total over FORMAT's row_order values
     "ASCENDING": lambda xs: all(a <= b for a, b in zip(xs, xs[1:])),
@@ -338,7 +351,7 @@ def label(curves, points, fast):
     ns, xs, rs = [len(p) for p in points], [x for p in points for x, _ in p], [n for p in points for _, n in p]
     seqs = {tuple(x for x, _ in p) for p in points}
     return Sampling(len(curves), sum(len(c.slow) for c in curves), min(ns), statistics.median(ns), max(ns), fast, len(set(xs)),
-                    {True: Alignment.ALIGNED, False: Alignment.MISALIGNED}[len(seqs) == 1], (min(rs), max(rs)))
+                    {True: Alignment.ALIGNED, False: Alignment.MISALIGNED}[len(seqs) == 1], (min(rs), max(rs)), max(c.drift for c in curves))
 
 
 def bodies(t, d):

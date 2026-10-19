@@ -9,11 +9,14 @@
      so this test carries its own plant per row over the sentinel banks, with the same totality check.
  K3. No byte of intake-report.md, SEAL.json, seal.log, access.log, stdout or stderr of any plant holds any sentinel cell in any of its forms.
  K4. The report's census section lists the curves by ordinal and file name.
+ K5. (1160 P2) A FAST_RESTART drift bank (22 sweeps, 579 rows, every slow value a distinct sentinel) forms 22 curves and its report gives
+     distinct_slow_in_block max = 27, a count.
 Seen RED (each mutation applied by hand, the test run, the mutation reverted):
  - the fast-span summary reinstated in cc/intake_data.py Census.summary (`{x.fast} span [{lo:g}, {hi:g}]`): K3 FAILS on the two PASS runs;
  - _blocks' where reinstated as f"{f.name} block {i} ({g.columns[-1]} = {h:g})": K3 FAILS (the LONG_TABLE census section and CURVE_REPEATED);
  - _resolve's COLUMN_NAME_ABSENT detail printing the names line (f"... {names}"): K3 FAILS on the numeric-names plant;
  - Census.listing printing the slow value instead of the where: K4 and K3 FAIL;
+ - (1160 P2) BREAK["FAST_RESTART"] made the EXACT rule: K2 FAILS on the two-sweep FAST_RESTART PASS plant (CURVE_REPEATED) and K5 FAILS (579 one-point curves);
  - (1160 P2) intake_names.masked returning the stated text unmasked: K3 FAILS on the UNIT_DIFFERS plant whose unit holds a sentinel."""
 import contextlib
 import hashlib
@@ -131,6 +134,10 @@ with tempfile.TemporaryDirectory() as tmp:
     xl = lambda t: t.replace('[reader.format]\nkind = "COMMA"', '[reader.format]\nkind = "XLSX"\nsheet = "data"')
     rows = [[float(x) for x in r.split(",")] + [float(h)] for h, rs in CURVES for r in rs]
     numeric_names = ("T,C,sigma,h\n" + "".join(f"{r},{h}\n" for h, rs in CURVES for r in rs)).replace("T,C,sigma,h", "h," + ",".join(cell(0, j, 1) for j in range(3)), 1).encode()
+    (_, r0), (_, r1) = CURVES[1], CURVES[0]   # (1160 P2) sweep 1 in curve 1's T cells, sweep 2 in curve 0's (lower): T turns back between them
+    SWEEPS = [(slow(1), r0[:2]), (slow(2), r0[2:4]), (slow(3), r0[4:]), (slow(4), r1[:2]), (slow(1), r1[2:4]), (slow(2), r1[4:])]
+    drift22 = ("T,C,sigma,h\n" + "".join(f"-7357.{99 - j:02d}1,-7357.{b:02d}{j:02d}3,-7357.{b:02d}{j:02d}9,-7357.{b:02d}{j:02d}7\n"
+                                          for b in range(22) for j in range(27 - (b >= 7)))).encode()   # 7 sweeps of 27 rows, 15 of 26: 579 rows
     S0 = lambda edit, trans=TRANS: (pf(PF, edit), PF, full(PF), trans)
     PLANTS = [
         ("PASS", "the PER_FILE sentinel bank, sealed", (pf(PF), PF, full(PF))),
@@ -154,6 +161,7 @@ with tempfile.TemporaryDirectory() as tmp:
         ("BRIDGE_NONE_FITS", "no bridge fits", S0(lambda t: t.replace('template = "CHAIN_SLOW"', 'template = "NONE_FITS"'))),
         ("BASIS_NOT_METADATA", "a figure in the basis", S0(lambda t: re.sub(r'class = "[A-Z_]+"', 'class = "FIGURE"', t, count=1))),
         ("TRANSDUCER_FILE_REFUSED", "a transducer.toml with no [reduction]", S0(lambda t: t, re.sub(r"(?s)\[reduction\].*?(?=\[interval\])", "", TRANS))),
+        ("BLOCK_RULE_HAS_NO_DIRECTION", "(1160 P2) block FAST_RESTART, rows in acquisition order, direction UNORDERED", (lt(LT, asc, block='"FAST_RESTART"'), LT, full(LT))),
         # S2 SEAL
         ("ALREADY_SEALED", "a second seal", (pf(PF), PF, (SEAL(banks / PF), SEAL(banks / PF)))),
         ("UNIVERSE_ROOT_ABSENT", "a universe that is no directory", (pf(PF), PF, (SEAL(tmp / "nowhere"),))),
@@ -187,6 +195,9 @@ with tempfile.TemporaryDirectory() as tmp:
          (lt(SF := lt_bank([(h, [x for j, r in enumerate(rs) for x in [r] * (1 + 2 * (i == 2 and j % 2 == 0))]) for i, (h, rs) in enumerate(CURVES)]),
              lambda t: t.replace('identity = "NONE"', 'identity = "SAME_FAST_VALUE"')), SF, full(SF))),
         ("FAST_VALUE_REPEATED", "(1160 P2) the same bank under identity NONE (row_order ASCENDING)", (lt(SF), SF, full(SF))),
+        ("CURVE_REPEATED", "(1160 P2) block EXACT: two sweeps whose slow column drifts (b, c, d; e, b, c) repeat b and c non-adjacently", (lt(DR := lt_bank(SWEEPS)), DR, full(DR))),
+        ("PASS", "(1160 P2) the same file under block FAST_RESTART: two curves, sealed", (lt(DR, block='"FAST_RESTART"'), DR, full(DR))),
+        ("PASS", "(1160 P2) block FAST_RESTART on a drift bank: 22 sweeps, 579 distinct slow values, sealed", (lt(D22 := lt_bank(raw=drift22), block='"FAST_RESTART"'), D22, full(D22))),
         ("SLOW_KEY_UNRESOLVED", "(1160) FILE_KEY h, each key line's value a sentinel followed by 'x'",
          (pf(SK := pf_bank(keyed(lambda i: f"h,{slow(i)}x\n")), lambda t: slow_source(t, "FILE_KEY")), SK, full(SK))),
         ("PASS", "(1160) FILE_KEY h on the PER_FILE sentinel bank, sealed", (pf(FK := pf_bank(keyed(lambda i: f"h,{slow(i)}\n")), lambda t: slow_source(t, "FILE_KEY")), FK, full(FK))),
@@ -239,6 +250,12 @@ with tempfile.TemporaryDirectory() as tmp:
                       ("PASS the LONG_TABLE sentinel bank, sealed", [f"{i + 1}. bank.csv block {i + 1}: {6 + i} points" for i in range(K)])):
         sec = said[key].split("## Census\n", 1)[-1].split("\n## ", 1)[0]
         check(f"K4. {key.split(' ', 1)[1]}: the census section lists each curve by ordinal and file name", "## Census\n" in said[key] and all(x in sec.splitlines() for x in want), sec[:400])
+
+    # ---- K5. (1160 P2) the drift bank's census: 22 curves, its drift reported as a count
+    out = said["PASS (1160 P2) block FAST_RESTART on a drift bank: 22 sweeps, 579 distinct slow values, sealed"]
+    check("K5. the drift bank is 579 rows of 579 distinct slow sentinels", drift22.count(b"\n") == 580 and len({ln.split(b",")[3] for ln in drift22.splitlines()[1:]}) == 579)
+    check("K5. FAST_RESTART forms 22 curves on the drift bank and reports distinct_slow_in_block max = 27 (a count)",
+          "Sampling: 22 curves;" in out and "distinct_slow_in_block max = 27" in out, out[:600])
 
 print("test_intake_leak: " + ("FAILED " + "; ".join(bad) if bad else "all passed"))
 sys.exit(1 if bad else 0)

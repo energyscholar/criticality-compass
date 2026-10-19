@@ -38,7 +38,10 @@ names = "TODO"          # NAMES, NAMES_UNITS: the 1-based header line that holds
 
 # [selection]: VARIANT on layout
 [selection]
-layout = "TODO"         # PER_FILE (one file per curve: files, excluded) | LONG_TABLE (one file holds every curve: file, excluded)
+layout = "TODO"         # PER_FILE (one file per curve: files, excluded) | LONG_TABLE (one file holds every curve: file, block, excluded);
+                        # LONG_TABLE block: EXACT (a curve is a run of rows with one slow value) | FAST_RESTART (a curve ends where the fast
+                        # knob turns back against its direction; its slow value is its first row's, and the census counts the distinct
+                        # slow values inside it)
 files = "TODO"          # PER_FILE: the curve files under root, in curve order, e.g. ["curve_000.csv", "curve_001.csv"]
 excluded = "TODO"       # a list of { file = "...", why = "..." }: files in the universe that are not curves ([] when none); with files and the
                         # truth side, every file of the universe exactly once (the seal refuses UNIVERSE_NOT_PARTITIONED otherwise)

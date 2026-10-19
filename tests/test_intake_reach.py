@@ -172,6 +172,7 @@ with tempfile.TemporaryDirectory() as tmp:
         ("BASIS_NOT_METADATA", "a figure in the basis", lambda: s0(re.sub(r'class = "[A-Z_]+"', 'class = "FIGURE"', base, count=1))),
         ("TRANSDUCER_FILE_REFUSED", "a planted transducer finding", lambda: s0(base, ["transducer.update[0]: planted"])),
         # S1 CHOICES (plan 1160 P1: one live row)
+        ("BLOCK_RULE_HAS_NO_DIRECTION", "(1160 P2) block FAST_RESTART, rows in acquisition order, direction UNORDERED", lambda: lt(bank(), asc, block='"FAST_RESTART"')),
         ("SLOW_VALUES_NOT_ONE_PER_FILE", "(1160) one LISTED value fewer than the files", lambda: pf("pf", lambda t: re.sub(r'values = \["[^"]*", ', 'values = [', t, count=1))),
         # S2 SEAL (bin/cc intake seal)
         ("ALREADY_SEALED", "a second seal", lambda: mint(banks / "pf", 2)),

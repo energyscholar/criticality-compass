@@ -12,6 +12,9 @@
 # by a declared conversion, with `converted_from`) and states `admissibility`, the deposit's class as the declarer reads it from metadata.
 # v4 against v3 (plan 1160 P2): [replicate] identity SAME_FAST_VALUE (consecutive rows of one curve with an equal fast value are the
 # readings of one point). Additive within schema 3: every v3 declaration is a v4 declaration.
+# v5 against v4 (plan 1160 P2): a LONG_TABLE states `block`: EXACT (a curve is a run of rows with one slow value, the v4 rule) |
+# FAST_RESTART (a curve ends where the fast knob turns back against its direction; its slow value is its first row's). Required, so a v4
+# LONG_TABLE declaration adds `block = "EXACT"`; schema stays 3 (no committed declaration is a LONG_TABLE).
 # A reader's `comment` prefixes are PREFIXES: an empty prefix marks every line a comment, so it is refused (COMMENT_PREFIX_EMPTY).
 # A field row: type = str | int | num | list | table | ref (cc/intake_blind.py TYPE); check = one of cc/intake_blind.py CHECK:
 #   TEXT      any text but the template's "TODO"
@@ -29,7 +32,7 @@
 # A key that is no field row is FIELD_IS_STAMPED when it is in `stamped`, FIELD_IS_DERIVED when in `derived`, else FIELD_UNKNOWN.
 schema = 1
 kind = "intake-format"
-version = "1160-v4"
+version = "1160-v5"
 header = { schema = 3, kind = "intake" }
 stamped = ["sealed_at", "author", "author_kind", "confirmed_by", "declaration_sha256", "code_identity", "protocol_identity", "universe_listing", "sampling", "pins"]
 derived = ["correlated"]
@@ -119,8 +122,9 @@ FILE_KEY = { key = { type = "str", check = "TEXT" } }                         # 
 NONE = {}                                                                     # the deposit has no slow knob: the curves carry no slow value
 [fields.selection.variants.LONG_TABLE]
 file = { type = "str", check = "TEXT" }   # the one file, under root, that holds every curve
+block = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { EXACT = "ADMIT", FAST_RESTART = "ADMIT" } }   # 1160 P2: where a curve begins
 excluded = { type = "list", check = "TABLES", fields = { file = { type = "str", check = "TEXT" }, why = { type = "str", check = "TEXT" } } }
-[fields.selection.variants.LONG_TABLE.slow]   # the slow knob is a column; a curve is a block of consecutive rows with one slow value, in file order
+[fields.selection.variants.LONG_TABLE.slow]   # the slow knob is a column; a curve is a block: EXACT, consecutive rows with one slow value; FAST_RESTART, rows up to where the fast knob turns back (its slow value the first row's)
 type = "table"
 check = "VARIANT"
 select = "source"

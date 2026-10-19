@@ -1,4 +1,4 @@
-# The intake pipeline (stage table 1160-v1, policy 1136-v1)
+# The intake pipeline (stage table 1160-v2, policy 1136-v1)
 
 Generated from intake/STAGES.toml and intake/POLICY.toml by `bin/cc intake explain` (docs/gen-intake.py); never edit it by hand.
 This is the intake's explain. `bin/cc explain <input> <point>` is a different command: it explains one point of a measured input.
@@ -58,6 +58,7 @@ The declared choices are consistent with each other, and the declared operation 
 | KNOBS_SAME_QUANTITY | NOT LIVE | The slow and fast knob name the same quantity or column; the Compass needs two distinct knobs. |
 | MEASURED_IS_A_KNOB | NOT LIVE | The measured number is one of the knobs. |
 | SLOW_VALUES_NOT_ONE_PER_FILE | live | Slow-knob values are declared per file (LISTED), but `values` does not give exactly one value per file of `files`. |
+| BLOCK_RULE_HAS_NO_DIRECTION | live | A LONG_TABLE declares block FAST_RESTART, but the fast knob has no declared direction (row_order ACQUISITION with direction UNORDERED), so no restart of a sweep can be seen. |
 | PROJECTION_REQUIRED | NOT LIVE | The raw observation is not one number per locus (a picture, positions, a series), and no projection to one number is declared before the bridge. |
 | PROJECTION_ESTIMAND_MIXED | NOT LIVE | One projection names two estimands (for example a location and a height); declare one projection per estimand. |
 | SECOND_LANE_MISSING | NOT LIVE | The source is real data and only one intake lane is declared; real data are taken in through two declared lanes (policy, intake/POLICY.toml). |

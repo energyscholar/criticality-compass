@@ -221,6 +221,17 @@ ONE_PER_FILE = {   # [selection.slow] source -> does the declaration give one sl
     "COLUMN": lambda sel: True,     # LONG_TABLE: the slow knob is a column of the one file
 }
 
+SWEEP = {   # [acquisition] row_order -> (the [acquisition] table) -> the direction the fast knob runs within a curve (plan 1160 P2); total
+    "ASCENDING": lambda acq: "ASCENDING", "DESCENDING": lambda acq: "DESCENDING", "ACQUISITION": lambda acq: acq["direction"],
+}
+RESTARTS = {   # a direction a curve runs in -> (previous fast value, fast value) -> does a new sweep begin (the fast knob turns back)
+    "ASCENDING": lambda a, b: b < a, "DESCENDING": lambda a, b: b > a,   # UNORDERED has no row: S1 refuses BLOCK_RULE_HAS_NO_DIRECTION first
+}
+DIRECTED = {   # [selection] layout -> does the curve rule of the declaration have the direction it needs; total over FORMAT's layouts (test)
+    "PER_FILE": lambda d: True,   # a file is a curve
+    "LONG_TABLE": lambda d: {"EXACT": True, "FAST_RESTART": SWEEP[d["acquisition"]["row_order"]](d["acquisition"]) in RESTARTS}[d["selection"]["block"]],
+}
+
 
 @dataclass(frozen=True)
 class Chosen:
@@ -239,8 +250,11 @@ class Chosen:
 
 def choices(declaration):
     """S1 CHOICES (reads no byte). Plan 1160 P1 makes one row live, SLOW_VALUES_NOT_ONE_PER_FILE, so that a LISTED count that differs from the
-    files count is refused before the loader and never zipped short; plan 1160 P4 adds the other rows."""
+    files count is refused before the loader and never zipped short; plan 1160 P2 adds BLOCK_RULE_HAS_NO_DIRECTION, so a FAST_RESTART block rule
+    always has a direction (RESTARTS has a row for it); plan 1160 P4 adds the other rows."""
     sel = declaration.data["selection"]
     rows = [(lambda: ONE_PER_FILE[sel["slow"]["source"]](sel), "SLOW_VALUES_NOT_ONE_PER_FILE",
-             lambda: detail(counts={"files": len(sel["files"]), "slow values": len(sel["slow"]["values"])}))]
+             lambda: detail(counts={"files": len(sel["files"]), "slow values": len(sel["slow"]["values"])})),
+            (lambda: DIRECTED[sel["layout"]](declaration.data), "BLOCK_RULE_HAS_NO_DIRECTION",   # plan 1160 P2: FAST_RESTART needs a direction
+             lambda: detail(words=["block FAST_RESTART", "row_order ACQUISITION", f"direction {declaration.data['acquisition']['direction']}"]))]
     return gate(rows, lambda: Pass(Chosen(declaration, tuple(r[1] for r in rows))))

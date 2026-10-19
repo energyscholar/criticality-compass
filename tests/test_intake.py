@@ -112,7 +112,12 @@ check("1. (1160 P1) PATH_PATTERN, pattern and index are gone", "PATH_PATTERN" no
 check("1. (1160 P1) PATH_NOT_ADMITTED is gone from STAGES.toml and the code; its three causes are three S3 rows, in ADMIT order",
       "PATH_NOT_ADMITTED" not in codes and "PATH_NOT_ADMITTED" not in Path(intake_data.__file__).read_text()
       and [c for c, _, _ in intake_data.ADMIT] == [c for c in REASONS["S3"] if c.startswith("PATH_")] == ["PATH_OUTSIDE_ROOT", "PATH_ON_TRUTH_SIDE", "PATH_NOT_A_FILE"], str(REASONS["S3"]))
-check("1. (1160 P1) S1's live rows are exactly the rows its body checks", [r["code"] for s in ST if s["id"] == "S1" for r in s["reason"] if r["live"]] == ["SLOW_VALUES_NOT_ONE_PER_FILE"], "")
+S1_LIVE = ["SLOW_VALUES_NOT_ONE_PER_FILE", "BLOCK_RULE_HAS_NO_DIRECTION"]   # plan 1160 P1; P2
+check("1. (1160 P1, P2) S1's live rows are exactly the rows its body checks", sorted(r["code"] for s in ST if s["id"] == "S1" for r in s["reason"] if r["live"]) == sorted(S1_LIVE), "")
+BLOCKS = set(F["selection"]["variants"]["LONG_TABLE"]["block"]["values"])
+check("1. (1160 P2) the LONG_TABLE blocks are EXACT and FAST_RESTART; BREAK is total over them, DIRECTED over the layouts, SWEEP over row_order",
+      BLOCKS == {"EXACT", "FAST_RESTART"} and set(intake_data.BREAK) == BLOCKS and set(blind.DIRECTED) == set(F["selection"]["variants"])
+      and set(blind.SWEEP) == set(F["acquisition"]["fields"]["row_order"]["values"]), str(BLOCKS))
 IDENT = set(F["replicate"]["fields"]["identity"]["values"])
 check("1. (1160 P2) the replicate identities hold SAME_FAST_VALUE; POINTS is total over them and REPLICATE over (layout, identity)",
       "SAME_FAST_VALUE" in IDENT and set(intake_data.POINTS) == IDENT and set(intake_data.REPLICATE) == set(itertools.product(F["selection"]["variants"], IDENT)), str(sorted(IDENT)))
