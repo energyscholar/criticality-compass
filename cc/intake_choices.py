@@ -47,6 +47,10 @@ NEEDS_COLUMN = {   # the intake's interval method (cc.toml alphabets.interval_me
     "block": False, "iid": False, "gamma": False, "chains": False, "STATED": True, "NONE": False,
 }
 HAS_COLUMN = {"COLUMN": True, "NONE": False}   # [measured.uncertainty] kind -> does the declaration name an uncertainty column; total
+POINTED = {   # (plan 1160 A17) [knobs.fast] control -> (identity, interval method) -> do the declared points exist; total over FORMAT's controls (test)
+    "SET": lambda identity, method: True,   # a grid: the identity names a point's readings, any method may draw on them
+    "MEASURED": lambda identity, method: identity == "NONE" and method in ("STATED", "NONE"),   # every row a point: no readings to group or resample
+}
 
 
 @dataclass(frozen=True)
@@ -97,6 +101,8 @@ def choices(declaration, policy):
              lambda: detail(words=[f"{lane}: projection {', '.join(form(lane)[0]) or 'none'}; bridge {', '.join(form(lane)[1])}" for lane in lanes])),
             (lambda: not NEIGHBOUR[d["replicate"]["identity"]](d), "REPLICATE_IS_SWEEP_NEIGHBOUR",
              lambda: detail(words=[f"identity {d['replicate']['identity']}", f"key '{d['replicate']['key']}' is the fast knob {d['knobs']['fast']['name']}"])),
+            (lambda: POINTED[d["knobs"]["fast"]["control"]](d["replicate"]["identity"], method), "MEASURED_KNOB_HAS_NO_POINTS",   # plan 1160 A17
+             lambda: detail(words=[f"control {d['knobs']['fast']['control']}", f"identity {d['replicate']['identity']}", f"interval method {method}"])),
             (lambda: not barred, "OPERATION_NOT_PERMITTED", lambda: detail(words=[f"{s[1]} {s[0]} {s[2]} on '{s[3]}' ({s[4]}; it is permitted on {WANTS(s[2])})" for s in barred][:3], counts={"steps not permitted": len(barred)})),
             (lambda: ROUTE[d["source"]["admissibility"]], "PROVENANCE_HAS_NO_KERNEL_ROUTE", lambda: detail(words=[f"admissibility {d['source']['admissibility']}"])),
             (lambda: not NEEDS_COLUMN[method] or HAS_COLUMN[kind], "METHOD_NEEDS_UNCERTAINTY_COLUMN", lambda: detail(words=[f"interval method {method}", f"uncertainty {kind}"]))]

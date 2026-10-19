@@ -1,0 +1,130 @@
+# declarations/dial1118-s1-v4/intake.toml - the worked example of intake format v4 (plan 1160 A17): declarations/dial1118-s1-v3 (format v3,
+# kept as history) restated field for field in v4, the only change being the fast knob's control = "SET" (the v3 meaning: the bank's T is a
+# grid the generator set). The planted S1 bank of plan 1118 (square Ising in a field h). It is sealed against a FIXTURE universe of empty
+# files (tests/planted/intake/p1118-bank-FIXTURE, amendment A2 Q7); no byte of the bank was read.
+schema = 4
+kind = "intake"
+id = "dial1118-s1-v4"
+
+[intake]
+mode = "EXPLORATORY"    # values of this bank have been seen (plan 1118's peak tables and dial results); 1118 used this bank to CHOOSE REDUCE,
+                        # so it cannot validate REDUCE (plan 1136 A1.10)
+
+[basis]
+read = [
+  { what = "plan 1118, the declaration of the planted banks", class = "PAPER_METHODS" },
+  { what = "toolset studies/DIAL1118/bank/run_bank.py header (file layout, keys)", class = "READER_CODE" },
+  { what = "<p1118-bank>/S1/MANIFEST.json (file names, sha256, seed and x per file)", class = "LISTING" },
+]
+
+[source]
+kind = "DEPOSIT"                # the bank's files as plan 1118 wrote them, read directly (no conversion)
+origin = "PLANTED"
+deposit = "plan-1118"
+root = "<p1118-bank>"           # a NAME; its location on this machine is given to `bin/cc intake seal --universe`
+universe = "S1/*"
+truth_side = ["truth.json"]     # run_bank.py copies truth.json into the bank directory; only plan 1118's score.py may read it
+admissibility = "RAW"           # a planted bank: the generator's own per-sweep output, every reduction declared (transducer.toml)
+
+[reader]
+name = "npz-curve-v1"           # a reader not yet live (deferred to the stage plan, A2 Q4): keys x, T (161,), C (161,), sigma (161,), e (161, 2000), aux (161, 2000)
+
+[selection]
+layout = "PER_FILE"
+files = [
+  "S1/S1_c000.npz", "S1/S1_c001.npz", "S1/S1_c002.npz", "S1/S1_c003.npz", "S1/S1_c004.npz", "S1/S1_c005.npz",
+  "S1/S1_c006.npz", "S1/S1_c007.npz", "S1/S1_c008.npz", "S1/S1_c009.npz", "S1/S1_c010.npz", "S1/S1_c011.npz",
+  "S1/S1_c012.npz", "S1/S1_c013.npz", "S1/S1_c014.npz", "S1/S1_c015.npz", "S1/S1_c016.npz", "S1/S1_c017.npz",
+  "S1/S1_c018.npz", "S1/S1_c019.npz", "S1/S1_c020.npz", "S1/S1_c021.npz", "S1/S1_c022.npz", "S1/S1_c023.npz",
+  "S1/S1_c024.npz", "S1/S1_c025.npz", "S1/S1_c026.npz", "S1/S1_c027.npz", "S1/S1_c028.npz", "S1/S1_c029.npz",
+  "S1/S1_c030.npz", "S1/S1_c031.npz", "S1/S1_c032.npz", "S1/S1_c033.npz", "S1/S1_c034.npz", "S1/S1_c035.npz",
+  "S1/S1_c036.npz", "S1/S1_c037.npz", "S1/S1_c038.npz", "S1/S1_c039.npz", "S1/S1_c040.npz", "S1/S1_c041.npz",
+  "S1/S1_c042.npz", "S1/S1_c043.npz", "S1/S1_c044.npz", "S1/S1_c045.npz", "S1/S1_c046.npz", "S1/S1_c047.npz",
+  "S1/S1_c048.npz", "S1/S1_c049.npz", "S1/S1_c050.npz", "S1/S1_c051.npz", "S1/S1_c052.npz", "S1/S1_c053.npz",
+  "S1/S1_c054.npz", "S1/S1_c055.npz", "S1/S1_c056.npz", "S1/S1_c057.npz", "S1/S1_c058.npz", "S1/S1_c059.npz",
+  "S1/S1_c060.npz",
+]
+excluded = [ { file = "S1/MANIFEST.json", why = "metadata (in basis), not a curve" } ]
+
+[selection.slow]
+source = "LISTED"               # from MANIFEST.json files.*.x (metadata), written as text as plan 1118 declared it; equals plan 1118's declared grid h = -0.15 + 0.005 i
+values = [
+  "-0.150", "-0.145", "-0.140", "-0.135", "-0.130", "-0.125", "-0.120", "-0.115", "-0.110", "-0.105", "-0.100", "-0.095",
+  "-0.090", "-0.085", "-0.080", "-0.075", "-0.070", "-0.065", "-0.060", "-0.055", "-0.050", "-0.045", "-0.040", "-0.035",
+  "-0.030", "-0.025", "-0.020", "-0.015", "-0.010", "-0.005", "0.000", "0.005", "0.010", "0.015", "0.020", "0.025",
+  "0.030", "0.035", "0.040", "0.045", "0.050", "0.055", "0.060", "0.065", "0.070", "0.075", "0.080", "0.085",
+  "0.090", "0.095", "0.100", "0.105", "0.110", "0.115", "0.120", "0.125", "0.130", "0.135", "0.140", "0.145",
+  "0.150",
+]
+
+[knobs.slow]
+name = "h"
+unit = "J"
+
+[knobs.fast]
+name = "T"
+unit = "J/k_B"
+source = "FILE_KEY"
+key = "T"                       # 161 values in [1.5, 3.5]
+control = "SET"                 # plan 1118 set each T of its grid (run_bank.py); v3 had no field for it
+
+[measured]
+name = "C"
+unit = "k_B per site"
+key = "C"                       # stored by the bank; itself a per-locus projection of e (transducer.toml [reduction])
+shape = "SCALAR_PER_LOCUS"
+
+[measured.uncertainty]
+kind = "COLUMN"
+key = "sigma"                   # the bank's per-point sigma key (161,)
+
+[acquisition]
+mode = "SWEEP_CARRIED"          # one cooling sweep per curve; the state is carried from T to T, so correlated (derived, never typed)
+direction = "DESCENDING"        # cooled from 3.5 to 1.5
+row_order = "ASCENDING"         # run_bank.py: "Arrays are in ascending T; the sweep cooled"
+
+[replicate]
+identity = "NONE"               # one curve per h; the seed names the curve, not a replicate
+key = ""
+
+[interval]
+method = "block"                # over the per-point energy series e (n = 2000), b = 100 => 20 blocks: the bank's own error rule
+resamples = 1000
+level = 0.95
+seed = 1136
+b = 100
+min_blocks = 30                 # the CC template value. PRE-REGISTERED (A2 Q9): S7 INTERVAL_FEASIBILITY refuses BELOW_METHOD_FLOOR once live (2000 // 100 = 20 < 30)
+
+[bracket]
+required = "CANDIDATE_BRACKET"  # no frozen planted coverage evidence exists, so this declaration does not require a ValidatedBracket (A2 Q8)
+
+[[projection]]
+lane = "PRIMARY"
+from = "C"
+to = "C_max"
+bias = "MAX_MEASURED"
+keeps = "the largest measured C on each curve (a measured value at a measured T)"
+discards = "every other point of the curve, and where along T the maximum sits"
+
+[[projection]]
+lane = "ALTERNATIVE"
+from = "C"
+to = "T_star"
+bias = "ARGMAX_FAST"
+keeps = "the measured T at which each curve's C is largest (ties to the lowest T)"
+discards = "the height of the maximum, and every other point"
+
+[[bridge]]
+lane = "PRIMARY"
+on = "C_max"
+template = "CHAIN_SLOW"
+bias = "CHAIN_SLOW"
+
+[[bridge]]
+lane = "ALTERNATIVE"
+on = "C"                        # PAIR joins locus values, anchored at T_star
+template = "PAIR_NEAREST_FAST"
+bias = "PAIR_NEAREST_FAST"
+
+[shift]
+c = 0.0

@@ -6,6 +6,7 @@ import statistics
 
 import intake_read
 from intake_blind import NUMBER, RESTARTS, SWEEP, Pass, Refuse, detail, gate, numbered, sweeps
+from intake_names import exits, repeats
 from intake_evidence import Alignment, Census, Curve, Pinned, Sampling, Shaped
 
 
@@ -97,9 +98,11 @@ REPLICATE = {   # ([selection] layout, [replicate] identity) -> (may two curves 
 }
 
 
-POINTS = {   # [replicate] identity -> a curve's rows -> its points as (fast value, readings); total over FORMAT's identities
-    **{k: (lambda rows: [(r[0], 1) for r in rows]) for k in ("NONE", "SEED", "RUN", "SAMPLE", "FILE")},   # every row is one point
-    "SAME_FAST_VALUE": lambda rows: [(x, len(list(rs))) for x, rs in itertools.groupby(rows, key=lambda r: r[0])],   # a run of one fast value is one point
+IDENTITIES = ("NONE", "SEED", "RUN", "SAMPLE", "FILE", "SAME_FAST_VALUE")   # FORMAT's [replicate] identity alphabet
+POINTS = {   # ([knobs.fast] control, [replicate] identity) -> a curve's rows -> its points as (key, fast value, readings); total over FORMAT's (plan 1160 A17)
+    **{("SET", k): (lambda rows: [(r[0], r[0], 1) for r in rows]) for k in IDENTITIES[:5]},   # a set knob: every row one point, keyed by its fast value
+    ("SET", "SAME_FAST_VALUE"): lambda rows: [(x, x, len(list(rs))) for x, rs in itertools.groupby(rows, key=lambda r: r[0])],   # a run of one fast value is one point
+    **{("MEASURED", k): (lambda rows: [(i, r[0], 1) for i, r in enumerate(rows)]) for k in IDENTITIES},   # a measured knob: every row a point, keyed by its ordinal (S1 admits NONE only)
 }
 
 
@@ -114,24 +117,25 @@ def census(pinned, shaped, t):
     curves = lambda: CURVES[d["selection"]["layout"]](d, pinned.files, grids)
     hs = lambda: [v for c in curves() for v in c.slow]   # the slow values of every curve that has one (none under NONE)
     unkeyed = lambda: KEYS[d["selection"]["layout"]](d, pinned.files, grids)
-    points = lambda c: POINTS[d["replicate"]["identity"]](c.rows)   # grouped BEFORE the repeat check: a run of readings is never a repeat
-    twice = lambda: [c.where for c in curves() if len({x for x, _ in points(c)}) != len(points(c))]
+    points = lambda c: POINTS[(d["knobs"]["fast"]["control"], d["replicate"]["identity"])](c.rows)   # grouped BEFORE the repeat check: a run of readings is never a repeat
+    twice = lambda: [c.where for c in curves() if len({k for k, _, _ in points(c)}) != len(points(c))]
+    kinds = lambda: repeats([[k for k, _, _ in points(c)] for c in curves() if c.where in twice()])   # A17: the repeat kinds, counts only
     against = lambda: [c.where for c in curves() if not DIRECTION[(acq["row_order"] == "ACQUISITION", acq["direction"])]([r[0] for r in c.rows])]
     again = lambda: [c.where for c in curves() if any(hs().count(v) > 1 for v in c.slow)]
     return gate([(lambda: not other, "FILE_DIFFERS_FROM_FIRST", lambda: detail(words=other[:3], counts={"files": len(other)})),
                  (lambda: not unkeyed(), "SLOW_KEY_UNRESOLVED", lambda: detail(words=unkeyed()[:3] + [f"key '{d['selection']['slow']['key']}'"], counts={"files": len(unkeyed())})),
                  (lambda: rep[1], "REPLICATE_KEY_UNRESOLVED", lambda: detail(words=[f"identity {d['replicate']['identity']}: reader {d['reader']['name']} with layout {d['selection']['layout']} carries no replicate key"])),
                  (lambda: rep[0] or len(set(hs())) == len(hs()), "CURVE_REPEATED", lambda: detail(words=again()[:3], counts={"curves whose slow value another curve has": len(again())})),
-                 (lambda: not twice(), "FAST_VALUE_REPEATED", lambda: detail(words=twice()[:3], counts={"curves": len(twice())})),
+                 (lambda: not twice(), "FAST_VALUE_REPEATED", lambda: detail(words=twice()[:3] + exits(kinds()), counts={"curves refused": len(twice()), "of curves": len(curves()), **kinds()})),
                  (lambda: not against(), "ACQUISITION_ORDER_DIFFERS", lambda: detail(words=against()[:3] + [f"stored in acquisition order, not {acq['direction']}"], counts={"curves": len(against())}))],
                 lambda: Pass(Census(pinned, label(curves(), [points(c) for c in curves()], d["knobs"]["fast"]["name"]), tuple((c.where, len(points(c))) for c in curves()),
-                                     tuple(tuple(n for _, n in points(c)) for c in curves()))))
+                                     tuple(tuple(n for _, _, n in points(c)) for c in curves()))))
 
 
 def label(curves, points, fast):
-    """The sampling label of curves and their points (fast value, readings), counted per point."""
-    ns, xs, rs = [len(p) for p in points], [x for p in points for x, _ in p], [n for p in points for _, n in p]
-    seqs = {tuple(x for x, _ in p) for p in points}
+    """The sampling label of curves and their points (key, fast value, readings), counted per point."""
+    ns, xs, rs = [len(p) for p in points], [x for p in points for _, x, _ in p], [n for p in points for _, _, n in p]
+    seqs = {tuple(x for _, x, _ in p) for p in points}
     return Sampling(len(curves), sum(len(c.slow) for c in curves), min(ns), statistics.median(ns), max(ns), fast, len(set(xs)),
                     {True: Alignment.ALIGNED, False: Alignment.MISALIGNED}[len(seqs) == 1], (min(rs), max(rs)), max(c.drift for c in curves))
 

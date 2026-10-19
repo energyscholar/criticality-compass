@@ -53,8 +53,8 @@ there.
 <host> 'cd ~/scratch/cc-intake && bin/cc new intake <id>'
 ```
 
-The new declaration's TODO lines are the choices. It is intake format v3 (`schema = 3`); a v2 declaration is refused SCHEMA_UNSUPPORTED,
-so restate it in v3 under a new id.
+The new declaration's TODO lines are the choices. It is intake format v4 (`schema = 4`); a v2 or v3 declaration is refused
+SCHEMA_UNSUPPORTED, so restate it in v4 under a new id (v3 to v4 adds `[knobs.fast] control = "SET"`, the v3 meaning).
 
 `[source]` says what the files are:
 
@@ -109,10 +109,27 @@ There are two layouts in `[selection]`:
     stored in acquisition order). The curve's slow value is its first row's, and the census reports `distinct_slow_in_block max = N`,
     a count. Rows in acquisition order with direction `UNORDERED` give no direction, so S1 refuses BLOCK_RULE_HAS_NO_DIRECTION.
 
-When a deposit repeats a point (several readings at one fast value, one after another), declare `[replicate] identity =
-"SAME_FAST_VALUE"`: consecutive rows of one curve with an equal fast value are then the readings of one point, and the census reports
-readings per point (min, max). Under any other identity such rows are refused FAST_VALUE_REPEATED. A repeat that is not consecutive is
-refused ROW_ORDER_DIFFERS (rows declared ASCENDING or DESCENDING).
+`[knobs.fast] control` says how the fast knob was driven: `SET` (it was set to each value of a grid; the template's line) or `MEASURED`
+(it was read, not set: a ramp or a carried sweep). It decides what a point is, and so what a repeated fast value means:
+
+| control | `[replicate] identity` | a point is | a repeated fast value in a curve |
+|---|---|---|---|
+| SET | NONE, SEED, RUN, SAMPLE, FILE | one row, keyed by its fast value | refused FAST_VALUE_REPEATED at S5 |
+| SET | SAME_FAST_VALUE | a run of consecutive rows with one fast value; the census reports readings per point (min, max) | consecutive: the readings of one point; revisited after the knob left it: refused FAST_VALUE_REPEATED |
+| MEASURED | NONE | one row, keyed by its place in the curve | no repeat: every row is its own point |
+| MEASURED | any other | (none) | refused at S1 MEASURED_KNOB_HAS_NO_POINTS, as is an `[interval] method` other than STATED or NONE |
+
+FAST_VALUE_REPEATED's detail counts, over the refused curves, `consecutive runs`, `longest run`, `values revisited` and `monotone runs`
+(counts only, never a value), and names the exit of each kind it found. The four kinds of repeat and their remedies:
+
+- **K1** consecutive replicate runs (a set knob, a grid): `[replicate] identity = "SAME_FAST_VALUE"`.
+- **K2** a value revisited after the knob left it (a measured knob dithering): `control = "MEASURED"`. A set knob that loops is two
+  branches: split the rows (SPLIT_ROWS), one file per branch.
+- **K3** a single consecutive duplicate: `SAME_FAST_VALUE`, as K1.
+- **K4** a long flat run (a hold: a segment, not a replicate): `control = "MEASURED"`, or exclude the segment.
+
+Not available: `[replicate] adjacency = "ANYWHERE"` (a point as every row with one fast value, wherever it lies); a revisit under SET
+stays refused.
 
 `excluded` lists the files of the universe that are not curves, each with a `why`. The seal checks that the universe is exactly the
 selected files, the excluded files and the truth side, each file in one part. Otherwise it refuses UNIVERSE_NOT_PARTITIONED, or

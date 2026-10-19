@@ -90,7 +90,7 @@ ST = T["stages"]["stage"]
 IDS = [s["id"] for s in ST]
 REASONS = {s["id"]: [r["code"] for r in s["reason"]] for s in ST}
 SEAL = T["stages"]["seal_stage"]
-EXAMPLE = ROOT / "declarations" / "dial1118-s1-v3"   # plan 1160 P1: the worked example restated in format v3 (dial1118-s1 is v1, -v2 is v2: history)
+EXAMPLE = ROOT / "declarations" / "dial1118-s1-v4"   # plan 1160 A17: the worked example restated in format v4 (dial1118-s1 is v1, -v2 is v2, -v3 is v3: history; was -v3)
 FIXTURE = ROOT / "tests" / "planted" / "intake" / "p1118-bank-FIXTURE"
 
 # ---- 1. the stage table and the runner
@@ -215,8 +215,12 @@ check("1. (1160 P2) the header kinds hold NAMES_UNITS_IN_NAMES; HEADER and NAMED
       "NAMES_UNITS_IN_NAMES" in HEADS and set(intake_read.HEADER) == set(intake_read.NAMED) == set(HEADS)
       and set(intake_names.UNIT_SYNTAX) == set(HEADS["NAMES_UNITS_IN_NAMES"]["unit_syntax"]["values"]), str(sorted(HEADS)))
 IDENT = set(F["replicate"]["fields"]["identity"]["values"])
-check("1. (1160 P2) the replicate identities hold SAME_FAST_VALUE; POINTS is total over them and REPLICATE over (layout, identity)",
-      "SAME_FAST_VALUE" in IDENT and set(intake_census.POINTS) == IDENT and set(intake_census.REPLICATE) == set(itertools.product(F["selection"]["variants"], IDENT)), str(sorted(IDENT)))
+CONTROL = set(F["knobs"]["fields"]["fast"]["fields"]["control"]["values"])   # (1160 A17, T17.3) the [knobs.fast] control alphabet
+check("1. (1160 P2; A17 T17.3) the replicate identities hold SAME_FAST_VALUE; POINTS is total over control x identity (1160 A17: was over the identities)"
+      " and REPLICATE over (layout, identity); IDENTITIES is FORMAT's identity alphabet; POINTED (S1) is total over the controls",
+      "SAME_FAST_VALUE" in IDENT and CONTROL == {"SET", "MEASURED"} and set(intake_census.POINTS) == set(itertools.product(CONTROL, IDENT))
+      and set(intake_census.IDENTITIES) == IDENT and set(intake_census.REPLICATE) == set(itertools.product(F["selection"]["variants"], IDENT))
+      and set(intake_choices.POINTED) == CONTROL, str(sorted(IDENT)))
 check("1. every admit source of FORMAT.toml is a source the tables provide", all(src in T["admit"] for spec in [T["format"]["fields"]["interval"]["method"]] for src in spec["admit"]), "")
 
 # ---- 2. the generated docs page
@@ -325,8 +329,9 @@ PLANTED = [
     ("(extra) a figure in the basis", base.replace('class = "PAPER_METHODS"', 'class = "FIGURE"'), "BASIS_NOT_METADATA"),
     ("(extra) a TODO left", base.replace('mode = "EXPLORATORY"', 'mode = "TODO"'), "VALUE_STILL_TODO"),
     ("(extra) not TOML", base + "\n[[[", "TOML_INVALID"),
-    ("(extra) another schema (4)", base.replace("schema = 3", "schema = 4", 1), "SCHEMA_UNSUPPORTED"),
+    ("(extra) another schema (5; 1160 A17: was 4, now the format)", base.replace("schema = 4", "schema = 5", 1), "SCHEMA_UNSUPPORTED"),
     ("(1160) a v2 declaration (format v2 is history)", (ROOT / "declarations" / "dial1118-s1-v2" / "intake.toml").read_text(), "SCHEMA_UNSUPPORTED"),
+    ("(1160 A17) a v3 declaration (format v3 is history)", (ROOT / "declarations" / "dial1118-s1-v3" / "intake.toml").read_text(), "SCHEMA_UNSUPPORTED"),
     ("(1160) PATTERN is gone: a v2 pattern and index in a v3 file", base.replace("files = [", 'pattern = "S1/S1_c{index:03d}.npz"\nfiles = [', 1), "FIELD_UNKNOWN"),
     ("(1160) a LISTED value that is not a number written as text", base.replace('"-0.150"', '"minus 0.15"', 1), "FIELD_TYPE_WRONG"),
     ("(1160) a LISTED value written as a TOML number", base.replace('"-0.150"', '-0.150', 1), "FIELD_TYPE_WRONG"),

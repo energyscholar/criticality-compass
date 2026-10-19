@@ -83,7 +83,7 @@ class Declaration(Evidence):
     data: dict
 
     def summary(self):
-        return f"The declaration '{self.id}' parses, and every field of format v3 is present, typed and listed (mode {self.mode})"
+        return f"The declaration '{self.id}' parses, and every field of format v4 is present, typed and listed (mode {self.mode})"
 
 
 def look(table, key, absent):
@@ -173,7 +173,7 @@ def field(spec, d, key, loc, tables, required=True):
 def unknown(d, rows, loc, tables):
     """Keys that are no field row: STAMPED, DERIVED, or UNKNOWN, by a total lookup."""
     cls = {**{k: "FIELD_IS_STAMPED" for k in tables["format"]["stamped"]}, **{k: "FIELD_IS_DERIVED" for k in tables["format"]["derived"]}}
-    return [Finding(look(cls, k, "FIELD_UNKNOWN"), f"{loc}.{k}".lstrip("."), "not a field of format v3") for k in d if k not in rows]
+    return [Finding(look(cls, k, "FIELD_UNKNOWN"), f"{loc}.{k}".lstrip("."), "not a field of format v4") for k in d if k not in rows]
 
 
 def section(rows, d, loc, tables):

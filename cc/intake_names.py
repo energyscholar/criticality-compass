@@ -70,6 +70,36 @@ def sweeps(seqs, row_order, order):
     return {k: got.count(k) for k in dict.fromkeys(ORDER_CLASS.values())}
 
 
+def _runs(xs):
+    """A sequence as its runs (key, length): adjacent equal keys merged (None is no key: the first item always starts a run)."""
+    starts = [i for i, (a, b) in enumerate(zip([None] + list(xs), xs)) if a != b]
+    return [(xs[i], j - i) for i, j in zip(starts, starts[1:] + [len(xs)])]
+
+
+def repeats(seqs):
+    """(plan 1160 A17) S5 FAST_VALUE_REPEATED's classification of the refused curves' point keys, as COUNTS only, summed over seqs (one
+    sequence per curve; longest run is the longest over them, 0 over none): consecutive runs (a key on two or more adjacent points), longest
+    run, values revisited (a key in two or more separate runs) and monotone runs (maximal runs of one direction, equal keys merged)."""
+    runs = [_runs(xs) for xs in seqs]
+    keys = [[k for k, _ in rs] for rs in runs]
+    twice = lambda ks: len({a for a, b in zip(sorted(ks), sorted(ks)[1:]) if a == b})   # the keys in two or more runs
+    steps = lambda ks: [b > a for a, b in zip(ks, ks[1:])]   # each step up (True) or down; equal keys are one run, never a step
+    turns = lambda ks: sum(p != q for p, q in zip(steps(ks), steps(ks)[1:]))   # the direction changes along a curve
+    return {"consecutive runs": sum(n > 1 for rs in runs for _, n in rs), "longest run": max([n for rs in runs for _, n in rs], default=0),
+            "values revisited": sum(twice(ks) for ks in keys), "monotone runs": sum(1 + turns(ks) for ks in keys)}
+
+
+REPEAT_EXIT = {   # (plan 1160 A30) a repeat kind of `repeats` -> the exit FAST_VALUE_REPEATED's Detail names when the kind is found; total over the kinds it names
+    "consecutive runs": "consecutive repeats: if the knob was set, they are readings of one point (replicate identity SAME_FAST_VALUE); if it was read, declare [knobs.fast] control MEASURED",
+    "values revisited": "non-consecutive repeats (a value revisited): if the knob was read, declare [knobs.fast] control MEASURED; a set knob's loop is two branches (SPLIT_ROWS, one per file)",
+}
+
+
+def exits(counts):
+    """The exit words of the kinds `repeats` found (a count above 0), in REPEAT_EXIT order."""
+    return [w for k, w in REPEAT_EXIT.items() if counts[k] > 0]
+
+
 @dataclass(frozen=True)
 class Detail:
     """The detail of every refusal (plan 1160 P0). Invariant: it holds a file name, row numbers, columns (a name or a 1-based position), named

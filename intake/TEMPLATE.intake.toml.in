@@ -1,8 +1,8 @@
-# declarations/<ID>/intake.toml - written by `bin/cc new intake <ID>` from intake/TEMPLATE.intake.toml.in (intake format v3, intake/FORMAT.toml).
+# declarations/<ID>/intake.toml - written by `bin/cc new intake <ID>` from intake/TEMPLATE.intake.toml.in (intake format v4, intake/FORMAT.toml).
 # Replace every TODO. A closed field takes one of the words its comment lists; `bin/cc intake lint <id>` names each field still wrong.
 # Write only what you read from metadata (a README, a listing, a header, the reader code), never from the data values.
 # A section marked VARIANT holds exactly the fields of the value you choose for its first field: delete the lines of the other choices.
-schema = 3
+schema = 4
 kind = "intake"
 id = "<ID>"
 
@@ -62,6 +62,7 @@ name = "TODO"           # the fast knob: the points along each curve
 unit = "TODO"           # its unit
 source = "TODO"         # COLUMN | FILE_KEY
 key = "TODO"            # its column: a name ("T") or a 1-based position (1), or its key
+control = "SET"         # SET (set to each value, a grid; the v3 meaning) | MEASURED (read, not set: a ramp or a carried sweep; every row is a point)
 
 [measured]
 name = "TODO"           # the measured quantity

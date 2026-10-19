@@ -1,0 +1,300 @@
+{
+ "schema": 1,
+ "kind": "intake-seal",
+ "id": "dial1118-s1-v4",
+ "sealed_at_ns": 1792439281956127880,
+ "sealed_at_utc": "2026-10-19T19:48:01Z",
+ "author": "Claude (plan 1160 A17)",
+ "author_kind": "AI_DRAFT",
+ "confirmed_by": "",
+ "mode": "EXPLORATORY",
+ "declaration_sha256": "2bc4eac3dbf791fe7cca38f6dfa759b6288d159015b435bb59540676ed24d7b7",
+ "files": {
+  "intake.toml": "18e227c9053569bc20af2359ae92e1e1d9f83a4f40b0dbc83938d387b1de3f07",
+  "transducer.toml": "8ae05dc36d837ae023fefdeb7e62e59c1d908dc25f56b1b6ed889631b10e42fe"
+ },
+ "code_identity": {
+  "commit": "87bfce2244a7ea1fd59dc4c010fd39d092308d8c",
+  "code_hash": "ae71c0e8b01b225529a838c0409f9401d3a9d2b275f4d375d9de43b543e26ffc",
+  "tree": "UNCOMMITTED_CHANGES"
+ },
+ "protocol_identity": {
+  "STAGES.toml": {
+   "sha256": "ec625815fa89209930f7d80f640beeea4326a752a426f8ec7bc8877f7338a048",
+   "version": "1160-v7"
+  },
+  "POLICY.toml": {
+   "sha256": "d7fc430f8befdff4986f6295ec2c0cc4d8cab28041c0135a5af28f92258d7797",
+   "version": "1136-v1"
+  },
+  "FORMAT.toml": {
+   "sha256": "3c420dbf9a2ce5acd6dd6edf358e1716ad6c8cf244d24a75e55986164fa7511b",
+   "version": "1160-v9"
+  }
+ },
+ "universe": {
+  "root": "<p1118-bank>",
+  "location_name": "p1118-bank-FIXTURE",
+  "glob": "S1/*",
+  "listing": [
+   [
+    "S1/MANIFEST.json",
+    0
+   ],
+   [
+    "S1/S1_c000.npz",
+    0
+   ],
+   [
+    "S1/S1_c001.npz",
+    0
+   ],
+   [
+    "S1/S1_c002.npz",
+    0
+   ],
+   [
+    "S1/S1_c003.npz",
+    0
+   ],
+   [
+    "S1/S1_c004.npz",
+    0
+   ],
+   [
+    "S1/S1_c005.npz",
+    0
+   ],
+   [
+    "S1/S1_c006.npz",
+    0
+   ],
+   [
+    "S1/S1_c007.npz",
+    0
+   ],
+   [
+    "S1/S1_c008.npz",
+    0
+   ],
+   [
+    "S1/S1_c009.npz",
+    0
+   ],
+   [
+    "S1/S1_c010.npz",
+    0
+   ],
+   [
+    "S1/S1_c011.npz",
+    0
+   ],
+   [
+    "S1/S1_c012.npz",
+    0
+   ],
+   [
+    "S1/S1_c013.npz",
+    0
+   ],
+   [
+    "S1/S1_c014.npz",
+    0
+   ],
+   [
+    "S1/S1_c015.npz",
+    0
+   ],
+   [
+    "S1/S1_c016.npz",
+    0
+   ],
+   [
+    "S1/S1_c017.npz",
+    0
+   ],
+   [
+    "S1/S1_c018.npz",
+    0
+   ],
+   [
+    "S1/S1_c019.npz",
+    0
+   ],
+   [
+    "S1/S1_c020.npz",
+    0
+   ],
+   [
+    "S1/S1_c021.npz",
+    0
+   ],
+   [
+    "S1/S1_c022.npz",
+    0
+   ],
+   [
+    "S1/S1_c023.npz",
+    0
+   ],
+   [
+    "S1/S1_c024.npz",
+    0
+   ],
+   [
+    "S1/S1_c025.npz",
+    0
+   ],
+   [
+    "S1/S1_c026.npz",
+    0
+   ],
+   [
+    "S1/S1_c027.npz",
+    0
+   ],
+   [
+    "S1/S1_c028.npz",
+    0
+   ],
+   [
+    "S1/S1_c029.npz",
+    0
+   ],
+   [
+    "S1/S1_c030.npz",
+    0
+   ],
+   [
+    "S1/S1_c031.npz",
+    0
+   ],
+   [
+    "S1/S1_c032.npz",
+    0
+   ],
+   [
+    "S1/S1_c033.npz",
+    0
+   ],
+   [
+    "S1/S1_c034.npz",
+    0
+   ],
+   [
+    "S1/S1_c035.npz",
+    0
+   ],
+   [
+    "S1/S1_c036.npz",
+    0
+   ],
+   [
+    "S1/S1_c037.npz",
+    0
+   ],
+   [
+    "S1/S1_c038.npz",
+    0
+   ],
+   [
+    "S1/S1_c039.npz",
+    0
+   ],
+   [
+    "S1/S1_c040.npz",
+    0
+   ],
+   [
+    "S1/S1_c041.npz",
+    0
+   ],
+   [
+    "S1/S1_c042.npz",
+    0
+   ],
+   [
+    "S1/S1_c043.npz",
+    0
+   ],
+   [
+    "S1/S1_c044.npz",
+    0
+   ],
+   [
+    "S1/S1_c045.npz",
+    0
+   ],
+   [
+    "S1/S1_c046.npz",
+    0
+   ],
+   [
+    "S1/S1_c047.npz",
+    0
+   ],
+   [
+    "S1/S1_c048.npz",
+    0
+   ],
+   [
+    "S1/S1_c049.npz",
+    0
+   ],
+   [
+    "S1/S1_c050.npz",
+    0
+   ],
+   [
+    "S1/S1_c051.npz",
+    0
+   ],
+   [
+    "S1/S1_c052.npz",
+    0
+   ],
+   [
+    "S1/S1_c053.npz",
+    0
+   ],
+   [
+    "S1/S1_c054.npz",
+    0
+   ],
+   [
+    "S1/S1_c055.npz",
+    0
+   ],
+   [
+    "S1/S1_c056.npz",
+    0
+   ],
+   [
+    "S1/S1_c057.npz",
+    0
+   ],
+   [
+    "S1/S1_c058.npz",
+    0
+   ],
+   [
+    "S1/S1_c059.npz",
+    0
+   ],
+   [
+    "S1/S1_c060.npz",
+    0
+   ],
+   [
+    "S1/truth.json",
+    0
+   ]
+  ],
+  "partition": {
+   "selected": 61,
+   "excluded": 1,
+   "truth_side": 1
+  }
+ },
+ "claim": "Sealing is recommended and not enforced. It records what you declared and when; it is an integrity practice, like a lab notebook. A seal proves INTEGRITY (the declaration's sha256) and ORDERING (the seal time against the first logged data read). It never proves ignorance: mode is the declarer's sealed statement of what they had seen."
+}

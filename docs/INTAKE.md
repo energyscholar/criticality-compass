@@ -1,4 +1,4 @@
-# The intake pipeline (stage table 1160-v6, policy 1136-v1)
+# The intake pipeline (stage table 1160-v7, policy 1136-v1)
 
 Generated from intake/STAGES.toml and intake/POLICY.toml by `bin/cc intake explain` (docs/gen-intake.py); never edit it by hand.
 This is the intake's explain. `bin/cc explain <input> <point>` is a different command: it explains one point of a measured input.
@@ -34,8 +34,8 @@ The declaration parses, holds every required field with the right type, and ever
 |---|---|---|
 | DECLARATION_FILE_ABSENT | live | declarations/<id>/ holds no intake.toml, and a directory alone declares nothing; write the file (docs/INTAKE-QUICKSTART.md starts one with bin/cc new intake). |
 | TOML_INVALID | live | The declaration is not valid TOML; fix the syntax at the line shown. |
-| SCHEMA_UNSUPPORTED | live | The file does not say schema = 3 and kind = "intake"; this tool reads intake format v3 only (a v1 or v2 declaration is history: restate it in v3 under a new id). |
-| FIELD_MISSING | live | A required field is absent; every field of format v3 must be written, even when its honest value is a refusal value such as NONE_FITS. |
+| SCHEMA_UNSUPPORTED | live | The file does not say schema = 4 and kind = "intake"; this tool reads intake format v4 only (a v1, v2 or v3 declaration is history: restate it in v4 under a new id; v3 to v4 adds [knobs.fast] control = "SET", the v3 meaning). |
+| FIELD_MISSING | live | A required field is absent; every field of format v4 must be written, even when its honest value is a refusal value such as NONE_FITS. |
 | FIELD_UNKNOWN | live | A field the format does not define is present; check its spelling against bin/cc intake explain. |
 | FIELD_TYPE_WRONG | live | A field holds the wrong kind of value (for example text where a list is required). |
 | VALUE_NOT_LISTED | live | A closed-list field holds a value its list does not name; use one of the listed values. |
@@ -66,6 +66,7 @@ The declared choices are consistent with each other, and the declared operation 
 | SECOND_LANE_MISSING | live | The source is real data and only one intake lane is declared; real data are taken in through two declared lanes (policy, intake/POLICY.toml). |
 | LANES_IDENTICAL | live | The two declared lanes use the same projection and bridge; the alternative must differ. |
 | REPLICATE_IS_SWEEP_NEIGHBOUR | live | Replicates are declared as adjacent points of one sweep (the replicate key is the fast knob); a replicate is a repeated preparation, never a neighbouring point. |
+| MEASURED_KNOB_HAS_NO_POINTS | live | The fast knob is measured, not set, so its rows are not readings of grid points: declare replicate identity NONE and an interval method STATED or NONE. |
 | OPERATION_NOT_PERMITTED | live | A declared step is not a permitted operation for its link of the chain (Raw, Projection, DerivedObservable, Bridge, KernelInput). |
 | PROVENANCE_HAS_NO_KERNEL_ROUTE | live | The source's admissibility ([source] admissibility, the deposit's class as the declarer read it from metadata) is FIGURE_LEVEL or PROCESSED_UNDECLARABLE, which has no kernel route. |
 | METHOD_NEEDS_UNCERTAINTY_COLUMN | live | The interval method is STATED (each point's interval is the declared uncertainty column), and [measured.uncertainty] declares none (kind NONE). |
@@ -137,7 +138,7 @@ Every selected file matches the first, and the sampling label is recorded: curve
 |---|---|---|
 | FILE_DIFFERS_FROM_FIRST | live | A selected file's shape, columns or keys differ from the first file's. |
 | CURVE_REPEATED | live | Two curves carry the same slow-knob value (two files; or, in a long table, two blocks that are not adjacent) and are not declared replicates. |
-| FAST_VALUE_REPEATED | live | A curve holds two points at the same fast-knob value and they are not declared replicates. |
+| FAST_VALUE_REPEATED | live | A curve holds two points at the same fast-knob value and they are not declared replicates. Its detail counts the repeats: consecutive runs (one value on adjacent rows) are readings of one point if the knob was set (replicate identity SAME_FAST_VALUE); a value revisited after the knob left it is a measured knob (declare [knobs.fast] control = "MEASURED") or, for a set knob, a loop of two branches (convert with SPLIT_ROWS, one branch per file). |
 | SLOW_KEY_UNRESOLVED | live | The slow knob is declared FILE_KEY, and a file's header does not hold exactly one line whose first cell is the key and whose second cell is a number. |
 | REPLICATE_KEY_UNRESOLVED | live | The declared replicate identity cannot be read for a file or point. |
 | ACQUISITION_ORDER_DIFFERS | live | A curve stored in acquisition order (row_order ACQUISITION) does not run in the declared direction along the fast knob. |
