@@ -16,6 +16,7 @@ Seen RED (each mutation applied by hand, the test run, the mutation reverted):
  - _blocks' where reinstated as f"{f.name} block {i} ({g.columns[-1]} = {h:g})": K3 FAILS (the LONG_TABLE census section and CURVE_REPEATED);
  - _resolve's COLUMN_NAME_ABSENT detail printing the names line (f"... {names}"): K3 FAILS on the numeric-names plant;
  - Census.listing printing the slow value instead of the where: K4 and K3 FAIL;
+ - (1160 P2, A1) intake_blind.SELECTED["PER_FILE"] made 1: the SELECTION_EMPTY plant passes S1 and the run crashes at S4 (files[0]);
  - (1160 P2) BREAK["FAST_RESTART"] made the EXACT rule: K2 FAILS on the two-sweep FAST_RESTART PASS plant (CURVE_REPEATED) and K5 FAILS (579 one-point curves);
  - (1160 P2) intake_names.masked returning the stated text unmasked: K3 FAILS on both UNIT_DIFFERS plants whose unit holds a sentinel
    (NAMES_UNITS 'K -7357.15', NAMES_UNITS_IN_NAMES 'T/K -7357.25')."""
@@ -150,6 +151,8 @@ with tempfile.TemporaryDirectory() as tmp:
         ("COMMENT_PREFIX_EMPTY", "(1160) comment = [\"\"] on table-curve-v1", (lt(LT, lambda t: t.replace('comment = ["#"]', 'comment = [""]', 1)), LT, full(LT))),
         ("ROOT_NOT_UNDER_CC_BANKS", "(1160) a CONVERTED source whose root is the deposit's", S0(lambda t: convert(t, f"<leak>/{PF}"))),
         # S1 CHOICES
+        ("SELECTION_EMPTY", "(1160 P2, A1) files = [] and values = [] (unsealed: S4 would read files[0])",
+         (pf(PF, lambda t: re.sub(r"values = \[[^\]]*\]", "values = []", re.sub(r"files = \[[^\]]*\]", "files = []", t, count=1), count=1)), PF, unsealed)),
         ("SLOW_VALUES_NOT_ONE_PER_FILE", "(1160) one LISTED value fewer than the files", S0(lambda t: re.sub(r'values = \["[^"]*", ', 'values = [', t, count=1))),
         ("FIELD_MISSING", "[knobs.fast] deleted", S0(lambda t: re.sub(r"(?s)\[knobs\.fast\].*?(?=\[measured\])", "", t))),
         ("FIELD_UNKNOWN", "a field the format does not define", S0(lambda t: t.replace("[intake]\n", '[intake]\ncolour = "red"\n'))),

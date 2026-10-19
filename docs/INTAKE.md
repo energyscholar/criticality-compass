@@ -57,6 +57,7 @@ The declared choices are consistent with each other, and the declared operation 
 |---|---|---|
 | KNOBS_SAME_QUANTITY | NOT LIVE | The slow and fast knob name the same quantity or column; the Compass needs two distinct knobs. |
 | MEASURED_IS_A_KNOB | NOT LIVE | The measured number is one of the knobs. |
+| SELECTION_EMPTY | live | The selection names no file (`files = []`); a census needs at least one curve file. |
 | SLOW_VALUES_NOT_ONE_PER_FILE | live | Slow-knob values are declared per file (LISTED), but `values` does not give exactly one value per file of `files`. |
 | BLOCK_RULE_HAS_NO_DIRECTION | live | A LONG_TABLE declares block FAST_RESTART, but the fast knob has no declared direction (row_order ACQUISITION with direction UNORDERED), so no restart of a sweep can be seen. |
 | PROJECTION_REQUIRED | NOT LIVE | The raw observation is not one number per locus (a picture, positions, a series), and no projection to one number is declared before the bridge. |

@@ -232,6 +232,10 @@ DIRECTED = {   # [selection] layout -> does the curve rule of the declaration ha
     "LONG_TABLE": lambda d: {"EXACT": True, "FAST_RESTART": SWEEP[d["acquisition"]["row_order"]](d["acquisition"]) in RESTARTS}[d["selection"]["block"]],
 }
 
+SELECTED = {   # [selection] layout -> how many files the declaration selects; total over FORMAT's layouts (test). Amendment A1 of plan 1160
+    "PER_FILE": lambda sel: len(sel["files"]), "LONG_TABLE": lambda sel: 1,   # LONG_TABLE names its one `file`
+}
+
 
 @dataclass(frozen=True)
 class Chosen:
@@ -250,10 +254,12 @@ class Chosen:
 
 def choices(declaration):
     """S1 CHOICES (reads no byte). Plan 1160 P1 makes one row live, SLOW_VALUES_NOT_ONE_PER_FILE, so that a LISTED count that differs from the
-    files count is refused before the loader and never zipped short; plan 1160 P2 adds BLOCK_RULE_HAS_NO_DIRECTION, so a FAST_RESTART block rule
+    files count is refused before the loader and never zipped short; plan 1160 P2 adds SELECTION_EMPTY (amendment A1: an empty `files` would
+    crash S4, which reads the first file) and BLOCK_RULE_HAS_NO_DIRECTION, so a FAST_RESTART block rule
     always has a direction (RESTARTS has a row for it); plan 1160 P4 adds the other rows."""
     sel = declaration.data["selection"]
-    rows = [(lambda: ONE_PER_FILE[sel["slow"]["source"]](sel), "SLOW_VALUES_NOT_ONE_PER_FILE",
+    rows = [(lambda: SELECTED[sel["layout"]](sel) > 0, "SELECTION_EMPTY", lambda: detail(words=[f"layout {sel['layout']}"], counts={"files selected": 0})),   # A1: S4 reads files[0]
+            (lambda: ONE_PER_FILE[sel["slow"]["source"]](sel), "SLOW_VALUES_NOT_ONE_PER_FILE",
              lambda: detail(counts={"files": len(sel["files"]), "slow values": len(sel["slow"]["values"])})),
             (lambda: DIRECTED[sel["layout"]](declaration.data), "BLOCK_RULE_HAS_NO_DIRECTION",   # plan 1160 P2: FAST_RESTART needs a direction
              lambda: detail(words=["block FAST_RESTART", "row_order ACQUISITION", f"direction {declaration.data['acquisition']['direction']}"]))]

@@ -64,11 +64,12 @@ name = "CHOICES"
 purpose = "The declared choices are consistent with each other, and the declared operation graph uses only permitted operations (static admissibility)."
 reads_bytes = "NONE"
 needs = ["S0"]
-implemented = true   # plan 1160 P1: one live row (SLOW_VALUES_NOT_ONE_PER_FILE), so a LISTED count never reaches the loader; P2 adds BLOCK_RULE_HAS_NO_DIRECTION; the other rows are P4's (live = false until then)
+implemented = true   # plan 1160 P1: one live row (SLOW_VALUES_NOT_ONE_PER_FILE), so a LISTED count never reaches the loader; P2 adds SELECTION_EMPTY (amendment A1) and BLOCK_RULE_HAS_NO_DIRECTION; the other rows are P4's (live = false until then)
 verdict = "PRIMARY"
 reason = [
   { code = "KNOBS_SAME_QUANTITY",            live = false, sentence = "The slow and fast knob name the same quantity or column; the Compass needs two distinct knobs." },
   { code = "MEASURED_IS_A_KNOB",             live = false, sentence = "The measured number is one of the knobs." },
+  { code = "SELECTION_EMPTY",                live = true,  sentence = "The selection names no file (`files = []`); a census needs at least one curve file." },
   { code = "SLOW_VALUES_NOT_ONE_PER_FILE",   live = true,  sentence = "Slow-knob values are declared per file (LISTED), but `values` does not give exactly one value per file of `files`." },
   { code = "BLOCK_RULE_HAS_NO_DIRECTION",    live = true,  sentence = "A LONG_TABLE declares block FAST_RESTART, but the fast knob has no declared direction (row_order ACQUISITION with direction UNORDERED), so no restart of a sweep can be seen." },
   { code = "PROJECTION_REQUIRED",            live = false, sentence = "The raw observation is not one number per locus (a picture, positions, a series), and no projection to one number is declared before the bridge." },

@@ -78,7 +78,7 @@ Columns are named in `[knobs.fast]`, `[measured]` and `[measured.uncertainty]` (
 
 There are two layouts in `[selection]`:
 
-- `PER_FILE`: one curve per file. `files` lists them, in curve order. `[selection.slow]` says where each curve's slow-knob value comes
+- `PER_FILE`: one curve per file. `files` lists them, in curve order. An empty `files` is refused SELECTION_EMPTY at S1. `[selection.slow]` says where each curve's slow-knob value comes
   from:
   - `LISTED` with `values`: one number per file of `files`, in that order, each written as text (`["-0.15", "-0.10"]`). A count that
     differs from `files` is refused SLOW_VALUES_NOT_ONE_PER_FILE before any byte is read.
