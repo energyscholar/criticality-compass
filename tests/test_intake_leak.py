@@ -27,6 +27,8 @@ Seen RED (each mutation applied by hand, the test run, the mutation reverted):
  - (1160 P2) BREAK["FAST_RESTART"] made the EXACT rule: K2 FAILS on the two-sweep FAST_RESTART PASS plant (CURVE_REPEATED) and K5 FAILS (579 one-point curves);
  - (1160 P2) intake_names.masked returning the stated text unmasked: K3 FAILS on both UNIT_DIFFERS plants whose unit holds a sentinel
    (NAMES_UNITS 'K -7357.15', NAMES_UNITS_IN_NAMES 'T/K -7357.25').;
+ - (1160 A10) intake_convert._named printing every sheet name unmasked: K6 FAILS where openpyxl is installed (here, without openpyxl, the
+   names are not listed: NOT seen red on this machine; the word table is seen red in test_intake_convert V4);
  - (1160 P3) intake_convert._said printing every head cell unmasked (numeric names included): K6 FAILS (peek stdout and peek.log);
  - (1160 P3) intake_convert._records adding each output's first data line to its manifest record: K6 FAILS on all four conversions;
  - (1160 P4) each S1 row's holds made `lambda: True` in cc/intake_choices.py, one at a time (the ten rows of intake_plant.CHOICE_PLANTS):
@@ -58,7 +60,7 @@ import intake  # noqa: E402
 import intake_blind as blind  # noqa: E402
 import intake_seal  # noqa: E402
 import intake_synth  # noqa: E402
-from intake_plant import ALL_ALTERNATIVE, PRIMARY_PAIR, SHIFT, BLOCK, BLOCK_NO_FLOOR, IID, PAIR_LANE, SAME_FAST, VALIDATED, CHOICE_PLANTS, conversion, long_table, per_file, slow_source, write_long, xlsx  # noqa: E402
+from intake_plant import ALL_ALTERNATIVE, PRIMARY_PAIR, SHIFT, BLOCK, BLOCK_NO_FLOOR, IID, PAIR_LANE, SAME_FAST, VALIDATED, CHOICE_PLANTS, conversion, long_table, per_file, slow_source, workbook, write_long, xlsx  # noqa: E402
 
 bad = []
 
@@ -375,7 +377,13 @@ with tempfile.TemporaryDirectory() as tmp:
     wide = (f"h,{cell(0, 0, 1)},{cell(0, 1, 1)},{cell(0, 2, 1)}\n" + "".join(f"{slow(k)},{cell(k, 0, 2)},{cell(k, 1, 2)},{cell(k, 2, 2)}\n" for k in range(K))).encode()
     WD = conv_bank({"wide.csv": wide}, [("wide.csv", "long.csv", '{op = "WIDE_TO_LONG", key = "h", fast = "T", measured = "C"}')])
     peeked = "".join(cli("peek", WD, "wide.csv", "--depth", str(k)) for k in (0, 1, 5)) + cli("peek", CV, "curve_000.csv", "--depth", "3")
-    peeked += (w / "declarations" / WD / "peek.log").read_text() + (w / "declarations" / CV / "peek.log").read_text()
+    # (1160 A10) an xlsx peeked with no --sheet: SHEET_REQUIRED, its sheets named by a sentinel numeric name and a text name holding one
+    XB = conv_bank({"book.xlsx": workbook({cell(0, 0, 1): [[cell(0, 1, 2)]], f"run {cell(1, 0, 1)}": [["T"], [float(cell(1, 1, 2))]]})},
+                   [("book.xlsx", "x.csv", '{op = "SHEET_TO_CSV", sheet = "data"}')])
+    xpeek = cli("peek", XB, "book.xlsx")
+    check("K6. (1160 A10) peek on the sentinel xlsx with no --sheet refuses SHEET_REQUIRED", "SHEET_REQUIRED" in xpeek, xpeek[:400])
+    peeked += xpeek
+    peeked += (w / "declarations" / WD / "peek.log").read_text() + (w / "declarations" / CV / "peek.log").read_text() + (w / "declarations" / XB / "peek.log").read_text()
     check("K6. the WIDE sentinel file converts (WIDE_TO_LONG) and verifies", CONVERTED[WD].count("PASS.") == 2, CONVERTED[WD][:400])
     check("K6. peek on the WIDE sentinel file prints '1 text name + 3 numeric names' and stops before the first line of numbers",
           "1 text name + 3 numeric names: 'h'" in peeked and "stopped: a line of numbers (not printed)" in peeked, peeked[:400])

@@ -24,7 +24,10 @@ bin/cc new intake <id>                                      # then declare the b
 1. The deposit sits in `<cc-datasets>/<id>/raw` (a root name of intake/ROOTS.toml: `~/scratch/cc-datasets` on the data host).
 2. `peek` prints the first lines of one raw file as counts and text names only, so you can see where the names line is without seeing a
    value. It prints at most depth + 2 lines (depth 1 unless you say) and stops before the first line whose every cell is a number. A
-   number in a text name prints as `#`. Each peek is recorded in `declarations/<id>/peek.log`.
+   number in a text name prints as `#`. Each peek is recorded in `declarations/<id>/peek.log`. For an xlsx, `--sheet` is required; to learn
+   the sheet names, peek without `--sheet`: it refuses SHEET_REQUIRED, and its Detail lists the workbook's sheet names as it lists any
+   names (a text name masked, a numeric name counted, never printed). Listing the names needs openpyxl, as SHEET_TO_CSV does, so peek on
+   the data host (plan 1160 A10).
 3. You write `declarations/<id>/CONVERSION.toml`.
 4. `convert` writes the bank to `<cc-banks>/<id>/bank` (`~/scratch/cc-banks` on the data host). It never overwrites a bank: remove the
    old one, or use a new id (BANK_EXISTS). It writes nothing unless the identity test passes on the exact bytes it is about to write.
@@ -192,6 +195,7 @@ others are:
 | STEP_OUT_OF_ORDER | move the step earlier: see the stages above |
 | SOURCE_FILE_ABSENT | `from` (or an UNPACK member) is not in the deposit |
 | CONTAINER_UNREADABLE, XLSX_READER_ABSENT, SHEET_ABSENT | the archive or workbook cannot be read as declared |
+| SHEET_REQUIRED | peek on an xlsx with no `--sheet`: the Detail lists the sheet names; peek again with `--sheet NAME` |
 | MARKER_LINE_ABSENT | no line is the marker, or the first row lacks the prefix |
 | COLUMN_ABSENT | a named column is missing or ambiguous, or a row is too short for it |
 | ENCODING_INVALID | the bytes are not the declared encoding: peek, then choose another |

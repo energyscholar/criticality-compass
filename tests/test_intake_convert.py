@@ -9,6 +9,8 @@ peek`). Planted inputs only (no real data).
      two-sheet xlsx through SHEET_TO_CSV + SELECT_COLUMNS + SPLIT_ROWS to two PER_FILE curves (NOT REACHED without openpyxl: it must run on
      the data host).
  V4. peek on the WIDE file prints "1 text name + N numeric names" and no value, at most depth + 2 lines, and stops before a line of numbers.
+ V4 (1160 A10). peek on an xlsx with no --sheet refuses SHEET_REQUIRED, its Detail the sheet names as peek prints names (a TEXT name masked, a
+     NUMERIC name counted), or, without openpyxl, that they cannot be listed here; no byte of the archive is printed.
  V5. The chain: --verify refuses CONVERSION_CHAIN_BROKEN after one source byte changes, and IDENTITY_FAILED when a bank cell changes and the
      manifest's sha256 is rewritten to match.
  V6. Structure: OPS is total over the [op] alphabet and the steps VARIANT; each rule table over its kinds; `float` is called only in _same,
@@ -206,6 +208,23 @@ with tempfile.TemporaryDirectory() as tmp:
     rc, said = peek(WD, "../" + WD + "/raw/wide.csv")
     check("V4. peek refuses a file outside <cc-datasets>/<id>/raw (SOURCE_FILE_ABSENT)", rc == 1 and "SOURCE_FILE_ABSENT" in said, said)
 
+    # ---- V4. (1160 A10) peek on an xlsx with no --sheet: SHEET_REQUIRED, its Detail the sheet names (text masked, numeric counted)
+    got, bank, XP = conv({"book.xlsx": workbook({"notes 2": [["planted"]], "1.5": [["T"], [1.5]], "data": [["T"], [1.5]]})}, [("book.xlsx", "x.csv", '{op = "SHEET_TO_CSV", sheet = "data"}')])
+    rc, said = peek(XP, "book.xlsx")
+    check("V4. (1160 A10) peek on an xlsx with no --sheet refuses SHEET_REQUIRED and prints no byte of the archive",
+          rc == 1 and "SHEET_REQUIRED" in said and "PK" not in said and "1.5" not in said and "xl/" not in said, said)
+    check("V4. (1160 A10) its Detail lists the sheet names where openpyxl is installed, and says it cannot list them where it is not",
+          {True: "the workbook's sheets: 2 text names + 1 numeric name: 'notes #', 'data'" in said,
+           False: "openpyxl is not installed on this machine, so the sheet names cannot be listed here" in said}[HAS_XLSX], said)
+    check("V4. (1160 A10) the sheet-name words: TEXT names masked, a NUMERIC name counted and never printed",
+          ic.SHEET_WORDS[(True, True)](["notes 2", "1.5", "data"]) == ["the workbook's sheets: 2 text names + 1 numeric name: 'notes #', 'data'"],
+          str(ic.SHEET_WORDS[(True, True)](["notes 2", "1.5", "data"])))
+    rc, said = peek(XP, "book.xlsx", "--sheet", "data")
+    check("V4. (1160 A10) peek on the xlsx with --sheet reads that sheet (XLSX_READER_ABSENT without openpyxl)",
+          {True: "line 1: 1 text name + 0 numeric names: 'T'" in said, False: "XLSX_READER_ABSENT" in said}[HAS_XLSX], said)
+    rc, said = peek(name, list(semi)[0], "--depth", "0")
+    check("V4. (1160 A10) a text file with no --sheet is peeked as text, as before", rc == 0 and "line 1:" in said, said)
+
     # ---- V5. the chain
     got, bank, name = conv({"a.csv": b"T,C\n1.5,0.25\n1.6,0.5\n"}, [("a.csv", "a.csv", "")])
     raw = tmp / "cc-datasets" / name / "raw" / "a.csv"
@@ -247,6 +266,7 @@ with tempfile.TemporaryDirectory() as tmp:
         ("CELL_MAP_NOT_A_PERMUTATION", lambda: conv({"a.csv": b"T\n1\n2\n3\n"}, [("a.csv", "a.csv", '{op = "SPLIT_ROWS", rule = {kind = "RANGES", parts = [{name = "a.csv", first = 1, last = 1}, {name = "b.csv", first = 3, last = 3}]}}')])),
         ("CELL_MAP_NOT_A_PERMUTATION", lambda: conv({"a.csv": b"T\n1\n2\n3\n"}, [("a.csv", "a.csv", '{op = "SPLIT_ROWS", rule = {kind = "RANGES", parts = [{name = "a.csv", first = 1, last = 2}, {name = "b.csv", first = 2, last = 3}]}}')])),
         ("XLSX_READER_ABSENT", lambda: conv({"a.xlsx": workbook({"data": [["T"], [1.5]]})}, [("a.xlsx", "a.csv", '{op = "SHEET_TO_CSV", sheet = "data"}')])),
+        ("SHEET_REQUIRED", lambda: REACHED.add(code(ic._head(workbook({"data": [["T"], [1.5]]}), "")))),   # (1160 A10) peek's refusal
         ("SHEET_ABSENT", lambda: conv({"a.xlsx": workbook({"data": [["T"], [1.5]]})}, [("a.xlsx", "a.csv", '{op = "SHEET_TO_CSV", sheet = "Sheet9"}')])),
     ]
     NOT_HERE = {False: ["SHEET_ABSENT"], True: ["XLSX_READER_ABSENT"]}[HAS_XLSX]

@@ -14,6 +14,7 @@ the S0 walker (intake_blind.section), and run as a fold of the declared steps ov
 import csv
 import functools
 import hashlib
+import importlib.util
 import io
 import itertools
 import json
@@ -520,11 +521,45 @@ def _cells(line):
     return [c.strip() for c in {True: lambda: re.split(r"[,;\t]", line), False: lambda: line.split()}[re.search(r"[,;\t]", line) is not None]() if c.strip()]
 
 
-def _said(k, cs):
-    """One head line as peek prints it: counts, and each TEXT name masked (a numeral in it as #); a NUMERIC name is counted, never printed."""
+def _named(cs):
+    """Names as peek prints them: counts, and each TEXT name masked (a numeral in it as #); a NUMERIC name is counted, never printed."""
     text = [c for c in cs if classify(c) is Name.TEXT]
     named = {True: lambda: ": " + ", ".join(f"'{masked(c)}'" for c in text), False: lambda: ""}[len(text) > 0]()
-    return {True: f"line {k}: blank", False: f"line {k}: {len(text)} text name{'s' * (len(text) != 1)} + {len(cs) - len(text)} numeric name{'s' * (len(cs) - len(text) != 1)}{named}"}[len(cs) == 0]
+    return f"{len(text)} text name{'s' * (len(text) != 1)} + {len(cs) - len(text)} numeric name{'s' * (len(cs) - len(text) != 1)}{named}"
+
+
+def _said(k, cs):
+    """One head line as peek prints it (_named), or blank."""
+    return {True: lambda: f"line {k}: blank", False: lambda: f"line {k}: {_named(cs)}"}[len(cs) == 0]()
+
+
+def _book_names(raw):
+    """The sheet names of a workbook through openpyxl (plan 1145: xlsx is read with openpyxl or not at all), or None for bytes it cannot open."""
+    import openpyxl
+    try:   # the decoding boundary, as intake_read._xlsx_cells: openpyxl raises zipfile, KeyError, ValueError and its own errors
+        return openpyxl.load_workbook(io.BytesIO(raw), read_only=True).sheetnames
+    except Exception:
+        return None
+
+
+SHEET_WORDS = {   # (is openpyxl installed, the names it read or None) -> the words of SHEET_REQUIRED's Detail (plan 1160 A10); the names as _named
+    (True, True): lambda names: [f"the workbook's sheets: {_named(names)}"],
+    (True, False): lambda names: ["openpyxl cannot open the workbook, so its sheet names cannot be listed (CONTAINER_UNREADABLE)"],
+    (False, False): lambda names: ["openpyxl is not installed on this machine, so the sheet names cannot be listed here; peek on the data host"],
+}
+
+
+def _sheets(raw):
+    """peek on an xlsx with no --sheet: SHEET_REQUIRED, its Detail the workbook's sheet names (a name is metadata; never a zip byte)."""
+    has = importlib.util.find_spec("openpyxl") is not None
+    names = {True: lambda: _book_names(raw), False: lambda: None}[has]()
+    return Refuse("SHEET_REQUIRED", detail(words=SHEET_WORDS[(has, names is not None)](names)))
+
+
+def _xlsx(raw):
+    """Is it an xlsx workbook: a zip archive whose members hold xl/workbook.xml (the structural route; a name only, no byte read)."""
+    z = _zipped(raw)
+    return z is not None and "xl/workbook.xml" in z.namelist()
 
 
 def _flag(args, name, absent):
@@ -532,9 +567,11 @@ def _flag(args, name, absent):
 
 
 def _head(raw, sheet):
-    """The lines peek may look at: [(line number, cells)] of a text file (utf-8, an undecodable byte replaced) or of one xlsx sheet."""
-    return {True: lambda: [(n, _cells(t)) for n, t in _split(raw.decode("utf-8", "replace"))],
-            False: lambda: _bind(sheet_rows(raw, sheet), lambda rows: [(n, [c.strip() for c in cs if c.strip()]) for n, cs in rows])}[sheet == ""]()
+    """The lines peek may look at: [(line number, cells)] of a text file (utf-8, an undecodable byte replaced) or of one xlsx sheet; an xlsx
+    with no sheet named is refused SHEET_REQUIRED with its sheet names."""
+    rows = lambda: _bind(sheet_rows(raw, sheet), lambda rows: [(n, [c.strip() for c in cs if c.strip()]) for n, cs in rows])
+    return {(True, False): lambda: [(n, _cells(t)) for n, t in _split(raw.decode("utf-8", "replace"))], (True, True): lambda: _sheets(raw),
+            (False, False): rows, (False, True): rows}[(sheet == "", _xlsx(raw))]()   # plan 1160 A10: an xlsx with no --sheet is SHEET_REQUIRED
 
 
 def peek(raw, sheet, depth):

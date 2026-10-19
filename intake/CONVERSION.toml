@@ -149,6 +149,10 @@ code = "SHEET_ABSENT"
 live = true
 sentence = "The workbook holds no sheet of the declared name."
 [[reason]]
+code = "SHEET_REQUIRED"
+live = true
+sentence = "peek on an xlsx workbook needs --sheet NAME; the Detail lists the workbook's sheet names (a numeric name counted, never printed). Peek again with --sheet."
+[[reason]]
 code = "MARKER_LINE_ABSENT"
 live = true
 sentence = "No line is the declared marker (DROP_LINES MARKER), or the first row does not begin with the declared prefix (NAMES_LINE REPLACE_PREFIXED)."

@@ -232,6 +232,8 @@ SENTENCES = [   # (doc, sentence, the defect it answers)
     ("INTAKE-COMPLETION.md", "A second lane must differ from the first; ARGMAX_FAST needs each curve's maximum to be interior; PAIR_NEAREST_FAST is declared `on` "
      "the measured quantity, not a derived one.", "D4"),
     ("INTAKE-COMPLETION.md", "A refused second lane does not withhold the result", "D4"),
+    ("INTAKE-CONVERSION.md", "For an xlsx, `--sheet` is required; to learn the sheet names, peek without `--sheet`: it refuses SHEET_REQUIRED, and "
+     "its Detail lists the workbook's sheet names", "D5"),
 ]
 GONE = [("INTAKE-COMPLETION.md", "A ROBUSTNESS refusal at S9 withholds S10", "D4 (plan 1160 A9: S10 runs before S9)")]
 for doc, text, why in SENTENCES:
