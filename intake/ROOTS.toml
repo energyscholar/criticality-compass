@@ -8,3 +8,4 @@ kind = "intake-roots"
 [root]
 "<intake-synth>" = "scratch/intake-synth"   # the default --out of `bin/cc intake synth` (gitignored)
 "<cc-datasets>" = "~/scratch/cc-datasets"   # plan 1145: the data sets on the data host (docs/INTAKE-ON-A-DATA-HOST.md); ROOT_UNRESOLVED where that directory is absent
+"<cc-banks>" = "~/scratch/cc-banks"   # plan 1160 P3: the banks `bin/cc intake convert` writes (docs/INTAKE-CONVERSION.md); a CONVERTED [source] root is under it

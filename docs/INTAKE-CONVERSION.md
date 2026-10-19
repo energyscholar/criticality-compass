@@ -1,0 +1,200 @@
+# Intake conversion: from a deposit to a bank the intake can read
+
+Plan 1160 P3. This page is for whoever turns a deposited data set into a bank the strict intake reads. It assumes you know nothing else
+about the Compass. Read the rule first, then the steps, then the op you need.
+
+**The rule: a conversion is not allowed to change a number; if your deposit needs one changed, the Compass cannot take it.**
+
+A conversion moves cells. It drops header lines, cuts lines into cells, picks columns, renames them, splits rows into files and turns a
+wide table into a long one. It never computes anything. Each cell is text from the moment it is read to the moment it is written. There
+is no op to interpolate, smooth, resample, change a unit, average, round, sort rows, fill a gap or drop a data row. A declaration that
+asks for one is refused OPERATION_NOT_LISTED. The one change to a cell's text is DECIMAL_MARK (`1,5` becomes `1.5`), and the identity test
+still demands the same number.
+
+## What you do
+
+```
+bin/cc intake peek <id> <file> [--sheet NAME] [--depth N]   # look at a raw file's head without seeing a value
+#   write declarations/<id>/CONVERSION.toml (below)
+bin/cc intake convert <id>                                  # write <cc-banks>/<id>/bank and its CONVERSION-MANIFEST.json
+bin/cc intake convert <id> --verify                         # re-check the bank against the raw files, at any later time
+bin/cc new intake <id>                                      # then declare the bank: [source] kind = "CONVERTED"
+```
+
+1. The deposit sits in `<cc-datasets>/<id>/raw` (a root name of intake/ROOTS.toml: `~/scratch/cc-datasets` on the data host).
+2. `peek` prints the first lines of one raw file as counts and text names only, so you can see where the names line is without seeing a
+   value. It prints at most depth + 2 lines (depth 1 unless you say) and stops before the first line whose every cell is a number. A
+   number in a text name prints as `#`. Each peek is recorded in `declarations/<id>/peek.log`.
+3. You write `declarations/<id>/CONVERSION.toml`.
+4. `convert` writes the bank to `<cc-banks>/<id>/bank` (`~/scratch/cc-banks` on the data host). It never overwrites a bank: remove the
+   old one, or use a new id (BANK_EXISTS). It writes nothing unless the identity test passes on the exact bytes it is about to write.
+5. In the intake declaration, `[source]` says `kind = "CONVERTED"`, `converted_from = "<cc-datasets>/<id>/raw"` and
+   `root = "<cc-banks>/<id>/bank"`, and `[selection]` excludes `CONVERSION-MANIFEST.json`. At S3 the intake checks the chain from the raw
+   files to the bank (CONVERSION_CHAIN_BROKEN) and then reads the bank exactly as a deposit.
+
+## The declaration
+
+```toml
+schema = 1
+kind = "conversion"
+source = "<cc-datasets>/run7/raw"
+out = "<cc-banks>/run7/bank"
+
+[[file]]                     # one entry per raw file you convert
+from = "run1.dat"            # a file under source
+to = "curve_000.csv"         # its name in the bank (letters, digits, _ . -)
+steps = [{op = "DROP_LINES", rule = {kind = "MARKER", marker = "[Data]"}}]
+```
+
+A file moves through four stages: RAW (bytes), TEXT (lines), TABLE (rows of cells) and NAMED (a names line and rows). Every output ends
+NAMED and is written as comma-separated UTF-8. When a step needs a later stage than the file is in, the default step of each stage in
+between runs first: DECODE `utf-8-sig`, then DELIMITER `COMMA`, then NAMES_LINE `FIRST`. So `steps = []` reads a plain CSV as it is. A
+step that needs an earlier stage than the file is already in is refused STEP_OUT_OF_ORDER. For example, DROP_LINES after DELIMITER is
+refused, because the lines are already cut into cells.
+
+A line with no text in any cell is skipped and recorded as blank. Every other line ends up in exactly one place: written, dropped by a
+DROP_LINES step, or the names line. The manifest records which.
+
+## The ops, each on a planted file
+
+Each example below is a case of tests/test_intake_convert.py (V1): the output is checked byte for byte.
+
+### UNPACK
+
+RAW to RAW: the bytes of one member of a zip archive.
+`a.zip` holds `run1.csv` = `T,C` / `1.5,0.25`.
+`steps = [{op = "UNPACK", member = "run1.csv"}]` writes `T,C` / `1.5,0.25`.
+If the archive does not hold the member, the refusal is SOURCE_FILE_ABSENT. If the bytes are not a zip archive, it is CONTAINER_UNREADABLE.
+
+### DECODE
+
+RAW to TEXT: the bytes decoded from `encoding`, one of `utf-8`, `utf-8-sig`, `latin-1`, `cp1252` and `utf-16`.
+A latin-1 file `T,µ` / `1.5,0.25` with `steps = [{op = "DECODE", encoding = "latin-1"}]` is written as UTF-8 `T,µ` / `1.5,0.25`.
+Bytes that are not that encoding are refused ENCODING_INVALID.
+
+### DROP_LINES
+
+TEXT to TEXT. Each dropped line is recorded in the manifest with its step. There are three rules:
+
+- `rule = {kind = "MARKER", marker = "[Data]"}` drops every line up to and including the first line that is exactly `[Data]` (blanks
+  around it ignored). This is a MultiVu-like file:
+  `[Header]` / `TITLE,run 1` / `[Data]` / `Time,Temp (K),Moment` / `1.0,300.5,1e-3` / `2.0,301.25,2e-3`.
+  It is written as `Time,Temp (K),Moment` / `1.0,300.5,1e-3` / `2.0,301.25,2e-3`. If no line is the marker, the refusal is MARKER_LINE_ABSENT.
+- `rule = {kind = "FIRST", count = 2}` drops the first two lines: `sample A` / `operator note` / `T,C` / `1.5,0.25` is written as `T,C` / `1.5,0.25`.
+- `rule = {kind = "PREFIX", prefix = "#"}` drops every line that begins with `#`: `# run 1` / `T,C` / `# pause` / `1.5,0.25` is written
+  as `T,C` / `1.5,0.25`.
+
+### DELIMITER
+
+TEXT to TABLE: each line cut into cells at `from`. `COMMA`, `SEMICOLON` and `TAB` are CSV dialects (quotes are honoured).
+`WHITESPACE` cuts at runs of blanks. A cell's text is never changed.
+`T⇥C` / `1.5⇥0.25` with `{op = "DELIMITER", from = "TAB"}` is written as `T,C` / `1.5,0.25`.
+`T   C` / `  1.5  0.25` / (blank) / `1.6 0.5` with `from = "WHITESPACE"` is written as `T,C` / `1.5,0.25` / `1.6,0.5` (the blank line is recorded as blank).
+
+### SHEET_TO_CSV
+
+RAW to TABLE: the rows of one sheet of an xlsx workbook. A number cell is written as Python writes it, and an empty cell as nothing.
+A workbook with sheets `notes` and `data`, where `data` holds `T`,`C` / 1.5,0.25: `steps = [{op = "SHEET_TO_CSV", sheet = "data"}]`
+writes `T,C` / `1.5,0.25`. This needs openpyxl (without it the refusal is XLSX_READER_ABSENT; run it on the data host). If the workbook
+has no such sheet, the refusal is SHEET_ABSENT. Bytes that are no workbook are refused CONTAINER_UNREADABLE.
+
+### NAMES_LINE
+
+TABLE to NAMED: which row is the names line.
+
+- `rule = {kind = "FIRST"}`: the first row (the default).
+- `rule = {kind = "WRITE", names = ["T", "C"]}`: the file has no names line, and these names are written. `1.5,0.25` / `1.6,0.5` is
+  written as `T,C` / `1.5,0.25` / `1.6,0.5`. No row is taken from the file.
+- `rule = {kind = "REPLACE_PREFIXED", prefix = "##"}`: the first row must begin with `##` (MARKER_LINE_ABSENT otherwise). It is the
+  names line without the prefix: `##T,C` / `1.5,0.25` is written as `T,C` / `1.5,0.25`.
+
+### DECIMAL_MARK
+
+NAMED to NAMED: in every data cell and every names cell, the decimal mark `,` becomes `.`. The only mark is `,`.
+`T;C` / `1,5;0,25` with `steps = [{op = "DELIMITER", from = "SEMICOLON"}, {op = "DECIMAL_MARK", mark = ","}]` is written as `T,C` / `1.5,0.25`.
+The identity test compares `1.5` with the source cell `1,5` after the same replacement, so the number is unchanged.
+
+### SELECT_COLUMNS
+
+NAMED to NAMED: the columns you name, in your order. Name a column by its name or by its 1-based position.
+`T,C,s` / `1.5,0.25,0.01` with `{op = "SELECT_COLUMNS", columns = ["C", 1]}` is written as `C,T` / `0.25,1.5`.
+A name that no column holds, or that two columns hold, a position out of range, or a row too short for a named column is refused COLUMN_ABSENT.
+
+### RENAME
+
+NAMED to NAMED: a names cell `from` becomes `to`. The cells below it are untouched.
+`Temp,C` / `1.5,0.25` with `{op = "RENAME", pairs = [{from = "Temp", to = "T"}]}` is written as `T,C` / `1.5,0.25`.
+If no single column is named `from`, the refusal is COLUMN_ABSENT.
+
+### SPLIT_ROWS
+
+NAMED to NAMED: one file becomes several. Rows are copied verbatim, in order, and each output repeats the names line.
+
+- `rule = {kind = "RANGES", parts = [{name = "up.csv", first = 1, last = 2}, {name = "down.csv", first = 3, last = 3}]}`: data rows
+  1 to 2 go to `up.csv`, and row 3 to `down.csv` (rows count from 1, after the names line).
+  `T,C` / `1.5,0.25` / `1.6,0.5` / `1.5,0.75` is written as `up.csv` = `T,C` / `1.5,0.25` / `1.6,0.5` and `down.csv` = `T,C` / `1.5,0.75`.
+  Every data row must land in exactly one part. A row in no part, or in two parts, is refused CELL_MAP_NOT_A_PERMUTATION.
+- `rule = {kind = "CHANGE", column = "h"}`: a new output starts each time the text of column `h` changes. The outputs are named after
+  `to`: `out.csv` gives `out_000.csv`, `out_001.csv` and so on.
+  `T,C,h` / `1.5,0.25,0.1` / `1.6,0.5,0.1` / `1.5,0.75,0.2` is written as `out_000.csv` (the two `0.1` rows) and `out_001.csv` (the `0.2` row).
+
+### WIDE_TO_LONG
+
+NAMED to NAMED: a wide table, whose names line is a key column followed by numbers, becomes a long table. Each source row becomes one block
+of rows, and each row of the block holds `fast` (the names cell, verbatim), `measured` (the row's cell) and the key cell.
+`h,1.5,1.6` / `0.1,0.25,0.5` / `0.2,0.75,1.0` with `{op = "WIDE_TO_LONG", key = "h", fast = "T", measured = "C"}` is written as
+`T,C,h` / `1.5,0.25,0.1` / `1.6,0.5,0.1` / `1.5,0.75,0.2` / `1.6,1.0,0.2`.
+Every name except the key's must be a number (NAMES_NOT_NUMERIC otherwise). A row shorter than the names line is refused COLUMN_ABSENT.
+Declare the bank as a LONG_TABLE whose slow column is the key.
+
+## Shapes that convert (tests/test_intake_convert.py V3)
+
+- **MultiVu-like** (`[Header]` ... `[Data]`, then a names line): `DROP_LINES` with rule MARKER `[Data]`.
+- **Semicolons, decimal commas and a `##` names line** such as `##Temp./°C;C;sigma`: `DELIMITER SEMICOLON`, `NAMES_LINE REPLACE_PREFIXED "##"`,
+  `DECIMAL_MARK ","`, then `RENAME` `Temp./°C` to `T`.
+- **WIDE** (a key column, and a names line of fast values): `WIDE_TO_LONG`, then a LONG_TABLE declaration.
+- **A workbook with two sheets**: `SHEET_TO_CSV` of the data sheet, `SELECT_COLUMNS`, then `SPLIT_ROWS RANGES` into one file per curve
+  and a PER_FILE declaration. This needs openpyxl, so it runs on the data host.
+
+## The identity test and the manifest
+
+Before writing, the converter checks two things on the exact bytes it is about to write:
+
+- **The cell map is a permutation.** Every output cell names one source cell (line and column). No source cell feeds two output cells,
+  except the repeated fast and key columns of WIDE_TO_LONG. Every source line is written, dropped by a declared DROP_LINES step, blank,
+  or a names line, exactly once. Otherwise the refusal is CELL_MAP_NOT_A_PERMUTATION.
+- **The identity holds.** Two numbers must be bitwise equal as floats, and any other cell must have equal text. Rows must stay in
+  source order. Otherwise the refusal is IDENTITY_FAILED.
+
+`CONVERSION-MANIFEST.json` in the bank records the following, and never a cell value:
+
+- the raw files: path, sha256 and size;
+- the outputs: path, sha256, size, rows, number of columns and the cell map, as line and column numbers;
+- the dropped and names lines, by number;
+- the steps as you declared them;
+- the code hash and the time.
+
+`convert <id> --verify` and S3 recompute everything from the files on disk. If a raw file or a bank file no longer has its recorded sha256,
+the refusal is CONVERSION_CHAIN_BROKEN. If the cells no longer match, the refusal is the identity test's.
+
+## Refusals
+
+Every refusal names the first check that failed. Its Detail gives counts, file names and text names, never a value. The sentences are
+in intake/CONVERSION.toml (`[[reason]]`). The S0 codes (TOML_INVALID, SCHEMA_UNSUPPORTED, FIELD_MISSING, FIELD_TYPE_WRONG, FIELD_UNKNOWN,
+VALUE_NOT_LISTED, VALUE_STILL_TODO, ROOT_NOT_UNDER_CC_BANKS and OPERATION_NOT_LISTED) mean the declaration itself needs fixing. The
+others are:
+
+| Code | What to do |
+|---|---|
+| ROOT_UNRESOLVED | `source` or `out` names a root that intake/ROOTS.toml lacks, or the raw directory does not exist |
+| BANK_EXISTS | the bank directory already has files; remove it or use a new id |
+| OUTPUT_NAME_REFUSED | an output name is not letters, digits, `_ . -`, is used twice, or is CONVERSION-MANIFEST.json |
+| STEP_OUT_OF_ORDER | move the step earlier: see the stages above |
+| SOURCE_FILE_ABSENT | `from` (or an UNPACK member) is not in the deposit |
+| CONTAINER_UNREADABLE, XLSX_READER_ABSENT, SHEET_ABSENT | the archive or workbook cannot be read as declared |
+| MARKER_LINE_ABSENT | no line is the marker, or the first row lacks the prefix |
+| COLUMN_ABSENT | a named column is missing or ambiguous, or a row is too short for it |
+| ENCODING_INVALID | the bytes are not the declared encoding: peek, then choose another |
+| NAMES_NOT_NUMERIC | WIDE_TO_LONG met a text name besides the key; SELECT_COLUMNS it away first |
+| CELL_MAP_NOT_A_PERMUTATION, IDENTITY_FAILED | the steps would lose, repeat, reorder or change a cell; this is the rule at the top |
+| CONVERSION_CHAIN_BROKEN | the raw files or the bank changed after the conversion; convert again under a new id |

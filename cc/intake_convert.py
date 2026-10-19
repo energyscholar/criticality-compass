@@ -36,9 +36,9 @@ LINES = re.compile(r"\r\n|\r|\n")
 OUT_NAME = re.compile(r"\w[\w.-]*")
 
 
-def ctables(root):
-    """intake/CONVERSION.toml and its sentences."""
-    ct = tomllib.loads((Path(root) / "intake" / "CONVERSION.toml").read_text())
+def ctables():
+    """intake/CONVERSION.toml of this code's own tree (as S3 reads it, and the manifest hashes it) and its sentences."""
+    ct = tomllib.loads((intake_data.ROOT / "intake" / "CONVERSION.toml").read_text())
     return {**ct, "sentences": {r["code"]: r["sentence"] for r in ct["reason"]}}
 
 
@@ -501,7 +501,7 @@ def s3(declaration, d, t, then):
     def go():
         loader = intake_data._t23().Loader({raw: "converted-from", bank: "universe"}, Path(d) / "access.log")
         m = _bind(_reader(bank, loader)(MANIFEST), lambda b: {True: lambda: None, False: lambda: _manifest(b.decode("utf-8", "replace"))}[b is None]())
-        got = chained(m, _reader(raw, loader), _reader(bank, loader), ctables(intake_data.ROOT), {"source": src["converted_from"], "out": src["root"]})
+        got = chained(m, _reader(raw, loader), _reader(bank, loader), ctables(), {"source": src["converted_from"], "out": src["root"]})
         broken = {True: lambda: got, False: lambda: Refuse("CONVERSION_CHAIN_BROKEN", got.evidence.within("", got.reason))}
         return {True: then, False: lambda: broken[got.reason == "CONVERSION_CHAIN_BROKEN"]()}[isinstance(got, Pass)]()
     return gate([(lambda: "" not in (bank, raw) and Path(bank).is_dir() and Path(raw).is_dir(), "ROOT_UNRESOLVED",
@@ -509,7 +509,7 @@ def s3(declaration, d, t, then):
 
 
 def convert_cli(root, ident, args, t):
-    ct = ctables(root)
+    ct = ctables()
     res = {True: lambda: verified(root, ident, t, ct), False: lambda: convert(root, ident, t, ct)}["--verify" in args]()
     print(f"convert {ident}{' --verify' * ('--verify' in args)}: " + res.text(ct["sentences"]))
     return {True: 1, False: 0}[isinstance(res, Refuse)]
@@ -549,7 +549,7 @@ def peek(raw, sheet, depth):
 def peek_cli(root, ident, args, t):
     """bin/cc intake peek <id> <file> [--sheet NAME] [--depth N]: the head of <cc-datasets>/<id>/raw/<file>, read through the logged loader;
     appended to declarations/<id>/peek.log (what was asked and how many lines were printed, never a line)."""
-    d, ct = Path(root) / "declarations" / ident, ctables(root)
+    d, ct = Path(root) / "declarations" / ident, ctables()
     rel, sheet, depth = {True: lambda: args[0], False: lambda: ""}[len(args) > 0](), _flag(args, "--sheet", ""), _flag(args, "--depth", "1")
     base = intake_data.located(f"<cc-datasets>/{ident}/raw", t["roots"])
     ok = rel != "" and not rel.startswith("--") and re.fullmatch(r"\d+", depth) is not None

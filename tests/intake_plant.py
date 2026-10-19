@@ -151,7 +151,7 @@ def converted(T, tmp, name, files, raws):
     d = Path(tmp) / "declarations" / f"c-{name}"
     d.mkdir(parents=True)
     (d / "CONVERSION.toml").write_text(conversion(f"<cc-datasets>/{name}/raw", f"<cc-banks>/{name}/bank", files))
-    return intake_convert.convert(tmp, f"c-{name}", rooted(T, tmp), intake_convert.ctables(ROOT))
+    return intake_convert.convert(tmp, f"c-{name}", rooted(T, tmp), intake_convert.ctables())
 
 
 def outcome(out, sid):
