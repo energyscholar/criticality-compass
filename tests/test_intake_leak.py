@@ -24,14 +24,22 @@ Seen RED (each mutation applied by hand, the test run, the mutation reverted):
  - (1160 P2) intake_names.masked returning the stated text unmasked: K3 FAILS on both UNIT_DIFFERS plants whose unit holds a sentinel
    (NAMES_UNITS 'K -7357.15', NAMES_UNITS_IN_NAMES 'T/K -7357.25').;
  - (1160 P3) intake_convert._said printing every head cell unmasked (numeric names included): K6 FAILS (peek stdout and peek.log);
- - (1160 P3) intake_convert._records adding each output's first data line to its manifest record: K6 FAILS on all four conversions."""
+ - (1160 P3) intake_convert._records adding each output's first data line to its manifest record: K6 FAILS on all four conversions;
+ - (1160 P4) each S1 row's holds made `lambda: True` in cc/intake_choices.py, one at a time (the ten rows of intake_plant.CHOICE_PLANTS):
+   that row's K2 plant(s) FAIL (PASS, or a later stage's code) and K2's totality FAILS; intake_seal.SEEN["PROSPECTIVE"] made True: the
+   MODE_CONTRADICTS_SOURCE plant and K2's totality FAIL; S6's READ_NOT_LOGGED or BYPASS_READ_LOGGED holds made True: that plant (the
+   deleted loader lines; the direct open()) and K2's totality FAIL; a CONVERTED bank read through a second loader: the converted PASS plant
+   FAILS (BYPASS_READ_LOGGED)."""
 import contextlib
 import hashlib
 import io
+import json
 import re
 import shutil
 import sys
 import tempfile
+import types
+from dataclasses import dataclass
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -40,8 +48,9 @@ import importlib.util  # noqa: E402
 
 import intake  # noqa: E402
 import intake_blind as blind  # noqa: E402
+import intake_seal  # noqa: E402
 import intake_synth  # noqa: E402
-from intake_plant import conversion, long_table, per_file, slow_source, write_long, xlsx  # noqa: E402
+from intake_plant import CHOICE_PLANTS, conversion, long_table, per_file, slow_source, write_long, xlsx  # noqa: E402
 
 bad = []
 
@@ -63,6 +72,13 @@ M = {"seed": 7357, "reader": "csv-curve-v1", "pattern": "curve_{index:03d}.csv",
      "measured": {"name": "C", "unit": "dimensionless", "column": "C"}, "files": [{"name": f"curve_{i:03d}.csv", "h": float(h)} for i, (h, _) in enumerate(CURVES)],
      "generator": {"path": "cc/intake_synth.py", "sha256": hashlib.sha256((ROOT / "cc" / "intake_synth.py").read_bytes()).hexdigest()}}
 TRANS = intake_synth.declare(M, "x", "pf")[2]
+
+
+@dataclass(frozen=True)
+class AtS6:
+    """(1160 P4) A plant step: `bin/cc intake run` in process (report written and printed as run writes it) with edit(bank dir, declaration
+    dir) applied between S5 and S6, so S6's body reads the access log as edited; one loader per run, as the command has."""
+    edit: object
 
 
 def forms(text):
@@ -119,11 +135,25 @@ with tempfile.TemporaryDirectory() as tmp:
         d.mkdir(parents=True)
         (d / "intake.toml").write_text(text(ident))
         (d / "transducer.toml").write_text(trans.replace('id = "x"', f'id = "{ident}"'))
-        said = "".join({True: lambda s=s: cli(s[0], ident, *s[1:]), False: lambda s=s: (s(banks / bank), "")[1]}[isinstance(s, tuple)]() for s in steps)
+        step = {tuple: lambda s: cli(s[0], ident, *s[1:]), types.FunctionType: lambda s: (s(banks / bank), "")[1], AtS6: lambda s: at_s6(ident, bank, s.edit)}   # total over the step kinds
+        said = "".join(step[type(s)](s) for s in steps)
         wrote = "".join((d / x).read_text() for x in ("intake-report.md", "SEAL.json", "seal.log", "access.log") if (d / x).is_file())
         m = re.search(r"REFUSE (\w+)\. [^\n]*?Detail: (?:[^;\n]*; )?(\w*)", said)
         code = {True: lambda: "PASS", False: lambda: {True: lambda: m[2], False: lambda: m[1]}[m[1] == "READER_REFUSED"]()}[m is None]()
         return code, said + wrote, ident
+
+    def at_s6(ident, bank, edit):
+        """(1160 P4) The run of an AtS6 step: intake.run's fold, with S6's body called after edit(bank dir, declaration dir)."""
+        t, d = intake.tables(w), w / "declarations" / ident
+        b = intake.bodies(t, d, (d / "intake.toml").read_text(), intake._findings(w, d, ident))
+        out = intake.fold(t["stages"]["stage"], {**b, "S6": lambda census: (edit(banks / bank, d), b["S6"](census))[1]})
+        text = intake.report(t, ident, out, intake_seal.ordering(d, t))
+        (d / "intake-report.md").write_text(text)
+        return text
+
+    def unlog(d, name):
+        """(1160 P4) The access log without the loader lines of file `name`."""
+        (d / "access.log").write_text("".join(ln + "\n" for ln in (d / "access.log").read_text().splitlines() if not json.loads(ln)["path"].endswith("/" + name)))
 
     PF, LT = pf_bank(), lt_bank()
 
@@ -194,11 +224,13 @@ with tempfile.TemporaryDirectory() as tmp:
         ("BRIDGE_NONE_FITS", "no bridge fits", S0(lambda t: t.replace('template = "CHAIN_SLOW"', 'template = "NONE_FITS"'))),
         ("BASIS_NOT_METADATA", "a figure in the basis", S0(lambda t: re.sub(r'class = "[A-Z_]+"', 'class = "FIGURE"', t, count=1))),
         ("TRANSDUCER_FILE_REFUSED", "a transducer.toml with no [reduction]", S0(lambda t: t, re.sub(r"(?s)\[reduction\].*?(?=\[interval\])", "", TRANS))),
+        *[(code, f"(1160 P4) {what}", S0(edit)) for code, what, edit in CHOICE_PLANTS],   # every live S1 row (and its PASS controls), linted, sealed, run
         ("BLOCK_RULE_HAS_NO_DIRECTION", "(1160 P2) block FAST_RESTART, rows in acquisition order, direction UNORDERED", (lt(LT, asc, block='"FAST_RESTART"'), LT, full(LT))),
         # S2 SEAL
         ("ALREADY_SEALED", "a second seal", (pf(PF), PF, (SEAL(banks / PF), SEAL(banks / PF)))),
         ("UNIVERSE_ROOT_ABSENT", "a universe that is no directory", (pf(PF), PF, (SEAL(tmp / "nowhere"),))),
         ("SELECTION_OUTSIDE_UNIVERSE", "an empty universe", (pf(PF), PF, (lambda b: (tmp / "empty").mkdir(), SEAL(tmp / "empty")))),
+        ("MODE_CONTRADICTS_SOURCE", "(1160 P4) mode PROSPECTIVE, sealed over the bank that holds the selected files", S0(lambda t: t.replace('mode = "RETROSPECTIVE_PREDECLARED"', 'mode = "PROSPECTIVE"', 1))),
         ("SELECTION_DUPLICATE", "(1160) a file named twice in files", (pf(PF, lambda t: t.replace("files = [", 'files = ["curve_002.csv", ', 1).replace("values = [", f'values = ["{slow(2)}", ', 1)), PF, full(PF))),
         ("UNIVERSE_NOT_PARTITIONED", "(1160) a universe file in no part", (pf(UP := pf_bank(lambda b: (b / "notes.txt").write_text("planted\n"))), UP, full(UP))),
         # S3 SOURCE_INTEGRITY
@@ -214,6 +246,9 @@ with tempfile.TemporaryDirectory() as tmp:
         ("CONVERSION_CHAIN_BROKEN", "(1160 P3) one byte of a raw sentinel file changed after the conversion",
          (*cv(conv_bank(curve_files, as_is, lambda raw, bank: (raw / "curve_001.csv").write_bytes((raw / "curve_001.csv").read_bytes().replace(b"T", b"t", 1)))), unsealed)),
         ("PASS", "(1160 P3) the converted PER_FILE sentinel bank, sealed", (*cv(CV := conv_bank(curve_files, as_is)), (("lint",), SEAL(tmp / "cc-banks" / CV / "bank"), ("run",)))),
+        # S6 ADMISSIBILITY (1160 P4): linted, sealed, then run with the edit between S5 and S6
+        ("READ_NOT_LOGGED", "(1160 P4) the loader lines of curve_002.csv deleted from the access log", (pf(PF), PF, full(PF)[:2] + (AtS6(lambda b, d: unlog(d, "curve_002.csv")),))),
+        ("BYPASS_READ_LOGGED", "(1160 P4) curve_001.csv opened directly in the test process (open(), not the loader)", (pf(PF), PF, full(PF)[:2] + (AtS6(lambda b, d: (b / "curve_001.csv").read_bytes()),))),
         # S4 SHAPE
         ("READER_NOT_LIVE", "reader P1", (pf(PF, lambda t: t.replace('name = "csv-curve-v1"', 'name = "P1"')), PF, full(PF))),
         ("COLUMNS_DIFFER", "csv-curve-v1, the first file's names line holds a NUMERIC name",

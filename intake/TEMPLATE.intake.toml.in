@@ -84,7 +84,7 @@ identity = "TODO"       # what makes two curves at one slow value replicates: NO
 key = "TODO"            # the key that names a replicate; "" for NONE
 
 [interval]
-method = "TODO"         # block | iid | gamma | chains; then add that method's fields (cc.toml [interval_fields.<method>])
+method = "TODO"         # block | iid | gamma | chains | STATED (the uncertainty column is each point's interval) | NONE (no interval); then add that method's fields (cc.toml [interval_fields.<method>]; STATED and NONE have none)
 
 [bracket]
 required = "TODO"       # the most this declaration requires of a bracket: CANDIDATE_BRACKET | VALIDATED_BRACKET

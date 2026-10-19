@@ -10,7 +10,14 @@ row is returnable. Planted inputs only; each check was seen RED under a stated m
  E3. UNIT_DIFFERS is reached through a file whose header states units (header kind NAMES_UNITS).
  E4. explain (docs/INTAKE.md) and every report carry the rows that are not live.
 Seen RED (1160 P3): intake_convert.s3 returning then() without the chain check: both CONVERSION_CHAIN_BROKEN plants FAIL (PASS) and E2's
-totality FAILS (CONVERSION_CHAIN_BROKEN live, never reached)."""
+totality FAILS (CONVERSION_CHAIN_BROKEN live, never reached).
+Seen RED (1160 P4): each S1 row's holds made `lambda: True` in cc/intake_choices.py (KNOBS_SAME_QUANTITY, MEASURED_IS_A_KNOB,
+PROJECTION_REQUIRED, PROJECTION_ESTIMAND_MIXED, SECOND_LANE_MISSING, LANES_IDENTICAL, REPLICATE_IS_SWEEP_NEIGHBOUR, OPERATION_NOT_PERMITTED,
+PROVENANCE_HAS_NO_KERNEL_ROUTE, METHOD_NEEDS_UNCERTAINTY_COLUMN), one at a time: that row's plant(s) FAIL (PASS, or a later stage's code)
+and E2's totality FAILS (the row live, never reached); intake_seal.SEEN["PROSPECTIVE"] made True: the MODE_CONTRADICTS_SOURCE plant FAILS
+(PASS) and E2's totality FAILS; S6's READ_NOT_LOGGED or BYPASS_READ_LOGGED holds made True: that plant FAILS (PASS: the deleted loader
+lines, the direct open()) and E2's totality FAILS; a CONVERTED source's bank read through a second loader (P3's two loaders): the converted
+PASS plant FAILS (BYPASS_READ_LOGGED: the chain loader's audit hook logged the bank loader's reads)."""
 import importlib.util
 import json
 import re
@@ -24,10 +31,11 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "tests")]
 import intake  # noqa: E402
 import intake_blind as blind  # noqa: E402
+import intake_data  # noqa: E402
 import intake_read as rd  # noqa: E402
 import intake_seal  # noqa: E402
 import intake_synth  # noqa: E402
-from intake_plant import converted, key_lines, long_table, outcome, per_file, rooted, run, slow_source, write_long, xlsx  # noqa: E402
+from intake_plant import CHOICE_PLANTS, converted, key_lines, long_table, outcome, per_file, rooted, run, slow_source, write_long, xlsx  # noqa: E402
 
 bad = []
 
@@ -159,6 +167,20 @@ with tempfile.TemporaryDirectory() as tmp:
         between(banks / name)
         return first(run(T, tmp, ident, text))
 
+    def at_s6(edit):
+        """(1160 P4) A PER_FILE declaration of pf folded over the stage table with `edit` (on the declaration directory and the bank directory)
+        applied between S5 and S6: S6's body then reads the access log as edited. One loader per run, as bin/cc intake run has."""
+        ident = f"d{next(n)}"
+        d, text = tmp / "declarations" / ident, per_file(m, ident)
+        d.mkdir(parents=True)
+        (d / "intake.toml").write_text(text)
+        b = intake.bodies(rooted(T, tmp), d, text, [])
+        return first(intake.fold(T["stages"]["stage"], {**b, "S6": lambda census: (edit(d, banks / "pf"), b["S6"](census))[1]}))
+
+    def unlog(d, name):
+        """(1160 P4) The access log without the loader lines of file `name`."""
+        (d / "access.log").write_text("".join(ln + "\n" for ln in (d / "access.log").read_text().splitlines() if not json.loads(ln)["path"].endswith("/" + name)))
+
     base = per_file(m, "s0")
     s0 = lambda text, findings=(): {True: lambda g: g.reason, False: lambda g: "PASS"}[isinstance(blind.format_stage(text, list(findings), T), blind.Refuse)](blind.format_stage(text, list(findings), T))
     nu = 'kind = "NAMES_UNITS"\nrows = 2\nnames = 1\nunits = 2'
@@ -183,7 +205,8 @@ with tempfile.TemporaryDirectory() as tmp:
         ("BRIDGE_NONE_FITS", "no bridge fits", lambda: s0(base.replace('template = "CHAIN_SLOW"', 'template = "NONE_FITS"'))),
         ("BASIS_NOT_METADATA", "a figure in the basis", lambda: s0(re.sub(r'class = "[A-Z_]+"', 'class = "FIGURE"', base, count=1))),
         ("TRANSDUCER_FILE_REFUSED", "a planted transducer finding", lambda: s0(base, ["transducer.update[0]: planted"])),
-        # S1 CHOICES (plan 1160 P1: one live row)
+        # S1 CHOICES (plan 1160 P1-P2; P4: every row, the plants of intake_plant.CHOICE_PLANTS, each run through every stage)
+        *[(code, f"(1160 P4) {what}", lambda edit=edit: pf("pf", edit)) for code, what, edit in CHOICE_PLANTS],
         ("BLOCK_RULE_HAS_NO_DIRECTION", "(1160 P2) block FAST_RESTART, rows in acquisition order, direction UNORDERED", lambda: lt(bank(), asc, block='"FAST_RESTART"')),
         ("SELECTION_EMPTY", "(1160 P2, A1) files = [] and values = []", lambda: pf("pf", lambda t: re.sub(r"values = \[[^\]]*\]", "values = []", re.sub(r"files = \[[^\]]*\]", "files = []", t, count=1), count=1))),
         ("SLOW_VALUES_NOT_ONE_PER_FILE", "(1160) one LISTED value fewer than the files", lambda: pf("pf", lambda t: re.sub(r'values = \["[^"]*", ', 'values = [', t, count=1))),
@@ -192,6 +215,8 @@ with tempfile.TemporaryDirectory() as tmp:
         ("UNIVERSE_ROOT_ABSENT", "a universe that is no directory", lambda: mint(tmp / "nowhere")),
         ("SELECTION_OUTSIDE_UNIVERSE", "an empty universe", lambda: mint([p for p in [tmp / "empty"] if p.mkdir() is None][0])),
         ("SELECTION_OUTSIDE_UNIVERSE", "(1160) a files entry the universe does not hold", lambda: mint(banks / "pf", edit=lambda t: grow(t, "curve_999.csv"))),
+        ("MODE_CONTRADICTS_SOURCE", "(1160 P4) mode PROSPECTIVE, sealed over a universe that holds the selected files",
+         lambda: mint(banks / "pf", edit=lambda t: t.replace('mode = "RETROSPECTIVE_PREDECLARED"', 'mode = "PROSPECTIVE"', 1))),
         ("SELECTION_DUPLICATE", "(1160) a file named twice in files", lambda: mint(banks / "pf", edit=lambda t: grow(t, m["files"][2]["name"]))),
         ("UNIVERSE_NOT_PARTITIONED", "(1160) a universe file in no part", lambda: mint(banks / copy(lambda b: (b / "notes.txt").write_text("planted\n")))),
         ("UNIVERSE_NOT_PARTITIONED", "(1160) a file both selected and excluded", lambda: mint(banks / "pf", edit=lambda t: t.replace('why = "metadata', f'why = "x" }}, {{ file = "{m["files"][1]["name"]}", why = "metadata', 1))),
@@ -210,6 +235,10 @@ with tempfile.TemporaryDirectory() as tmp:
         ("CONVERSION_CHAIN_BROKEN", "(1160 P3) one byte of a raw file changed after the conversion", lambda: conv(lambda raw, bank: (raw / m["files"][2]["name"]).write_bytes(
             (raw / m["files"][2]["name"]).read_bytes().replace(b"T", b"t", 1)))),
         ("PASS", "(1160 P3) a converted bank passes S3 and reads as a DEPOSIT", lambda: conv()),
+        # S6 ADMISSIBILITY (plan 1160 P4), each edit applied between S5 and S6 of one run
+        ("PASS", "(1160 P4) the access log as the run wrote it", lambda: at_s6(lambda d, b: None)),
+        ("READ_NOT_LOGGED", "(1160 P4) the loader lines of one pinned file deleted from the access log", lambda: at_s6(lambda d, b: unlog(d, m["files"][4]["name"]))),
+        ("BYPASS_READ_LOGGED", "(1160 P4) a bank file opened directly in the test process (open(), not the loader)", lambda: at_s6(lambda d, b: (b / m["files"][1]["name"]).read_bytes())),
         # S4 SHAPE
         ("READER_NOT_LIVE", "reader P1", lambda: pf("pf", lambda t: t.replace('name = "csv-curve-v1"', 'name = "P1"'))),
         ("COLUMNS_DIFFER", "csv-curve-v1, the first file's header T,Q,sigma", lambda: pf(copy(lambda b: (b / m["files"][0]["name"]).write_text((b / m["files"][0]["name"]).read_text().replace("T,C,sigma", "T,Q,sigma", 1))))),

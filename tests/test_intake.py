@@ -9,7 +9,12 @@
     information; no data stage's signature takes a seal; mint still refuses an absent universe and a second seal.
  5. Five planted bad declarations (the worked example with one planted edit each) are refused at S0 FORMAT with their named reasons.
  Plus: the enum names parse as Boolean formulas (binding rule); S0's module can open nothing (imports and calls, over the AST); the copied
- loader is byte-identical to its pin."""
+ loader is byte-identical to its pin.
+Seen RED (1160 P4; each mutation applied, the test run, the mutation reverted): NEEDS_COLUMN without NONE, or with a method BOGUS: the
+interval-alphabet check FAILS; PERMITTED without (PAIR_NEAREST_FAST, NO_LINK): the PERMITTED totality check FAILS; ROUTE without DECLARABLE,
+and intake_seal.SEEN without EXPLORATORY: the S1-tables totality check FAILS; STAGES LANES_IDENTICAL live = false: the S1 live-rows-in-order
+check FAILS (and the INTAKE.md checks); S1's first two rows swapped in intake_choices.choices: the in-order check FAILS; `import os` in
+cc/intake_choices.py: its blindness check FAILS."""
 import ast
 import dataclasses
 import enum

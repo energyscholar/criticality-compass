@@ -54,6 +54,29 @@ CHOICES = {"intake.mode": '"RETROSPECTIVE_PREDECLARED"',   # plan 1160 P4: PROSP
            "interval.method": '"iid"', "bracket.required": '"CANDIDATE_BRACKET"', "projection.lane": '"PRIMARY"', "projection.from": '"C"', "projection.to": '"C_max"',
            "projection.bias": '"MAX_MEASURED"', "projection.keeps": '"the largest C on each curve"', "projection.discards": '"every other point"',
            "bridge.lane": '"PRIMARY"', "bridge.on": '"C_max"', "bridge.template": '"CHAIN_SLOW"', "bridge.bias": '"CHAIN_SLOW"', "shift.c": "0.0"}
+IID = 'method = "iid"\nresamples = 1000\nlevel = 0.95\nseed = 1145\ntau_declared = 1'   # per_file's interval block
+ALT = '\n[[projection]]\nlane = "ALTERNATIVE"\nfrom = "C"\nto = "{to}"\nbias = "{bias}"\nkeeps = "planted"\ndiscards = "planted"\n'
+ALT_BRIDGE = '\n[[bridge]]\nlane = "ALTERNATIVE"\non = "{on}"\ntemplate = "CHAIN_SLOW"\nbias = "CHAIN_SLOW"\n'
+NO_SIGMA = lambda t: re.sub(r'kind = "COLUMN"([^\n]*)\nkey = "sigma"[^\n]*\n', r'kind = "NONE"\1\n', t, count=1)   # [measured.uncertainty] kind NONE
+CHOICE_PLANTS = [   # (1160 P4) one plant per live S1 CHOICES row, and the PASS controls: (code, what, an edit of a per_file declaration text).
+    # tests/test_intake_reach.py runs each in process, tests/test_intake_leak.py through bin/cc intake lint | seal | run on its sentinel bank
+    ("KNOBS_SAME_QUANTITY", "[knobs.slow] name T, the fast knob's", lambda t: t.replace('name = "h"', 'name = "T"', 1)),
+    ("MEASURED_IS_A_KNOB", "[measured] key T, the fast knob's column", lambda t: t.replace('key = "C"', 'key = "T"', 1)),
+    ("PROJECTION_REQUIRED", "shape PICTURE, and the bridge on the raw C", lambda t: t.replace('shape = "SCALAR_PER_LOCUS"', 'shape = "PICTURE"', 1).replace('on = "C_max"', 'on = "C"', 1)),
+    ("PROJECTION_ESTIMAND_MIXED", "a second projection to C_max by ARGMAX_FAST (a location; MAX_MEASURED's is a height)", lambda t: t + ALT.format(to="C_max", bias="ARGMAX_FAST")),
+    ("SECOND_LANE_MISSING", "origin EXPERIMENT with one lane", lambda t: t.replace('origin = "PLANTED"', 'origin = "EXPERIMENT"', 1)),
+    ("LANES_IDENTICAL", "an ALTERNATIVE lane with the PRIMARY's projection and bridge", lambda t: t + ALT.format(to="C_max", bias="MAX_MEASURED") + ALT_BRIDGE.format(on="C_max")),
+    ("REPLICATE_IS_SWEEP_NEIGHBOUR", "identity SEED keyed by T, the fast knob", lambda t: t.replace('identity = "NONE"', 'identity = "SEED"', 1).replace('key = ""', 'key = "T"', 1)),
+    ("OPERATION_NOT_PERMITTED", "the bridge PAIR_NEAREST_FAST on C_max (a derived observable; it pairs raw locus values)",
+     lambda t: t.replace('template = "CHAIN_SLOW"', 'template = "PAIR_NEAREST_FAST"', 1).replace('bias = "CHAIN_SLOW"', 'bias = "PAIR_NEAREST_FAST"', 1)),
+    ("OPERATION_NOT_PERMITTED", "a bridge on C_maxx, a name the chain does not hold", lambda t: t.replace('on = "C_max"', 'on = "C_maxx"', 1)),
+    ("PROVENANCE_HAS_NO_KERNEL_ROUTE", "admissibility FIGURE_LEVEL", lambda t: t.replace('admissibility = "RAW"', 'admissibility = "FIGURE_LEVEL"', 1)),
+    ("METHOD_NEEDS_UNCERTAINTY_COLUMN", "interval STATED, and [measured.uncertainty] kind NONE", lambda t: NO_SIGMA(t.replace(IID, 'method = "STATED"', 1))),
+    ("PASS", "interval STATED with the sigma column", lambda t: t.replace(IID, 'method = "STATED"', 1)),
+    ("PASS", "interval NONE (no interval; the file's sigma column is still declared, S4 reads every column)", lambda t: t.replace(IID, 'method = "NONE"', 1)),
+    ("PASS", "origin EXPERIMENT with two lanes that differ (ALTERNATIVE: C to T_star by ARGMAX_FAST, chained)",
+     lambda t: t.replace('origin = "PLANTED"', 'origin = "EXPERIMENT"', 1) + ALT.format(to="T_star", bias="ARGMAX_FAST") + ALT_BRIDGE.format(on="T_star")),
+]
 LONG = '''# [reader]: VARIANT on name
 [reader]
 name = "table-curve-v1"
