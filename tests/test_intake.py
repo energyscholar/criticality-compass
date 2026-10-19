@@ -118,6 +118,11 @@ BLOCKS = set(F["selection"]["variants"]["LONG_TABLE"]["block"]["values"])
 check("1. (1160 P2) the LONG_TABLE blocks are EXACT and FAST_RESTART; BREAK is total over them, DIRECTED over the layouts, SWEEP over row_order",
       BLOCKS == {"EXACT", "FAST_RESTART"} and set(intake_data.BREAK) == BLOCKS and set(blind.DIRECTED) == set(F["selection"]["variants"])
       and set(blind.SWEEP) == set(F["acquisition"]["fields"]["row_order"]["values"]), str(BLOCKS))
+HEADS = F["reader"]["variants"]["table-curve-v1"]["header"]["variants"]
+import intake_read  # noqa: E402
+check("1. (1160 P2) the header kinds hold NAMES_UNITS_IN_NAMES; HEADER and NAMED are total over them, UNIT_SYNTAX over its unit_syntax values",
+      "NAMES_UNITS_IN_NAMES" in HEADS and set(intake_read.HEADER) == set(intake_read.NAMED) == set(HEADS)
+      and set(intake_names.UNIT_SYNTAX) == set(HEADS["NAMES_UNITS_IN_NAMES"]["unit_syntax"]["values"]), str(sorted(HEADS)))
 IDENT = set(F["replicate"]["fields"]["identity"]["values"])
 check("1. (1160 P2) the replicate identities hold SAME_FAST_VALUE; POINTS is total over them and REPLICATE over (layout, identity)",
       "SAME_FAST_VALUE" in IDENT and set(intake_data.POINTS) == IDENT and set(intake_data.REPLICATE) == set(itertools.product(F["selection"]["variants"], IDENT)), str(sorted(IDENT)))

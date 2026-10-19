@@ -67,6 +67,9 @@ For a table, `[reader]` is `table-curve-v1`:
   - `SKIP` with `rows`;
   - `NAMES` with `rows` and the line of `names`;
   - `NAMES_UNITS` with `rows`, the line of `names` and the line of `units`.
+  - `NAMES_UNITS_IN_NAMES` with `rows`, the line of `names` and `unit_syntax`: each names cell holds its unit, as `T (K)` (`PAREN`) or
+    `T/K` (`SLASH`, split at the first slash). Declare a column by its bare name (`T`). A names cell with no unit states none, and a
+    unit that differs from the declared one is refused UNIT_DIFFERS. A refusal prints a stated unit with every number in it as `#`.
 - `comment` holds the line prefixes to drop, for example `["#"]`, or `[]` for none. An empty prefix `""` would drop every line, so it is
   refused COMMENT_PREFIX_EMPTY.
 

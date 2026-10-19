@@ -19,13 +19,15 @@ import io
 from dataclasses import dataclass, field
 
 from intake_blind import NUMBER, Detail, detail
+from intake_names import split_unit
 
 
 @dataclass(frozen=True)
 class Grid:
     """A file a reader could read. Invariant: `columns` is the column of each cell of a row (table-curve-v1: the declared column of each
     role, in role order; csv-curve-v1: its header line); every row of `rows` holds one float per column, in file order; `units` holds the
-    (role, unit) pairs the file states (a NAMES_UNITS header), () when it states none; `head` holds the header lines as read, each a tuple of
+    (role, unit) pairs the file states (a NAMES_UNITS header, or NAMES_UNITS_IN_NAMES: "" for a names cell with no unit), () when it
+    states none; `head` holds the header lines as read, each a tuple of
     cell texts (plan 1160 P1: the one place a FILE_KEY slow value is found, see keyed), and takes no part in comparing two Grids."""
     columns: tuple
     units: tuple
@@ -156,6 +158,11 @@ HEADER = {   # [reader.header] kind -> (the 1-based header lines it names: names
     "SKIP": lambda h: {},
     "NAMES": lambda h: {"names": h["names"]},
     "NAMES_UNITS": lambda h: {"names": h["names"], "units": h["units"]},
+    "NAMES_UNITS_IN_NAMES": lambda h: {"names": h["names"]},   # plan 1160 P2: the units are inside the names line (NAMED)
+}
+NAMED = {   # [reader.header] kind -> (its row, the cells of each line HEADER names) -> the names and the units the file states; total (test)
+    **{k: (lambda h, lined: lined) for k in ("SKIP", "NAMES", "NAMES_UNITS")},
+    "NAMES_UNITS_IN_NAMES": lambda h, lined: dict(zip(("names", "units"), map(list, zip(*[split_unit(c, h["unit_syntax"]) for c in lined["names"]])))),
 }
 
 
@@ -179,11 +186,11 @@ def table(cells, spec, roles):
     return first([(lambda: len(head) == h["rows"] and all(1 <= n <= h["rows"] for n in lines.values()), "HEADER_LINE_ABSENT",
                    lambda: detail(rows=lines.values(), counts={"header lines": len(head), "header lines declared": h["rows"]})),
                   (lambda: len(body) > 0, "NO_DATA_ROW", lambda: detail(counts={"header lines": len(head), "data rows": 0}))],
-                 lambda: _columns(head, body, lines, roles))
+                 lambda: _columns(head, body, lines, roles, h))
 
 
-def _columns(head, body, lines, roles):
-    named = {k: [_name(x) for x in head[n - 1][1]] for k, n in lines.items()}
+def _columns(head, body, lines, roles, h):
+    named = NAMED[h["kind"]](h, {k: [_name(x) for x in head[n - 1][1]] for k, n in lines.items()})
     names = {True: lambda: named["names"], False: lambda: []}["names" in named]()
     width = {True: lambda: len(head[lines["names"] - 1][1]), False: lambda: len(body[0][1])}["names" in lines]()
     short = [(i, len(c)) for i, c in body if len(c) != width]

@@ -21,7 +21,11 @@ here (tests/test_intake_cli.py runs it on the command line).
      value and distinct_slow_in_block max = 3. Two sweeps with one slow value each pass under both rules with the same label. FAST_RESTART
      with rows in acquisition order needs a direction: UNORDERED refuses S1 BLOCK_RULE_HAS_NO_DIRECTION, ASCENDING passes. Seen RED:
      BREAK["FAST_RESTART"] made the EXACT rule fails the FAST_RESTART PASS check (CURVE_REPEATED); DIRECTED["LONG_TABLE"] made always True
-     makes the S1 check unreachable: the run passes S1 and crashes at S4 (RESTARTS has no UNORDERED row), the crash S1 now refuses."""
+     makes the S1 check unreachable: the run passes S1 and crashes at S4 (RESTARTS has no UNORDERED row), the crash S1 now refuses.
+ L8. (plan 1160 P2) [reader.header] kind NAMES_UNITS_IN_NAMES: names cells "T (dimensionless)" (PAREN) or "T/dimensionless" (SLASH) pass
+     S5 with the label of the plain long file, the columns declared by their bare names; "T (K)" and "T/K" refuse S4 UNIT_DIFFERS; a role's
+     names cell with no unit states none, so it refuses UNIT_DIFFERS against a declared unit. Seen RED: NAMED["NAMES_UNITS_IN_NAMES"] made
+     the identity (no split) fails both PASS checks (COLUMN_NAME_ABSENT: no names cell is a bare name)."""
 import sys
 import tempfile
 from pathlib import Path
@@ -131,6 +135,18 @@ with tempfile.TemporaryDirectory() as tmp:
     check("L7. FAST_RESTART with rows in acquisition order and direction UNORDERED refuses S1 BLOCK_RULE_HAS_NO_DIRECTION", nd[0] == "BLOCK_RULE_HAS_NO_DIRECTION", str(nd)[:300])
     ad = outcome(run(tmp, "ba", blk("ba", "dr", "FAST_RESTART", acq_dir("ASCENDING"))), "S5")
     check("L7. the same with direction ASCENDING passes S5 with two curves", ad[0] == "PASS" and ad[1].label.curves == 2, str(ad)[:300])
+
+    # ---- L8. (1160 P2) units inside the names cells
+    inn = lambda syntax: f'kind = "NAMES_UNITS_IN_NAMES"\nrows = 1\nnames = 1\nunit_syntax = "{syntax}"'
+    cases = [("PAREN", "T (dimensionless),C (dimensionless),sigma (dimensionless),h (dimensionless)", "PASS"),
+             ("SLASH", "T/dimensionless,C / dimensionless,sigma/dimensionless,h/dimensionless", "PASS"),
+             ("PAREN", "T (K),C (dimensionless),sigma (dimensionless),h (dimensionless)", "UNIT_DIFFERS"),
+             ("SLASH", "T/K,C/dimensionless,sigma/dimensionless,h/dimensionless", "UNIT_DIFFERS"),
+             ("PAREN", "T,C (dimensionless),sigma (dimensionless),h (dimensionless)", "UNIT_DIFFERS")]
+    for i, (syntax, names, want) in enumerate(cases):
+        got = outcome(run(tmp, f"in{i}", long_table(m, f"in{i}", header=inn(syntax)).replace("<long-test>/pf", "<long-test>/" + bank(f"in{i}", curves, head=names + "\n"))), "S5")
+        check(f"L8. {syntax} names line '{names[:24]}...': {want}" + " with the plain long file's label" * (want == "PASS"),
+              got[0] == want and (want != "PASS" or got[1].label == lt[1].label), str(got)[:300])
 
 print("test_intake_long: " + ("FAILED " + "; ".join(bad) if bad else "all passed"))
 sys.exit(1 if bad else 0)

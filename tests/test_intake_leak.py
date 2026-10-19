@@ -17,7 +17,8 @@ Seen RED (each mutation applied by hand, the test run, the mutation reverted):
  - _resolve's COLUMN_NAME_ABSENT detail printing the names line (f"... {names}"): K3 FAILS on the numeric-names plant;
  - Census.listing printing the slow value instead of the where: K4 and K3 FAIL;
  - (1160 P2) BREAK["FAST_RESTART"] made the EXACT rule: K2 FAILS on the two-sweep FAST_RESTART PASS plant (CURVE_REPEATED) and K5 FAILS (579 one-point curves);
- - (1160 P2) intake_names.masked returning the stated text unmasked: K3 FAILS on the UNIT_DIFFERS plant whose unit holds a sentinel."""
+ - (1160 P2) intake_names.masked returning the stated text unmasked: K3 FAILS on both UNIT_DIFFERS plants whose unit holds a sentinel
+   (NAMES_UNITS 'K -7357.15', NAMES_UNITS_IN_NAMES 'T/K -7357.25')."""
 import contextlib
 import hashlib
 import io
@@ -131,6 +132,7 @@ with tempfile.TemporaryDirectory() as tmp:
     append = lambda name, text: lambda b: (b / name).write_text((b / name).read_text() + text)
     asc = lambda t: t.replace('row_order = "ASCENDING"', 'row_order = "ACQUISITION"')
     nu = 'kind = "NAMES_UNITS"\nrows = 2\nnames = 1\nunits = 2'
+    inn = lambda syntax: f'kind = "NAMES_UNITS_IN_NAMES"\nrows = 1\nnames = 1\nunit_syntax = "{syntax}"'   # 1160 P2
     xl = lambda t: t.replace('[reader.format]\nkind = "COMMA"', '[reader.format]\nkind = "XLSX"\nsheet = "data"')
     rows = [[float(x) for x in r.split(",")] + [float(h)] for h, rs in CURVES for r in rs]
     numeric_names = ("T,C,sigma,h\n" + "".join(f"{r},{h}\n" for h, rs in CURVES for r in rs)).replace("T,C,sigma,h", "h," + ",".join(cell(0, j, 1) for j in range(3)), 1).encode()
@@ -184,6 +186,10 @@ with tempfile.TemporaryDirectory() as tmp:
         ("UNIT_DIFFERS", "a NAMES_UNITS header stating T in K", (lt(UD := lt_bank(head="T,C,sigma,h\nK,dimensionless,dimensionless,dimensionless\n"), header=nu), UD, full(UD))),
         ("UNIT_DIFFERS", "(1160 P2) a NAMES_UNITS header whose unit of T holds a sentinel number ('K -7357.15'): the stated unit prints masked",
          (lt(US := lt_bank(head=f"T,C,sigma,h\nK {slow(0)},dimensionless,dimensionless,dimensionless\n"), header=nu), US, full(US))),
+        ("PASS", "(1160 P2) NAMES_UNITS_IN_NAMES PAREN, every names cell 'name (dimensionless)', sealed",
+         (lt(IP := lt_bank(head="T (dimensionless),C (dimensionless),sigma (dimensionless),h (dimensionless)\n"), header=inn("PAREN")), IP, full(IP))),
+        ("UNIT_DIFFERS", "(1160 P2) NAMES_UNITS_IN_NAMES SLASH, T's names cell 'T/K -7357.25' (a sentinel in the unit): the unit prints masked",
+         (lt(IS := lt_bank(head=f"T/K {slow(1)},C/dimensionless,sigma/dimensionless,h/dimensionless\n"), header=inn("SLASH")), IS, full(IS))),
         ("ROW_ORDER_DIFFERS", "one swapped pair inside block 5",
          (lt(RO := lt_bank([(h, rs[:3] + [rs[4], rs[3]] + rs[5:]) if i == 4 else (h, rs) for i, (h, rs) in enumerate(CURVES)])), RO, full(RO))),
         # S5 CENSUS

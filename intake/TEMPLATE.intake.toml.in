@@ -32,7 +32,9 @@ comment = "TODO"        # table-curve-v1: a list of line prefixes that mark a co
 kind = "TODO"           # COMMA | TAB | WHITESPACE | XLSX (then also: sheet = "<sheet name>")
 # [reader.header]: table-curve-v1, VARIANT on kind
 [reader.header]
-kind = "TODO"           # SKIP (rows) | NAMES (rows, names) | NAMES_UNITS (rows, names, units): header line counts, after comment lines are dropped
+kind = "TODO"           # SKIP (rows) | NAMES (rows, names) | NAMES_UNITS (rows, names, units) | NAMES_UNITS_IN_NAMES (rows, names,
+                        # unit_syntax = PAREN for "T (K)" | SLASH for "T/K"; declare columns by the bare name): header line counts, after
+                        # comment lines are dropped
 rows = "TODO"           # how many header lines precede the data
 names = "TODO"          # NAMES, NAMES_UNITS: the 1-based header line that holds the column names
 

@@ -197,6 +197,8 @@ with tempfile.TemporaryDirectory() as tmp:
         # S4 SHAPE
         ("READER_NOT_LIVE", "reader P1", lambda: pf("pf", lambda t: t.replace('name = "csv-curve-v1"', 'name = "P1"'))),
         ("COLUMNS_DIFFER", "csv-curve-v1, the first file's header T,Q,sigma", lambda: pf(copy(lambda b: (b / m["files"][0]["name"]).write_text((b / m["files"][0]["name"]).read_text().replace("T,C,sigma", "T,Q,sigma", 1))))),
+        ("UNIT_DIFFERS", "(1160 P2) a NAMES_UNITS_IN_NAMES names line 'T (K),...'", lambda: lt(bank(head="T (K),C (dimensionless),sigma (dimensionless),h (dimensionless)\n"),
+                                                                                          header='kind = "NAMES_UNITS_IN_NAMES"\nrows = 1\nnames = 1\nunit_syntax = "PAREN"')),
         ("UNIT_DIFFERS", "E3: a NAMES_UNITS header stating T in K", lambda: lt(bank(head="T,C,sigma,h\nK,dimensionless,dimensionless,dimensionless\n"), header=nu)),
         ("ROW_ORDER_DIFFERS", "one swapped pair inside block 5", lambda: lt(bank([(h, rs[:3] + [rs[4], rs[3]] + rs[5:]) if i == 4 else (h, rs) for i, (h, rs) in enumerate(curves)]))),
         # S5 CENSUS
