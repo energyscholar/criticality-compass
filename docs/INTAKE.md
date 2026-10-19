@@ -1,4 +1,4 @@
-# The intake pipeline (stage table 1160-v5, policy 1136-v1)
+# The intake pipeline (stage table 1160-v6, policy 1136-v1)
 
 Generated from intake/STAGES.toml and intake/POLICY.toml by `bin/cc intake explain` (docs/gen-intake.py); never edit it by hand.
 This is the intake's explain. `bin/cc explain <input> <point>` is a different command: it explains one point of a measured input.

@@ -30,6 +30,7 @@ import enum
 import hashlib
 import inspect
 import itertools
+import json
 import os
 import re
 import shutil
@@ -263,7 +264,10 @@ with tempfile.TemporaryDirectory() as tmp:
     decl = blind.format_stage((d / "intake.toml").read_text(), [], T).evidence
     status = lambda: intake_seal.verify(decl, d, T)
     check("4. S2 before any seal passes UNSEALED, unconfirmed", isinstance(status(), blind.Pass) and status().evidence.status is intake_seal.SealStatus.UNSEALED and not status().confirmed(), str(status()))
+    raw = lambda t_ns, path, part="converted-from": json.dumps({"t_ns": t_ns, "route": "loader", "partition": part, "path": path}) + "\n"
+    (d / "conversion-access.log").write_text(raw(1, "/r/a.csv") + raw(2, "/r/a.csv") + raw(2, "/r/b.csv") + raw(3, "/b/a.csv", "bank") + raw(2 ** 62, "/r/c.csv"))
     check("4. the ordering note before any seal is NOT_SEALED", intake_seal.ordering(d, T)[0] is intake_seal.Ordering.NOT_SEALED, "")
+    check("4. (1160 A13) with no seal, no conversion read precedes one: the note says nothing of the conversion", "CONVERSION_READ" not in intake_seal.ordering(d, T)[1], intake_seal.ordering(d, T)[1])
     who = {"author": "test", "author_kind": "AI_DRAFT", "confirmed_by": ""}
     check("4. mint refuses a universe that is not a directory", intake_seal.mint(decl, d, str(Path(tmp) / "none"), who, ROOT, T).reason == "UNIVERSE_ROOT_ABSENT", "")
     minted = intake_seal.mint(decl, d, str(FIXTURE), who, ROOT, T)
@@ -273,6 +277,9 @@ with tempfile.TemporaryDirectory() as tmp:
     check("4. a second mint is ALREADY_SEALED", intake_seal.mint(decl, d, str(FIXTURE), who, ROOT, T).reason == "ALREADY_SEALED", "")
     check("4. S2 after the seal passes SEALED (unconfirmed: confirmed_by is empty)", status().evidence.status is intake_seal.SealStatus.SEALED and not status().confirmed(), str(status())[:200])
     check("4. the ordering note with no logged read is NO_DATA_READ_LOGGED", intake_seal.ordering(d, T)[0] is intake_seal.Ordering.NO_DATA_READ_LOGGED, "")
+    check("4. (1160 A13) conversion-access.log's raw reads before the seal are counted by distinct file (2: a bank read and a read after the seal are not),"
+          " as information: the ordering atom is unchanged", intake_seal.ordering(d, T)[1].endswith(" CONVERSION_READ_BEFORE_SEAL (2 files). " + T["stages"]["report"]["conversion_read"]),
+          intake_seal.ordering(d, T)[1])
     (d / "access.log").write_text('{"t_ns": 1, "route": "loader", "path": "S1/S1_c000.npz"}\n')
     check("4. a loader read before the seal is an ordering note A_READ_PRECEDES_SEAL, and S2 still passes", intake_seal.ordering(d, T)[0] is intake_seal.Ordering.A_READ_PRECEDES_SEAL and isinstance(status(), blind.Pass), "")
     (d / "intake.toml").write_text((d / "intake.toml").read_text() + "# one edit after the seal\n")

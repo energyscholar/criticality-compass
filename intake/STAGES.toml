@@ -9,7 +9,7 @@
 # needs, and never the seal stage (test 1).
 schema = 1
 kind = "intake-stages"
-version = "1160-v5"   # plan 1160 A9: S10 runs before S9 (a refused second lane never withholds the terminal)
+version = "1160-v6"   # plan 1160 A9: S10 runs before S9 (a refused second lane never withholds the terminal); A13: conversion_read
 seal_stage = "S2"
 
 [report]
@@ -24,6 +24,7 @@ stub = "This stage has no body yet, so nothing was checked; a stub is never a pa
 after_refusal = "Not run: an earlier stage refused, and no later check can redeem a refusal."
 input_absent = "Not run: a stage it needs did not pass."
 confirmation = "No human has confirmed this declaration (it is unsealed, edited after its seal, or sealed with an empty confirmed_by); PRIMARY_READY needs a seal that holds the declaration now with a non-empty confirmed_by."
+conversion_read = "A conversion read these raw files before the seal. That is the designed order (convert, then declare and seal), so it is information and never a refusal; the seal claims ordering only for the intake's own reads."   # plan 1160 A13
 ordering = [   # the ordering note of a report (information, never a refusal): (ordering atom, sentence); total over intake_seal.Ordering
   { code = "NOT_SEALED",            sentence = "There is no seal, so there is no ordering to report." },
   { code = "NO_DATA_READ_LOGGED",   sentence = "The access log holds no data read of this declaration." },

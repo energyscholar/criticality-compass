@@ -9,6 +9,8 @@
      so this test carries its own plant per row over the sentinel banks, with the same totality check.
  K3. No byte of intake-report.md, SEAL.json, seal.log, access.log, stdout or stderr of any plant holds any sentinel cell in any of its forms.
  K4. The report's census section lists the curves by ordinal and file name.
+     (1160 A13) The ordering note of a bank converted under its declaration's id and sealed after the conversion counts the raw files the
+     conversion read before the seal (CONVERSION_READ_BEFORE_SEAL (n files)), and names none.
  K5. (1160 P2) A FAST_RESTART drift bank (22 sweeps, 579 rows, every slow value a distinct sentinel) forms 22 curves and its report gives
      distinct_slow_in_block max = 27, a count.
  K7. (1160 P6) RESULT.json (the terminal's record, written when S10 passed) holds numbers ONLY in these fields: the ranks and counts
@@ -19,6 +21,7 @@
      intake peek` stdout or peek.log holds a sentinel: the sentinel PER_FILE files converted as they are, and a WIDE sentinel file (its
      names line h + sentinel numeric names) peeked and converted by WIDE_TO_LONG. The copy's <cc-datasets> and <cc-banks> name <tmp>.
 Seen RED (each mutation applied by hand, the test run, the mutation reverted):
+ - (1160 A13) intake_seal.ordering's conversion clause keyed always False: K4 "(1160 A13)" FAILS.
  - the fast-span summary reinstated in cc/intake_data.py Census.summary (`{x.fast} span [{lo:g}, {hi:g}]`): K3 FAILS on the two PASS runs;
  - _blocks' where reinstated as f"{f.name} block {i} ({g.columns[-1]} = {h:g})": K3 FAILS (the LONG_TABLE census section and CURVE_REPEATED);
  - _resolve's COLUMN_NAME_ABSENT detail printing the names line (f"... {names}"): K3 FAILS on the numeric-names plant;
@@ -138,12 +141,13 @@ with tempfile.TemporaryDirectory() as tmp:
 
     SEAL = lambda u: ("seal", "--universe", str(u), "--author", "plan 1160 leak test", "--as", "ai-draft", "--unconfirmed")
 
-    def plant(text, bank, steps, trans=TRANS):
+    def plant(text, bank, steps, trans=TRANS, ident=None):
         """Write the declaration, run `steps` (each a tuple of CLI words after the id, or a function of the bank dir), and return (its code,
-        everything it printed and wrote). Its code is the first REFUSE code printed (the reader reason for READER_REFUSED), else PASS."""
-        ident = f"d{next(n)}"
+        everything it printed and wrote). Its code is the first REFUSE code printed (the reader reason for READER_REFUSED), else PASS. The id is
+        a new one, or (1160 A13) `ident`: a conversion's own id, whose declarations/<id>/ holds its CONVERSION.toml and conversion-access.log."""
+        ident = {True: lambda: f"d{next(n)}", False: lambda: ident}[ident is None]()
         d = w / "declarations" / ident
-        d.mkdir(parents=True)
+        d.mkdir(parents=True, exist_ok=True)
         (d / "intake.toml").write_text(text(ident))
         (d / "transducer.toml").write_text(trans.replace('id = "x"', f'id = "{ident}"'))
         step = {tuple: lambda s: cli(s[0], ident, *s[1:]), types.FunctionType: lambda s: (s(banks / bank), "")[1], AtS6: lambda s: at_s6(ident, bank, s.edit)}   # total over the step kinds
@@ -281,7 +285,7 @@ with tempfile.TemporaryDirectory() as tmp:
          (*cv(conv_bank(curve_files, as_is, lambda raw, bank: (raw / "curve_001.csv").write_bytes((raw / "curve_001.csv").read_bytes().replace(b"T", b"t", 1)))), unsealed)),
         ("PASS", "(1160 P3) the converted PER_FILE sentinel bank, sealed", (*cv(CV := conv_bank(curve_files, as_is)), (("lint",), SEAL(tmp / "cc-banks" / CV / "bank"), ("run",)))),
         ("PASS", "(1160 A11) the converted PER_FILE sentinel bank, a sentinel row with C = n/a in each file dropped by DROP_ROWS_NOT_NUMERIC, sealed",
-         (*cv(DNN := conv_bank(NN, [(f, f, '{op = "DROP_ROWS_NOT_NUMERIC", columns = ["C"]}') for f in NN])), (("lint",), SEAL(tmp / "cc-banks" / DNN / "bank"), ("run",)))),
+         (*cv(DNN := conv_bank(NN, [(f, f, '{op = "DROP_ROWS_NOT_NUMERIC", columns = ["C"]}') for f in NN])), (("lint",), SEAL(tmp / "cc-banks" / DNN / "bank"), ("run",)), TRANS, DNN)),
         # S6 ADMISSIBILITY (1160 P4): linted, sealed, then run with the edit between S5 and S6
         ("READ_NOT_LOGGED", "(1160 P4) the loader lines of curve_002.csv deleted from the access log", (pf(PF), PF, full(PF)[:2] + (AtS6(lambda b, d: unlog(d, "curve_002.csv")),))),
         ("BYPASS_READ_LOGGED", "(1160 P4) curve_001.csv opened directly in the test process (open(), not the loader)", (pf(PF), PF, full(PF)[:2] + (AtS6(lambda b, d: (b / "curve_001.csv").read_bytes()),))),
@@ -407,6 +411,9 @@ with tempfile.TemporaryDirectory() as tmp:
     check("K4. (1160 A11) the census section prints, per converted file, the rows DROP_ROWS_NOT_NUMERIC dropped (1 each)",
           all(f"- converted curve_{i:03d}.csv -> curve_{i:03d}.csv: rows dropped as not numeric (DROP_ROWS_NOT_NUMERIC): 1" in sec.splitlines() for i in range(K)), sec[:600])
     check("K4. (1160 A11) the dropped sentinel rows reach no output: the bank files are the deposit's", all((tmp / "cc-banks" / DNN / "bank" / f).read_bytes() == b for f, b in curve_files.items()))
+    note = [ln for ln in out.splitlines() if ln.startswith("- **Ordering**")]
+    check(f"K4. (1160 A13) the converted bank sealed after its conversion: the ordering note counts the raw files the conversion read before the seal ({K}), "
+          "and names none", note != [] and all(f" CONVERSION_READ_BEFORE_SEAL ({K} files). " in x and not any(f in x for f in curve_files) for x in note), str(note))
 
     # ---- K5. (1160 P2) the drift bank's census: 22 curves, its drift reported as a count
     out = said["PASS (1160 P2) block FAST_RESTART on a drift bank: 22 sweeps, 579 distinct slow values, sealed"]

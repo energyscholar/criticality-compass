@@ -164,6 +164,9 @@ Then:
 ```
 
 Sealing is recommended and not enforced. Seal before the first run: `run` reads the data through the logged loader, and the report's
-ordering note compares the seal time with the first logged read.
+ordering note compares the seal time with the first logged read. A conversion reads the raw files before you seal; that is the designed
+order, so the ordering note reports it as information and never as a refusal: when declarations/<id>/conversion-access.log holds reads of
+raw files from before the seal, the note adds `CONVERSION_READ_BEFORE_SEAL (n files)`, and the seal claims ordering only for the intake's
+own reads (plan 1160 A13).
 
 The reports and seals stay in the clone on the host. Copy back only what you mean to keep, with the same `<host>` command.

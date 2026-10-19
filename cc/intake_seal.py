@@ -95,11 +95,15 @@ def said(t, status):
 
 
 def ordering(d, t):
-    """The ordering note (information): (Ordering, its sentence) from SEAL.json's seal time and the access log's loader reads, read after the run."""
+    """The ordering note (information): (Ordering, its sentence) from SEAL.json's seal time and the access log's loader reads, read after the run;
+    the sentence adds CONVERSION_READ_BEFORE_SEAL (n files) when conversion-access.log holds raw-file reads from before the seal (plan 1160 A13:
+    information, never a refusal: converting before declaring is the designed order; with no seal, no read precedes one)."""
     rec, reads = record(d), [a["t_ns"] for a in lines(Path(d) / "access.log") if a["route"] == "loader"]
     o = {False: lambda: Ordering.NOT_SEALED,
          True: lambda: list(Ordering)[1 + (len(reads) > 0) + any(r < rec["sealed_at_ns"] for r in reads)]}[rec != {}]()
-    return o, {r["code"]: r["sentence"] for r in t["stages"]["report"]["ordering"]}[o.name]
+    conv = {a["path"] for a in lines(Path(d) / "conversion-access.log") if a["partition"] == "converted-from" and a["t_ns"] < rec.get("sealed_at_ns", 0)}
+    said = {True: f" CONVERSION_READ_BEFORE_SEAL ({len(conv)} file{'s' * (len(conv) != 1)}). {t['stages']['report']['conversion_read']}", False: ""}[len(conv) > 0]
+    return o, {r["code"]: r["sentence"] for r in t["stages"]["report"]["ordering"]}[o.name] + said
 
 
 def _git(root, *args):

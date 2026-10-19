@@ -237,6 +237,9 @@ SENTENCES = [   # (doc, sentence, the defect it answers)
     ("INTAKE-CONVERSION.md", "If a data row holds an empty or text cell in a declared column, the intake refuses it (CELL_NOT_A_NUMBER; `nan` is text). "
      "Declare DROP_ROWS_NOT_NUMERIC on that column if the row is a reading the instrument did not record; declare another column if that column "
      "is the wrong one; or report the deposit as unreadable. A conversion cannot fill a row, and it drops one only through DROP_ROWS_NOT_NUMERIC.", "D6 (adapted, plan 1160 A11)"),
+    ("INTAKE-ON-A-DATA-HOST.md", "A conversion reads the raw files before you seal; that is the designed order, so the ordering note reports it as information "
+     "and never as a refusal: when declarations/<id>/conversion-access.log holds reads of raw files from before the seal, the note adds "
+     "`CONVERSION_READ_BEFORE_SEAL (n files)`, and the seal claims ordering only for the intake's own reads", "D9 (adapted, plan 1160 A13)"),
     ("INTAKE-CONVERSION.md", "Peek every file of the family, not one per kind: files of one family can differ in header length and column order. The Detail of a "
      "conversion refusal names the file (`file '<from>' -> '<to>'`), so you know which one to peek again", "D8 (adapted, plan 1160 A12)"),
 ]
