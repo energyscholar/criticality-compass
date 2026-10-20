@@ -8,6 +8,7 @@ import statistics
 import intake_read
 from intake_blind import NUMBER, RESTARTS, SWEEP, Pass, Refuse, detail, gate, numbered, sweeps
 from intake_names import exits, repeats
+from intake_differs import DIFFERS, differs
 from intake_evidence import Alignment, Census, Curve, Pinned, Sampling, Shaped
 
 
@@ -125,6 +126,7 @@ def census(pinned, shaped, t):
     grids = [read(t, d, f) for f in pinned.files]
     key, acq = KEYED[d["replicate"]["identity"]](d["selection"]["layout"], d["replicate"]["key"]["kind"]), d["acquisition"]
     other = [f.name for f, g in zip(pinned.files, grids) if g.columns != shaped.columns]
+    what = [differs(pinned.files[0].data, f.data, d) for f, g in zip(pinned.files, grids) if g.columns != shaped.columns]   # 1160 A34: what each differs in
     curves = lambda: CURVES[d["selection"]["layout"]](d, pinned.files, grids)
     unkeyed = lambda: KEYS[d["selection"]["layout"]](d, pinned.files, grids)
     points = lambda c: POINTS[(d["knobs"]["fast"]["control"], d["replicate"]["identity"])](c.rows)   # grouped BEFORE the repeat check: a run of readings is never a repeat
@@ -135,7 +137,8 @@ def census(pinned, shaped, t):
     unnamed = lambda: [c.where for c, k in named() if k is None]
     pairs = lambda: [(v, k) for c, k in named() for v in c.slow]   # (slow value, replicate key): a curve's place; two curves may share one only as replicates
     again = lambda: [c.where for c, k in named() if any(pairs().count((v, k)) > 1 for v in c.slow)]
-    return gate([(lambda: not other, "FILE_DIFFERS_FROM_FIRST", lambda: detail(words=other[:3], counts={"files": len(other)})),
+    return gate([(lambda: not other, "FILE_DIFFERS_FROM_FIRST", lambda: detail(words=other[:3] + [f"{k}: {DIFFERS[k]}" for k in DIFFERS if k in what],
+                                                                                 counts={"files": len(other), **{k: what.count(k) for k in DIFFERS if k in what}})),
                  (lambda: not unkeyed(), "SLOW_KEY_UNRESOLVED", lambda: detail(words=unkeyed()[:3] + [f"key '{d['selection']['slow']['key']}'"], counts={"files": len(unkeyed())})),
                  (lambda: not unnamed(), "REPLICATE_KEY_UNRESOLVED", lambda: detail(words=unnamed()[:3] + [f"identity {d['replicate']['identity']}, key {d['replicate']['key']['kind']}, layout {d['selection']['layout']}: no replicate key"], counts={"curves": len(unnamed()), "of": len(curves())})),
                  (lambda: len(set(pairs())) == len(pairs()), "CURVE_REPEATED", lambda: detail(words=again()[:3], counts={"curves whose slow value another curve has": len(again())})),
