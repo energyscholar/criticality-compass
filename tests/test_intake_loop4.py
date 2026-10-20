@@ -12,6 +12,8 @@ the Compass (bin, cc, intake, ...) in a temporary directory, whose intake/ROOTS.
        planted name that must never print); a data cell that is no number under an equal header (ROWS, the residue the four leave). Each run
        refuses S5 FILE_DIFFERS_FROM_FIRST and its S5 line names that member and no other; DIFFERS is total over the closed set, and the
        planted name never prints.
+ T42.1 (A42) peek finds a file whose name holds spaces (<cc-datasets>/sp/raw/my run 1.csv), by membership of each directory's listing; the
+       four T19.2 refusals (another root, an absolute path, a '..' part, a bare name) still hold, each SOURCE_FILE_ABSENT.
 Seen RED (each mutation applied by hand, the test run, the mutation reverted):
  - T35.1: the SLOW_KNOB_HAS_NO_METRIC row deleted from intake_choices.choices: FAIL (lint and seal pass S1); METRIC["ORDINAL"] made True
    (ORDINAL mapped to a path): FAIL.
@@ -19,6 +21,8 @@ Seen RED (each mutation applied by hand, the test run, the mutation reverted):
    (CURVE_REPEATED).
  - T34.1: the DELIMITER row removed from intake_differs.DIFFERS: the DELIMITER plant FAILS (it reads COLUMN_COUNT) and the totality check
    FAILS.
+ - T42.1: peek_cli's `at = listed(rel, base)` restored to the old class, `intake_bytes.located(rel, {"<cc-datasets>": base})`: the spaced
+   file is SOURCE_FILE_ABSENT (FAIL); the four refusals still hold.
 """
 import contextlib
 import io
@@ -32,6 +36,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "tests")]
 import intake  # noqa: E402
+import intake_convert  # noqa: E402
 import intake_differs  # noqa: E402
 import intake_synth  # noqa: E402
 from intake_plant import ORDINAL, per_file  # noqa: E402
@@ -118,6 +123,24 @@ with tempfile.TemporaryDirectory() as tmp:
               "REFUSE FILE_DIFFERS_FROM_FIRST" in line and f"{member}: {intake_differs.DIFFERS.get(member, '?')}" in line
               and not [k for k in EDITS if k != member and f"{k}: " in line], line)
         check(f"T34.1 (A34) {member}: the planted header name never prints", PLANTED.decode() not in out, "printed")
+
+    # ---- T42.1 (A42): peek by listing membership
+    raw = tmp / "cc-datasets" / "sp" / "raw"
+    raw.mkdir(parents=True)
+    (raw / "my run 1.csv").write_bytes(b"T,C\n1.5,0.25\n")
+    RT = {"roots": {"<cc-datasets>": str(tmp / "cc-datasets")}}
+
+    def peek(rel, *args):
+        (w / "declarations" / "pk").mkdir(parents=True, exist_ok=True)
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            rc = intake_convert.peek_cli(w, "pk", [rel, *args], RT)
+        return rc, out.getvalue()
+    rc, said = peek("<cc-datasets>/sp/raw/my run 1.csv")
+    check("T42.1 (A42) a file named with spaces is peeked", rc == 0 and "line 1: 2 text names" in said, said)
+    outside = ["<cc-banks>/sp/raw/my run 1.csv", str(raw / "my run 1.csv"), "<cc-datasets>/sp/raw/../raw/my run 1.csv", "my run 1.csv"]
+    said = [peek(rel)[1] for rel in outside]
+    check("T42.1 (A42) another root, an absolute path, a '..' part and a bare name are each SOURCE_FILE_ABSENT", all("SOURCE_FILE_ABSENT" in x for x in said), "\n".join(said))
 
 print("test_intake_loop4: " + ("FAILED " + "; ".join(bad) if bad else "all passed"))
 sys.exit(1 if bad else 0)

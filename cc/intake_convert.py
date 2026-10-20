@@ -686,6 +686,16 @@ def peek(raw, sheet, depth, encoding):
     return _bind(_head(raw, sheet, encoding), lines)
 
 
+def listed(rel, base):
+    """(plan 1160 A42) The file a root-named path names under the <cc-datasets> root, by MEMBERSHIP: each part after "<cc-datasets>" must be
+    a name in the actual listing of the directory before it, so any name the file system allows (spaces too) is found, and a `..` part, an
+    absolute path, another root or a bare name never is (no listing holds "..", "" or another root's name). "" for none."""
+    parts = rel.split("/")
+    step = lambda at, p: {True: lambda: {c.name: c for c in at.iterdir()}, False: dict}[at is not None and at.is_dir()]().get(p)
+    at = functools.reduce(step, parts[1:], {True: Path(base), False: None}[parts[0] == "<cc-datasets>" and len(parts) > 1])
+    return {True: lambda: str(at), False: lambda: ""}[at is not None and at.is_file()]()
+
+
 def peek_cli(root, ident, args, t):
     """bin/cc intake peek <id> <cc-datasets>/<name>/raw/<file> [--sheet NAME|k] [--depth N] [--encoding E]: first which encodings of DECODE's
     alphabet decode the file whole (A22; --encoding, one of them, decodes the head lines), then the head of a file named by its root-named path
@@ -696,7 +706,7 @@ def peek_cli(root, ident, args, t):
     rel, depth = {True: lambda: args[0], False: lambda: ""}[len(args) > 0](), flag(args, "--depth", "1")
     sheet = {True: int, False: str}[re.fullmatch(r"[1-9]\d*", flag(args, "--sheet", "")) is not None](flag(args, "--sheet", ""))   # (A21) a position, or a name
     base = t["roots"]["<cc-datasets>"]
-    at = intake_bytes.located(rel, {"<cc-datasets>": base})   # "" for any other root, an absolute path or a ".." part
+    at = listed(rel, base)   # (A42: was intake_bytes.located, a character class) "" for any other root, an absolute path, a ".." part or a bare name
     ok = rel != "" and not rel.startswith("--") and re.fullmatch(r"\d+", depth) is not None
     def go():
         loader = intake_bytes._t23().Loader({base: "converted-from"}, d / "conversion-access.log")
