@@ -14,6 +14,8 @@ the Compass (bin, cc, intake, ...) in a temporary directory, whose intake/ROOTS.
        planted name never prints.
  T42.1 (A42) peek finds a file whose name holds spaces (<cc-datasets>/sp/raw/my run 1.csv), by membership of each directory's listing; the
        four T19.2 refusals (another root, an absolute path, a '..' part, a bare name) still hold, each SOURCE_FILE_ABSENT.
+ T43.1 (A43) peek on a 2-column file whose header line holds 6 blank-separated tokens: the shown line says 2 cells under COMMA (the
+       default; --delimiter WHITESPACE says 6 cells under WHITESPACE, the 6 tokens), and the head says the file's line count (4).
 Seen RED (each mutation applied by hand, the test run, the mutation reverted):
  - T35.1: the SLOW_KNOB_HAS_NO_METRIC row deleted from intake_choices.choices: FAIL (lint and seal pass S1); METRIC["ORDINAL"] made True
    (ORDINAL mapped to a path): FAIL.
@@ -23,6 +25,7 @@ Seen RED (each mutation applied by hand, the test run, the mutation reverted):
    FAILS.
  - T42.1: peek_cli's `at = listed(rel, base)` restored to the old class, `intake_bytes.located(rel, {"<cc-datasets>": base})`: the spaced
    file is SOURCE_FILE_ABSENT (FAIL); the four refusals still hold.
+ - T43.1: the count omitted (peek's `count` made to return ""): FAIL.
 """
 import contextlib
 import io
@@ -124,10 +127,11 @@ with tempfile.TemporaryDirectory() as tmp:
               and not [k for k in EDITS if k != member and f"{k}: " in line], line)
         check(f"T34.1 (A34) {member}: the planted header name never prints", PLANTED.decode() not in out, "printed")
 
-    # ---- T42.1 (A42): peek by listing membership
+    # ---- T42.1 (A42) / T43.1 (A43): peek by listing membership; cell and line counts
     raw = tmp / "cc-datasets" / "sp" / "raw"
     raw.mkdir(parents=True)
     (raw / "my run 1.csv").write_bytes(b"T,C\n1.5,0.25\n")
+    (raw / "six.csv").write_bytes(b"temp in K, heat cap C\n1,2\n3,4\n5,6\n")
     RT = {"roots": {"<cc-datasets>": str(tmp / "cc-datasets")}}
 
     def peek(rel, *args):
@@ -141,6 +145,10 @@ with tempfile.TemporaryDirectory() as tmp:
     outside = ["<cc-banks>/sp/raw/my run 1.csv", str(raw / "my run 1.csv"), "<cc-datasets>/sp/raw/../raw/my run 1.csv", "my run 1.csv"]
     said = [peek(rel)[1] for rel in outside]
     check("T42.1 (A42) another root, an absolute path, a '..' part and a bare name are each SOURCE_FILE_ABSENT", all("SOURCE_FILE_ABSENT" in x for x in said), "\n".join(said))
+    (rc, said), (_, ws) = peek("<cc-datasets>/sp/raw/six.csv"), peek("<cc-datasets>/sp/raw/six.csv", "--delimiter", "WHITESPACE")
+    check("T43.1 (A43) a 2-column file with a 6-token header: the shown line has 2 cells under COMMA, and the file's line count is 4",
+          rc == 0 and "; 2 cells under COMMA" in said and "lines in the file: 4" in said, said)
+    check("T43.1 (A43) --delimiter WHITESPACE: the same line has 6 cells under WHITESPACE (the 6 tokens)", "; 6 cells under WHITESPACE" in ws, ws)
 
 print("test_intake_loop4: " + ("FAILED " + "; ".join(bad) if bad else "all passed"))
 sys.exit(1 if bad else 0)

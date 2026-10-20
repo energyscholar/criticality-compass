@@ -100,7 +100,7 @@ def run(root, ident, args):
 
 def _usage(why):
     print(f"bin/cc intake: {why}\n  usage: bin/cc intake explain | synth <id> --seed N [--curves K] [--out DIR] | lint <id> | seal <id> --author NAME --as human|ai-draft "
-          "(--confirmed-by NAME | --unconfirmed) | run <id> | convert <id> [--verify] | peek <id> <cc-datasets>/<name>/raw/<file> [--sheet NAME|k] [--depth N] [--encoding E]\n  Next: bin/cc intake explain")
+          "(--confirmed-by NAME | --unconfirmed) | run <id> | convert <id> [--verify] | peek <id> <cc-datasets>/<name>/raw/<file> [--sheet NAME|k] [--depth N] [--encoding E] [--delimiter D]\n  Next: bin/cc intake explain")
     return 1
 
 

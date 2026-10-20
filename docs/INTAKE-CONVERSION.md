@@ -16,7 +16,7 @@ empty or text cell) is dropped, recorded by its line number, and the identity te
 
 ```
 bin/cc new intake <id>                                      # first: declarations/<id>/, which peek and convert need
-bin/cc intake peek <id> <cc-datasets>/<name>/raw/<file> [--sheet NAME|k] [--depth N] [--encoding E]   # a raw file's head, no value
+bin/cc intake peek <id> <cc-datasets>/<name>/raw/<file> [--sheet NAME|k] [--depth N] [--encoding E] [--delimiter D]   # a raw file's head, no value: each shown line's cell count under D (COMMA unless named) and the file's line count
 #   write declarations/<id>/CONVERSION.toml (below)
 bin/cc intake convert <id>                                  # write <cc-banks>/<id>/bank and its CONVERSION-MANIFEST.json
 bin/cc intake convert <id> --verify                         # re-check the bank against the raw files, at any later time

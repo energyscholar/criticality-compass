@@ -677,12 +677,17 @@ def decodes(raw, codes):
     return f"decodes as: {', '.join(ok) or '(none of them)'}; not as: {', '.join(e for e in codes if e not in ok) or '(none of them)'}"
 
 
-def peek(raw, sheet, depth, encoding):
-    """The lines peek prints: at most depth + 2 head lines, stopping before the first line whose every cell is a number (a data line)."""
+def peek(raw, sheet, depth, encoding, delim="COMMA"):
+    """The lines peek prints: at most depth + 2 head lines, stopping before the first line whose every cell is a number (a data line); (plan
+    1160 A43) each with its cell count, a text line cut by SPLIT[delim] (an xlsx row: its cells), and the file's line count. Counts only."""
+    text = {True: lambda: dict(_split(raw.decode(encoding, "replace"))), False: lambda: {}}[sheet == "" and not _xlsx(raw)]()
+    count = {True: lambda n, cs: f"; {len(SPLIT[delim](text[n]))} cells under {delim}", False: lambda n, cs: f"; {len(cs)} cells"}[text != {}]
+
     def lines(rows):
         stop = [i for i, (_, cs) in enumerate(rows) if cs and all(classify(c) is Name.NUMERIC for c in cs)] + [len(rows)]
         shown_ = rows[:min(stop[0], depth + 2)]
-        return [_said(n, cs) for n, cs in shown_], {True: "a line of numbers (not printed)", False: "depth + 2 lines"}[stop[0] <= depth + 2 and stop[0] < len(rows)]
+        return ([_said(n, cs) + count(n, cs) for n, cs in shown_], {True: "a line of numbers (not printed)", False: "depth + 2 lines"}[stop[0] <= depth + 2 and stop[0] < len(rows)],
+                len(rows))
     return _bind(_head(raw, sheet, encoding), lines)
 
 
@@ -697,12 +702,13 @@ def listed(rel, base):
 
 
 def peek_cli(root, ident, args, t):
-    """bin/cc intake peek <id> <cc-datasets>/<name>/raw/<file> [--sheet NAME|k] [--depth N] [--encoding E]: first which encodings of DECODE's
+    """bin/cc intake peek <id> <cc-datasets>/<name>/raw/<file> [--sheet NAME|k] [--depth N] [--encoding E] [--delimiter D]: first which encodings of DECODE's
     alphabet decode the file whole (A22; --encoding, one of them, decodes the head lines), then the head of a file named by its root-named path
     (plan 1160 A19: nothing is derived from the id, which names only declarations/<id>/), resolved under the <cc-datasets> root alone and
     read through the logged loader; appended to declarations/<id>/peek.log (what was asked and how many lines were printed, never a line)."""
     d, ct = Path(root) / "declarations" / ident, ctables()
     codes, enc = list(ct["fields"]["file"]["fields"]["steps"]["variants"]["DECODE"]["encoding"]["values"]), flag(args, "--encoding", "utf-8-sig")   # (A22)
+    delim = flag(args, "--delimiter", "COMMA")   # (A43) a key of SPLIT: what each shown line's cell count is cut by
     rel, depth = {True: lambda: args[0], False: lambda: ""}[len(args) > 0](), flag(args, "--depth", "1")
     sheet = {True: int, False: str}[re.fullmatch(r"[1-9]\d*", flag(args, "--sheet", "")) is not None](flag(args, "--sheet", ""))   # (A21) a position, or a name
     base = t["roots"]["<cc-datasets>"]
@@ -712,8 +718,9 @@ def peek_cli(root, ident, args, t):
         loader = intake_bytes._t23().Loader({base: "converted-from"}, d / "conversion-access.log")
         raw = {True: lambda: None, False: lambda: _reader(base, loader)(Path(at).relative_to(base))}[at == ""]()
         got = gate([(lambda: raw is not None, "SOURCE_FILE_ABSENT", lambda: detail(words=[f"'{rel}' (a file under the <cc-datasets> root)"])),
-                    (lambda: enc in codes, "VALUE_NOT_LISTED", lambda: detail(words=[f"--encoding '{enc}'", f"DECODE's alphabet: {', '.join(codes)}"]))],
-                   lambda: _bind(_in(f"file '{rel}'", peek(raw, sheet, int(depth), enc)), lambda g: (g[0], g[1], decodes(raw, codes))))   # (A22)
+                    (lambda: enc in codes, "VALUE_NOT_LISTED", lambda: detail(words=[f"--encoding '{enc}'", f"DECODE's alphabet: {', '.join(codes)}"])),
+                    (lambda: delim in SPLIT, "VALUE_NOT_LISTED", lambda: detail(words=[f"--delimiter '{delim}'", f"one of: {', '.join(SPLIT)}"]))],   # (A43)
+                   lambda: _bind(_in(f"file '{rel}'", peek(raw, sheet, int(depth), enc, delim)), lambda g: (g[0], g[1], decodes(raw, codes) + f"; lines in the file: {g[2]}")))
         with open(d / "peek.log", "a") as f:
             f.write(json.dumps({"time": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "file": rel, "sheet": sheet, "depth": depth, "encoding": enc,
                                 "printed": {True: lambda: 0, False: lambda: len(got[0])}[isinstance(got, Refuse)](),
@@ -721,4 +728,4 @@ def peek_cli(root, ident, args, t):
         print({True: lambda: f"peek {ident} {rel}: " + got.text(ct["sentences"]),
                False: lambda: f"peek {ident} {rel}:\n  {got[2]}\n" + "".join(f"  {x}\n" for x in got[0]) + f"  stopped: {got[1]}"}[isinstance(got, Refuse)]())
         return {True: 1, False: 0}[isinstance(got, Refuse)]
-    return {True: go, False: lambda: print("bin/cc intake peek: usage: peek <id> <cc-datasets>/<name>/raw/<file> [--sheet NAME|k] [--depth N] [--encoding E]") or 1}[ok]()
+    return {True: go, False: lambda: print("bin/cc intake peek: usage: peek <id> <cc-datasets>/<name>/raw/<file> [--sheet NAME|k] [--depth N] [--encoding E] [--delimiter D]") or 1}[ok]()
