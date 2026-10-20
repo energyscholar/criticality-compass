@@ -67,7 +67,8 @@ class Frame:
     step dropped (step -1: a line with no text in any cell); `named` the names line's source line (none when written); `broadcast` the
     output columns whose source cell repeats down the rows (WIDE_TO_LONG fast and key); `not_numeric` the source cell that is no number in each
     row DROP_ROWS_NOT_NUMERIC dropped (its [line, column]: a coordinate, never the cell's text; plan 1160 A11), and `not_numeric_kind` that
-    row's kind, EMPTY or TEXT (plan 1160 A16), one per row, in the same order."""
+    row's kind, EMPTY or TEXT (plan 1160 A16), one per row, in the same order; `not_numeric_numbers` the count of that row's cells that are
+    numbers (plan 1165 P5, D2: a TEXT row with none is a TEXT run, a block boundary, which intake_against refuses; a count, never a cell)."""
     raw: bytes = b""
     lines: tuple = ()
     rows: tuple = ()
@@ -77,6 +78,7 @@ class Frame:
     broadcast: frozenset = frozenset()
     not_numeric: tuple = ()
     not_numeric_kind: tuple = ()
+    not_numeric_numbers: tuple = ()
     cut: str = "NONE"   # (plan 1160 A32) the DELIMITER that cut the lines into cells (NONE: an xlsx sheet's cells, never cut from text)
 
 
@@ -280,9 +282,11 @@ def _not_numeric(fr, step, k):
     is no number is empty, else TEXT. Every kept row is unchanged, so the identity test still holds on it."""
     def drop(at):
         bad = lambda cs: [cs[a][1] for a in at if NUMBER.fullmatch(cs[a][0].strip()) is None]
-        gone = [(n, bad(cs)[0], EMPTINESS[all(t.strip() == "" for t, _ in cs if NUMBER.fullmatch(t.strip()) is None)]) for n, cs in fr.rows if bad(cs)]
-        return replace(fr, rows=tuple((n, cs) for n, cs in fr.rows if not bad(cs)), dropped=fr.dropped + tuple((n, k) for n, _, _ in gone),
-                       not_numeric=fr.not_numeric + tuple(c for _, c, _ in gone), not_numeric_kind=fr.not_numeric_kind + tuple(e for _, _, e in gone))
+        gone = [(n, bad(cs)[0], EMPTINESS[all(t.strip() == "" for t, _ in cs if NUMBER.fullmatch(t.strip()) is None)], sum(NUMBER.fullmatch(t.strip()) is not None for t, _ in cs))
+                for n, cs in fr.rows if bad(cs)]   # plan 1165 P5: and the row's count of number cells
+        return replace(fr, rows=tuple((n, cs) for n, cs in fr.rows if not bad(cs)), dropped=fr.dropped + tuple((n, k) for n, _, _, _ in gone),
+                       not_numeric=fr.not_numeric + tuple(c for _, c, _, _ in gone), not_numeric_kind=fr.not_numeric_kind + tuple(e for _, _, e, _ in gone),
+                       not_numeric_numbers=fr.not_numeric_numbers + tuple(x for *_, x in gone))
     return _columns(fr, step["columns"], drop)
 
 
@@ -475,9 +479,11 @@ def _records(conv, ct, raws, built):
     """(units, outputs, frames): the manifest's records and the bytes they describe."""
     srcs = list(dict.fromkeys(f["from"] for f in conv["file"]))
     kinded = lambda parts: dict((c, e) for _, fr in parts for c, e in zip(fr.not_numeric, fr.not_numeric_kind))   # each dropped row once, with its one kind
+    numbered = lambda parts: dict((c, x) for _, fr in parts for c, x in zip(fr.not_numeric, fr.not_numeric_numbers))   # plan 1165 P5: and its count of number cells
     units = [{"file": u, "source": srcs.index(conv["file"][u]["from"]), "dropped": sorted({tuple(x) for _, fr in parts for x in fr.dropped}),
               "names": sorted({n for _, fr in parts for n in fr.named}), "not_numeric": [{True: lambda c=c: list(c), False: lambda: None}[c is not None]() for c in kinded(parts)],
-              "not_numeric_count": len(kinded(parts)), "not_numeric_split": {e: list(kinded(parts).values()).count(e) for e in EMPTINESS.values()}}
+              "not_numeric_count": len(kinded(parts)), "not_numeric_split": {e: list(kinded(parts).values()).count(e) for e in EMPTINESS.values()},
+              "cell_kind": list(kinded(parts).values()), "numbers": list(numbered(parts).values())}   # plan 1165 P5: per dropped row, in not_numeric's order
              for u, parts in built]   # plan 1160 A11: lines and a count, never a cell; A16: the count split EMPTY / TEXT, summing to it by construction
     outs = [(name, fr, u) for u, parts in built for name, fr in parts]
     rendered = [(render(fr), name, fr, u) for name, fr, u in outs]
@@ -536,7 +542,8 @@ def _manifest(text):
     try:
         m = json.loads(text)
         ok = (all(isinstance(m[k], list) for k in ("files", "sources", "units", "outputs")) and all(isinstance(r["cells"], list) for r in m["outputs"])
-              and all(isinstance(u["not_numeric"], list) and isinstance(u["not_numeric_count"], int) for u in m["units"]))   # plan 1160 A18, A18b: both required (no default)
+              and all(isinstance(u["not_numeric"], list) and isinstance(u["not_numeric_count"], int) and len(u["cell_kind"]) == len(u["numbers"]) == len(u["not_numeric"])
+                      for u in m["units"]))   # plan 1160 A18, A18b: both required (no default); plan 1165 P5: cell_kind and numbers, one per dropped row
         return {True: m, False: None}[ok]
     except (ValueError, KeyError, TypeError):
         return None

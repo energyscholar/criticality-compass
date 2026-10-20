@@ -8,6 +8,8 @@ peek`). Planted inputs only (no real data).
  V2 (1160 A11). DROP_ROWS_NOT_NUMERIC: the manifest records the dropped rows' source lines (with the step), the [line, column] of each
      cell that is no number and the count, never a cell; the identity test refuses a mutation of the op that drops a numeric row (recording
      that row's own cell, another row's cell, no cell, or a sourceless cell), and a drop declared before DECIMAL_MARK.
+     (1165 P5, D2) Each dropped row's cell_kind (EMPTY | TEXT) and its count of number cells (`numbers`): a TEXT row with none is a
+     TEXT run, which `profile --check` refuses (test_intake_profile T5).
  V3. Planted shapes convert and reach an S5 census: a MultiVu-like file through DROP_LINES; a semicolon file with a `##Temp./°C;...` names
      line and decimal commas through DELIMITER + NAMES_LINE + DECIMAL_MARK + RENAME; a WIDE file through WIDE_TO_LONG to a LONG_TABLE; a
      two-sheet xlsx through SHEET_TO_CSV + SELECT_COLUMNS + SPLIT_ROWS to two PER_FILE curves (NOT REACHED without openpyxl: it must run on
@@ -32,6 +34,7 @@ Seen RED (each mutation applied by hand, the test run, the mutation reverted):
  - (1160 A11) DROP_ROWS_NOT_NUMERIC dropping the rows whose cell IS a number: V1 FAILS; verify justifying every DROP_ROWS_NOT_NUMERIC drop:
    V2 FAILS (each numeric-row drop passes); verify judging the cell without the decimal mark: V2 FAILS (the drop before DECIMAL_MARK passes);
    the manifest's not_numeric_count off by one: V2 FAILS (the manifest record).
+ - (1165 P5) the dropped row's count of number cells made 0: V2 "(1165 P5, D2) each dropped row's cell_kind ..." FAILS.
  - (1160 A12) _in keeping the file empty: V6 and V7 FAIL; _built naming the first entry for every file, verify's IDENTITY_FAILED without its
    file, peek's old re.split cut, peek decoding utf-8: V7 FAILS.
  - (1160 A10) _xlsx always False: V4 and V6 FAIL; _named printing every name unmasked: V4 FAILS (the sheet-name words).
@@ -170,6 +173,10 @@ with tempfile.TemporaryDirectory() as tmp:
     unit = json.loads(man)["units"][0]
     check("V2. (1160 A11) the manifest records the dropped rows' source lines with their step, the cells that are no number, and the count; no cell",
           unit["dropped"] == [[3, 0], [4, 0]] and unit["not_numeric"] == [[3, 1], [4, 1]] and unit["not_numeric_count"] == 2 and "n/a" not in man, str(unit))
+    got2, bank2, _ = conv({"a.csv": b"T,C\n1.5,0.25\n1.6,n/a\nT,C\n1.8,0.5\n1.9,\n"}, [(NN[1], "out.csv", NN[2])])
+    u2 = json.loads((bank2 / ic.MANIFEST).read_text())["units"][0]
+    check("V2. (1165 P5, D2) each dropped row's cell_kind and count of number cells: a lone n/a (TEXT, 1), a repeated names line (TEXT, 0: a "
+          "TEXT run), an empty cell (EMPTY, 1)", (u2["cell_kind"], u2["numbers"]) == (["TEXT", "TEXT", "EMPTY"], [1, 0, 1]), str(u2))
     dropper = ic.OPS["DROP_ROWS_NOT_NUMERIC"]
     NUMERIC_DROPS = {   # a mutation of the op's result: the frame it returns drops the numeric row of line 5 (1.8,0.5) as well
         "recording that row's own cell (a number)": lambda fr: replace(fr, rows=fr.rows[:-1], dropped=fr.dropped + ((5, 0),), not_numeric=fr.not_numeric + ((5, 1),)),

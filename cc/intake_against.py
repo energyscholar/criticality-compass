@@ -65,8 +65,8 @@ HOLDS = {   # Contradiction -> (holds over one file's facts, where it is: positi
     R.COLUMN_CONTRADICTS_PROFILE: (lambda c: c["t"] is not NONE and c["names"] is not None and any({str: lambda r: c["names"].count(masked(r)) != 1 and (masked(r) == r or masked(r) not in c["names"]),
                                    int: lambda r: not 1 <= r <= c["width"]}[type(r)](r) for r in c["refs"]), lambda c: f"columns {[masked(str(r)) for r in c['refs']]} declared; names {c['names']}, width {c['width']}"),
     R.WIDTH_CONTRADICTS_PROFILE: (lambda c: any(r["width"] != c["width"] for r in c["body"]), lambda c: f"line {[r['first'] for r in c['body'] if r['width'] != c['width']][0]}: width not {c['width']}"),
-    R.CELLS_CONTRADICT_PROFILE: (lambda c: "DROP_ROWS_NOT_NUMERIC" not in c["ops"] and (any(c["col"](r)["text"] + c["col"](r)["empty"] > 0 for r in c["refs"]) or any(
-        r["kind"] == "TEXT" and r["numbers"] == 0 for r in c["body"])), lambda c: "a declared column holds text or empty cells, or a text run lies in the body"),
+    R.CELLS_CONTRADICT_PROFILE: (lambda c: "TEXT_RUN" in c["ops"] or "DROP_ROWS_NOT_NUMERIC" not in c["ops"] and (any(c["col"](r)["text"] + c["col"](r)["empty"] > 0 for r in c["refs"]) or any(
+        r["kind"] == "TEXT" and r["numbers"] == 0 for r in c["body"])), lambda c: "a declared column holds text or empty cells, or a text run lies in the body or was dropped as rows (D2: BLOCKS)"),
     R.ORDER_CONTRADICTS_PROFILE: (lambda c: ONE(c) and ACQ(c["d"]) != "UNORDERED" and (FAST(c)["monotone_runs"] > 1 or FAST(c)["first_direction"] == OPPOSITE[ACQ(c["d"])]),
                                   lambda c: f"fast column: {FAST(c)['monotone_runs']} monotone runs, first {FAST(c)['first_direction']}; declared {ACQ(c['d'])}"),
     R.REPEATS_CONTRADICT_PROFILE: (lambda c: ONE(c) and c["d"]["knobs"]["fast"]["control"] == "SET" and FAST(c)["revisited"] + sum(FAST(c)["equal_runs"]) * (
@@ -77,7 +77,7 @@ HOLDS = {   # Contradiction -> (holds over one file's facts, where it is: positi
 def against(p, m, d):
     """Plan 1165 section 5: the contradictions (code, file, where) of an S0-admitted declaration's data d against a profile p (PROFILE.json's
     values) and a conversion manifest m ({} for none); reads no byte. A reader that is not live has none (READER_NOT_LIVE is not predictable)."""
-    ops, have, names = {x[k]: [s["op"] for s in x["steps"]] for x in m.get("files", []) for k in ("from", "to")}, {f["name"]: f for f in p["files"]}, intake_seal.selected(d["selection"])
+    ops, have, names = {x[k]: [s["op"] for s in x["steps"]] + ["TEXT_RUN"] * any(e == "TEXT" and n == 0 for u in m["units"] if u["file"] == i for e, n in zip(u["cell_kind"], u["numbers"])) for i, x in enumerate(m.get("files", [])) for k in ("from", "to")}, {f["name"]: f for f in p["files"]}, intake_seal.selected(d["selection"])   # P5: a dropped TEXT run
     facts = [(n, _facts(have[n], SPEC[d["reader"]["name"]](d), d, ops.get(n, []))) for n in names if n in have and d["reader"]["name"] in SPEC]
     lines = {tuple(c["names"] or ()) for _, c in facts} | {tuple(masked(str(r)) for r in c["refs"]) for _, c in facts if d["reader"]["name"] == "csv-curve-v1"}
     return (tuple((R.FILE_NOT_PROFILED, n, "not in the profile") for n in names if n not in have) + tuple((code, n, said(c)) for n, c in facts for code, (holds, said) in HOLDS.items() if holds(c))

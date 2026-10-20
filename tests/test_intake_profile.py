@@ -36,6 +36,9 @@
      one, so no openpyxl is needed); --check with no PROFILE.json is PROFILE_ABSENT, on a declaration S0 refuses REFUSE, each exit 1.
  K11 A two-file plant the test never opens: profile-access.log holds two loader lines of partition "profiled" and no in-process-bypass line
      (the profile's own hooked loader sees any other open of those paths in the process).
+ T5  (P5, D2) against() on a DROP_ROWS_NOT_NUMERIC conversion manifest (values): dropped rows of a lone n/a (TEXT, 1 number) or an
+     empty cell (EMPTY) are no contradiction; a dropped TEXT row with no number (a TEXT run: a repeated names line) is
+     CELLS_CONTRADICT_PROFILE, its text naming D2: BLOCKS.
 Seen RED (each mutation applied by hand, the test run, the mutation reverted):
  - T0: a RESPONSE row deleted (ONE_FILE): FAIL; a code (CURVE_REPEATED) removed from NOT_PREDICTABLE: FAIL.
  - K8: ColumnProfile given a `first_value` field (the first cell of the column): FAIL; HeaderLine cells as the raw cells (not _name): FAIL.
@@ -55,6 +58,9 @@ Seen RED (each mutation applied by hand, the test run, the mutation reverted):
    IndexError, each raised by its `where` text at the control's --check (a crash, rc 1: the where of a row is only total where it holds);
    FILES (`if ONE(c) and len(lines) > 1` made `if True`): FAIL the control, "1 contradictions"; FILE_NOT_PROFILED (`if n not in have`
    made `if True`): FAIL the control, "9 contradictions".
+ - T5 (plan 1165 P5): the TEXT_RUN marker condition `e == "TEXT" and n == 0` made False: FAIL "T5 a repeated names line ...: []"
+   and the D2 text check; made `e == "TEXT"`: FAIL "T5 a lone n/a cell ...: [CELLS_CONTRADICT_PROFILE, 'curve_003.csv']"; the CELLS
+   holds made True (`lambda c: True or ...`): FAIL "T4 the clean bank (the control): ... 9 contradictions".
 """
 import contextlib
 import hashlib
@@ -366,6 +372,16 @@ with tempfile.TemporaryDirectory() as tmp:
     check("T4 --check with no PROFILE.json: PROFILE_ABSENT, exit 1", code == 1 and "PROFILE_ABSENT" in out, out)
     ident, (code, out) = plant(edit=lambda x: x.replace("\n[reader]\n", "\n[readerx]\n", 1))
     check("T4 --check on a declaration S0 refuses: REFUSE <reason>, exit 1", code == 1 and " REFUSE " in out and "does not pass FORMAT" in out, out)
+
+# ---- T5 (P5, D2): a DROP_ROWS_NOT_NUMERIC drop of a TEXT run is CELLS_CONTRADICT_PROFILE; a lone TEXT cell or an EMPTY one is not
+DROP = lambda kinds, numbers: {"files": [{"from": f3, "to": f3, "steps": [{"op": "DROP_ROWS_NOT_NUMERIC", "columns": ["C"]}]}],
+                               "units": [{"file": 0, "cell_kind": kinds, "numbers": numbers}]}
+for what, m, want in (("a lone n/a cell (TEXT, 1 number) and an empty one (EMPTY, 1)", DROP(["TEXT", "EMPTY"], [1, 1]), []),
+                      ("an empty row (EMPTY, 0 numbers)", DROP(["EMPTY"], [0]), []),
+                      ("a repeated names line (TEXT, 0 numbers: a TEXT run, a block boundary)", DROP(["TEXT", "TEXT"], [1, 0]), [(R.CELLS_CONTRADICT_PROFILE, f3)])):
+    got = [(c, f) for c, f, _ in A.against(p0, m, d0)]
+    check(f"T5 {what} dropped by DROP_ROWS_NOT_NUMERIC: {[(c.name, f) for c, f in want] or 'no contradiction'}", got == want, str(got))
+check("T5 the TEXT-run contradiction's text says D2: BLOCKS", "D2: BLOCKS" in str(A.against(p0, DROP(["TEXT"], [0]), d0)), str(A.against(p0, DROP(["TEXT"], [0]), d0)))
 
 print("test_intake_profile:", "all passed" if not bad else f"{len(bad)} FAILED: {bad}")
 sys.exit(1 if bad else 0)
