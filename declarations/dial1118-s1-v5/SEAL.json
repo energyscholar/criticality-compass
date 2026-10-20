@@ -2,9 +2,9 @@
  "schema": 1,
  "kind": "intake-seal",
  "id": "dial1118-s1-v5",
- "sealed_at_ns": 1792454702952478333,
- "sealed_at_utc": "2026-10-20T00:05:02Z",
- "author": "Claude (plan 1160 loop4 A33)",
+ "sealed_at_ns": 1792456574352135655,
+ "sealed_at_utc": "2026-10-20T00:36:14Z",
+ "author": "Claude (plan 1160 loop4, final re-seal)",
  "author_kind": "AI_DRAFT",
  "confirmed_by": "",
  "mode": "EXPLORATORY",
@@ -14,22 +14,22 @@
   "transducer.toml": "5c2738e663bf6237f06bab2c6b8c17079fecf5ff3726453f2a274219a17d5611"
  },
  "code_identity": {
-  "commit": "d8d87c2614a965a4c07d0d595622986de1072edd",
-  "code_hash": "f68e975e52f271f8015eded72467074f81e4c50985b59deec1ba4a90f01cba1a",
-  "tree": "UNCOMMITTED_CHANGES"
+  "commit": "f4be4b5a896c02893f4c95fe59d5370a27e00398",
+  "code_hash": "658bfa6b8847023a414eca7d29bf101dc8ac57153dc0b4ec4d34ae8357465b6e",
+  "tree": "CLEAN"
  },
  "protocol_identity": {
   "STAGES.toml": {
-   "sha256": "eaef9aa98196349ad1b2db9d6ea3d948ba45a30a1e2a7919967a5ffc130a3a30",
-   "version": "1160-v10"
+   "sha256": "4737b3993f1c4271d850b3c90307f642307fe86d7be583e92690753b0b1b6b9a",
+   "version": "1160-v11"
   },
   "POLICY.toml": {
    "sha256": "d7fc430f8befdff4986f6295ec2c0cc4d8cab28041c0135a5af28f92258d7797",
    "version": "1136-v1"
   },
   "FORMAT.toml": {
-   "sha256": "bcfa884b4d575f1626cf12c6a73f9fc4bb1a0de468b53705644ccd5adedb202c",
-   "version": "1160-v12"
+   "sha256": "cfd10b0f0d41b09a5337ade39fb2567809dc69f89837e2be78fcfbec8218d12f",
+   "version": "1160-v13"
   }
  },
  "universe": {
