@@ -52,7 +52,15 @@ there.
 
 ```
 <host> 'cd ~/scratch/cc-intake && bin/cc new intake <id>'
+<host> 'cd ~/scratch/cc-intake && bin/cc intake profile <id> <cc-datasets>/<name>/raw'
 ```
+
+(Plan 1165.) Profile before you fill a TODO: the profile reads every byte of the path and writes declarations/<id>/PROFILE.json and
+PROFILE.md, and a `## Profile` section in `<cc-datasets>/<name>/MANIFEST.md` (counts only). Read PROFILE.md first; each finding names its
+one response (docs/INTAKE-PREPROCESSING.md). For a CONVERTED bank profile the bank too (`<cc-banks>/<id>/bank`); for a RESERVED set
+profile the blinded view (`<cc-blind>/<id>`). After the TODO lines are filled, `bin/cc intake profile <id> --check` checks the declaration
+against the profile (exit 1 on any contradiction); S3 refuses a run with no profile (PROFILE_ABSENT), a stale one (PROFILE_STALE) or a
+contradicted one (PROFILE_CONTRADICTED).
 
 The new declaration's TODO lines are the choices. It is intake format v5 (`schema = 5`); a v2, v3 or v4 declaration is refused
 SCHEMA_UNSUPPORTED, so restate it in v5 under a new id (v4 to v5 adds `[knobs.slow] kind = "QUANTITY"`, the v4 meaning, and writes `[replicate] key = ""` as `[replicate.key] kind = "NONE"`; v3 to v4 added

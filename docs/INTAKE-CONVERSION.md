@@ -15,11 +15,13 @@ empty or text cell) is dropped, recorded by its line number, and the identity te
 ## What you do
 
 ```
-bin/cc new intake <id>                                      # first: declarations/<id>/, which peek and convert need
+bin/cc new intake <id>                                      # first: declarations/<id>/, which profile, peek and convert need
+bin/cc intake profile <id> <cc-datasets>/<name>/raw         # (plan 1165) read every byte; read PROFILE.md first: each finding names its response (docs/INTAKE-PREPROCESSING.md)
 bin/cc intake peek <id> <cc-datasets>/<name>/raw/<file> [--sheet NAME|k] [--depth N] [--encoding E] [--delimiter D]   # a raw file's head, no value: each shown line's cell count under D (COMMA unless named) and the file's line count
 #   write declarations/<id>/CONVERSION.toml (below)
 bin/cc intake convert <id>                                  # write <cc-banks>/<id>/bank and its CONVERSION-MANIFEST.json
 bin/cc intake convert <id> --verify                         # re-check the bank against the raw files, at any later time
+bin/cc intake profile <id> <cc-banks>/<id>/bank             # (plan 1165) profile the bank the run will read (PROFILE.json); --raw keeps the deposit's beside it
 #   then declare the bank in declarations/<id>/intake.toml: [source] kind = "CONVERTED"
 ```
 
@@ -201,6 +203,9 @@ the instrument did not record). A row dropped this way loses its other cells too
 mid-file, a repeated names line, or a comment line, the column is not wrong: those are not data rows, and DROP_LINES (PREFIX or FIRST) or
 SPLIT_ROWS (one output per block) handles them, so that each block keeps its own names line. If most rows of a column would be dropped,
 it is a sign the column is the wrong one: peek again and declare another column.
+(Plan 1165, ruling D2.) The manifest also records, per dropped row, its `cell_kind` (EMPTY or TEXT) and `numbers` (how many of its cells
+are numbers). A dropped row of kind TEXT with no number cell is a TEXT run, a block boundary: `bin/cc intake profile <id> --check` and S3
+refuse it as CELLS_CONTRADICT_PROFILE, and its response is BLOCKS (SPLIT_ROWS, or DROP_LINES), never a row drop.
 
 ## Shapes that convert (tests/test_intake_convert.py V3)
 
