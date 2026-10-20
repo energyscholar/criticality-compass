@@ -20,6 +20,7 @@ import itertools
 import json
 import re
 import struct
+import sys
 import time
 import tomllib
 import zipfile
@@ -139,6 +140,7 @@ def _drop(fr, step, k):
 
 
 SPLIT = {**intake_read.SPLIT, "SEMICOLON": lambda ln: next(csv.reader([ln], delimiter=";"))}   # DELIMITER from -> one line to its cells; total
+csv.field_size_limit(sys.maxsize)   # (plan 1165 F1) every csv cut total over line length: no str is longer than sys.maxsize, so no field reaches the limit
 
 
 def blank(cs):

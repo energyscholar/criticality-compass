@@ -39,6 +39,8 @@
  T5  (P5, D2) against() on a DROP_ROWS_NOT_NUMERIC conversion manifest (values): dropped rows of a lone n/a (TEXT, 1 number) or an
      empty cell (EMPTY) are no contradiction; a dropped TEXT row with no number (a TEXT run: a repeated names line) is
      CELLS_CONTRADICT_PROFILE, its text naming D2: BLOCKS.
+ F1  (fix S11.P2b) the splitter is total over line length: a SEMICOLON file whose third line holds one 200 000-character field (beyond the
+     csv module's default field limit, 131 072) profiles in a fresh process (only intake_profile imported) to its exact rows.
 Seen RED (each mutation applied by hand, the test run, the mutation reverted):
  - T0: a RESPONSE row deleted (ONE_FILE): FAIL; a code (CURVE_REPEATED) removed from NOT_PREDICTABLE: FAIL.
  - K8: ColumnProfile given a `first_value` field (the first cell of the column): FAIL; HeaderLine cells as the raw cells (not _name): FAIL.
@@ -61,6 +63,8 @@ Seen RED (each mutation applied by hand, the test run, the mutation reverted):
  - T5 (plan 1165 P5): the TEXT_RUN marker condition `e == "TEXT" and n == 0` made False: FAIL "T5 a repeated names line ...: []"
    and the D2 text check; made `e == "TEXT"`: FAIL "T5 a lone n/a cell ...: [CELLS_CONTRADICT_PROFILE, 'curve_003.csv']"; the CELLS
    holds made True (`lambda c: True or ...`): FAIL "T4 the clean bank (the control): ... 9 contradictions".
+ - F1: the limit line (`csv.field_size_limit(sys.maxsize)` in cc/intake_convert.py) deleted, the old splitter: FAIL "F1 a 200 000-character
+   field ...: _csv.Error: field larger than field limit (131072)".
 """
 import contextlib
 import hashlib
@@ -382,6 +386,12 @@ for what, m, want in (("a lone n/a cell (TEXT, 1 number) and an empty one (EMPTY
     got = [(c, f) for c, f, _ in A.against(p0, m, d0)]
     check(f"T5 {what} dropped by DROP_ROWS_NOT_NUMERIC: {[(c.name, f) for c, f in want] or 'no contradiction'}", got == want, str(got))
 check("T5 the TEXT-run contradiction's text says D2: BLOCKS", "D2: BLOCKS" in str(A.against(p0, DROP(["TEXT"], [0]), d0)), str(A.against(p0, DROP(["TEXT"], [0]), d0)))
+
+# ---- F1 (fix S11.P2b): the splitter total over line length, in a fresh process (the limit is the process's, set where SPLIT is)
+LONG = "import sys; sys.path[:0] = [sys.argv[1]]; import intake_profile as P; t = P.profiled('long.csv', b'T;C\\n1;2\\n3;' + b'x' * 200000 + b'\\n4;5\\n').tables[0]; print(t.delimiter, [(r.first, r.last, r.kind, r.width) for r in t.rows])"
+got = __import__("subprocess").run([sys.executable, "-I", "-c", LONG, str(ROOT / "cc")], capture_output=True, text=True)
+check("F1 a 200 000-character field on a SEMICOLON file profiles: SEMICOLON, rows TEXT 2, NUMERIC 2, TEXT 2, NUMERIC 2", got.stdout.strip()
+      == "SEMICOLON [(1, 1, 'TEXT', 2), (2, 2, 'NUMERIC', 2), (3, 3, 'TEXT', 2), (4, 4, 'NUMERIC', 2)]", (got.stderr.strip().splitlines() or [got.stdout])[-1])
 
 print("test_intake_profile:", "all passed" if not bad else f"{len(bad)} FAILED: {bad}")
 sys.exit(1 if bad else 0)
