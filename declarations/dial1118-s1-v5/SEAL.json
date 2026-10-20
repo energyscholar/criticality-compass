@@ -2,8 +2,8 @@
  "schema": 1,
  "kind": "intake-seal",
  "id": "dial1118-s1-v5",
- "sealed_at_ns": 1792456574352135655,
- "sealed_at_utc": "2026-10-20T00:36:14Z",
+ "sealed_at_ns": 1792456916244814762,
+ "sealed_at_utc": "2026-10-20T00:41:56Z",
  "author": "Claude (plan 1160 loop4, final re-seal)",
  "author_kind": "AI_DRAFT",
  "confirmed_by": "",
@@ -14,8 +14,8 @@
   "transducer.toml": "5c2738e663bf6237f06bab2c6b8c17079fecf5ff3726453f2a274219a17d5611"
  },
  "code_identity": {
-  "commit": "f4be4b5a896c02893f4c95fe59d5370a27e00398",
-  "code_hash": "658bfa6b8847023a414eca7d29bf101dc8ac57153dc0b4ec4d34ae8357465b6e",
+  "commit": "615a6a5f995235f0a1342ff860a9d57d7b7b51fe",
+  "code_hash": "a51ead9585b1c0452669a94e892e28956ef457f07b20592717be426f020fcc33",
   "tree": "CLEAN"
  },
  "protocol_identity": {
