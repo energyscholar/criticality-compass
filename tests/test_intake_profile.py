@@ -8,6 +8,11 @@
      the n/a cell is a TEXT cell of column 2 at its line; neither text is in PROFILE.json.
  K10 The JSON walk: every leaf of PROFILE.json is an int, a sha256, a name of the profiled listing, an enum atom of the profile's enums, the
      profiled path, a comment-prefix class, or a masked string holding no numeral except in a #k position name.
+ T1  (P1) one planted file per RowKind transition and per encoding and delimiter, each asserting the exact `rows` (first, last, kind,
+     width[, prefix]): a title row, a names line, a body, a mid-file header, a blank line and trailing text; a ragged tail; an `n/a`
+     column; an empty cell; a semicolon, a tab and a blank-separated file; a comma file with a blank after each comma (COMMA and
+     WHITESPACE tie: COMMA, the first in Delimiter order); a latin-1, a utf-16 and a BOM file; a zip (members by masked name and size);
+     a binary and an empty file (UNPROFILED_FORMAT, UNDECODABLE); the evidence names all four delimiters.
  K11 A two-file plant the test never opens: profile-access.log holds two loader lines of partition "profiled" and no in-process-bypass line
      (the profile's own hooked loader sees any other open of those paths in the process).
 Seen RED (each mutation applied by hand, the test run, the mutation reverted):
@@ -15,6 +20,10 @@ Seen RED (each mutation applied by hand, the test run, the mutation reverted):
  - K8: ColumnProfile given a `first_value` field (the first cell of the column): FAIL; HeaderLine cells as the raw cells (not _name): FAIL.
  - K9: masked replaced by the identity in intake_profile._name: FAIL.
  - K10: a float leaf planted (ColumnProfile.longest given 0.5): FAIL.
+ - T1: NUMERIC_WITH_EMPTY folded into NUMERIC in kind(): FAIL (the empty-cell plant's rows); the tie order reversed (CUT built from
+   the four delimiters in reverse): FAIL (the tab plant elects WHITESPACE, the comma-and-blank plant WHITESPACE). Plan 1165 P1 words
+   this mutation "the whitespace plant elects TAB"; reversed, ties go to WHITESPACE, so the plants that turn are the tab and the
+   comma-and-blank ones.
  - K11: profiled reading one file with Path.read_bytes() beside the loader: FAIL (a bypass line).
 """
 import json
@@ -63,6 +72,44 @@ def outputs(tmp, ident):
     d = Path(tmp) / "declarations" / ident
     return {f.name: f.read_bytes() for f in d.iterdir() if f.is_file()}
 
+
+# ---- T1: the text profiler, one plant per transition (no file: profiled is a function of bytes)
+def rows(raw):
+    p = P.profiled("plant.csv", raw)
+    return p, [tuple(r for r in (x.first, x.last, x.kind, x.width, x.prefix) if r != "") for t in p.tables for x in t.rows]
+
+
+ZIP = __import__("io").BytesIO()
+with __import__("zipfile").ZipFile(ZIP, "w") as z:
+    z.writestr("run_12.csv", "x,y\n1,2\n")
+PLANTS = [   # (what, bytes, kind, encoding, delimiter, rows)
+    ("title, names, body, mid-file header, blank, trailing text", b"# title line\nT,C,S\n1,2,3\n4,5,6\nT,C,S\n7,8,9\n\nend of file\n", "TEXT_TABLE",
+     "UTF8", "COMMA", [(1, 1, "TEXT", 1, "#"), (2, 2, "TEXT", 3), (3, 4, "NUMERIC", 3), (5, 5, "TEXT", 3), (6, 6, "NUMERIC", 3), (7, 7, "BLANK", 0), (8, 8, "TEXT", 1)]),
+    ("ragged tail", b"T,C\n1,2\n3,4\n5\n6\n", "TEXT_TABLE", "UTF8", "COMMA", [(1, 1, "TEXT", 2), (2, 3, "NUMERIC", 2), (4, 5, "NUMERIC", 1)]),
+    ("an n/a column", b"T,C,S\n1,2,3\n4,n/a,6\n7,8,9\n", "TEXT_TABLE", "UTF8", "COMMA", [(1, 1, "TEXT", 3), (2, 2, "NUMERIC", 3), (3, 3, "TEXT", 3), (4, 4, "NUMERIC", 3)]),
+    ("an empty cell", b"T,C,S\n1,,3\n4,5,6\n", "TEXT_TABLE", "UTF8", "COMMA", [(1, 1, "TEXT", 3), (2, 2, "NUMERIC_WITH_EMPTY", 3), (3, 3, "NUMERIC", 3)]),
+    ("semicolon", b"T;C\n1.5;2\n", "TEXT_TABLE", "UTF8", "SEMICOLON", [(1, 1, "TEXT", 2), (2, 2, "NUMERIC", 2)]),
+    ("tab", b"T\tC\n1\t2\n", "TEXT_TABLE", "UTF8", "TAB", [(1, 1, "TEXT", 2), (2, 2, "NUMERIC", 2)]),
+    ("blank-separated", b"T  C\n1 2\n", "TEXT_TABLE", "UTF8", "WHITESPACE", [(1, 1, "TEXT", 2), (2, 2, "NUMERIC", 2)]),
+    ("comma and blank tie", b"T, C\n1, 2\n", "TEXT_TABLE", "UTF8", "COMMA", [(1, 1, "TEXT", 2), (2, 2, "NUMERIC", 2)]),
+    ("latin-1", "T,\u00b5\n1,2\n".encode("latin-1"), "TEXT_TABLE", "LATIN1_ONLY", "COMMA", [(1, 1, "TEXT", 2), (2, 2, "NUMERIC", 2)]),
+    ("utf-16", "T,C\r\n1,2\r\n".encode("utf-16"), "TEXT_TABLE", "UTF16", "COMMA", [(1, 1, "TEXT", 2), (2, 2, "NUMERIC", 2)]),
+    ("BOM", b"\xef\xbb\xbfT,C\n1,2\n", "TEXT_TABLE", "UTF8_SIG", "COMMA", [(1, 1, "TEXT", 2), (2, 2, "NUMERIC", 2)]),
+    ("zip", ZIP.getvalue(), "ZIP", "UNDECODABLE", None, []),
+    ("binary", b"\x89HDF\r\n\x1a\n\x00\x00\x01", "UNPROFILED_FORMAT", "UNDECODABLE", None, []),
+    ("empty", b"", "UNPROFILED_FORMAT", "UNDECODABLE", None, []),
+]
+for what, raw, k, enc, d, want in PLANTS:
+    p, got = rows(raw)
+    check(f"T1 {what}: {k}, {enc}, {d}, rows", (p.kind, p.encoding, [t.delimiter for t in p.tables][:1] or [None], got) == (k, enc, [d], want),
+          str((p.kind, p.encoding, [t.delimiter for t in p.tables], got)))
+p = rows(PLANTS[0][1])[0]
+t = p.tables[0]
+check("T1 blank lines, comment prefixes, header lines (masked cells) and the four delimiters' evidence", (t.blank_lines, t.comment_prefixes,
+      [h.line for h in t.header_lines], [d for d, _ in t.widths]) == (((7, 7),), (("#", 1),), [1, 2], ["COMMA", "SEMICOLON", "TAB", "WHITESPACE"]), str(t))
+check("T1 the n/a cell is a TEXT cell of column 2 at line 3; the empty cell an empty one of column 2 at line 2",
+      (rows(PLANTS[2][1])[0].tables[0].columns[1].text_lines, rows(PLANTS[3][1])[0].tables[0].columns[1].empty_lines) == (((3, 3),), ((2, 2),)))
+check("T1 the zip's members by masked name and size", rows(ZIP.getvalue())[0].members == (("run_#csv", 8),), str(rows(ZIP.getvalue())[0].members))
 
 # ---- T0: the tables
 st = tomllib.loads((ROOT / "intake" / "STAGES.toml").read_text())

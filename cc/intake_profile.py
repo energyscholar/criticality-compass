@@ -7,18 +7,18 @@ structure. Invariants:
  - every file is read once through the vendored t23 logged loader, partition "profiled", into declarations/<id>/profile-access.log;
    nothing is written under the profiled path;
  - a finding is a row of FindingKind and its response is looked up in RESPONSE, total over FindingKind (tests/test_intake_profile.py)."""
-import csv
 import enum
 import hashlib
 import itertools
 import json
+import re
 from collections import Counter
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
 import intake_bytes
 from intake_blind import detail, gate
-from intake_convert import _split
+from intake_convert import SPLIT, _decoded, _split, _zipped
 from intake_names import NUMBER, Name, classify, masked
 
 FileKind = enum.Enum("FileKind", "TEXT_TABLE XLSX ZIP UNPROFILED_FORMAT")   # by content, never by extension (plan 1165 2.2)
@@ -78,7 +78,12 @@ NOT_PREDICTABLE = {   # plan 1165 section 5: the live reasons no profile can pre
     "READER_NOT_LIVE": "a fact of the declaration's reader name, not of the files",
     "READER_REFUSED": "the wrapper of a reader reason; each reader reason has its own row",
 }
-CUT = {"COMMA": lambda ln: next(csv.reader([ln]), [])}   # Delimiter -> one line to its cells (NONE: the line is one cell)
+CUT = {d: SPLIT[d] for d in ("COMMA", "SEMICOLON", "TAB", "WHITESPACE")}   # Delimiter -> one line to its cells, in the election's tie order (NONE:
+# the line is one cell); the converter's own DELIMITER cuts, so a profile's widths are the widths DELIMITER from = d gives
+ENCODINGS = (   # (Encoding, does it hold, DECODE's name): the first that holds decodes the file (plan 1165 2.2); a BOM is structure, read first
+    ("UTF8_SIG", lambda r: r.startswith(b"\xef\xbb\xbf"), "utf-8-sig"), ("UTF16", lambda r: r[:2] in (b"\xff\xfe", b"\xfe\xff"), "utf-16"),
+    ("UTF8", lambda r: True, "utf-8"), ("LATIN1_ONLY", lambda r: True, "latin-1"))   # latin-1 decodes every byte: LATIN1_ONLY is "not UTF-8"
+BINARY = re.compile("[\x00-\x08\x0e-\x1f\x7f]")   # a decoded control character no text table holds: the bytes are a binary format
 NUMERIC_KINDS = ("NUMERIC", "NUMERIC_WITH_EMPTY")
 CLASSES = ("#", "%", ";", "//", "!", "[")   # comment prefix classes: a line's first characters (the reader's own test, startswith)
 
@@ -222,15 +227,33 @@ def cells_table(cut, delimiter, widths):
                  tuple(HeaderLine(n, tuple(_name(cs, k) for k in range(1, len(cs) + 1))) for n, cs in head[:12]), columns)
 
 
-def _text_file(name, raw):
-    lines = _split(raw.decode("utf-8"))
+def decoded(raw):
+    """(Encoding, text): the first of ENCODINGS that holds and decodes every byte; ("UNDECODABLE", None) for empty bytes or a binary format."""
+    enc, text = next((e, t) for e, holds, code in ENCODINGS if holds(raw) for t in [_decoded(raw, code)] if t is not None)
+    return {True: (enc, text), False: ("UNDECODABLE", None)}[text != "" and not BINARY.search(text)]
+
+
+def _text_file(head, enc, text):
+    lines = _split(text)
     delimiter, widths = _elect(lines)
-    return FileProfile(name, len(raw), hashlib.sha256(raw).hexdigest(), "TEXT_TABLE", "UTF8", (table(lines, delimiter, widths),))
+    return FileProfile(*head, "TEXT_TABLE", enc, (table(lines, delimiter, widths),))
+
+
+KINDS = {   # (is it a zip, does it hold xl/workbook.xml, does it decode as text) -> its FileProfile; total over the 8 keys; by content, never by name
+    **{(True, True, t): lambda h, z, e: FileProfile(*h, "XLSX", "UNDECODABLE") for t in (True, False)},
+    **{(True, False, t): lambda h, z, e: FileProfile(*h, "ZIP", "UNDECODABLE", members=tuple((masked(i.filename), i.file_size) for i in z.infolist()))
+       for t in (True, False)},
+    (False, False, True): lambda h, z, e: _text_file(h, *e),
+    (False, False, False): lambda h, z, e: FileProfile(*h, "UNPROFILED_FORMAT", "UNDECODABLE"),
+}
 
 
 def profiled(name, raw):
-    """The FileProfile of one file's bytes (plan 1165 P0: a UTF-8 comma text table; P1 extends the kinds and the encodings)."""
-    return _text_file(name, raw)
+    """The FileProfile of one file's bytes: a zip (an xlsx when it holds xl/workbook.xml, members by masked name and size), a text table (decoded
+    by ENCODINGS, cut by the elected delimiter), or UNPROFILED_FORMAT (empty or binary: the alphabet has no reader)."""
+    z, e = _zipped(raw), decoded(raw)
+    xlsx = z is not None and "xl/workbook.xml" in z.namelist()
+    return KINDS[(z is not None, xlsx, e[1] is not None)]((name, len(raw), hashlib.sha256(raw).hexdigest()), z, e)
 
 
 def as_json(p):
