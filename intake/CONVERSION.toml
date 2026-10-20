@@ -28,7 +28,7 @@ derived = []
 schema = { type = "int", check = "NUMBER" }
 kind = { type = "str", check = "TEXT" }
 source = { type = "str", check = "TEXT" }                                    # "<cc-datasets>/<id>/raw"
-out = { type = "str", check = "UNDER", under = "<cc-banks>/" }               # "<cc-banks>/<id>/bank"
+out = { type = "str", check = "UNDER", under = "<cc-banks>/", want = "<id>/bank", refused = "ROOT_NOT_UNDER_CC_BANKS" }               # "<cc-banks>/<id>/bank"
 
 [fields.file]
 type = "list"
@@ -192,3 +192,22 @@ sentence = "An output cell is not its source cell (a number not bitwise equal as
 code = "CONVERSION_CHAIN_BROKEN"
 live = true
 sentence = "The bank has no CONVERSION-MANIFEST.json, or the manifest's steps are not the declaration's, or a raw file's or a bank file's sha256 is not the manifest's. Next: `bin/cc intake convert <id>` writes it; `--verify` re-checks an existing bank."
+
+# plan 1160 A41: the refusals of `bin/cc intake blind` (cc/intake_blindview.py), the blinded view of a RESERVED run; it also refuses
+# ROOT_UNRESOLVED and SOURCE_FILE_ABSENT, rows of [[reason]] above. A Detail here counts selected names and never prints one.
+[[blind_reason]]
+code = "BLIND_ID_REFUSED"
+live = true
+sentence = "The id is not letters, digits, _ . - only (starting with a letter or digit); the view is <cc-blind>/<id>/, so an id never names another directory."
+[[blind_reason]]
+code = "BLIND_NAME_REPEATED"
+live = true
+sentence = "A selected file is named more than once; each selected file gets exactly one ordinal."
+[[blind_reason]]
+code = "BLIND_VIEW_EXISTS"
+live = true
+sentence = "The view <cc-blind>/<id>/ or its key <cc-blind>/<id>.KEY.json exists; a view is never replaced (its key is the only way back to the names)."
+[[blind_reason]]
+code = "BLIND_NOT_ONE_DEVICE"
+live = true
+sentence = "A selected file and <cc-blind> are on different devices, and a hard link cannot cross devices: put <cc-blind> on the deposit's device."

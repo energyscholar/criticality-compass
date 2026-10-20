@@ -15,6 +15,7 @@ read = "TODO"           # what you read to write this: a list of { what = "...",
 # [source]: VARIANT on kind
 [source]
 kind = "TODO"           # DEPOSIT (the files as deposited, read directly) | CONVERTED (a bank written by a declared conversion; also converted_from)
+                        # | BLINDED (the ordinal-named view `bin/cc intake blind` made for a RESERVED run; also blinded_from, key_sha256)
 origin = "TODO"         # PLANTED (a generated bank) | EXPERIMENT
 deposit = "TODO"        # where the data came from, one line
 root = "TODO"           # <name>/<path>: a name of intake/ROOTS.toml, then the bank's directory under it
@@ -22,6 +23,8 @@ universe = "TODO"       # a glob, relative to root, of every file the deposit ho
 truth_side = "TODO"     # a list of file names on the truth side of a planted deposit; no stage may read them ([] for an experiment)
 admissibility = "TODO"  # the deposit's class, read from its metadata: RAW | DECLARABLE | FIGURE_LEVEL | PROCESSED_UNDECLARABLE
 converted_from = "TODO" # CONVERTED: "<cc-datasets>/<name>/raw" (an example), the deposit the conversion read
+blinded_from = "TODO"   # BLINDED: the deposit's directory `bin/cc intake blind` linked from; root is then "<cc-blind>/<id>"
+key_sha256 = "TODO"     # BLINDED: the sha256 `bin/cc intake blind` printed for the key; the key itself is never read by the intake
 
 # [reader]: VARIANT on name
 [reader]

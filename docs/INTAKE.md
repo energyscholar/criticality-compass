@@ -47,6 +47,7 @@ The declaration parses, holds every required field with the right type, and ever
 | BRIDGE_NONE_FITS | live | The declaration says no bridge fits these data; this is an honest answer, and such an intake cannot be sealed. |
 | BASIS_NOT_METADATA | live | The declaration lists a source read before sealing that is not metadata (data values, a figure, or analysis code); the choice was made after seeing values. |
 | ROOT_NOT_UNDER_CC_BANKS | live | A CONVERTED source's root is not under <cc-banks>/: a converted bank is written there by its declared conversion, never beside the deposit. |
+| ROOT_NOT_UNDER_CC_BLIND | live | A BLINDED source's root is not under <cc-blind>/: a blinded run reads only the ordinal-named view `bin/cc intake blind` made, never the deposit (plan 1160 A41). |
 | COMMENT_PREFIX_EMPTY | live | A reader's comment list holds an empty prefix ""; every line starts with it, so every line would be dropped as a comment. Use [] for no comment lines. |
 | TRANSDUCER_FILE_REFUSED | live | The declaration's transducer.toml is refused by the CC transducer check; its findings are listed with their Next lines. |
 

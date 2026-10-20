@@ -75,6 +75,7 @@ reason = [
   { code = "BRIDGE_NONE_FITS",        live = true,  sentence = "The declaration says no bridge fits these data; this is an honest answer, and such an intake cannot be sealed." },
   { code = "BASIS_NOT_METADATA",      live = true,  sentence = "The declaration lists a source read before sealing that is not metadata (data values, a figure, or analysis code); the choice was made after seeing values." },
   { code = "ROOT_NOT_UNDER_CC_BANKS", live = true,  sentence = "A CONVERTED source's root is not under <cc-banks>/: a converted bank is written there by its declared conversion, never beside the deposit." },
+  { code = "ROOT_NOT_UNDER_CC_BLIND", live = true,  sentence = "A BLINDED source's root is not under <cc-blind>/: a blinded run reads only the ordinal-named view `bin/cc intake blind` made, never the deposit (plan 1160 A41)." },
   { code = "COMMENT_PREFIX_EMPTY",    live = true,  sentence = "A reader's comment list holds an empty prefix \"\"; every line starts with it, so every line would be dropped as a comment. Use [] for no comment lines." },
   { code = "TRANSDUCER_FILE_REFUSED", live = true,  sentence = "The declaration's transducer.toml is refused by the CC transducer check; its findings are listed with their Next lines." },
 ]

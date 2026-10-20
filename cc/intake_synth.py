@@ -103,5 +103,5 @@ def declare(m, ident, sid):
              f'inputs = {q(cmd)}\noutput = {q(cfg["phase1_output"])}\n\n'
              f'[reduction]\nname = "none in the Compass: the bank stores one value of C per (h, T) point"\nkeeps = "the planted value of C at each kept point, with its noise"\n'
              f'discards = "nothing the bank holds"\n\n[interval]\nrole = {q(cfg["interval_role"])}\nkeeps = "the planted noise sigma written on every row"\ndiscards = "the noise draw itself"\n')
-    dropped = frozenset({"reader.comment", "reader.format", "reader.header", "source.converted_from", "replicate.key.separator", "replicate.key.field", "replicate.key.column"})   # csv-curve-v1 has no other field; a DEPOSIT has no converted_from
+    dropped = frozenset({"reader.comment", "reader.format", "reader.header", "source.converted_from", "source.blinded_from", "source.key_sha256", "replicate.key.separator", "replicate.key.field", "replicate.key.column"})   # csv-curve-v1 has no other field; a DEPOSIT has no converted_from
     return values, dropped, trans

@@ -139,7 +139,7 @@ def _variant(spec, v, loc, tables):
 
 CHECK = {   # a FORMAT field's check word -> its findings for a value of the right type; total over FORMAT.toml's check words (test)
     "TEXT": lambda spec, v, loc, tables: {True: [Finding("VALUE_STILL_TODO", loc, "TODO")], False: []}[v == TODO],
-    "UNDER": lambda spec, v, loc, tables: {True: [], False: [Finding("ROOT_NOT_UNDER_CC_BANKS", loc, f"want '{spec['under']}<id>/bank'")]}[v.startswith(spec["under"])],   # TODO: refused by typed
+    "UNDER": lambda spec, v, loc, tables: {True: [], False: [Finding(spec["refused"], loc, f"want '{spec['under']}{spec['want']}'")]}[v.startswith(spec["under"])],   # TODO: refused by typed
     "NUMBER": lambda spec, v, loc, tables: [],   # SCALAR: a cc.toml [interval_fields] field (str, int or num), TODO refused
     "SCALAR": lambda spec, v, loc, tables: {True: [Finding("VALUE_STILL_TODO", loc, "TODO")], False: []}[v == TODO],
     "CLOSED": _closed,

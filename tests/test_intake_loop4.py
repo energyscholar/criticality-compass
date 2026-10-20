@@ -16,6 +16,14 @@ the Compass (bin, cc, intake, ...) in a temporary directory, whose intake/ROOTS.
        four T19.2 refusals (another root, an absolute path, a '..' part, a bare name) still hold, each SOURCE_FILE_ABSENT.
  T43.1 (A43) peek on a 2-column file whose header line holds 6 blank-separated tokens: the shown line says 2 cells under COMMA (the
        default; --delimiter WHITESPACE says 6 cells under WHITESPACE, the 6 tokens), and the head says the file's line count (4).
+ T41.1 (A41, leak) a plant bank whose nine curve FILE NAMES carry a sentinel (curve_zzqBLIND4471_<k>.csv): `bin/cc intake blind` makes
+       the view <cc-blind>/<id>/ of ordinal-named links (001.csv ...) and the key beside it; a BLINDED declaration whose selection is the
+       view's listing (as a declarer reads it) is linted, sealed and run, and passes S5; nothing printed (blind, lint, seal, run) and no
+       file the intake wrote under declarations/<id>/ (report, RESULT.json, SEAL.json, access.log, seal.log) holds the sentinel. Each
+       refusal of the command is planted (its Detail must not print a selected name either, so the absent name carries the sentinel):
+       BLIND_ID_REFUSED, ROOT_UNRESOLVED, BLIND_NAME_REPEATED, SOURCE_FILE_ABSENT, BLIND_VIEW_EXISTS, and BLIND_NOT_ONE_DEVICE when this
+       machine has a second device at /dev/shm (else NOT REACHED HERE); a BLINDED root not under <cc-blind>/ is refused at S0
+       ROOT_NOT_UNDER_CC_BLIND.
 Seen RED (each mutation applied by hand, the test run, the mutation reverted):
  - T35.1: the SLOW_KNOB_HAS_NO_METRIC row deleted from intake_choices.choices: FAIL (lint and seal pass S1); METRIC["ORDINAL"] made True
    (ORDINAL mapped to a path): FAIL.
@@ -25,6 +33,8 @@ Seen RED (each mutation applied by hand, the test run, the mutation reverted):
    FAILS.
  - T42.1: peek_cli's `at = listed(rel, base)` restored to the old class, `intake_bytes.located(rel, {"<cc-datasets>": base})`: the spaced
    file is SOURCE_FILE_ABSENT (FAIL); the four refusals still hold.
+ - T41.1: the view built with the original names (`view / n` for `view / o` in intake_blindview._make): the leak checks FAIL (the
+   sentinel in the view's names reaches the declaration's outputs).
  - T43.1: the count omitted (peek's `count` made to return ""): FAIL.
 """
 import contextlib
@@ -41,6 +51,7 @@ sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "tests")]
 import intake  # noqa: E402
 import intake_convert  # noqa: E402
 import intake_differs  # noqa: E402
+import intake_convert as ic  # noqa: E402
 import intake_synth  # noqa: E402
 from intake_plant import ORDINAL, per_file  # noqa: E402
 
@@ -57,7 +68,9 @@ with tempfile.TemporaryDirectory() as tmp:
     tmp = Path(tmp)
     w, banks = tmp / "cc", tmp / "banks"
     shutil.copytree(ROOT, w, ignore=shutil.ignore_patterns(".git", "__pycache__", "results", "benchmark", "fixtures", "data", "scratch"))
-    (w / "intake" / "ROOTS.toml").write_text((w / "intake" / "ROOTS.toml").read_text() + f'\n"<l4>" = "{banks}"   # test_intake_loop4: the planted banks\n')
+    (w / "intake" / "ROOTS.toml").write_text(re.sub(r'(?m)^"<cc-blind>" = "[^"]*"', f'"<cc-blind>" = "{tmp / "cc-blind"}"', (w / "intake" / "ROOTS.toml").read_text(), count=1)
+                                             + f'\n"<l4>" = "{banks}"   # test_intake_loop4: the planted banks\n')
+    (tmp / "cc-blind").mkdir()
     intake_synth.write(banks / "pf", tmp / "pf-TRUTH", "pf", 1, 9)
     M = json.loads((banks / "pf" / "MANIFEST.json").read_text())
     TRANS = intake_synth.declare(M, "x", "pf")[2]
@@ -149,6 +162,51 @@ with tempfile.TemporaryDirectory() as tmp:
     check("T43.1 (A43) a 2-column file with a 6-token header: the shown line has 2 cells under COMMA, and the file's line count is 4",
           rc == 0 and "; 2 cells under COMMA" in said and "lines in the file: 4" in said, said)
     check("T43.1 (A43) --delimiter WHITESPACE: the same line has 6 cells under WHITESPACE (the 6 tokens)", "; 6 cells under WHITESPACE" in ws, ws)
+
+    # ---- T41.1 (A41): the blinded view; a sentinel in the FILE NAMES never reaches an output
+    SENT = "zzqBLIND4471"
+    (banks / "sb").mkdir()
+    [(banks / "sb" / f"curve_{SENT}_{k}.csv").write_bytes((banks / "pf" / f["name"]).read_bytes()) for k, f in enumerate(M["files"])]
+    named = [f"curve_{SENT}_{k}.csv" for k in range(len(M["files"]))]
+    ib = declare(bank="sb")
+    said = [cli("blind", ib, "<l4>/sb", *named)]
+    view = tmp / "cc-blind" / ib
+    seen = sorted(p.name for p in view.iterdir()) if view.is_dir() else []
+    blinded = lambda x: re.sub(r'(?m)^root = "[^"]*"', f'root = "<cc-blind>/{ib}"\nblinded_from = "<l4>/sb"\nkey_sha256 = "' + (re.findall(r"sha256 ([0-9a-f]{64})", said[0][1]) or ["?"])[0] + '"',
+                                x.replace('kind = "DEPOSIT"', 'kind = "BLINDED"', 1), count=1)
+    listed_ = lambda x: re.sub(r'(?m)^excluded = \[[^#]*\]', "excluded = []", re.sub(r'(?m)^files = \[[^\]]*\]', "files = " + json.dumps(seen), x, count=1), count=1)
+    d = w / "declarations" / ib
+    (d / "intake.toml").write_text(listed_(blinded((d / "intake.toml").read_text())))
+    said += [cli("lint", ib), cli("seal", ib, *SEAL), cli("run", ib)]
+    check("T41.1 (A41) blind makes nine ordinal-named links and the key beside the view", said[0][0] == 0 and len(seen) == 9 and (tmp / "cc-blind" / f"{ib}.KEY.json").is_file(), said[0][1])
+    check("T41.1 (A41) the BLINDED declaration lints, seals and runs, and passes S5", [s[0] for s in said[:3]] == [0, 0, 0] and "**S5 CENSUS** (LIVE): EXECUTED, PASS" in said[3][1],
+          "".join(s[1][-300:] for s in said))
+    wrote = {p.name: p.read_text(errors="replace") for p in d.iterdir() if p.is_file() and p.name not in ("intake.toml", "transducer.toml")}
+    check("T41.1 (A41) the intake wrote a report, RESULT.json or SEAL.json, and the logs", {"SEAL.json", "access.log", "seal.log"} <= set(wrote) and [n for n in wrote if n.endswith(".md")] != [], str(sorted(wrote)))
+    check("T41.1 (A41, leak) no output printed by blind, lint, seal or run holds the sentinel", not [s for s in said if SENT in s[1]], str([s[1][s[1].index(SENT) - 80:][:200] for s in said if SENT in s[1]]))
+    check("T41.1 (A41, leak) no file the intake wrote holds the sentinel", not [n for n, x in wrote.items() if SENT in x], str([n for n, x in wrote.items() if SENT in x]))
+    say = {**ic.ctables()["sentences"], **{r["code"]: r["sentence"] for r in ic.ctables()["blind_reason"]}}
+    ref = lambda out: (re.findall(r": REFUSE (\w+)", out[1]) or ["PASS"])[0]
+    (w / "declarations" / "bad id").mkdir()
+    shm = Path("/dev/shm")
+    PLANTS = {"BLIND_ID_REFUSED": lambda: cli("blind", "bad id", "<l4>/sb", named[0]), "ROOT_UNRESOLVED": lambda: cli("blind", declare(), "<nope>/sb", named[0]),
+              "BLIND_NAME_REPEATED": lambda: cli("blind", declare(), "<l4>/sb", named[0], named[0]),
+              "SOURCE_FILE_ABSENT": lambda: cli("blind", declare(), "<l4>/sb", named[0], f"curve_{SENT}_absent.csv"), "BLIND_VIEW_EXISTS": lambda: cli("blind", ib, "<l4>/sb", named[0])}
+    two = shm.is_dir() and shm.stat().st_dev != (tmp / "cc-blind").stat().st_dev
+    got = {k: f() for k, f in PLANTS.items()}
+    with tempfile.TemporaryDirectory(dir={True: shm, False: None}[two]) as other:
+        (Path(other) / f"curve_{SENT}.csv").write_bytes(b"T,C,sigma\n")
+        (w / "intake" / "ROOTS.toml").write_text((w / "intake" / "ROOTS.toml").read_text() + f'"<l4shm>" = "{other}"\n')
+        got |= {True: lambda: {"BLIND_NOT_ONE_DEVICE": cli("blind", declare(), "<l4shm>", f"curve_{SENT}.csv")}, False: dict}[two]()
+    NOT_HERE = {True: [], False: ["BLIND_NOT_ONE_DEVICE"]}[two]
+    print(f"  /dev/shm a second device here: {two}; NOT REACHED HERE: {NOT_HERE or 'none'}")
+    for k, out in got.items():
+        check(f"T41.1 (A41) {k} is refused by its plant, exit 1, and prints no selected name", ref(out) == k and out[0] == 1 and SENT not in out[1], out[1][-300:])
+    check("T41.1 (A41) the codes reached are exactly the blind rows of CONVERSION.toml with ROOT_UNRESOLVED and SOURCE_FILE_ABSENT",
+          set(got) | set(NOT_HERE) == {r["code"] for r in ic.ctables()["blind_reason"]} | {"ROOT_UNRESOLVED", "SOURCE_FILE_ABSENT"} and all(k in say for k in got), str(sorted(got)))
+    nu = declare(lambda x: blinded(x).replace(f'root = "<cc-blind>/{ib}"', 'root = "<l4>/sb"', 1), "sb")
+    lint_nu = cli("lint", nu)
+    check("T41.1 (A41) a BLINDED root not under <cc-blind>/ is refused at S0 ROOT_NOT_UNDER_CC_BLIND", lint_nu[0] == 1 and "ROOT_NOT_UNDER_CC_BLIND" in lint_nu[1], lint_nu[1][-300:])
 
 print("test_intake_loop4: " + ("FAILED " + "; ".join(bad) if bad else "all passed"))
 sys.exit(1 if bad else 0)

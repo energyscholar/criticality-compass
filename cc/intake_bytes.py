@@ -48,6 +48,7 @@ SOURCE = {   # [source] kind -> the S3 body of that kind; total over FORMAT's [s
     "DEPOSIT": lambda declaration, d, t: _deposit(declaration, d, t, lambda loc: _t23().Loader({loc: "universe", str(Path(loc).parent): "outside-universe"}, Path(d) / "access.log")),
     "CONVERTED": lambda declaration, d, t: _converted(declaration, d, t),
 }
+SOURCE["BLINDED"] = SOURCE["DEPOSIT"]   # plan 1160 A41: the view is read exactly as a deposit; its names are ordinals
 
 
 def source_integrity(declaration, d, t):

@@ -145,7 +145,7 @@ check("1. every type word of FORMAT.toml is a key of intake_blind.TYPE", words(T
 F = T["format"]["fields"]
 KINDS = set(F["source"]["variants"])
 SLOWS = {lay: set(F["selection"]["variants"][lay]["slow"]["variants"]) for lay in F["selection"]["variants"]}
-check("1. (1160 P1) the [source] kinds are DEPOSIT and CONVERTED, and SOURCE (the S3 body per kind) is total over them", KINDS == {"DEPOSIT", "CONVERTED"} and set(intake_bytes.SOURCE) == KINDS, str(KINDS))
+check("1. (1160 P1, A41) the [source] kinds are DEPOSIT, CONVERTED and BLINDED, and SOURCE (the S3 body per kind) is total over them", KINDS == {"DEPOSIT", "CONVERTED", "BLINDED"} and set(intake_bytes.SOURCE) == KINDS, str(KINDS))
 check("1. (1160 P1) the PER_FILE slow sources are LISTED, FILE_KEY, NONE; SLOW and UNKEYED are total over them",
       SLOWS["PER_FILE"] == {"LISTED", "FILE_KEY", "NONE"} and set(intake_census.SLOW) == set(intake_census.UNKEYED) == SLOWS["PER_FILE"], str(SLOWS))
 check("1. (1160 A24) SLOW_PATH (S1) is total over every slow source of every layout, and NONE alone has no path",
@@ -437,7 +437,7 @@ READS = {"intake_bytes", "intake_seal",   # the two modules of the split that ma
 readers = {m for m, tr in INTAKE_MODULES.items() if called(tr) & {"open", "read_bytes", "read_text"}}
 check("split: open, read_bytes and read_text are called only in intake_bytes, intake_seal and the declared exceptions", readers <= READS, str(sorted(readers - READS)))
 PRINTS = {"intake",   # the only module of the split that prints or exits
-          "intake_convert", "intake_synth"}   # outside the split: they print already (convert and peek; the planted bank)
+          "intake_convert", "intake_synth", "intake_blindview"}   # outside the split: they print already (convert and peek; the planted bank; 1160 A41 blind)
 printers = {m for m, tr in INTAKE_MODULES.items() if called(tr) & {"print", "exit"}}
 check("split: print and sys.exit are called only in intake.py and the declared modules outside the split", printers <= PRINTS, str(sorted(printers - PRINTS)))
 check("split: cc/intake_data.py is retired (its parts are intake_evidence, intake_bytes and intake_census)", "intake_data" not in INTAKE_MODULES, "")

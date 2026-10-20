@@ -250,6 +250,8 @@ with tempfile.TemporaryDirectory() as tmp:
         ("SCHEMA_UNSUPPORTED", "schema = 4, the format before 1160 A35 (1160 A35: was schema = 3, the format before A17; 1160 A17: was schema = 4 over a schema-3 format)", S0(lambda t: t.replace("schema = 5", "schema = 4", 1))),
         ("COMMENT_PREFIX_EMPTY", "(1160) comment = [\"\"] on table-curve-v1", (lt(LT, lambda t: t.replace('comment = ["#"]', 'comment = [""]', 1)), LT, full(LT))),
         ("ROOT_NOT_UNDER_CC_BANKS", "(1160) a CONVERTED source whose root is the deposit's", S0(lambda t: convert(t, f"<leak>/{PF}"))),
+        ("ROOT_NOT_UNDER_CC_BLIND", "(1160 A41) a BLINDED source whose root is the deposit's", S0(lambda t: re.sub(r'root = "[^"]*"', f'root = "<leak>/{PF}"\nblinded_from = "<leak>/{PF}"\nkey_sha256 = "0"',
+                                                                                                         t.replace('kind = "DEPOSIT"', 'kind = "BLINDED"', 1), count=1))),
         # S1 CHOICES
         ("SELECTION_EMPTY", "(1160 P2, A1) files = [] and values = [] (unsealed: S4 would read files[0])",
          (pf(PF, lambda t: re.sub(r"values = \[[^\]]*\]", "values = []", re.sub(r"files = \[[^\]]*\]", "files = []", t, count=1), count=1)), PF, unsealed)),

@@ -21,6 +21,7 @@ HANDOFF_CAP = 900   # plan 1160 P3: checks.toml [roles] intake_handoff, the conv
 CHOICES_CAP = 120   # plan 1160 P4: checks.toml [roles] intake_choices, S1 CHOICES (every row), moved out of intake_blind so INTAKE_CAP is not raised
 NAMES_CAP = 120
 FEASIBLE_CAP = 120   # plan 1160 P5: checks.toml [roles] intake_feasible, S7, S8 and S9 (cc/intake_feasible.py), so INTAKE_CAP is not raised   # plan 1160 P2: checks.toml [roles] intake_names, the name classifier and Detail, moved out of the intake so INTAKE_CAP is not raised
+BLINDVIEW_CAP = 80   # plan 1160 A41: checks.toml [roles] intake_blindview, `bin/cc intake blind` (cc/intake_blindview.py), so CORE_CAP is not raised
 DIFFERS_CAP = 60   # plan 1160 A34: checks.toml [roles] intake_differs, what a file differs from the first in (cc/intake_differs.py), so CORE_CAP is not raised
 NEW_CAP = 60   # plan 1164: checks.toml [roles] intake_new, `bin/cc new intake` (cc/intake_new.py), moved out of the intake
 TERMINAL_CAP = 200   # plan 1160 P6: checks.toml [roles] intake_terminal, S10 KERNEL_HANDOFF and the terminal (cc/intake_terminal.py), so INTAKE_CAP is not raised
@@ -49,6 +50,7 @@ handoff = {f: lines(f) for f in roles["intake_handoff"]}
 terminal = {f: lines(f) for f in roles["intake_terminal"]}
 new = {f: lines(f) for f in roles["intake_new"]}
 differs = {f: lines(f) for f in roles["intake_differs"]}
+blindview = {f: lines(f) for f in roles["intake_blindview"]}
 for f, n in {**counts, **intake, **names, **choices, **tests, **maths}.items():
     print(f"  {f}: {n}")
 total = sum(counts.values())
@@ -61,6 +63,7 @@ print(f"intake_handoff total {sum(handoff.values())} of {HANDOFF_CAP}")
 print(f"intake_terminal total {sum(terminal.values())} of {TERMINAL_CAP}")
 print(f"intake_new total {sum(new.values())} of {NEW_CAP}")
 print(f"intake_differs total {sum(differs.values())} of {DIFFERS_CAP}")
+print(f"intake_blindview total {sum(blindview.values())} of {BLINDVIEW_CAP}")
 assert not set(intake) & set(roles["plumbing"]), f"a file in both plumbing and intake: {sorted(set(intake) & set(roles['plumbing']))}"
 assert sum(intake.values()) <= CORE_CAP, f"intake line budget exceeded: {sum(intake.values())} > {CORE_CAP}; stop and report which files grew"
 for r, c in CORE.items():
@@ -80,5 +83,7 @@ assert sum(new.values()) <= NEW_CAP, f"intake_new line budget exceeded: {sum(new
 assert not set(new) & (set(intake) | set(names) | set(choices) | set(feasible) | set(handoff) | set(terminal) | set(roles["plumbing"])), "intake_new shares a file with another capped role"
 assert sum(differs.values()) <= DIFFERS_CAP, f"intake_differs line budget exceeded: {sum(differs.values())} > {DIFFERS_CAP}"
 assert not set(differs) & (set(intake) | set(names) | set(choices) | set(feasible) | set(handoff) | set(terminal) | set(new) | set(roles["plumbing"])), "intake_differs shares a file with another capped role"
+assert sum(blindview.values()) <= BLINDVIEW_CAP, f"intake_blindview line budget exceeded: {sum(blindview.values())} > {BLINDVIEW_CAP}"
+assert not set(blindview) & (set(intake) | set(names) | set(choices) | set(feasible) | set(handoff) | set(terminal) | set(new) | set(differs) | set(roles["plumbing"])), "intake_blindview shares a file with another capped role"
 assert total <= CAP, f"line budget exceeded: {total} > {CAP}; stop and report which files grew"
 print("test_budget: all passed")

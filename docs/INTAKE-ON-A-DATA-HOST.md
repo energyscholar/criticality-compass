@@ -148,6 +148,23 @@ that same directory. A deposit with no files.lst is declared from its raw direct
 selected files, the excluded files and the truth side, each file in one part. Otherwise it refuses UNIVERSE_NOT_PARTITIONED, or
 SELECTION_DUPLICATE when a name is given twice.
 
+### A RESERVED data set: declare the blinded view (plan 1160 A41)
+
+A deposit's file names can carry the slow value (`run_h0.5.csv`). The intake's Details, census and report name curve files, so on a
+RESERVED data set the names alone would leak it. Make the blinded view first, then declare the view, never the deposit:
+
+```
+<host> 'cd ~/scratch/cc-intake && bin/cc intake blind <id> "<cc-datasets>/<name>/raw" "<file 1>" "<file 2>" ...'   # the curve files, in curve order
+```
+
+It makes `<cc-blind>/<id>/` with one hard link per file named by ordinal (`001.csv`, `002.csv` ...), writes the name-to-ordinal key to
+`<cc-blind>/<id>.KEY.json`, beside the view and outside it, and prints the key's sha256. Leave the key unread until unblinding: no
+intake stage reads it, and an in-process read of it is logged as a bypass, which S6 refuses. Then declare `[source] kind = "BLINDED"`,
+`root = "<cc-blind>/<id>"`, `blinded_from` (the deposit's directory you named), `key_sha256` (the printed sha256, which the seal
+records with the declaration), `universe = "*"`, and in `[selection]` the ordinals in the order you gave the files, `excluded = []`.
+Every Detail, census line and report then names ordinals only. `<cc-blind>` must be on the deposit's device (a hard link cannot cross
+devices: BLIND_NOT_ONE_DEVICE); a view is never replaced (BLIND_VIEW_EXISTS).
+
 ### transducer.toml for real data
 
 Alongside intake.toml, `new intake` writes transducer.toml. For real data it must say `kind = "record"` with `[record]` (apparatus, preparation, observation, authors_projection, source) plus `[reduction]` (name, keeps, discards) and `[interval]` (role as printed, keeps, discards); lint refuses while any TODO remains.

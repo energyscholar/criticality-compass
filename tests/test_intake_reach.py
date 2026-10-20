@@ -211,6 +211,8 @@ with tempfile.TemporaryDirectory() as tmp:
         ("SCHEMA_UNSUPPORTED", "schema = 4, the format before 1160 A35 (1160 A35: was schema = 3, the format before A17; 1160 A17: was schema = 4 over a schema-3 format)", lambda: s0(base.replace("schema = 5", "schema = 4", 1))),
         ("COMMENT_PREFIX_EMPTY", "(1160) comment = [\"\"] on table-curve-v1", lambda: s0(long_table(m, "s0").replace('comment = ["#"]', 'comment = [""]', 1))),
         ("ROOT_NOT_UNDER_CC_BANKS", "(1160) a CONVERTED source whose root is the deposit's", lambda: s0(convert(base, "<long-test>/pf"))),
+        ("ROOT_NOT_UNDER_CC_BLIND", "(1160 A41) a BLINDED source whose root is the deposit's",
+         lambda: s0(re.sub(r'root = "[^"]*"', 'root = "<long-test>/pf"\nblinded_from = "<long-test>/pf"\nkey_sha256 = "0"', base.replace('kind = "DEPOSIT"', 'kind = "BLINDED"', 1), count=1))),
         ("FIELD_MISSING", "[knobs.fast] deleted", lambda: s0(re.sub(r"(?s)\[knobs\.fast\].*?(?=\[measured\])", "", base))),
         ("FIELD_MISSING", "(1160 A4) a block interval without min_blocks (FORMAT [interval_fields.block] requires it)", lambda: s0(BLOCK_NO_FLOOR(base))),
         ("FIELD_UNKNOWN", "a field the format does not define", lambda: s0(base.replace("[intake]\n", "[intake]\ncolour = \"red\"\n"))),

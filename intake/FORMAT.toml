@@ -9,7 +9,7 @@
 # v3 against v2 (plan 1160 P1): PER_FILE names its files as an explicit list `files`, in curve order (`pattern` and `index` are deleted);
 # its [selection.slow] is LISTED (`values`: one numeral TEXT per file, in `files` order) | FILE_KEY (`key`: a header line of each file) |
 # NONE (no slow knob); PATH_PATTERN is deleted. [source] is a VARIANT on `kind` (DEPOSIT: the files as deposited | CONVERTED: a bank written
-# by a declared conversion, with `converted_from`) and states `admissibility`, the deposit's class as the declarer reads it from metadata.
+# by a declared conversion, with `converted_from` | BLINDED: the ordinal-named view of `bin/cc intake blind`, plan 1160 A41) and states `admissibility`, the deposit's class as the declarer reads it from metadata.
 # v4 against v3 (plan 1160 P2): [replicate] identity SAME_FAST_VALUE (consecutive rows of one curve with an equal fast value are the
 # readings of one point). Additive within schema 3: every v3 declaration is a v4 declaration.
 # v5 against v4 (plan 1160 P2): a LONG_TABLE states `block`: EXACT (a curve is a run of rows with one slow value, the v4 rule) |
@@ -31,6 +31,8 @@
 # v11 against v10 (plan 1160 A35, schema 5): [knobs.slow] states `kind`: QUANTITY (a physical quantity with a metric: a field, a temperature)
 # | ORDINAL (an index or a category: a run number, a cycle index, a sample label); S1 SLOW_KNOB_HAS_NO_METRIC refuses ORDINAL. A v4
 # declaration restated as v5 adds kind = "QUANTITY" (the v4 meaning).
+# v13 against v12 (plan 1160 A41, schema 5): [source] gains the variant BLINDED, a RESERVED run's ordinal-named view (`bin/cc intake blind`);
+# its root is under <cc-blind>/ (S0 ROOT_NOT_UNDER_CC_BLIND), and an UNDER check names its own reason (`refused`) and form (`want`).
 # v12 against v11 (plan 1160 A33, still schema 5: loop 4 builds v5 whole): [replicate] key is a table [replicate.key], VARIANT on kind:
 # NONE (no key) | FILE_NAME (separator, field: the 1-based field of the file name without its extension, split on the separator; PER_FILE)
 # | COLUMN (column: a column holding one number per curve; it is read as a role column before the slow column). A v4 `key = ""` is
@@ -53,7 +55,8 @@
 # A key that is no field row is FIELD_IS_STAMPED when it is in `stamped`, FIELD_IS_DERIVED when in `derived`, else FIELD_UNKNOWN.
 schema = 1
 kind = "intake-format"
-version = "1160-v12"   # plan 1160 A33: [replicate.key] VARIANT on kind NONE | FILE_NAME (separator, field) | COLUMN (column), in schema 5 (loop 4 builds v5 whole);
+version = "1160-v13"   # plan 1160 A41: [source] kind BLINDED (root under <cc-blind>/, blinded_from, key_sha256), schema 5;
+# was "1160-v12"   # plan 1160 A33: [replicate.key] VARIANT on kind NONE | FILE_NAME (separator, field) | COLUMN (column), in schema 5 (loop 4 builds v5 whole);
 # was "1160-v11"   # plan 1160 A35: [knobs.slow] kind QUANTITY | ORDINAL, schema 5; plan 1160 A21: [reader.format] XLSX sheet a name or a position; plan 1160 A17: [knobs.fast] control, schema 4
 header = { schema = 5, kind = "intake" }
 stamped = ["sealed_at", "author", "author_kind", "confirmed_by", "declaration_sha256", "code_identity", "protocol_identity", "universe_listing", "sampling", "pins"]
@@ -95,11 +98,20 @@ admissibility = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NO
 [fields.source.variants.CONVERTED]   # a bank under <cc-banks> written by the declared conversion of the deposit at converted_from (plan 1160 P3)
 origin = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { PLANTED = "ADMIT", EXPERIMENT = "ADMIT" } }
 deposit = { type = "str", check = "TEXT" }
-root = { type = "str", check = "UNDER", under = "<cc-banks>/" }   # a converted bank lives under <cc-banks> (ROOTS.toml, plan 1160 P3)
+root = { type = "str", check = "UNDER", under = "<cc-banks>/", want = "<id>/bank", refused = "ROOT_NOT_UNDER_CC_BANKS" }   # a converted bank lives under <cc-banks> (ROOTS.toml, plan 1160 P3)
 universe = { type = "str", check = "TEXT" }
 truth_side = { type = "list", check = "ITEMS", item = "str" }
 admissibility = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { RAW = "ADMIT", DECLARABLE = "ADMIT", FIGURE_LEVEL = "ADMIT", PROCESSED_UNDECLARABLE = "ADMIT" } }
 converted_from = { type = "str", check = "TEXT" }   # "<cc-datasets>/<id>/raw": the deposit the conversion read
+[fields.source.variants.BLINDED]   # (plan 1160 A41) the blinded view `bin/cc intake blind` made: ordinal-named links, the names' key unread
+origin = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { PLANTED = "ADMIT", EXPERIMENT = "ADMIT" } }
+deposit = { type = "str", check = "TEXT" }
+root = { type = "str", check = "UNDER", under = "<cc-blind>/", want = "<id>", refused = "ROOT_NOT_UNDER_CC_BLIND" }   # the view, never the deposit
+universe = { type = "str", check = "TEXT" }
+truth_side = { type = "list", check = "ITEMS", item = "str" }
+admissibility = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { RAW = "ADMIT", DECLARABLE = "ADMIT", FIGURE_LEVEL = "ADMIT", PROCESSED_UNDECLARABLE = "ADMIT" } }
+blinded_from = { type = "str", check = "TEXT" }   # "<name>/<path>": the deposit's directory the view links to
+key_sha256 = { type = "str", check = "TEXT" }   # the sha256 `bin/cc intake blind` printed for <cc-blind>/<id>.KEY.json: the seal records it
 
 [fields.reader]   # a table per reader (plan 1145): `name` selects the row; the reader's own fields are exactly that row's
 type = "table"

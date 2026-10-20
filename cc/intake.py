@@ -1,6 +1,7 @@
 """intake - `bin/cc intake explain | lint | seal | run | synth | convert | peek`: the command-line surface of the intake pipeline.
 Invariant: the only intake module that prints or exits, every exit code from a table; it reads the tables and the declaration's text (never
 a data byte: S3 reads those, cc/intake_bytes.py) and registers the stage bodies; it is what bin/cc and docs/gen-intake.py import."""
+import importlib
 import tomllib
 from pathlib import Path
 
@@ -100,7 +101,7 @@ def run(root, ident, args):
 
 def _usage(why):
     print(f"bin/cc intake: {why}\n  usage: bin/cc intake explain | synth <id> --seed N [--curves K] [--out DIR] | lint <id> | seal <id> --author NAME --as human|ai-draft "
-          "(--confirmed-by NAME | --unconfirmed) | run <id> | convert <id> [--verify] | peek <id> <cc-datasets>/<name>/raw/<file> [--sheet NAME|k] [--depth N] [--encoding E] [--delimiter D]\n  Next: bin/cc intake explain")
+          "(--confirmed-by NAME | --unconfirmed) | run <id> | convert <id> [--verify] | peek <id> <cc-datasets>/<name>/raw/<file> [--sheet NAME|k] [--depth N] [--encoding E] [--delimiter D] | blind <id> <name>/<path> <file>...\n  Next: bin/cc intake explain")
     return 1
 
 
@@ -116,16 +117,16 @@ def synth(root, args):
     return intake_synth.cli(root, args)
 
 
-def _handoff(pick):
-    """bin/cc intake convert | peek: the conversion before the intake (cc/intake_convert.py, role intake_handoff), imported when asked for."""
+def _handoff(pick, name="intake_convert"):
+    """bin/cc intake convert | peek | blind: before the intake (cc/intake_convert.py, role intake_handoff; blind: cc/intake_blindview.py), imported when asked for."""
     def go(root, ident, a):
-        import intake_convert
-        return pick(intake_convert)(root, ident, a, tables(root))
+        return pick(importlib.import_module(name))(root, ident, a, tables(root))
     return _with_id(go)
 
 
 INTAKE = {"explain": lambda root, a: print(intake_say.explain(tables(root)), end="") or 0, "lint": _with_id(lint), "seal": _with_id(seal), "run": _with_id(run),
-          "synth": synth, "convert": _handoff(lambda m: m.convert_cli), "peek": _handoff(lambda m: m.peek_cli)}
+          "synth": synth, "convert": _handoff(lambda m: m.convert_cli), "peek": _handoff(lambda m: m.peek_cli),
+          "blind": _handoff(lambda m: m.blind_cli, "intake_blindview")}
 
 
 def cli(root, args):
