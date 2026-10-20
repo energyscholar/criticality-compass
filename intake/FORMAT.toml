@@ -1,6 +1,6 @@
 # intake/FORMAT.toml - declaration format v5, schema 5 (plan 1160 A35; format v4 was schema 4, format v3 schema 3) (plan 1136, amendment A2 ruling Q5; plan 1145; plan 1160 P1): the S0 FORMAT schema as DATA. S0
 # (cc/intake_blind.py) walks this table and emits the reason codes of intake/STAGES.toml directly; it holds no per-field code. Every field is
-# required. A field that exists only for one reader, layout, kind or source is a field of that VARIANT row: never an optional field, and never
+# required, except a row that states required = false (v14: [plane], [plane.slice] and [suspect] only). A field that exists only for one reader, layout, kind or source is a field of that VARIANT row: never an optional field, and never
 # a field written "" or [] where it does not apply.
 # v2 against v1 (plan 1145): [source] reader and layout leave [source]; [reader] is a VARIANT on its name (a table per reader); [selection]
 # is a VARIANT on its layout (PER_FILE | LONG_TABLE) and holds the slow knob's source ([selection.slow], a VARIANT per layout, the v1 value
@@ -37,6 +37,13 @@
 # NONE (no key) | FILE_NAME (separator, field: the 1-based field of the file name without its extension, split on the separator; PER_FILE)
 # | COLUMN (column: a column holding one number per curve; it is read as a role column before the slow column). A v4 `key = ""` is
 # [replicate.key] kind = "NONE".
+# v14 against v13 (plan 1176 phase A, still schema 5): two OPTIONAL sections, the navigator's plane and the user's suspect line; a row
+# with required = false may be absent (S0 walks it only when present). [plane] axes "slow-fast" (the alphabet now; "slow-slow2" arrives
+# with plan 1176 phase 2b) and an optional [plane.slice] (column, value): the one value of the declared [replicate.key] COLUMN that fixes
+# a second knob. [suspect] vertices [[slow, fast], ...] in the declared knobs' physical units, and corridor "grid" (the frozen linenav grid
+# PARAMS, w_c 5 cells). The suspect is the declarer's GUESS, never data: cc/intake_suspect.py converts it to cells (curve rank, sample
+# rank) by an exact slow match and the in-span nearest sample, and refuses it typed otherwise. Additive: every v13 declaration is a v14
+# declaration and lints byte-identically.
 # A reader's `comment` prefixes are PREFIXES: an empty prefix marks every line a comment, so it is refused (COMMENT_PREFIX_EMPTY).
 # A field row: type = str | int | num | list | table | ref (cc/intake_blind.py TYPE); check = one of cc/intake_blind.py CHECK:
 #   TEXT      any text but the template's "TODO"
@@ -55,7 +62,8 @@
 # A key that is no field row is FIELD_IS_STAMPED when it is in `stamped`, FIELD_IS_DERIVED when in `derived`, else FIELD_UNKNOWN.
 schema = 1
 kind = "intake-format"
-version = "1160-v13"   # plan 1160 A41: [source] kind BLINDED (root under <cc-blind>/, blinded_from, key_sha256), schema 5;
+version = "1160-v14"   # plan 1176 phase A: optional [plane] (axes, [plane.slice]) and [suspect] (vertices, corridor), schema 5
+# was "1160-v13"   # plan 1160 A41: [source] kind BLINDED (root under <cc-blind>/, blinded_from, key_sha256), schema 5;
 # was "1160-v12"   # plan 1160 A33: [replicate.key] VARIANT on kind NONE | FILE_NAME (separator, field) | COLUMN (column), in schema 5 (loop 4 builds v5 whole);
 # was "1160-v11"   # plan 1160 A35: [knobs.slow] kind QUANTITY | ORDINAL, schema 5; plan 1160 A21: [reader.format] XLSX sheet a name or a position; plan 1160 A17: [knobs.fast] control, schema 4
 header = { schema = 5, kind = "intake" }
@@ -266,6 +274,30 @@ type = "table"
 check = "TABLE"
 [fields.shift.fields]
 c = { type = "num", check = "NUMBER" }
+
+# [plane] and [suspect] (plan 1176 phase A, v14) are OPTIONAL: required = false, so a v13 declaration without them is unchanged. S0 types
+# them; what needs the census (a vertex on a curve, inside its span; a slice where a second knob varies) is cc/intake_suspect.py's.
+[fields.plane]
+type = "table"
+check = "TABLE"
+required = false
+[fields.plane.fields]
+axes = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { "slow-fast" = "ADMIT" } }   # slow-slow2: phase 2b
+[fields.plane.fields.slice]   # optional: the plane at one value of a second knob, the declared [replicate.key] COLUMN
+type = "table"
+check = "TABLE"
+required = false
+[fields.plane.fields.slice.fields]
+column = { type = "ref", check = "REF" }   # the [replicate.key] column, as declared there
+value = { type = "num", check = "NUMBER" }   # the curves whose key is exactly this value
+
+[fields.suspect]   # the declarer's guess of a line, in the declared knobs' units: never data, never a checkpoint
+type = "table"
+check = "TABLE"
+required = false
+[fields.suspect.fields]
+vertices = { type = "list", check = "ITEMS", item = "list" }   # [[slow, fast], ...]: two numbers each, at least two (cc/intake_suspect.py)
+corridor = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { grid = "ADMIT" } }   # frozen linenav grid PARAMS, w_c 5 cells
 
 [interval_fields.STATED]   # plan 1160 P4: no field beyond method; the interval of each point is the declared uncertainty column
 required = {}

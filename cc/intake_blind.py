@@ -177,9 +177,9 @@ def unknown(d, rows, loc, tables):
 
 
 def section(rows, d, loc, tables):
-    """Every field of a table, in FORMAT order, then its unknown keys."""
+    """Every field of a table, in FORMAT order (a row stating required = false may be absent: FORMAT v14), then its unknown keys."""
     pre = {True: "", False: loc + "."}[loc == ""]
-    return [f for k, spec in rows.items() for f in field(spec, d, k, pre + k, tables)] + unknown(d, rows, loc, tables)
+    return [f for k, spec in rows.items() for f in field(spec, d, k, pre + k, tables, look(spec, "required", True))] + unknown(d, rows, loc, tables)
 
 
 @dataclass(frozen=True)
