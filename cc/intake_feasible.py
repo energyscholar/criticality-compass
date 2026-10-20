@@ -64,28 +64,40 @@ def peak(c):
     return c.rows[top][0], (min(r[0] for r in c.rows), max(r[0] for r in c.rows))
 
 
-ENDS = {   # an ALTERNATIVE projection's bias -> (the curves in slow order) -> the curves on which it is empty; total over POLICY's projections
-    "ARGMAX_FAST": lambda cs: [c.where for c in cs if peak(c)[0] in peak(c)[1]],   # the maximum sits at a fast end: no interior location
+DOMAIN = {   # (plan 1160 A39.1: was ENDS) a POLICY projection -> (the curves in slow order) -> the curves on which it is empty; total over POLICY's
+    "ARGMAX_FAST": lambda cs: [c.where for c in cs if peak(c)[0] in peak(c)[1]],   # projections. The maximum sits at a fast end: no interior location
     "MAX_MEASURED": lambda cs: [],   # a height exists on every curve
+}   # consulted by S9 for every ALTERNATIVE step and by S10 (cc/intake_terminal.py) for the PRIMARY projection
+ANCHOR = {   # an ALTERNATIVE bridge's template -> the projection its anchor is (its domain is that projection's); total over POLICY's bridges
+    "CHAIN_SLOW": "MAX_MEASURED",   # chains every curve in slow order: no anchor, never empty
+    "PAIR_NEAREST_FAST": "ARGMAX_FAST",   # the anchor is the fast value at each curve's maximum
 }
-PAIRS = {   # an ALTERNATIVE bridge's template -> (the curves in slow order) -> the curves it cannot pair; total over POLICY's bridges
-    "CHAIN_SLOW": lambda cs: [],   # chains every curve in slow order
-    "PAIR_NEAREST_FAST": lambda cs: [a.where for a, b in zip(cs, cs[1:]) for p, q in ((a, b), (b, a)) if not peak(q)[1][0] <= peak(p)[0] <= peak(q)[1][1]],   # anchor outside the neighbour's span
+PAIRS = {   # an ALTERNATIVE bridge's template -> (the curves in slow order) -> the curves whose anchor lies outside a slow neighbour's fast span,
+    "CHAIN_SLOW": lambda cs: [],   # distinct, in slow order (plan 1160 A39.3: the curve p whose anchor is outside); total over POLICY's bridges
+    "PAIR_NEAREST_FAST": lambda cs: [c.where for c in cs if c.where in {p.where for a, b in zip(cs, cs[1:]) for p, q in ((a, b), (b, a)) if not peak(q)[1][0] <= peak(p)[0] <= peak(q)[1][1]}],
+}
+NEXT = {   # S9's refusal -> its Next (plan 1160 A39.2); total over S9's rows
+    "NO_INTERIOR_FAST_MAXIMUM": "Next: robustness is unavailable, not mis-chosen: no location-anchored second lane exists on a family with no interior fast maximum; it needs a second observable",
+    "ANCHOR_OUTSIDE_NEIGHBOUR_SPAN": "Next: the anchors are interior but a slow neighbour's fast span does not reach them (ragged or shifted grids): select curves on a common fast span, or bridge CHAIN_SLOW",
 }
 
 
 def second(census, t):
-    """S9: SECOND_LANE_INFEASIBLE when an ALTERNATIVE projection is ARGMAX_FAST and a curve's maximum sits at its fast end, or an ALTERNATIVE
-    bridge is PAIR_NEAREST_FAST and a curve's anchor (the fast value at its maximum) lies outside a slow neighbour's fast span: a structural
-    emptiness, no tolerance. With no ALTERNATIVE lane (origin PLANTED needs one lane, S1), nothing is checked and it passes, with that said."""
+    """S9 (plan 1160 A39.2: was SECOND_LANE_INFEASIBLE): NO_INTERIOR_FAST_MAXIMUM when an ALTERNATIVE step's DOMAIN is empty on a curve (a
+    projection's own; a bridge's anchor projection, ANCHOR) | ANCHOR_OUTSIDE_NEIGHBOUR_SPAN when an ALTERNATIVE bridge PAIR_NEAREST_FAST
+    finds a curve's interior anchor outside a slow neighbour's fast span: structural emptiness, no tolerance. With no ALTERNATIVE lane
+    (origin PLANTED needs one lane, S1), nothing is checked and it passes, with that said. A Detail: the step, <= 3 curves, {curves, of}, Next."""
     d = census.pinned.declaration.data
-    alt = [(f"projection {p['bias']}", ENDS[p["bias"]]) for p in d["projection"] if p["lane"] == "ALTERNATIVE"] + [
-        (f"bridge {b['template']}", PAIRS[b["template"]]) for b in d["bridge"] if b["lane"] == "ALTERNATIVE"]
     files = census.pinned.files
     cs = sorted(intake_census.CURVES[d["selection"]["layout"]](d, files, [intake_census.read(t, d, f) for f in files]), key=lambda c: c.slow)
-    empty = [(what, f(cs)) for what, f in alt if f(cs)]
-    return gate([(lambda: not empty, "SECOND_LANE_INFEASIBLE", lambda: detail(words=[empty[0][0]] + empty[0][1][:3], counts={"curves": len(empty[0][1])}))],
-                lambda: Pass(SecondLane(census, tuple(what for what, _ in alt), len({b["lane"] for b in d["bridge"]}))))
+    steps = [(f"projection {p['bias']}", p["bias"], lambda cs: []) for p in d["projection"] if p["lane"] == "ALTERNATIVE"] + [
+        (f"bridge {b['template']}", ANCHOR[b["template"]], PAIRS[b["template"]]) for b in d["bridge"] if b["lane"] == "ALTERNATIVE"]
+    found = lambda rule: [(what, rule(dom, pair)) for what, dom, pair in steps if rule(dom, pair)]
+    said = lambda code, got: lambda: detail(words=[got[0][0]] + got[0][1][:3] + [NEXT[code]], counts={"curves": len(got[0][1]), "of": len(cs)})
+    empty, outside = found(lambda dom, pair: DOMAIN[dom](cs)), found(lambda dom, pair: pair(cs))
+    return gate([(lambda: not empty, "NO_INTERIOR_FAST_MAXIMUM", said("NO_INTERIOR_FAST_MAXIMUM", empty)),
+                 (lambda: not outside, "ANCHOR_OUTSIDE_NEIGHBOUR_SPAN", said("ANCHOR_OUTSIDE_NEIGHBOUR_SPAN", outside))],
+                lambda: Pass(SecondLane(census, tuple(what for what, _, _ in steps), len({b["lane"] for b in d["bridge"]}))))
 
 
 def bodies(t, d):

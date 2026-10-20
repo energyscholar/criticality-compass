@@ -24,6 +24,15 @@ the Compass (bin, cc, intake, ...) in a temporary directory, whose intake/ROOTS.
        BLIND_ID_REFUSED, ROOT_UNRESOLVED, BLIND_NAME_REPEATED, SOURCE_FILE_ABSENT, BLIND_VIEW_EXISTS, and BLIND_NOT_ONE_DEVICE when this
        machine has a second device at /dev/shm (else NOT REACHED HERE); a BLINDED root not under <cc-blind>/ is refused at S0
        ROOT_NOT_UNDER_CC_BLIND.
+ T39.1-T39.5 (A39) on three planted banks of nine curves on one T grid (0..9): MONO (C rises with T: every maximum at the fast end),
+       PEAKED (C peaks at T = 4 or 5: interior), SHIFTED (PEAKED with curve_004's T moved by +100).
+       T39.1 MONO, an ALTERNATIVE projection ARGMAX_FAST (chained): S9 refuses NO_INTERIOR_FAST_MAXIMUM, {curves 9, of 9}, its Next printed;
+             S10 still passes. T39.2 MONO, the PRIMARY projection ARGMAX_FAST: S10 refuses PROJECTION_EMPTY_ON_CURVE and no RESULT.json is
+             written (PEAKED, the control, passes S10). T39.3 SHIFTED, the ALTERNATIVE bridge PAIR_NEAREST_FAST: S9 refuses
+             ANCHOR_OUTSIDE_NEIGHBOUR_SPAN naming curve_003, curve_004, curve_005 once each in slow order, {curves 3, of 9}. T39.4 MONO
+             on the aligned grid, PAIR_NEAREST_FAST: S9 refuses NO_INTERIOR_FAST_MAXIMUM (the span rule alone passed it). T39.5 DOMAIN is total
+             over POLICY's projections, ANCHOR and PAIRS over its bridges, NEXT over S9's rows; S9's rows are the two, and S10's
+             PROJECTION_EMPTY_ON_CURVE is live and before DOOR_REFUSED.
 Seen RED (each mutation applied by hand, the test run, the mutation reverted):
  - T35.1: the SLOW_KNOB_HAS_NO_METRIC row deleted from intake_choices.choices: FAIL (lint and seal pass S1); METRIC["ORDINAL"] made True
    (ORDINAL mapped to a path): FAIL.
@@ -35,6 +44,9 @@ Seen RED (each mutation applied by hand, the test run, the mutation reverted):
    file is SOURCE_FILE_ABSENT (FAIL); the four refusals still hold.
  - T41.1: the view built with the original names (`view / n` for `view / o` in intake_blindview._make): the leak checks FAIL (the
    sentinel in the view's names reaches the declaration's outputs).
+ - T39: DOMAIN["ARGMAX_FAST"] made `lambda cs: []`: T39.1, T39.2 and T39.4 FAIL; the S10 row's holds made `lambda: True`: T39.2 FAILS;
+   the old PAIRS row restored (`a.where` for both directions): T39.3 FAILS; ANCHOR["PAIR_NEAREST_FAST"] made "MAX_MEASURED": T39.4 FAILS;
+   NEXT's ANCHOR_OUTSIDE_NEIGHBOUR_SPAN row deleted: T39.5 FAILS.
  - T43.1: the count omitted (peek's `count` made to return ""): FAIL.
 """
 import contextlib
@@ -51,9 +63,11 @@ sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "tests")]
 import intake  # noqa: E402
 import intake_convert  # noqa: E402
 import intake_differs  # noqa: E402
+import intake_feasible  # noqa: E402
+import tomllib  # noqa: E402
 import intake_convert as ic  # noqa: E402
 import intake_synth  # noqa: E402
-from intake_plant import ORDINAL, per_file  # noqa: E402
+from intake_plant import ARGMAX_LANE, ORDINAL, PAIR_LANE, per_file  # noqa: E402
 
 bad = []
 
@@ -207,6 +221,42 @@ with tempfile.TemporaryDirectory() as tmp:
     nu = declare(lambda x: blinded(x).replace(f'root = "<cc-blind>/{ib}"', 'root = "<l4>/sb"', 1), "sb")
     lint_nu = cli("lint", nu)
     check("T41.1 (A41) a BLINDED root not under <cc-blind>/ is refused at S0 ROOT_NOT_UNDER_CC_BLIND", lint_nu[0] == 1 and "ROOT_NOT_UNDER_CC_BLIND" in lint_nu[1], lint_nu[1][-300:])
+
+    # ---- T39 (A39): DOMAIN, the S9 split, PAIRS naming, S10 PROJECTION_EMPTY_ON_CURVE
+    def grid(name, c, shift=lambda k: 0):
+        """A bank of nine curves on T = 0..9 (curve k's T moved by shift(k)), C = c(k, T), sigma 0.1."""
+        (banks / name).mkdir()
+        [(banks / name / f"curve_{k:03d}.csv").write_text("T,C,sigma\n" + "".join(f"{T + shift(k)},{c(k, T)},0.1\n" for T in range(10))) for k in range(9)]
+        (banks / name / "MANIFEST.json").write_text('{"planted": "test_intake_loop4"}\n')
+        return name
+    mono, peaked = grid("mono", lambda k, T: T + 0.1 * k), grid("peaked", lambda k, T: 10 - (T - 4.5 - 0.1 * k) ** 2)
+    shifted = grid("shifted", lambda k, T: 10 - (T - 4.5 - 0.1 * k) ** 2, lambda k: 100 * (k == 4))
+    PRIMARY_ARGMAX = lambda x: x.replace('bias = "MAX_MEASURED"', 'bias = "ARGMAX_FAST"', 1)
+    line = lambda out, s: (re.findall(r"- \*\*" + s + r" [A-Z_]+\*\* \(LIVE\): [^\n]*", out) or [out[-300:]])[0]   # the stage's verdict line
+    o1 = s5i(declare(ARGMAX_LANE, mono))
+    check("T39.1 (A39) MONO, ALTERNATIVE ARGMAX_FAST: S9 refuses NO_INTERIOR_FAST_MAXIMUM, curves 9 of 9, its Next printed; S10 passes",
+          "EXECUTED, REFUSE NO_INTERIOR_FAST_MAXIMUM" in line(o1, "S9") and "curves = 9; of = 9" in line(o1, "S9")
+          and intake_feasible.NEXT["NO_INTERIOR_FAST_MAXIMUM"] in line(o1, "S9") and "EXECUTED, PASS" in line(o1, "S10"), line(o1, "S9") + " | " + line(o1, "S10"))
+    i2, i2c = declare(PRIMARY_ARGMAX, mono), declare(PRIMARY_ARGMAX, peaked)
+    o2, o2c = s5i(i2), s5i(i2c)
+    check("T39.2 (A39.1) MONO, PRIMARY ARGMAX_FAST: S10 refuses PROJECTION_EMPTY_ON_CURVE, curves 9 of 9, and writes no RESULT.json",
+          "EXECUTED, REFUSE PROJECTION_EMPTY_ON_CURVE" in line(o2, "S10") and "curves = 9; of = 9" in line(o2, "S10")
+          and not (w / "declarations" / i2 / "RESULT.json").exists(), line(o2, "S10"))
+    check("T39.2 (A39.1) PEAKED, PRIMARY ARGMAX_FAST (the control): S10 passes and RESULT.json is written",
+          "EXECUTED, PASS" in line(o2c, "S10") and (w / "declarations" / i2c / "RESULT.json").is_file(), line(o2c, "S10"))
+    o3 = line(s5i(declare(PAIR_LANE, shifted)), "S9")
+    check("T39.3 (A39.3) SHIFTED, PAIR_NEAREST_FAST: S9 refuses ANCHOR_OUTSIDE_NEIGHBOUR_SPAN naming curve_003, curve_004, curve_005 once each in slow order, curves 3 of 9",
+          "EXECUTED, REFUSE ANCHOR_OUTSIDE_NEIGHBOUR_SPAN" in o3 and re.findall(r"curve_\d{3}\.csv", o3) == ["curve_003.csv", "curve_004.csv", "curve_005.csv"]
+          and "curves = 3; of = 9" in o3 and intake_feasible.NEXT["ANCHOR_OUTSIDE_NEIGHBOUR_SPAN"] in o3, o3)
+    o4 = line(s5i(declare(PAIR_LANE, mono)), "S9")
+    check("T39.4 (A39.1) MONO on the aligned grid, PAIR_NEAREST_FAST: S9 refuses NO_INTERIOR_FAST_MAXIMUM", "EXECUTED, REFUSE NO_INTERIOR_FAST_MAXIMUM" in o4, o4)
+    ST = tomllib.loads((ROOT / "intake" / "STAGES.toml").read_text())
+    rows = {s["id"]: [r["code"] for r in s["reason"]] for s in ST["stage"]}
+    POL = tomllib.loads((ROOT / "intake" / "POLICY.toml").read_text())
+    check("T39.5 (A39) DOMAIN total over POLICY's projections, ANCHOR and PAIRS over its bridges, NEXT over S9's rows; S9 holds the two rows; S10's PROJECTION_EMPTY_ON_CURVE before DOOR_REFUSED",
+          set(intake_feasible.DOMAIN) == set(POL["projection"]) and set(intake_feasible.ANCHOR) == set(intake_feasible.PAIRS) == set(POL["bridge"])
+          and set(intake_feasible.ANCHOR.values()) <= set(intake_feasible.DOMAIN) and rows["S9"] == list(intake_feasible.NEXT) == ["NO_INTERIOR_FAST_MAXIMUM", "ANCHOR_OUTSIDE_NEIGHBOUR_SPAN"]
+          and rows["S10"].index("PROJECTION_EMPTY_ON_CURVE") < rows["S10"].index("DOOR_REFUSED"), str((sorted(intake_feasible.NEXT), rows["S9"], rows["S10"])))
 
 print("test_intake_loop4: " + ("FAILED " + "; ".join(bad) if bad else "all passed"))
 sys.exit(1 if bad else 0)

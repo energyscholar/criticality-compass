@@ -16,6 +16,7 @@ import numpy as np
 import admit
 import door
 import intake_census
+import intake_feasible
 import intake_seal
 import kernel
 import schema
@@ -168,8 +169,9 @@ def reduce(xs, bias, z, rel):
 
 
 def handoff(lineage, plan, feasibility, t):
-    """S10: NO_KERNEL_ROUTE (no PRIMARY bridge, or one whose template has no door template in CC) | DOOR_REFUSED (the door refuses a value:
-    door.nodefield's Null on a non-finite r_k or sigma), in that order; else the KernelInput of every PRIMARY bridge."""
+    """S10: NO_KERNEL_ROUTE (no PRIMARY bridge, or one whose template has no door template in CC) | PROJECTION_EMPTY_ON_CURVE (plan 1160
+    A39.1: the PRIMARY projection's DOMAIN, intake_feasible's, is empty on a curve) | DOOR_REFUSED (the door refuses a value: door.nodefield's
+    Null on a non-finite r_k or sigma), in that order; else the KernelInput of every PRIMARY bridge."""
     census = lineage.census
     d, files = census.pinned.declaration.data, census.pinned.files
     cs = sorted(intake_census.CURVES[d["selection"]["layout"]](d, files, [intake_census.read(t, d, f) for f in files]), key=lambda c: c.slow)
@@ -177,8 +179,10 @@ def handoff(lineage, plan, feasibility, t):
     unrouted = [b for b in primary if ROUTE[b["template"]] not in door.TEMPLATES]
     bias = lambda b: [p["bias"] for p in d["projection"] if p["lane"] == "PRIMARY" and p["to"] == b["on"]][0]   # CHAIN_SLOW takes a projection's `to` (S1)
     vals = lambda b: values(cs, bias(b), plan.tiering, d["shift"]["c"])
+    empty = lambda: [(bias(b), intake_feasible.DOMAIN[bias(b)](cs)) for b in primary if intake_feasible.DOMAIN[bias(b)](cs)]
     return gate([(lambda: primary and not unrouted, "NO_KERNEL_ROUTE", lambda: detail(words=[f"PRIMARY bridge {b['template']} on '{b['on']}': no door template in CC" for b in unrouted][:3] or ["no PRIMARY bridge"],
-                                                                                      counts={"PRIMARY bridges": len(primary)}))],
+                                                                                      counts={"PRIMARY bridges": len(primary)})),
+                 (lambda: not empty(), "PROJECTION_EMPTY_ON_CURVE", lambda: detail(words=[f"PRIMARY projection {empty()[0][0]}"] + empty()[0][1][:3], counts={"curves": len(empty()[0][1]), "of": len(cs)}))],
                 lambda: admitted(lineage, plan, feasibility, t, cs, primary, bias, vals))
 
 

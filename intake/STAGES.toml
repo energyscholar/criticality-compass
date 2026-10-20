@@ -9,7 +9,7 @@
 # needs, and never the seal stage (test 1).
 schema = 1
 kind = "intake-stages"
-version = "1160-v10"   # plan 1160 A35: S1 SLOW_KNOB_HAS_NO_METRIC, schema 5; plan 1160 A24: S1 SLOW_NONE_HAS_NO_PATH; plan 1160 A20: UNIVERSE_ROOT_ABSENT names the root (seal has no --universe); plan 1160 A17: S1 MEASURED_KNOB_HAS_NO_POINTS, schema 4; plan 1160 A9: S10 runs before S9 (a refused second lane never withholds the terminal); A13: conversion_read
+version = "1160-v11"   # plan 1160 A39: S9 SECOND_LANE_INFEASIBLE split into NO_INTERIOR_FAST_MAXIMUM and ANCHOR_OUTSIDE_NEIGHBOUR_SPAN, S10 PROJECTION_EMPTY_ON_CURVE; plan 1160 A41: S0 ROOT_NOT_UNDER_CC_BLIND; plan 1160 A35: S1 SLOW_KNOB_HAS_NO_METRIC, schema 5; plan 1160 A24: S1 SLOW_NONE_HAS_NO_PATH; plan 1160 A20: UNIVERSE_ROOT_ABSENT names the root (seal has no --universe); plan 1160 A17: S1 MEASURED_KNOB_HAS_NO_POINTS, schema 4; plan 1160 A9: S10 runs before S9 (a refused second lane never withholds the terminal); A13: conversion_read
 seal_stage = "S2"
 
 [report]
@@ -250,6 +250,7 @@ implemented = true   # plan 1160 P6 (cc/intake_terminal.py): every row live; the
 verdict = "HANDOFF"
 reason = [
   { code = "NO_KERNEL_ROUTE", live = true, sentence = "The PRIMARY lane has no bridge, or a PRIMARY bridge's template has no door template in CC (PAIR_NEAREST_FAST, plan 1118's PAIR, is not yet one), so no value reaches the kernel." },
+  { code = "PROJECTION_EMPTY_ON_CURVE", live = true, sentence = "(plan 1160 A39.1) The PRIMARY projection is empty on a curve: ARGMAX_FAST finds the curve's maximum at a fast end, so it has no interior location there (the projection's domain, the one S9 checks for an ALTERNATIVE step). No value reaches the kernel and no RESULT.json is written. Next: project MAX_MEASURED (a height exists on every curve), or select the curves with an interior maximum." },
   { code = "DOOR_REFUSED",    live = true, sentence = "The door refused a value of the kernel input: a curve's value at its maximum (after x + c) or its sigma is not finite (door.nodefield's Null). The chain relation itself cannot be refused: it is acyclic by construction." },
 ]
 
@@ -262,5 +263,6 @@ needs = ["S5"]   # plan 1160 A9: it runs AFTER S10 (table order is run order), s
 implemented = true   # plan 1160 P5 (cc/intake_feasible.py). With no ALTERNATIVE lane (origin PLANTED, one lane) nothing is checked, and its summary says so
 verdict = "ROBUSTNESS"
 reason = [
-  { code = "SECOND_LANE_INFEASIBLE", live = true,  sentence = "The census does not support the second lane: its projection ARGMAX_FAST finds a curve's maximum at a fast end, or its bridge PAIR_NEAREST_FAST finds a curve's anchor outside a slow neighbour's fast span." },
+  { code = "NO_INTERIOR_FAST_MAXIMUM", live = true,  sentence = "(plan 1160 A39.2: half of SECOND_LANE_INFEASIBLE) An ALTERNATIVE step is location-anchored (projection ARGMAX_FAST, or bridge PAIR_NEAREST_FAST, whose anchor is the fast value at each curve's maximum), and on some curve the maximum sits at a fast end: no interior location exists there. Next: robustness is unavailable, not mis-chosen; no location-anchored second lane exists on such a family, and robustness needs a second observable." },
+  { code = "ANCHOR_OUTSIDE_NEIGHBOUR_SPAN", live = true,  sentence = "(plan 1160 A39.2: the other half of SECOND_LANE_INFEASIBLE) Every anchor is interior, but the ALTERNATIVE bridge PAIR_NEAREST_FAST finds a curve's anchor outside a slow neighbour's fast span (ragged or shifted grids). Next: select curves on a common fast span, or bridge CHAIN_SLOW." },
 ]

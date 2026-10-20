@@ -43,7 +43,9 @@ Seen RED (each mutation applied by hand, the test run, the mutation reverted):
  - (1160 P5) ENDS["ARGMAX_FAST"] or PAIRS["PAIR_NEAREST_FAST"] made empty in cc/intake_feasible.py: that K2 SECOND_LANE_INFEASIBLE plant
    FAILS (PASS); S9's PASS evidence given the first curve's anchor as a word (f"anchor {v!r}"): K3 FAILS on every PASS run; S9's refusal
    detail given the anchor inside a word: K3 FAILS on both SECOND_LANE_INFEASIBLE plants. (The anchor as a bare-number word did NOT go
-   red: intake_names.detail prints it as "a numeric word", the structural mask.)"""
+   red: intake_names.detail prints it as "a numeric word", the structural mask.) (1160 A39: ENDS is DOMAIN; SECOND_LANE_INFEASIBLE is
+   NO_INTERIOR_FAST_MAXIMUM and ANCHOR_OUTSIDE_NEIGHBOUR_SPAN, the latter planted on PEAKED, curves with an interior maximum; the S10
+   PROJECTION_EMPTY_ON_CURVE plant is new. Their seen-red mutations are in tests/test_intake_loop4.py T39.)"""
 import contextlib
 import hashlib
 import io
@@ -83,6 +85,7 @@ SENT = re.compile(rb"-7357\.\d+")   # a sentinel cell as written in a bank file 
 cell = lambda k, j, r: f"-7357.{8 - k}{99 - j:02d}{r}"   # curve k, point j, role r (1 fast, 2 measured, 3 sigma): fast ascends in j; no rounding carry
 slow = lambda k: f"-7357.{k + 1}5"
 CURVES = [(slow(k), [f"{cell(k, j, 1)},{cell(k, j, 2)},{cell(k, j, 3)}" for j in range(6 + k)]) for k in range(K)]
+PEAKED = [(slow(k), [f"{cell(k, j, 1)},{cell(k, 20 - abs(j - 2), 2)},{cell(k, j, 3)}" for j in range(6 + k)]) for k in range(K)]   # (1160 A39) C peaks at point 3: interior
 M = {"seed": 7357, "reader": "csv-curve-v1", "pattern": "curve_{index:03d}.csv", "columns": ["T", "C", "sigma"], "replicate": "NONE",
      "slow": {"name": "h", "unit": "dimensionless"}, "fast": {"name": "T", "unit": "dimensionless", "column": "T"},
      "measured": {"name": "C", "unit": "dimensionless", "column": "C"}, "files": [{"name": f"curve_{i:03d}.csv", "h": float(h)} for i, (h, _) in enumerate(CURVES)],
@@ -239,7 +242,7 @@ with tempfile.TemporaryDirectory() as tmp:
     S0 = lambda edit, trans=TRANS: (pf(PF, edit), PF, full(PF), trans)
     GONE = "# plan 1164: this intake.toml is deleted by the plant's first step\n"
     ON_SENTINEL = {   # (1160 P5) a CHOICE_PLANTS PASS control the sentinel banks carry past S1 to a later refusal, and why
-        "origin EXPERIMENT with two lanes that differ (ALTERNATIVE: C to T_star by ARGMAX_FAST, chained)": "SECOND_LANE_INFEASIBLE"}   # C ascends with T: every maximum at the fast end
+        "origin EXPERIMENT with two lanes that differ (ALTERNATIVE: C to T_star by ARGMAX_FAST, chained)": "NO_INTERIOR_FAST_MAXIMUM"}   # C ascends with T: every maximum at the fast end (1160 A39: was SECOND_LANE_INFEASIBLE)
     PLANTS = [
         ("PASS", "the PER_FILE sentinel bank, sealed", (pf(PF), PF, full(PF))),
         ("PASS", "the LONG_TABLE sentinel bank, sealed", (lt(LT), LT, full(LT))),
@@ -335,7 +338,11 @@ with tempfile.TemporaryDirectory() as tmp:
         ("METHOD_HAS_NO_FLOOR", "(1160 P5) the SAME_FAST_VALUE bank, iid", (lt(SF, lambda t: IID(SAME_FAST(t))), SF, full(SF))),
         ("TOO_FEW_POINTS_IN_CURVE", "(1160 P5) block 4 cut to its first two rows", (lt(TP := lt_bank([(h, rs[:2] if i == 3 else rs) for i, (h, rs) in enumerate(CURVES)])), TP, full(TP))),
         ("NO_COVERAGE_EVIDENCE", "(1160 P5) [bracket] required VALIDATED_BRACKET", S0(VALIDATED)),
-        ("SECOND_LANE_INFEASIBLE", "(1160 P5) PAIR_NEAREST_FAST on C: each curve's T span is disjoint from its neighbours'", S0(PAIR_LANE)),
+        ("NO_INTERIOR_FAST_MAXIMUM", "(1160 P5) PAIR_NEAREST_FAST on C: each curve's T span is disjoint from its neighbours', and C ascends with T (1160 A39: was SECOND_LANE_INFEASIBLE)", S0(PAIR_LANE)),
+        ("ANCHOR_OUTSIDE_NEIGHBOUR_SPAN", "(1160 A39) PAIR_NEAREST_FAST on C: each curve's maximum interior, its T span disjoint from its neighbours'",
+         (pf(PK := pf_bank(curves=PEAKED), PAIR_LANE), PK, full(PK))),
+        ("PROJECTION_EMPTY_ON_CURVE", "(1160 A39.1) the PRIMARY projection ARGMAX_FAST: C ascends with T, every maximum at the fast end",
+         S0(lambda t: t.replace('bias = "MAX_MEASURED"', 'bias = "ARGMAX_FAST"', 1))),
         # S10 KERNEL_HANDOFF (plan 1160 P6), sealed and run
         ("NO_KERNEL_ROUTE", "(1160 P6) the PRIMARY bridge PAIR_NEAREST_FAST on raw C", S0(PRIMARY_PAIR)),
         ("NO_KERNEL_ROUTE", "(1160 P6) no PRIMARY bridge (the projection and the bridge both ALTERNATIVE)", S0(ALL_ALTERNATIVE)),

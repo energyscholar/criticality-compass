@@ -23,7 +23,8 @@ made []: the BELOW_METHOD_FLOOR plant and the FLOOR block check FAIL; k_gamma re
 too many): the FLOOR chains check FAILS; HAS_FLOOR["iid"] True: the METHOD_HAS_NO_FLOOR plant FAILS; TIERING["STATED"] REPLICATES: the
 evidence check FAILS; with_slow >= 2: the two-curve TOO_FEW_CURVES plant FAILS; n < 2: the TOO_FEW_POINTS_IN_CURVE plant and totality
 FAIL; COVERED["VALIDATED_BRACKET"] True: the NO_COVERAGE_EVIDENCE plant and totality FAIL; ENDS["ARGMAX_FAST"] or PAIRS["PAIR_NEAREST_FAST"]
-made empty: that SECOND_LANE_INFEASIBLE plant FAILS (PASS).
+made empty: that SECOND_LANE_INFEASIBLE plant FAILS (PASS). (1160 A39: ENDS is DOMAIN, and SECOND_LANE_INFEASIBLE is NO_INTERIOR_FAST_MAXIMUM
+and ANCHOR_OUTSIDE_NEIGHBOUR_SPAN; the S10 PROJECTION_EMPTY_ON_CURVE plant is new, seen red in tests/test_intake_loop4.py T39.2.)
 Seen RED (1160 A7): intake_names.ORDER_CLASS[(False, True)] made "in neither order (not monotone)": the descending-blocks A7 check FAILS;
 intake_names.OPPOSITE["ASCENDING"] made "ASCENDING": the descending-blocks A7 check FAILS."""
 import importlib.util
@@ -271,9 +272,10 @@ with tempfile.TemporaryDirectory() as tmp:
         ("TOO_FEW_POINTS_IN_CURVE", "(1160 P5) block 5 cut to its first two rows", lambda: lt(bank([(h, rs[:2] if i == 4 else rs) for i, (h, rs) in enumerate(curves)]))),
         ("NO_COVERAGE_EVIDENCE", "(1160 P5) [bracket] required VALIDATED_BRACKET (no coverage evidence exists)", lambda: pf("pf", VALIDATED)),
         # S9 ALTERNATIVE_INTAKE (plan 1160 P5)
-        ("SECOND_LANE_INFEASIBLE", "(1160 P5) ARGMAX_FAST, block 3 cut after its maximum (its maximum at its fast end)", lambda: lt(bank(cut), ARGMAX_LANE)),
+        ("NO_INTERIOR_FAST_MAXIMUM", "(1160 P5) ARGMAX_FAST, block 3 cut after its maximum (its maximum at its fast end) (1160 A39: was SECOND_LANE_INFEASIBLE)", lambda: lt(bank(cut), ARGMAX_LANE)),
         ("PASS", "(1160 P5) ARGMAX_FAST on the uncut bank (every maximum interior)", lambda: lt(bank(), ARGMAX_LANE)),
-        ("SECOND_LANE_INFEASIBLE", "(1160 P5) PAIR_NEAREST_FAST on C, block 5's T moved beyond every neighbour's span", lambda: lt(bank(moved), PAIR_LANE)),
+        ("ANCHOR_OUTSIDE_NEIGHBOUR_SPAN", "(1160 P5) PAIR_NEAREST_FAST on C, block 5's T moved beyond every neighbour's span (1160 A39: was SECOND_LANE_INFEASIBLE)", lambda: lt(bank(moved), PAIR_LANE)),
+        ("PROJECTION_EMPTY_ON_CURVE", "(1160 A39.1) the PRIMARY projection ARGMAX_FAST, block 3 cut after its maximum", lambda: lt(bank(cut), lambda t: t.replace('bias = "MAX_MEASURED"', 'bias = "ARGMAX_FAST"', 1))),
         ("PASS", "(1160 P5) PAIR_NEAREST_FAST on C on the unmoved bank", lambda: lt(bank(), PAIR_LANE)),
         # S10 KERNEL_HANDOFF (plan 1160 P6)
         ("NO_KERNEL_ROUTE", "(1160 P6) the PRIMARY bridge PAIR_NEAREST_FAST on raw C (plan 1118's PAIR: no door template in CC)", lambda: pf("pf", PRIMARY_PAIR)),
@@ -337,11 +339,12 @@ with tempfile.TemporaryDirectory() as tmp:
         ident = f"d{next(n)}"
         base = {True: lambda: per_file(m, ident), False: lambda: long_table(m, ident).replace("<long-test>/pf", f"<long-test>/{bank(blocks)}")}[blocks is None]()
         return run(T, tmp, ident, text_of(base))
-    for what, blocks, lane in (("ARGMAX_FAST, block 3 cut after its maximum", cut, ARGMAX_LANE), ("PAIR_NEAREST_FAST on C, block 5's T moved", moved, PAIR_LANE)):
+    for what, blocks, lane, code in (("ARGMAX_FAST, block 3 cut after its maximum", cut, ARGMAX_LANE, "NO_INTERIOR_FAST_MAXIMUM"),
+                                     ("PAIR_NEAREST_FAST on C, block 5's T moved", moved, PAIR_LANE, "ANCHOR_OUTSIDE_NEIGHBOUR_SPAN")):
         out9 = folded(lane, blocks)
         p9, r9 = intake_fold.verdicts(T, out9)
-        check(f"E2. (1160 A9) {what}: S9 refuses SECOND_LANE_INFEASIBLE, S10 still EXECUTES and passes, PRIMARY misses only confirmation, ROBUSTNESS_REFUSED at S9",
-              outcome(out9, "S9")[0] == "SECOND_LANE_INFEASIBLE" and out9["S10"].mark is intake.Mark.PASSED and p9.missing == ("confirmation",)
+        check(f"E2. (1160 A9) {what}: S9 refuses {code} (1160 A39: was SECOND_LANE_INFEASIBLE), S10 still EXECUTES and passes, PRIMARY misses only confirmation, ROBUSTNESS_REFUSED at S9",
+              outcome(out9, "S9")[0] == code and out9["S10"].mark is intake.Mark.PASSED and p9.missing == ("confirmation",)
               and (r9.kind, r9.at) == (intake_fold.Robustness.ROBUSTNESS_REFUSED, "S9"), str((out9["S10"].mark, p9, r9)))
     words = lambda edit: " | ".join(getattr(getattr(folded(edit)["S1"], "result", None), "evidence", blind.detail()).words)
     check("E2. (1160 A9) OPERATION_NOT_PERMITTED names the link the step is permitted on: PAIR_NEAREST_FAST on C_max wants RAW (the measured name)",

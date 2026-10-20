@@ -92,9 +92,23 @@ S10 counts toward PRIMARY, which the run reports as one of three verdicts:
 | **PRIMARY_INCOMPLETE[confirmation]** | S10 executed, but the seal is not confirmed. RESULT.json is still written, with `confirmation = UNCONFIRMED`. |
 | **PRIMARY_REFUSED_AT S10** | S10 refused. No RESULT.json is written, and a stale one is removed. |
 
+PRIMARY_INCOMPLETE[confirmation] is the seal's confirmation; it is never the second lane. A refused S9 shows only in the ROBUSTNESS
+verdict (plan 1160 A39).
+
 S9 ALTERNATIVE_INTAKE runs after S10 (plan 1160 A9). A refused second lane does not withhold the result: S10 still runs, the PRIMARY
 verdict is what S0 to S8 and S10 make it, RESULT.json is written when S10 passed, and the ROBUSTNESS verdict is ROBUSTNESS_REFUSED at S9
-with S9's code (SECOND_LANE_INFEASIBLE). Fix the second lane and run again to examine robustness.
+with S9's code: NO_INTERIOR_FAST_MAXIMUM or ANCHOR_OUTSIDE_NEIGHBOUR_SPAN (plan 1160 A39; both were SECOND_LANE_INFEASIBLE).
+
+- **NO_INTERIOR_FAST_MAXIMUM**: on some curve the maximum sits at a fast end, so a location-anchored step (ARGMAX_FAST, or
+  PAIR_NEAREST_FAST, whose anchor is the same location) has no value there. Robustness is unavailable, not mis-chosen: no
+  location-anchored second lane exists on such a family, and robustness needs a second observable. Do not swap one location lane for
+  the other; neither is feasible.
+- **ANCHOR_OUTSIDE_NEIGHBOUR_SPAN**: every anchor is interior, but a slow neighbour's fast span does not reach a curve's anchor (ragged
+  or shifted grids). Its Detail names those curves (at most three), in slow order. Select curves on a common fast span, or bridge
+  CHAIN_SLOW.
+
+The same rule binds the PRIMARY lane: a PRIMARY projection ARGMAX_FAST that is empty on a curve is refused at S10,
+PROJECTION_EMPTY_ON_CURVE, and no RESULT.json is written (plan 1160 A39.1).
 
 ## Choosing a second lane
 
@@ -107,9 +121,9 @@ projection of the same lane.
 | Step | Declare it on | What the data must hold | Refused when they do not |
 |---|---|---|---|
 | projection `MAX_MEASURED` | `from` = the measured quantity (RAW) | nothing beyond the census | - |
-| projection `ARGMAX_FAST` | `from` = the measured quantity (RAW) | each curve's largest reading is interior: not at the first or last fast point of its curve | S9 SECOND_LANE_INFEASIBLE |
+| projection `ARGMAX_FAST` | `from` = the measured quantity (RAW) | each curve's largest reading is interior: not at the first or last fast point of its curve | S9 NO_INTERIOR_FAST_MAXIMUM (ALTERNATIVE); S10 PROJECTION_EMPTY_ON_CURVE (PRIMARY) |
 | bridge `CHAIN_SLOW` | `on` = the `to` of a projection of the same lane (DERIVED_OBSERVABLE) | three or more curves (S8) | S8 TOO_FEW_CURVES |
-| bridge `PAIR_NEAREST_FAST` | `on` = the measured quantity (RAW), not a projection's `to` | each curve's anchor inside a slow neighbour's fast span | S9 SECOND_LANE_INFEASIBLE |
+| bridge `PAIR_NEAREST_FAST` | `on` = the measured quantity (RAW), not a projection's `to` | each curve's maximum interior (its anchor is ARGMAX_FAST's location), then each anchor inside a slow neighbour's fast span | S9 NO_INTERIOR_FAST_MAXIMUM, then S9 ANCHOR_OUTSIDE_NEIGHBOUR_SPAN |
 
 `PAIR_NEAREST_FAST` has no door template in CC, so declare it in the ALTERNATIVE lane only: as the PRIMARY bridge, S10 refuses
 NO_KERNEL_ROUTE. The two lanes differ when their projections or their bridges differ (else S1 refuses LANES_IDENTICAL). Two pairs that
@@ -120,8 +134,8 @@ differ, for example:
   measured quantity to `X_star`, then `CHAIN_SLOW` on `X_star`, when every curve's maximum is interior.
 
 `peek` and the census cannot tell you whether a maximum is interior (that is a value). If S9 refuses, the result of S10 stands; the
-second lane is what was refused. When you cannot know the maxima are interior, declare `PAIR_NEAREST_FAST` as the ALTERNATIVE bridge
-(plan 1160 A23).
+second lane is what was refused. Both location-anchored steps need an interior maximum on every curve, so `PAIR_NEAREST_FAST` is no
+way around a maximum at a fast end (plan 1160 A39: this replaces A23's advice to declare it when the maxima may not be interior).
 
 ## RESULT.json
 

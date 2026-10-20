@@ -183,8 +183,8 @@ import intake_feasible  # noqa: E402  (plan 1160 P5: S7, S8, S9)
 check("1. (1160 P5) the S7 tables REPLICATED, TIERING, HAS_FLOOR and FLOOR are total over the interval alphabet; TIERING says STATED | REPLICATES | NONE",
       all(set(tab) == ALPHA for tab in (intake_feasible.REPLICATED, intake_feasible.TIERING, intake_feasible.HAS_FLOOR, intake_feasible.FLOOR))
       and set(intake_feasible.TIERING.values()) == {"STATED", "REPLICATES", "NONE"}, "")
-check("1. (1160 P5) COVERED (S8) is total over [bracket] required's values; ENDS and PAIRS (S9) over POLICY's projections and bridges",
-      set(intake_feasible.COVERED) == set(T["format"]["fields"]["bracket"]["fields"]["required"]["values"]) and set(intake_feasible.ENDS) == set(T["policy"]["projection"])
+check("1. (1160 P5, A39) COVERED (S8) is total over [bracket] required's values; DOMAIN (was ENDS) and PAIRS (S9) over POLICY's projections and bridges",
+      set(intake_feasible.COVERED) == set(T["format"]["fields"]["bracket"]["fields"]["required"]["values"]) and set(intake_feasible.DOMAIN) == set(T["policy"]["projection"])
       and set(intake_feasible.PAIRS) == set(T["policy"]["bridge"]), "")
 FEAS = {n.value for n in ast.walk(ast.parse(Path(intake_feasible.__file__).read_text())) if isinstance(n, ast.Constant) and n.value in set(codes)}
 check("1. (1160 P5) every reason code cc/intake_feasible.py names is a row of S7, S8 or S9, and every row of S7, S8 and S9 is named there",

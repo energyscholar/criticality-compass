@@ -1,4 +1,4 @@
-# The intake pipeline (stage table 1160-v10, policy 1136-v1)
+# The intake pipeline (stage table 1160-v11, policy 1136-v1)
 
 Generated from intake/STAGES.toml and intake/POLICY.toml by `bin/cc intake explain` (docs/gen-intake.py); never edit it by hand.
 This is the intake's explain. `bin/cc explain <input> <point>` is a different command: it explains one point of a measured input.
@@ -182,6 +182,7 @@ Mint the kernel input (NodeField and Relations) through the provenance route and
 | reason | live | what it means |
 |---|---|---|
 | NO_KERNEL_ROUTE | live | The PRIMARY lane has no bridge, or a PRIMARY bridge's template has no door template in CC (PAIR_NEAREST_FAST, plan 1118's PAIR, is not yet one), so no value reaches the kernel. |
+| PROJECTION_EMPTY_ON_CURVE | live | (plan 1160 A39.1) The PRIMARY projection is empty on a curve: ARGMAX_FAST finds the curve's maximum at a fast end, so it has no interior location there (the projection's domain, the one S9 checks for an ALTERNATIVE step). No value reaches the kernel and no RESULT.json is written. Next: project MAX_MEASURED (a height exists on every curve), or select the curves with an interior maximum. |
 | DOOR_REFUSED | live | The door refused a value of the kernel input: a curve's value at its maximum (after x + c) or its sigma is not finite (door.nodefield's Null). The chain relation itself cannot be refused: it is acyclic by construction. |
 
 ## S9 ALTERNATIVE_INTAKE (LIVE)
@@ -190,7 +191,8 @@ The second declared lane passes the same census-level checks as the first, so th
 
 | reason | live | what it means |
 |---|---|---|
-| SECOND_LANE_INFEASIBLE | live | The census does not support the second lane: its projection ARGMAX_FAST finds a curve's maximum at a fast end, or its bridge PAIR_NEAREST_FAST finds a curve's anchor outside a slow neighbour's fast span. |
+| NO_INTERIOR_FAST_MAXIMUM | live | (plan 1160 A39.2: half of SECOND_LANE_INFEASIBLE) An ALTERNATIVE step is location-anchored (projection ARGMAX_FAST, or bridge PAIR_NEAREST_FAST, whose anchor is the fast value at each curve's maximum), and on some curve the maximum sits at a fast end: no interior location exists there. Next: robustness is unavailable, not mis-chosen; no location-anchored second lane exists on such a family, and robustness needs a second observable. |
+| ANCHOR_OUTSIDE_NEIGHBOUR_SPAN | live | (plan 1160 A39.2: the other half of SECOND_LANE_INFEASIBLE) Every anchor is interior, but the ALTERNATIVE bridge PAIR_NEAREST_FAST finds a curve's anchor outside a slow neighbour's fast span (ragged or shifted grids). Next: select curves on a common fast span, or bridge CHAIN_SLOW. |
 
 ## Policy (POLICY, 1136-v1)
 
