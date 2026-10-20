@@ -11,7 +11,8 @@ here (tests/test_intake_cli.py runs it on the command line).
      ASCENDING; one swapped pair inside a block refuses S4 ROW_ORDER_DIFFERS.
  L4. UNIT_DIFFERS (S4) is live: a NAMES_UNITS header that states the declared units passes; one that states another unit refuses.
  L5. ACQUISITION_ORDER_DIFFERS (S5) is live: rows stored in acquisition order that do not run in the declared direction refuse; rows that do
-     pass; direction UNORDERED makes no claim.
+     pass; direction UNORDERED makes no claim. (plan 1165) A PER_FILE bank so declared is refused first at S3, PROFILE_CONTRADICTED
+     ORDER_CONTRADICTS_PROFILE: every run here profiles its bank first (intake_plant.run, plan 1165 section 6).
  L6. (plan 1160 P2) [replicate] identity SAME_FAST_VALUE: a curve with consecutive rows of one T (three readings of a point) passes S5,
      its points counted once and its readings per point min 1, max 3; the same bank under NONE refuses FAST_VALUE_REPEATED; a
      NON-consecutive repeat refuses S4 ROW_ORDER_DIFFERS under both (row_order ASCENDING). Seen RED: POINTS["SAME_FAST_VALUE"] made one
@@ -102,7 +103,9 @@ with tempfile.TemporaryDirectory() as tmp:
     un = outcome(run(tmp, "a3", acq("a3", "UNORDERED")), "S5")
     check("L5. direction UNORDERED makes no claim: S5 passes", un[0] == "PASS", str(un)[:300])
     pfd = outcome(run(tmp, "a4", per_file(m, "a4").replace('row_order = "ASCENDING"', 'row_order = "ACQUISITION"').replace('direction = "UNORDERED"', 'direction = "DESCENDING"')), "S5")
-    check("L5. the same holds for PER_FILE: ascending files in acquisition order, declared DESCENDING, refuse", pfd[0] == "ACQUISITION_ORDER_DIFFERS", str(pfd)[:300])
+    check("L5. the same holds for PER_FILE: ascending files in acquisition order, declared DESCENDING, refuse (plan 1165: at S3, PROFILE_CONTRADICTED"
+          " ORDER_CONTRADICTS_PROFILE: a PER_FILE file is one curve, so its profile predicts the order; was S5 ACQUISITION_ORDER_DIFFERS)",
+          pfd[0] == "PROFILE_CONTRADICTED" and "words=('ORDER_CONTRADICTS_PROFILE'," in pfd[1], str(pfd)[:300])
 
     # ---- L6. (1160 P2) SAME_FAST_VALUE: consecutive readings of one point
     tripled = [(h, [x for j, r in enumerate(rs) for x in [r] * (1 + 2 * (i == 2 and j % 2 == 0))]) for i, (h, rs) in enumerate(curves)]

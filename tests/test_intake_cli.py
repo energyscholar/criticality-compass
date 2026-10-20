@@ -4,7 +4,8 @@ plan-1139 report lists them).
  2. The bank holds no truth file, and no stage opens the truth directory: every access-log line is a loader read inside the bank.
  3. Each LIVE stage refuses a planted bad bank with its named reason: a repeated T (S5 FAST_VALUE_REPEATED), two files with one h
     (S5 CURVE_REPEATED), a wrong header (first file: S4 COLUMNS_DIFFER; a later file: S5 FILE_DIFFERS_FROM_FIRST), bytes changed after
-    their pin (S3 PIN_MISMATCH).
+    their pin (S3 PIN_MISMATCH). (plan 1165) `new intake --from-synth` profiles the spoiled bank, so the repeated T and both wrong headers
+    are refused first at S3, PROFILE_CONTRADICTED (REPEATS_CONTRADICT_PROFILE; COLUMN_CONTRADICTS_PROFILE for both headers).
  4. An unsealed run reaches the data stages and reports UNSEALED; a run after an edit that follows the seal reports SEALED_THEN_EDITED.
  5. docs/INTAKE-QUICKSTART.md's command block is the plan's sequence, and it runs clean in a copy of the Compass with the edit step done
     by applying the quickstart's filled example.
@@ -200,17 +201,19 @@ with tempfile.TemporaryDirectory() as tmp:
         (b / "MANIFEST.json").write_text(json.dumps(m))
 
     keep = lambda b: None
-    cases = [("3. a repeated T: S5 refuses FAST_VALUE_REPEATED", "badt", edit("curve_003.csv", repeat_row), keep, "S5 CENSUS** (LIVE): EXECUTED, REFUSE FAST_VALUE_REPEATED."),
-             ("3. two files with one h: S5 refuses CURVE_REPEATED", "badh", same_h, keep, "S5 CENSUS** (LIVE): EXECUTED, REFUSE CURVE_REPEATED."),
-             ("3. a wrong header in the first file: S4 refuses COLUMNS_DIFFER", "badhead", edit("curve_000.csv", lambda x: x.replace(b"T,C,sigma", b"T,Q,sigma", 1)), keep,
-              "S4 SHAPE** (LIVE): EXECUTED, REFUSE COLUMNS_DIFFER."),
-             ("3. a wrong header in a later file: S5 refuses FILE_DIFFERS_FROM_FIRST", "badhead2", edit("curve_005.csv", lambda x: x.replace(b"T,C,sigma", b"T,C,err", 1)), keep,
-              "S5 CENSUS** (LIVE): EXECUTED, REFUSE FILE_DIFFERS_FROM_FIRST."),
+    pc = "S3 SOURCE_INTEGRITY** (LIVE): EXECUTED, REFUSE PROFILE_CONTRADICTED."   # plan 1165: new --from-synth profiles the spoiled bank; S3 meets it first
+    cases = [("3. a repeated T: S5 refuses FAST_VALUE_REPEATED (plan 1165: S3 refuses PROFILE_CONTRADICTED, REPEATS_CONTRADICT_PROFILE)", "badt", edit("curve_003.csv", repeat_row), keep,
+              (pc, "Detail: curve_003.csv; REPEATS_CONTRADICT_PROFILE")),
+             ("3. two files with one h: S5 refuses CURVE_REPEATED", "badh", same_h, keep, ("S5 CENSUS** (LIVE): EXECUTED, REFUSE CURVE_REPEATED.",)),
+             ("3. a wrong header in the first file: S4 refuses COLUMNS_DIFFER (plan 1165: S3 refuses PROFILE_CONTRADICTED, COLUMN_CONTRADICTS_PROFILE)", "badhead",
+              edit("curve_000.csv", lambda x: x.replace(b"T,C,sigma", b"T,Q,sigma", 1)), keep, (pc, "Detail: curve_000.csv; COLUMN_CONTRADICTS_PROFILE")),
+             ("3. a wrong header in a later file: S5 refuses FILE_DIFFERS_FROM_FIRST (plan 1165: S3 refuses PROFILE_CONTRADICTED, COLUMN_CONTRADICTS_PROFILE)", "badhead2",
+              edit("curve_005.csv", lambda x: x.replace(b"T,C,sigma", b"T,C,err", 1)), keep, (pc, "Detail: curve_005.csv; COLUMN_CONTRADICTS_PROFILE")),
              ("3. bytes changed after their pin: S3 refuses PIN_MISMATCH", "badpin", keep, edit("curve_002.csv", lambda x: x + b"3.5000,0.5,0.03\n"),
-              "S3 SOURCE_INTEGRITY** (LIVE): EXECUTED, REFUSE PIN_MISMATCH.")]
+              ("S3 SOURCE_INTEGRITY** (LIVE): EXECUTED, REFUSE PIN_MISMATCH.",))]
     for name, ident, before, after, want in cases:
         got = planted(ident, before, after)
-        check(name, want in got and "PRIMARY verdict: PRIMARY_REFUSED_AT" in got, "\n".join(x for x in got.splitlines() if "EXECUTED" in x or "verdict" in x)[:700])
+        check(name, all(x in got for x in want) and "PRIMARY verdict: PRIMARY_REFUSED_AT" in got, "\n".join(x for x in got.splitlines() if "EXECUTED" in x or "verdict" in x)[:700])
 
 # ---- 7. (1160 A8) the data-host doc's worked record file passes the transducer check; the template names every required table
 sys.path.insert(0, str(ROOT / "cc"))

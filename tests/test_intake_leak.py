@@ -45,7 +45,14 @@ Seen RED (each mutation applied by hand, the test run, the mutation reverted):
    detail given the anchor inside a word: K3 FAILS on both SECOND_LANE_INFEASIBLE plants. (The anchor as a bare-number word did NOT go
    red: intake_names.detail prints it as "a numeric word", the structural mask.) (1160 A39: ENDS is DOMAIN; SECOND_LANE_INFEASIBLE is
    NO_INTERIOR_FAST_MAXIMUM and ANCHOR_OUTSIDE_NEIGHBOUR_SPAN, the latter planted on PEAKED, curves with an interior maximum; the S10
-   PROJECTION_EMPTY_ON_CURVE plant is new. Their seen-red mutations are in tests/test_intake_loop4.py T39.)"""
+   PROJECTION_EMPTY_ON_CURVE plant is new. Their seen-red mutations are in tests/test_intake_loop4.py T39.)
+ (1165 P4) Every plant that reaches S3 runs `bin/cc intake profile` first; PROFILE.md/PROFILE.json and stdout join K3's scan;
+   SEAL.json stamps profile_sha256 and conversion_manifest_sha256; the report carries the Profile line and PROFILE_READ_BEFORE_SEAL.
+ - Seen RED (1165 P4, cc/intake_bytes.py S3 gate rows made `lambda: True`, one at a time): PROFILE_ABSENT: the run crashes (KeyError
+   'files': every profiled plant reads a profile it was told is present); PROFILE_STALE / MANIFEST_STALE / PROFILE_CONTRADICTED: that row's
+   plant FAILS (FAST_VALUE_REPEATED or PASS) and the K2 totality FAILS (the row live, never reached); PROFILE_CONTRADICTED also turns every
+   AT_S3 plant red ('the profile did not predict this').
+ - (1165 P4) intake_seal's stamp key renamed (profile_sha256_unstamped): the K2 SEAL.json stamp check and the Profile-line check FAIL."""
 import contextlib
 import hashlib
 import io
@@ -67,8 +74,9 @@ import intake_blind as blind  # noqa: E402
 import intake_fold  # noqa: E402
 import intake_say  # noqa: E402
 import intake_seal  # noqa: E402
+import intake_against as against  # noqa: E402
 import intake_synth  # noqa: E402
-from intake_plant import ALL_ALTERNATIVE, PRIMARY_PAIR, SHIFT, BLOCK, BLOCK_NO_FLOOR, IID, PAIR_LANE, SAME_FAST, VALIDATED, CHOICE_PLANTS, conversion, long_table, per_file, slow_source, workbook, write_long, xlsx  # noqa: E402
+from intake_plant import ALL_ALTERNATIVE, PRIMARY_PAIR, SHIFT, BLOCK, BLOCK_NO_FLOOR, IID, PAIR_LANE, SAME_FAST, VALIDATED, CHOICE_PLANTS, AT_S3, conversion, long_table, per_file, slow_source, workbook, write_long, xlsx  # noqa: E402
 
 bad = []
 
@@ -91,6 +99,16 @@ M = {"seed": 7357, "reader": "csv-curve-v1", "pattern": "curve_{index:03d}.csv",
      "measured": {"name": "C", "unit": "dimensionless", "column": "C"}, "files": [{"name": f"curve_{i:03d}.csv", "h": float(h)} for i, (h, _) in enumerate(CURVES)],
      "generator": {"path": "cc/intake_synth.py", "sha256": hashlib.sha256((ROOT / "cc" / "intake_synth.py").read_bytes()).hexdigest()}}
 TRANS = intake_synth.declare(M, "x", "pf")[2]
+
+
+@dataclass(frozen=True)
+class Profiled:
+    """(plan 1165 section 6) A plant step: `bin/cc intake profile <id> <root>` on the root the declaration names (none when it names none).
+    What it prints is scanned by K3 with what the plant wrote, never read for the plant's code (a profile of an unresolved root refuses
+    ROOT_UNRESOLVED, as the run would)."""
+
+
+PROFILE = Profiled()
 
 
 @dataclass(frozen=True)
@@ -155,9 +173,11 @@ with tempfile.TemporaryDirectory() as tmp:
         d.mkdir(parents=True, exist_ok=True)
         (d / "intake.toml").write_text(text(ident))
         (d / "transducer.toml").write_text(trans.replace('id = "x"', f'id = "{ident}"'))
-        step = {tuple: lambda s: cli(s[0], ident, *s[1:]), types.FunctionType: lambda s: (s(banks / bank), "")[1], AtS6: lambda s: at_s6(ident, bank, s.edit)}   # total over the step kinds
+        profiled = []   # (plan 1165) what the profile step printed: K3 scans it, the code is never read from it
+        step = {tuple: lambda s: cli(s[0], ident, *s[1:]), types.FunctionType: lambda s: (s(banks / bank), "")[1], AtS6: lambda s: at_s6(ident, bank, s.edit),
+                Profiled: lambda s: (profiled.extend(cli("profile", ident, r) for r in re.findall(r'^root = "([^"]*)"', (d / "intake.toml").read_text(), re.M)[:1]), "")[1]}   # total over the step kinds
         said = "".join(step[type(s)](s) for s in steps)
-        wrote = "".join((d / x).read_text() for x in ("intake-report.md", "SEAL.json", "seal.log", "access.log") if (d / x).is_file())
+        wrote = "".join((d / x).read_text() for x in ("intake-report.md", "SEAL.json", "seal.log", "access.log", "PROFILE.json", "PROFILE.md", "profile.log", "profile-access.log") if (d / x).is_file()) + "".join(profiled)
         wrote += {True: lambda: scrubbed(d / "RESULT.json", ident), False: lambda: ""}[(d / "RESULT.json").is_file()]()   # 1160 P6 (K7)
         m = re.search(r"REFUSE (\w+)\. [^\n]*?Detail: (?:[^;\n]*; )?(\w*)", said)
         code = {True: lambda: "PASS", False: lambda: {True: lambda: m[2], False: lambda: m[1]}[m[1] == "READER_REFUSED"]()}[m is None]()
@@ -226,8 +246,8 @@ with tempfile.TemporaryDirectory() as tmp:
     def keyed(line):
         """(1160 P1) A bank edit: each curve file i gets `line(i)` above its names line (a FILE_KEY header line)."""
         return lambda b: [(b / f"curve_{i:03d}.csv").write_text(line(i) + (b / f"curve_{i:03d}.csv").read_text()) for i in range(K)]
-    full = lambda bank: (("lint",), SEAL, ("run",))
-    unsealed = (("lint",), ("run",))
+    full = lambda bank: (PROFILE, ("lint",), SEAL, ("run",))   # plan 1165 section 6: profiled first (D1)
+    unsealed = (PROFILE, ("lint",), ("run",))
     append = lambda name, text: lambda b: (b / name).write_text((b / name).read_text() + text)
     asc = lambda t: t.replace('row_order = "ASCENDING"', 'row_order = "ACQUISITION"')
     nu = 'kind = "NAMES_UNITS"\nrows = 2\nnames = 1\nunits = 2'
@@ -288,17 +308,24 @@ with tempfile.TemporaryDirectory() as tmp:
         ("PATH_NOT_A_FILE", "a selected file deleted (unsealed: the seal would refuse it; 1160: was PATH_NOT_ADMITTED)", (pf(pf_bank(lambda b: (b / "curve_003.csv").unlink())), PF, unsealed)),
         ("PIN_MISMATCH", "a file's bytes changed after its first logged read (unsealed: the seal would see the size)",
          (pf(PIN := pf_bank()), PIN, unsealed + (append("curve_002.csv", f"{cell(2, 50, 1)},{cell(2, 50, 2)},{cell(2, 50, 3)}\n"), ("run",)))),
-        ("UNIVERSE_CHANGED", "a file added after the seal", (pf(UC := pf_bank()), UC, full(UC)[:2] + (lambda b: (b / "late.csv").write_text("T,C,sigma\n"), ("run",)))),
+        ("UNIVERSE_CHANGED", "a file added after the seal", (pf(UC := pf_bank()), UC, full(UC)[:3] + (lambda b: (b / "late.csv").write_text("T,C,sigma\n"), ("run",)))),
+        ("PROFILE_ABSENT", "(1165) the PER_FILE sentinel bank linted, sealed and run with no profile step", (pf(PF), PF, (("lint",), SEAL, ("run",)))),
+        ("PROFILE_STALE", "(1165) a sentinel row appended to one file after the profile, before the seal (the PIN_MISMATCH plant's shape)",
+         (pf(PS := pf_bank()), PS, (PROFILE, append("curve_002.csv", f"{cell(2, 50, 1)},{cell(2, 50, 2)},{cell(2, 50, 3)}\n")) + full(PS)[1:])),
+        ("MANIFEST_STALE", "(1165 A1) one byte of the converted bank's CONVERSION-MANIFEST.json (its time) changed after the seal",
+         (*cv(MS := conv_bank(curve_files, as_is)), full(None)[:3] + (lambda b: (q := tmp / "cc-banks" / MS / "bank" / "CONVERSION-MANIFEST.json").write_text(q.read_text().replace('"time": "2', '"time": "1', 1)), ("run",)))),
+        ("PROFILE_CONTRADICTED", "(1165) one swapped pair inside curve_004.csv, declared ASCENDING (without the profile: ROW_ORDER_DIFFERS at S4)",
+         (pf(PC := pf_bank(curves=[(h, rs[:3] + [rs[4], rs[3]] + rs[5:]) if i == 4 else (h, rs) for i, (h, rs) in enumerate(CURVES)])), PC, full(PC))),
         ("CONVERSION_CHAIN_BROKEN", "(1160 P3) a converted sentinel bank whose CONVERSION-MANIFEST.json was deleted (was CONVERSION_NOT_LIVE)",
          (*cv(conv_bank(curve_files, as_is, lambda raw, bank: (bank / "CONVERSION-MANIFEST.json").unlink())), unsealed)),
         ("CONVERSION_CHAIN_BROKEN", "(1160 P3) one byte of a raw sentinel file changed after the conversion",
          (*cv(conv_bank(curve_files, as_is, lambda raw, bank: (raw / "curve_001.csv").write_bytes((raw / "curve_001.csv").read_bytes().replace(b"T", b"t", 1)))), unsealed)),
-        ("PASS", "(1160 P3) the converted PER_FILE sentinel bank, sealed", (*cv(CV := conv_bank(curve_files, as_is)), (("lint",), SEAL, ("run",)))),
+        ("PASS", "(1160 P3) the converted PER_FILE sentinel bank, sealed", (*cv(CV := conv_bank(curve_files, as_is)), full(None))),
         ("PASS", "(1160 A11) the converted PER_FILE sentinel bank, a sentinel row with C = n/a in each file dropped by DROP_ROWS_NOT_NUMERIC, sealed",
-         (*cv(DNN := conv_bank(NN, [(f, f, '{op = "DROP_ROWS_NOT_NUMERIC", columns = ["C"]}') for f in NN])), (("lint",), SEAL, ("run",)), TRANS, DNN)),
+         (*cv(DNN := conv_bank(NN, [(f, f, '{op = "DROP_ROWS_NOT_NUMERIC", columns = ["C"]}') for f in NN])), full(None), TRANS, DNN)),
         # S6 ADMISSIBILITY (1160 P4): linted, sealed, then run with the edit between S5 and S6
-        ("READ_NOT_LOGGED", "(1160 P4) the loader lines of curve_002.csv deleted from the access log", (pf(PF), PF, full(PF)[:2] + (AtS6(lambda b, d: unlog(d, "curve_002.csv")),))),
-        ("BYPASS_READ_LOGGED", "(1160 P4) curve_001.csv opened directly in the test process (open(), not the loader)", (pf(PF), PF, full(PF)[:2] + (AtS6(lambda b, d: (b / "curve_001.csv").read_bytes()),))),
+        ("READ_NOT_LOGGED", "(1160 P4) the loader lines of curve_002.csv deleted from the access log", (pf(PF), PF, full(PF)[:3] + (AtS6(lambda b, d: unlog(d, "curve_002.csv")),))),
+        ("BYPASS_READ_LOGGED", "(1160 P4) curve_001.csv opened directly in the test process (open(), not the loader)", (pf(PF), PF, full(PF)[:3] + (AtS6(lambda b, d: (b / "curve_001.csv").read_bytes()),))),
         # S4 SHAPE
         ("READER_NOT_LIVE", "reader P1", (pf(PF, lambda t: t.replace('name = "csv-curve-v1"', 'name = "P1"')), PF, full(PF))),
         ("COLUMNS_DIFFER", "csv-curve-v1, the first file's names line holds a NUMERIC name",
@@ -310,7 +337,7 @@ with tempfile.TemporaryDirectory() as tmp:
          (lt(IP := lt_bank(head="T (dimensionless),C (dimensionless),sigma (dimensionless),h (dimensionless)\n"), header=inn("PAREN")), IP, full(IP))),
         ("UNIT_DIFFERS", "(1160 P2) NAMES_UNITS_IN_NAMES SLASH, T's names cell 'T/K -7357.25' (a sentinel in the unit): the unit prints masked",
          (lt(IS := lt_bank(head=f"T/K {slow(1)},C/dimensionless,sigma/dimensionless,h/dimensionless\n"), header=inn("SLASH")), IS, full(IS))),
-        ("ROW_ORDER_DIFFERS", "one swapped pair inside block 5",
+        ("ROW_ORDER_DIFFERS", "one swapped pair inside block 5 (1165: a LONG_TABLE's blocks are no profile fact, so S4 refuses and says the profile did not predict it)",
          (lt(RO := lt_bank([(h, rs[:3] + [rs[4], rs[3]] + rs[5:]) if i == 4 else (h, rs) for i, (h, rs) in enumerate(CURVES)])), RO, full(RO))),
         # S5 CENSUS
         ("FILE_DIFFERS_FROM_FIRST", "a later file's header T,C,err",
@@ -363,6 +390,7 @@ with tempfile.TemporaryDirectory() as tmp:
                       ("SHEET_ABSENT", "sheet 'data' declared, the workbook holds 'Sheet1'", (lt(B9 := lt_bank(raw=xlsx([["T", "C", "sigma", "h"]] + rows, "Sheet1")), xl), B9, full(B9))),
                       ("PASS", "the xlsx sentinel bank", (lt(XL, xl), XL, full(XL)))]}[HAS_XLSX]
     NOT_HERE = {False: ["NOT_AN_XLSX", "SHEET_ABSENT"], True: ["XLSX_READER_ABSENT"]}[HAS_XLSX]
+    # (plan 1165 section 6) intake_plant.AT_S3: the rows a profiled plant reaches PROFILE_CONTRADICTED first; K2's totality counts them through it
 
     # ---- K1. the sentinel alphabet: every numeric cell of every bank and every declared slow value
     cells = {m.decode() for q in banks.rglob("*") if q.is_file() for m in SENT.findall(q.read_bytes())} | {slow(k) for k in range(K)}
@@ -374,18 +402,41 @@ with tempfile.TemporaryDirectory() as tmp:
     # ---- K2, K3. every live row planted, and nothing printed or written holds a sentinel
     hit = lambda text: sorted({f for f in every if f in text})
     check("K3. the scan sees a sentinel when one is printed (a check that cannot see must not convict)", hit(f"T span [{float(cell(0, 0, 1)):g}, 1]") != [])
+    IDENT, UNPREDICTED = {}, []
     live = {r["code"] for s in intake.tables(ROOT)["stages"]["stage"] for k in ("reason", "reader_reason") for r in blind.look(s, k, []) if r["live"]}
     reached, said = set(), {}
     for code, what, (text, bank, steps, *trans) in PLANTS:
         got, out, ident = plant(text, bank, steps, *trans)
         reached |= {got}
         said[code + " " + what] = out
-        check(f"K2. {code}: {what}", got == code, got)
+        IDENT[code + " " + what] = ident
+        first = {True: lambda: f"Detail: {{}}; {AT_S3[code]}_CONTRADICT", False: lambda: ""}[code in AT_S3]()
+        check(f"K2. {code}: {what}" + {True: f" (1165: profiled, PROFILE_CONTRADICTED, first {AT_S3.get(code)})", False: ""}[code in AT_S3],
+              got == {True: "PROFILE_CONTRADICTED", False: code}[code in AT_S3] and re.search(re.escape(first).replace(r"\{\}", r"[\w.]+"), out) is not None,
+              got + " " + "; ".join(ln for ln in out.splitlines() if "PROFILE_CONTRADICTED" in ln)[:500])
+        UNPREDICTED.extend([f"{code}: {what}"] * (code in against.PREDICTS and got == code and against.PREDICTED not in out))
         check(f"K3. {code}: no sentinel in its stdout, stderr, intake-report.md, SEAL.json, seal.log or access.log", not hit(out), f"{hit(out)[:5]} in {ident}")
     reached |= {True: {"READER_REFUSED"}, False: set()}[any("REFUSE READER_REFUSED" in o for o in said.values())]   # the reader-reason plants arrived through S4
     print(f"  openpyxl {'installed' if HAS_XLSX else 'NOT installed'} on this machine; NOT REACHED HERE: {NOT_HERE}")
-    check("K2. the codes the plants reach are exactly the live rows (with the machine's NOT REACHED rows)", (reached - {"PASS"}) | set(NOT_HERE) == live,
-          f"live, never reached: {sorted(live - reached - set(NOT_HERE))}; reached, not live: {sorted(reached - live - {'PASS'})}")
+    check("K2. the codes the plants reach are exactly the live rows (with the machine's NOT REACHED rows and the rows the profile reaches first, AT_S3)",
+          (reached - {"PASS"}) | set(NOT_HERE) | set(AT_S3) == live, f"live, never reached: {sorted(live - reached - set(NOT_HERE) - set(AT_S3))}; reached, not live: {sorted(reached - live - {'PASS'})}")
+    check("K2. (1165) every PREDICTS reason still refused at S4 / S5 on a profiled run says 'the profile did not predict this' (a hole of section 5)", not UNPREDICTED, str(UNPREDICTED))
+    # ---- (plan 1165 section 6) the seal stamps the profile's sha256 and the manifest's; the report's Profile line; the ordering atom
+    pd = w / "declarations" / IDENT["PASS the PER_FILE sentinel bank, sealed"]
+    sealed = json.loads((pd / "SEAL.json").read_text())
+    check("K2. (1165) SEAL.json's profile_sha256 is the sha256 of PROFILE.json; conversion_manifest_sha256 is '' (a DEPOSIT bank)",
+          sealed.get("profile_sha256") == hashlib.sha256((pd / "PROFILE.json").read_bytes()).hexdigest() and sealed.get("conversion_manifest_sha256") == "", str({k: v for k, v in sealed.items() if "sha" in k}))
+    cd = w / "declarations" / IDENT["PASS (1160 P3) the converted PER_FILE sentinel bank, sealed"]
+    check("K2. (1165 A1) a CONVERTED bank's seal stamps the sha256 of its CONVERSION-MANIFEST.json",
+          json.loads((cd / "SEAL.json").read_text()).get("conversion_manifest_sha256") == hashlib.sha256((tmp / "cc-banks" / CV / "bank" / "CONVERSION-MANIFEST.json").read_bytes()).hexdigest())
+    rpt = (pd / "intake-report.md").read_text()
+    check("K2. (1165) the report's Profile line: PROFILED, the sha256 prefix, 6 files (5 curves, MANIFEST.json), 0 contradictions; the ordering note counts PROFILE_READ_BEFORE_SEAL (6 files)",
+          f"- **Profile** (plan 1165): PROFILED {sealed.get('profile_sha256', '')[:12]} (6 files," in rpt and "0 contradictions)" in rpt and " PROFILE_READ_BEFORE_SEAL (6 files). " in rpt,
+          "\n".join(ln for ln in rpt.splitlines() if "Profile" in ln or "Ordering" in ln or "BEFORE" in ln))
+    check("K2. (1165) the report of the unprofiled run says NOT PROFILED", "- **Profile** (plan 1165): NOT PROFILED" in said["PROFILE_ABSENT (1165) the PER_FILE sentinel bank linted, sealed and run with no profile step"])
+    chk = cli("profile", IDENT["PROFILE_CONTRADICTED (1165) one swapped pair inside curve_004.csv, declared ASCENDING (without the profile: ROW_ORDER_DIFFERS at S4)"], "--check")
+    check("K2. (1165) `bin/cc intake profile <id> --check` on the PROFILE_CONTRADICTED plant lists ORDER_CONTRADICTS_PROFILE for curve_004.csv, no sentinel",
+          "1 contradictions" in chk and "ORDER_CONTRADICTS_PROFILE curve_004.csv:" in chk and not hit(chk), chk)
 
     # ---- K7. (1160 P6) RESULT.json: written on the PASS runs, its numbers only in the declared fields, the slow values there the only data values
     check("K7. RESULT.json was written on the two sentinel PASS runs (S10 passed)", len(RESULTS) >= 2, str(sorted(RESULTS)))

@@ -96,14 +96,15 @@ def said(t, status):
 
 
 def ordering(d, t):
-    """The ordering note (information): (Ordering, its sentence) from SEAL.json's seal time and the access log's loader reads, read after the run;
-    the sentence adds CONVERSION_READ_BEFORE_SEAL (n files) when conversion-access.log holds raw-file reads from before the seal (plan 1160 A13:
-    information, never a refusal: converting before declaring is the designed order; with no seal, no read precedes one)."""
+    """The ordering note (information): (Ordering, its sentence) from SEAL.json's seal time and the access log's loader reads, read after the run; the sentence adds
+    CONVERSION_READ_BEFORE_SEAL (n files) when conversion-access.log holds raw-file reads from before the seal (plan 1160 A13), and PROFILE_READ_BEFORE_SEAL (n files)
+    from profile-access.log (plan 1165): information, never a refusal (converting and profiling before declaring is the designed order; no seal, no read precedes one)."""
     rec, reads = record(d), [a["t_ns"] for a in lines(Path(d) / "access.log") if a["route"] == "loader"]
-    before = lambda: {a["path"] for a in lines(Path(d) / "conversion-access.log") if a["partition"] == "converted-from" and a["t_ns"] < rec["sealed_at_ns"]}
-    o, conv = {False: lambda: (Ordering.NOT_SEALED, set()),
-               True: lambda: (list(Ordering)[1 + (len(reads) > 0) + any(r < rec["sealed_at_ns"] for r in reads)], before())}[rec != {}]()
-    said = {True: f" CONVERSION_READ_BEFORE_SEAL ({len(conv)} file{'s' * (len(conv) != 1)}). {t['stages']['report']['conversion_read']}", False: ""}[len(conv) > 0]
+    before = lambda log, part: {a["path"] for a in lines(Path(d) / log) if a["partition"] == part and a["t_ns"] < rec["sealed_at_ns"]}
+    o, conv = {False: lambda: (Ordering.NOT_SEALED, (set(), set())), True: lambda: (list(Ordering)[1 + (len(reads) > 0) + any(r < rec["sealed_at_ns"] for r in reads)],
+                                                                         (before("conversion-access.log", "converted-from"), before("profile-access.log", "profiled")))}[rec != {}]()
+    said = "".join({True: f" {a} ({len(c)} file{'s' * (len(c) != 1)}). {t['stages']['report'][k]}", False: ""}[len(c) > 0]   # plan 1165: and PROFILE_READ_BEFORE_SEAL
+                   for a, k, c in zip(("CONVERSION_READ_BEFORE_SEAL", "PROFILE_READ_BEFORE_SEAL"), ("conversion_read", "profile_read"), conv))
     return o, {r["code"]: r["sentence"] for r in t["stages"]["report"]["ordering"]}[o.name] + said
 
 
@@ -171,7 +172,7 @@ def _stamp(d, decl, universe, have, who, root, tables, schema, counts):
     _append(Path(d) / "seal.log", {"t_ns": t, "sha256": sha, "file": "SEAL.json"})   # the seal time IS the log time
     rec = {
         "schema": 1, "kind": "intake-seal", "id": decl.id, "sealed_at_ns": t, "sealed_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(t // 10**9)),
-        **who, "mode": decl.mode, "declaration_sha256": sha,
+        **who, "mode": decl.mode, "declaration_sha256": sha, **dict(zip(("profile_sha256", "conversion_manifest_sha256"), intake_bytes.intake_profile.read(d, universe, Path.read_bytes)[1::2])),   # plan 1165, A1
         "files": {n: hashlib.sha256((Path(d) / n).read_bytes()).hexdigest() for n in FILES},
         "code_identity": {"commit": _git(root, "rev-parse", "HEAD"), "code_hash": schema.code_hash(root),
                           "tree": {True: "CLEAN", False: "UNCOMMITTED_CHANGES"}[_git(root, "status", "--porcelain", "--", "cc", "bin/cc") == ""]},

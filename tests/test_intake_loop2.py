@@ -5,6 +5,9 @@ A29-A32): one check per amendment test. Planted inputs only (the synthetic bank 
  T17.4 a SET/NONE curve with one consecutive pair, one revisit and three monotone runs: FAST_VALUE_REPEATED's Detail prints `consecutive
        runs = 1; longest run = 2; values revisited = 1; monotone runs = 3`, the refused curves out of all (S11.8: `curves refused = 1; of
        curves = 9`) and the exit of each kind found (A30); with the file name and the counts taken out it holds no digit.
+       (plan 1165) Every run here profiles its bank first (intake_plant.run), and that profile predicts the repeat: T17.1's SET run is
+       refused at S3 PROFILE_CONTRADICTED (REPEATS_CONTRADICT_PROFILE); T17.4 reaches S5's Detail with intake_against.HOLDS' REPEATS row
+       taken out for its one run (a profile that did not predict it), and its Detail then also says "the profile did not predict this".
  T17.5 control MEASURED changes no result on a bank with no repeat: S10's records and the census label of MAX_MEASURED and of ARGMAX_FAST
        (the PRIMARY projection) are the same under MEASURED as under SET.
  (T17.2 is intake_plant.CHOICE_PLANTS' MEASURED_KNOB_HAS_NO_POINTS rows, run by test_intake_reach E2 and test_intake_leak K2 through lint;
@@ -43,6 +46,7 @@ import intake  # noqa: E402
 import intake_terminal  # noqa: E402
 import intake_synth  # noqa: E402
 from intake_plant import MEASURED, outcome, per_file, run  # noqa: E402
+import intake_against as A  # noqa: E402
 
 bad = []
 
@@ -81,11 +85,15 @@ with tempfile.TemporaryDirectory() as tmp:
     meas, setk = go(rv, lambda t: MEASURED(ACQ(t))), go(rv, ACQ)
     check("T17.1 control MEASURED, one revisited fast value: S5 passes and S10 passes", (outcome(meas, "S5")[0], meas["S10"].mark) == ("PASS", intake.Mark.PASSED),
           f"{outcome(meas, 'S5')[0]} {meas['S10'].mark}")
-    check("T17.1 the same declaration with control SET is FAST_VALUE_REPEATED at S5", outcome(setk, "S5")[0] == "FAST_VALUE_REPEATED", outcome(setk, "S5")[0])
+    check("T17.1 the same declaration with control SET is FAST_VALUE_REPEATED at S5 (plan 1165: its profile predicts it, so S3 refuses PROFILE_CONTRADICTED,"
+          " REPEATS_CONTRADICT_PROFILE)", outcome(setk, "S5")[0] == "PROFILE_CONTRADICTED" and setk["S3"].result.evidence.words[0] == "REPEATS_CONTRADICT_PROFILE", outcome(setk, "S5")[0])
 
     # ---- T17.4: x0 x1 x1 x2 .. x(n-3) x(n-1) x(n-4) x(n-2): a consecutive pair (x1), one revisit (x(n-4)), up / down / up
     k4 = bank(lambda rs: rs[:2] + rs[1:-2] + rs[-1:] + [rs[-4], rs[-2]])
-    said = str(go(k4, ACQ)["S5"].result.evidence)
+    row = A.HOLDS.pop(A.R.REPEATS_CONTRADICT_PROFILE)   # plan 1165: the profile predicts this repeat (S3 PROFILE_CONTRADICTED); its S5 Detail is reached
+    said = str(go(k4, ACQ)["S5"].result.evidence)      # here only past a profile that did not predict it: the REPEATS row taken out of HOLDS for this one run
+    A.HOLDS[A.R.REPEATS_CONTRADICT_PROFILE] = row
+    check("T17.4 (plan 1165) past a profile that did not predict it, S5's Detail says so", A.PREDICTED in said, said)
     counts = "curves refused = 1; of curves = 9; consecutive runs = 1; longest run = 2; values revisited = 1; monotone runs = 3"
     check("T17.4 FAST_VALUE_REPEATED's Detail counts the refused curves out of all, then the repeat kinds", said.endswith(counts), said)
     check("T17.4 (A30) it names the exit of each kind found: SAME_FAST_VALUE for the consecutive run, MEASURED or SPLIT_ROWS for the revisit",

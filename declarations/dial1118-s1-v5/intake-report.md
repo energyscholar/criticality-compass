@@ -1,12 +1,13 @@
 # Intake report: dial1118-s1-v5
 
-Written by `bin/cc intake run dial1118-s1-v5`. Stage table 1160-v11, policy 1136-v1.
+Written by `bin/cc intake run dial1118-s1-v5`. Stage table 1165-v1, policy 1136-v1.
 
 - **Mode** (the declarer's sealed statement of what they had seen): EXPLORATORY
 - **PRIMARY verdict: PRIMARY_REFUSED_AT** at S4. Missing: none.
 - **ROBUSTNESS verdict: ROBUSTNESS_WITHHELD**. Missing: none.
 - **S10 KERNEL_HANDOFF** (the terminal; it counts toward PRIMARY): WITHHELD.
 - **Seal status** (advisory; sealing is recommended and not enforced): SEALED. A seal holds this declaration exactly as it is now. Sealed at 2026-10-20T00:41:56Z (seal-log t_ns 1792456916244814762) by Claude (plan 1160 loop4, final re-seal) (AI_DRAFT), confirmed_by '', mode EXPLORATORY; declaration sha256 0ca08e029982d3e93cb7b42cc73fdd3ddb725bed4a7d4ec5ee2d686c6b0bacef; universe '<p1118-bank>' (located at a directory named 'p1118-bank-FIXTURE'): 63 files, names and sizes in SEAL.json
+- **Profile** (plan 1165): PROFILED d1f0336ced07 (64 files, 66 findings, 0 contradictions)
 - **Ordering** (information, never a refusal): READS_FOLLOW_SEAL. Every logged data read of this declaration came after its seal.
 
 | stage | name | state | reads data bytes | execution |

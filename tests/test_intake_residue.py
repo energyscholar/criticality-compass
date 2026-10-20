@@ -4,7 +4,8 @@ Planted inputs only (no real data).
  R2. intake_terminal.identity: RESULT.json's seal fields from a table total over SealStatus (no `.get` default of "").
  R3. an absent declarations/<id>/intake.toml is S0 DECLARATION_FILE_ABSENT through the CLI's path (it was read as "" and refused as a schema).
  R4. intake_bytes.located: a declared name and no ".." part, both in the pattern (no guard chain).
- R5. intake_bytes._read: the first logged read of a file is its pin (one expression, no loop).
+ R5. intake_bytes._read: the first logged read of a file is its pin (one expression, no loop). (plan 1165: a held pin goes on to S3's
+     profile rows; the planted directory holds no PROFILE.json, so the run after a held pin is PROFILE_ABSENT, not Pass.)
  R6. intake_read.read_csv: the columns are the header table() found (no `or [[]]` default).
  R7. intake_convert.POSITION: a name is a position only when the names line holds it once (a lookup, no inline if/else).
  R8. intake_convert.verify: an output row with no source cell outside a broadcast column is CELL_MAP_NOT_A_PERMUTATION (min had default=()).
@@ -98,11 +99,13 @@ with tempfile.TemporaryDirectory() as tmp:
     (loc / "a.csv").write_bytes(b"T,C\n1,2\n")
     sha = hashlib.sha256(b"T,C\n1,2\n").hexdigest()
     reader = type("Loader", (), {"read": lambda self, p: Path(p).read_bytes()})()
+    R5 = type("Declaration", (), {"id": "r5", "data": {"source": {"root": "<r>/r5bank"}}})()   # plan 1165: S3's profile rows name the declaration
     path = str((loc / "a.csv").resolve())
     pinned = lambda first, then: (log(d5 / "access.log", [{"path": path, "sha256": first, "route": "loader"}, {"path": path, "sha256": then, "route": "loader"},
-                                                          {"path": path, "sha256": "x", "route": "bypass"}]), intake_bytes._read(None, d5, loc, ("a.csv",), reader))[1]
-    check("R5. the first loader read pins the file: first = the bytes' sha passes, a later different read does not move the pin",
-          isinstance(pinned(sha, "0" * 64), blind.Pass) and getattr(pinned("0" * 64, sha), "reason", "PASS") == "PIN_MISMATCH",
+                                                          {"path": path, "sha256": "x", "route": "bypass"}]), intake_bytes._read(R5, d5, loc, ("a.csv",), reader))[1]
+    check("R5. the first loader read pins the file: first = the bytes' sha passes the pin (plan 1165: to S3's next row, PROFILE_ABSENT: d5 holds no"
+          " PROFILE.json; was Pass), a later different read does not move the pin",
+          getattr(pinned(sha, "0" * 64), "reason", "PASS") == "PROFILE_ABSENT" and getattr(pinned("0" * 64, sha), "reason", "PASS") == "PIN_MISMATCH",
           f"{getattr(pinned(sha, '0' * 64), 'reason', 'PASS')} {getattr(pinned('0' * 64, sha), 'reason', 'PASS')}")
 
     # ---- R6. read_csv

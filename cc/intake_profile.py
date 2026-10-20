@@ -1,12 +1,10 @@
-"""intake_profile - pre-processing (plan 1165; role intake_profile, its own cap tests/test_budget.py PROFILE_CAP; the cross-check against a
-declaration is cc/intake_against.py): `bin/cc intake profile` reads every byte of every file under a root-named path, before any
-declaration is written, and reduces them to a PROFILE of their structure. Invariants:
- - value-free BY TYPE: every field of Profile, FileProfile, Table, RowRun, HeaderLine, ColumnProfile and Finding is an int, a str that is a
-   file name, a sha256, an enum atom or a masked name (intake_names.masked: every numeral as #; a NUMERIC cell as its position #k), or a tuple
-   of these; no float, and no str that receives a cell's text unmasked. A value is held in memory to count runs, never kept;
- - every file is read once through the vendored t23 logged loader, partition "profiled", into declarations/<id>/profile-access.log;
-   nothing is written under the profiled path;
- - a finding is a row of FindingKind and its response is looked up in RESPONSE, total over FindingKind (tests/test_intake_profile.py)."""
+"""intake_profile - pre-processing (plan 1165; role intake_profile, its own cap tests/test_budget.py PROFILE_CAP; the cross-check against a declaration
+is cc/intake_against.py): `bin/cc intake profile` reads every byte of every file under a root-named path, before any declaration is written, and reduces
+them to a PROFILE of their structure. Invariants: - value-free BY TYPE: every field of Profile, FileProfile, Table, RowRun, HeaderLine, ColumnProfile and
+Finding is an int, a str that is a file name, a sha256, an enum atom or a masked name (intake_names.masked: every numeral as #; a NUMERIC cell as its position
+#k), or a tuple of these; no float, and no str that receives a cell's text unmasked. A value is held in memory to count runs, never kept; - every file is read
+once through the vendored t23 logged loader, partition "profiled", into declarations/<id>/profile-access.log; nothing is written under the profiled path;
+- a finding is a row of FindingKind and its response is looked up in RESPONSE, total over FindingKind (tests/test_intake_profile.py)."""
 import datetime
 import enum
 import functools
@@ -20,8 +18,8 @@ from dataclasses import asdict, field, make_dataclass
 from pathlib import Path
 
 import intake_bytes
-from intake_blind import Refuse, detail, gate
-from intake_convert import SPLIT, _book_names, _decoded, _split, _zipped, sheet_rows
+from intake_blind import Absent, Refuse, detail, format_stage, gate
+from intake_convert import MANIFEST, SPLIT, _book_names, _decoded, _manifest, _split, _zipped, sheet_rows
 from intake_names import NUMBER, Name, _runs, classify, masked, repeats
 
 FileKind = enum.Enum("FileKind", "TEXT_TABLE XLSX ZIP UNPROFILED_FORMAT")   # by content, never by extension (plan 1165 2.2)
@@ -136,8 +134,7 @@ def segments(ks):
 
 
 def order(xs):
-    """The order and repeat fields of a column's numbers in file order (counts only; the values are dropped on return): monotone_runs (the
-    segments), first_direction, equal_runs (runs of 2, 3-9, 10+), longest, revisited, distinct (intake_names.repeats for the run counts)."""
+    """The order and repeat fields of a column's numbers in file order (counts only; the values are dropped on return): monotone_runs (the segments), first_direction, equal_runs (runs of 2, 3-9, 10+), longest, revisited, distinct (intake_names.repeats for the run counts)."""
     runs, rep = _runs(xs), repeats([xs])
     ks = [k for k, _ in runs]
     bins = Counter(BIN.get(min(n, 10)) for _, n in runs)
@@ -200,8 +197,7 @@ def _sheet(k, name, raw):
 
 
 def sheets(raw):
-    """An XLSX's sheets, each profiled as a table of its cells (intake_convert.sheet_rows, the SHEET_TO_CSV cut), or READER_ABSENT without
-    openpyxl; a workbook openpyxl cannot open has none."""
+    """An XLSX's sheets, each profiled as a table of its cells (intake_convert.sheet_rows, the SHEET_TO_CSV cut), or READER_ABSENT without openpyxl; a workbook openpyxl cannot open has none."""
     has = importlib.util.find_spec("openpyxl") is not None
     names = {True: lambda: _book_names(raw) or [], False: lambda: None}[has]()
     return {True: lambda: tuple(_sheet(k, n, raw) for k, n in enumerate(names, 1)), False: lambda: READER_ABSENT}[has]()
@@ -217,8 +213,7 @@ KINDS = {   # (is it a zip, does it hold xl/workbook.xml, does it decode as text
 
 
 def profiled(name, raw):
-    """The FileProfile of one file's bytes: a zip (an xlsx when it holds xl/workbook.xml, members by masked name and size), a text table (decoded
-    by ENCODINGS, cut by the elected delimiter), or UNPROFILED_FORMAT (empty or binary: the alphabet has no reader)."""
+    """The FileProfile of one file's bytes: a zip (an xlsx when it holds xl/workbook.xml, members by masked name and size), a text table (decoded by ENCODINGS, cut by the elected delimiter), or UNPROFILED_FORMAT (empty or binary: the alphabet has no reader)."""
     z, e = _zipped(raw), decoded(raw)
     xlsx = z is not None and "xl/workbook.xml" in z.namelist()
     return KINDS[(z is not None, xlsx, e[1] is not None)]((name, len(raw), hashlib.sha256(raw).hexdigest()), z, e, raw)
@@ -291,9 +286,7 @@ def findings(files):
 
 
 def profile(root, ident, path, t, out="PROFILE.json"):
-    """Profile the directory a root-named path names (intake_bytes.located; any other form is ROOT_UNRESOLVED): every file read once through
-    the logged loader (partition "profiled", declarations/<id>/profile-access.log); writes declarations/<id>/<out> and its .md, appends to
-    profile.log, replaces the ## Profile section of <path>/../MANIFEST.md when it exists. Writes nothing under the path. Profile | Refuse."""
+    """Profile the directory a root-named path names (intake_bytes.located; any other form is ROOT_UNRESOLVED): every file read once through the logged loader (partition "profiled", declarations/<id>/profile-access.log); writes declarations/<id>/<out> and its .md, appends to profile.log, replaces the ## Profile section of <path>/../MANIFEST.md when it exists. Writes nothing under the path. Profile | Refuse."""
     d, base = Path(root) / "declarations" / ident, intake_bytes.located(path, t["roots"])
     def go():
         loader = intake_bytes._t23().Loader({base: "profiled"}, d / "profile-access.log")
@@ -371,7 +364,7 @@ def _said(ident, p, out):
 
 
 def profile_cli(root, ident, args, t):
-    """bin/cc intake profile <id> [--raw] <root-named path> | --check: the profile and its findings printed, exit 0; a refusal or usage, exit 1."""
+    """bin/cc intake profile <id> [--raw] <root-named path>: the profile and its findings printed, exit 0; a refusal or usage, exit 1 (--check: check_cli)."""
     import intake_convert
     path, out = [a for a in args if a != "--raw"], {True: "PROFILE-raw.json", False: "PROFILE.json"}["--raw" in args]
     ok = len(path) == 1 and not path[0].startswith("--")
@@ -379,3 +372,21 @@ def profile_cli(root, ident, args, t):
     print({(True, True): lambda: f"profile {ident}: " + got.text(intake_convert.ctables()["sentences"]),
            (True, False): lambda: _said(ident, got, Path(root) / "declarations" / ident / out), (False, False): lambda: f"bin/cc intake: {USAGE}"}[(ok, isinstance(got, Refuse))]())
     return {True: 0, False: 1}[ok and not isinstance(got, Refuse)]
+
+
+
+def read(d, bank, get):
+    """[PROFILE.json of declarations/<id>, its sha256, the bank's CONVERSION-MANIFEST.json (intake_convert._manifest, {} when not of its shape), its sha256]; {} and "" for a file not there; `get` reads the manifest (S3: the run's loader)."""
+    got = [{True: lambda: g(f), False: lambda: None}[f.is_file()]() for f, g in ((Path(d) / "PROFILE.json", Path.read_bytes), (Path(bank) / MANIFEST, get))]
+    return [x for b, v in zip(got, (json.loads, lambda b: _manifest(b.decode("utf-8", "replace")) or {})) for x in {True: lambda: (v(b), hashlib.sha256(b).hexdigest()), False: lambda: ({}, "")}[b is not None]()]
+
+
+def check_cli(root, ident, args, t):
+    """bin/cc intake profile <id> --check, the declarer's gate before lint: the declaration (S0) against PROFILE.json and its bank's manifest (intake_against.against); every contradiction printed (code, file, where), exit 1 on any or on no profile."""
+    d = Path(root) / "declarations" / ident
+    s0 = format_stage({True: lambda: (d / "intake.toml").read_text(), False: lambda: Absent(f"declarations/{ident}/intake.toml")}[(d / "intake.toml").is_file()](), (), t)
+    p, _, m, _ = {True: lambda: [{}, "", {}, ""], False: lambda: read(d, intake_bytes.located(s0.evidence.data["source"]["root"], t["roots"]), Path.read_bytes)}[isinstance(s0, Refuse)]()
+    found = {True: lambda: (), False: lambda: intake_bytes.intake_against.against(p, m, s0.evidence.data)}[p == {}]()
+    print(f"profile {ident} --check: " + {True: lambda: f"REFUSE {s0.reason}: the declaration does not pass FORMAT (bin/cc intake lint {ident})", False: lambda: {True: f"PROFILE_ABSENT: run bin/cc intake profile {ident} <root-named path> first",
+          False: f"{len(found)} contradictions" + "".join(f"\n  {c.name} {f}: {w}" for c, f, w in found)}[p == {}]}[isinstance(s0, Refuse)]())
+    return int(isinstance(s0, Refuse) or p == {} or len(found) > 0)

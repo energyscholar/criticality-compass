@@ -2,7 +2,7 @@
 Invariant: value-free and blind: every field is a count, a name, a code, the pinned bytes or an upstream evidence, and every summary()
 prints through shown and counts only; it imports only enum, dataclasses and intake_blind, constructs no Path and opens nothing."""
 import enum
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from intake_blind import Declaration, Evidence, shown
 
@@ -28,10 +28,11 @@ class File:
 class Pinned(Evidence):
     """S3 SOURCE_INTEGRITY: every selected file, admitted, read once through the logged loader and pinned. Invariant: carries the Declaration
     it read and the bytes, so no later stage opens a file. `dropped`: per converted file that declares DROP_ROWS_NOT_NUMERIC, (its name, the rows
-    dropped), set by intake_convert.s3 from the manifest."""
+    dropped), set by intake_convert.s3 from the manifest. `profile` (plan 1165): PROFILE.json's values and its "sha256", whose files S3 matched."""
     declaration: Declaration
     files: tuple
     dropped: tuple = ()
+    profile: dict = field(default_factory=dict)
 
     def summary(self):
         return (f"{len(self.files)} files admitted, read once each through the logged loader (declarations/{self.declaration.id}/access.log) "

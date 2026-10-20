@@ -26,7 +26,13 @@ FAIL; COVERED["VALIDATED_BRACKET"] True: the NO_COVERAGE_EVIDENCE plant and tota
 made empty: that SECOND_LANE_INFEASIBLE plant FAILS (PASS). (1160 A39: ENDS is DOMAIN, and SECOND_LANE_INFEASIBLE is NO_INTERIOR_FAST_MAXIMUM
 and ANCHOR_OUTSIDE_NEIGHBOUR_SPAN; the S10 PROJECTION_EMPTY_ON_CURVE plant is new, seen red in tests/test_intake_loop4.py T39.2.)
 Seen RED (1160 A7): intake_names.ORDER_CLASS[(False, True)] made "in neither order (not monotone)": the descending-blocks A7 check FAILS;
-intake_names.OPPOSITE["ASCENDING"] made "ASCENDING": the descending-blocks A7 check FAILS."""
+intake_names.OPPOSITE["ASCENDING"] made "ASCENDING": the descending-blocks A7 check FAILS.
+(1165 P4) Every plant that reaches S3 now runs `bin/cc intake profile` first (intake_plant.run(profile=True)); the rows a
+profiled plant meets at S3 first are intake_plant.AT_S3 and count as reached. Four PROFILE/MANIFEST plants are added.
+Seen RED (1165 P4, cc/intake_bytes.py S3 gate rows made `lambda: True`, one at a time): PROFILE_ABSENT: the run crashes (KeyError
+'files': every profiled plant reads a profile it was told is present); PROFILE_STALE / MANIFEST_STALE / PROFILE_CONTRADICTED: that row's
+plant FAILS (FAST_VALUE_REPEATED or PASS) and the totality FAILS (the row live, never reached); PROFILE_CONTRADICTED also turns every
+AT_S3 plant red ('the profile did not predict this')."""
 import importlib.util
 import json
 import re
@@ -47,7 +53,8 @@ import readout  # noqa: E402
 import intake_read as rd  # noqa: E402
 import intake_seal  # noqa: E402
 import intake_synth  # noqa: E402
-from intake_plant import ALL_ALTERNATIVE, PRIMARY_PAIR, SHIFT, ARGMAX_LANE, BLOCK, BLOCK_NO_FLOOR, IID, PAIR_LANE, SAME_FAST, VALIDATED, CHOICE_PLANTS, converted, key_lines, long_table, outcome, per_file, rooted, run, slow_source, write_long, xlsx  # noqa: E402
+from intake_plant import ALL_ALTERNATIVE, PRIMARY_PAIR, SHIFT, ARGMAX_LANE, BLOCK, BLOCK_NO_FLOOR, IID, PAIR_LANE, SAME_FAST, VALIDATED, CHOICE_PLANTS, AT_S3, converted, key_lines, long_table, outcome, per_file, profiled, rooted, run, slow_source, write_long, xlsx  # noqa: E402
+import intake_against as against  # noqa: E402
 
 bad = []
 
@@ -72,7 +79,7 @@ check("E2. the root name <cc-datasets> resolves under the home directory (~/scra
       T["roots"]["<cc-datasets>"] == str(Path.home() / "scratch" / "cc-datasets"), T["roots"]["<cc-datasets>"])
 
 
-SEEN = set()   # every stage reason a run returned, READER_REFUSED among them (first() reports its detail's reader reason instead)
+SEEN, WORDS = set(), []   # (WORDS: plan 1165) every stage reason a run returned, READER_REFUSED among them (first() reports its detail's reader reason instead)
 
 
 def first(out):
@@ -80,6 +87,7 @@ def first(out):
     ref = [e.result for e in out.values() if e.mark is intake.Mark.REFUSED]
     code = {True: lambda: ref[0].reason, False: lambda: "PASS"}[bool(ref)]()
     SEEN.add(code)
+    WORDS[:] = {True: lambda: list(ref[0].evidence.words), False: lambda: []}[bool(ref)]()   # (plan 1165) the first refusal's words, for AT_S3 and the hole word
     return {True: lambda: ref[0].evidence.words[0], False: lambda: code}[code == "READER_REFUSED"]()
 
 
@@ -187,8 +195,32 @@ with tempfile.TemporaryDirectory() as tmp:
         d, text = tmp / "declarations" / ident, per_file(m, ident)
         d.mkdir(parents=True)
         (d / "intake.toml").write_text(text)
+        profiled(T, tmp, ident, text)   # plan 1165 section 6: the plant profiles its bank first
         b = intake.bodies(rooted(T, tmp), d, text, [])
         return first(intake_fold.fold(T["stages"]["stage"], {**b, "S6": lambda census: (edit(d, banks / "pf"), b["S6"](census))[1]}))
+
+    def stale(between, sealed=False, conv_name=None):
+        """(plan 1165) A PER_FILE declaration of a copy of pf (or of the converted bank `conv_name`) profiled, sealed when `sealed`, then
+        `between` applied to the bank directory, then run with no second profile step."""
+        name = copy(lambda b: None)
+        ident = f"d{next(n)}"
+        text = {True: lambda: per_file(m, ident).replace("<long-test>/pf", f"<long-test>/{name}"),
+                False: lambda: convert(per_file(m, ident), f"<cc-banks>/{conv_name}/bank", f"<cc-datasets>/{conv_name}/raw")}[conv_name is None]()
+        d = tmp / "declarations" / ident
+        d.mkdir(parents=True)
+        (d / "intake.toml").write_text(text)
+        (d / "transducer.toml").write_text("# planted: the seal hashes this file; S0's transducer check is not run here\n")
+        profiled(T, tmp, ident, text)
+        who = {"author": "plan 1165 test", "author_kind": intake_seal.AUTHOR_KIND["ai-draft"], "confirmed_by": ""}
+        [intake_seal.mint(blind.format_stage(text, [], T).evidence, d, who, ROOT, rooted(T, tmp)) for _ in range(int(sealed))]
+        between({True: banks / name, False: tmp / "cc-banks" / str(conv_name) / "bank"}[conv_name is None])
+        return first(run(T, tmp, ident, text, profile=False))
+
+    def conv_only():
+        """(plan 1165) pf's curve files converted as they are into a new converted bank: its name."""
+        name = f"cv{next(n)}"
+        converted(T, tmp, name, [(f["name"], f["name"], "") for f in m["files"]], {f["name"]: (banks / "pf" / f["name"]).read_bytes() for f in m["files"]})
+        return name
 
     def unlog(d, name):
         """(1160 P4) The access log without the loader lines of file `name`."""
@@ -257,6 +289,13 @@ with tempfile.TemporaryDirectory() as tmp:
         ("CONVERSION_CHAIN_BROKEN", "(1160 P3) one byte of a raw file changed after the conversion", lambda: conv(lambda raw, bank: (raw / m["files"][2]["name"]).write_bytes(
             (raw / m["files"][2]["name"]).read_bytes().replace(b"T", b"t", 1)))),
         ("PASS", "(1160 P3) a converted bank passes S3 and reads as a DEPOSIT", lambda: conv()),
+        ("PROFILE_ABSENT", "(1165) the plant run with no profile step", lambda: (lambda i: first(run(T, tmp, i, per_file(m, i), profile=False)))(f"d{next(n)}")),
+        ("PROFILE_STALE", "(1165) unsealed: a file's bytes changed after the profile (test_intake_leak plants it sealed)", lambda: stale(lambda b: (b / m["files"][2]["name"]).write_text((b / m["files"][2]["name"]).read_text() + "3.5,0.5,0.03\n"))),
+        ("MANIFEST_STALE", "(1165 A1) one byte of a converted bank's CONVERSION-MANIFEST.json (its time) changed after the seal",
+         lambda: stale(lambda b: (b / "CONVERSION-MANIFEST.json").write_text((b / "CONVERSION-MANIFEST.json").read_text().replace('"time": "2', '"time": "1', 1)), sealed=True, conv_name=conv_only())),
+        ("PASS", "(1165 A1) the same converted bank, sealed, its manifest as the seal recorded it", lambda: stale(lambda b: None, sealed=True, conv_name=conv_only())),
+        ("PROFILE_CONTRADICTED", "(1165) one swapped pair inside a PER_FILE curve file, declared ASCENDING (without the profile: ROW_ORDER_DIFFERS at S4)",
+         lambda: pf(copy(lambda b: (b / m["files"][4]["name"]).write_text("".join(x + "\n" for x in (lambda ls: ls[:3] + [ls[4], ls[3]] + ls[5:])((b / m["files"][4]["name"]).read_text().splitlines())))))),
         # S6 ADMISSIBILITY (plan 1160 P4), each edit applied between S5 and S6 of one run
         ("PASS", "(1160 P4) the access log as the run wrote it", lambda: at_s6(lambda d, b: None)),
         ("READ_NOT_LOGGED", "(1160 P4) the loader lines of one pinned file deleted from the access log", lambda: at_s6(lambda d, b: unlog(d, m["files"][4]["name"]))),
@@ -319,11 +358,14 @@ with tempfile.TemporaryDirectory() as tmp:
                    ("XLSX_GRID", "(not a reason) an xlsx bank passes S5 with the comma bank's census label", lambda: {True: "XLSX_GRID", False: "x"}[
                        census(bank(raw=xlsx([["T", "C", "sigma", "h"]] + rows, "data")), xl("data")) == census(bank())])]}[HAS_XLSX]
     NOT_HERE = {False: ["NOT_AN_XLSX", "SHEET_ABSENT"], True: []}[HAS_XLSX]
-    reached = set()
+    reached, UNPREDICTED = set(), []
     for code, what, plant in PLANTS + XLSX:
         got = plant()
         reached |= {got}
-        check(f"E2. {code}: {what}", got == code, got)
+        check(f"E2. {code}: {what}" + {True: f" (1165: profiled, PROFILE_CONTRADICTED, first {AT_S3.get(code)})", False: ""}[code in AT_S3],
+              got == {True: "PROFILE_CONTRADICTED", False: code}[code in AT_S3] and (code not in AT_S3 or WORDS[:1] != [] and WORDS[0].startswith(AT_S3[code] + "_CONTRADICT")), f"{got} {WORDS[:2]}")
+        UNPREDICTED.extend([f"{code}: {what}"] * (code in against.PREDICTS and got == code and against.PREDICTED not in WORDS))
+    check("E2. (1165) every PREDICTS reason still refused at S4 / S5 on a profiled run says 'the profile did not predict this' (a hole of section 5)", not UNPREDICTED, str(UNPREDICTED))
     def s4(blocks):
         """(1160 A7) The counts of S4 ROW_ORDER_DIFFERS's Detail on a LONG_TABLE of `blocks` declared row_order ASCENDING (or S4's mark)."""
         ident = f"d{next(n)}"
@@ -382,8 +424,8 @@ with tempfile.TemporaryDirectory() as tmp:
     check("E2. READER_REFUSED: the reader-reason plants arrived through S4 READER_REFUSED", "READER_REFUSED" in SEEN, str(sorted(SEEN)))
     reached |= SEEN & {"READER_REFUSED"}
     print(f"  openpyxl {'installed' if HAS_XLSX else 'NOT installed'} on this machine; NOT REACHED HERE: {NOT_HERE or 'none'}")
-    check("E2. the codes the plants reach are exactly the live rows (with the machine's NOT REACHED rows)",
-          (reached - {"XLSX_GRID", "PASS"}) | set(NOT_HERE) == LIVE, f"live, never reached: {sorted(LIVE - reached - set(NOT_HERE))}; reached, not live: {sorted(reached - LIVE - {'XLSX_GRID', 'PASS'})}")   # 1160: PASS plants (FILE_KEY, NONE)
+    check("E2. the codes the plants reach are exactly the live rows (with the machine's NOT REACHED rows and intake_plant.AT_S3, the rows a profiled plant meets at S3 first)",
+          (reached - {"XLSX_GRID", "PASS"}) | set(NOT_HERE) | set(AT_S3) == LIVE, f"live, never reached: {sorted(LIVE - reached - set(NOT_HERE) - set(AT_S3))}; reached, not live: {sorted(reached - LIVE - {'XLSX_GRID', 'PASS'})}")   # 1160: PASS plants (FILE_KEY, NONE)
 
     # ---- E4. explain and the report carry the rows that are not live
     dead = [f"- {s['id']} {r['code']}" for s, _, r in ROWS if not r["live"]]

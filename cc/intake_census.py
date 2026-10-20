@@ -5,6 +5,7 @@ import itertools
 import re
 import statistics
 
+import intake_against
 import intake_read
 from intake_blind import NUMBER, RESTARTS, SWEEP, Pass, Refuse, detail, gate, numbered, sweeps
 from intake_names import exits, repeats
@@ -159,8 +160,8 @@ def label(curves, points, fast):
 def bodies(t, d):
     """The registered bodies of S4 and S5, closed over the tables (each has its signature row, tests/test_intake.py)."""
     def s4(pinned: Pinned) -> Pass | Refuse:
-        return shape(pinned, t)
+        return intake_against.unpredicted(pinned, shape(pinned, t))   # plan 1165: a refusal the profile should have predicted says so
 
     def s5(pinned: Pinned, shaped: Shaped) -> Pass | Refuse:
-        return census(pinned, shaped, t)
+        return intake_against.unpredicted(pinned, census(pinned, shaped, t))
     return {"S4": s4, "S5": s5}

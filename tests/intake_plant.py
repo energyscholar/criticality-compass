@@ -167,13 +167,31 @@ def write_long(bank, blocks, head="T,C,sigma,h\n"):
     (bank / "bank.csv").write_text("# the synthetic bank as one long table (plan 1145 test)\n" + head + "".join(f"{r},{h}\n" for h, rows in blocks for r in rows))
 
 
-def run(T, tmp, ident, text, findings=()):
+AT_S3 = {   # (plan 1165 section 6) the S4 / S5 rows a profiled plant no longer reaches -> the Contradiction (its first word) its plant names first:
+    # the profile predicts each (intake_against.PREDICTS), so the plant, profiled, refuses PROFILE_CONTRADICTED at S3; a plant may meet a
+    # Contradiction row that precedes PREDICTS's (a names line both differs and is numeric: COLUMN before FILES; one n/a row: no numeric line, HEADER)
+    "COLUMNS_DIFFER": "COLUMN", "FILE_DIFFERS_FROM_FIRST": "COLUMN", "NOT_UTF8": "ENCODING", "HEADER_LINE_ABSENT": "HEADER", "NO_DATA_ROW": "HEADER",
+    "ROW_WIDTH_DIFFERS": "WIDTH", "COLUMN_NAME_ABSENT": "COLUMN", "COLUMN_NAME_AMBIGUOUS": "COLUMN", "COLUMN_POSITION_OUT_OF_RANGE": "COLUMN",
+    "CELL_NOT_A_NUMBER": "HEADER", "SHEET_ABSENT": "SHEET"}
+
+
+def run(T, tmp, ident, text, findings=(), profile=True):
     """Every stage of one planted declaration folded in-process, the root name <long-test> naming <tmp>/banks; `findings` are planted CC
-    transducer findings (S0 TRANSDUCER_FILE_REFUSED). A second run of one ident reuses its directory (its access.log and SEAL.json)."""
+    transducer findings (S0 TRANSDUCER_FILE_REFUSED). A second run of one ident reuses its directory (its access.log and SEAL.json).
+    (plan 1165 section 6) `profile`: the declared root profiled first (profiled), as a declarer does before declaring; False omits the step."""
     d = Path(tmp) / "declarations" / ident
     d.mkdir(parents=True, exist_ok=True)
     (d / "intake.toml").write_text(text)
+    [profiled(T, tmp, ident, text) for _ in range(int(profile))]
     return intake_fold.fold(T["stages"]["stage"], intake.bodies(rooted(T, tmp), d, text, list(findings)))
+
+
+def profiled(T, tmp, ident, text):
+    """(plan 1165 section 6) The plants' one profile step: `bin/cc intake profile <id> <root>` in process (intake_profile.profile) on the
+    root the declaration text names (none in a text with no root line: nothing profiled, as a declarer with no root profiles nothing)."""
+    import intake_profile
+    (Path(tmp) / "declarations" / ident).mkdir(parents=True, exist_ok=True)
+    return [intake_profile.profile(tmp, ident, root, rooted(T, tmp)) for root in re.findall(r'^root = "([^"]*)"', text, re.M)[:1]]
 
 
 def rooted(T, tmp):

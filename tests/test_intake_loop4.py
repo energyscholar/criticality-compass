@@ -33,6 +33,9 @@ the Compass (bin, cc, intake, ...) in a temporary directory, whose intake/ROOTS.
              on the aligned grid, PAIR_NEAREST_FAST: S9 refuses NO_INTERIOR_FAST_MAXIMUM (the span rule alone passed it). T39.5 DOMAIN is total
              over POLICY's projections, ANCHOR and PAIRS over its bridges, NEXT over S9's rows; S9's rows are the two, and S10's
              PROJECTION_EMPTY_ON_CURVE is live and before DOOR_REFUSED.
+(plan 1165) Every declaration that reaches S3 is profiled first (`intake profile <id> <its root>`, s5i; T41.1's blinded view too). T34.1's
+five members are then refused at S3 PROFILE_CONTRADICTED (the profile predicts each), the planted name unprinted; the S5 Detail is checked
+on a second declaration run with intake_against.against returning () (a profile that predicts nothing).
 Seen RED (each mutation applied by hand, the test run, the mutation reverted):
  - T35.1: the SLOW_KNOB_HAS_NO_METRIC row deleted from intake_choices.choices: FAIL (lint and seal pass S1); METRIC["ORDINAL"] made True
    (ORDINAL mapped to a path): FAIL.
@@ -67,6 +70,7 @@ import intake_feasible  # noqa: E402
 import tomllib  # noqa: E402
 import intake_convert as ic  # noqa: E402
 import intake_synth  # noqa: E402
+import intake_against as A  # noqa: E402
 from intake_plant import ARGMAX_LANE, ORDINAL, PAIR_LANE, per_file  # noqa: E402
 
 bad = []
@@ -128,7 +132,8 @@ with tempfile.TemporaryDirectory() as tmp:
     keyed = lambda field: lambda t: t.replace('identity = "NONE"', 'identity = "RUN"', 1).replace(
         '[replicate.key]\nkind = "NONE"', f'[replicate.key]\nkind = "FILE_NAME"\nseparator = "_"\nfield = {field}', 1)
     S5 = lambda x: (re.findall(r"- \*\*S5 CENSUS\*\*[^\n]{0,900}", x) or [x[-300:]])[0]   # the run's S5 line, for a failure's why
-    s5i = lambda i: (cli("lint", i), cli("seal", i, *SEAL), cli("run", i))[2][1]   # a declaration linted, sealed and run: what run printed
+    root = lambda i: re.findall(r'(?m)^root = "([^"]*)"', (w / "declarations" / i / "intake.toml").read_text())[0]
+    s5i = lambda i: (cli("profile", i, root(i)), cli("lint", i), cli("seal", i, *SEAL), cli("run", i))[3][1]   # a declaration profiled (plan 1165), linted, sealed and run: what run printed
     s5 = lambda edit: s5i(declare(lambda t: edit(shared(runs(t))), "rep"))
     by_name, unkeyed, absent = s5(keyed(2)), s5(lambda t: t.replace('identity = "NONE"', 'identity = "RUN"', 1)), s5(keyed(3))
     check("T33.1 (A33) two curves at one slow value, identity RUN keyed by the file-name field 2: S5 passes", "**S5 CENSUS** (LIVE): EXECUTED, PASS" in by_name, S5(by_name))
@@ -147,9 +152,14 @@ with tempfile.TemporaryDirectory() as tmp:
         b = banks / f"df-{member}"
         shutil.copytree(banks / "pf", b)
         (b / "curve_003.csv").write_bytes(edit((b / "curve_003.csv").read_bytes()))
+        at3 = s5i(declare(bank=b.name))   # plan 1165: the profile predicts each member's difference, so S3 refuses it first
+        check(f"T34.1 (plan 1165) {member}: S3 refuses PROFILE_CONTRADICTED; the planted header name never prints",
+              "**S3 SOURCE_INTEGRITY** (LIVE): EXECUTED, REFUSE PROFILE_CONTRADICTED" in at3 and PLANTED.decode() not in at3, (re.findall(r"- \*\*S3 [^\n]{0,400}", at3) or [at3[-300:]])[0])
+        keep, A.against = A.against, lambda p, m, d: ()   # past a profile that predicts nothing (the seam: S3 reads intake_against.against at call time)
         out = s5i(declare(bank=b.name))
+        A.against = keep
         line = S5(out)
-        check(f"T34.1 (A34) {member}: S5 refuses FILE_DIFFERS_FROM_FIRST and names {member} and no other member",
+        check(f"T34.1 (A34) {member}: S5 refuses FILE_DIFFERS_FROM_FIRST and names {member} and no other member (plan 1165: past a profile that predicts nothing)",
               "REFUSE FILE_DIFFERS_FROM_FIRST" in line and f"{member}: {intake_differs.DIFFERS.get(member, '?')}" in line
               and not [k for k in EDITS if k != member and f"{k}: " in line], line)
         check(f"T34.1 (A34) {member}: the planted header name never prints", PLANTED.decode() not in out, "printed")
@@ -191,7 +201,8 @@ with tempfile.TemporaryDirectory() as tmp:
     listed_ = lambda x: re.sub(r'(?m)^excluded = \[[^#]*\]', "excluded = []", re.sub(r'(?m)^files = \[[^\]]*\]', "files = " + json.dumps(seen), x, count=1), count=1)
     d = w / "declarations" / ib
     (d / "intake.toml").write_text(listed_(blinded((d / "intake.toml").read_text())))
-    said += [cli("lint", ib), cli("seal", ib, *SEAL), cli("run", ib)]
+    prof = cli("profile", ib, root(ib))   # plan 1165: the blinded view profiled before lint; its output joins the leak checks below
+    said += [cli("lint", ib), cli("seal", ib, *SEAL), cli("run", ib), prof]
     check("T41.1 (A41) blind makes nine ordinal-named links and the key beside the view", said[0][0] == 0 and len(seen) == 9 and (tmp / "cc-blind" / f"{ib}.KEY.json").is_file(), said[0][1])
     check("T41.1 (A41) the BLINDED declaration lints, seals and runs, and passes S5", [s[0] for s in said[:3]] == [0, 0, 0] and "**S5 CENSUS** (LIVE): EXECUTED, PASS" in said[3][1],
           "".join(s[1][-300:] for s in said))

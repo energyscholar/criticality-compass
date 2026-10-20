@@ -9,7 +9,7 @@
 # needs, and never the seal stage (test 1).
 schema = 1
 kind = "intake-stages"
-version = "1160-v11"   # plan 1160 A39: S9 SECOND_LANE_INFEASIBLE split into NO_INTERIOR_FAST_MAXIMUM and ANCHOR_OUTSIDE_NEIGHBOUR_SPAN, S10 PROJECTION_EMPTY_ON_CURVE; plan 1160 A41: S0 ROOT_NOT_UNDER_CC_BLIND; plan 1160 A35: S1 SLOW_KNOB_HAS_NO_METRIC, schema 5; plan 1160 A24: S1 SLOW_NONE_HAS_NO_PATH; plan 1160 A20: UNIVERSE_ROOT_ABSENT names the root (seal has no --universe); plan 1160 A17: S1 MEASURED_KNOB_HAS_NO_POINTS, schema 4; plan 1160 A9: S10 runs before S9 (a refused second lane never withholds the terminal); A13: conversion_read
+version = "1165-v1"   # plan 1165: S3 PROFILE_ABSENT, PROFILE_STALE, MANIFEST_STALE (A1), PROFILE_CONTRADICTED; report profile_read; was "1160-v11": plan 1160 A39: S9 SECOND_LANE_INFEASIBLE split into NO_INTERIOR_FAST_MAXIMUM and ANCHOR_OUTSIDE_NEIGHBOUR_SPAN, S10 PROJECTION_EMPTY_ON_CURVE; plan 1160 A41: S0 ROOT_NOT_UNDER_CC_BLIND; plan 1160 A35: S1 SLOW_KNOB_HAS_NO_METRIC, schema 5; plan 1160 A24: S1 SLOW_NONE_HAS_NO_PATH; plan 1160 A20: UNIVERSE_ROOT_ABSENT names the root (seal has no --universe); plan 1160 A17: S1 MEASURED_KNOB_HAS_NO_POINTS, schema 4; plan 1160 A9: S10 runs before S9 (a refused second lane never withholds the terminal); A13: conversion_read
 seal_stage = "S2"
 
 [report]
@@ -24,6 +24,7 @@ stub = "This stage has no body yet, so nothing was checked; a stub is never a pa
 after_refusal = "Not run: an earlier stage refused, and no later check can redeem a refusal."
 input_absent = "Not run: a stage it needs did not pass."
 confirmation = "No human has confirmed this declaration (it is unsealed, edited after its seal, or sealed with an empty confirmed_by); PRIMARY_READY needs a seal that holds the declaration now with a non-empty confirmed_by."
+profile_read = "The profile read these files before the seal. That is the designed order (profile, then declare and seal), so it is information and never a refusal."   # plan 1165
 conversion_read = "A conversion read these raw files before the seal. That is the designed order (convert, then declare and seal), so it is information and never a refusal; the seal claims ordering only for the intake's own reads."   # plan 1160 A13
 explain = [   # the prose of `bin/cc intake explain` (and docs/INTAKE.md), between its title and the seal claim, one line per entry
   "Generated from intake/STAGES.toml and intake/POLICY.toml by `bin/cc intake explain` (docs/gen-intake.py); never edit it by hand.",
@@ -149,6 +150,10 @@ reason = [
   { code = "PATH_NOT_A_FILE",    live = true,  sentence = "A selected name is not a file under the source root (absent, or a directory); nothing was read." },
   { code = "PIN_MISMATCH",      live = true,  sentence = "The file's bytes do not match their pinned sha256; the data changed since they were pinned." },
   { code = "UNIVERSE_CHANGED",  live = true,  sentence = "The source universe now lists files that differ from the sealed listing (added, removed, or resized)." },
+  { code = "PROFILE_ABSENT",    live = true,  sentence = "The declaration has no PROFILE.json: profile the files before declaring them (`bin/cc intake profile <id> <root-named path>`, docs/INTAKE-PREPROCESSING.md) (plan 1165)." },
+  { code = "PROFILE_STALE",     live = true,  sentence = "A pinned file is not in the profile, or its sha256 is not the profile's: the files changed since they were profiled; profile them again (plan 1165)." },
+  { code = "MANIFEST_STALE",    live = true,  sentence = "The bank's CONVERSION-MANIFEST.json is not the one the seal recorded (its sha256 differs, or it appeared or went): every file the run reads is in a sha check, the manifest included (plan 1165 A1)." },
+  { code = "PROFILE_CONTRADICTED", live = true, sentence = "The declaration contradicts the profile of its files (`bin/cc intake profile <id> --check` lists every contradiction); the first is named, and the rest are counted (plan 1165)." },
 ]
 
 [[stage]]

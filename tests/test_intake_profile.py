@@ -28,6 +28,12 @@
      section (counts only) and keeps its other sections; profiled twice, the MANIFEST is the same but for the time and the log has two
      lines (idempotent); nothing under the profiled path changes (a hash of the tree before and after); --raw writes PROFILE-raw.json;
      a bare path is refused ROOT_UNRESOLVED (exit 1); `profile` is a row of intake.INTAKE.
+ T4  (P4) against() and `--check` (check_cli in process): a clean synthetic PER_FILE bank (the control) has 0 contradictions, exit 0;
+     one plant per Contradiction row, each a spoil of curve_003.csv, is refused exit 1 with exactly its codes (ENCODING with WIDTH and
+     CELLS: the 0xff line is a ragged text line; HEADER with COLUMN, WIDTH and FILES: the title line is read as the names line; COLUMN
+     with FILES); the REPEATS plant under SAME_FAST_VALUE is its row's control; FILE_NOT_PROFILED and SHEET are plants of the profile
+     VALUE (against is pure over values: a profile with curve_003.csv taken out; a workbook entry whose one sheet is not the declared
+     one, so no openpyxl is needed); --check with no PROFILE.json is PROFILE_ABSENT, on a declaration S0 refuses REFUSE, each exit 1.
  K11 A two-file plant the test never opens: profile-access.log holds two loader lines of partition "profiled" and no in-process-bypass line
      (the profile's own hooked loader sees any other open of those paths in the process).
 Seen RED (each mutation applied by hand, the test run, the mutation reverted):
@@ -44,12 +50,18 @@ Seen RED (each mutation applied by hand, the test run, the mutation reverted):
    `## Profile` sections); the MANIFEST written under the profiled path (the write target made Path(base) / "MANIFEST.md"): FAIL (the
    tree hash, and no section beside raw/).
  - K11: profiled reading one file with Path.read_bytes() beside the loader: FAIL (a bypass line).
+ - T4 (plan 1165 P4: each `holds` made True, `lambda c: True or ...`): ENCODING, DELIMITER, COLUMN, CELLS, ORDER, REPEATS: FAIL "T4 the
+   clean bank (the control): ... profile t4-0 --check: 9 contradictions"; HEADER: the same FAIL; SHEET: KeyError 'sheet' and WIDTH:
+   IndexError, each raised by its `where` text at the control's --check (a crash, rc 1: the where of a row is only total where it holds);
+   FILES (`if ONE(c) and len(lines) > 1` made `if True`): FAIL the control, "1 contradictions"; FILE_NOT_PROFILED (`if n not in have`
+   made `if True`): FAIL the control, "9 contradictions".
 """
 import contextlib
 import hashlib
 import io
 import json
 import re
+import shutil
 import sys
 import tempfile
 import tomllib
@@ -59,6 +71,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "tests")]
 import intake  # noqa: E402
 import intake_plant  # noqa: E402
+import intake_synth  # noqa: E402
 import intake_against as A  # noqa: E402
 import intake_profile as P  # noqa: E402
 
@@ -288,6 +301,71 @@ with tempfile.TemporaryDirectory() as tmp:
     log = [json.loads(x) for x in (Path(tmp) / "declarations" / "k11" / "profile-access.log").read_text().splitlines()]
     check("K11 two loader lines of partition 'profiled', no in-process bypass", sorted((a["route"], a["partition"]) for a in log)
           == [("loader", "profiled")] * 2, str([(a["route"], a["partition"]) for a in log]))
+
+# ---- T4 (P4): against(), one plant per Contradiction row, and --check (check_cli in process)
+with tempfile.TemporaryDirectory() as tmp:
+    tmp, n = Path(tmp), iter(range(100))
+    banks = tmp / "banks"
+    intake_synth.write(banks / "pf", tmp / "pf-TRUTH", "pf", 1, 9)
+    M = json.loads((banks / "pf" / "MANIFEST.json").read_text())
+    f3, t4 = M["files"][3]["name"], roots(tmp)
+
+    def check_cli(ident):
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            code = P.check_cli(tmp, ident, ["--check"], t4)
+        return code, buf.getvalue()
+
+    def plant(spoil=lambda b: None, edit=lambda x: x, profiled=True):
+        """A copy of bank pf spoiled by spoil(bank dir), declared PER_FILE (edited by edit), profiled: (its id, check_cli's (exit, stdout))."""
+        ident = f"t4-{next(n)}"
+        shutil.copytree(banks / "pf", banks / ident)
+        spoil(banks / ident)
+        (tmp / "declarations" / ident).mkdir(parents=True)
+        (tmp / "declarations" / ident / "intake.toml").write_text(edit(intake_plant.per_file(M, ident).replace("<long-test>/pf", f"<long-test>/{ident}")))
+        [P.profile(tmp, ident, f"<long-test>/{ident}", t4) for _ in range(int(profiled))]
+        return ident, check_cli(ident)
+
+    def ed(f):
+        return lambda b: (b / f3).write_bytes(f((b / f3).read_bytes()))
+    ls = lambda x: x.split(b"\n")
+    widen = lambda x: b"\n".join([ls(x)[0] + b",extra"] + [r + b",0" * (r != b"") for r in ls(x)[1:]])   # a 4th column throughout one file
+    R = A.Contradiction
+    PLANTS = {   # Contradiction -> (its plant: a spoil of curve_003.csv, the exact codes --check prints)
+        R.ENCODING_CONTRADICTS_PROFILE: (lambda x: x + b"\xff\n", {R.ENCODING_CONTRADICTS_PROFILE, R.WIDTH_CONTRADICTS_PROFILE, R.CELLS_CONTRADICT_PROFILE}),
+        R.DELIMITER_CONTRADICTS_PROFILE: (lambda x: x.replace(b",", b"\t"), {R.DELIMITER_CONTRADICTS_PROFILE}),
+        R.HEADER_CONTRADICTS_PROFILE: (lambda x: b"a title\n" + x, {R.HEADER_CONTRADICTS_PROFILE, R.COLUMN_CONTRADICTS_PROFILE, R.WIDTH_CONTRADICTS_PROFILE, R.FILES_CONTRADICT_PROFILE}),
+        R.COLUMN_CONTRADICTS_PROFILE: (lambda x: x.replace(b"T,C,sigma", b"T,Q,sigma", 1), {R.COLUMN_CONTRADICTS_PROFILE, R.FILES_CONTRADICT_PROFILE}),
+        R.CELLS_CONTRADICT_PROFILE: (lambda x: b"\n".join(ls(x)[:3] + [ls(x)[3].split(b",")[0] + b",n/a," + ls(x)[3].split(b",")[2]] + ls(x)[4:]), {R.CELLS_CONTRADICT_PROFILE}),
+        R.WIDTH_CONTRADICTS_PROFILE: (lambda x: b"\n".join(ls(x)[:3] + [ls(x)[3] + b",9"] + ls(x)[4:]), {R.WIDTH_CONTRADICTS_PROFILE}),
+        R.ORDER_CONTRADICTS_PROFILE: (lambda x: b"\n".join(ls(x)[:2] + [ls(x)[3], ls(x)[2]] + ls(x)[4:]), {R.ORDER_CONTRADICTS_PROFILE}),
+        R.REPEATS_CONTRADICT_PROFILE: (lambda x: b"\n".join(ls(x)[:3] + ls(x)[2:]), {R.REPEATS_CONTRADICT_PROFILE}),
+        R.FILES_CONTRADICT_PROFILE: (widen, {R.FILES_CONTRADICT_PROFILE}),
+    }
+    said = lambda out: {R[c] for c in re.findall(r"(?m)^  ([A-Z_]+) ", out)}
+    ident, (code, out) = plant()
+    check("T4 the clean bank (the control): --check prints 0 contradictions, exit 0", (code, out.strip()) == (0, f"profile {ident} --check: 0 contradictions"), out)
+    for row, (spoil, want) in PLANTS.items():
+        ident, (code, out) = plant(ed(spoil))
+        check(f"T4 {row.name}: its plant is refused by --check (exit 1) with exactly {sorted(w.name for w in want)}", code == 1 and said(out) == want
+              and f"{len(want)} contradictions" in out and f"{row.name} curve_" in out, out)
+    ident, (code, out) = plant(ed(PLANTS[R.REPEATS_CONTRADICT_PROFILE][0]), intake_plant.SAME_FAST)
+    check("T4 the REPEATS plant under identity SAME_FAST_VALUE (the control of its row): 0 contradictions, exit 0", code == 0 and "0 contradictions" in out, out)
+    p0 = json.loads((tmp / "declarations" / ident / "PROFILE.json").read_text())
+    d0 = P.format_stage((tmp / "declarations" / ident / "intake.toml").read_text(), (), t4).evidence.data
+    lost = {**p0, "files": [f for f in p0["files"] if f["name"] != f3]}
+    check("T4 FILE_NOT_PROFILED: a selected file the profile does not hold (a profile value with curve_003.csv taken out)",
+          [(c, f) for c, f, _ in A.against(lost, {}, d0)] == [(R.FILE_NOT_PROFILED, f3)], str(A.against(lost, {}, d0)))
+    fp = next(f for f in p0["files"] if f["name"] == f3)
+    book = {**p0, "files": [{**f, "kind": "XLSX", "tables": [], "sheets": [{"position": 2, "name": "other", "table": fp["tables"][0]}]} if f is fp else f for f in p0["files"]]}
+    xd = {**d0, "reader": {"name": "table-curve-v1", "comment": [], "format": {"kind": "XLSX", "sheet": "data"}, "header": {"kind": "NAMES", "rows": 1, "names": 1}}}
+    check("T4 SHEET_CONTRADICTS_PROFILE: a declared sheet ('data') not among a workbook's masked sheet names (a profile value: no openpyxl needed)",
+          R.SHEET_CONTRADICTS_PROFILE in {c for c, f, _ in A.against(book, {}, xd) if f == f3}, str(A.against(book, {}, xd)))
+    check("T4 every Contradiction row has its plant here", set(PLANTS) | {R.FILE_NOT_PROFILED, R.SHEET_CONTRADICTS_PROFILE} == set(R), str(set(R) - set(PLANTS)))
+    ident, (code, out) = plant(profiled=False)
+    check("T4 --check with no PROFILE.json: PROFILE_ABSENT, exit 1", code == 1 and "PROFILE_ABSENT" in out, out)
+    ident, (code, out) = plant(edit=lambda x: x.replace("\n[reader]\n", "\n[readerx]\n", 1))
+    check("T4 --check on a declaration S0 refuses: REFUSE <reason>, exit 1", code == 1 and " REFUSE " in out and "does not pass FORMAT" in out, out)
 
 print("test_intake_profile:", "all passed" if not bad else f"{len(bad)} FAILED: {bad}")
 sys.exit(1 if bad else 0)

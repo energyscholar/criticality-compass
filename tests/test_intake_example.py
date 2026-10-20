@@ -44,7 +44,9 @@ check("6. S0 FORMAT passes (needs the toolset through CC_DATA_ROOT for the trans
 check("6. S2 SEAL passes SEALED: the committed SEAL.json and seal.log hold the declaration's sha (plan 1139: the seal is advisory)", out["S2"].mark is intake.Mark.PASSED and out["S2"].result.evidence.status.name == "SEALED", out["S2"].text(t)[:300])
 # plan 1160 A40 (was: S3 refuses ROOT_UNRESOLVED, PRIMARY_REFUSED_AT S3, S10 withheld after S3): the bank '<p1118-bank>' is a name of
 # intake/ROOTS.toml (the committed fixture), so S3 admits the 61 empty files and S4 refuses READER_NOT_LIVE (npz-curve-v1 is not live);
-# every stage that needs it is withheld.
+# every stage that needs it is withheld. (plan 1165) S3 needs a PROFILE.json: the example carries the committed PROFILE.json and PROFILE.md
+# of `bin/cc intake profile dial1118-s1-v5 <p1118-bank>` (64 files, the 61 npz UNPROFILED_FORMAT; npz-curve-v1 is no reader against()
+# checks, so 0 contradictions), and the committed report carries its Profile line.
 check("6. (1160 A40) S3 passes on the fixture (61 files, each 0 bytes)", out["S3"].mark is intake.Mark.PASSED and len(out["S3"].result.evidence.files) == 61
       and all(f.data == b"" for f in out["S3"].result.evidence.files), out["S3"].text(t)[:300])
 check("6. (1160 A40) S4 refuses READER_NOT_LIVE", out["S4"].mark is intake.Mark.REFUSED and out["S4"].result.reason == "READER_NOT_LIVE", out["S4"].text(t)[:300])

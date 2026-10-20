@@ -1,4 +1,4 @@
-# The intake pipeline (stage table 1160-v11, policy 1136-v1)
+# The intake pipeline (stage table 1165-v1, policy 1136-v1)
 
 Generated from intake/STAGES.toml and intake/POLICY.toml by `bin/cc intake explain` (docs/gen-intake.py); never edit it by hand.
 This is the intake's explain. `bin/cc explain <input> <point>` is a different command: it explains one point of a measured input.
@@ -106,6 +106,10 @@ Each selected file is admitted before it is read, read once through the logged l
 | PATH_NOT_A_FILE | live | A selected name is not a file under the source root (absent, or a directory); nothing was read. |
 | PIN_MISMATCH | live | The file's bytes do not match their pinned sha256; the data changed since they were pinned. |
 | UNIVERSE_CHANGED | live | The source universe now lists files that differ from the sealed listing (added, removed, or resized). |
+| PROFILE_ABSENT | live | The declaration has no PROFILE.json: profile the files before declaring them (`bin/cc intake profile <id> <root-named path>`, docs/INTAKE-PREPROCESSING.md) (plan 1165). |
+| PROFILE_STALE | live | A pinned file is not in the profile, or its sha256 is not the profile's: the files changed since they were profiled; profile them again (plan 1165). |
+| MANIFEST_STALE | live | The bank's CONVERSION-MANIFEST.json is not the one the seal recorded (its sha256 differs, or it appeared or went): every file the run reads is in a sha check, the manifest included (plan 1165 A1). |
+| PROFILE_CONTRADICTED | live | The declaration contradicts the profile of its files (`bin/cc intake profile <id> --check` lists every contradiction); the first is named, and the rest are counted (plan 1165). |
 
 ## S4 SHAPE (LIVE)
 

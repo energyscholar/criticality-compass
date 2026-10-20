@@ -45,6 +45,13 @@ def explain(t):
     return "\n".join(out) + "\n"
 
 
+def profiled(t, out):
+    """The report's Profile line (plan 1165) from S3: PROFILED <sha256 prefix 12> (n files, m findings, 0 contradictions) | NOT PROFILED (S3 refused PROFILE_ABSENT) | not reported, with S3's text."""
+    s3 = out[[s["id"] for s in t["stages"]["stage"] if s["name"] == "SOURCE_INTEGRITY"][0]]
+    return {(True, False): lambda: (lambda p: f"PROFILED {p['sha256'][:12]} ({len(p['files'])} files, {len(p['findings'])} findings, 0 contradictions)")(s3.result.evidence.profile),
+            (False, True): lambda: "NOT PROFILED", (False, False): lambda: "not reported: " + s3.text(t)}[(s3.mark is Mark.PASSED, s3.mark is Mark.REFUSED and s3.result.reason == "PROFILE_ABSENT")]()
+
+
 def report(t, ident, out, note):
     """intake-report.md of a run: the verdicts, the seal status and the ordering note (`note`, an (Ordering, sentence) read after the run), then
     every stage in plain sentences, then the seal claim and what no stage can see."""
@@ -60,7 +67,7 @@ def report(t, ident, out, note):
              f"- **{handoff} {names[handoff]}** (the terminal; it counts toward PRIMARY): {out[handoff].atom.name}.",
              "- **Seal status** (advisory; sealing is recommended and not enforced): " + {True: lambda: out[seal].result.evidence.summary(),
                                                                                            False: lambda: "not reported: " + out[seal].text(t)}[out[seal].mark is Mark.PASSED](),
-             f"- **Ordering** (information, never a refusal): {note[0].name}. {note[1]}"]
+             f"- **Profile** (plan 1165): {profiled(t, out)}", f"- **Ordering** (information, never a refusal): {note[0].name}. {note[1]}"]
     lines += {True: [f"- **confirmation**: {t['stages']['report']['confirmation']}"], False: []}["confirmation" in p.missing]
     lines += ["",
              "| stage | name | state | reads data bytes | execution |", "|---|---|---|---|---|"]
