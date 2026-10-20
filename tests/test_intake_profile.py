@@ -41,6 +41,8 @@
      CELLS_CONTRADICT_PROFILE, its text naming D2: BLOCKS.
  F2  (fix S11.P2b) the encoding is total by FileKind: a zip and an xlsx (by content) are NOT_APPLICABLE, never UNDECODABLE; an empty and a
      binary file UNDECODABLE; a text file one of the four decodings (T1's zip row now expects NOT_APPLICABLE: an existing test edited).
+ F3  (fix S11.P2b) a text file with no numeric row run (a README, a script) raises NOT_A_TABLE and no HEADER / COMMENT / DELIMITER finding;
+     the same head over a numeric body raises exactly DELIMITER_NOT_COMMA, HEADER_LINES_BEFORE_NAMES (1-4) and COMMENT_LINES (1-2).
  F1  (fix S11.P2b) the splitter is total over line length: a SEMICOLON file whose third line holds one 200 000-character field (beyond the
      csv module's default field limit, 131 072) profiles in a fresh process (only intake_profile imported) to its exact rows.
 Seen RED (each mutation applied by hand, the test run, the mutation reverted):
@@ -68,6 +70,8 @@ Seen RED (each mutation applied by hand, the test run, the mutation reverted):
  - F1: the limit line (`csv.field_size_limit(sys.maxsize)` in cc/intake_convert.py) deleted, the old splitter: FAIL "F1 a 200 000-character
    field ...: _csv.Error: field larger than field limit (131072)".
  - F2: KINDS' XLSX row given "UNDECODABLE" again: FAIL "F2 the encoding by FileKind ..."; its ZIP row: the same FAIL and T1's zip row.
+ - F3: RAISES' NOT_A_TABLE row made `not texts(f)`: FAIL "F3 a text file with no numeric row ...: [...]"; COMMENT_LINES back on per_table:
+   the same FAIL (COMMENT_LINES (1, 2) on the bodiless file); DELIMITER_NOT_COMMA back on texts(f): the same FAIL (DELIMITER_NOT_COMMA).
 """
 import contextlib
 import hashlib
@@ -396,6 +400,15 @@ ENC = {"TEXT_TABLE": {"UTF8", "UTF8_SIG", "UTF16", "LATIN1_ONLY"}, "XLSX": {"NOT
 got = [(f.kind, f.encoding) for f in (P.profiled(f"p{i}", raw) for i, (_, raw, *_) in enumerate(T1_PLANTS + [("xlsx", BOOK.getvalue())]))]
 check("F2 the encoding by FileKind: a zip and an xlsx NOT_APPLICABLE, an empty or binary file UNDECODABLE, a text file a decoding",
       set(ENC) == {k.name for k in P.FileKind} and all(e in ENC[k] for k, e in got) and {"XLSX", "ZIP", "UNPROFILED_FORMAT", "TEXT_TABLE"} <= {k for k, _ in got}, str(got))
+
+# ---- F3 (fix S11.P2b): NOT_A_TABLE, and no head finding of a file with no body
+HEAD = b"% readme; the data is in t.csv\n% a note; two cells\nfunction y = f(x); end\nT;C\nsee the paper; units K\n"
+of = lambda name, fs: [(x.code, x.lines) for x in P.findings(fs) if x.file == name]
+got = of("readme.txt", (P.profiled("readme.txt", HEAD), P.profiled("t.csv", b"T,C\n1,2\n3,4\n")))
+check("F3 a text file with no numeric row raises NOT_A_TABLE and no HEADER / COMMENT / DELIMITER finding", got == [("NOT_A_TABLE", ())], str(got))
+got = of("t.txt", (P.profiled("t.txt", HEAD + b"1;2\n3;4\n"), P.profiled("u.csv", b"T,C\n1,2\n3,4\n")))
+check("F3 the same head over a numeric body: DELIMITER_NOT_COMMA, HEADER_LINES_BEFORE_NAMES 1-4, COMMENT_LINES 1-2", got ==
+      [("DELIMITER_NOT_COMMA", ()), ("HEADER_LINES_BEFORE_NAMES", (1, 4)), ("COMMENT_LINES", (1, 2))], str(got))
 
 # ---- F1 (fix S11.P2b): the splitter total over line length, in a fresh process (the limit is the process's, set where SPLIT is)
 LONG = "import sys; sys.path[:0] = [sys.argv[1]]; import intake_profile as P; t = P.profiled('long.csv', b'T;C\\n1;2\\n3;' + b'x' * 200000 + b'\\n4;5\\n').tables[0]; print(t.delimiter, [(r.first, r.last, r.kind, r.width) for r in t.rows])"

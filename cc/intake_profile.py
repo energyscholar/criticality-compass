@@ -20,61 +20,25 @@ from pathlib import Path
 import intake_bytes
 from intake_blind import Absent, Refuse, detail, format_stage, gate
 from intake_convert import MANIFEST, SPLIT, _book_names, _decoded, _manifest, _split, _zipped, sheet_rows
+from intake_findings import NUMERIC_KINDS, RAISES, RESPONSE, Finding, FindingKind, Response, body, findings, frozen, tables_of   # (fix F3) the findings' own role
 from intake_names import NUMBER, Name, _runs, classify, masked, repeats
 
 FileKind = enum.Enum("FileKind", "TEXT_TABLE XLSX ZIP UNPROFILED_FORMAT")   # by content, never by extension (plan 1165 2.2)
 Encoding = enum.Enum("Encoding", "UTF8 UTF8_SIG UTF16 LATIN1_ONLY UNDECODABLE NOT_APPLICABLE")   # by FileKind (KINDS): a text decoding; UNDECODABLE (empty or binary); NOT_APPLICABLE (a zip, an xlsx)
 Delimiter = enum.Enum("Delimiter", "COMMA SEMICOLON TAB WHITESPACE NONE")   # the election's tie order is this order
 RowKind = enum.Enum("RowKind", "BLANK NUMERIC NUMERIC_WITH_EMPTY TEXT")
-FindingKind = enum.Enum("FindingKind", "ENCODING_NOT_UTF8 BOM_PRESENT DELIMITER_NOT_COMMA NO_DELIMITER HEADER_LINES_BEFORE_NAMES NAMES_LINE_ABSENT "
-                        "NAMES_LINE_NUMERIC COMMENT_LINES TEXT_RUN_IN_BODY TEXT_RUN_TRAILING TEXT_CELLS_IN_COLUMN EMPTY_CELLS_IN_COLUMN WIDTH_CHANGES "
-                        "COLUMNS_DIFFER_ACROSS_FILES NOT_MONOTONE DIRECTION_DESCENDING EQUAL_RUNS_SHORT EQUAL_RUN_LONG REVISITED_VALUES XLSX_SHEETS "
-                        "ZIP_MEMBERS UNPROFILED_FORMAT LARGE_FILE ONE_FILE")
-Response = enum.Enum("Response", "CONVERT DECLARE BLOCKS REFUSE_DEPOSIT NONE")
-C = Response
-RESPONSE = {   # plan 1165 section 4: FindingKind -> (its one response, what it prints, the "or ..." it prints second, "" none); total (test)
-    "ENCODING_NOT_UTF8": (C.CONVERT, "DECODE encoding = latin-1 / utf-16", ""),
-    "BOM_PRESENT": (C.NONE, "the readers and DECODE's default strip it", ""),
-    "DELIMITER_NOT_COMMA": (C.CONVERT, "DELIMITER from = the elected delimiter", "[reader.format] kind TAB / WHITESPACE, when the reader has it"),
-    "NO_DELIMITER": (C.REFUSE_DEPOSIT, "NOT_A_TABLE", ""),
-    "HEADER_LINES_BEFORE_NAMES": (C.CONVERT, "DROP_LINES MARKER / FIRST count = the lines before the names line", "[reader.header] rows = n"),
-    "NAMES_LINE_ABSENT": (C.CONVERT, "NAMES_LINE WRITE names = ...", ""),
-    "NAMES_LINE_NUMERIC": (C.CONVERT, "WIDE_TO_LONG key = ...", ""),
-    "COMMENT_LINES": (C.DECLARE, "comment = [the prefix]", "DROP_LINES PREFIX"),
-    "TEXT_RUN_IN_BODY": (C.BLOCKS, "SPLIT_ROWS RANGES at the run's lines; each NUMERIC run its own output (a curve)",
-                         "DROP_LINES PREFIX, when every line of the run shares a comment prefix"),
-    "TEXT_RUN_TRAILING": (C.BLOCKS, "SPLIT_ROWS RANGES ending at the last NUMERIC line", ""),
-    "TEXT_CELLS_IN_COLUMN": (C.DECLARE, "another column, when another column has no text cell", "DROP_ROWS_NOT_NUMERIC (a lone TEXT cell; never a TEXT run)"),
-    "EMPTY_CELLS_IN_COLUMN": (C.CONVERT, "DROP_ROWS_NOT_NUMERIC columns = [k] (a blank is a reading not taken, never a zero)", ""),
-    "WIDTH_CHANGES": (C.BLOCKS, "SPLIT_ROWS RANGES where the widths bound blocks", "SELECT_COLUMNS, when the extra columns are trailing empties"),
-    "COLUMNS_DIFFER_ACROSS_FILES": (C.DECLARE, "[selection] files per family, with SELECT_COLUMNS / RENAME to one names line", ""),
-    "NOT_MONOTONE": (C.DECLARE, "[acquisition] row_order = ACQUISITION, direction = UNORDERED (a dithering knob)", "BLOCKS when the runs are sweeps (FAST_RESTART, or RANGES per run)"),
-    "DIRECTION_DESCENDING": (C.DECLARE, "row_order = DESCENDING", ""),
-    "EQUAL_RUNS_SHORT": (C.DECLARE, "[replicate] identity = SAME_FAST_VALUE", ""),
-    "EQUAL_RUN_LONG": (C.BLOCKS, "the hold is a segment: RANGES around it, or excluded", ""),
-    "REVISITED_VALUES": (C.DECLARE, "[knobs.fast] control = MEASURED", ""),
-    "XLSX_SHEETS": (C.CONVERT, "SHEET_TO_CSV sheet = one of the sheets", "[reader.format] kind = XLSX, sheet = ..."),
-    "ZIP_MEMBERS": (C.CONVERT, "UNPACK member = ... per member", ""),
-    "UNPROFILED_FORMAT": (C.REFUSE_DEPOSIT, "NO_READER_FOR_FORMAT (the alphabet has no reader; the card's reader_needed says so)", ""),
-    "LARGE_FILE": (C.NONE, "expect the conversion's cost", ""),
-    "ONE_FILE": (C.DECLARE, "[selection] layout = LONG_TABLE, slow COLUMN from the column of fewest distinct values and longest equal runs", ""),
-}
 CUT = {d: SPLIT[d] for d in ("COMMA", "SEMICOLON", "TAB", "WHITESPACE")}   # Delimiter -> one line to its cells, in the election's tie order (NONE:
 # the line is one cell); the converter's own DELIMITER cuts, so a profile's widths are the widths DELIMITER from = d gives
 ENCODINGS = (   # (Encoding, does it hold, DECODE's name): the first that holds decodes the file (plan 1165 2.2); a BOM is structure, read first
     ("UTF8_SIG", lambda r: r.startswith(b"\xef\xbb\xbf"), "utf-8-sig"), ("UTF16", lambda r: r[:2] in (b"\xff\xfe", b"\xfe\xff"), "utf-16"),
     ("UTF8", lambda r: True, "utf-8"), ("LATIN1_ONLY", lambda r: True, "latin-1"))   # latin-1 decodes every byte: LATIN1_ONLY is "not UTF-8"
 BINARY = re.compile("[\x00-\x08\x0e-\x1f\x7f]")   # a decoded control character no text table holds: the bytes are a binary format
-NUMERIC_KINDS = ("NUMERIC", "NUMERIC_WITH_EMPTY")
 BIN = {2: 0, **{n: 1 for n in range(3, 10)}, 10: 2}   # an equal run's length (10 for 10 or more) -> its equal_runs bin (2, 3-9, 10+); a run of 1 none
 DIRECTION = {None: "FLAT", True: "ASCENDING", False: "DESCENDING"}   # the first step of a column's numbers (equal values merged) -> first_direction
 READER_ABSENT = "NONE_READER_ABSENT"   # an XLSX's `sheets` on a machine without openpyxl (XLSX_READER_ABSENT: the kind stays XLSX)
 CLASSES = ("#", "%", ";", "//", "!", "[")   # comment prefix classes: a line's first characters (the reader's own test, startswith)
 
 
-def frozen(name, fields, doc):
-    """A frozen dataclass of typed fields ((name, type) or (name, type, default)): the profile's types (plan 1165 section 3)."""
-    return make_dataclass(name, [f[:2] + tuple(field(default=d) for d in f[2:]) for f in fields], frozen=True, namespace={"__doc__": doc})
 
 
 RowRun = frozen("RowRun", [("first", int), ("last", int), ("kind", str), ("width", int), ("prefix", str), ("numbers", int)],
@@ -95,8 +59,6 @@ FileProfile = frozen("FileProfile", [("name", str), ("bytes", int), ("sha256", s
                      "One file: `tables` its one Table (a TEXT_TABLE); `sheets` an XLSX's Sheets (or READER_ABSENT); `members` a ZIP's (masked name, size).")
 Sheet = frozen("Sheet", [("position", int), ("name", str), ("rows", int), ("columns", int), ("table", object)],
                "One sheet of an XLSX: its 1-based position (the address `sheet = k` takes), its masked name, its row and column counts, its Table.")
-Finding = frozen("Finding", [("code", str), ("file", str), ("sheet", int), ("lines", tuple), ("column", int), ("response", str), ("does", str), ("otherwise", str)],
-                 "A FindingKind atom where it is (file; sheet position or 0; lines [first, last] or none; column or 0) and its RESPONSE row.")
 Profile = frozen("Profile", [("path", str), ("files", tuple), ("findings", tuple)], "The profile of a root-named path: its files in listing order, its findings.")
 
 
@@ -229,60 +191,6 @@ def listing(base):
     return sorted(q.relative_to(base).as_posix() for q in Path(base).rglob("*") if q.is_file())
 
 
-def tables_of(f):
-    """(sheet position, Table) of a file: its text table (sheet 0) or each sheet of an XLSX."""
-    return [(0, t) for t in f.tables] + [(x.position, x.table) for x in {True: f.sheets, False: ()}[isinstance(f.sheets, tuple)]]
-
-
-def body(t):
-    """(the first NUMERIC line, the last NUMERIC run's first and last lines, the names line: the last TEXT line before the body, 0 for none)."""
-    nr = [r for r in t.rows if r.kind in NUMERIC_KINDS] or [RowRun(t.lines + 1, t.lines + 1, "", 0, "", 0)]
-    return nr[0].first, nr[-1].first, nr[-1].last, max([r.last for r in t.rows if r.kind == "TEXT" and r.last < nr[0].first], default=0)
-
-
-def runs(t, where):
-    """The lines of t's whole-text runs (no numeric cell) that `where(first line of body, first and last line of the last NUMERIC run)` holds."""
-    b = body(t)
-    return [((r.first, r.last), 0) for r in t.rows if r.kind == "TEXT" and r.numbers == 0 and where(r, *b[:3])]
-
-
-span = lambda ls: {True: lambda: (ls[0][0], ls[-1][1]), False: tuple}[len(ls) > 0]()
-per_file = lambda holds: lambda fs: [(f.name, 0, (), 0) for f in fs if holds(f)]
-per_table = lambda found: lambda fs: [(f.name, k, ls, c) for f in fs for k, t in tables_of(f) for ls, c in found(t)]
-per_column = lambda holds, lines=lambda c: (): per_table(lambda t: [(span(lines(c)), c.position) for c in t.columns if holds(c)])
-texts = lambda f: [t for t in f.tables if f.kind == "TEXT_TABLE"]
-shape = lambda f: [([c.name for c in t.columns], len(t.columns)) for t in f.tables]   # a text file's masked names line and dominant width
-RAISES = {   # FindingKind -> (the profiled files) -> [(file, sheet, lines, column)] where its structure (plan 1165 section 4) is; total (test)
-    "ENCODING_NOT_UTF8": per_file(lambda f: f.encoding in ("LATIN1_ONLY", "UTF16")), "BOM_PRESENT": per_file(lambda f: f.encoding == "UTF8_SIG"),
-    "DELIMITER_NOT_COMMA": per_file(lambda f: any(t.delimiter in ("SEMICOLON", "TAB", "WHITESPACE") for t in texts(f))),
-    "NO_DELIMITER": per_file(lambda f: any(t.delimiter == "NONE" for t in texts(f))),
-    "HEADER_LINES_BEFORE_NAMES": per_table(lambda t: [((1, body(t)[3] - 1), 0) for _ in range(int(len([r for r in t.rows if r.kind != "BLANK" and r.last < body(t)[3]]) > 0))]),
-    "NAMES_LINE_ABSENT": per_table(lambda t: [((), 0) for _ in range(int(body(t)[3] == 0 and body(t)[0] <= t.lines))]),
-    "NAMES_LINE_NUMERIC": per_table(lambda t: [((body(t)[3], body(t)[3]), 0) for h in t.header_lines if h.line == body(t)[3]
-                                               and len(h.cells) >= 3 and sum(bool(re.fullmatch(r"#\d+", c)) for c in h.cells) >= len(h.cells) - 1]),
-    "COMMENT_LINES": per_table(lambda t: [((r.first, r.last), 0) for r in t.rows if r.prefix != ""]),
-    "TEXT_RUN_IN_BODY": per_table(lambda t: runs(t, lambda r, first, last0, last1: first < r.first < last0)),
-    "TEXT_RUN_TRAILING": per_table(lambda t: runs(t, lambda r, first, last0, last1: r.first > last1)),
-    "TEXT_CELLS_IN_COLUMN": per_column(lambda c: c.text > 0, lambda c: c.text_lines),
-    "EMPTY_CELLS_IN_COLUMN": per_column(lambda c: c.empty > 0, lambda c: c.empty_lines),
-    "WIDTH_CHANGES": per_table(lambda t: [((r.first, r.last), 0) for r in t.rows if r.kind in NUMERIC_KINDS and r.width != len(t.columns)]),
-    "COLUMNS_DIFFER_ACROSS_FILES": lambda fs: [(f.name, 0, (), 0) for f in fs if [shape(f)] != [shape(g) for g in fs if texts(g)][:1] and texts(f)],
-    "NOT_MONOTONE": per_column(lambda c: c.monotone_runs > 1),
-    "DIRECTION_DESCENDING": per_column(lambda c: c.monotone_runs == 1 and c.first_direction == "DESCENDING"),
-    "EQUAL_RUNS_SHORT": per_column(lambda c: c.equal_runs[0] + c.equal_runs[1] > 0 and c.revisited == 0),
-    "EQUAL_RUN_LONG": per_column(lambda c: c.longest >= 10), "REVISITED_VALUES": per_column(lambda c: c.revisited > 0),
-    "XLSX_SHEETS": per_file(lambda f: f.kind == "XLSX"), "ZIP_MEMBERS": per_file(lambda f: f.kind == "ZIP"),
-    "UNPROFILED_FORMAT": per_file(lambda f: f.kind == "UNPROFILED_FORMAT"),
-    "LARGE_FILE": per_file(lambda f: any(t.lines >= 10000 for _, t in tables_of(f))),
-    "ONE_FILE": lambda fs: [(f.name, 0, (), 0) for f in fs if f.kind == "TEXT_TABLE" and sum(g.kind == "TEXT_TABLE" for g in fs) == 1],
-}
-
-
-def findings(files):
-    """Every finding of the profiled files, in file order then FindingKind order, each with its response from RESPONSE (computed, never chosen)."""
-    order = {f.name: i for i, f in enumerate(files)}
-    found = [(order[f], k.value, Finding(k.name, f, s, ls, c, RESPONSE[k.name][0].name, *RESPONSE[k.name][1:])) for k in FindingKind for f, s, ls, c in RAISES[k.name](files)]
-    return tuple(x for _, _, x in sorted(found, key=lambda x: x[:2]))
 
 
 def profile(root, ident, path, t, out="PROFILE.json"):
