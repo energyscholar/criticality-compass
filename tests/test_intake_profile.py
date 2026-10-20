@@ -48,6 +48,8 @@
      COLUMNS_DIFFER_ACROSS_FILES its names line and the first TABLE file it is compared against (a README listed first is not it);
      ENCODING_NOT_UTF8 the lines utf-8 cannot read (LATIN1_ONLY) or the whole file (UTF16); PROFILE.md prints 12 ranges, "+N more in
      PROFILE.json", and "against <file>". (T3's two-file expectations now carry ranges and compared: an existing test edited.)
+ F5  (fix S11.P2b) ONE_FILE counts TABLE files (a text file with a numeric row run): a converted bank of one csv beside its
+     CONVERSION-MANIFEST.json raises ONE_FILE on the csv; two table files raise none.
  F1  (fix S11.P2b) the splitter is total over line length: a SEMICOLON file whose third line holds one 200 000-character field (beyond the
      csv module's default field limit, 131 072) profiles in a fresh process (only intake_profile imported) to its exact rows.
 Seen RED (each mutation applied by hand, the test run, the mutation reverted):
@@ -82,6 +84,8 @@ Seen RED (each mutation applied by hand, the test run, the mutation reverted):
    LATIN1_ONLY row `lambda ls: ()`: FAIL "F4 the run findings ..."; md's ranges[:12] made [:1]: FAIL "F4 PROFILE.md prints ..."; COLUMNS_DIFFER
    against `fs[:1]`: FAIL "F4 the run findings ...: [('COLUMNS_DIFFER_ACROSS_FILES', 't.csv', (1, 1), 0, ((1, 1),), 'readme.txt'), ..."; the
    EQUAL_RUNS_SHORT where made `lambda c: ()`: FAIL "T3 ..." and FAIL "F4 the run findings ...: [... ('EQUAL_RUNS_SHORT', 't.csv', (), 2, (), '')".
+ - F5: ONE_FILE's count back on `g.kind == "TEXT_TABLE"` (and its holds on f.kind): FAIL "F5 a bank of one csv beside its
+   CONVERSION-MANIFEST.json raises ONE_FILE on the csv: []".
 """
 import contextlib
 import hashlib
@@ -438,6 +442,13 @@ check("F4 PROFILE.md prints each range (12, then +N more in PROFILE.json) and 'a
       in said and "COLUMNS_DIFFER_ACROSS_FILES: u.csv lines 1-1 against t.csv" in said and "lines 2-3, 3-4, 4-5, 5-6, 6-7, 7-8, 8-9, 9-10, 10-11, 11-12, "
       "12-13, 13-14 (+2 more in PROFILE.json)" in P.md(P.Profile("x", (), (P.Finding("NOT_MONOTONE", "f", 0, (2, 16), 1, "DECLARE", "", "",
       tuple((n, n + 1) for n in range(2, 16))),)), "sha"), said)
+
+# ---- F5 (fix S11.P2b): ONE_FILE counts table files
+MAN = b'{"time": "2026-10-19T00:00:00Z", "files": [{"from": "a.dat", "to": "t.csv", "steps": []}], "units": []}\n'
+got = [(x.code, x.file) for x in P.findings((P.profiled("CONVERSION-MANIFEST.json", MAN), P.profiled("t.csv", b"T,C\n1,2\n2,3\n"))) if x.code == "ONE_FILE"]
+check("F5 a bank of one csv beside its CONVERSION-MANIFEST.json raises ONE_FILE on the csv", got == [("ONE_FILE", "t.csv")], str(got))
+got = [x.code for x in P.findings((P.profiled("s.csv", b"T,C\n1,2\n2,3\n"), P.profiled("t.csv", b"T,C\n1,2\n2,3\n"))) if x.code == "ONE_FILE"]
+check("F5 two table files raise no ONE_FILE", got == [], str(got))
 
 # ---- F1 (fix S11.P2b): the splitter total over line length, in a fresh process (the limit is the process's, set where SPLIT is)
 LONG = "import sys; sys.path[:0] = [sys.argv[1]]; import intake_profile as P; t = P.profiled('long.csv', b'T;C\\n1;2\\n3;' + b'x' * 200000 + b'\\n4;5\\n').tables[0]; print(t.delimiter, [(r.first, r.last, r.kind, r.width) for r in t.rows])"

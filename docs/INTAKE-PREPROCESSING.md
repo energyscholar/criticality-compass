@@ -94,7 +94,7 @@ first table file of the path it differs from. PROFILE.md prints the first 12 ran
 | ZIP_MEMBERS | `kind` ZIP | CONVERT(UNPACK member = …) per member | SOURCE_FILE_ABSENT; CONTAINER_UNREADABLE |
 | UNPROFILED_FORMAT | `kind` UNPROFILED_FORMAT | REFUSE_DEPOSIT(NO_READER_FOR_FORMAT) — the alphabet has no op; the card's `reader_needed` says so | ROOT_UNRESOLVED-class dead ends; the HDF5/mat/NeXus sets of INDEX.md |
 | LARGE_FILE | `lines ≥ 10 000` in a TEXT_TABLE | NONE — printed so the declarer expects the conversion's cost (Z19: tens of thousands of rows; DIAG item 2's fix is separate) | r3 defect 3 (28 min) |
-| ONE_FILE | the path holds one TEXT_TABLE | DECLARE(`[selection] layout = LONG_TABLE`) with `slow` COLUMN from the column whose `distinct` is smallest and `equal_runs` longest | TOO_FEW_CURVES on a PER_FILE of one file |
+| ONE_FILE | the path holds one table file: a TEXT_TABLE with a NUMERIC run (fix S11.P2b F5: a manifest or README beside it is not counted) | DECLARE(`[selection] layout = LONG_TABLE`) with `slow` COLUMN from the column whose `distinct` is smallest and `equal_runs` longest | TOO_FEW_CURVES on a PER_FILE of one file |
 | NOT_A_TABLE | a TEXT_TABLE file with no NUMERIC run (a README, a script, a CONVERSION-MANIFEST.json); it raises no DELIMITER / NO_DELIMITER / HEADER / COMMENT finding (those are of a table's head, and it has no body) | DECLARE(`[selection] files` without it: no numeric row, so no curve) | (fix S11.P2b F3; before it, such a file raised HEADER / COMMENT / DELIMITER noise) |
 
 (The table is plan 1165 §4 verbatim. The owner ruled D2 on 2026-10-19: DROP_ROWS_NOT_NUMERIC stays for EMPTY cells and for a lone

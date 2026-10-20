@@ -108,7 +108,8 @@ RAISES = {   # FindingKind -> (the profiled files) -> [(file, sheet, lines, colu
     "XLSX_SHEETS": per_file(lambda f: f.kind == "XLSX"), "ZIP_MEMBERS": per_file(lambda f: f.kind == "ZIP"),
     "UNPROFILED_FORMAT": per_file(lambda f: f.kind == "UNPROFILED_FORMAT"),
     "LARGE_FILE": per_file(lambda f: any(t.lines >= 10000 for _, t in tables_of(f))),
-    "ONE_FILE": lambda fs: [(f.name, 0, (), 0, "") for f in fs if f.kind == "TEXT_TABLE" and sum(g.kind == "TEXT_TABLE" for g in fs) == 1],
+    "ONE_FILE": lambda fs: [(f.name, 0, (), 0, "") for f in fs if bodied(f) and sum(len(bodied(g)) for g in fs) == 1],   # (fix F5) one TABLE file: a
+    # manifest, README or script beside it is no table (it counted TEXT_TABLE, so a bank's CONVERSION-MANIFEST.json hid ONE_FILE on every one-csv bank)
     "NOT_A_TABLE": per_file(lambda f: f.kind == "TEXT_TABLE" and not bodied(f)),   # (fix F3) a text file with no numeric row run
 }
 
