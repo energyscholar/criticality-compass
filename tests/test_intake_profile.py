@@ -43,6 +43,11 @@
      binary file UNDECODABLE; a text file one of the four decodings (T1's zip row now expects NOT_APPLICABLE: an existing test edited).
  F3  (fix S11.P2b) a text file with no numeric row run (a README, a script) raises NOT_A_TABLE and no HEADER / COMMENT / DELIMITER finding;
      the same head over a numeric body raises exactly DELIMITER_NOT_COMMA, HEADER_LINES_BEFORE_NAMES (1-4) and COMMENT_LINES (1-2).
+ F4  (fix S11.P2b) where, value-free: the run findings carry each [first, last] line range (NOT_MONOTONE each segment, EQUAL_RUNS_SHORT
+     each run of 2-9, EQUAL_RUN_LONG each run of 10+, REVISITED_VALUES each run of a value seen before), lines their span;
+     COLUMNS_DIFFER_ACROSS_FILES its names line and the first TABLE file it is compared against (a README listed first is not it);
+     ENCODING_NOT_UTF8 the lines utf-8 cannot read (LATIN1_ONLY) or the whole file (UTF16); PROFILE.md prints 12 ranges, "+N more in
+     PROFILE.json", and "against <file>". (T3's two-file expectations now carry ranges and compared: an existing test edited.)
  F1  (fix S11.P2b) the splitter is total over line length: a SEMICOLON file whose third line holds one 200 000-character field (beyond the
      csv module's default field limit, 131 072) profiles in a fresh process (only intake_profile imported) to its exact rows.
 Seen RED (each mutation applied by hand, the test run, the mutation reverted):
@@ -72,6 +77,11 @@ Seen RED (each mutation applied by hand, the test run, the mutation reverted):
  - F2: KINDS' XLSX row given "UNDECODABLE" again: FAIL "F2 the encoding by FileKind ..."; its ZIP row: the same FAIL and T1's zip row.
  - F3: RAISES' NOT_A_TABLE row made `not texts(f)`: FAIL "F3 a text file with no numeric row ...: [...]"; COMMENT_LINES back on per_table:
    the same FAIL (COMMENT_LINES (1, 2) on the bodiless file); DELIMITER_NOT_COMMA back on texts(f): the same FAIL (DELIMITER_NOT_COMMA).
+ - F4: order()'s segment starts `starts(ks)[1:]`: FAIL "F4 the run findings ...: [('NOT_MONOTONE', 't.csv', (5, 21), 1, ((5, 19), (20, 21)), ...",
+   FAIL "T3 the two-file plant ..." and FAIL "F4 PROFILE.md prints ..."; revisited `first[k] <= i`: FAIL "F4 the run findings ..."; ENCODING_LINES'
+   LATIN1_ONLY row `lambda ls: ()`: FAIL "F4 the run findings ..."; md's ranges[:12] made [:1]: FAIL "F4 PROFILE.md prints ..."; COLUMNS_DIFFER
+   against `fs[:1]`: FAIL "F4 the run findings ...: [('COLUMNS_DIFFER_ACROSS_FILES', 't.csv', (1, 1), 0, ((1, 1),), 'readme.txt'), ..."; the
+   EQUAL_RUNS_SHORT where made `lambda c: ()`: FAIL "T3 ..." and FAIL "F4 the run findings ...: [... ('EQUAL_RUNS_SHORT', 't.csv', (), 2, (), '')".
 """
 import contextlib
 import hashlib
@@ -216,11 +226,14 @@ print(f"  openpyxl {'installed' if HAS_XLSX else 'NOT installed'} on this machin
 check("T3 RAISES is total over FindingKind", set(P.RAISES) == {k.name for k in P.FindingKind}, str(set(P.RAISES) ^ {k.name for k in P.FindingKind}))
 A_CSV = b"# Title\nh = 5 T\nT,C,S\n1,2,3\n2,n/a,4\n3,,5\nT,C,S\n9,8,7\n8,7,6\n\nend\n"
 B_CSV = b"T;C\n1;2\n1;2\n1;2\n"
-got = [(x.code, x.file, x.lines, x.column) for x in P.findings((P.profiled("a.csv", A_CSV), P.profiled("b.csv", B_CSV)))]
-want = [("HEADER_LINES_BEFORE_NAMES", "a.csv", (1, 2), 0), ("COMMENT_LINES", "a.csv", (1, 1), 0), ("TEXT_RUN_IN_BODY", "a.csv", (7, 7), 0),
-        ("TEXT_RUN_TRAILING", "a.csv", (11, 11), 0), ("TEXT_CELLS_IN_COLUMN", "a.csv", (5, 5), 2), ("EMPTY_CELLS_IN_COLUMN", "a.csv", (6, 6), 2),
-        ("NOT_MONOTONE", "a.csv", (), 1), ("NOT_MONOTONE", "a.csv", (), 2), ("NOT_MONOTONE", "a.csv", (), 3), ("DELIMITER_NOT_COMMA", "b.csv", (), 0),
-        ("COLUMNS_DIFFER_ACROSS_FILES", "b.csv", (), 0), ("EQUAL_RUNS_SHORT", "b.csv", (), 1), ("EQUAL_RUNS_SHORT", "b.csv", (), 2)]
+got = [(x.code, x.file, x.lines, x.column, x.ranges, x.compared) for x in P.findings((P.profiled("a.csv", A_CSV), P.profiled("b.csv", B_CSV)))]
+SEG = ((4, 8), (9, 9))   # (1165 F4: the run findings and COLUMNS_DIFFER carry ranges and the file compared against; were lines (), no ranges)
+want = [("HEADER_LINES_BEFORE_NAMES", "a.csv", (1, 2), 0, ((1, 2),), ""), ("COMMENT_LINES", "a.csv", (1, 1), 0, ((1, 1),), ""),
+        ("TEXT_RUN_IN_BODY", "a.csv", (7, 7), 0, ((7, 7),), ""), ("TEXT_RUN_TRAILING", "a.csv", (11, 11), 0, ((11, 11),), ""),
+        ("TEXT_CELLS_IN_COLUMN", "a.csv", (5, 5), 2, ((5, 5),), ""), ("EMPTY_CELLS_IN_COLUMN", "a.csv", (6, 6), 2, ((6, 6),), ""),
+        ("NOT_MONOTONE", "a.csv", (4, 9), 1, SEG, ""), ("NOT_MONOTONE", "a.csv", (4, 9), 2, SEG, ""), ("NOT_MONOTONE", "a.csv", (4, 9), 3, SEG, ""),
+        ("DELIMITER_NOT_COMMA", "b.csv", (), 0, (), ""), ("COLUMNS_DIFFER_ACROSS_FILES", "b.csv", (1, 1), 0, ((1, 1),), "a.csv"),
+        ("EQUAL_RUNS_SHORT", "b.csv", (2, 4), 1, ((2, 4),), ""), ("EQUAL_RUNS_SHORT", "b.csv", (2, 4), 2, ((2, 4),), "")]
 check("T3 the two-file plant raises exactly its 13 findings", got == want, str(got))
 one = P.findings((P.profiled("only.csv", b"T,C\n1,2\n3,2\n2,2\n"), P.profiled("w.bin", intake_plant.xlsx([("T", "C"), (1, 2)])),
                   P.profiled("z.bin", b"\x00\x01binary")))
@@ -409,6 +422,22 @@ check("F3 a text file with no numeric row raises NOT_A_TABLE and no HEADER / COM
 got = of("t.txt", (P.profiled("t.txt", HEAD + b"1;2\n3;4\n"), P.profiled("u.csv", b"T,C\n1,2\n3,4\n")))
 check("F3 the same head over a numeric body: DELIMITER_NOT_COMMA, HEADER_LINES_BEFORE_NAMES 1-4, COMMENT_LINES 1-2", got ==
       [("DELIMITER_NOT_COMMA", ()), ("HEADER_LINES_BEFORE_NAMES", (1, 4)), ("COMMENT_LINES", (1, 2))], str(got))
+
+# ---- F4 (fix S11.P2b): where each finding is, value-free
+RUNS = b"T,C\n" + b"".join(b"%d,%d\n" % r for r in [(1, 5), (2, 5), (3, 6), (1, 7), (2, 7), (3, 7)] + [(9, 8)] * 12 + [(4, 9), (4, 9)])
+F4 = (P.profiled("readme.txt", b"see t.csv; it is the table\n"), P.profiled("t.csv", RUNS), P.profiled("l.csv", b"T,C\n1,2\n\xe9 x,3\n4,5\n\xb5,6\n"),
+      P.profiled("u.csv", "T;C;D\n1;2;3\n".encode("utf-16")))
+got = [(x.code, x.file, x.lines, x.column, x.ranges, x.compared) for x in P.findings(F4) if x.code not in ("NOT_A_TABLE", "TEXT_CELLS_IN_COLUMN", "DELIMITER_NOT_COMMA")]
+want = [("NOT_MONOTONE", "t.csv", (2, 21), 1, ((2, 4), (5, 19), (20, 21)), ""), ("EQUAL_RUNS_SHORT", "t.csv", (2, 21), 2, ((2, 3), (5, 7), (20, 21)), ""),
+        ("EQUAL_RUN_LONG", "t.csv", (8, 19), 1, ((8, 19),), ""), ("EQUAL_RUN_LONG", "t.csv", (8, 19), 2, ((8, 19),), ""),
+        ("REVISITED_VALUES", "t.csv", (5, 7), 1, ((5, 5), (6, 6), (7, 7)), ""), ("ENCODING_NOT_UTF8", "l.csv", (3, 5), 0, ((3, 3), (5, 5)), ""),
+        ("ENCODING_NOT_UTF8", "u.csv", (1, 2), 0, ((1, 2),), ""), ("COLUMNS_DIFFER_ACROSS_FILES", "u.csv", (1, 1), 0, ((1, 1),), "t.csv")]
+check("F4 the run findings, ENCODING_NOT_UTF8 and COLUMNS_DIFFER_ACROSS_FILES carry their line ranges and the file compared against", got == want, str(got))
+said = P.md(P.Profile("x", F4, P.findings(F4)), "sha")
+check("F4 PROFILE.md prints each range (12, then +N more in PROFILE.json) and 'against <file>'", "NOT_MONOTONE: t.csv lines 2-4, 5-19, 20-21 column 1"
+      in said and "COLUMNS_DIFFER_ACROSS_FILES: u.csv lines 1-1 against t.csv" in said and "lines 2-3, 3-4, 4-5, 5-6, 6-7, 7-8, 8-9, 9-10, 10-11, 11-12, "
+      "12-13, 13-14 (+2 more in PROFILE.json)" in P.md(P.Profile("x", (), (P.Finding("NOT_MONOTONE", "f", 0, (2, 16), 1, "DECLARE", "", "",
+      tuple((n, n + 1) for n in range(2, 16))),)), "sha"), said)
 
 # ---- F1 (fix S11.P2b): the splitter total over line length, in a fresh process (the limit is the process's, set where SPLIT is)
 LONG = "import sys; sys.path[:0] = [sys.argv[1]]; import intake_profile as P; t = P.profiled('long.csv', b'T;C\\n1;2\\n3;' + b'x' * 200000 + b'\\n4;5\\n').tables[0]; print(t.delimiter, [(r.first, r.last, r.kind, r.width) for r in t.rows])"

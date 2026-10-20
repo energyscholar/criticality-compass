@@ -47,15 +47,18 @@ RowRun = frozen("RowRun", [("first", int), ("last", int), ("kind", str), ("width
 HeaderLine = frozen("HeaderLine", [("line", int), ("cells", tuple)], "A line before the body as cells: a TEXT cell masked, a NUMERIC one #k, an empty one \"\".")
 ColumnProfile = frozen("ColumnProfile", [("position", int), ("name", str), ("numeric", int), ("empty", int), ("text", int), ("text_lines", tuple),
                                          ("empty_lines", tuple), ("monotone_runs", int, 0), ("first_direction", str, "FLAT"), ("equal_runs", tuple, (0, 0, 0)),
-                                         ("longest", int, 0), ("revisited", int, 0), ("distinct", int, 0)],
+                                         ("longest", int, 0), ("revisited", int, 0), ("distinct", int, 0), ("segment_lines", tuple, ()),
+                                         ("short_lines", tuple, ()), ("long_lines", tuple, ()), ("revisited_lines", tuple, ())],
                        "Position k of the dominant width over the body lines of that width holding a number: counts of cell classes, the lines of TEXT "
-                       "and empty cells ([first, last] runs), the order and repeats of its numbers (counts only; equal_runs: runs of 2, 3-9, 10+).")
+                       "and empty cells ([first, last] runs), the order and repeats of its numbers (counts only; equal_runs: runs of 2, 3-9, 10+), and "
+                       "(fix S11.P2b F4) where they are, as [first, last] line ranges: each monotone segment, each equal run of 2-9 and of 10+, each "
+                       "run of a value seen in an earlier run.")
 Table = frozen("Table", [("delimiter", str), ("widths", tuple), ("lines", int), ("blank_lines", tuple), ("comment_prefixes", tuple), ("rows", tuple),
                          ("header_lines", tuple), ("columns", tuple)],
                "A text file's or a sheet's cells: the elected delimiter and every delimiter's (width, lines) evidence, the line count, the blank lines, "
                "the comment prefixes counted, the row runs, the header lines (at most 12) and the columns.")
 FileProfile = frozen("FileProfile", [("name", str), ("bytes", int), ("sha256", str), ("kind", str), ("encoding", str), ("tables", tuple, ()),
-                                     ("sheets", object, ()), ("members", tuple, ())],
+                                     ("sheets", object, ()), ("members", tuple, ()), ("encoding_lines", tuple, ())],
                      "One file: `tables` its one Table (a TEXT_TABLE); `sheets` an XLSX's Sheets (or READER_ABSENT); `members` a ZIP's (masked name, size).")
 Sheet = frozen("Sheet", [("position", int), ("name", str), ("rows", int), ("columns", int), ("table", object)],
                "One sheet of an XLSX: its 1-based position (the address `sheet = k` takes), its masked name, its row and column counts, its Table.")
@@ -95,13 +98,26 @@ def segments(ks):
     return functools.reduce(lambda st, up: {None: (st[0], up), up: (st[0], up)}.get(st[1], (st[0] + 1, None)), steps, (int(len(ks) > 0), None))[0]
 
 
-def order(xs):
-    """The order and repeat fields of a column's numbers in file order (counts only; the values are dropped on return): monotone_runs (the segments), first_direction, equal_runs (runs of 2, 3-9, 10+), longest, revisited, distinct (intake_names.repeats for the run counts)."""
+def starts(ks):
+    """(fix F4) The index of each monotone segment's first key: segments' own fold, keeping where each segment opens (len = segments(ks))."""
+    up = lambda st, iu: {None: (st[0], iu[1]), iu[1]: (st[0], iu[1])}.get(st[1], (st[0] + (iu[0] + 1,), None))
+    return functools.reduce(up, enumerate(b > a for a, b in zip(ks, ks[1:])), ((0,)[:len(ks)], None))[0]
+
+
+def order(pairs):
+    """The order and repeat fields of a column's numbers in file order, from (line, number) pairs (counts and line ranges only; the values are dropped on return): monotone_runs (the segments), first_direction, equal_runs (runs of 2, 3-9, 10+), longest, revisited, distinct (intake_names.repeats for the run counts), and each count's [first, last] lines."""
+    xs = [x for _, x in pairs]
     runs, rep = _runs(xs), repeats([xs])
     ks = [k for k, _ in runs]
     bins = Counter(BIN.get(min(n, 10)) for _, n in runs)
+    g = [(k, [n for n, _ in grp]) for k, grp in itertools.groupby(pairs, key=lambda p: p[1])]   # the equal runs with their lines
+    at = lambda sel: tuple((ls[0], ls[-1]) for i, (k, ls) in enumerate(g) if sel(i, k, len(ls)))
+    first = {k: i for i, (k, _) in reversed(list(enumerate(g)))}   # each value's first run
+    seg = starts(ks) + (len(g),)
     return dict(monotone_runs=segments(ks), first_direction=DIRECTION[next((b > a for a, b in zip(ks, ks[1:])), None)],
-                equal_runs=tuple(bins[b] for b in range(3)), longest=rep["longest run"], revisited=rep["values revisited"], distinct=len(set(xs)))
+                equal_runs=tuple(bins[b] for b in range(3)), longest=rep["longest run"], revisited=rep["values revisited"], distinct=len(set(xs)),
+                segment_lines=tuple((g[a][1][0], g[b - 1][1][-1]) for a, b in zip(seg, seg[1:])), short_lines=at(lambda i, k, n: 2 <= n < 10),
+                long_lines=at(lambda i, k, n: n >= 10), revisited_lines=at(lambda i, k, n: first[k] < i))
 
 
 def _column(k, name, cells):
@@ -109,7 +125,7 @@ def _column(k, name, cells):
     cls = [(n, {True: "empty", False: {True: "numeric", False: "text"}[NUMBER.fullmatch(c.strip()) is not None]}[c.strip() == ""], c) for n, c in cells]
     count = lambda w: [n for n, x, _ in cls if x == w]
     return ColumnProfile(k, name, len(count("numeric")), len(count("empty")), len(count("text")), rle(count("text")), rle(count("empty")),
-                         **order([float(c) for _, x, c in cls if x == "numeric"]))
+                         **order([(n, float(c)) for n, x, c in cls if x == "numeric"]))
 
 
 def _name(cs, k):
@@ -146,10 +162,15 @@ def decoded(raw):
     return {True: (enc, text), False: ("UNDECODABLE", None)}[text != "" and not BINARY.search(text)]
 
 
+ENCODING_LINES = {   # (fix F4) Encoding -> (the decoded lines) -> where ENCODING_NOT_UTF8 is: the lines no utf-8 decode reads; total over the text decodings
+    "UTF8": lambda ls: (), "UTF8_SIG": lambda ls: (), "UTF16": lambda ls: ((1, len(ls)),)[:len(ls)],
+    "LATIN1_ONLY": lambda ls: rle(n for n, t in ls if _decoded(t.encode("latin-1"), "utf-8") is None)}   # latin-1 is one byte per character
+
+
 def _text_file(head, enc, text):
     lines = _split(text)
     delimiter, widths = _elect(lines)
-    return FileProfile(*head, "TEXT_TABLE", enc, (table(lines, delimiter, widths),))
+    return FileProfile(*head, "TEXT_TABLE", enc, (table(lines, delimiter, widths),), encoding_lines=ENCODING_LINES[enc](lines))
 
 
 def _sheet(k, name, raw):
@@ -243,8 +264,9 @@ def md(p, sha):
         out += {True: [f"- sheets: openpyxl is not installed here ({READER_ABSENT})"], False: [f"- sheet #{x.position} '{x.name}': {x.rows} rows, {x.columns} columns"
                 for x in {True: f.sheets, False: ()}[isinstance(f.sheets, tuple)]]}[f.sheets == READER_ABSENT] + [""]
         out += [x for k, t in tables_of(f) for x in _table_md(t, {True: "the table", False: f"sheet #{k}"}[k == 0])]
-    out += ["## Findings", ""] + [f"- {x.code}: {x.file}" + f" sheet #{x.sheet}" * (x.sheet > 0) + "".join(f" lines {x.lines[0]}-{x.lines[1]}" for _ in x.lines[:1])
-            + f" column {x.column}" * (x.column > 0) + f" -> {x.response}: {x.does}" + f" (or {x.otherwise})" * (x.otherwise != "") for x in p.findings]
+    where = lambda x: "".join(" lines " + ", ".join(f"{a}-{b}" for a, b in x.ranges[:12]) for _ in x.ranges[:1]) + f" (+{len(x.ranges) - 12} more in PROFILE.json)" * (len(x.ranges) > 12)
+    out += ["## Findings", ""] + [f"- {x.code}: {x.file}" + f" sheet #{x.sheet}" * (x.sheet > 0) + where(x) + f" column {x.column}" * (x.column > 0)   # (fix F4) every range
+            + f" against {x.compared}" * (x.compared != "") + f" -> {x.response}: {x.does}" + f" (or {x.otherwise})" * (x.otherwise != "") for x in p.findings]
     return "\n".join(out + ["", "Unprofiled: " + (", ".join(f"{f.name} ({f.bytes} bytes)" for f in p.files if f.kind == "UNPROFILED_FORMAT") or "none"), ""])
 
 

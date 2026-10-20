@@ -64,6 +64,11 @@ The response is computed by the table, not chosen. Where two responses are liste
 second prints as "or ...". A BLOCKS response names the lines; you copy them. The profile never writes CONVERSION.toml: which block is a
 curve and which is a hold is your declaration, not the tool's.
 
+Each finding says where (fix S11.P2b F4), value-free: its `ranges` (every [first, last] line range of its structure: each monotone
+segment for NOT_MONOTONE, each equal run for EQUAL_RUNS_SHORT / EQUAL_RUN_LONG, each run of a value seen before for REVISITED_VALUES, the
+lines utf-8 cannot read for ENCODING_NOT_UTF8), `lines` their span, and for COLUMNS_DIFFER_ACROSS_FILES the names line and `compared`, the
+first table file of the path it differs from. PROFILE.md prints the first 12 ranges and "+N more in PROFILE.json".
+
 | FindingKind | the structure that raises it | Response | predicts (the refusal the run would otherwise meet) |
 |---|---|---|---|
 | ENCODING_NOT_UTF8 | `encoding` LATIN1_ONLY or UTF16 | CONVERT(DECODE encoding = latin-1 / utf-16) | S4 NOT_UTF8; converter ENCODING_INVALID; r3 defect 7 |

@@ -49,8 +49,10 @@ def frozen(name, fields, doc):
     return make_dataclass(name, [f[:2] + tuple(field(default=d) for d in f[2:]) for f in fields], frozen=True, namespace={"__doc__": doc})
 
 
-Finding = frozen("Finding", [("code", str), ("file", str), ("sheet", int), ("lines", tuple), ("column", int), ("response", str), ("does", str), ("otherwise", str)],
-                 "A FindingKind atom where it is (file; sheet position or 0; lines [first, last] or none; column or 0) and its RESPONSE row.")
+Finding = frozen("Finding", [("code", str), ("file", str), ("sheet", int), ("lines", tuple), ("column", int), ("response", str), ("does", str), ("otherwise", str),
+                             ("ranges", tuple, ()), ("compared", str, "")],
+                 "A FindingKind atom where it is (file; sheet position or 0; lines [first, last] or none: the span of ranges; column or 0) and its "
+                 "RESPONSE row; (fix F4) ranges: each [first, last] where its structure is; compared: the file a cross-file finding is against, or \"\".")
 
 
 numeric = lambda t: [r for r in t.rows if r.kind in NUMERIC_KINDS]   # a table's numeric row runs: its body (none: it is no table)
@@ -74,15 +76,16 @@ def runs(t, where):
 
 
 span = lambda ls: {True: lambda: (ls[0][0], ls[-1][1]), False: tuple}[len(ls) > 0]()
-per_file = lambda holds: lambda fs: [(f.name, 0, (), 0) for f in fs if holds(f)]
-per_table = lambda found: lambda fs: [(f.name, k, ls, c) for f in fs for k, t in tables_of(f) for ls, c in found(t)]
-per_column = lambda holds, lines=lambda c: (): per_table(lambda t: [(span(lines(c)), c.position) for c in t.columns if holds(c)])
+# a RAISES row: (file, sheet, ranges: each [first, last], column, compared); findings() takes lines as the span of ranges (fix F4)
+per_file = lambda holds, where=lambda f: (): lambda fs: [(f.name, 0, where(f), 0, "") for f in fs if holds(f)]
+per_table = lambda found: lambda fs: [(f.name, k, tuple(x for x in [ls] if x), c, "") for f in fs for k, t in tables_of(f) for ls, c in found(t)]
+per_column = lambda holds, lines=lambda c: (): lambda fs: [(f.name, k, lines(c), c.position, "") for f in fs for k, t in tables_of(f) for c in t.columns if holds(c)]
 texts = lambda f: [t for t in f.tables if f.kind == "TEXT_TABLE"]
 bodied = lambda f: [t for t in texts(f) if numeric(t)]   # (fix F3) a text file's tables that have a body
 per_body = lambda found: per_table(lambda t: [x for _ in numeric(t)[:1] for x in found(t)])   # (fix F3) a head finding: only of a table with a body
 shape = lambda f: [([c.name for c in t.columns], len(t.columns)) for t in f.tables]   # a text file's masked names line and dominant width
 RAISES = {   # FindingKind -> (the profiled files) -> [(file, sheet, lines, column)] where its structure (plan 1165 section 4) is; total (test)
-    "ENCODING_NOT_UTF8": per_file(lambda f: f.encoding in ("LATIN1_ONLY", "UTF16")), "BOM_PRESENT": per_file(lambda f: f.encoding == "UTF8_SIG"),
+    "ENCODING_NOT_UTF8": per_file(lambda f: f.encoding in ("LATIN1_ONLY", "UTF16"), lambda f: f.encoding_lines), "BOM_PRESENT": per_file(lambda f: f.encoding == "UTF8_SIG"),
     "DELIMITER_NOT_COMMA": per_file(lambda f: any(t.delimiter in ("SEMICOLON", "TAB", "WHITESPACE") for t in bodied(f))),
     "NO_DELIMITER": per_file(lambda f: any(t.delimiter == "NONE" for t in bodied(f))),
     "HEADER_LINES_BEFORE_NAMES": per_body(lambda t: [((1, body(t)[3] - 1), 0) for _ in range(int(len([r for r in t.rows if r.kind != "BLANK" and r.last < body(t)[3]]) > 0))]),
@@ -95,15 +98,17 @@ RAISES = {   # FindingKind -> (the profiled files) -> [(file, sheet, lines, colu
     "TEXT_CELLS_IN_COLUMN": per_column(lambda c: c.text > 0, lambda c: c.text_lines),
     "EMPTY_CELLS_IN_COLUMN": per_column(lambda c: c.empty > 0, lambda c: c.empty_lines),
     "WIDTH_CHANGES": per_table(lambda t: [((r.first, r.last), 0) for r in t.rows if r.kind in NUMERIC_KINDS and r.width != len(t.columns)]),
-    "COLUMNS_DIFFER_ACROSS_FILES": lambda fs: [(f.name, 0, (), 0) for f in fs if [shape(f)] != [shape(g) for g in fs if texts(g)][:1] and texts(f)],
-    "NOT_MONOTONE": per_column(lambda c: c.monotone_runs > 1),
+    "COLUMNS_DIFFER_ACROSS_FILES": lambda fs: [(f.name, 0, tuple((n, n) for t in bodied(f) for n in [body(t)[3]] if n), 0, g.name)   # (fix F4) against the
+                                               for g in [g for g in fs if bodied(g)][:1] for f in fs if bodied(f) and shape(f) != shape(g)],   # first table file
+    "NOT_MONOTONE": per_column(lambda c: c.monotone_runs > 1, lambda c: c.segment_lines),
     "DIRECTION_DESCENDING": per_column(lambda c: c.monotone_runs == 1 and c.first_direction == "DESCENDING"),
-    "EQUAL_RUNS_SHORT": per_column(lambda c: c.equal_runs[0] + c.equal_runs[1] > 0 and c.revisited == 0),
-    "EQUAL_RUN_LONG": per_column(lambda c: c.longest >= 10), "REVISITED_VALUES": per_column(lambda c: c.revisited > 0),
+    "EQUAL_RUNS_SHORT": per_column(lambda c: c.equal_runs[0] + c.equal_runs[1] > 0 and c.revisited == 0, lambda c: c.short_lines),
+    "EQUAL_RUN_LONG": per_column(lambda c: c.longest >= 10, lambda c: c.long_lines),
+    "REVISITED_VALUES": per_column(lambda c: c.revisited > 0, lambda c: c.revisited_lines),
     "XLSX_SHEETS": per_file(lambda f: f.kind == "XLSX"), "ZIP_MEMBERS": per_file(lambda f: f.kind == "ZIP"),
     "UNPROFILED_FORMAT": per_file(lambda f: f.kind == "UNPROFILED_FORMAT"),
     "LARGE_FILE": per_file(lambda f: any(t.lines >= 10000 for _, t in tables_of(f))),
-    "ONE_FILE": lambda fs: [(f.name, 0, (), 0) for f in fs if f.kind == "TEXT_TABLE" and sum(g.kind == "TEXT_TABLE" for g in fs) == 1],
+    "ONE_FILE": lambda fs: [(f.name, 0, (), 0, "") for f in fs if f.kind == "TEXT_TABLE" and sum(g.kind == "TEXT_TABLE" for g in fs) == 1],
     "NOT_A_TABLE": per_file(lambda f: f.kind == "TEXT_TABLE" and not bodied(f)),   # (fix F3) a text file with no numeric row run
 }
 
@@ -111,5 +116,6 @@ RAISES = {   # FindingKind -> (the profiled files) -> [(file, sheet, lines, colu
 def findings(files):
     """Every finding of the profiled files, in file order then FindingKind order, each with its response from RESPONSE (computed, never chosen)."""
     order = {f.name: i for i, f in enumerate(files)}
-    found = [(order[f], k.value, Finding(k.name, f, s, ls, c, RESPONSE[k.name][0].name, *RESPONSE[k.name][1:])) for k in FindingKind for f, s, ls, c in RAISES[k.name](files)]
+    found = [(order[f], k.value, Finding(k.name, f, s, span(rs), c, RESPONSE[k.name][0].name, *RESPONSE[k.name][1:], rs, g))
+             for k in FindingKind for f, s, rs, c, g in RAISES[k.name](files)]
     return tuple(x for _, _, x in sorted(found, key=lambda x: x[:2]))
