@@ -87,7 +87,9 @@ row_order = "ASCENDING"         # run_bank.py: "Arrays are in ascending T; the s
 
 [replicate]
 identity = "NONE"               # one curve per h; the seed names the curve, not a replicate
-key = ""
+
+[replicate.key]
+kind = "NONE"                   # no replicates, so no key (plan 1160 A33; was key = "")
 
 [interval]
 method = "block"                # over the per-point energy series e (n = 2000), b = 100 => 20 blocks: the bank's own error rule

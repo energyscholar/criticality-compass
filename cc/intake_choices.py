@@ -42,9 +42,11 @@ PERMITTED = {   # (a step's op, the link of the chain its input is in) -> may it
 LINK_WORDS = {"RAW": "RAW (the measured name)", "DERIVED_OBSERVABLE": "DERIVED_OBSERVABLE (the `to` of a projection of the same lane)", "NO_LINK": "NO_LINK"}   # total
 WANTS = lambda op: " or ".join(LINK_WORDS[k] for (o, k), ok in PERMITTED.items() if o == op and ok)   # (plan 1160 A9) the link(s) PERMITTED lets an op take
 LANES = {"PLANTED": lambda policy: 1, "EXPERIMENT": lambda policy: policy["policy"]["real_data_lanes"]}   # [source] origin -> lanes required; total
+KEYCOL = {"NONE": lambda k: (), "FILE_NAME": lambda k: (), "COLUMN": lambda k: (k["column"],)}   # (1160 A33) [replicate.key] kind -> the column it reads; total
 NEIGHBOUR = {   # [replicate] identity -> the declaration -> does the replicate key name the fast knob (a neighbouring point of one sweep); total
     "NONE": lambda d: False, "SAME_FAST_VALUE": lambda d: False,   # 1160 P2: readings at one fast value are one point, never neighbours
-    **{k: (lambda d: d["replicate"]["key"] in {d["knobs"]["fast"]["name"], str(d["knobs"]["fast"]["key"])}) for k in ("SEED", "RUN", "SAMPLE", "FILE")},
+    **{k: (lambda d: bool({str(c) for c in KEYCOL[d["replicate"]["key"]["kind"]](d["replicate"]["key"])} & {d["knobs"]["fast"]["name"], str(d["knobs"]["fast"]["key"])}))
+       for k in ("SEED", "RUN", "SAMPLE", "FILE")},
 }
 ROUTE = {"RAW": True, "DECLARABLE": True, "FIGURE_LEVEL": False, "PROCESSED_UNDECLARABLE": False}   # [source] admissibility -> has a kernel route; total
 NEEDS_COLUMN = {   # the intake's interval method (cc.toml alphabets.interval_method | STATED | NONE) -> does it need an uncertainty column; total (test)
@@ -106,7 +108,7 @@ def choices(declaration, policy):
             (lambda: len({form(lane) for lane in lanes}) == len(lanes), "LANES_IDENTICAL",
              lambda: detail(words=[f"{lane}: projection {', '.join(form(lane)[0]) or 'none'}; bridge {', '.join(form(lane)[1])}" for lane in lanes])),
             (lambda: not NEIGHBOUR[d["replicate"]["identity"]](d), "REPLICATE_IS_SWEEP_NEIGHBOUR",
-             lambda: detail(words=[f"identity {d['replicate']['identity']}", f"key '{d['replicate']['key']}' is the fast knob {d['knobs']['fast']['name']}"])),
+             lambda: detail(words=[f"identity {d['replicate']['identity']}", f"key column '{d['replicate']['key']['column']}' is the fast knob {d['knobs']['fast']['name']}"])),
             (lambda: POINTED[d["knobs"]["fast"]["control"]](d["replicate"]["identity"], method), "MEASURED_KNOB_HAS_NO_POINTS",   # plan 1160 A17
              lambda: detail(words=[f"control {d['knobs']['fast']['control']}", f"identity {d['replicate']['identity']}", f"interval method {method}"])),
             (lambda: not barred, "OPERATION_NOT_PERMITTED", lambda: detail(words=[f"{s[1]} {s[0]} {s[2]} on '{s[3]}' ({s[4]}; it is permitted on {WANTS(s[2])})" for s in barred][:3], counts={"steps not permitted": len(barred)})),

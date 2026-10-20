@@ -39,7 +39,8 @@ def decl(fmt, header, cols=("T", "C", "sigma"), comment=("#",), layout="PER_FILE
     unc = {True: {"kind": "NONE"}, False: {"kind": "COLUMN", "key": cols[2:3] and cols[2]}}[len(cols) < 3]
     sel = {"PER_FILE": {"layout": "PER_FILE"}, "LONG_TABLE": {"layout": "LONG_TABLE", "slow": {"source": "COLUMN", "key": cols[-1]}}}[layout]
     return {"reader": {"name": "table-curve-v1", "comment": list(comment), "format": fmt, "header": header},
-            "knobs": {"fast": {"key": cols[0]}, "slow": {"unit": "T"}}, "measured": {"key": cols[1], "unit": "J/K", "uncertainty": unc}, "selection": sel}
+            "knobs": {"fast": {"key": cols[0]}, "slow": {"unit": "T"}}, "measured": {"key": cols[1], "unit": "J/K", "uncertainty": unc}, "selection": sel,
+            "replicate": {"identity": "NONE", "key": {"kind": "NONE"}}}   # 1160 A33: role_columns reads [replicate.key] (a COLUMN key is a role column)
 
 
 def text(sep, rows=ROWS, head=(NAMES, UNITS), pre="# a planted table (plan 1145)\n", blank="\n"):

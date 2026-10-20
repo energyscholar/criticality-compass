@@ -2,25 +2,25 @@
  "schema": 1,
  "kind": "intake-seal",
  "id": "dial1118-s1-v5",
- "sealed_at_ns": 1792454128314211467,
- "sealed_at_utc": "2026-10-19T23:55:28Z",
- "author": "Claude (plan 1160 loop4 A35)",
+ "sealed_at_ns": 1792454702952478333,
+ "sealed_at_utc": "2026-10-20T00:05:02Z",
+ "author": "Claude (plan 1160 loop4 A33)",
  "author_kind": "AI_DRAFT",
  "confirmed_by": "",
  "mode": "EXPLORATORY",
- "declaration_sha256": "aaf26e3290daccbcc29c0775cb2e2883a91f056148859bcb0f2ea3fa64ab5406",
+ "declaration_sha256": "0ca08e029982d3e93cb7b42cc73fdd3ddb725bed4a7d4ec5ee2d686c6b0bacef",
  "files": {
-  "intake.toml": "b9e0d6fb485b5d1b8fe8a3538945bf3eef4b8d28ba9a5941672403ce27482924",
+  "intake.toml": "3bb5dd6b1200ffa5214c9590dc6c29250bc726fc2f25ba6c7783132d1c39dbf2",
   "transducer.toml": "5c2738e663bf6237f06bab2c6b8c17079fecf5ff3726453f2a274219a17d5611"
  },
  "code_identity": {
-  "commit": "de46da0b52235d65d2a411b4b9213fb0839ac8b3",
-  "code_hash": "cc0515105cea776af02a4cd8e3335a61ee27ef26ddf401952a4287e977d4b1bf",
+  "commit": "d8d87c2614a965a4c07d0d595622986de1072edd",
+  "code_hash": "f68e975e52f271f8015eded72467074f81e4c50985b59deec1ba4a90f01cba1a",
   "tree": "UNCOMMITTED_CHANGES"
  },
  "protocol_identity": {
   "STAGES.toml": {
-   "sha256": "65228a1f35a0931181b0f6cfddc2c99a31f06397390ea7e4799fe2f4cf0fa377",
+   "sha256": "eaef9aa98196349ad1b2db9d6ea3d948ba45a30a1e2a7919967a5ffc130a3a30",
    "version": "1160-v10"
   },
   "POLICY.toml": {
@@ -28,8 +28,8 @@
    "version": "1136-v1"
   },
   "FORMAT.toml": {
-   "sha256": "e51c4bd00bd058a77980b96251fc1ea1a79124a39189664318e19ac8f3fa3912",
-   "version": "1160-v11"
+   "sha256": "bcfa884b4d575f1626cf12c6a73f9fc4bb1a0de468b53705644ccd5adedb202c",
+   "version": "1160-v12"
   }
  },
  "universe": {

@@ -55,7 +55,7 @@ there.
 ```
 
 The new declaration's TODO lines are the choices. It is intake format v5 (`schema = 5`); a v2, v3 or v4 declaration is refused
-SCHEMA_UNSUPPORTED, so restate it in v5 under a new id (v4 to v5 adds `[knobs.slow] kind = "QUANTITY"`, the v4 meaning; v3 to v4 added
+SCHEMA_UNSUPPORTED, so restate it in v5 under a new id (v4 to v5 adds `[knobs.slow] kind = "QUANTITY"`, the v4 meaning, and writes `[replicate] key = ""` as `[replicate.key] kind = "NONE"`; v3 to v4 added
 `[knobs.fast] control = "SET"`, the v3 meaning).
 
 `[source]` says what the files are:

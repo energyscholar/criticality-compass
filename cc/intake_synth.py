@@ -92,7 +92,7 @@ def declare(m, ident, sid):
         "knobs.fast.name": q(m["fast"]["name"]), "knobs.fast.unit": q(m["fast"]["unit"]), "knobs.fast.source": q("COLUMN"), "knobs.fast.key": q(m["fast"]["column"]),
         "measured.name": q(m["measured"]["name"]), "measured.unit": q(m["measured"]["unit"]), "measured.key": q(m["measured"]["column"]), "measured.shape": q("SCALAR_PER_LOCUS"),
         "measured.uncertainty.kind": q("COLUMN"), "measured.uncertainty.key": q(m["columns"][2]),
-        "replicate.identity": q(m["replicate"]), "replicate.key": q(""),
+        "replicate.identity": q(m["replicate"]), "replicate.key.kind": q("NONE"),   # (1160 A33: was replicate.key "")
     }
     cfg = tomllib.loads((Path(__file__).resolve().parent.parent / "cc.toml").read_text())["transducer"]
     trans = (f"# declarations/{ident}/transducer.toml - written by bin/cc new intake {ident} --from-synth {sid}: the CC transducer file of a synthetic bank.\n"
@@ -103,5 +103,5 @@ def declare(m, ident, sid):
              f'inputs = {q(cmd)}\noutput = {q(cfg["phase1_output"])}\n\n'
              f'[reduction]\nname = "none in the Compass: the bank stores one value of C per (h, T) point"\nkeeps = "the planted value of C at each kept point, with its noise"\n'
              f'discards = "nothing the bank holds"\n\n[interval]\nrole = {q(cfg["interval_role"])}\nkeeps = "the planted noise sigma written on every row"\ndiscards = "the noise draw itself"\n')
-    dropped = frozenset({"reader.comment", "reader.format", "reader.header", "source.converted_from"})   # csv-curve-v1 has no other field; a DEPOSIT has no converted_from
+    dropped = frozenset({"reader.comment", "reader.format", "reader.header", "source.converted_from", "replicate.key.separator", "replicate.key.field", "replicate.key.column"})   # csv-curve-v1 has no other field; a DEPOSIT has no converted_from
     return values, dropped, trans

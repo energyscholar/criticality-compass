@@ -220,11 +220,15 @@ check("1. (1160 P2) the header kinds hold NAMES_UNITS_IN_NAMES; HEADER and NAMED
       "NAMES_UNITS_IN_NAMES" in HEADS and set(intake_read.HEADER) == set(intake_read.NAMED) == set(HEADS)
       and set(intake_names.UNIT_SYNTAX) == set(HEADS["NAMES_UNITS_IN_NAMES"]["unit_syntax"]["values"]), str(sorted(HEADS)))
 IDENT = set(F["replicate"]["fields"]["identity"]["values"])
-CONTROL = set(F["knobs"]["fields"]["fast"]["fields"]["control"]["values"])   # (1160 A17, T17.3) the [knobs.fast] control alphabet
+CONTROL = set(F["knobs"]["fields"]["fast"]["fields"]["control"]["values"])
+KEYKINDS = F["replicate"]["fields"]["key"]["variants"]   # (1160 A33) the [replicate.key] kinds   # (1160 A17, T17.3) the [knobs.fast] control alphabet
 check("1. (1160 P2; A17 T17.3) the replicate identities hold SAME_FAST_VALUE; POINTS is total over control x identity (1160 A17: was over the identities)"
-      " and REPLICATE over (layout, identity); IDENTITIES is FORMAT's identity alphabet; POINTED (S1) is total over the controls",
+      " and KEYED over the identities, DECLARED over (key kind, layout) (1160 A33: was REPLICATE over (layout, identity)); IDENTITIES is FORMAT's"
+      " identity alphabet; POINTED (S1) is total over the controls",
       "SAME_FAST_VALUE" in IDENT and CONTROL == {"SET", "MEASURED"} and set(intake_census.POINTS) == set(itertools.product(CONTROL, IDENT))
-      and set(intake_census.IDENTITIES) == IDENT and set(intake_census.REPLICATE) == set(itertools.product(F["selection"]["variants"], IDENT))
+      and set(intake_census.IDENTITIES) == IDENT and set(intake_census.KEYED) == IDENT
+      and set(intake_census.DECLARED) == set(KEYKINDS) == set(intake_choices.KEYCOL) and all(set(r) == set(F["selection"]["variants"]) for r in intake_census.DECLARED.values())
+      and all(callable(intake_census.KEYED[i](lay, k)) for i in IDENT for lay in F["selection"]["variants"] for k in KEYKINDS)
       and set(intake_choices.POINTED) == CONTROL, str(sorted(IDENT)))
 check("1. every admit source of FORMAT.toml is a source the tables provide", all(src in T["admit"] for spec in [T["format"]["fields"]["interval"]["method"]] for src in spec["admit"]), "")
 

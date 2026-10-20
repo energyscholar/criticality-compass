@@ -86,7 +86,14 @@ row_order = "TODO"      # the order the rows are stored in: ASCENDING | DESCENDI
 [replicate]
 identity = "TODO"       # what makes two curves at one slow value replicates: NONE | SEED | RUN | SAMPLE | FILE; or SAME_FAST_VALUE:
                         # consecutive rows of one curve with an equal fast value are readings of one point
-key = "TODO"            # the key that names a replicate; "" for NONE
+# [replicate.key]: VARIANT on kind
+[replicate.key]
+kind = "TODO"           # what tells replicates at one slow value apart, read for identity SEED | RUN | SAMPLE (FILE is the file name; NONE and
+                        # SAME_FAST_VALUE read no key): NONE (no other field; two curves at one slow value are then CURVE_REPEATED) |
+                        # FILE_NAME (separator, field; PER_FILE) | COLUMN (column; PER_FILE or LONG_TABLE)
+separator = "TODO"      # FILE_NAME: the text the file name (without its extension) is split on, e.g. "_"
+field = "TODO"          # FILE_NAME: the 1-based field of the split name that names the replicate (run_3.csv split on "_": field 2)
+column = "TODO"         # COLUMN: the column that names the replicate (one number per curve), a name or a 1-based position
 
 [interval]
 method = "TODO"         # block | iid | gamma | chains | STATED (the uncertainty column is each point's interval) | NONE (no interval); then add that method's fields (cc.toml [interval_fields.<method>]; STATED and NONE have none)

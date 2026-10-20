@@ -2,6 +2,7 @@
 Invariant: it reads bytes only from a Pinned (what S3 read), never from a path, and its tables are total over FORMAT's alphabets; it
 constructs no Path and opens nothing, and it holds counts and names, never a value, in what it passes on."""
 import itertools
+import re
 import statistics
 
 import intake_read
@@ -15,8 +16,9 @@ def read(t, d, f):
     return intake_read.readers(t)[d["reader"]["name"]](f.data, d)
 
 
+NAMING = lambda d: [i for i, (k, _) in enumerate(intake_read.role_columns(d)) if k in ("replicate", "slow")]   # the role columns that name a curve
 BREAK = {   # LONG_TABLE [selection] block -> (the declaration) -> (previous row, row) -> does a new curve begin at row; total over FORMAT's blocks
-    "EXACT": lambda d: lambda p, r: p[-1] != r[-1],   # the slow value (the last role column) changes
+    "EXACT": lambda d: lambda p, r: [p[i] for i in NAMING(d)] != [r[i] for i in NAMING(d)],   # the slow value or (1160 A33) a replicate column changes
     "FAST_RESTART": lambda d: lambda p, r: RESTARTS[SWEEP[d["acquisition"]["row_order"]](d["acquisition"])](p[0], r[0]),   # the fast knob turns back (S1: it has a direction)
 }
 
@@ -72,6 +74,7 @@ DIRECTION = {   # (are rows stored in acquisition order, [acquisition] direction
 UNIT = {   # a role of intake_read.role_columns -> its declared unit (the uncertainty is in the measured quantity's unit); total over the roles
     "fast": lambda d: d["knobs"]["fast"]["unit"], "measured": lambda d: d["measured"]["unit"],
     "uncertainty": lambda d: d["measured"]["unit"], "slow": lambda d: d["knobs"]["slow"]["unit"],
+    "replicate": lambda d: "dimensionless",   # (1160 A33) a replicate column names a run, a seed or a sample by a number: a count, no unit
 }
 
 
@@ -90,11 +93,19 @@ def shape(pinned, t):
                 lambda: Pass(Shaped(pinned, g.columns)))
 
 
-REPLICATE = {   # ([selection] layout, [replicate] identity) -> (may two curves share a slow value, can the reader resolve the identity); total
-    **{(lay, k): v for lay in ("PER_FILE", "LONG_TABLE") for k, v in (("NONE", (False, True)), ("SEED", (False, False)), ("RUN", (False, False)), ("SAMPLE", (False, False)),
-                                                                     ("SAME_FAST_VALUE", (False, True)))},   # replicate readings of a point, inside one curve
-    ("PER_FILE", "FILE"): (True, True),
-    ("LONG_TABLE", "FILE"): (False, False),   # one file holds every curve: the file tells no two curves apart
+ONE = lambda d, c: ""   # (1160 A33) no key: every curve has the same one, so a slow value on two curves is CURVE_REPEATED
+NO = lambda d, c: None   # one file holds every curve: its name tells no two apart (REPLICATE_KEY_UNRESOLVED)
+FIELD = lambda d, c: dict(enumerate(re.split(re.escape(d["replicate"]["key"]["separator"]), re.sub(r"\.[^.]*$", "", c.where)), 1)).get(d["replicate"]["key"]["field"])
+CELL = lambda d, c: (lambda vs: {1: min(vs, default=None)}.get(len(vs)))({r[[k for k, _ in intake_read.role_columns(d)].index("replicate")] for r in c.rows})
+DECLARED = {   # (1160 A33) [replicate.key] kind -> [selection] layout -> (declaration, curve) -> its key, None when the declared key is absent from
+    "NONE": {"PER_FILE": ONE, "LONG_TABLE": ONE},   # it (no such field in the file name; not one value in the column); total over FORMAT's
+    "FILE_NAME": {"PER_FILE": FIELD, "LONG_TABLE": NO},
+    "COLUMN": {"PER_FILE": CELL, "LONG_TABLE": CELL},
+}
+KEYED = {   # [replicate] identity -> ([selection] layout, [replicate.key] kind) -> (declaration, curve) -> its replicate key | None; total over FORMAT's
+    **{k: (lambda lay, kind: ONE) for k in ("NONE", "SAME_FAST_VALUE")},   # SAME_FAST_VALUE: replicate readings of a point, inside one curve
+    "FILE": lambda lay, kind: {"PER_FILE": lambda d, c: c.where, "LONG_TABLE": NO}[lay],   # the file name (the 1160 P2 rule)
+    **{k: (lambda lay, kind: DECLARED[kind][lay]) for k in ("SEED", "RUN", "SAMPLE")},   # (1160 A33: was unresolved on every layout)
 }
 
 
@@ -112,20 +123,22 @@ def census(pinned, shaped, t):
     label (curves; points per curve min, median, max; the fast span; ALIGNED or MISALIGNED), the same for every layout."""
     d = pinned.declaration.data
     grids = [read(t, d, f) for f in pinned.files]
-    rep, acq = REPLICATE[(d["selection"]["layout"], d["replicate"]["identity"])], d["acquisition"]
+    key, acq = KEYED[d["replicate"]["identity"]](d["selection"]["layout"], d["replicate"]["key"]["kind"]), d["acquisition"]
     other = [f.name for f, g in zip(pinned.files, grids) if g.columns != shaped.columns]
     curves = lambda: CURVES[d["selection"]["layout"]](d, pinned.files, grids)
-    hs = lambda: [v for c in curves() for v in c.slow]   # the slow values of every curve that has one (none under NONE)
     unkeyed = lambda: KEYS[d["selection"]["layout"]](d, pinned.files, grids)
     points = lambda c: POINTS[(d["knobs"]["fast"]["control"], d["replicate"]["identity"])](c.rows)   # grouped BEFORE the repeat check: a run of readings is never a repeat
     twice = lambda: [c.where for c in curves() if len({k for k, _, _ in points(c)}) != len(points(c))]
     kinds = lambda: repeats([[k for k, _, _ in points(c)] for c in curves() if c.where in twice()])   # A17: the repeat kinds, counts only
     against = lambda: [c.where for c in curves() if not DIRECTION[(acq["row_order"] == "ACQUISITION", acq["direction"])]([r[0] for r in c.rows])]
-    again = lambda: [c.where for c in curves() if any(hs().count(v) > 1 for v in c.slow)]
+    named = lambda: [(c, key(d, c)) for c in curves()]   # (1160 A33) each curve with its replicate key
+    unnamed = lambda: [c.where for c, k in named() if k is None]
+    pairs = lambda: [(v, k) for c, k in named() for v in c.slow]   # (slow value, replicate key): a curve's place; two curves may share one only as replicates
+    again = lambda: [c.where for c, k in named() if any(pairs().count((v, k)) > 1 for v in c.slow)]
     return gate([(lambda: not other, "FILE_DIFFERS_FROM_FIRST", lambda: detail(words=other[:3], counts={"files": len(other)})),
                  (lambda: not unkeyed(), "SLOW_KEY_UNRESOLVED", lambda: detail(words=unkeyed()[:3] + [f"key '{d['selection']['slow']['key']}'"], counts={"files": len(unkeyed())})),
-                 (lambda: rep[1], "REPLICATE_KEY_UNRESOLVED", lambda: detail(words=[f"identity {d['replicate']['identity']}: reader {d['reader']['name']} with layout {d['selection']['layout']} carries no replicate key"])),
-                 (lambda: rep[0] or len(set(hs())) == len(hs()), "CURVE_REPEATED", lambda: detail(words=again()[:3], counts={"curves whose slow value another curve has": len(again())})),
+                 (lambda: not unnamed(), "REPLICATE_KEY_UNRESOLVED", lambda: detail(words=unnamed()[:3] + [f"identity {d['replicate']['identity']}, key {d['replicate']['key']['kind']}, layout {d['selection']['layout']}: no replicate key"], counts={"curves": len(unnamed()), "of": len(curves())})),
+                 (lambda: len(set(pairs())) == len(pairs()), "CURVE_REPEATED", lambda: detail(words=again()[:3], counts={"curves whose slow value another curve has": len(again())})),
                  (lambda: not twice(), "FAST_VALUE_REPEATED", lambda: detail(words=twice()[:3] + exits(kinds()), counts={"curves refused": len(twice()), "of curves": len(curves()), **kinds()})),
                  (lambda: not against(), "ACQUISITION_ORDER_DIFFERS", lambda: detail(words=against()[:3] + [f"stored in acquisition order, not {acq['direction']}"], counts={"curves": len(against())}))],
                 lambda: Pass(Census(pinned, label(curves(), [points(c) for c in curves()], d["knobs"]["fast"]["name"]), tuple((c.where, len(points(c))) for c in curves()),

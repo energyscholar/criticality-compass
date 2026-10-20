@@ -34,7 +34,7 @@ The declaration parses, holds every required field with the right type, and ever
 |---|---|---|
 | DECLARATION_FILE_ABSENT | live | declarations/<id>/ holds no intake.toml, and a directory alone declares nothing; write the file (docs/INTAKE-QUICKSTART.md starts one with bin/cc new intake). |
 | TOML_INVALID | live | The declaration is not valid TOML; fix the syntax at the line shown. |
-| SCHEMA_UNSUPPORTED | live | The file does not say schema = 5 and kind = "intake"; this tool reads intake format v5 only (a v1, v2, v3 or v4 declaration is history: restate it in v5 under a new id; v4 to v5 adds [knobs.slow] kind = "QUANTITY", the v4 meaning; v3 to v4 added [knobs.fast] control = "SET", the v3 meaning). |
+| SCHEMA_UNSUPPORTED | live | The file does not say schema = 5 and kind = "intake"; this tool reads intake format v5 only (a v1, v2, v3 or v4 declaration is history: restate it in v5 under a new id; v4 to v5 adds [knobs.slow] kind = "QUANTITY", the v4 meaning, and writes the v4 [replicate] key = "" as [replicate.key] kind = "NONE"; v3 to v4 added [knobs.fast] control = "SET", the v3 meaning). |
 | FIELD_MISSING | live | A required field is absent; every field of format v5 must be written, even when its honest value is a refusal value such as NONE_FITS. |
 | FIELD_UNKNOWN | live | A field the format does not define is present; check its spelling against bin/cc intake explain. |
 | FIELD_TYPE_WRONG | live | A field holds the wrong kind of value (for example text where a list is required). |

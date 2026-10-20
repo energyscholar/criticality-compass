@@ -51,11 +51,13 @@ class Unreadable:
 
 
 def role_columns(d):
-    """The (role, declared column) pairs of a declaration, in role order: fast, measured, the uncertainty column when one is declared, the slow
-    column of a LONG_TABLE. Every reader's Grid holds its rows in this order (csv-curve-v1: S4 checks its header equals these columns)."""
+    """The (role, declared column) pairs of a declaration, in role order: fast, measured, the uncertainty column when one is declared, the
+    replicate column when [replicate.key] is a COLUMN (plan 1160 A33), the slow column of a LONG_TABLE (always last). Every reader's Grid
+    holds its rows in this order (csv-curve-v1: S4 checks its header equals these columns)."""
     unc = {"COLUMN": lambda u: (("uncertainty", u["key"]),), "NONE": lambda u: ()}[d["measured"]["uncertainty"]["kind"]](d["measured"]["uncertainty"])
+    rep = {"COLUMN": lambda k: (("replicate", k["column"]),), "FILE_NAME": lambda k: (), "NONE": lambda k: ()}[d["replicate"]["key"]["kind"]](d["replicate"]["key"])
     slow = {"PER_FILE": lambda s: (), "LONG_TABLE": lambda s: (("slow", s["slow"]["key"]),)}[d["selection"]["layout"]](d["selection"])
-    return (("fast", d["knobs"]["fast"]["key"]), ("measured", d["measured"]["key"])) + unc + slow
+    return (("fast", d["knobs"]["fast"]["key"]), ("measured", d["measured"]["key"])) + unc + rep + slow
 
 
 first = functools.partial(gate, refuse=Unreadable)   # gate for readers: the first failing row's Unreadable, else then()

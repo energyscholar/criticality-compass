@@ -80,7 +80,7 @@ class Census(Evidence):
 
     def summary(self):
         x = self.label
-        return (f"Every file has the first file's columns; no slow value or fast value repeats; no curve contradicts the declared direction. Sampling: {x.curves} curves; points per curve "
+        return (f"Every file has the first file's columns; no slow value repeats but on declared replicates, no fast value repeats; no curve contradicts the declared direction. Sampling: {x.curves} curves; points per curve "
                 f"min {x.n_min}, median {x.n_median:g}, max {x.n_max}; {x.distinct} distinct {x.fast} values; {x.alignment.name}; curves_with_slow = {x.with_slow}; "
                 f"readings per point min {x.readings[0]}, max {x.readings[1]}; distinct_slow_in_block max = {x.drift}")
 

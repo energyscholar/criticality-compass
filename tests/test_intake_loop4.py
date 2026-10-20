@@ -4,13 +4,19 @@ the Compass (bin, cc, intake, ...) in a temporary directory, whose intake/ROOTS.
  T35.1 an ORDINAL slow knob ([knobs.slow] kind ORDINAL) is refused at S1 SLOW_KNOB_HAS_NO_METRIC by `bin/cc intake lint` and by `bin/cc intake
        seal` (which writes no SEAL.json); the same declaration with kind QUANTITY passes S1 and seals. (METRIC's totality is tests/test_intake.py
        test 1.)
+ T33.1 (A33) a PER_FILE bank of nine curves named run_<k>.csv in which two curves share a slow value: identity RUN with [replicate.key]
+       FILE_NAME (separator "_", field 2) passes S5 (every (slow value, run) pair once); the same bank with the key undeclared (kind NONE)
+       refuses S5 CURVE_REPEATED; a FILE_NAME field the names do not have (field 3) refuses S5 REPLICATE_KEY_UNRESOLVED.
 Seen RED (each mutation applied by hand, the test run, the mutation reverted):
  - T35.1: the SLOW_KNOB_HAS_NO_METRIC row deleted from intake_choices.choices: FAIL (lint and seal pass S1); METRIC["ORDINAL"] made True
    (ORDINAL mapped to a path): FAIL.
+ - T33.1: the key ignored (DECLARED["FILE_NAME"]["PER_FILE"] made ONE in cc/intake_census.py): the FILE_NAME PASS check FAILS
+   (CURVE_REPEATED).
 """
 import contextlib
 import io
 import json
+import re
 import shutil
 import sys
 import tempfile
@@ -69,6 +75,21 @@ with tempfile.TemporaryDirectory() as tmp:
           seal_o[0] == 1 and s1 in seal_o[1] and not (w / "declarations" / o / "SEAL.json").exists(), seal_o[1][-400:])
     check("T35.1 (A35) kind QUANTITY (the control): lint passes S1 and seal writes SEAL.json",
           lint_q[0] == 0 and "S1 EXECUTED, PASS" in lint_q[1] and seal_q[0] == 0 and (w / "declarations" / q / "SEAL.json").is_file(), lint_q[1][-300:] + seal_q[1][-300:])
+
+    # ---- T33.1 (A33): a replicate key read from the file name
+    (banks / "rep").mkdir()
+    [(banks / "rep" / f"run_{k}.csv").write_bytes((banks / "pf" / f["name"]).read_bytes()) for k, f in enumerate(M["files"])]
+    (banks / "rep" / "MANIFEST.json").write_bytes((banks / "pf" / "MANIFEST.json").read_bytes())
+    runs = lambda t: re.sub(r'(?m)^files = \[[^\]]*\]', "files = " + json.dumps([f"run_{k}.csv" for k in range(len(M["files"]))]), t, count=1)
+    shared = lambda t: re.sub(r'(?m)^(values = \[)("[^"]*"), "[^"]*"', r"\1\2, \2", t, count=1)   # the second curve at the first's slow value
+    keyed = lambda field: lambda t: t.replace('identity = "NONE"', 'identity = "RUN"', 1).replace(
+        '[replicate.key]\nkind = "NONE"', f'[replicate.key]\nkind = "FILE_NAME"\nseparator = "_"\nfield = {field}', 1)
+    S5 = lambda x: (re.findall(r"- \*\*S5 CENSUS\*\*[^\n]{0,200}", x) or [x[-300:]])[0]   # the run's S5 line, for a failure's why
+    s5 = lambda edit: (lambda i: (cli("lint", i), cli("seal", i, *SEAL), cli("run", i))[2][1])(declare(lambda t: edit(shared(runs(t))), "rep"))
+    by_name, unkeyed, absent = s5(keyed(2)), s5(lambda t: t.replace('identity = "NONE"', 'identity = "RUN"', 1)), s5(keyed(3))
+    check("T33.1 (A33) two curves at one slow value, identity RUN keyed by the file-name field 2: S5 passes", "**S5 CENSUS** (LIVE): EXECUTED, PASS" in by_name, S5(by_name))
+    check("T33.1 (A33) the same bank with the key undeclared (kind NONE): S5 refuses CURVE_REPEATED", "**S5 CENSUS** (LIVE): EXECUTED, REFUSE CURVE_REPEATED" in unkeyed, S5(unkeyed))
+    check("T33.1 (A33) a file-name field the names do not have (field 3): S5 refuses REPLICATE_KEY_UNRESOLVED", "**S5 CENSUS** (LIVE): EXECUTED, REFUSE REPLICATE_KEY_UNRESOLVED" in absent, S5(absent))
 
 print("test_intake_loop4: " + ("FAILED " + "; ".join(bad) if bad else "all passed"))
 sys.exit(1 if bad else 0)
