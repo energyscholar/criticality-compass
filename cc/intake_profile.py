@@ -1,12 +1,13 @@
-"""intake_profile - pre-processing (plan 1165; role intake_profile, its own line cap tests/test_budget.py PROFILE_CAP): `bin/cc intake profile`
-reads every byte of every file under a root-named path, before any declaration is written, and reduces them to a PROFILE of their
-structure. Invariants:
+"""intake_profile - pre-processing (plan 1165; role intake_profile, its own cap tests/test_budget.py PROFILE_CAP; the cross-check against a
+declaration is cc/intake_against.py): `bin/cc intake profile` reads every byte of every file under a root-named path, before any
+declaration is written, and reduces them to a PROFILE of their structure. Invariants:
  - value-free BY TYPE: every field of Profile, FileProfile, Table, RowRun, HeaderLine, ColumnProfile and Finding is an int, a str that is a
    file name, a sha256, an enum atom or a masked name (intake_names.masked: every numeral as #; a NUMERIC cell as its position #k), or a tuple
    of these; no float, and no str that receives a cell's text unmasked. A value is held in memory to count runs, never kept;
  - every file is read once through the vendored t23 logged loader, partition "profiled", into declarations/<id>/profile-access.log;
    nothing is written under the profiled path;
  - a finding is a row of FindingKind and its response is looked up in RESPONSE, total over FindingKind (tests/test_intake_profile.py)."""
+import datetime
 import enum
 import functools
 import importlib.util
@@ -15,11 +16,11 @@ import itertools
 import json
 import re
 from collections import Counter
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, field, make_dataclass
 from pathlib import Path
 
 import intake_bytes
-from intake_blind import detail, gate
+from intake_blind import Refuse, detail, gate
 from intake_convert import SPLIT, _book_names, _decoded, _split, _zipped, sheet_rows
 from intake_names import NUMBER, Name, _runs, classify, masked, repeats
 
@@ -32,10 +33,7 @@ FindingKind = enum.Enum("FindingKind", "ENCODING_NOT_UTF8 BOM_PRESENT DELIMITER_
                         "COLUMNS_DIFFER_ACROSS_FILES NOT_MONOTONE DIRECTION_DESCENDING EQUAL_RUNS_SHORT EQUAL_RUN_LONG REVISITED_VALUES XLSX_SHEETS "
                         "ZIP_MEMBERS UNPROFILED_FORMAT LARGE_FILE ONE_FILE")
 Response = enum.Enum("Response", "CONVERT DECLARE BLOCKS REFUSE_DEPOSIT NONE")
-Contradiction = enum.Enum("Contradiction", "FILE_NOT_PROFILED ENCODING_CONTRADICTS_PROFILE DELIMITER_CONTRADICTS_PROFILE HEADER_CONTRADICTS_PROFILE "
-                          "COLUMN_CONTRADICTS_PROFILE CELLS_CONTRADICT_PROFILE WIDTH_CONTRADICTS_PROFILE ORDER_CONTRADICTS_PROFILE "
-                          "REPEATS_CONTRADICT_PROFILE SHEET_CONTRADICTS_PROFILE FILES_CONTRADICT_PROFILE")
-C, R = Response, Contradiction
+C = Response
 RESPONSE = {   # plan 1165 section 4: FindingKind -> (its one response, what it prints, the "or ..." it prints second, "" none); total (test)
     "ENCODING_NOT_UTF8": (C.CONVERT, "DECODE encoding = latin-1 / utf-16", ""),
     "BOM_PRESENT": (C.NONE, "the readers and DECODE's default strip it", ""),
@@ -63,23 +61,6 @@ RESPONSE = {   # plan 1165 section 4: FindingKind -> (its one response, what it 
     "LARGE_FILE": (C.NONE, "expect the conversion's cost", ""),
     "ONE_FILE": (C.DECLARE, "[selection] layout = LONG_TABLE, slow COLUMN from the column of fewest distinct values and longest equal runs", ""),
 }
-PREDICTS = {   # plan 1165 section 5: a live S4 / S4 reader / S5 reason a byte-level fact can raise -> the Contradiction that precedes it (test)
-    "NOT_UTF8": R.ENCODING_CONTRADICTS_PROFILE, "ROW_WIDTH_DIFFERS": R.WIDTH_CONTRADICTS_PROFILE, "COLUMN_NAME_ABSENT": R.COLUMN_CONTRADICTS_PROFILE,
-    "COLUMN_NAME_AMBIGUOUS": R.COLUMN_CONTRADICTS_PROFILE, "COLUMN_POSITION_OUT_OF_RANGE": R.COLUMN_CONTRADICTS_PROFILE,
-    "CELL_NOT_A_NUMBER": R.CELLS_CONTRADICT_PROFILE, "HEADER_LINE_ABSENT": R.HEADER_CONTRADICTS_PROFILE, "NO_DATA_ROW": R.HEADER_CONTRADICTS_PROFILE,
-    "SHEET_ABSENT": R.SHEET_CONTRADICTS_PROFILE, "COLUMNS_DIFFER": R.FILES_CONTRADICT_PROFILE, "ROW_ORDER_DIFFERS": R.ORDER_CONTRADICTS_PROFILE,
-    "FILE_DIFFERS_FROM_FIRST": R.FILES_CONTRADICT_PROFILE, "FAST_VALUE_REPEATED": R.REPEATS_CONTRADICT_PROFILE, "ACQUISITION_ORDER_DIFFERS": R.ORDER_CONTRADICTS_PROFILE,
-}
-NOT_PREDICTABLE = {   # plan 1165 section 5: the live reasons no profile can precede, each with why (test: PREDICTS + this = every live S4, S5 reason)
-    "CURVE_REPEATED": "a slow value's recurrence is a value fact, and the profile holds no value",
-    "SLOW_KEY_UNRESOLVED": "a FILE_KEY slow value is a header cell's value, which the profile masks",
-    "REPLICATE_KEY_UNRESOLVED": "a replicate key is a value of a file name field or a column, which the profile does not hold",
-    "UNIT_DIFFERS": "a unit is compared as declared text; the profile masks every numeral in it",
-    "NOT_AN_XLSX": "openpyxl's parse of the cells, not a structure the profile states",
-    "XLSX_READER_ABSENT": "a fact of the machine that runs the reader, not of the files",
-    "READER_NOT_LIVE": "a fact of the declaration's reader name, not of the files",
-    "READER_REFUSED": "the wrapper of a reader reason; each reader reason has its own row",
-}
 CUT = {d: SPLIT[d] for d in ("COMMA", "SEMICOLON", "TAB", "WHITESPACE")}   # Delimiter -> one line to its cells, in the election's tie order (NONE:
 # the line is one cell); the converter's own DELIMITER cuts, so a profile's widths are the widths DELIMITER from = d gives
 ENCODINGS = (   # (Encoding, does it hold, DECODE's name): the first that holds decodes the file (plan 1165 2.2); a BOM is structure, read first
@@ -93,92 +74,32 @@ READER_ABSENT = "NONE_READER_ABSENT"   # an XLSX's `sheets` on a machine without
 CLASSES = ("#", "%", ";", "//", "!", "[")   # comment prefix classes: a line's first characters (the reader's own test, startswith)
 
 
-@dataclass(frozen=True)
-class RowRun:
-    """A run of lines of one (kind, width, comment prefix): `first` and `last` are 1-based file lines (a block boundary is a change of any)."""
-    first: int
-    last: int
-    kind: str
-    width: int
-    prefix: str
+def frozen(name, fields, doc):
+    """A frozen dataclass of typed fields ((name, type) or (name, type, default)): the profile's types (plan 1165 section 3)."""
+    return make_dataclass(name, [f[:2] + tuple(field(default=d) for d in f[2:]) for f in fields], frozen=True, namespace={"__doc__": doc})
 
 
-@dataclass(frozen=True)
-class HeaderLine:
-    """A line before the first NUMERIC run, as cells: a TEXT cell masked, a NUMERIC one as its position #k, an empty one as ""."""
-    line: int
-    cells: tuple
-
-
-@dataclass(frozen=True)
-class ColumnProfile:
-    """Position k of the dominant width over the body lines of that width: counts of cell classes, the lines of TEXT and empty cells
-    (run-length encoded [first, last] pairs), and the order and repeats of its numbers (counts only; equal_runs = runs of 2, 3-9, 10+)."""
-    position: int
-    name: str
-    numeric: int
-    empty: int
-    text: int
-    text_lines: tuple
-    empty_lines: tuple
-    monotone_runs: int = 0
-    first_direction: str = "FLAT"
-    equal_runs: tuple = (0, 0, 0)
-    longest: int = 0
-    revisited: int = 0
-    distinct: int = 0
-
-
-@dataclass(frozen=True)
-class Table:
-    """One text file's (or one sheet's) cells: the elected delimiter and every delimiter's evidence ((width, lines) pairs), the line count,
-    the blank lines (run-length encoded), the comment prefixes counted, the row runs, the header lines (at most 12) and the columns."""
-    delimiter: str
-    widths: tuple
-    lines: int
-    blank_lines: tuple
-    comment_prefixes: tuple
-    rows: tuple
-    header_lines: tuple
-    columns: tuple
-
-
-@dataclass(frozen=True)
-class FileProfile:
-    """One file of the profiled path. `tables` holds its one Table (a TEXT_TABLE) or none; `sheets` (an XLSX) its sheets as
-    (position, masked name, Table); `members` (a ZIP) (masked name, size) pairs."""
-    name: str
-    bytes: int
-    sha256: str
-    kind: str
-    encoding: str
-    tables: tuple = ()
-    sheets: object = ()
-    members: tuple = ()
-
-
-@dataclass(frozen=True)
-class Sheet:
-    """One sheet of an XLSX: its 1-based position (the address `sheet = k` takes), its masked name, its row and column counts, its Table."""
-    position: int
-    name: str
-    rows: int
-    columns: int
-    table: Table
-
-
-@dataclass(frozen=True)
-class Finding:
-    """A FindingKind atom where it is (file; sheet position, 0 for none; lines [first, last] or none; column position, 0 for none) and its
-    response from RESPONSE: the atom, the text it prints, the "or ..." it prints second."""
-    code: str
-    file: str
-    sheet: int
-    lines: tuple
-    column: int
-    response: str
-    does: str
-    otherwise: str
+RowRun = frozen("RowRun", [("first", int), ("last", int), ("kind", str), ("width", int), ("prefix", str), ("numbers", int)],
+                "A run of lines of one (kind, width, comment prefix, numbers: 1 when each line holds a numeric cell, so a `n/a` row of a body is told "
+                "from a whole text row); first and last are 1-based file lines (a block boundary is a change of any).")
+HeaderLine = frozen("HeaderLine", [("line", int), ("cells", tuple)], "A line before the body as cells: a TEXT cell masked, a NUMERIC one #k, an empty one \"\".")
+ColumnProfile = frozen("ColumnProfile", [("position", int), ("name", str), ("numeric", int), ("empty", int), ("text", int), ("text_lines", tuple),
+                                         ("empty_lines", tuple), ("monotone_runs", int, 0), ("first_direction", str, "FLAT"), ("equal_runs", tuple, (0, 0, 0)),
+                                         ("longest", int, 0), ("revisited", int, 0), ("distinct", int, 0)],
+                       "Position k of the dominant width over the body lines of that width holding a number: counts of cell classes, the lines of TEXT "
+                       "and empty cells ([first, last] runs), the order and repeats of its numbers (counts only; equal_runs: runs of 2, 3-9, 10+).")
+Table = frozen("Table", [("delimiter", str), ("widths", tuple), ("lines", int), ("blank_lines", tuple), ("comment_prefixes", tuple), ("rows", tuple),
+                         ("header_lines", tuple), ("columns", tuple)],
+               "A text file's or a sheet's cells: the elected delimiter and every delimiter's (width, lines) evidence, the line count, the blank lines, "
+               "the comment prefixes counted, the row runs, the header lines (at most 12) and the columns.")
+FileProfile = frozen("FileProfile", [("name", str), ("bytes", int), ("sha256", str), ("kind", str), ("encoding", str), ("tables", tuple, ()),
+                                     ("sheets", object, ()), ("members", tuple, ())],
+                     "One file: `tables` its one Table (a TEXT_TABLE); `sheets` an XLSX's Sheets (or READER_ABSENT); `members` a ZIP's (masked name, size).")
+Sheet = frozen("Sheet", [("position", int), ("name", str), ("rows", int), ("columns", int), ("table", object)],
+               "One sheet of an XLSX: its 1-based position (the address `sheet = k` takes), its masked name, its row and column counts, its Table.")
+Finding = frozen("Finding", [("code", str), ("file", str), ("sheet", int), ("lines", tuple), ("column", int), ("response", str), ("does", str), ("otherwise", str)],
+                 "A FindingKind atom where it is (file; sheet position or 0; lines [first, last] or none; column or 0) and its RESPONSE row.")
+Profile = frozen("Profile", [("path", str), ("files", tuple), ("findings", tuple)], "The profile of a root-named path: its files in listing order, its findings.")
 
 
 def rle(numbers):
@@ -245,7 +166,7 @@ def table(lines, delimiter, widths):
 
 
 def cells_table(cut, delimiter, widths):
-    keyed = [(n, (kind(cs), len(cs), p)) for n, cs, p in cut]
+    keyed = [(n, (kind(cs), len(cs), p, int(any(NUMBER.fullmatch(c.strip()) for c in cs)))) for n, cs, p in cut]
     runs = tuple(RowRun(g[0][0], g[-1][0], *key) for key, g in ((k, list(g)) for k, g in itertools.groupby(keyed, key=lambda x: x[1])))
     body = [r for r in runs if r.kind in NUMERIC_KINDS]
     start = {True: lambda: body[0].first, False: lambda: len(cut) + 1}[len(body) > 0]()
@@ -253,7 +174,7 @@ def cells_table(cut, delimiter, widths):
     head = [(n, cs) for n, cs, _ in cut if n < start]
     names = [cs for n, cs in head if kind(cs) == "TEXT"][-1:]
     named = lambda k: {True: lambda: _name(names[0], k), False: lambda: "NONE"}[len(names) == 1 and len(names[0]) >= k]()
-    within = [(n, cs) for n, cs, _ in cut if n >= start and len(cs) == dominant and kind(cs) != "BLANK"]
+    within = [(n, cs) for n, cs, _ in cut if n >= start and len(cs) == dominant and any(NUMBER.fullmatch(c.strip()) for c in cs)]
     columns = tuple(_column(k, named(k), [(n, cs[k - 1]) for n, cs in within]) for k in range(1, dominant + 1))
     prefixes = Counter(p for _, _, p in cut if p != "")
     return Table(delimiter, widths, len(cut), rle(n for n, cs, _ in cut if kind(cs) == "BLANK"), tuple(sorted(prefixes.items())), runs,
@@ -308,27 +229,153 @@ def as_json(p):
     return json.dumps(asdict(p), indent=1, sort_keys=True) + "\n"
 
 
-@dataclass(frozen=True)
-class Profile:
-    """The profile of a root-named path: its files in listing order and the findings of section 4."""
-    path: str
-    files: tuple
-    findings: tuple
-
-
 def listing(base):
     """Every file under base, by its relative path, sorted (the profile reads the whole path: no glob, no sampling)."""
     return sorted(q.relative_to(base).as_posix() for q in Path(base).rglob("*") if q.is_file())
 
 
+def tables_of(f):
+    """(sheet position, Table) of a file: its text table (sheet 0) or each sheet of an XLSX."""
+    return [(0, t) for t in f.tables] + [(x.position, x.table) for x in {True: f.sheets, False: ()}[isinstance(f.sheets, tuple)]]
+
+
+def body(t):
+    """(the first NUMERIC line, the last NUMERIC run's first and last lines, the names line: the last TEXT line before the body, 0 for none)."""
+    nr = [r for r in t.rows if r.kind in NUMERIC_KINDS] or [RowRun(t.lines + 1, t.lines + 1, "", 0, "", 0)]
+    return nr[0].first, nr[-1].first, nr[-1].last, max([r.last for r in t.rows if r.kind == "TEXT" and r.last < nr[0].first], default=0)
+
+
+def runs(t, where):
+    """The lines of t's whole-text runs (no numeric cell) that `where(first line of body, first and last line of the last NUMERIC run)` holds."""
+    b = body(t)
+    return [((r.first, r.last), 0) for r in t.rows if r.kind == "TEXT" and r.numbers == 0 and where(r, *b[:3])]
+
+
+span = lambda ls: {True: lambda: (ls[0][0], ls[-1][1]), False: tuple}[len(ls) > 0]()
+per_file = lambda holds: lambda fs: [(f.name, 0, (), 0) for f in fs if holds(f)]
+per_table = lambda found: lambda fs: [(f.name, k, ls, c) for f in fs for k, t in tables_of(f) for ls, c in found(t)]
+per_column = lambda holds, lines=lambda c: (): per_table(lambda t: [(span(lines(c)), c.position) for c in t.columns if holds(c)])
+texts = lambda f: [t for t in f.tables if f.kind == "TEXT_TABLE"]
+shape = lambda f: [([c.name for c in t.columns], len(t.columns)) for t in f.tables]   # a text file's masked names line and dominant width
+RAISES = {   # FindingKind -> (the profiled files) -> [(file, sheet, lines, column)] where its structure (plan 1165 section 4) is; total (test)
+    "ENCODING_NOT_UTF8": per_file(lambda f: f.encoding in ("LATIN1_ONLY", "UTF16")), "BOM_PRESENT": per_file(lambda f: f.encoding == "UTF8_SIG"),
+    "DELIMITER_NOT_COMMA": per_file(lambda f: any(t.delimiter in ("SEMICOLON", "TAB", "WHITESPACE") for t in texts(f))),
+    "NO_DELIMITER": per_file(lambda f: any(t.delimiter == "NONE" for t in texts(f))),
+    "HEADER_LINES_BEFORE_NAMES": per_table(lambda t: [((1, body(t)[3] - 1), 0) for _ in range(int(len([r for r in t.rows if r.kind != "BLANK" and r.last < body(t)[3]]) > 0))]),
+    "NAMES_LINE_ABSENT": per_table(lambda t: [((), 0) for _ in range(int(body(t)[3] == 0 and body(t)[0] <= t.lines))]),
+    "NAMES_LINE_NUMERIC": per_table(lambda t: [((body(t)[3], body(t)[3]), 0) for h in t.header_lines if h.line == body(t)[3]
+                                               and len(h.cells) >= 3 and sum(bool(re.fullmatch(r"#\d+", c)) for c in h.cells) >= len(h.cells) - 1]),
+    "COMMENT_LINES": per_table(lambda t: [((r.first, r.last), 0) for r in t.rows if r.prefix != ""]),
+    "TEXT_RUN_IN_BODY": per_table(lambda t: runs(t, lambda r, first, last0, last1: first < r.first < last0)),
+    "TEXT_RUN_TRAILING": per_table(lambda t: runs(t, lambda r, first, last0, last1: r.first > last1)),
+    "TEXT_CELLS_IN_COLUMN": per_column(lambda c: c.text > 0, lambda c: c.text_lines),
+    "EMPTY_CELLS_IN_COLUMN": per_column(lambda c: c.empty > 0, lambda c: c.empty_lines),
+    "WIDTH_CHANGES": per_table(lambda t: [((r.first, r.last), 0) for r in t.rows if r.kind in NUMERIC_KINDS and r.width != len(t.columns)]),
+    "COLUMNS_DIFFER_ACROSS_FILES": lambda fs: [(f.name, 0, (), 0) for f in fs if [shape(f)] != [shape(g) for g in fs if texts(g)][:1] and texts(f)],
+    "NOT_MONOTONE": per_column(lambda c: c.monotone_runs > 1),
+    "DIRECTION_DESCENDING": per_column(lambda c: c.monotone_runs == 1 and c.first_direction == "DESCENDING"),
+    "EQUAL_RUNS_SHORT": per_column(lambda c: c.equal_runs[0] + c.equal_runs[1] > 0 and c.revisited == 0),
+    "EQUAL_RUN_LONG": per_column(lambda c: c.longest >= 10), "REVISITED_VALUES": per_column(lambda c: c.revisited > 0),
+    "XLSX_SHEETS": per_file(lambda f: f.kind == "XLSX"), "ZIP_MEMBERS": per_file(lambda f: f.kind == "ZIP"),
+    "UNPROFILED_FORMAT": per_file(lambda f: f.kind == "UNPROFILED_FORMAT"),
+    "LARGE_FILE": per_file(lambda f: any(t.lines >= 10000 for _, t in tables_of(f))),
+    "ONE_FILE": lambda fs: [(f.name, 0, (), 0) for f in fs if f.kind == "TEXT_TABLE" and sum(g.kind == "TEXT_TABLE" for g in fs) == 1],
+}
+
+
+def findings(files):
+    """Every finding of the profiled files, in file order then FindingKind order, each with its response from RESPONSE (computed, never chosen)."""
+    order = {f.name: i for i, f in enumerate(files)}
+    found = [(order[f], k.value, Finding(k.name, f, s, ls, c, RESPONSE[k.name][0].name, *RESPONSE[k.name][1:])) for k in FindingKind for f, s, ls, c in RAISES[k.name](files)]
+    return tuple(x for _, _, x in sorted(found, key=lambda x: x[:2]))
+
+
 def profile(root, ident, path, t, out="PROFILE.json"):
     """Profile the directory a root-named path names (intake_bytes.located; any other form is ROOT_UNRESOLVED): every file read once through
-    the logged loader (partition "profiled", declarations/<id>/profile-access.log); writes declarations/<id>/<out>. Profile | Refuse."""
+    the logged loader (partition "profiled", declarations/<id>/profile-access.log); writes declarations/<id>/<out> and its .md, appends to
+    profile.log, replaces the ## Profile section of <path>/../MANIFEST.md when it exists. Writes nothing under the path. Profile | Refuse."""
     d, base = Path(root) / "declarations" / ident, intake_bytes.located(path, t["roots"])
     def go():
         loader = intake_bytes._t23().Loader({base: "profiled"}, d / "profile-access.log")
-        p = Profile(path, tuple(profiled(n, loader.read(Path(base) / n)) for n in listing(base)), ())
+        files = tuple(profiled(n, loader.read(Path(base) / n)) for n in listing(base))
+        p, now = Profile(path, files, findings(files)), datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         (d / out).write_text(as_json(p))
+        sha = hashlib.sha256((d / out).read_bytes()).hexdigest()
+        (d / out).with_suffix(".md").write_text(md(p, sha))
+        with (d / "profile.log").open("a") as log:
+            log.write(json.dumps({"time": now, "path": path, "out": out, "files": len(files), "bytes": sum(f.bytes for f in files), "sha256": sha}) + "\n")
+        manifest = Path(base).parent / "MANIFEST.md"
+        {True: lambda: manifest.write_text(section(manifest.read_text(), p, sha, now)), False: lambda: None}[manifest.is_file()]()
         return p
     return gate([(lambda: base != "" and Path(base).is_dir(), "ROOT_UNRESOLVED", lambda: detail(words=[f"path '{path}' (a root-named path: <name>/<relative path>)"]))], go)
 
+
+def _cells(h):
+    """A header line as peek prints it (intake_convert._said's form): its text names masked, its numeric names counted, or blank."""
+    text = [c for c in h.cells if c != "" and not re.fullmatch(r"#\d+", c)]
+    num = sum(bool(re.fullmatch(r"#\d+", c)) for c in h.cells)
+    return {True: f"line {h.line}: blank", False: f"line {h.line}: {len(text)} text name{'s' * (len(text) != 1)} + {num} numeric name{'s' * (num != 1)}" + "".join(f"{', ' * (i > 0) or ': '}'{c}'" for i, c in enumerate(text))}[
+        len(text) + num == 0]
+
+
+def _table_md(t, title):
+    names, blanks = body(t)[3], [n for a, b in t.blank_lines for n in range(a, b + 1)]
+    row = lambda n: n - names - sum(names < b <= n for b in blanks)   # RANGES' data-row number: rows after the names line, blank lines not rows
+    rows = lambda r: {True: lambda: f"{row(r.first)}-{row(r.last)}", False: lambda: "-"}[r.first > names and r.kind != "BLANK"]()
+    out = [f"### {title}", f"- delimiter {t.delimiter}; evidence " + "; ".join(f"{d} " + " ".join(f"{w}x{n}" for w, n in h) for d, h in t.widths),
+           f"- {t.lines} lines; blank lines " + (", ".join(f"{a}-{b}" for a, b in t.blank_lines) or "none") + "; comment prefixes "
+           + (", ".join(f"'{c}' x{n}" for c, n in t.comment_prefixes) or "none"), "", "| lines | data rows | kind | width |", "|---|---|---|---|"]
+    out += [f"| {r.first}-{r.last} | {rows(r)} | {r.kind}{' (' + r.prefix + ')' if r.prefix else ''}{' with numbers' * (r.kind == 'TEXT' and r.numbers)} | {r.width} |" for r in t.rows]
+    out += ["", "Header lines:"] + [f"- {_cells(h)}" for h in t.header_lines] + ["", "| k | name | numeric | empty | text | text lines | empty lines | monotone runs |"
+            " first direction | equal runs 2 / 3-9 / 10+ | longest | revisited | distinct |", "|" + "---|" * 13]
+    lines = lambda ls: ", ".join(f"{a}-{b}" for a, b in ls) or "-"
+    out += [f"| {c.position} | {c.name or '(empty)'} | {c.numeric} | {c.empty} | {c.text} | {lines(c.text_lines)} | {lines(c.empty_lines)} | {c.monotone_runs} |"
+            f" {c.first_direction} | {' / '.join(map(str, c.equal_runs))} | {c.longest} | {c.revisited} | {c.distinct} |" for c in t.columns[:12]]
+    return out + [f"+{len(t.columns) - 12} more columns in PROFILE.json" for _ in range(int(len(t.columns) > 12))] + [""]
+
+
+def md(p, sha):
+    """PROFILE.md: the human form of PROFILE.json (no fact in one that is not in the other), per file, then the findings with their responses."""
+    out = [f"# Profile of {p.path}", "", f"PROFILE.json sha256 {sha}; {len(p.files)} files; {len(p.findings)} findings.", ""]
+    for f in p.files:
+        out += [f"## {f.name}", f"- {f.kind}; encoding {f.encoding}; {f.bytes} bytes; sha256 {f.sha256}"] + [f"- member {m} ({n} bytes)" for m, n in f.members]
+        out += {True: [f"- sheets: openpyxl is not installed here ({READER_ABSENT})"], False: [f"- sheet #{x.position} '{x.name}': {x.rows} rows, {x.columns} columns"
+                for x in {True: f.sheets, False: ()}[isinstance(f.sheets, tuple)]]}[f.sheets == READER_ABSENT] + [""]
+        out += [x for k, t in tables_of(f) for x in _table_md(t, {True: "the table", False: f"sheet #{k}"}[k == 0])]
+    out += ["## Findings", ""] + [f"- {x.code}: {x.file}" + f" sheet #{x.sheet}" * (x.sheet > 0) + "".join(f" lines {x.lines[0]}-{x.lines[1]}" for _ in x.lines[:1])
+            + f" column {x.column}" * (x.column > 0) + f" -> {x.response}: {x.does}" + f" (or {x.otherwise})" * (x.otherwise != "") for x in p.findings]
+    return "\n".join(out + ["", "Unprofiled: " + (", ".join(f"{f.name} ({f.bytes} bytes)" for f in p.files if f.kind == "UNPROFILED_FORMAT") or "none"), ""])
+
+
+def section(text, p, sha, now):
+    """MANIFEST.md with its `## Profile` section (counts only) replaced whole: from that heading to the next `## ` or the end; appended when absent."""
+    rows = [f"| {f.name} | {f.kind} | {f.encoding} | {' '.join(t.delimiter for t in f.tables) or '-'} | {sum(t.lines for _, t in tables_of(f))} |"
+            f" {sum(r.last - r.first + 1 for _, t in tables_of(f) for r in t.rows if r.kind in NUMERIC_KINDS)} | {len(RAISES['TEXT_RUN_IN_BODY']([f]))} |"
+            f" {'/'.join(sorted({str(r.width) for _, t in tables_of(f) for r in t.rows if r.kind in NUMERIC_KINDS})) or '-'} | {sum(x.file == f.name for x in p.findings)} |" for f in p.files]
+    new = "\n".join([f"## Profile", "", f"Profiled {now} (bin/cc intake profile); PROFILE.json sha256 {sha}.", "",
+                     "| file | kind | encoding | delimiter | lines | numeric rows | text runs in body | widths | findings |", "|" + "---|" * 9] + rows) + "\n"
+    m = re.search(r"^## Profile[ \t]*$.*?(?=^## |\Z)", text, re.M | re.S)
+    return {True: lambda: text[:m.start()] + new + "\n" * (m.end() < len(text)) + text[m.end():], False: lambda: text.rstrip("\n") + "\n\n" + new}[m is not None]()
+
+
+
+USAGE = ("usage: bin/cc intake profile <id> <root-named path> (PROFILE.json of the files the run reads) | profile <id> --raw <root-named path>"
+         " (PROFILE-raw.json of a deposit a conversion reads) | profile <id> --check (the declaration against PROFILE.json)")
+
+
+def _said(ident, p, out):
+    sha = hashlib.sha256((Path(out)).read_bytes()).hexdigest()
+    return (f"profile {ident}: {p.path}: {len(p.files)} files ({sum(f.kind == 'UNPROFILED_FORMAT' for f in p.files)} unprofiled), {len(p.findings)} findings;"
+            f" {Path(out).name} sha256 {sha}\n" + "".join(f"  {x}\n" for x in md(p, sha).split("## Findings\n\n")[1].split("\n\nUnprofiled")[0].splitlines())
+            + f"  Next: read declarations/{ident}/{Path(out).with_suffix('.md').name}; each finding names its one response (docs/INTAKE-PREPROCESSING.md)")
+
+
+def profile_cli(root, ident, args, t):
+    """bin/cc intake profile <id> [--raw] <root-named path> | --check: the profile and its findings printed, exit 0; a refusal or usage, exit 1."""
+    import intake_convert
+    path, out = [a for a in args if a != "--raw"], {True: "PROFILE-raw.json", False: "PROFILE.json"}["--raw" in args]
+    ok = len(path) == 1 and not path[0].startswith("--")
+    got = {True: lambda: profile(root, ident, path[0], t, out), False: lambda: None}[ok]()
+    print({(True, True): lambda: f"profile {ident}: " + got.text(intake_convert.ctables()["sentences"]),
+           (True, False): lambda: _said(ident, got, Path(root) / "declarations" / ident / out), (False, False): lambda: f"bin/cc intake: {USAGE}"}[(ok, isinstance(got, Refuse))]())
+    return {True: 0, False: 1}[ok and not isinstance(got, Refuse)]

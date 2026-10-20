@@ -145,7 +145,10 @@ with tempfile.TemporaryDirectory() as tmp:
     check("6. RESULT.json after it: confirmation CONFIRMED, PRIMARY_READY, the seal's author kind HUMAN, the same result",
           (res2.get("confirmation"), res2.get("primary_verdict"), res2.get("seal_identity", {}).get("author_kind")) == ("CONFIRMED", "PRIMARY_READY", "HUMAN")
           and res2.get("results") == res.get("results"), json.dumps(res2)[:600])
-    sh("bin/cc new intake demo4 --from-synth demo1", w)
+    synth = sh("bin/cc new intake demo4 --from-synth demo1", w)
+    check("6. (plan 1165 P3) `new intake --from-synth` profiles the bank it declares: PROFILE.json, PROFILE.md written, the line printed",
+          (w / "declarations" / "demo4" / "PROFILE.json").is_file() and (w / "declarations" / "demo4" / "PROFILE.md").is_file()
+          and "profiled <intake-synth>/demo1: 10 files" in synth.stdout, synth.stdout[-400:] + synth.stderr[-400:])
     fill(w / "declarations" / "demo4" / "intake.toml")
     (w / "declarations" / "demo4" / "RESULT.json").write_text("{}\n")   # a stale result
     t4 = w / "declarations" / "demo4" / "intake.toml"

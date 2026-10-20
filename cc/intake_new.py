@@ -30,8 +30,12 @@ def _write_new(root, d, ident, values, dropped, trans):
 
 
 def _from_synth(root, d, ident, sid, synth):
-    import intake_synth   # test infrastructure: it knows the MANIFEST it wrote
-    return _write_new(root, d, ident, *intake_synth.declare(json.loads(synth.read_text()), ident, sid))
+    """The declaration filled from the synth MANIFEST, then the bank it declares profiled (plan 1165: <intake-synth>/<sid>), so the quickstart
+    path does not change: S3 finds the PROFILE the user never asked for by name."""
+    import intake, intake_profile, intake_synth   # intake_synth is test infrastructure: it knows the MANIFEST it wrote
+    code, said = _write_new(root, d, ident, *intake_synth.declare(json.loads(synth.read_text()), ident, sid))
+    p = intake_profile.profile(root, ident, f"<intake-synth>/{sid}", intake.tables(root))
+    return code, said + f"\n  profiled <intake-synth>/{sid}: {len(p.files)} files, {len(p.findings)} findings (declarations/{ident}/PROFILE.md)"
 
 
 def new(root, ident, sid):

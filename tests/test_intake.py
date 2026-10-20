@@ -433,11 +433,13 @@ INTAKE_MODULES = {f.stem: ast.parse(f.read_text()) for f in sorted((ROOT / "cc")
 READS = {"intake_bytes", "intake_seal",   # the two modules of the split that may open a file (the data bytes through the t23 loader; the seal files)
          "intake",   # declared exception: the tables and the declaration's text, never a data byte
          "intake_new",   # declared exception: the two templates and the synth MANIFEST
-         "intake_convert", "intake_terminal", "intake_synth"}   # outside the split: the conversion, RESULT.json's code hash, the planted bank
+         "intake_convert", "intake_terminal", "intake_synth",   # outside the split: the conversion, RESULT.json's code hash, the planted bank
+         "intake_profile"}   # outside the split (plan 1165): the MANIFEST.md it rewrites, profile.log, its PROFILE.json; data bytes only through the loader
 readers = {m for m, tr in INTAKE_MODULES.items() if called(tr) & {"open", "read_bytes", "read_text"}}
 check("split: open, read_bytes and read_text are called only in intake_bytes, intake_seal and the declared exceptions", readers <= READS, str(sorted(readers - READS)))
 PRINTS = {"intake",   # the only module of the split that prints or exits
-          "intake_convert", "intake_synth", "intake_blindview"}   # outside the split: they print already (convert and peek; the planted bank; 1160 A41 blind)
+          "intake_convert", "intake_synth", "intake_blindview",   # outside the split: they print already (convert and peek; the planted bank; 1160 A41 blind)
+          "intake_profile"}   # outside the split (plan 1165): `bin/cc intake profile` prints its findings
 printers = {m for m, tr in INTAKE_MODULES.items() if called(tr) & {"print", "exit"}}
 check("split: print and sys.exit are called only in intake.py and the declared modules outside the split", printers <= PRINTS, str(sorted(printers - PRINTS)))
 check("split: cc/intake_data.py is retired (its parts are intake_evidence, intake_bytes and intake_census)", "intake_data" not in INTAKE_MODULES, "")

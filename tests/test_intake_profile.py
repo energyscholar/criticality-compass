@@ -2,7 +2,8 @@
  T0  RESPONSE is total over FindingKind; PREDICTS + NOT_PREDICTABLE cover every live S4 reason, S4 reader reason and S5 reason of
      intake/STAGES.toml (plan 1165 section 5), and no code is in both.
  K8  Two sentinel banks (every numeric cell and slow value "-7357.", as test_intake_leak): a PER_FILE bank of five csv files and a LONG_TABLE
-     file whose comment line holds a sentinel; profiled: no byte of PROFILE.json or profile-access.log holds any printed form of any sentinel cell.
+     file whose comment line holds a sentinel, with a MANIFEST.md beside them; profiled by profile_cli: no byte of its stdout, PROFILE.json,
+     PROFILE.md, profile.log, profile-access.log or the MANIFEST holds any printed form of any sentinel cell.
  K9  A planted file whose names line is `T=-7357.5K,C,h -7357.25` and whose body holds `n/a` and `nan` cells: the names print through
      intake_names.masked (`T=#K`, `C`, `h #`: masked writes each numeral as one #, not one # per digit as plan 1165 K9's example shows);
      the n/a cell is a TEXT cell of column 2 at its line; neither text is in PROFILE.json.
@@ -21,6 +22,12 @@
      monotone_runs counts maximal monotone SEGMENTS of the values (intake_profile.segments: a reset between sweeps opens one segment, so
      22 sweeps are 22); intake_names.repeats' "monotone runs" counts runs of STEPS (a reset is its own run: 43 on this bank), so the
      profile takes repeats' longest run and values revisited and computes its segments itself.
+ T3  (P3) RAISES is total over FindingKind; a two-file plant raises exactly its findings (code, file, lines, column), each with its RESPONSE
+     row; `bin/cc intake profile` (profile_cli, in process, the plant roots of intake_plant.rooted) on <cc-datasets>/set/raw: exit 0, the
+     findings printed, PROFILE.json, PROFILE.md and one profile.log line written, the MANIFEST.md beside raw/ gains one `## Profile`
+     section (counts only) and keeps its other sections; profiled twice, the MANIFEST is the same but for the time and the log has two
+     lines (idempotent); nothing under the profiled path changes (a hash of the tree before and after); --raw writes PROFILE-raw.json;
+     a bare path is refused ROOT_UNRESOLVED (exit 1); `profile` is a row of intake.INTAKE.
  K11 A two-file plant the test never opens: profile-access.log holds two loader lines of partition "profiled" and no in-process-bypass line
      (the profile's own hooked loader sees any other open of those paths in the process).
 Seen RED (each mutation applied by hand, the test run, the mutation reverted):
@@ -33,8 +40,14 @@ Seen RED (each mutation applied by hand, the test run, the mutation reverted):
    this mutation "the whitespace plant elects TAB"; reversed, ties go to WHITESPACE, so the plants that turn are the tab and the
    comma-and-blank ones.
  - T2: BIN[2] made 1 (a run of 2 counted under 3-9): FAIL (the runs-of-2 plant); revisited computed over consecutive pairs only (`sum(a == b for a, b in zip(xs, xs[1:]))`): FAIL (the revisited plant).
+ - T3: a RAISES row deleted (ONE_FILE): FAIL; the section appended, never replaced (`[m is not None]` made `[False]`): FAIL (two
+   `## Profile` sections); the MANIFEST written under the profiled path (the write target made Path(base) / "MANIFEST.md"): FAIL (the
+   tree hash, and no section beside raw/).
  - K11: profiled reading one file with Path.read_bytes() beside the loader: FAIL (a bypass line).
 """
+import contextlib
+import hashlib
+import io
 import json
 import re
 import sys
@@ -45,6 +58,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "tests")]
 import intake  # noqa: E402
+import intake_plant  # noqa: E402
+import intake_against as A  # noqa: E402
 import intake_profile as P  # noqa: E402
 
 bad = []
@@ -75,6 +90,15 @@ def roots(tmp):
 def run(tmp, ident, bank):
     (Path(tmp) / "declarations" / ident).mkdir(parents=True, exist_ok=True)
     return P.profile(tmp, ident, f"<long-test>/{bank}", roots(tmp))
+
+
+def cli(tmp, ident, args, t=None):
+    """profile_cli in process: (exit code, stdout)."""
+    (Path(tmp) / "declarations" / ident).mkdir(parents=True, exist_ok=True)
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        code = P.profile_cli(tmp, ident, args, t or intake_plant.rooted(T, tmp))
+    return code, buf.getvalue()
 
 
 def outputs(tmp, ident):
@@ -157,15 +181,58 @@ else:
     check("T2 without openpyxl: sheets NONE_READER_ABSENT", P.profiled("plant.bin", BOOK.getvalue()).sheets == P.READER_ABSENT)
 print(f"  openpyxl {'installed' if HAS_XLSX else 'NOT installed'} on this machine; NOT REACHED HERE: {'the reader-absent case' if HAS_XLSX else 'the profiled sheets'}")
 
+# ---- T3: findings, the command, the artefacts
+check("T3 RAISES is total over FindingKind", set(P.RAISES) == {k.name for k in P.FindingKind}, str(set(P.RAISES) ^ {k.name for k in P.FindingKind}))
+A_CSV = b"# Title\nh = 5 T\nT,C,S\n1,2,3\n2,n/a,4\n3,,5\nT,C,S\n9,8,7\n8,7,6\n\nend\n"
+B_CSV = b"T;C\n1;2\n1;2\n1;2\n"
+got = [(x.code, x.file, x.lines, x.column) for x in P.findings((P.profiled("a.csv", A_CSV), P.profiled("b.csv", B_CSV)))]
+want = [("HEADER_LINES_BEFORE_NAMES", "a.csv", (1, 2), 0), ("COMMENT_LINES", "a.csv", (1, 1), 0), ("TEXT_RUN_IN_BODY", "a.csv", (7, 7), 0),
+        ("TEXT_RUN_TRAILING", "a.csv", (11, 11), 0), ("TEXT_CELLS_IN_COLUMN", "a.csv", (5, 5), 2), ("EMPTY_CELLS_IN_COLUMN", "a.csv", (6, 6), 2),
+        ("NOT_MONOTONE", "a.csv", (), 1), ("NOT_MONOTONE", "a.csv", (), 2), ("NOT_MONOTONE", "a.csv", (), 3), ("DELIMITER_NOT_COMMA", "b.csv", (), 0),
+        ("COLUMNS_DIFFER_ACROSS_FILES", "b.csv", (), 0), ("EQUAL_RUNS_SHORT", "b.csv", (), 1), ("EQUAL_RUNS_SHORT", "b.csv", (), 2)]
+check("T3 the two-file plant raises exactly its 13 findings", got == want, str(got))
+one = P.findings((P.profiled("only.csv", b"T,C\n1,2\n3,2\n2,2\n"), P.profiled("w.bin", intake_plant.xlsx([("T", "C"), (1, 2)])),
+                  P.profiled("z.bin", b"\x00\x01binary")))
+check("T3 ONE_FILE, XLSX_SHEETS, UNPROFILED_FORMAT, and each finding's response is its RESPONSE row", [x.code for x in one] ==
+      ["NOT_MONOTONE", "EQUAL_RUNS_SHORT", "ONE_FILE", "XLSX_SHEETS", "UNPROFILED_FORMAT"]
+      and all((x.response, x.does, x.otherwise) == (P.RESPONSE[x.code][0].name,) + P.RESPONSE[x.code][1:] for x in one), str([(x.code, x.column) for x in one]))
+with tempfile.TemporaryDirectory() as tmp:
+    raw = Path(tmp) / "cc-datasets" / "set" / "raw"
+    raw.mkdir(parents=True)
+    (raw / "a.csv").write_bytes(A_CSV)
+    (raw / "b.csv").write_bytes(B_CSV)
+    manifest = raw.parent / "MANIFEST.md"
+    manifest.write_text("# set\n\n## Files\n\n| file |\n|---|\n| a.csv |\n\n## Profile\n\nan old section\n\n## Notes\n\nkept\n")
+    tree = lambda: sorted((str(q.relative_to(raw)), hashlib.sha256(q.read_bytes()).hexdigest()) for q in raw.rglob("*"))
+    before = tree()
+    code, said = cli(tmp, "t3", ["<cc-datasets>/set/raw"])
+    first = manifest.read_text()
+    code2, _ = cli(tmp, "t3", ["<cc-datasets>/set/raw"])
+    second = manifest.read_text()
+    d = Path(tmp) / "declarations" / "t3"
+    untimed = lambda text: re.sub(r"Profiled \S+ ", "Profiled <time> ", text)
+    check("T3 exit 0, the findings printed (13), PROFILE.json and PROFILE.md written", (code, code2) == (0, 0) and said.count("\n  ") >= 13
+          and "TEXT_RUN_IN_BODY: a.csv lines 7-7" in said and (d / "PROFILE.json").is_file() and (d / "PROFILE.md").is_file(), said[:300])
+    check("T3 the MANIFEST: one ## Profile section, its other sections kept, the old section gone", first.count("## Profile") == 1 and "## Files" in first
+          and "## Notes\n\nkept" in first and "an old section" not in first and "| a.csv | TEXT_TABLE | UTF8 | COMMA | 11 | 4 | 1 | 3 | 9 |" in first, first)
+    check("T3 profiled twice: the MANIFEST is the same but for the time; profile.log has two lines", untimed(first) == untimed(second)
+          and len((d / "profile.log").read_text().splitlines()) == 2, second)
+    check("T3 nothing under the profiled path changed", tree() == before, str(tree()))
+    code, said = cli(tmp, "t3", ["--raw", "<cc-datasets>/set/raw"])
+    check("T3 --raw writes PROFILE-raw.json and PROFILE-raw.md", code == 0 and (d / "PROFILE-raw.json").is_file() and (d / "PROFILE-raw.md").is_file(), said)
+    code, said = cli(tmp, "t3", ["raw"])
+    check("T3 a bare path is refused ROOT_UNRESOLVED, exit 1", code == 1 and "REFUSE ROOT_UNRESOLVED" in said, said)
+    check("T3 `profile` is a row of intake.INTAKE", "profile" in intake.INTAKE)
+
 # ---- T0: the tables
 st = tomllib.loads((ROOT / "intake" / "STAGES.toml").read_text())
 live = {r["code"] for s in st["stage"] if s["id"] in ("S4", "S5") for r in s["reason"] + s.get("reader_reason", []) if r["live"]}
 check("T0 RESPONSE is total over FindingKind", set(P.RESPONSE) == {k.name for k in P.FindingKind}, str(set(P.RESPONSE) ^ {k.name for k in P.FindingKind}))
 check("T0 every RESPONSE row is a Response atom with its texts", all(isinstance(r, P.Response) and isinstance(a, str) and isinstance(b, str) for r, a, b in P.RESPONSE.values()))
-check("T0 every live S4 / S4 reader / S5 reason is mapped or NOT PREDICTABLE (with a reason)", live == set(P.PREDICTS) | set(P.NOT_PREDICTABLE)
-      and all(w.strip() for w in P.NOT_PREDICTABLE.values()), str(live ^ (set(P.PREDICTS) | set(P.NOT_PREDICTABLE))))
-check("T0 no code both mapped and NOT PREDICTABLE; every mapping is a Contradiction", not set(P.PREDICTS) & set(P.NOT_PREDICTABLE)
-      and all(isinstance(c, P.Contradiction) for c in P.PREDICTS.values()))
+check("T0 every live S4 / S4 reader / S5 reason is mapped or NOT PREDICTABLE (with a reason)", live == set(A.PREDICTS) | set(A.NOT_PREDICTABLE)
+      and all(w.strip() for w in A.NOT_PREDICTABLE.values()), str(live ^ (set(A.PREDICTS) | set(A.NOT_PREDICTABLE))))
+check("T0 no code both mapped and NOT PREDICTABLE; every mapping is a Contradiction", not set(A.PREDICTS) & set(A.NOT_PREDICTABLE)
+      and all(isinstance(c, A.Contradiction) for c in A.PREDICTS.values()))
 
 with tempfile.TemporaryDirectory() as tmp:
     banks = Path(tmp) / "banks"
@@ -178,12 +245,14 @@ with tempfile.TemporaryDirectory() as tmp:
     every = {x.encode() for s in sentinels for x in forms(s)}
 
     # ---- K8
+    (banks / "MANIFEST.md").write_text("# the sentinel banks\n\n## Files\n\n- pf, long\n")
     for b in ("pf", "long"):
-        p = run(tmp, f"k8-{b}", b)
-        got = outputs(tmp, f"k8-{b}")
+        code, said = cli(tmp, f"k8-{b}", [f"<long-test>/{b}"], roots(tmp))
+        got = {**outputs(tmp, f"k8-{b}"), "stdout": said.encode(), "MANIFEST.md": (banks / "MANIFEST.md").read_bytes()}
         leaked = sorted({(n, x.decode()) for n, data in got.items() for x in every if x in data})
-        check(f"K8 {b}: profiled ({len(p.files)} files) and PROFILE.json, profile-access.log hold no sentinel form", isinstance(p, P.Profile)
-              and set(got) >= {"PROFILE.json", "profile-access.log"} and not leaked, f"{len(leaked)} leaks, first in {leaked[:1] and leaked[0][0]}")
+        check(f"K8 {b}: profiled (exit {code}); stdout, PROFILE.json, PROFILE.md, profile.log, profile-access.log and the MANIFEST hold no sentinel form",
+              code == 0 and set(got) >= {"PROFILE.json", "PROFILE.md", "profile.log", "profile-access.log"} and "## Profile" in got["MANIFEST.md"].decode()
+              and not leaked, f"{len(leaked)} leaks, first in {leaked[:1] and leaked[0][0]}")
 
     # ---- K9
     (banks / "k9").mkdir()
@@ -198,7 +267,7 @@ with tempfile.TemporaryDirectory() as tmp:
           and "7357" not in js and "h -" not in js)
 
     # ---- K10
-    enums = {a.name for e in (P.FileKind, P.Encoding, P.Delimiter, P.RowKind, P.FindingKind, P.Response, P.Contradiction) for a in e}
+    enums = {a.name for e in (P.FileKind, P.Encoding, P.Delimiter, P.RowKind, P.FindingKind, P.Response, A.Contradiction) for a in e}
 
     def leaves(x):
         return {dict: lambda: [y for v in x.values() for y in leaves(v)], list: lambda: [y for v in x for y in leaves(v)]}.get(type(x), lambda: [x])()

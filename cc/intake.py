@@ -1,4 +1,4 @@
-"""intake - `bin/cc intake explain | lint | seal | run | synth | convert | peek`: the command-line surface of the intake pipeline.
+"""intake - `bin/cc intake explain | lint | seal | run | synth | convert | peek | blind | profile`: the command-line surface of the intake pipeline.
 Invariant: the only intake module that prints or exits, every exit code from a table; it reads the tables and the declaration's text (never
 a data byte: S3 reads those, cc/intake_bytes.py) and registers the stage bodies; it is what bin/cc and docs/gen-intake.py import."""
 import tomllib
@@ -100,7 +100,7 @@ def run(root, ident, args):
 
 def _usage(why):
     print(f"bin/cc intake: {why}\n  usage: bin/cc intake explain | synth <id> --seed N [--curves K] [--out DIR] | lint <id> | seal <id> --author NAME --as human|ai-draft "
-          "(--confirmed-by NAME | --unconfirmed) | run <id> | convert <id> [--verify] | peek <id> <cc-datasets>/<name>/raw/<file> [--sheet NAME|k] [--depth N] [--encoding E] [--delimiter D] | blind <id> <name>/<path> <file>...\n  Next: bin/cc intake explain")
+          "(--confirmed-by NAME | --unconfirmed) | run <id> | convert <id> [--verify] | peek <id> <cc-datasets>/<name>/raw/<file> [--sheet NAME|k] [--depth N] [--encoding E] [--delimiter D] | blind <id> <name>/<path> <file>... | profile <id> [--raw] <root-named path> | profile <id> --check\n  Next: bin/cc intake explain")
     return 1
 
 
@@ -117,17 +117,16 @@ def synth(root, args):
 
 
 def _handoff(pick):
-    """bin/cc intake convert | peek | blind: before the intake (cc/intake_convert.py, role intake_handoff; blind: cc/intake_blindview.py), imported when asked for."""
+    """bin/cc intake convert | peek | blind | profile: before the intake (cc/intake_convert.py, role intake_handoff; cc/intake_blindview.py; cc/intake_profile.py), imported when asked for."""
     def go(root, ident, a):
-        import intake_blindview
-        import intake_convert
-        return pick(intake_convert, intake_blindview)(root, ident, a, tables(root))
+        import intake_blindview, intake_convert, intake_profile   # one line: cc/intake.py is at its cap (tests/test_budget.py)
+        return pick(intake_convert, intake_blindview, intake_profile)(root, ident, a, tables(root))
     return _with_id(go)
 
 
 INTAKE = {"explain": lambda root, a: print(intake_say.explain(tables(root)), end="") or 0, "lint": _with_id(lint), "seal": _with_id(seal), "run": _with_id(run),
-          "synth": synth, "convert": _handoff(lambda c, b: c.convert_cli), "peek": _handoff(lambda c, b: c.peek_cli),
-          "blind": _handoff(lambda c, b: b.blind_cli)}
+          "synth": synth, "convert": _handoff(lambda c, b, p: c.convert_cli), "peek": _handoff(lambda c, b, p: c.peek_cli),
+          "blind": _handoff(lambda c, b, p: b.blind_cli), "profile": _handoff(lambda c, b, p: p.profile_cli)}
 
 
 def cli(root, args):
