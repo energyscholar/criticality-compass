@@ -1,6 +1,7 @@
 """test_intake_convert - plan 1160 P3: the conversion of a deposit into a canonical bank (cc/intake_convert.py, `bin/cc intake convert |
 peek`). Planted inputs only (no real data).
- V1. Each op of intake/CONVERSION.toml [op], on a planted file, writes a bank file equal byte for byte to a hand-written expected file, and
+ V1. Each op of intake/CONVERSION.toml [op], on a planted file (and, plan 1160 A37/A38, the two cases docs/INTAKE-CONVERSION.md states:
+     WIDE_TO_LONG with an empty key name then RENAME, and DROP_LINES FIRST counting a blank line), writes a bank file equal byte for byte to a hand-written expected file, and
      --verify passes on it (SHEET_TO_CSV only where openpyxl is installed; elsewhere it refuses XLSX_READER_ABSENT and is NOT REACHED here).
  V2. The identity test catches a cell rewritten as repr(float(cell) + 1e-9), a dropped row and a reordered row (each a mutation of
      intake_convert.render, so the bytes about to be written differ from what the ops built): convert refuses and writes no bank.
@@ -127,6 +128,11 @@ with tempfile.TemporaryDirectory() as tmp:
          {"out_000.csv": "T,C,h\n1.5,0.25,0.1\n1.6,0.5,0.1\n", "out_001.csv": "T,C,h\n1.5,0.75,0.2\n"}),
         ("WIDE_TO_LONG", {"a.csv": b"h,1.5,1.6\n0.1,0.25,0.5\n0.2,0.75,1.0\n"}, "a.csv", '{op = "WIDE_TO_LONG", key = "h", fast = "T", measured = "C"}',
          {"out.csv": "T,C,h\n1.5,0.25,0.1\n1.6,0.5,0.1\n1.5,0.75,0.2\n1.6,1.0,0.2\n"}),
+        ("WIDE_TO_LONG, an empty key name, then RENAME (1160 A37)", {"a.csv": b",1.5,1.6\n0.1,0.25,0.5\n0.2,0.75,1.0\n"}, "a.csv",
+         '{op = "WIDE_TO_LONG", key = "", fast = "T", measured = "C"}, {op = "RENAME", pairs = [{from = "", to = "h"}]}',
+         {"out.csv": "T,C,h\n1.5,0.25,0.1\n1.6,0.5,0.1\n1.5,0.75,0.2\n1.6,1.0,0.2\n"}),
+        ("DROP_LINES FIRST counts a blank line (1160 A38)", {"a.csv": b"sample A\n\nT,C\n1.5,0.25\n"}, "a.csv", '{op = "DROP_LINES", rule = {kind = "FIRST", count = 2}}',
+         {"out.csv": "T,C\n1.5,0.25\n"}),
         ("DROP_ROWS_NOT_NUMERIC", {"a.csv": b"T,C\n1.5,0.25\n1.6,\n1.7,n/a\n1.8,0.5\n"}, "a.csv", '{op = "DROP_ROWS_NOT_NUMERIC", columns = ["C"]}',   # 1160 A11
          {"out.csv": "T,C\n1.5,0.25\n1.8,0.5\n"}),
     ]

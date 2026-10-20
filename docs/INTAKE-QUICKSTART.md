@@ -1,6 +1,11 @@
 # Intake quickstart: synthetic data from the command line
 
 Plan 1139. Run from the root of the Criticality Compass, with no environment variable set. Everything runs on this machine in seconds.
+
+This page is the synthetic bank. For a deposited data set, the first step is not `synth`: start at section 3 of
+docs/INTAKE-ON-A-DATA-HOST.md ("Declare a data set"), and when the files need moving into a readable shape, at
+docs/INTAKE-CONVERSION.md. Its transducer.toml is then a record, `kind = "record"`, not the template's `kind = "transducer"`
+("transducer.toml for real data" in the same section 3) (plan 1160 A38).
 tests/test_intake_cli.py runs exactly the block below (test 5), with the edit step done by applying the filled example, so this page
 cannot drift from what works.
 
@@ -25,6 +30,9 @@ What each line does:
 4. You replace each TODO. The example's interval method is `STATED`: the bank's `sigma` column is each point's interval, since the bank
    holds one reading per point (plan 1160 P5: a resampling method such as `iid` or `block` needs more, and S7 refuses it with
    ONE_READING_PER_POINT). A resampling method also needs its fields (cc.toml `[interval_fields.<method>]`); lint names any that are missing.
+   A tier needs an interval method: `method = "NONE"` makes S7's tiering `NONE`, and every result is then UNTIERED, a candidate with no
+   resolution claim, whatever the data hold. Choose `STATED` when the file has an uncertainty column, or a resampling method when there
+   are several readings per point (plan 1160 A38).
 5. `lint` runs the stages that read no data. It should pass FORMAT and CHOICES. CHOICES checks the choices against each other: two distinct
    knobs and a measured number that is neither, a selection that names a file with one slow value per file, a direction for a FAST_RESTART
    block, the projections and bridges (a permitted step at each link, one estimand per projection, the lanes the source needs and lanes that
@@ -93,8 +101,9 @@ c = 0.0
 - `PRIMARY verdict: PRIMARY_INCOMPLETE`, missing only `confirmation`: every PRIMARY stage and the terminal passed, and the seal is not
   confirmed. RESULT.json is written with `confirmation = UNCONFIRMED`. To reach `PRIMARY_READY`, a human confirms the seal: see
   "From INCOMPLETE to READY" in docs/INTAKE-COMPLETION.md.
-- Reading a result: RESULT.json's first keys are `tiering`, `primary_verdict` and `reading`. Read them first, never `type` alone. A
+- Reading a result: read `tiering`, `primary_verdict` and `reading` first: they are RESULT.json's first keys. Never read `type` alone. A
   located maximum (`MaxLocated`) is not, by itself, evidence of a transition; `tiering` and `primary_verdict` say how far it was tested
-  ("Reading a result" in docs/INTAKE-COMPLETION.md).
+  ("Reading a result" in docs/INTAKE-COMPLETION.md). A `tiering` of `NONE` comes from `[interval] method = "NONE"`: no tier was
+  possible. With an ALTERNATIVE lane, S9 can refuse while S10 passes: the PRIMARY result stands and only ROBUSTNESS is refused.
 
 To start again: `rm -r scratch/intake-synth/demo1 scratch/intake-synth/demo1-TRUTH declarations/demo1`.

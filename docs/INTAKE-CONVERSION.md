@@ -47,8 +47,8 @@ note counts the conversion's reads (plan 1160 A13).
    old one, or use a new id (BANK_EXISTS). Its summary lists each output's columns as names are printed everywhere: a numeral in a
    text name as `#`, a numeric name never (plan 1160 A31). A conversion takes seconds; one that runs for minutes is a defect, report it. A killed
    conversion writes no bank; `declarations/<id>/conversion-access.log` lists the files it had read (plan 1160 A23). It writes nothing unless the identity test passes on the exact bytes it is about to write.
-5. In the intake declaration, `[source]` says `kind = "CONVERTED"`, `converted_from = "<cc-datasets>/<name>/raw"` (the deposit you converted) and
-   `root = "<cc-banks>/<id>/bank"`, and `[selection]` excludes `CONVERSION-MANIFEST.json`. At S3 the intake checks the chain from the raw
+5. In the intake declaration, `[source]` says `kind = "CONVERTED"`, `converted_from = "<cc-datasets>/<name>/raw"` (the deposit you converted),
+   `root = "<cc-banks>/<id>/bank"` and `universe = "*"`, and `[selection]` excludes `CONVERSION-MANIFEST.json`. At S3 the intake checks the chain from the raw
    files to the bank (CONVERSION_CHAIN_BROKEN) and then reads the bank exactly as a deposit.
 
 ## The declaration
@@ -100,6 +100,7 @@ TEXT to TEXT. Each dropped line is recorded in the manifest with its step. There
   `[Header]` / `TITLE,run 1` / `[Data]` / `Time,Temp (K),Moment` / `1.0,300.5,1e-3` / `2.0,301.25,2e-3`.
   It is written as `Time,Temp (K),Moment` / `1.0,300.5,1e-3` / `2.0,301.25,2e-3`. If no line is the marker, the refusal is MARKER_LINE_ABSENT.
 - `rule = {kind = "FIRST", count = 2}` drops the first two lines: `sample A` / `operator note` / `T,C` / `1.5,0.25` is written as `T,C` / `1.5,0.25`.
+  FIRST counts blank lines too: `count` is the number of text lines from the top, blank or not, as peek numbers them (plan 1160 A38).
 - `rule = {kind = "PREFIX", prefix = "#"}` drops every line that begins with `#`: `# run 1` / `T,C` / `# pause` / `1.5,0.25` is written
   as `T,C` / `1.5,0.25`.
 
@@ -163,6 +164,8 @@ NAMED to NAMED: one file becomes several. Rows are copied verbatim, in order, an
 - `rule = {kind = "CHANGE", column = "h"}`: a new output starts each time the text of column `h` changes. The outputs are named after
   `to`: `out.csv` gives `out_000.csv`, `out_001.csv` and so on.
   `T,C,h` / `1.5,0.25,0.1` / `1.6,0.5,0.1` / `1.5,0.75,0.2` is written as `out_000.csv` (the two `0.1` rows) and `out_001.csv` (the `0.2` row).
+  Every change starts an output, so a column that returns to a value, or holds a stray cell, gives extra outputs. Choose the curves
+  from the convert summary and list every other output in the declaration's `excluded` (plan 1160 A38).
 
 ### WIDE_TO_LONG
 
@@ -172,6 +175,15 @@ of rows, and each row of the block holds `fast` (the names cell, verbatim), `mea
 `T,C,h` / `1.5,0.25,0.1` / `1.6,0.5,0.1` / `1.5,0.75,0.2` / `1.6,1.0,0.2`.
 Every name except the key's must be a number (NAMES_NOT_NUMERIC otherwise). A row shorter than the names line is refused COLUMN_ABSENT.
 Declare the bank as a LONG_TABLE whose slow column is the key.
+
+The orientation rule: WIDE_TO_LONG reads each row as one curve, so the first column's quantity (the key) becomes the slow knob, and
+the numbers of the names line become the fast knob. A table the other way round (one curve per column, the fast knob down the first
+column) is not this op's shape: its rows would become blocks of one fast value each, and a conversion never reorders rows.
+
+When the key column has an empty name (the names line begins with a comma), name it `key = ""` (or by position, `key = 1`), then
+RENAME it: `,1.5,1.6` / `0.1,0.25,0.5` / `0.2,0.75,1.0` with
+`steps = [{op = "WIDE_TO_LONG", key = "", fast = "T", measured = "C"}, {op = "RENAME", pairs = [{from = "", to = "h"}]}]` is written
+as `T,C,h` / `1.5,0.25,0.1` / `1.6,0.5,0.1` / `1.5,0.75,0.2` / `1.6,1.0,0.2` (plan 1160 A37).
 
 ### DROP_ROWS_NOT_NUMERIC
 

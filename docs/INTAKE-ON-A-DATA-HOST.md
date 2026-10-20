@@ -67,6 +67,8 @@ SCHEMA_UNSUPPORTED, so restate it in v5 under a new id (v4 to v5 adds `[knobs.sl
   CONVERSION-MANIFEST.json from `[selection]`, as MANIFEST.json is.
 - `admissibility`: `RAW`, `DECLARABLE`, `FIGURE_LEVEL` or `PROCESSED_UNDECLARABLE`, read from the deposit's metadata. It is sealed with the
   declaration.
+- `universe`: a glob, relative to `root`, of every file the seal lists. For a CONVERTED bank (or a BLINDED view) write
+  `universe = "*"`: the bank directory holds the outputs and CONVERSION-MANIFEST.json, nothing else (plan 1160 A38).
 
 For a table, `[reader]` is `table-curve-v1`:
 
@@ -79,7 +81,11 @@ For a table, `[reader]` is `table-curve-v1`:
     `T/K` (`SLASH`, split at the first slash). Declare a column by its bare name (`T`). A names cell with no unit states none, and a
     unit that differs from the declared one is refused UNIT_DIFFERS. A refusal prints a stated unit with every number in it as `#`.
 - `comment` holds the line prefixes to drop, for example `["#"]`, or `[]` for none. An empty prefix `""` would drop every line, so it is
-  refused COMMENT_PREFIX_EMPTY.
+  refused COMMENT_PREFIX_EMPTY. Comment lines are dropped before the header is counted: `rows` counts the lines that are left. When
+  every line above the data is a comment line, declare `kind = "SKIP"` with `rows = 0` and the `comment` prefix, and name the columns
+  by position; `rows = 1` would take the first data row as a header line. A prefix drops every line it begins, so `comment = ["#"]`
+  also drops a `##T,C` names line, and the reader then finds no names line: convert the file instead, with NAMES_LINE
+  REPLACE_PREFIXED `"##"` (docs/INTAKE-CONVERSION.md) (plan 1160 A38).
 
 Columns are named in `[knobs.fast]`, `[measured]` and `[measured.uncertainty]` (COLUMN or NONE): by NAME (a string) or by 1-based POSITION
 (an integer). A report prints a column declared by name in quotes (`'T'`) and one declared by position as `#k`, its 1-based position. S4
@@ -117,7 +123,9 @@ There are two layouts in `[selection]`:
     a count. Rows in acquisition order with direction `UNORDERED` give no direction, so S1 refuses BLOCK_RULE_HAS_NO_DIRECTION.
 
 `[knobs.fast] control` says how the fast knob was driven: `SET` (it was set to each value of a grid; the template's line) or `MEASURED`
-(it was read, not set: a ramp or a carried sweep). It decides what a point is, and so what a repeated fast value means:
+(it was read, not set: a ramp or a carried sweep). An instrument ramp's fast knob is MEASURED: a temperature or field swept at a rate
+and read as it passed is never a grid, whatever its step looks like (plan 1160 A38). It decides what a point is, and so what a
+repeated fast value means:
 
 | control | `[replicate] identity` | a point is | a repeated fast value in a curve |
 |---|---|---|---|
@@ -146,7 +154,15 @@ that same directory. A deposit with no files.lst is declared from its raw direct
 
 `excluded` lists the files of the universe that are not curves, each with a `why`. The seal checks that the universe is exactly the
 selected files, the excluded files and the truth side, each file in one part. Otherwise it refuses UNIVERSE_NOT_PARTITIONED, or
-SELECTION_DUPLICATE when a name is given twice.
+SELECTION_DUPLICATE when a name is given twice. After a conversion with SPLIT_ROWS CHANGE the bank holds one output per change, some
+of them short or not curves: choose the curves for `[selection] files` from the convert summary (rows and columns per output), and list
+every other output in `excluded` with its why (plan 1160 A38).
+
+A family of files that varies in two parameters (a field and a pressure, say) is not one curve family. One parameter becomes the slow
+knob; the other must be held fixed: by selection (select the files at one value of it and list the rest in `excluded`, with the why),
+or, when the deposit itself holds it fixed, by stating that in transducer.toml's `[record] preparation`. Never let both vary across the
+selected curves: two curves at one slow value are refused CURVE_REPEATED, and curves that differ in both would be chained as if only
+the slow knob had changed (plan 1160 A38).
 
 ### A RESERVED data set: declare the blinded view (plan 1160 A41)
 
