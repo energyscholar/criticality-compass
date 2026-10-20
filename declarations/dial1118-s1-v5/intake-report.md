@@ -1,6 +1,6 @@
 # Intake report: dial1118-s1-v5
 
-Written by `bin/cc intake run dial1118-s1-v5`. Stage table 1165-v1, policy 1136-v1.
+Written by `bin/cc intake run dial1118-s1-v5`. Stage table 1165-v1, policy 1176-v1.
 
 - **Mode** (the declarer's sealed statement of what they had seen): EXPLORATORY
 - **PRIMARY verdict: PRIMARY_REFUSED_AT** at S4. Missing: none.
