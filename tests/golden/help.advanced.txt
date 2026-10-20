@@ -1,28 +1,30 @@
 $ bin/cc help --advanced
 cc - Criticality Compass   (ADVANCED)
 
-  bin/cc show <input>                                         every reading of an input, and each point's verdict (a declared report: cc.toml [report] verdict)
-  bin/cc explain <input> <point>                              the whole chain for one point: data -> verdict (a declared report: cc.toml [report] verdict)
-  bin/cc run <input> | --all [--tables SET] [--dry]           measure; each verdict is a declared report (cc.toml [report] verdict); --dry writes nothing
-  bin/cc reverdict <input> --tables SET [--from SET]          re-verdict a stored result under another rulebook; measures nothing
-  bin/cc freeze <run-id> | --all [--tables SET]               make a result and what it read read-only
-  bin/cc tabulate [--diff A B]                                write SIGNATURE-TABLE.md + docs/verdict-table.html; --diff prints only
-  bin/cc new case <id>                                        start a case file from the template
-  bin/cc new input <id> [--like X ...]                        start an input from the template; --like also takes --points --data-dir --label-format --add-instrument
-  bin/cc new instrument <id>                                  start an instrument (registry file + stub module) from the template
-  bin/cc data add <input>                                     pin the sha256 of an input's data files
-  bin/cc tables fork <from> <to>                              copy a rulebook so you can edit it
-  bin/cc tables drop <set> [--with-results]                   delete an unfrozen rulebook
-  bin/cc tables split <set> --column C --value V --verdict X  override one cell family
-  bin/cc validate [--input ID --tables SET | --mvt]           check every file; each problem has a Next line
-  bin/cc check [--fast | --baseline]                          validate + tests; run it before a commit; --baseline reads the recorded green run of this tree
-  bin/cc test [-v] [--regolden [--classify]] [<name> ...]     run the named tests (default all); --classify tags a regolden's changed lines a-e and undoes it on any (e)
-  bin/cc mutate <relpath> (--sed E | --py E) -- <test> ...    run tests against a temporary mutation
-  bin/cc help [--advanced]                                    this text
-  bin/cc navigate <input> [--access-log PATH]                 UNTESTED: walk a stored map (an input with [interval] method chains) by the N0 bisection; reads only the nodes it visits, logged per T23
-  bin/cc family <id> [--tables SET]                           the family report (a declared projection C over bracket, f1, f2: cc.toml [report] family) of a stored result; measures nothing
-  bin/cc new family <id>                                      start a family declaration from the template
-  bin/cc intake explain | (lint | seal | run) <id>            the intake pipeline of a raw-data declaration declarations/<id>/ (explain prints its stage table; not `explain <input> <point>`)
-  bin/cc intake synth <id> --seed N [--curves K]              write a planted synthetic bank to scratch/intake-synth/<id> (docs/INTAKE-QUICKSTART.md)
-  bin/cc new intake <id> [--from-synth <id>]                  start a declaration declarations/<id>/ from the template (--from-synth fills the bank's metadata)
+  bin/cc show <input>                                                                every reading of an input, and each point's verdict (a declared report: cc.toml [report] verdict)
+  bin/cc explain <input> <point>                                                     the whole chain for one point: data -> verdict (a declared report: cc.toml [report] verdict)
+  bin/cc run <input> | --all [--tables SET] [--dry]                                  measure; each verdict is a declared report (cc.toml [report] verdict); --dry writes nothing
+  bin/cc reverdict <input> --tables SET [--from SET]                                 re-verdict a stored result under another rulebook; measures nothing
+  bin/cc freeze <run-id> | --all [--tables SET]                                      make a result and what it read read-only
+  bin/cc tabulate [--diff A B]                                                       write SIGNATURE-TABLE.md + docs/verdict-table.html; --diff prints only
+  bin/cc new case <id>                                                               start a case file from the template
+  bin/cc new input <id> [--like X ...]                                               start an input from the template; --like also takes --points --data-dir --label-format --add-instrument
+  bin/cc new instrument <id>                                                         start an instrument (registry file + stub module) from the template
+  bin/cc data add <input>                                                            pin the sha256 of an input's data files
+  bin/cc tables fork <from> <to>                                                     copy a rulebook so you can edit it
+  bin/cc tables drop <set> [--with-results]                                          delete an unfrozen rulebook
+  bin/cc tables split <set> --column C --value V --verdict X                         override one cell family
+  bin/cc validate [--input ID --tables SET | --mvt]                                  check every file; each problem has a Next line
+  bin/cc check [--fast | --baseline]                                                 validate + tests; run it before a commit; --baseline reads the recorded green run of this tree
+  bin/cc test [-v] [--regolden [--classify]] [<name> ...]                            run the named tests (default all); --classify tags a regolden's changed lines a-e and undoes it on any (e)
+  bin/cc mutate <relpath> (--sed E | --py E) -- <test> ...                           run tests against a temporary mutation
+  bin/cc help [--advanced]                                                           this text
+  bin/cc navigate <input> [--access-log PATH]                                        UNTESTED: walk a stored map (an input with [interval] method chains) by the N0 bisection; reads only the nodes it visits, logged per T23
+  bin/cc navigate family <id> | score <id> <checkpoints.toml>                        follow an intake declaration's [suspect] line with the frozen linenav (grid cells); score it against checkpoints kept outside declarations/
+  bin/cc family <id> [--tables SET]                                                  the family report (a declared projection C over bracket, f1, f2: cc.toml [report] family) of a stored result; measures nothing
+  bin/cc new family <id>                                                             start a family declaration from the template
+  bin/cc intake explain | (lint | seal | run) <id>                                   the intake pipeline of a raw-data declaration declarations/<id>/ (explain prints its stage table; not `explain <input> <point>`)
+  bin/cc intake convert <id> [--verify] | peek <id> <cc-datasets>/<name>/raw/<file>  convert a deposit into a canonical bank per declarations/<id>/CONVERSION.toml, or print the head of a raw file without a value (docs/INTAKE-CONVERSION.md)
+  bin/cc intake synth <id> --seed N [--curves K]                                     write a planted synthetic bank to scratch/intake-synth/<id> (docs/INTAKE-QUICKSTART.md)
+  bin/cc new intake <id> [--from-synth <id>]                                         start a declaration declarations/<id>/ from the template (--from-synth fills the bank's metadata)
 exit 0

@@ -15,16 +15,16 @@ from dataclasses import dataclass
 import numpy as np
 
 import intake_census
+import linenav
 from intake_blind import look
 from intake_seal import SealStatus
 
 KEY = "FEATURE_ARGMAX_FAST"   # the POLICY row this projection cites (intake/POLICY.toml [feature_projection])
 
 
-class Side(enum.Enum):
-    """linenav's side alphabet (tools/linenav.py v2.1-T Side), by member name. The oracle reads SIDE's names through its `alphabet`, so a
-    caller that holds linenav.Side passes it and gets linenav's members (phase D); this enum is the default."""
-    NEG = "NEG"; POS = "POS"; MID = "MID"; UNRES = "UNRES"; SINGLE = "SINGLE"
+Side, FiniteStored = linenav.Side, linenav.FiniteStored   # plan 1176 D (B-E3): linenav's own alphabet and evidence class (cc/linenav.py, frozen
+# v2.1-T), no stand-in: the oracle reads SIDE's names through its `alphabet` (default linenav.Side); FiniteStored(source) is the class of a
+# finite-size reader of STORED data, so it can never claim the line ends, and the oracle's evidence is never Sharp
 
 
 class Locus(enum.Enum):
@@ -121,13 +121,6 @@ SOURCE = {   # S2's seal status -> (declaration id, SEAL.json record) -> the Fin
 
 
 @dataclass(frozen=True)
-class FiniteStored:
-    """linenav's evidence class of a finite-size reader of STORED data (plan 1109): FINITE, it can never claim the line ends. source names the
-    stored object. The oracle's evidence is always this class, never Sharp."""
-    source: str
-
-
-@dataclass(frozen=True)
 class Oracle:
     """The real-data side oracle: one Feature per curve in slow order; called on a cell u = (curve_rank, sample_rank) it returns a member of
     `alphabet` (linenav's Side, or this module's) named by SIDE. A curve rank outside the family is Absent (UNRES): no default side exists."""
@@ -150,17 +143,24 @@ class Unprojected:
         return f"{self.reason}: intake/POLICY.toml has no [feature_projection.{KEY}] row (estimand, preserves, discards); no feature is projected without it"
 
 
-DECLARED = {True: lambda t, census, seal, alphabet: _build(t, census, seal, alphabet), False: lambda t, census, seal, alphabet: Unprojected()}
+DECLARED = {True: lambda t, cs, census, seal, alphabet: _build(t, cs, census, seal, alphabet), False: lambda t, cs, census, seal, alphabet: Unprojected()}
 
 
 def oracle(t, census, seal, alphabet=Side):
-    """The side oracle of a census (S5's evidence) under S2's seal state: an Oracle, or Unprojected when POLICY declares no feature projection."""
-    return DECLARED[KEY in look(t["policy"], "feature_projection", {})](t, census, seal, alphabet)
-
-
-def _build(t, census, seal, alphabet):
+    """The side oracle of a census (S5's evidence) under S2's seal state, over all its curves: an Oracle, or Unprojected (no projection in M)."""
     d, files = census.pinned.declaration.data, census.pinned.files
     cs = sorted(intake_census.CURVES[d["selection"]["layout"]](d, files, [intake_census.read(t, d, f) for f in files]), key=lambda c: c.slow)
+    return on(t, cs, census, seal, alphabet)
+
+
+def on(t, cs, census, seal, alphabet=Side):
+    """The side oracle over the curves `cs` of a census, in slow order (plan 1176 D, A-E6: a plane's curves, intake_suspect.Plane.source, so
+    the oracle's curve rank is the suspect's): an Oracle, or Unprojected when POLICY declares no feature projection."""
+    return DECLARED[KEY in look(t["policy"], "feature_projection", {})](t, cs, census, seal, alphabet)
+
+
+def _build(t, cs, census, seal, alphabet):
+    d = census.pinned.declaration.data
     z, kind = t["policy"]["policy"]["tier_z"], d["measured"]["uncertainty"]["kind"]
     ev = FiniteStored(SOURCE[seal.status](census.pinned.declaration.id, seal.record))
     return Oracle(tuple(feature(c.rows, z, kind) for c in cs), ev, alphabet)

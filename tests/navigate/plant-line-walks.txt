@@ -1,0 +1,22 @@
+$ bin/cc navigate family plant
+UNTESTED: cc navigate (family mode) is tested on planted families only (tests/test_navfamily.py); no real family's transcript has been scored against a known line.
+family plant (family mode): 12 curves x up to 40 samples; plane (0, 0) .. (11, 39) in cells
+oracle: FEATURE_ARGMAX_FAST side oracle over the suspect's plane; evidence FiniteStored(plant:UNSEALED)
+suspect: (0, 8) (11, 30) (corridor grid: linenav grid PARAMS, w_c 5 cells)
+verdict: FOLLOWED_IN_CORRIDOR
+terminals: backward EDGE, forward EDGE
+path (cells): (0, 8) (1, 10) (2, 12) (4, 16) (6, 20) (8, 24) (10, 28) (11, 30)
+reads: 8 distinct cells of budget 400
+results: results/navigate/plant.toml (the polyline in physical units, as measured brackets)
+T23 access log: results/navigate/plant.access.jsonl (every open of this process); reads outside this loader (a shell, another process, another copy of the bytes) are not logged
+exit 0
+--- results/navigate/plant.toml
+schema = 1
+kind = "navigate-family"
+id = "plant"
+verdict = "FOLLOWED_IN_CORRIDOR"
+terminals = "backward EDGE, forward EDGE"
+evidence = "plant:UNSEALED"
+# the traced polyline: in cells, and per point the measured values of its neighbouring cells ([slow lo, slow hi], [fast lo, fast hi]); nothing between measured points is formed
+cells = [[0.0, 8.0], [1.0, 10.0], [2.0, 12.0], [4.0, 16.0], [6.0, 20.0], [8.0, 24.0], [10.0, 28.0], [11.0, 30.0]]
+physical = [[[0.1, 0.1], [9.0, 9.0]], [[0.2, 0.2], [11.0, 11.0]], [[0.3, 0.3], [13.0, 13.0]], [[0.5, 0.5], [17.0, 17.0]], [[0.7, 0.7], [21.0, 21.0]], [[0.9, 0.9], [25.0, 25.0]], [[1.1, 1.1], [29.0, 29.0]], [[1.2, 1.2], [31.0, 31.0]]]

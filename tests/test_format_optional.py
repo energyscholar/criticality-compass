@@ -1,4 +1,4 @@
-"""test_format_optional - plan 1176 phase D0 (Argus's gate note on phase A, REPORT-A.md): the FORMAT rows that state `required = false`
+"""test_format_optional - plan 1176 phase D0 (the gate note on phase A): the FORMAT rows that state `required = false`
 are EXACTLY [plane], [plane.slice] and [suspect]. Phase A's E1 lets a row stating `required = false` be absent (intake_blind.section), so
 without this test any section could be made silently optional by one line of intake/FORMAT.toml, and nothing would go red.
 It walks the whole of intake/FORMAT.toml (every table and every array of tables, not only [fields]) and reads no data.

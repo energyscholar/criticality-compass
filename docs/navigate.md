@@ -106,3 +106,26 @@ Predictions (written before `cc navigate` exists; nothing about these chains was
 
 Seen-red (step 2): the same map with one node removed (node 0.2747 dropped from `axes.point`, `obtained` and its `[[data.files]]`) must not pass
 silently: its node list loses a node and its walk reads 0.21 as the last end, so the transcript differs from the golden.
+
+## Family mode (plan 1176 phase D): `bin/cc navigate family <id>` and `bin/cc navigate score <id> <checkpoints.toml>`
+
+**The navigator is vendored, frozen.** `cc/linenav.py` is a byte-for-byte copy of the toolset's `tools/linenav.py`, frozen at v2.1-T
+(toolset `studies/LINENAV/LINENAV-FROZEN.md`, plan 1113): cc/linenav.py sha256 `560e2712b83e0966e2c95113ff872f82999b35303a0d87197cc40c5f905e0ab2`.
+It is never edited here; `tests/test_navfamily.py` D2 checks the sha. Family mode (`cc/navfamily.py`) is an adapter over it.
+
+**What it walks.** A family is an intake declaration `declarations/<id>/intake.toml` that declares `[plane]` and `[suspect]` (FORMAT v14) and
+whose intake run refuses at no stage. Its plane is grid cells, curve rank x sample rank (`cc/intake_suspect.py`); the navigator's plane is
+(0, 0) .. (curves - 1, n_max - 1) in grid mode, with linenav's grid PARAMS untouched (w_c 5 cells, budget 400). The side oracle is the R1
+feature projection (`cc/intake_feature.py`, POLICY `[feature_projection.FEATURE_ARGMAX_FAST]`), built over the SAME plane as the suspect
+(the sliced curves when `[plane.slice]` is declared), answering in `linenav.Side`, its evidence `linenav.FiniteStored("<id>:<seal hash>")`.
+stdout is value-free: the verdict, the terminals and the traced polyline in cells. `results/navigate/<id>.toml` holds the same polyline and,
+per point, the measured slow and fast values of its neighbouring cells (a bracket of measured values, never a value between them).
+
+**Refusals** are typed values, `REFUSED <code>: ...`, exit status 1: NO_DECLARATION, INTAKE_REFUSED_AT (the first refused stage), the suspect's
+(SUSPECT_ABSENT: no default line exists, ...), PROJECTION_UNDECLARED, and for score CHECKPOINTS_INSIDE_DECLARATIONS, CHECKPOINTS_UNREADABLE.
+
+**Score and the hold-out.** `score` reads a checkpoints file `points = [[slow, fast], ...]` that must live outside `declarations/`; each point is
+converted by the suspect's rules (exact slow, in-span nearest sample) and scored by its distance in cells to the traced polyline; FOLLOWED needs
+every checkpoint within w_c (5 cells). `family` takes no checkpoints argument and has no code path to them. Every file each command opens is
+appended to its own access log (an audit hook on `open`): `results/navigate/<id>.access.jsonl` (family) and
+`results/navigate/<id>.score.access.jsonl` (score). The family log never names the checkpoints (D5).

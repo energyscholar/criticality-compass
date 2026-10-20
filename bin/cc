@@ -38,6 +38,7 @@ ADVANCED = [
     ("mutate <relpath> (--sed E | --py E) -- <test> ...", "run tests against a temporary mutation"),
     ("help [--advanced]", "this text"),
     ("navigate <input> [--access-log PATH]", "UNTESTED: walk a stored map (an input with [interval] method chains) by the N0 bisection; reads only the nodes it visits, logged per T23"),
+    ("navigate family <id> | score <id> <checkpoints.toml>", "follow an intake declaration's [suspect] line with the frozen linenav (grid cells); score it against checkpoints kept outside declarations/"),
     ("family <id> [--tables SET]", "the family report (a declared projection C over bracket, f1, f2: cc.toml [report] family) of a stored result; measures nothing"),
     ("new family <id>", "start a family declaration from the template"),
     ("intake explain | (lint | seal | run) <id>", "the intake pipeline of a raw-data declaration declarations/<id>/ (explain prints its stage table; not `explain <input> <point>`)"),
@@ -651,11 +652,30 @@ def cmd_bench(a):   # plan 0932: the frozen benchmark suite as a manifest (cc/be
     return bench.main(a, {"cc": ROOT, "data": c.data_root}, ROOT)
 
 
-def cmd_navigate(args):
-    """navigate <input> [--access-log PATH]: stored-map mode (plan 1114, docs/navigate.md). UNTESTED: every output's first line says so."""
+def _stored_map(args):
     import navmap
     log = opt(args, "--access-log")
-    lines, status = navmap.main(ROOT, (args + [""])[0], Path(log).resolve() if log else None)   # no input given: the typed refusal names the inputs
+    return navmap.main(ROOT, (args + [""])[0], Path(log).resolve() if log else None)   # no input given: the typed refusal names the inputs
+
+
+def _family(a):
+    import navfamily
+    return navfamily.family(ROOT, (a + [""])[0])
+
+
+def _score(a):
+    import navfamily
+    return navfamily.score(ROOT, (a + ["", ""])[0], (a + ["", ""])[1])
+
+
+NAVIGATE = {"family": _family, "score": _score}   # plan 1176 D: family mode (cc/navfamily.py); any other first word is a stored-map input
+
+
+def cmd_navigate(args):
+    """navigate <input> [--access-log PATH]: stored-map mode (plan 1114); navigate family <id> | score <id> <checkpoints.toml>: family mode
+    (plan 1176, cc/navfamily.py over the frozen cc/linenav.py). docs/navigate.md. UNTESTED: every output's first line says so."""
+    sub = (args + [""])[0]
+    lines, status = {True: lambda: NAVIGATE[sub](args[1:]), False: lambda: _stored_map(args)}[sub in NAVIGATE]()
     print("\n".join(lines))
     return status
 

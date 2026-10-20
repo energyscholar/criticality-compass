@@ -20,7 +20,10 @@ another capped role").
 Plan 1176 phase B: the R1 feature projection and side oracle (cc/intake_feature.py) is the role intake_feature, FEATURE_CAP = 200; no cap rises.
 Seen RED (tests/test_feature.py B9): FEATURE_CAP made 100 (the cap assert FAILS); cc/intake_feature.py also listed under intake_handoff (the disjointness assert FAILS).
 Plan 1176 phase A: FORMAT v14's [plane] and [suspect] in cells (cc/intake_suspect.py) is the role intake_suspect, SUSPECT_CAP = 160; no cap rises.
-Seen RED (tests/test_suspect.py A6): SUSPECT_CAP made 100 (the cap assert FAILS); cc/intake_suspect.py also listed under intake_handoff (the disjointness assert FAILS)."""
+Seen RED (tests/test_suspect.py A6): SUSPECT_CAP made 100 (the cap assert FAILS); cc/intake_suspect.py also listed under intake_handoff (the disjointness assert FAILS).
+Plan 1176 phase D: family mode of `cc navigate` (cc/navfamily.py) is the role navigate_family, NAVFAMILY_CAP = 200; no cap rises (cc/linenav.py,
+the vendored frozen navigator, is in maths, uncapped). Seen RED (tests/test_navfamily.py D6): NAVFAMILY_CAP made 100 (the cap assert FAILS);
+cc/navfamily.py also listed under intake_handoff (the disjointness assert FAILS)."""
 import tomllib
 from pathlib import Path
 
@@ -39,6 +42,7 @@ FINDINGS_CAP = 160   # plan 1165 fix S11.P2b F3: checks.toml [roles] intake_find
 PROFILE_CAP = 320   # plan 1165 D5: checks.toml [roles] intake_profile, `bin/cc intake profile` (cc/intake_profile.py), so CORE_CAP is not raised
 NEW_CAP = 60   # plan 1164: checks.toml [roles] intake_new, `bin/cc new intake` (cc/intake_new.py), moved out of the intake
 FEATURE_CAP = 200   # plan 1176 phase B: checks.toml [roles] intake_feature, the R1 feature projection and side oracle (cc/intake_feature.py), so CORE_CAP is not raised
+NAVFAMILY_CAP = 200   # plan 1176 phase D: checks.toml [roles] navigate_family, `cc navigate family | score` (cc/navfamily.py)
 SUSPECT_CAP = 160   # plan 1176 phase A: checks.toml [roles] intake_suspect, FORMAT v14's [plane] and [suspect] in cells (cc/intake_suspect.py), so CORE_CAP is not raised
 TERMINAL_CAP = 200   # plan 1160 P6: checks.toml [roles] intake_terminal, S10 KERNEL_HANDOFF and the terminal (cc/intake_terminal.py), so INTAKE_CAP is not raised
 VERBATIM = [
@@ -72,6 +76,7 @@ against = {f: lines(f) for f in roles["intake_against"]}
 findings = {f: lines(f) for f in roles["intake_findings"]}
 feature = {f: lines(f) for f in roles["intake_feature"]}
 suspect = {f: lines(f) for f in roles["intake_suspect"]}
+navfamily = {f: lines(f) for f in roles["navigate_family"]}
 for f, n in {**counts, **intake, **names, **choices, **tests, **maths}.items():
     print(f"  {f}: {n}")
 total = sum(counts.values())
@@ -90,6 +95,7 @@ print(f"intake_against total {sum(against.values())} of {AGAINST_CAP}")
 print(f"intake_findings total {sum(findings.values())} of {FINDINGS_CAP}")
 print(f"intake_feature total {sum(feature.values())} of {FEATURE_CAP}")
 print(f"intake_suspect total {sum(suspect.values())} of {SUSPECT_CAP}")
+print(f"navigate_family total {sum(navfamily.values())} of {NAVFAMILY_CAP}")
 assert not set(intake) & set(roles["plumbing"]), f"a file in both plumbing and intake: {sorted(set(intake) & set(roles['plumbing']))}"
 assert sum(intake.values()) <= CORE_CAP, f"intake line budget exceeded: {sum(intake.values())} > {CORE_CAP}; stop and report which files grew"
 for r, c in CORE.items():
@@ -121,5 +127,7 @@ assert sum(feature.values()) <= FEATURE_CAP, f"intake_feature line budget exceed
 assert not set(feature) & (set(intake) | set(names) | set(choices) | set(feasible) | set(handoff) | set(terminal) | set(new) | set(differs) | set(blindview) | set(against) | set(profile) | set(findings) | set(roles["plumbing"])), "intake_feature shares a file with another capped role"
 assert sum(suspect.values()) <= SUSPECT_CAP, f"intake_suspect line budget exceeded: {sum(suspect.values())} > {SUSPECT_CAP}"
 assert not set(suspect) & (set(intake) | set(names) | set(choices) | set(feasible) | set(handoff) | set(terminal) | set(new) | set(differs) | set(blindview) | set(against) | set(profile) | set(findings) | set(feature) | set(roles["plumbing"])), "intake_suspect shares a file with another capped role"
+assert sum(navfamily.values()) <= NAVFAMILY_CAP, f"navigate_family line budget exceeded: {sum(navfamily.values())} > {NAVFAMILY_CAP}"
+assert not set(navfamily) & (set(intake) | set(names) | set(choices) | set(feasible) | set(handoff) | set(terminal) | set(new) | set(differs) | set(blindview) | set(against) | set(profile) | set(findings) | set(feature) | set(suspect) | set(roles["plumbing"])), "navigate_family shares a file with another capped role"
 assert total <= CAP, f"line budget exceeded: {total} > {CAP}; stop and report which files grew"
 print("test_budget: all passed")

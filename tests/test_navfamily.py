@@ -1,0 +1,220 @@
+"""test_navfamily - plan 1176 phase D: `bin/cc navigate family | score` (cc/navfamily.py) over the frozen line navigator (cc/linenav.py).
+Families are planted LONG_TABLE banks (tests/intake_plant.py); the CLI checks run `bin/cc` on a copy of the Compass whose ROOTS.toml names the
+planted banks. It reads no real data. Each check names its red mutation (applied by hand or with `bin/cc mutate`, seen FAIL by this name, reverted):
+ D1. plan 1114's stored-map golden tests/navigate/b7-at-line-ch.txt is byte-identical to its copy at 80e113f (sha256 pinned below; the stored-
+     map transcript itself is compared by tests/test_navigate.py). Red: one byte of the golden edited.
+ D2. cc/linenav.py's sha256 is LINENAV-FROZEN v2.1-T's (the toolset's tools/linenav.py, pinned below) and is the sha docs/navigate.md
+     records. Red: one byte of cc/linenav.py edited (a comment character).
+ D3. the walking golden tests/navigate/plant-line-walks.txt: a 12-curve planted family (a sharp peak at sample rank 8 + 2k on curve k, the
+     suspect its two end vertices) walks FOLLOWED_IN_CORRIDOR, both terminals EDGE, and stdout plus results/navigate/plant.toml equal the
+     golden (CC_REGOLDEN=1 rewrites it). Red: the planted slope tilted (SLOPE 1: the peak at 8 + k, the suspect unchanged).
+ D4. a family with [plane] and no [suspect] is REFUSED SUSPECT_ABSENT (exit 1, no results file). Red: navfamily.walk given a default
+     diagonal suspect (0, 0) .. (curves - 1, n_max - 1) when the declaration has none.
+ D5. the checkpoints are a structural hold-out: after family, score, family, the family access log never holds the checkpoints path, and the
+     score log does (it opened them); a checkpoint ON the planted line scores FOLLOWED. Red: score shares the family's reader log (LOG["score"]
+     made LOG["family"]).
+ D6. navfamily is the role navigate_family, cc/linenav.py is in maths, both outside the measurement closure, and tests/test_budget.py
+     (NAVFAMILY_CAP 200, disjointness) passes. Red: NAVFAMILY_CAP made 100 (the cap assert FAILS); cc/navfamily.py also listed under
+     intake_handoff (the disjointness assert FAILS).
+ E3. (gate note B-E3) the oracle's alphabet is linenav.Side and its evidence linenav.FiniteStored: phase B's stand-ins are retired.
+     Red: intake_feature's local `class Side(enum.Enum)` restored.
+ E6. (gate note A-E6) on a sliced family (two values of a second knob, [plane.slice]) the oracle navfamily builds names the curves the
+     suspect names: one feature per SLICED curve, and the suspect's cells read the sliced curve's side. Red: navfamily.oracle_for given the
+     unsliced census (intake_feature.oracle(t, census, seal, ...)).
+ E2. (gate notes B-E2, A-E2) every local refusal surfaces through the CLI as `REFUSED <code>: ...`, exit 1: navfamily's REFUSAL rows (every
+     row reached), intake_suspect.Refused (SUSPECT_ABSENT, SUSPECT_SLOW_NOT_A_CURVE) and intake_feature.Unprojected (PROJECTION_UNDECLARED)."""
+import hashlib
+import json
+import os
+import re
+import shutil
+import subprocess
+import sys
+import tempfile
+import tomllib
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "tests")]
+import intake  # noqa: E402
+import intake_feature as F  # noqa: E402
+import intake_suspect as S  # noqa: E402
+import intake_synth  # noqa: E402
+import linenav  # noqa: E402
+import navfamily  # noqa: E402
+from intake_evidence import Census  # noqa: E402
+from intake_plant import long_table, rooted, run, write_long  # noqa: E402
+
+T = intake.tables(ROOT)
+GOLD = ROOT / "tests" / "navigate" / "plant-line-walks.txt"
+REGOLDEN = os.environ.get("CC_REGOLDEN") == "1"
+LINENAV_SHA = "560e2712b83e0966e2c95113ff872f82999b35303a0d87197cc40c5f905e0ab2"   # LINENAV-FROZEN v2.1-T (toolset tools/linenav.py)
+B7_SHA = "9b212d899237cef15cfd8e833d045964805a9221329ca17ddb992037ec664f40"   # tests/navigate/b7-at-line-ch.txt at 80e113f (plan 1114)
+N, K, SLOPE = 40, 12, 2   # the walking plant: K curves of N samples, the peak of curve k at sample rank 8 + SLOPE * k
+HS = [round(0.1 * (k + 1), 1) for k in range(K)]
+bad, reached = [], set()
+
+
+def check(name, ok, why=""):
+    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
+    if not ok:
+        bad.append(name)
+
+
+def sha(p):
+    return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+
+
+def rows(p, n=N, extra=""):
+    """A curve's rows (T, C, sigma) at T = 1 .. n: a sharp peak at sample rank p (sigma 0.03: the plateau is rank p alone)."""
+    return [f"{1.0 + j:.4f},{10.0 / (1 + (j - p) ** 2):.4f},0.0300{extra}" for j in range(n)]
+
+
+def tail(vertices, plane=True, sl=""):
+    return (f'\n[plane]\naxes = "slow-fast"\n' * plane) + sl + (f'\n[suspect]\nvertices = {vertices}\ncorridor = "grid"\n' * (vertices is not None))
+
+
+PLANT = [(h, rows(8 + SLOPE * k)) for k, h in enumerate(HS)]
+SUSPECT = f"[[{HS[0]}, 9.0], [{HS[-1]}, 31.0]]"   # the planted line's end vertices at slope 2 (T = rank + 1): cells (0, 8), (11, 30)
+
+# ---- D1, D2 the pinned bytes
+check("D1. 1114's stored-map golden b7-at-line-ch.txt is unchanged", sha(ROOT / "tests" / "navigate" / "b7-at-line-ch.txt") == B7_SHA)
+check("D2. cc/linenav.py is LINENAV-FROZEN v2.1-T byte for byte", sha(ROOT / "cc" / "linenav.py") == LINENAV_SHA, sha(ROOT / "cc" / "linenav.py"))
+doc = re.findall(r"cc/linenav\.py sha256 `([0-9a-f]{64})`", (ROOT / "docs" / "navigate.md").read_text())
+check("D2. docs/navigate.md records that sha beside the LINENAV-FROZEN reference", doc == [LINENAV_SHA] and "LINENAV-FROZEN" in (ROOT / "docs" / "navigate.md").read_text(), str(doc))
+
+# ---- D6 roles, closure, caps
+roles = tomllib.loads((ROOT / "checks.toml").read_text())
+check("D6. navigate_family is cc/navfamily.py alone; cc/linenav.py is in maths",
+      roles["roles"].get("navigate_family") == ["cc/navfamily.py"] and "cc/linenav.py" in roles["roles"]["maths"], str(roles["roles"].get("navigate_family")))
+check("D6. both are outside the measurement closure", {"cc/navfamily.py", "cc/linenav.py"} <= set(roles["closure"]["measure"]["outside"]))
+r = subprocess.run([sys.executable, str(ROOT / "tests" / "test_budget.py")], capture_output=True, text=True)
+check("D6. tests/test_budget.py passes (NAVFAMILY_CAP, disjointness)", r.returncode == 0, (r.stdout + r.stderr)[-400:])
+
+# ---- E3 linenav's alphabet and evidence class
+check("E3. intake_feature's Side and FiniteStored are linenav's (the stand-ins are retired)", F.Side is linenav.Side and F.FiniteStored is linenav.FiniteStored,
+      f"{F.Side.__module__}.Side, {F.FiniteStored.__module__}.FiniteStored")
+
+
+def sliced():
+    """E6 in process: a family of two values of a second knob p, the p = 1 peaks at rank 5 and the p = 2 peaks at rank 2, sliced at p = 2."""
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp = Path(tmp)
+        banks = tmp / "banks"
+        intake_synth.write(banks / "pf", tmp / "pf-TRUTH", "pf", 1, 9)
+        m = json.loads((banks / "pf" / "MANIFEST.json").read_text())
+        (banks / "two").mkdir()
+        write_long(banks / "two", [(h, rows(rk, 7, f",{p}")) for p, rk in ((1.0, 5), (2.0, 2)) for h in (0.1, 0.2, 0.3)], "T,C,sigma,p,h\n")
+        run_p = lambda t: t.replace('identity = "NONE"', 'identity = "RUN"', 1).replace('[replicate.key]\nkind = "NONE"', '[replicate.key]\nkind = "COLUMN"\ncolumn = "p"', 1)  # noqa: E731
+        out = run(T, tmp, "two", run_p(long_table(m, "two").replace("<long-test>/pf", "<long-test>/two"))
+                  + tail("[[0.1, 3.0], [0.3, 3.0]]", sl='[plane.slice]\ncolumn = "p"\nvalue = 2.0\n'))
+        census, seal, t = out["S5"].result.evidence, out["S2"].result.evidence, rooted(T, tmp)
+        check("E6. the sliced family reaches S5", isinstance(census, Census), str(out["S5"].result)[:300])
+        cells = S.suspect(t, census)
+        o = navfamily.oracle_for(t, cells, census, seal)
+        check("E6. the suspect converts on the three sliced curves", isinstance(cells, S.Cells) and cells.cells == ((0, 2), (2, 2)) and cells.curves == 3, repr(cells))
+        check("E6. the oracle holds one feature per SLICED curve, each the p = 2 peak (rank 2)", [getattr(f, "rank", None) for f in o.features] == [2, 2, 2], repr(o.features))
+        check("E6. at each suspect cell the oracle reads the sliced curve's side (MID: the vertex is on its peak)", [o(c).name for c in cells.cells] == ["MID", "MID"],
+              str([o(c).name for c in cells.cells]))
+        check("E3. the oracle navfamily builds answers in linenav.Side with linenav's FiniteStored evidence",
+              o.alphabet is linenav.Side and type(o.evidence) is linenav.FiniteStored and o.evidence == linenav.FiniteStored("two:UNSEALED"), repr(o.evidence))
+
+
+try:
+    sliced()
+except Exception as e:   # a crash is a named FAIL, never a silent pass
+    check("E6. the sliced family runs to the end", False, repr(e)[:300])
+
+
+def cli_checks():
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp = Path(tmp)
+        w, banks = tmp / "cc", tmp / "banks"
+        shutil.copytree(ROOT, w, ignore=shutil.ignore_patterns(".git", "__pycache__", "results", "benchmark", "fixtures", "data", "scratch"))
+        with (w / "intake" / "ROOTS.toml").open("a") as f:
+            f.write(f'\n"<nav-test>" = "{banks}"   # test_navfamily: the planted banks\n')
+        intake_synth.write(banks / "pf", tmp / "pf-TRUTH", "pf", 1, 9)
+        m = json.loads((banks / "pf" / "MANIFEST.json").read_text())
+
+        def cc(*args):
+            r = subprocess.run([sys.executable, str(w / "bin" / "cc"), *args], capture_output=True, text=True, cwd=w)
+            return r.stdout + r.stderr, r.returncode
+
+        def plant(ident, blocks, tl, profile=True):
+            """A planted family declarations/<ident>/ on bank <nav-test>/<ident>, profiled as a declarer does before running."""
+            (banks / ident).mkdir()
+            write_long(banks / ident, blocks)
+            d = w / "declarations" / ident
+            d.mkdir()
+            text = long_table(m, ident).replace("<long-test>/pf", f"<nav-test>/{ident}") + tl
+            (d / "intake.toml").write_text(text)
+            (d / "transducer.toml").write_text(intake_synth.declare(m, ident, "pf")[2])
+            [cc("intake", "profile", ident, root) for root in re.findall(r'^root = "([^"]*)"', text, re.M)[:1] if profile]
+
+        def refused(out):
+            code = re.findall(r"^REFUSED ([A-Z_]+):", out, re.M)
+            reached.update(code)
+            return code[:1]
+
+        # ---- D3 the walking golden
+        plant("plant", PLANT, tail(SUSPECT))
+        out, rc = cc("navigate", "family", "plant")
+        res = w / "results" / "navigate" / "plant.toml"
+        text = f"$ bin/cc navigate family plant\n{out}exit {rc}\n--- results/navigate/plant.toml\n" + {True: lambda: res.read_text(), False: lambda: "(absent)\n"}[res.is_file()]()
+        {True: lambda: GOLD.write_text(text), False: lambda: None}[REGOLDEN]()
+        check("D3. the planted line walks FOLLOWED_IN_CORRIDOR", "\nverdict: FOLLOWED_IN_CORRIDOR\n" in out and rc == 0, out[-600:])
+        check("D3. both terminals are EDGE (the line leaves the plane at both ends)", "\nterminals: backward EDGE, forward EDGE\n" in out, out[-600:])
+        check("D3. stdout and results/navigate/plant.toml equal the walking golden tests/navigate/plant-line-walks.txt", GOLD.is_file() and text == GOLD.read_text(),
+              "\n".join(l for l in text.splitlines() if l not in (GOLD.read_text().splitlines() if GOLD.is_file() else []))[:600])
+        written = tomllib.loads(res.read_text()) if res.is_file() else {}
+        check("D3. the results file holds the verdict and the physical polyline as measured brackets (first point h 0.1, T 9)",
+              written.get("verdict") == "FOLLOWED_IN_CORRIDOR" and written.get("physical", [None])[0] == [[0.1, 0.1], [9.0, 9.0]], str(written)[:400])
+        check("D3. stdout is value-free: no measured slow or fast value is printed", not re.search(r"\b(0\.[1-9]|9\.0|31\.0)\b", out), out[-400:])
+
+        # ---- D5 the structural hold-out
+        held = tmp / "held-out" / "checkpoints.toml"
+        held.parent.mkdir()
+        held.write_text(f"points = [[{HS[0]}, 9.0], [{HS[5]}, 19.0], [{HS[-1]}, 31.0]]   # on the planted line (rank 8 + 2k)\n")
+        sc, src = cc("navigate", "score", "plant", str(held))
+        cc("navigate", "family", "plant")
+        flog = (w / "results" / "navigate" / "plant.access.jsonl").read_text()
+        slog = (w / "results" / "navigate" / "plant.score.access.jsonl")
+        check("D5. checkpoints on the planted line score FOLLOWED (3 of 3 within w_c)", "3 of 3 checkpoints within w_c 5 cells -> FOLLOWED" in sc and src == 0, sc[-500:])
+        check("D5. the family access log never holds the checkpoints path", str(held) not in flog and "checkpoints.toml" not in flog, "the family log names it")
+        check("D5. the score access log holds it (score opened it; the log can see an open)", slog.is_file() and str(held) in slog.read_text(), "absent from the score log")
+        check("D5. the family access log holds the bank it read (every open is logged)", str(banks / "plant" / "bank.csv") in flog, flog[:300])
+        inside = w / "declarations" / "plant" / "checkpoints.toml"
+        inside.write_text(held.read_text())
+        check("E2. checkpoints inside declarations/ are REFUSED CHECKPOINTS_INSIDE_DECLARATIONS", refused(cc("navigate", "score", "plant", str(inside))[0]) == ["CHECKPOINTS_INSIDE_DECLARATIONS"])
+        inside.unlink()
+        (tmp / "held-out" / "empty.toml").write_text("points = []\n")
+        check("E2. a checkpoints file without points is REFUSED CHECKPOINTS_UNREADABLE", refused(cc("navigate", "score", "plant", str(tmp / "held-out" / "empty.toml"))[0]) == ["CHECKPOINTS_UNREADABLE"])
+
+        # ---- D4 no suspect
+        plant("nosus", PLANT, tail(None))
+        out, rc = cc("navigate", "family", "nosus")
+        check("D4. [plane] without [suspect] is REFUSED SUSPECT_ABSENT, exit 1, no results file",
+              refused(out) == ["SUSPECT_ABSENT"] and rc == 1 and not (w / "results" / "navigate" / "nosus.toml").exists(), out[-400:])
+
+        # ---- E2 the other typed refusals through the CLI
+        plant("offcurve", PLANT, tail(f"[[0.15, 9.0], [{HS[-1]}, 31.0]]"))
+        out, rc = cc("navigate", "family", "offcurve")
+        check("E2. a suspect vertex on no curve is REFUSED SUSPECT_SLOW_NOT_A_CURVE (intake_suspect.Refused)", refused(out) == ["SUSPECT_SLOW_NOT_A_CURVE"] and rc == 1, out[-400:])
+        out, rc = cc("navigate", "family", "nosuch")
+        check("E2. an id with no declarations/<id>/ is REFUSED NO_DECLARATION", refused(out) == ["NO_DECLARATION"] and rc == 1, out[-400:])
+        plant("unprofiled", PLANT, tail(SUSPECT), profile=False)
+        out, rc = cc("navigate", "family", "unprofiled")
+        check("E2. a declaration the intake refuses is REFUSED INTAKE_REFUSED_AT, naming the stage", refused(out) == ["INTAKE_REFUSED_AT"] and "stage S3" in out and rc == 1, out[-400:])
+        pol = w / "intake" / "POLICY.toml"
+        pol.write_text(re.sub(r"(?s)\n\[feature_projection\.FEATURE_ARGMAX_FAST\].*?(?=\n\[|\Z)", "\n", pol.read_text()))
+        out, rc = cc("navigate", "family", "plant")
+        check("E2. POLICY without the projection row is REFUSED PROJECTION_UNDECLARED (intake_feature.Unprojected)", refused(out) == ["PROJECTION_UNDECLARED"] and rc == 1, out[-400:])
+
+
+try:
+    cli_checks()
+except Exception as e:   # a crash is a named FAIL, never a silent pass
+    check("D3-D5. the CLI checks run to the end", False, repr(e)[:300])
+check("E2. every REFUSAL row of navfamily was reached through the CLI", set(navfamily.REFUSAL) <= reached, str(sorted(set(navfamily.REFUSAL) - reached)))
+print(f"{len(bad)} failed" if bad else "test_navfamily: all passed")
+sys.exit(1 if bad else 0)

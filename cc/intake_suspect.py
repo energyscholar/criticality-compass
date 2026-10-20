@@ -11,7 +11,7 @@ the curves whose key is exactly its value (none: PLANE_SLICE_SELECTS_NO_CURVE).
 Every refusal is a local typed value (Refused, its sentence in REFUSAL): STAGES.toml is untouched and the core is at its cap. Like the side
 oracle, it reads only the Census object (the pinned bytes it carries) and the tables as values: it constructs no Path and opens nothing, and a
 refusal's detail names vertex ordinals, the declared guess and curve ranks, never a measured value."""
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import intake_census
 from intake_blind import gate, look
@@ -42,18 +42,22 @@ class Refused:
 
 @dataclass(frozen=True)
 class Plane:
-    """The curves of the plane, in slow order (curve rank = index), each as (slow value, fast values in ascending order (sample rank = index))."""
+    """The curves of the plane, in slow order (curve rank = index), each as (slow value, fast values in ascending order (sample rank = index));
+    source: the census's curve objects in the same order (plan 1176 D, A-E6: the side oracle is built over exactly these)."""
     curves: tuple
+    source: tuple = ()
 
 
 @dataclass(frozen=True)
 class Cells:
     """The suspect polyline in grid cells: (curve rank, sample rank) per vertex, in declared order, and the grid's extent (curves, n_max),
-    the navigator's plane (0, 0) .. (curves - 1, n_max - 1). corridor is the declared corridor word."""
+    the navigator's plane (0, 0) .. (curves - 1, n_max - 1). corridor is the declared corridor word. plane: the Plane they were converted on
+    (plan 1176 D; not part of a Cells' identity)."""
     cells: tuple
     corridor: str
     curves: int
     n_max: int
+    plane: Plane = field(default=None, compare=False)
 
 
 KEY_COLUMN = {   # [replicate.key] kind -> (its row) -> the column a slice may name; total over FORMAT's kinds (only a COLUMN is a column)
@@ -71,7 +75,8 @@ def _curves(t, d, census):
 
 def _plane(keyed):
     """A Plane of (curve, key) pairs: slow order (stable), each curve's fast values ascending (stable, as intake_feature ranks samples)."""
-    return Plane(tuple((c.slow, tuple(sorted(r[0] for r in c.rows))) for c, _ in sorted(keyed, key=lambda ck: ck[0].slow)))
+    cs = [c for c, _ in sorted(keyed, key=lambda ck: ck[0].slow)]
+    return Plane(tuple((c.slow, tuple(sorted(r[0] for r in c.rows))) for c in cs), tuple(cs))
 
 
 def _sliced(d, keyed, sl):
@@ -122,7 +127,7 @@ def _cells(p, s):
     """Every vertex in cells, or the first vertex's refusal."""
     each = [cell(p, i, v) for i, v in enumerate(s["vertices"])]
     bad = [c for c in each if isinstance(c, Refused)] + [None]
-    return {True: lambda: Cells(tuple(each), s["corridor"], len(p.curves), max(len(f) for _, f in p.curves)), False: lambda: bad[0]}[bad[0] is None]()
+    return {True: lambda: Cells(tuple(each), s["corridor"], len(p.curves), max(len(f) for _, f in p.curves), p), False: lambda: bad[0]}[bad[0] is None]()
 
 
 ON_PLANE = {Plane: lambda p, s: _cells(p, s), Refused: lambda p, s: p}   # the plane's outcome type -> (it, [suspect]) -> Cells | Refused
