@@ -50,6 +50,9 @@
      PROFILE.json", and "against <file>". (T3's two-file expectations now carry ranges and compared: an existing test edited.)
  F5  (fix S11.P2b) ONE_FILE counts TABLE files (a text file with a numeric row run): a converted bank of one csv beside its
      CONVERSION-MANIFEST.json raises ONE_FILE on the csv; two table files raise none.
+ F6  (fix S11.P2b) absence is a sha, never a missing key: read() of no PROFILE.json gives the EMPTY profile value (files []) and sha "";
+     every HOLDS `where` of intake_against is total: over every file's facts of T4's control and over edge facts (no declared column, an
+     XLSX declaration over a workbook value, sheets NONE_READER_ABSENT, a csv format with no `sheet`) each returns its text.
  F1  (fix S11.P2b) the splitter is total over line length: a SEMICOLON file whose third line holds one 200 000-character field (beyond the
      csv module's default field limit, 131 072) profiles in a fresh process (only intake_profile imported) to its exact rows.
 Seen RED (each mutation applied by hand, the test run, the mutation reverted):
@@ -86,6 +89,10 @@ Seen RED (each mutation applied by hand, the test run, the mutation reverted):
    EQUAL_RUNS_SHORT where made `lambda c: ()`: FAIL "T3 ..." and FAIL "F4 the run findings ...: [... ('EQUAL_RUNS_SHORT', 't.csv', (), 2, (), '')".
  - F5: ONE_FILE's count back on `g.kind == "TEXT_TABLE"` (and its holds on f.kind): FAIL "F5 a bank of one csv beside its
    CONVERSION-MANIFEST.json raises ONE_FILE on the csv: []".
+ - F6: read()'s absent profile value made {} again: FAIL "F6 read() of no PROFILE.json ..."; WIDTH's where back on `[...][0]`: FAIL "F6 every
+   HOLDS where is total ...: [('WIDTH_CONTRADICTS_PROFILE', 'IndexError list index out of range')]"; SHEET's where back on ['sheet']:
+   FAIL "F6 ...: [('SHEET_CONTRADICTS_PROFILE', "KeyError 'sheet'")]"; FAST back on refs[0]: FAIL "F6 ...: [('ORDER_CONTRADICTS_PROFILE',
+   'IndexError ...'), ('REPEATS_CONTRADICT_PROFILE', 'IndexError ...')]". (The S3 row PROFILE_ABSENT made `lambda: True`: tests/test_intake_leak.py.)
 """
 import contextlib
 import hashlib
@@ -411,6 +418,28 @@ for what, m, want in (("a lone n/a cell (TEXT, 1 number) and an empty one (EMPTY
     got = [(c, f) for c, f, _ in A.against(p0, m, d0)]
     check(f"T5 {what} dropped by DROP_ROWS_NOT_NUMERIC: {[(c.name, f) for c, f in want] or 'no contradiction'}", got == want, str(got))
 check("T5 the TEXT-run contradiction's text says D2: BLOCKS", "D2: BLOCKS" in str(A.against(p0, DROP(["TEXT"], [0]), d0)), str(A.against(p0, DROP(["TEXT"], [0]), d0)))
+
+# ---- F6 (fix S11.P2b): absence is a sha; the HOLDS `where` lambdas total
+with tempfile.TemporaryDirectory() as tmp:
+    got = P.read(tmp, tmp, Path.read_bytes)
+    check("F6 read() of no PROFILE.json: the EMPTY profile value (files []) and sha \"\" (absence is the sha, never a missing key)",
+          got == [{"path": "", "files": [], "findings": []}, "", {}, ""], str(got))
+spec = lambda d: A.SPEC[d["reader"]["name"]](d)
+facts = [A._facts(f, spec(d0), d0, []) for f in p0["files"]]
+edge = [{**facts[0], "refs": []}, A._facts(next(f for f in book["files"] if f["name"] == f3), spec(xd), xd, []),
+        A._facts({**fp, "kind": "XLSX", "tables": [], "sheets": "NONE_READER_ABSENT"}, spec(xd), xd, [])]
+
+
+def where(w, c):
+    """A where's text, or its crash as a name: the check FAILS by name (a crash would stop the test at the first)."""
+    try:
+        return type(w(c)).__name__
+    except Exception as e:  # noqa: BLE001
+        return f"{type(e).__name__} {e}"
+
+
+got = sorted({(row.name, where(w, c)) for c in facts + edge for row, (_, w) in A.HOLDS.items()} - {(row.name, "str") for row in A.HOLDS})
+check("F6 every HOLDS where is total over the control's facts and the edge facts (each returns its text)", got == [] and len(facts) >= 5, str(got))
 
 # ---- F2 (fix S11.P2b): the encoding by FileKind
 ENC = {"TEXT_TABLE": {"UTF8", "UTF8_SIG", "UTF16", "LATIN1_ONLY"}, "XLSX": {"NOT_APPLICABLE"}, "ZIP": {"NOT_APPLICABLE"}, "UNPROFILED_FORMAT": {"UNDECODABLE"}}

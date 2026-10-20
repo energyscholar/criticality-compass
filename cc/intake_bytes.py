@@ -89,7 +89,7 @@ def _read(declaration, d, loc, names, loader):
     (p, sha, m, msha), rec = intake_profile.read(d, loc, loader.read), intake_seal.record(d)   # plan 1165 section 6: the manifest through the run's loader
     stale, found = lambda: [f.name for f in files if {x["name"]: x["sha256"] for x in p["files"]}.get(f.name) != f.sha256], lambda: intake_against.against(p, m, declaration.data)
     return gate([(lambda: not moved(), "PIN_MISMATCH", lambda: detail(words=moved()[:3], counts={"files that differ from their pins": len(moved())})),
-                 (lambda: p != {}, "PROFILE_ABSENT", lambda: detail(words=[f"declarations/{declaration.id}/PROFILE.json", f"bin/cc intake profile {declaration.id} {declaration.data['source']['root']}"])),
+                 (lambda: sha != "", "PROFILE_ABSENT", lambda: detail(words=[f"declarations/{declaration.id}/PROFILE.json", f"bin/cc intake profile {declaration.id} {declaration.data['source']['root']}"])),
                  (lambda: not stale(), "PROFILE_STALE", lambda: detail(words=stale()[:3], counts={"pinned files not in the profile or not as profiled": len(stale())})),
                  (lambda: rec == {} or rec.get("conversion_manifest_sha256", "") == msha, "MANIFEST_STALE", lambda: detail(words=[intake_profile.MANIFEST], counts={"sealed": int(rec.get("conversion_manifest_sha256", "") != ""), "now": int(msha != "")})),
                  (lambda: not found(), "PROFILE_CONTRADICTED", lambda: detail(found()[0][1], words=[found()[0][0].name, found()[0][2]], counts={"contradictions after the first": len(found()) - 1}))],

@@ -53,18 +53,18 @@ def _facts(fp, spec, d, ops):
 
 ACQ = lambda d: {"ACQUISITION": d["acquisition"]["direction"]}.get(d["acquisition"]["row_order"], d["acquisition"]["row_order"])   # the direction a curve holds
 ONE = lambda c: c["d"]["selection"]["layout"] == "PER_FILE"   # ORDER, REPEATS, FILES: a PER_FILE file is one curve (a LONG_TABLE's blocks are no profile fact)
-FAST = lambda c: c["col"](c["refs"][0])   # the fast column's profile (role_columns: the fast column first)
+FAST = lambda c: c["col"]((c["refs"] + [0])[0])   # the fast column's profile (role_columns: the fast column first; no column: COLUMN)
 HOLDS = {   # Contradiction -> (holds over one file's facts, where it is: positions, counts, masked names); every row but FILE_NOT_PROFILED, FILES (in against)
     R.ENCODING_CONTRADICTS_PROFILE: (lambda c: c["fp"]["encoding"] in ("UTF16", "LATIN1_ONLY") and "DECODE" not in c["ops"], lambda c: f"encoding {c['fp']['encoding']}, no DECODE"),
     R.DELIMITER_CONTRADICTS_PROFILE: (lambda c: "DELIMITER" not in c["ops"] and (c["fp"]["kind"] != {True: "XLSX", False: "TEXT_TABLE"}[c["spec"]["format"]["kind"] == "XLSX"] or c["score"].get(
         c["spec"]["format"]["kind"], 0) < c["score"].get(c["t"]["delimiter"], 0)), lambda c: f"{c['fp']['kind']}, delimiter {c['t']['delimiter']}; declared {c['spec']['format']['kind']}"),
     R.SHEET_CONTRADICTS_PROFILE: (lambda c: c["fp"]["kind"] == "XLSX" == c["spec"]["format"]["kind"] and isinstance(c["fp"]["sheets"], list) and c["t"] is NONE,
-                                  lambda c: f"sheet {masked(str(c['spec']['format']['sheet']))} declared, {len(c['fp']['sheets'])} sheets"),
+                                  lambda c: f"sheet {masked(str(c['spec']['format'].get('sheet', '')))} declared, {len(c['fp']['sheets'])} sheets"),
     R.HEADER_CONTRADICTS_PROFILE: (lambda c: c["t"] is not NONE and (c["i"] == len(c["live"]) or len(c["head"]) != c["spec"]["header"]["rows"]),
                                    lambda c: f"header rows {c['spec']['header']['rows']} declared, {len(c['head'])} lines before the first numeric line"),
     R.COLUMN_CONTRADICTS_PROFILE: (lambda c: c["t"] is not NONE and c["names"] is not None and any({str: lambda r: c["names"].count(masked(r)) != 1 and (masked(r) == r or masked(r) not in c["names"]),
                                    int: lambda r: not 1 <= r <= c["width"]}[type(r)](r) for r in c["refs"]), lambda c: f"columns {[masked(str(r)) for r in c['refs']]} declared; names {c['names']}, width {c['width']}"),
-    R.WIDTH_CONTRADICTS_PROFILE: (lambda c: any(r["width"] != c["width"] for r in c["body"]), lambda c: f"line {[r['first'] for r in c['body'] if r['width'] != c['width']][0]}: width not {c['width']}"),
+    R.WIDTH_CONTRADICTS_PROFILE: (lambda c: any(r["width"] != c["width"] for r in c["body"]), lambda c: f"line {([r['first'] for r in c['body'] if r['width'] != c['width']] + [0])[0]}: width not {c['width']}"),
     R.CELLS_CONTRADICT_PROFILE: (lambda c: "TEXT_RUN" in c["ops"] or "DROP_ROWS_NOT_NUMERIC" not in c["ops"] and (any(c["col"](r)["text"] + c["col"](r)["empty"] > 0 for r in c["refs"]) or any(
         r["kind"] == "TEXT" and r["numbers"] == 0 for r in c["body"])), lambda c: "a declared column holds text or empty cells, or a text run lies in the body or was dropped as rows (D2: BLOCKS)"),
     R.ORDER_CONTRADICTS_PROFILE: (lambda c: ONE(c) and ACQ(c["d"]) != "UNORDERED" and (FAST(c)["monotone_runs"] > 1 or FAST(c)["first_direction"] == OPPOSITE[ACQ(c["d"])]),

@@ -305,18 +305,21 @@ def profile_cli(root, ident, args, t):
 
 
 
+EMPTY = {"path": "", "files": [], "findings": []}   # (fix F6) the profile value of no PROFILE.json: absence is its sha "", never a missing key
+
+
 def read(d, bank, get):
-    """[PROFILE.json of declarations/<id>, its sha256, the bank's CONVERSION-MANIFEST.json (intake_convert._manifest, {} when not of its shape), its sha256]; {} and "" for a file not there; `get` reads the manifest (S3: the run's loader)."""
+    """[PROFILE.json of declarations/<id>, its sha256, the bank's CONVERSION-MANIFEST.json (intake_convert._manifest, {} when not of its shape), its sha256]; EMPTY / {} and "" for a file not there (absent: the sha is ""); `get` reads the manifest (S3: the run's loader)."""
     got = [{True: lambda: g(f), False: lambda: None}[f.is_file()]() for f, g in ((Path(d) / "PROFILE.json", Path.read_bytes), (Path(bank) / MANIFEST, get))]
-    return [x for b, v in zip(got, (json.loads, lambda b: _manifest(b.decode("utf-8", "replace")) or {})) for x in {True: lambda: (v(b), hashlib.sha256(b).hexdigest()), False: lambda: ({}, "")}[b is not None]()]
+    return [x for b, v, e in zip(got, (json.loads, lambda b: _manifest(b.decode("utf-8", "replace")) or {}), (EMPTY, {})) for x in {True: lambda: (v(b), hashlib.sha256(b).hexdigest()), False: lambda: (e, "")}[b is not None]()]
 
 
 def check_cli(root, ident, args, t):
     """bin/cc intake profile <id> --check, the declarer's gate before lint: the declaration (S0) against PROFILE.json and its bank's manifest (intake_against.against); every contradiction printed (code, file, where), exit 1 on any or on no profile."""
     d = Path(root) / "declarations" / ident
     s0 = format_stage({True: lambda: (d / "intake.toml").read_text(), False: lambda: Absent(f"declarations/{ident}/intake.toml")}[(d / "intake.toml").is_file()](), (), t)
-    p, _, m, _ = {True: lambda: [{}, "", {}, ""], False: lambda: read(d, intake_bytes.located(s0.evidence.data["source"]["root"], t["roots"]), Path.read_bytes)}[isinstance(s0, Refuse)]()
-    found = {True: lambda: (), False: lambda: intake_bytes.intake_against.against(p, m, s0.evidence.data)}[p == {}]()
+    p, sha, m, _ = {True: lambda: [EMPTY, "", {}, ""], False: lambda: read(d, intake_bytes.located(s0.evidence.data["source"]["root"], t["roots"]), Path.read_bytes)}[isinstance(s0, Refuse)]()
+    found = {True: lambda: (), False: lambda: intake_bytes.intake_against.against(p, m, s0.evidence.data)}[sha == ""]()
     print(f"profile {ident} --check: " + {True: lambda: f"REFUSE {s0.reason}: the declaration does not pass FORMAT (bin/cc intake lint {ident})", False: lambda: {True: f"PROFILE_ABSENT: run bin/cc intake profile {ident} <root-named path> first",
-          False: f"{len(found)} contradictions" + "".join(f"\n  {c.name} {f}: {w}" for c, f, w in found)}[p == {}]}[isinstance(s0, Refuse)]())
-    return int(isinstance(s0, Refuse) or p == {} or len(found) > 0)
+          False: f"{len(found)} contradictions" + "".join(f"\n  {c.name} {f}: {w}" for c, f, w in found)}[sha == ""]}[isinstance(s0, Refuse)]())
+    return int(isinstance(s0, Refuse) or sha == "" or len(found) > 0)

@@ -48,8 +48,10 @@ Seen RED (each mutation applied by hand, the test run, the mutation reverted):
    PROJECTION_EMPTY_ON_CURVE plant is new. Their seen-red mutations are in tests/test_intake_loop4.py T39.)
  (1165 P4) Every plant that reaches S3 runs `bin/cc intake profile` first; PROFILE.md/PROFILE.json and stdout join K3's scan;
    SEAL.json stamps profile_sha256 and conversion_manifest_sha256; the report carries the Profile line and PROFILE_READ_BEFORE_SEAL.
- - Seen RED (1165 P4, cc/intake_bytes.py S3 gate rows made `lambda: True`, one at a time): PROFILE_ABSENT: the run crashes (KeyError
-   'files': every profiled plant reads a profile it was told is present); PROFILE_STALE / MANIFEST_STALE / PROFILE_CONTRADICTED: that row's
+ - Seen RED (1165 P4, cc/intake_bytes.py S3 gate rows made `lambda: True`, one at a time): PROFILE_ABSENT: the run crashed (KeyError
+   'files'); since fix S11.P2b F6 (absence is the sha; an absent profile is the EMPTY value, files []) the same mutation FAILS by name:
+   "K2. PROFILE_ABSENT: ...: PROFILE_STALE", the K2 totality ("live, never reached: ['PROFILE_ABSENT']") and "K2. (1165) the report of the
+   unprofiled run says NOT PROFILED"; PROFILE_STALE / MANIFEST_STALE / PROFILE_CONTRADICTED: that row's
    plant FAILS (FAST_VALUE_REPEATED or PASS) and the K2 totality FAILS (the row live, never reached); PROFILE_CONTRADICTED also turns every
    AT_S3 plant red ('the profile did not predict this').
  - (1165 P4) intake_seal's stamp key renamed (profile_sha256_unstamped): the K2 SEAL.json stamp check and the Profile-line check FAIL."""
