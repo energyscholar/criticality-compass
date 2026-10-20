@@ -8,6 +8,8 @@ structure. Invariants:
    nothing is written under the profiled path;
  - a finding is a row of FindingKind and its response is looked up in RESPONSE, total over FindingKind (tests/test_intake_profile.py)."""
 import enum
+import functools
+import importlib.util
 import hashlib
 import itertools
 import json
@@ -18,8 +20,8 @@ from pathlib import Path
 
 import intake_bytes
 from intake_blind import detail, gate
-from intake_convert import SPLIT, _decoded, _split, _zipped
-from intake_names import NUMBER, Name, classify, masked
+from intake_convert import SPLIT, _book_names, _decoded, _split, _zipped, sheet_rows
+from intake_names import NUMBER, Name, _runs, classify, masked, repeats
 
 FileKind = enum.Enum("FileKind", "TEXT_TABLE XLSX ZIP UNPROFILED_FORMAT")   # by content, never by extension (plan 1165 2.2)
 Encoding = enum.Enum("Encoding", "UTF8 UTF8_SIG UTF16 LATIN1_ONLY UNDECODABLE")
@@ -85,6 +87,9 @@ ENCODINGS = (   # (Encoding, does it hold, DECODE's name): the first that holds 
     ("UTF8", lambda r: True, "utf-8"), ("LATIN1_ONLY", lambda r: True, "latin-1"))   # latin-1 decodes every byte: LATIN1_ONLY is "not UTF-8"
 BINARY = re.compile("[\x00-\x08\x0e-\x1f\x7f]")   # a decoded control character no text table holds: the bytes are a binary format
 NUMERIC_KINDS = ("NUMERIC", "NUMERIC_WITH_EMPTY")
+BIN = {2: 0, **{n: 1 for n in range(3, 10)}, 10: 2}   # an equal run's length (10 for 10 or more) -> its equal_runs bin (2, 3-9, 10+); a run of 1 none
+DIRECTION = {None: "FLAT", True: "ASCENDING", False: "DESCENDING"}   # the first step of a column's numbers (equal values merged) -> first_direction
+READER_ABSENT = "NONE_READER_ABSENT"   # an XLSX's `sheets` on a machine without openpyxl (XLSX_READER_ABSENT: the kind stays XLSX)
 CLASSES = ("#", "%", ";", "//", "!", "[")   # comment prefix classes: a line's first characters (the reader's own test, startswith)
 
 
@@ -148,8 +153,18 @@ class FileProfile:
     kind: str
     encoding: str
     tables: tuple = ()
-    sheets: tuple = ()
+    sheets: object = ()
     members: tuple = ()
+
+
+@dataclass(frozen=True)
+class Sheet:
+    """One sheet of an XLSX: its 1-based position (the address `sheet = k` takes), its masked name, its row and column counts, its Table."""
+    position: int
+    name: str
+    rows: int
+    columns: int
+    table: Table
 
 
 @dataclass(frozen=True)
@@ -192,11 +207,29 @@ def _elect(lines):
     return best[0], tuple(hist.items())
 
 
+def segments(ks):
+    """The count of maximal monotone segments of a sequence (equal neighbours merged first): a segment takes its direction from its first
+    step and ends at the first step against it, the value after which opens the next (a reset between two sweeps opens one, never two)."""
+    steps = [b > a for a, b in zip(ks, ks[1:])]
+    return functools.reduce(lambda st, up: {None: (st[0], up), up: (st[0], up)}.get(st[1], (st[0] + 1, None)), steps, (int(len(ks) > 0), None))[0]
+
+
+def order(xs):
+    """The order and repeat fields of a column's numbers in file order (counts only; the values are dropped on return): monotone_runs (the
+    segments), first_direction, equal_runs (runs of 2, 3-9, 10+), longest, revisited, distinct (intake_names.repeats for the run counts)."""
+    runs, rep = _runs(xs), repeats([xs])
+    ks = [k for k, _ in runs]
+    bins = Counter(BIN.get(min(n, 10)) for _, n in runs)
+    return dict(monotone_runs=segments(ks), first_direction=DIRECTION[next((b > a for a, b in zip(ks, ks[1:])), None)],
+                equal_runs=tuple(bins[b] for b in range(3)), longest=rep["longest run"], revisited=rep["values revisited"], distinct=len(set(xs)))
+
+
 def _column(k, name, cells):
     """ColumnProfile of position k (1-based) over (line, cell) pairs."""
-    cls = [(n, {True: "empty", False: {True: "numeric", False: "text"}[NUMBER.fullmatch(c.strip()) is not None]}[c.strip() == ""]) for n, c in cells]
-    count = lambda w: [n for n, x in cls if x == w]
-    return ColumnProfile(k, name, len(count("numeric")), len(count("empty")), len(count("text")), rle(count("text")), rle(count("empty")))
+    cls = [(n, {True: "empty", False: {True: "numeric", False: "text"}[NUMBER.fullmatch(c.strip()) is not None]}[c.strip() == ""], c) for n, c in cells]
+    count = lambda w: [n for n, x, _ in cls if x == w]
+    return ColumnProfile(k, name, len(count("numeric")), len(count("empty")), len(count("text")), rle(count("text")), rle(count("empty")),
+                         **order([float(c) for _, x, c in cls if x == "numeric"]))
 
 
 def _name(cs, k):
@@ -239,12 +272,26 @@ def _text_file(head, enc, text):
     return FileProfile(*head, "TEXT_TABLE", enc, (table(lines, delimiter, widths),))
 
 
+def _sheet(k, name, raw):
+    cut = [(n, [c.strip() for c in cs], "") for n, cs in sheet_rows(raw, k)]
+    return Sheet(k, {Name.TEXT: masked, Name.NUMERIC: lambda n: f"#{k}"}[classify(name)](name), len(cut), max([len(cs) for _, cs, _ in cut], default=0),
+                 cells_table(cut, "NONE", ()))
+
+
+def sheets(raw):
+    """An XLSX's sheets, each profiled as a table of its cells (intake_convert.sheet_rows, the SHEET_TO_CSV cut), or READER_ABSENT without
+    openpyxl; a workbook openpyxl cannot open has none."""
+    has = importlib.util.find_spec("openpyxl") is not None
+    names = {True: lambda: _book_names(raw) or [], False: lambda: None}[has]()
+    return {True: lambda: tuple(_sheet(k, n, raw) for k, n in enumerate(names, 1)), False: lambda: READER_ABSENT}[has]()
+
+
 KINDS = {   # (is it a zip, does it hold xl/workbook.xml, does it decode as text) -> its FileProfile; total over the 8 keys; by content, never by name
-    **{(True, True, t): lambda h, z, e: FileProfile(*h, "XLSX", "UNDECODABLE") for t in (True, False)},
-    **{(True, False, t): lambda h, z, e: FileProfile(*h, "ZIP", "UNDECODABLE", members=tuple((masked(i.filename), i.file_size) for i in z.infolist()))
+    **{(True, True, t): lambda h, z, e, raw: FileProfile(*h, "XLSX", "UNDECODABLE", sheets=sheets(raw)) for t in (True, False)},
+    **{(True, False, t): lambda h, z, e, raw: FileProfile(*h, "ZIP", "UNDECODABLE", members=tuple((masked(i.filename), i.file_size) for i in z.infolist()))
        for t in (True, False)},
-    (False, False, True): lambda h, z, e: _text_file(h, *e),
-    (False, False, False): lambda h, z, e: FileProfile(*h, "UNPROFILED_FORMAT", "UNDECODABLE"),
+    (False, False, True): lambda h, z, e, raw: _text_file(h, *e),
+    (False, False, False): lambda h, z, e, raw: FileProfile(*h, "UNPROFILED_FORMAT", "UNDECODABLE"),
 }
 
 
@@ -253,7 +300,7 @@ def profiled(name, raw):
     by ENCODINGS, cut by the elected delimiter), or UNPROFILED_FORMAT (empty or binary: the alphabet has no reader)."""
     z, e = _zipped(raw), decoded(raw)
     xlsx = z is not None and "xl/workbook.xml" in z.namelist()
-    return KINDS[(z is not None, xlsx, e[1] is not None)]((name, len(raw), hashlib.sha256(raw).hexdigest()), z, e)
+    return KINDS[(z is not None, xlsx, e[1] is not None)]((name, len(raw), hashlib.sha256(raw).hexdigest()), z, e, raw)
 
 
 def as_json(p):

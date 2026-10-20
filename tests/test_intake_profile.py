@@ -13,6 +13,14 @@
      column; an empty cell; a semicolon, a tab and a blank-separated file; a comma file with a blank after each comma (COMMA and
      WHITESPACE tie: COMMA, the first in Delimiter order); a latin-1, a utf-16 and a BOM file; a zip (members by masked name and size);
      a binary and an empty file (UNPROFILED_FORMAT, UNDECODABLE); the evidence names all four delimiters.
+ T2  (P2) the order and repeat fields: the leak test's drift bank (22 FAST_RESTART sweeps, 579 rows): column 1 has monotone_runs 22,
+     ASCENDING; a SAME_FAST_VALUE plant (each value 3 times): equal_runs (0, 9, 0); a revisited plant (1, 2, 1, 2, ...): revisited 2,
+     equal_runs (0, 0, 0), monotone_runs 5; a runs-of-2 plant: equal_runs (2, 0, 0); a hold plant (40 equal values after 9 rising ones): longest 40, equal_runs (0, 0, 1). An XLSX (by content: a
+     zip holding xl/workbook.xml) is kind XLSX; without openpyxl its sheets are NONE_READER_ABSENT (XLSX_READER_ABSENT), with it each
+     sheet is profiled (a planted workbook of two sheets); the test names the case it cannot reach on a NOT REACHED HERE line.
+     monotone_runs counts maximal monotone SEGMENTS of the values (intake_profile.segments: a reset between sweeps opens one segment, so
+     22 sweeps are 22); intake_names.repeats' "monotone runs" counts runs of STEPS (a reset is its own run: 43 on this bank), so the
+     profile takes repeats' longest run and values revisited and computes its segments itself.
  K11 A two-file plant the test never opens: profile-access.log holds two loader lines of partition "profiled" and no in-process-bypass line
      (the profile's own hooked loader sees any other open of those paths in the process).
 Seen RED (each mutation applied by hand, the test run, the mutation reverted):
@@ -24,6 +32,7 @@ Seen RED (each mutation applied by hand, the test run, the mutation reverted):
    the four delimiters in reverse): FAIL (the tab plant elects WHITESPACE, the comma-and-blank plant WHITESPACE). Plan 1165 P1 words
    this mutation "the whitespace plant elects TAB"; reversed, ties go to WHITESPACE, so the plants that turn are the tab and the
    comma-and-blank ones.
+ - T2: BIN[2] made 1 (a run of 2 counted under 3-9): FAIL (the runs-of-2 plant); revisited computed over consecutive pairs only (`sum(a == b for a, b in zip(xs, xs[1:]))`): FAIL (the revisited plant).
  - K11: profiled reading one file with Path.read_bytes() beside the loader: FAIL (a bypass line).
 """
 import json
@@ -110,6 +119,43 @@ check("T1 blank lines, comment prefixes, header lines (masked cells) and the fou
 check("T1 the n/a cell is a TEXT cell of column 2 at line 3; the empty cell an empty one of column 2 at line 2",
       (rows(PLANTS[2][1])[0].tables[0].columns[1].text_lines, rows(PLANTS[3][1])[0].tables[0].columns[1].empty_lines) == (((3, 3),), ((2, 2),)))
 check("T1 the zip's members by masked name and size", rows(ZIP.getvalue())[0].members == (("run_#csv", 8),), str(rows(ZIP.getvalue())[0].members))
+
+# ---- T2: order, repeats, xlsx
+col = lambda raw: P.profiled("plant.csv", raw).tables[0].columns[0]
+drift22 = ("T,C,sigma,h\n" + "".join(f"-7357.{99 - j:02d}1,-7357.{b:02d}{j:02d}3,-7357.{b:02d}{j:02d}9,-7357.{b:02d}{j:02d}7\n"
+                                      for b in range(22) for j in range(27 - (b >= 7)))).encode()   # test_intake_leak's drift bank
+c = col(drift22)
+check("T2 the drift bank: monotone_runs 22, ASCENDING", (c.monotone_runs, c.first_direction) == (22, "ASCENDING"), str(c)[:300])
+column = lambda vs: ("T\n" + "".join(f"{v}\n" for v in vs)).encode()
+c = col(column([v for v in range(9) for _ in range(3)]))
+check("T2 SAME_FAST_VALUE (each of 9 values 3 times): equal_runs (0, 9, 0), longest 3", (c.equal_runs, c.longest, c.revisited) == ((0, 9, 0), 3, 0), str(c))
+c = col(column([1, 2] * 5))
+check("T2 revisited (1, 2 five times): revisited 2, equal_runs (0, 0, 0), monotone_runs 5", (c.revisited, c.equal_runs, c.monotone_runs, c.distinct)
+      == (2, (0, 0, 0), 5, 2), str(c))
+c = col(column(list(range(9)) + [9] * 40))
+check("T2 hold (40 equal values after 9 rising): longest 40, equal_runs (0, 0, 1)", (c.longest, c.equal_runs, c.monotone_runs) == (40, (0, 0, 1), 1), str(c))
+c = col(column([1, 1, 2, 2, 3]))
+check("T2 runs of 2: equal_runs (2, 0, 0)", c.equal_runs == (2, 0, 0), str(c))
+BOOK = __import__("io").BytesIO()
+with __import__("zipfile").ZipFile(BOOK, "w") as z:
+    z.writestr("xl/workbook.xml", "<workbook/>")
+HAS_XLSX = __import__("importlib.util").util.find_spec("openpyxl") is not None
+check("T2 a zip holding xl/workbook.xml is XLSX by content", P.profiled("plant.bin", BOOK.getvalue()).kind == "XLSX")
+if HAS_XLSX:
+    import openpyxl
+    wb = openpyxl.Workbook()
+    wb.active.title = "run 7"
+    for r in [("T", "C"), (1, 2), (2, 3)]:
+        wb.active.append(r)
+    wb.create_sheet("notes").append(("a note",))
+    out = __import__("io").BytesIO()
+    wb.save(out)
+    sh = P.profiled("plant.xlsx", out.getvalue()).sheets
+    check("T2 with openpyxl: two sheets, by position and masked name, the first profiled", [(x.position, x.name, x.rows, x.columns) for x in sh]
+          == [(1, "run #", 3, 2), (2, "notes", 1, 1)] and [(r.first, r.last, r.kind) for r in sh[0].table.rows] == [(1, 1, "TEXT"), (2, 3, "NUMERIC")], str(sh))
+else:
+    check("T2 without openpyxl: sheets NONE_READER_ABSENT", P.profiled("plant.bin", BOOK.getvalue()).sheets == P.READER_ABSENT)
+print(f"  openpyxl {'installed' if HAS_XLSX else 'NOT installed'} on this machine; NOT REACHED HERE: {'the reader-absent case' if HAS_XLSX else 'the profiled sheets'}")
 
 # ---- T0: the tables
 st = tomllib.loads((ROOT / "intake" / "STAGES.toml").read_text())
