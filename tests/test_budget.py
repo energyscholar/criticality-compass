@@ -9,7 +9,9 @@ Plan 1164: the intake core is split by invariant (Layout C): each module is its 
 the old INTAKE_CAP, still bounds the sum of the split core, so no line cap is raised. Seen RED: FOLD_CAP made 100 (the cap assert FAILS); the sum
 bound made 1000 (CORE_CAP FAILS); cc/intake_fold.py also listed under intake (the disjointness assert FAILS).
 Plan 1160 P6: S10 and the terminal (cc/intake_terminal.py) are the role intake_terminal, TERMINAL_CAP = 200 (see its line). Seen RED: TERMINAL_CAP
-made 100 (the cap assert FAILS); cc/intake_terminal.py also listed under intake (the disjointness assert FAILS)."""
+made 100 (the cap assert FAILS); cc/intake_terminal.py also listed under intake (the disjointness assert FAILS).
+Plan 1165: pre-processing (cc/intake_profile.py) is the role intake_profile, PROFILE_CAP = 320 (plan 1165 D5). Seen RED: PROFILE_CAP made 100 (the
+cap assert FAILS); cc/intake_profile.py also listed under intake_handoff (the disjointness assert FAILS)."""
 import tomllib
 from pathlib import Path
 
@@ -23,6 +25,7 @@ NAMES_CAP = 120
 FEASIBLE_CAP = 120   # plan 1160 P5: checks.toml [roles] intake_feasible, S7, S8 and S9 (cc/intake_feasible.py), so INTAKE_CAP is not raised   # plan 1160 P2: checks.toml [roles] intake_names, the name classifier and Detail, moved out of the intake so INTAKE_CAP is not raised
 BLINDVIEW_CAP = 80   # plan 1160 A41: checks.toml [roles] intake_blindview, `bin/cc intake blind` (cc/intake_blindview.py), so CORE_CAP is not raised
 DIFFERS_CAP = 60   # plan 1160 A34: checks.toml [roles] intake_differs, what a file differs from the first in (cc/intake_differs.py), so CORE_CAP is not raised
+PROFILE_CAP = 320   # plan 1165 D5: checks.toml [roles] intake_profile, `bin/cc intake profile` (cc/intake_profile.py), so CORE_CAP is not raised
 NEW_CAP = 60   # plan 1164: checks.toml [roles] intake_new, `bin/cc new intake` (cc/intake_new.py), moved out of the intake
 TERMINAL_CAP = 200   # plan 1160 P6: checks.toml [roles] intake_terminal, S10 KERNEL_HANDOFF and the terminal (cc/intake_terminal.py), so INTAKE_CAP is not raised
 VERBATIM = [
@@ -51,6 +54,7 @@ terminal = {f: lines(f) for f in roles["intake_terminal"]}
 new = {f: lines(f) for f in roles["intake_new"]}
 differs = {f: lines(f) for f in roles["intake_differs"]}
 blindview = {f: lines(f) for f in roles["intake_blindview"]}
+profile = {f: lines(f) for f in roles["intake_profile"]}
 for f, n in {**counts, **intake, **names, **choices, **tests, **maths}.items():
     print(f"  {f}: {n}")
 total = sum(counts.values())
@@ -64,6 +68,7 @@ print(f"intake_terminal total {sum(terminal.values())} of {TERMINAL_CAP}")
 print(f"intake_new total {sum(new.values())} of {NEW_CAP}")
 print(f"intake_differs total {sum(differs.values())} of {DIFFERS_CAP}")
 print(f"intake_blindview total {sum(blindview.values())} of {BLINDVIEW_CAP}")
+print(f"intake_profile total {sum(profile.values())} of {PROFILE_CAP}")
 assert not set(intake) & set(roles["plumbing"]), f"a file in both plumbing and intake: {sorted(set(intake) & set(roles['plumbing']))}"
 assert sum(intake.values()) <= CORE_CAP, f"intake line budget exceeded: {sum(intake.values())} > {CORE_CAP}; stop and report which files grew"
 for r, c in CORE.items():
@@ -85,5 +90,7 @@ assert sum(differs.values()) <= DIFFERS_CAP, f"intake_differs line budget exceed
 assert not set(differs) & (set(intake) | set(names) | set(choices) | set(feasible) | set(handoff) | set(terminal) | set(new) | set(roles["plumbing"])), "intake_differs shares a file with another capped role"
 assert sum(blindview.values()) <= BLINDVIEW_CAP, f"intake_blindview line budget exceeded: {sum(blindview.values())} > {BLINDVIEW_CAP}"
 assert not set(blindview) & (set(intake) | set(names) | set(choices) | set(feasible) | set(handoff) | set(terminal) | set(new) | set(differs) | set(roles["plumbing"])), "intake_blindview shares a file with another capped role"
+assert sum(profile.values()) <= PROFILE_CAP, f"intake_profile line budget exceeded: {sum(profile.values())} > {PROFILE_CAP}"
+assert not set(profile) & (set(intake) | set(names) | set(choices) | set(feasible) | set(handoff) | set(terminal) | set(new) | set(differs) | set(blindview) | set(roles["plumbing"])), "intake_profile shares a file with another capped role"
 assert total <= CAP, f"line budget exceeded: {total} > {CAP}; stop and report which files grew"
 print("test_budget: all passed")
