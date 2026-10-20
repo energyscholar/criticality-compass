@@ -47,12 +47,12 @@ line then says `none`.
 
 The root name `<cc-datasets>` (intake/ROOTS.toml) is `~/scratch/cc-datasets` under the home directory. A declaration names its files as
 `root = "<cc-datasets>/<name>"` (an example: the root-named path is the declaration, and the id is free; it names only
-`declarations/<id>/`, plan 1160 A19). Peek names a file the same way: `bin/cc intake peek <id> <cc-datasets>/<name>/raw/<file>`. On a machine without that directory, S3 refuses ROOT_UNRESOLVED. That refusal is honest: the data are not
+`declarations/<id>/`, plan 1160 A19). Peek names a file the same way: `bin/cc intake peek <id> '<cc-datasets>/<name>/raw/<file>'`. On a machine without that directory, S3 refuses ROOT_UNRESOLVED. That refusal is honest: the data are not
 there.
 
 ```
 <host> 'cd ~/scratch/cc-intake && bin/cc new intake <id>'
-<host> 'cd ~/scratch/cc-intake && bin/cc intake profile <id> <cc-datasets>/<name>/raw'
+<host> 'cd ~/scratch/cc-intake && bin/cc intake profile <id> "<cc-datasets>/<name>/raw"'
 ```
 
 (Plan 1165.) Profile before you fill a TODO: the profile reads every byte of the path and writes declarations/<id>/PROFILE.json and

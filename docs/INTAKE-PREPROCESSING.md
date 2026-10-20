@@ -12,13 +12,13 @@ profile the blinded view `<cc-blind>/<id>`, never the raw names).
 deposit (raw/)                                 the files as retrieved; never edited
   │
   ├─ bin/cc new intake <id>                                         declarations/<id>/, which the profile writes into
-  ├─ bin/cc intake profile <id> <cc-datasets>/<name>/raw            PRE-PROCESSING: reads every byte, writes the PROFILE
+  ├─ bin/cc intake profile <id> '<cc-datasets>/<name>/raw'          PRE-PROCESSING: reads every byte, writes the PROFILE
   │       PROFILE.json, PROFILE.md, profile.log, profile-access.log in declarations/<id>/; ## Profile in <cc-datasets>/<name>/MANIFEST.md
   │
   ├─ (read PROFILE.md: each finding names its one response, the table below)
   │
   ├─ declarations/<id>/CONVERSION.toml → bin/cc intake convert <id>  when a response is a conversion op (docs/INTAKE-CONVERSION.md)
-  │       bin/cc intake profile <id> <cc-banks>/<id>/bank             PRE-PROCESSING again, on the bank the run will read
+  │       bin/cc intake profile <id> '<cc-banks>/<id>/bank'           PRE-PROCESSING again, on the bank the run will read
   │
   ├─ declarations/<id>/intake.toml, transducer.toml                  the declaration, written against the profile
   │
@@ -31,7 +31,7 @@ deposit (raw/)                                 the files as retrieved; never edi
 The path is root-named: `<cc-datasets>/<name>/raw`, `<cc-banks>/<id>/bank`, `<intake-synth>/<name>`, `<cc-blind>/<id>`. Any other
 form (a bare or absolute path) is refused ROOT_UNRESOLVED. The profile writes nothing under the path it reads. Profiling again
 overwrites PROFILE.json (it is derived) and appends one line to profile.log. A CONVERTED declaration's PROFILE.json is the profile of
-the **bank**; `bin/cc intake profile <id> --raw <cc-datasets>/<name>/raw` keeps the deposit's profile beside it as PROFILE-raw.json.
+the **bank**; `bin/cc intake profile <id> --raw '<cc-datasets>/<name>/raw'` keeps the deposit's profile beside it as PROFILE-raw.json.
 
 ## What the profile says, per file
 

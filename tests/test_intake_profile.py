@@ -53,6 +53,7 @@
  F6  (fix S11.P2b) absence is a sha, never a missing key: read() of no PROFILE.json gives the EMPTY profile value (files []) and sha "";
      every HOLDS `where` of intake_against is total: over every file's facts of T4's control and over edge facts (no declared column, an
      XLSX declaration over a workbook value, sheets NONE_READER_ABSENT, a csv format with no `sheet`) each returns its text.
+ F7  (fix S11.P2b) no peek or profile command in the intake docs names a root-named path unquoted (`<cc-...>` unquoted is a shell redirect).
  F1  (fix S11.P2b) the splitter is total over line length: a SEMICOLON file whose third line holds one 200 000-character field (beyond the
      csv module's default field limit, 131 072) profiles in a fresh process (only intake_profile imported) to its exact rows.
 Seen RED (each mutation applied by hand, the test run, the mutation reverted):
@@ -93,6 +94,7 @@ Seen RED (each mutation applied by hand, the test run, the mutation reverted):
    HOLDS where is total ...: [('WIDTH_CONTRADICTS_PROFILE', 'IndexError list index out of range')]"; SHEET's where back on ['sheet']:
    FAIL "F6 ...: [('SHEET_CONTRADICTS_PROFILE', "KeyError 'sheet'")]"; FAST back on refs[0]: FAIL "F6 ...: [('ORDER_CONTRADICTS_PROFILE',
    'IndexError ...'), ('REPEATS_CONTRADICT_PROFILE', 'IndexError ...')]". (The S3 row PROFILE_ABSENT made `lambda: True`: tests/test_intake_leak.py.)
+ - F7: INTAKE-CONVERSION.md's peek line unquoted again: FAIL "F7 no peek / profile command ...: ['INTAKE-CONVERSION.md: bin/cc intake peek ..."]".
 """
 import contextlib
 import hashlib
@@ -478,6 +480,11 @@ got = [(x.code, x.file) for x in P.findings((P.profiled("CONVERSION-MANIFEST.jso
 check("F5 a bank of one csv beside its CONVERSION-MANIFEST.json raises ONE_FILE on the csv", got == [("ONE_FILE", "t.csv")], str(got))
 got = [x.code for x in P.findings((P.profiled("s.csv", b"T,C\n1,2\n2,3\n"), P.profiled("t.csv", b"T,C\n1,2\n2,3\n"))) if x.code == "ONE_FILE"]
 check("F5 two table files raise no ONE_FILE", got == [], str(got))
+
+# ---- F7 (fix S11.P2b): root-named paths quoted in the docs' shell examples
+bare = [f"{d}: {m.group(0)}" for d in ("INTAKE-CONVERSION.md", "INTAKE-PREPROCESSING.md", "INTAKE-ON-A-DATA-HOST.md")
+        for m in re.finditer(r"bin/cc intake (?:peek|profile)[^`\n#]*?[^'\"]<(?:cc-[a-z]+|intake-synth)>/\S*", (ROOT / "docs" / d).read_text())]
+check("F7 no peek / profile command in the intake docs names a root-named path unquoted", bare == [], str(bare))
 
 # ---- F1 (fix S11.P2b): the splitter total over line length, in a fresh process (the limit is the process's, set where SPLIT is)
 LONG = "import sys; sys.path[:0] = [sys.argv[1]]; import intake_profile as P; t = P.profiled('long.csv', b'T;C\\n1;2\\n3;' + b'x' * 200000 + b'\\n4;5\\n').tables[0]; print(t.delimiter, [(r.first, r.last, r.kind, r.width) for r in t.rows])"
