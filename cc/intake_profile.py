@@ -23,7 +23,7 @@ from intake_convert import MANIFEST, SPLIT, _book_names, _decoded, _manifest, _s
 from intake_names import NUMBER, Name, _runs, classify, masked, repeats
 
 FileKind = enum.Enum("FileKind", "TEXT_TABLE XLSX ZIP UNPROFILED_FORMAT")   # by content, never by extension (plan 1165 2.2)
-Encoding = enum.Enum("Encoding", "UTF8 UTF8_SIG UTF16 LATIN1_ONLY UNDECODABLE")
+Encoding = enum.Enum("Encoding", "UTF8 UTF8_SIG UTF16 LATIN1_ONLY UNDECODABLE NOT_APPLICABLE")   # by FileKind (KINDS): a text decoding; UNDECODABLE (empty or binary); NOT_APPLICABLE (a zip, an xlsx)
 Delimiter = enum.Enum("Delimiter", "COMMA SEMICOLON TAB WHITESPACE NONE")   # the election's tie order is this order
 RowKind = enum.Enum("RowKind", "BLANK NUMERIC NUMERIC_WITH_EMPTY TEXT")
 FindingKind = enum.Enum("FindingKind", "ENCODING_NOT_UTF8 BOM_PRESENT DELIMITER_NOT_COMMA NO_DELIMITER HEADER_LINES_BEFORE_NAMES NAMES_LINE_ABSENT "
@@ -204,8 +204,8 @@ def sheets(raw):
 
 
 KINDS = {   # (is it a zip, does it hold xl/workbook.xml, does it decode as text) -> its FileProfile; total over the 8 keys; by content, never by name
-    **{(True, True, t): lambda h, z, e, raw: FileProfile(*h, "XLSX", "UNDECODABLE", sheets=sheets(raw)) for t in (True, False)},
-    **{(True, False, t): lambda h, z, e, raw: FileProfile(*h, "ZIP", "UNDECODABLE", members=tuple((masked(i.filename), i.file_size) for i in z.infolist()))
+    **{(True, True, t): lambda h, z, e, raw: FileProfile(*h, "XLSX", "NOT_APPLICABLE", sheets=sheets(raw)) for t in (True, False)},
+    **{(True, False, t): lambda h, z, e, raw: FileProfile(*h, "ZIP", "NOT_APPLICABLE", members=tuple((masked(i.filename), i.file_size) for i in z.infolist()))
        for t in (True, False)},
     (False, False, True): lambda h, z, e, raw: _text_file(h, *e),
     (False, False, False): lambda h, z, e, raw: FileProfile(*h, "UNPROFILED_FORMAT", "UNDECODABLE"),

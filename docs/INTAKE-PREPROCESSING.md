@@ -38,7 +38,8 @@ the **bank**; `bin/cc intake profile <id> --raw <cc-datasets>/<name>/raw` keeps 
 - **name, bytes, sha256.** Every file, whatever its kind.
 - **kind.** By content, never by extension: TEXT_TABLE (text that decodes), XLSX (a zip holding `xl/workbook.xml`), ZIP (another
   zip: its members by masked name and size), UNPROFILED_FORMAT (anything else: HDF5, .mat, .npz, TIFF; no reader exists for it).
-- **encoding.** UTF8, UTF8_SIG (a byte-order mark), UTF16, LATIN1_ONLY (not UTF-8), UNDECODABLE.
+- **encoding.** UTF8, UTF8_SIG (a byte-order mark), UTF16, LATIN1_ONLY (not UTF-8) for a text file; UNDECODABLE for an empty or binary file
+  (UNPROFILED_FORMAT); NOT_APPLICABLE for a zip or an xlsx (their cells are read as a workbook or members, never decoded as text).
 - **delimiter.** COMMA, SEMICOLON, TAB, WHITESPACE or NONE: the cut that gives the most lines the same width of two or more cells;
   ties go to that order. The widths under all four are printed beside it, so you see the alternative.
 - **sheets.** XLSX only: each sheet by position and masked name, then profiled as a table.

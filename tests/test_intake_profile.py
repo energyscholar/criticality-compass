@@ -39,6 +39,8 @@
  T5  (P5, D2) against() on a DROP_ROWS_NOT_NUMERIC conversion manifest (values): dropped rows of a lone n/a (TEXT, 1 number) or an
      empty cell (EMPTY) are no contradiction; a dropped TEXT row with no number (a TEXT run: a repeated names line) is
      CELLS_CONTRADICT_PROFILE, its text naming D2: BLOCKS.
+ F2  (fix S11.P2b) the encoding is total by FileKind: a zip and an xlsx (by content) are NOT_APPLICABLE, never UNDECODABLE; an empty and a
+     binary file UNDECODABLE; a text file one of the four decodings (T1's zip row now expects NOT_APPLICABLE: an existing test edited).
  F1  (fix S11.P2b) the splitter is total over line length: a SEMICOLON file whose third line holds one 200 000-character field (beyond the
      csv module's default field limit, 131 072) profiles in a fresh process (only intake_profile imported) to its exact rows.
 Seen RED (each mutation applied by hand, the test run, the mutation reverted):
@@ -65,6 +67,7 @@ Seen RED (each mutation applied by hand, the test run, the mutation reverted):
    holds made True (`lambda c: True or ...`): FAIL "T4 the clean bank (the control): ... 9 contradictions".
  - F1: the limit line (`csv.field_size_limit(sys.maxsize)` in cc/intake_convert.py) deleted, the old splitter: FAIL "F1 a 200 000-character
    field ...: _csv.Error: field larger than field limit (131072)".
+ - F2: KINDS' XLSX row given "UNDECODABLE" again: FAIL "F2 the encoding by FileKind ..."; its ZIP row: the same FAIL and T1's zip row.
 """
 import contextlib
 import hashlib
@@ -151,10 +154,11 @@ PLANTS = [   # (what, bytes, kind, encoding, delimiter, rows)
     ("latin-1", "T,\u00b5\n1,2\n".encode("latin-1"), "TEXT_TABLE", "LATIN1_ONLY", "COMMA", [(1, 1, "TEXT", 2), (2, 2, "NUMERIC", 2)]),
     ("utf-16", "T,C\r\n1,2\r\n".encode("utf-16"), "TEXT_TABLE", "UTF16", "COMMA", [(1, 1, "TEXT", 2), (2, 2, "NUMERIC", 2)]),
     ("BOM", b"\xef\xbb\xbfT,C\n1,2\n", "TEXT_TABLE", "UTF8_SIG", "COMMA", [(1, 1, "TEXT", 2), (2, 2, "NUMERIC", 2)]),
-    ("zip", ZIP.getvalue(), "ZIP", "UNDECODABLE", None, []),
+    ("zip", ZIP.getvalue(), "ZIP", "NOT_APPLICABLE", None, []),   # (1165 F2: was UNDECODABLE)
     ("binary", b"\x89HDF\r\n\x1a\n\x00\x00\x01", "UNPROFILED_FORMAT", "UNDECODABLE", None, []),
     ("empty", b"", "UNPROFILED_FORMAT", "UNDECODABLE", None, []),
 ]
+T1_PLANTS = list(PLANTS)   # (1165 F2) kept: T4 below rebinds PLANTS
 for what, raw, k, enc, d, want in PLANTS:
     p, got = rows(raw)
     check(f"T1 {what}: {k}, {enc}, {d}, rows", (p.kind, p.encoding, [t.delimiter for t in p.tables][:1] or [None], got) == (k, enc, [d], want),
@@ -386,6 +390,12 @@ for what, m, want in (("a lone n/a cell (TEXT, 1 number) and an empty one (EMPTY
     got = [(c, f) for c, f, _ in A.against(p0, m, d0)]
     check(f"T5 {what} dropped by DROP_ROWS_NOT_NUMERIC: {[(c.name, f) for c, f in want] or 'no contradiction'}", got == want, str(got))
 check("T5 the TEXT-run contradiction's text says D2: BLOCKS", "D2: BLOCKS" in str(A.against(p0, DROP(["TEXT"], [0]), d0)), str(A.against(p0, DROP(["TEXT"], [0]), d0)))
+
+# ---- F2 (fix S11.P2b): the encoding by FileKind
+ENC = {"TEXT_TABLE": {"UTF8", "UTF8_SIG", "UTF16", "LATIN1_ONLY"}, "XLSX": {"NOT_APPLICABLE"}, "ZIP": {"NOT_APPLICABLE"}, "UNPROFILED_FORMAT": {"UNDECODABLE"}}
+got = [(f.kind, f.encoding) for f in (P.profiled(f"p{i}", raw) for i, (_, raw, *_) in enumerate(T1_PLANTS + [("xlsx", BOOK.getvalue())]))]
+check("F2 the encoding by FileKind: a zip and an xlsx NOT_APPLICABLE, an empty or binary file UNDECODABLE, a text file a decoding",
+      set(ENC) == {k.name for k in P.FileKind} and all(e in ENC[k] for k, e in got) and {"XLSX", "ZIP", "UNPROFILED_FORMAT", "TEXT_TABLE"} <= {k for k, _ in got}, str(got))
 
 # ---- F1 (fix S11.P2b): the splitter total over line length, in a fresh process (the limit is the process's, set where SPLIT is)
 LONG = "import sys; sys.path[:0] = [sys.argv[1]]; import intake_profile as P; t = P.profiled('long.csv', b'T;C\\n1;2\\n3;' + b'x' * 200000 + b'\\n4;5\\n').tables[0]; print(t.delimiter, [(r.first, r.last, r.kind, r.width) for r in t.rows])"
