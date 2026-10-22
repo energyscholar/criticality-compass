@@ -29,6 +29,7 @@ import intake_feature
 import intake_suspect
 import linenav
 import navmap
+import scorewords
 from intake_fold import Primary, verdicts
 
 UNTESTED = ("UNTESTED: cc navigate (family mode) is tested on planted families only (tests/test_navfamily.py); no real family's transcript "
@@ -214,17 +215,13 @@ def distance(path, u):
 
 
 WC = linenav.PARAMS["continuous"]["wc"]   # the frozen continuous corridor, in span units
-WITHIN = {True: lambda d: d <= WC, False: lambda d: False}   # was a line traced -> (distance) -> within w_c
-SCORE = {True: "FOLLOWED", False: "NOT_FOLLOWED"}   # is every checkpoint within w_c of the traced line
 
 
-def _scored(w, cps):
-    path = path_of(w.rec)
-    ds = [distance(path, u) for u in cps]
-    ok = [WITHIN[d is not None](d) for d in ds]
-    rows = [f"  checkpoint {i}: distance {('none' if d is None else f'{d:.4f}')} span units -> {('within' if k else 'beyond')} w_c" for i, (u, d, k) in enumerate(zip(cps, ds, ok))]
-    return [UNTESTED, f"score {w.ident}: navigator verdict {w.rec['verdict'].name}; {len(cps)} checkpoints converted by the suspect's rules", *rows,
-            f"score: {sum(ok)} of {len(cps)} checkpoints within w_c {WC} span units -> {SCORE[all(ok)]}"], 0
+def _scored(w, cps, d):
+    """The score's words (plan 1201 AMENDMENT 1, cc/scorewords.py): the navigator's verdict copied, each checkpoint's Reach, the ranges, the
+    named census and one sentence. d: the declaration (the slow unit, the uncertainty kind)."""
+    return scorewords.lines(w.ident, w.rec["verdict"], w.oracle, w.rec, path_of(w.rec), cps, w.suspect, WC, d["knobs"]["slow"]["unit"],
+                            d["measured"]["uncertainty"]["kind"], UNTESTED), 0
 
 
 def score(root, ident, f):
@@ -234,4 +231,4 @@ def score(root, ident, f):
     w = then(have, lambda i: (logged(root, i, "score"), walk(root, i))[1])
     pts = then(w, lambda _: points(root, f))
     cps = then(pts, lambda ps: (lambda each: ([c for c in each if isinstance(c, REFUSED)] + [tuple(w.oracle.span.u(v) for v in ps)])[0])([intake_suspect.cell(w.cells.plane, i, v) for i, v in enumerate(ps)]))
-    return {True: lambda: (refusal_text(cps), 1), False: lambda: _scored(w, cps)}[isinstance(cps, REFUSED)]()
+    return {True: lambda: (refusal_text(cps), 1), False: lambda: _scored(w, cps, tomllib.loads((Path(root) / 'declarations' / ident / 'intake.toml').read_text()))}[isinstance(cps, REFUSED)]()

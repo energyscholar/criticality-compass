@@ -1,0 +1,13 @@
+$ bin/cc navigate score plant <held-out>/checkpoints.toml
+UNTESTED: cc navigate (family mode) is tested on planted families only (tests/test_navfamily.py); no real family's transcript has been scored against a known line.
+score plant: navigator_verdict FOLLOWED_IN_CORRIDOR (the navigator's, copied); 3 checkpoints converted by the suspect's rules
+  checkpoint 0: slow 0.1 dimensionless, distance 0.0000 span units -> REACHED_WITHIN_WC
+  checkpoint 1: slow 0.6 dimensionless, distance 0.0010 span units -> REACHED_WITHIN_WC
+  checkpoint 2: slow 1.2 dimensionless, distance 0.0097 span units -> REACHED_WITHIN_WC
+checkpoints_summary: REACHED_WITHIN_WC 3, REACHED_BEYOND_WC 0, NOT_REACHED 0
+traced_slow_range: 0.1 -> 1.189 dimensionless; the curves read: ranks 0 .. 11, 0.1 -> 1.2 dimensionless (the checkpoints' reach range); enclosing measured curves of the traced ends 0.1|0.1 and 1.1|1.2 dimensionless
+suspect_slow_range: 0.1 -> 1.2 dimensionless (the declared vertices)
+census: Located 12: 0 (0.1), 1 (0.2), 2 (0.3), 3 (0.4), 4 (0.5), 5 (0.6), 6 (0.7), 7 (0.8), 8 (0.9), 9 (1), 10 (1.1), 11 (1.2); Broad 0: none; AtSpanEnd 0: none; Absent 0: none (curve rank (slow) per Feature kind)
+score: 3 of 3 checkpoints within w_c 0.15 span units and reached (REACHED_WITHIN_WC)
+sentence: FOLLOWED trace (navigator verdict FOLLOWED_IN_CORRIDOR): traced 0.1 -> 1.189 dimensionless of the suspect line's 0.1 -> 1.2 dimensionless; 3 of 3 checkpoints reached, 3 within w_c and 0 beyond w_c (0.15 of each span), 0 not reached (outside the slow range of the curves the trace read); backward stopped at 0.1 dimensionless (terminal EDGE; nearest curve rank 0, Located, 0.1 dimensionless; no curve beyond (the family's end)); forward stopped at 1.189 dimensionless (terminal EDGE; nearest curve rank 11, Located, 1.2 dimensionless; no curve beyond (the family's end)). Tiered: the declared sigma column.
+exit 0
