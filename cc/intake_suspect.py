@@ -7,7 +7,9 @@ SUSPECT_FAST_OUT_OF_SPAN); its cell is then (curve rank, the in-span nearest sam
 points is ever formed: a cell is a rank pair, never a value. Curve rank and sample rank are intake_feature's (slow order; ascending fast, stable).
 The plane: [plane] axes "slow-fast". A family whose curves carry more than one replicate key (intake_census.KEYED: a second knob varies) needs
 [plane.slice] (else PLANE_NEEDS_A_SLICE); the slice names the declared [replicate.key] COLUMN (else PLANE_SLICE_NOT_THE_SECOND_KNOB) and keeps
-the curves whose key is exactly its value (none: PLANE_SLICE_SELECTS_NO_CURVE).
+the curves whose key is exactly its value (none: PLANE_SLICE_SELECTS_NO_CURVE). Plan 1176 E0: an optional [plane.fast_window] lo, hi (the fast
+knob's unit, declared before data) is the feature projection's DOMAIN, carried on the Plane (Plane.window) to the oracle; it edits no curve.
+It must be ordered (FAST_WINDOW_NOT_ORDERED) and inside the plane's measured fast span (FAST_WINDOW_BEYOND_SPAN): typed, never clamped.
 Every refusal is a local typed value (Refused, its sentence in REFUSAL): STAGES.toml is untouched and the core is at its cap. Like the side
 oracle, it reads only the Census object (the pinned bytes it carries) and the tables as values: it constructs no Path and opens nothing, and a
 refusal's detail names vertex ordinals, the declared guess and curve ranks, never a measured value."""
@@ -26,6 +28,8 @@ REFUSAL = {   # code -> sentence; every code this module emits is a row (tests/t
     "PLANE_NEEDS_A_SLICE": "The curves carry more than one value of a second knob ([replicate.key]); [plane.slice] must fix one value.",
     "PLANE_SLICE_NOT_THE_SECOND_KNOB": "[plane.slice] column is not the declared [replicate.key] COLUMN, the only second knob a family declares.",
     "PLANE_SLICE_SELECTS_NO_CURVE": "No curve's [replicate.key] value is exactly the [plane.slice] value.",
+    "FAST_WINDOW_NOT_ORDERED": "[plane.fast_window] needs lo < hi, in the fast knob's unit.",
+    "FAST_WINDOW_BEYOND_SPAN": "[plane.fast_window] reaches outside the plane's measured fast span; a window is never clamped to the span.",
 }
 
 
@@ -43,9 +47,11 @@ class Refused:
 @dataclass(frozen=True)
 class Plane:
     """The curves of the plane, in slow order (curve rank = index), each as (slow value, fast values in ascending order (sample rank = index));
-    source: the census's curve objects in the same order (plan 1176 D, A-E6: the side oracle is built over exactly these)."""
+    source: the census's curve objects in the same order (plan 1176 D, A-E6: the side oracle is built over exactly these); window: the declared
+    [plane.fast_window] (lo, hi) in the fast knob's unit, the feature projection's domain (plan 1176 E0), or None (the whole span)."""
     curves: tuple
     source: tuple = ()
+    window: tuple = None
 
 
 @dataclass(frozen=True)
@@ -96,11 +102,26 @@ SLICE = {   # (does a second knob vary: more than one replicate key, is a [plane
 }
 
 
+def _windowed(p, w):
+    """The plane with its declared fast window (plan 1176 E0), or Refused: ordered, and inside the plane's measured fast span (never clamped)."""
+    lo, hi = min(f[0] for _, f in p.curves), max(f[-1] for _, f in p.curves)
+    return gate([(lambda: w["lo"] < w["hi"], "FAST_WINDOW_NOT_ORDERED", lambda: f"declared lo {w['lo']!r}, hi {w['hi']!r}"),
+                 (lambda: lo <= w["lo"] and w["hi"] <= hi, "FAST_WINDOW_BEYOND_SPAN", lambda: f"declared lo {w['lo']!r}, hi {w['hi']!r}; {len(p.curves)} curves")],
+                lambda: Plane(p.curves, p.source, (float(w["lo"]), float(w["hi"]))), Refused)
+
+
+WINDOW = {   # (the plane's outcome type, is a [plane.fast_window] declared) -> (it, declaration) -> Plane | Refused; total over the four answers
+    (Plane, True): lambda p, d: _windowed(p, d["plane"]["fast_window"]), (Plane, False): lambda p, d: p,
+    (Refused, True): lambda p, d: p, (Refused, False): lambda p, d: p,
+}
+
+
 def plane(t, census):
-    """The plane of a census (S5's evidence) under its declaration's [plane]: a Plane, or Refused."""
+    """The plane of a census (S5's evidence) under its declaration's [plane]: a Plane (with its fast window, E0), or Refused."""
     d = census.pinned.declaration.data
     keyed = _curves(t, d, census)
-    return SLICE[(len({k for _, k in keyed}) > 1, "slice" in look(d, "plane", {}))](d, keyed)
+    p = SLICE[(len({k for _, k in keyed}) > 1, "slice" in look(d, "plane", {}))](d, keyed)
+    return WINDOW[(type(p), "fast_window" in look(d, "plane", {}))](p, d)
 
 
 def pair(v):

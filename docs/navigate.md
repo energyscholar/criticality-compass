@@ -118,6 +118,11 @@ whose intake run refuses at no stage. Its plane is grid cells, curve rank x samp
 (0, 0) .. (curves - 1, n_max - 1) in grid mode, with linenav's grid PARAMS untouched (w_c 5 cells, budget 400). The side oracle is the R1
 feature projection (`cc/intake_feature.py`, POLICY `[feature_projection.FEATURE_ARGMAX_FAST]`), built over the SAME plane as the suspect
 (the sliced curves when `[plane.slice]` is declared), answering in `linenav.Side`, its evidence `linenav.FiniteStored("<id>:<seal hash>")`.
+**The fast window (plan 1176 amendment E0, FORMAT v16).** An optional `[plane.fast_window] lo, hi`, in the fast knob's physical unit and
+declared before data, is the feature projection's DOMAIN: each curve's maximum, plateau and kind are read over its in-window samples only, a
+window edge is a span end (an edge maximum is AtSpanEnd), a curve with fewer than three in-window samples is Absent, and Broad and the plane's
+fast span unit are the window's. It is not a row filter: every sample stays in its curve. A window not ordered (FAST_WINDOW_NOT_ORDERED) or
+reaching outside the plane's measured fast span (FAST_WINDOW_BEYOND_SPAN) is a typed refusal, never clamped. Absent: the whole span.
 stdout is value-free: the verdict, the terminals and the traced polyline in cells. `results/navigate/<id>.toml` holds the same polyline and,
 per point, the measured slow and fast values of its neighbouring cells (a bracket of measured values, never a value between them).
 

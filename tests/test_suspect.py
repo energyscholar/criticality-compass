@@ -8,14 +8,18 @@ It reads no real data. Each check names its red mutation (applied by hand, seen 
  A3. every existing planted declaration (declarations/*, the PER_FILE and LONG_TABLE plants, every CHOICE_PLANTS edit) lints identically under
      v14 and under v13 (FORMAT's tables without [plane] and [suspect]); a declaration with them passes S0 under v14 and is FIELD_UNKNOWN under
      v13. Red: [fields.suspect] required = true in intake/FORMAT.toml.
- A4. intake.tables() reports FORMAT 1160-v15 (plan 1176 C'': was v14, the version check moved with the additive corridor word), header schema
-     still 5. Red: the version line left at "1160-v14".
+ A4. intake.tables() reports FORMAT 1160-v16 (plan 1176 E0: was v15, the version check moved with the additive [plane.fast_window]; C'':
+     was v14, moved with the additive corridor word), header schema still 5. Red: the version line left at "1160-v15".
  A7. (plan 1176 C'') the [suspect] corridor alphabet is exactly {grid, continuous}, each a key of linenav.PARAMS. Red: continuous removed.
  A5. a family whose curves carry two values of a second knob ([replicate.key] COLUMN p) without [plane.slice] is PLANE_NEEDS_A_SLICE; with the
      slice it converts on that slice's curves; a slice naming another column is PLANE_SLICE_NOT_THE_SECOND_KNOB. Red: the column ignored
      (_curves keys every curve "").
  A6. intake_suspect is its own role in checks.toml, outside the measurement closure, and tests/test_budget.py (SUSPECT_CAP 160, disjointness)
      passes. Red: SUSPECT_CAP made 100 (the cap assert FAILS); cc/intake_suspect.py also listed under intake_handoff (the disjointness assert FAILS).
+ A8. (plan 1176 E0) a declared [plane.fast_window] is carried on the Plane as (lo, hi) in the fast knob's unit (navfamily hands it to the
+     oracle); lo >= hi is FAST_WINDOW_NOT_ORDERED; a window reaching outside the plane's measured fast span is FAST_WINDOW_BEYOND_SPAN, typed,
+     never clamped. Red: the window dropped (WINDOW (Plane, True) returns the plane unwindowed); the span gate made True (a window wider than
+     the span accepted silently).
  Every code the module refuses with is a row of REFUSAL (each reached below)."""
 import json
 import subprocess
@@ -70,7 +74,7 @@ def lint(t, d, text, findings):
 
 
 # ---- A4 the version
-check("A4. intake.tables() reports FORMAT 1160-v15", T["format"]["version"] == "1160-v15", T["format"]["version"])
+check("A4. intake.tables() reports FORMAT 1160-v16", T["format"]["version"] == "1160-v16", T["format"]["version"])
 corr = set(T["format"]["fields"]["suspect"]["fields"]["corridor"]["values"])
 check("A7. the corridor alphabet is {grid, continuous}, each a linenav PARAMS key", corr == {"grid", "continuous"} and corr <= set(S_PARAMS), str(corr))
 check("A4. the header schema stays 5 (additive v14)", T["format"]["header"] == {"schema": 5, "kind": "intake"}, str(T["format"]["header"]))
@@ -113,6 +117,18 @@ def planted():
                                   ("pair", section('[[0.1, 3.0], [0.2]]'), "SUSPECT_VERTEX_NOT_A_PAIR"), ("pairs", section('[[0.1, 3.0], [0.2, "4"]]'), "SUSPECT_VERTEX_NOT_A_PAIR")):
             r = suspect(fam, ident, tail)
             check(f"A1. {want} is a typed refusal", code(r) == want, repr(r))
+
+        # ---- A8 the declared fast window (E0): carried, ordered, inside the span, never clamped
+        win = lambda lo, hi: section("[[0.1, 3.0], [0.3, 4.0]]", sl=f"[plane.fast_window]\nlo = {lo}\nhi = {hi}\n")   # noqa: E731
+        r = suspect(fam, "win", win(2.0, 6.0))
+        check("A8. a declared [plane.fast_window] is carried on the Plane as (lo, hi)", getattr(getattr(r, "plane", None), "window", None) == (2.0, 6.0), repr(r)[:200])
+        check("A8. without one the Plane's window is None (the whole span)", ok.plane.window is None, repr(ok.plane)[:200])
+        r = suspect(fam, "winrev", win(6.0, 2.0))
+        check("A8. lo >= hi is FAST_WINDOW_NOT_ORDERED", code(r) == "FAST_WINDOW_NOT_ORDERED", repr(r))
+        r = suspect(fam, "winwide", win(0.5, 7.0))
+        check("A8. a window reaching outside the plane's measured fast span (1..7) is FAST_WINDOW_BEYOND_SPAN, never clamped", code(r) == "FAST_WINDOW_BEYOND_SPAN", repr(r))
+        r = suspect(fam, "winedge", win(1.0, 7.0))
+        check("A8. a window exactly the measured span is admitted", getattr(getattr(r, "plane", None), "window", None) == (1.0, 7.0), repr(r)[:200])
 
         # ---- A5 a second knob
         two = [(h, rows(PEAK, f",{p}")) for p in (1.0, 2.0) for h in (0.1, 0.2, 0.3)]

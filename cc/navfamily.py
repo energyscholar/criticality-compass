@@ -102,7 +102,7 @@ def oracle_for(t, cells, census, seal):
     """The side oracle over the suspect's OWN plane (A-E6: Plane.source, the sliced curves in slow order), answering in linenav.Side with
     linenav's FiniteStored evidence (B-E3): a curve rank names the same curve for the suspect and for the oracle. The suspect's corridor word
     carries the frozen w_c to the feature (plan 1176 C', O1: Broad = a bracket wider than w_c)."""
-    return intake_feature.on(t, cells.plane.source, census, seal, cells.corridor, linenav.Side)
+    return intake_feature.on(t, cells.plane.source, census, seal, cells.corridor, linenav.Side, cells.plane.window)
 
 
 CORRIDOR = {"continuous": lambda c: c, "grid": lambda c: Refusal("CORRIDOR_GRID_RETIRED", f"corridor {c.corridor!r}")}   # FORMAT v15's words, total

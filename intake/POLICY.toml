@@ -4,7 +4,8 @@
 schema = 1
 kind = "intake-policy"
 status = "POLICY"
-version = "1176-v2"   # plan 1176 phase C'': + [coordinate.PLANE_SPAN_UNIT]; Broad in span units
+version = "1176-v3"   # plan 1176 amendment E0: FEATURE_ARGMAX_FAST gains its domain (the declared [plane.fast_window])
+# was "1176-v2"   # plan 1176 phase C'': + [coordinate.PLANE_SPAN_UNIT]; Broad in span units
 # was "1176-v1"   # plan 1176 phase B: + [feature_projection.FEATURE_ARGMAX_FAST] (was 1136-v1)
 evidence_note = "The plan 1118 banks were used to CHOOSE these rows; they cannot validate them (A1.10). Validation needs fresh held-out planted banks."
 
@@ -40,7 +41,8 @@ fails_when = "the ridge moves between neighbouring curves by more than the grid 
 # (cc/intake_feature.py), never by S10: it is not a [projection] bias a declaration may cite (S1 admits [projection] keys only).
 estimand = "fast location of each curve's sigma-indistinguishable maximum: the argmax sample rank and its sigma-plateau [lo, hi] (consecutive samples with value + tier_z sigma >= max - tier_z sigma_max); UNRES at a span end, when absent, or when Broad (plan 1176 C': an interior plateau wider than the declared corridor's frozen w_c; C'': its end samples' fast values farther apart than w_c of the plane's fast span)"
 preserves = "per-curve shape (where along the fast knob each curve's maximum sits, at sample resolution, with its sigma-plateau); the declared slow order of the curves"
-discards = "cross-curve pointwise comparison (no fast value is compared between curves); the amplitude of the maximum; the bracket width beyond the corridor (read as Broad)"
+domain = "plan 1176 E0: the declared [plane.fast_window] [lo, hi] in the fast knob's physical unit, declared before data, else the plane's whole fast span. The maximum, its plateau and its kind are read over the in-window samples only; a window edge is a span end (an edge maximum is AtSpanEnd); a curve with fewer than three in-window samples is Absent; Broad and the plane's fast span unit are the window's width. Never a value transform and never a row filter: every sample stays in the curve (its measured span, OffSpan, the re-projection)"
+discards = "cross-curve pointwise comparison (no fast value is compared between curves); the amplitude of the maximum; the bracket width beyond the corridor (read as Broad); the shape outside the declared window (E0: a maximum outside the domain is not seen)"
 measured_by = "plan 1176 phase B planted tests (tests/test_feature.py) only; phase C's planted 2-D bank measures it"
 cannot = "locate a maximum between measured samples; see a line that runs along the curves (ruling R2, phase 2b)"
 depends_on = "the fast-knob density of each curve near its peak and the stated sigma column (none: the bracket is the argmax sample alone, UNTIERED)"

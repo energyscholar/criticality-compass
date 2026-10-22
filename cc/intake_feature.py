@@ -1,22 +1,21 @@
 """intake_feature - plan 1176 phase B (ruling R1): the per-curve feature, a declared projection in M, and the real-data side oracle over it
 (role intake_feature with its own cap, tests/test_budget.py FEATURE_CAP, so CORE_CAP stays 1200).
-The projection (POLICY [feature_projection.FEATURE_ARGMAX_FAST]) gives each curve one typed Feature: Located(rank, lo, hi) | Broad | AtSpanEnd |
-Absent.
-rank is the argmax sample rank (samples in ascending fast order, ties to the first); [lo, hi] is the sigma-plateau, the maximal run of
-consecutive samples around rank whose value + Z sigma >= max - Z sigma_max (Z = POLICY's tier_z): a declared interval, never a guard. With no
-sigma column the bracket is [rank, rank] and the tiering UNTIERED (reported, not refused). AtSpanEnd when lo = 0 or hi = n - 1; Absent when
-n < 3. Broad (plan 1176 C', ruling 10-20; C'' in span units) when the interior bracket is WIDER THAN w_c of the fast span (its END SAMPLES'
-fast values farther apart than w_c x the plane's fast span width): a point's uncertainty is never larger than the verdict's tolerance, so a
-Broad curve sides nowhere (UNRES). w_c is the frozen linenav PARAMS[corridor]["wc"] of the declared [suspect] corridor word, never a knob here.
-The cross-curve relation is the declared slow order of the curves (curve rank = 0-based slow order). The plane (C'', O4): the declared knobs'
-physical units, each normalised to its declared span by the declared affine coordinate map Span (POLICY [coordinate.PLANE_SPAN_UNIT]), a
-coordinate map, never a value transform; linenav reads it in CONTINUOUS mode on [0, 1] x [0, 1]. At a point u: the NEAREST CURVE by slow (a tie
-to the lower rank), then the ORDER of u's fast against that curve's bracket END SAMPLE values (Below | Inside | Above; outside the curve's
-measured span OffSpan). Nothing between measured points is formed: a side changes only at a sample. On output a located point is re-projected
-to its ENCLOSING MEASURED PAIR (Oracle.measured, Oracle.ranks).
-The oracle answers linenav's side alphabet {NEG, POS, MID, UNRES, SINGLE} by member NAME from SIDE, total over FEATURES x LOCI (one-curve family:
-SINGLE). Its evidence is always FiniteStored(source = "<declaration id>:<seal hash>"), never Sharp. It reads only the Census object (the pinned
-bytes it carries) and the tables as values: it constructs no Path and opens nothing."""
+The projection (POLICY [feature_projection.FEATURE_ARGMAX_FAST]) gives each curve one typed Feature: Located(rank, lo, hi) | Broad | AtSpanEnd | Absent.
+E0: its DOMAIN is the declared [plane.fast_window] if any (else the span); no curve is edited, a window edge IS a span end. rank is the argmax
+sample rank (samples in ascending fast order, ties to the first); [lo, hi] is the sigma-plateau, the maximal run of consecutive samples around rank
+whose value + Z sigma >= max - Z sigma_max (Z = POLICY's tier_z): a declared interval, never a guard. With no sigma column the bracket is [rank,
+rank] and the tiering UNTIERED (reported, not refused). AtSpanEnd when lo = 0 or hi = n - 1; Absent when n < 3. Broad (plan 1176 C', ruling 10-20;
+C'' in span units) when the interior bracket is WIDER THAN w_c of the fast span (its END SAMPLES' fast values farther apart than w_c x the plane's
+fast span width): a point's uncertainty is never larger than the verdict's tolerance, so a Broad curve sides nowhere (UNRES). w_c is the frozen
+linenav PARAMS[corridor]["wc"] of the declared [suspect] corridor word, never a knob here. The cross-curve relation is the declared slow order of
+the curves (curve rank = 0-based slow order). The plane (C'', O4): the declared knobs' physical units, each normalised to its declared span by the
+declared affine coordinate map Span (POLICY [coordinate.PLANE_SPAN_UNIT]), a coordinate map, never a value transform; linenav reads it in CONTINUOUS
+mode on [0, 1] x [0, 1]. At a point u: the NEAREST CURVE by slow (a tie to the lower rank), then the ORDER of u's fast against that curve's bracket
+END SAMPLE values (Below | Inside | Above; outside the curve's measured span OffSpan). Nothing between measured points is formed: a side changes
+only at a sample. On output a located point is re-projected to its ENCLOSING MEASURED PAIR (Oracle.measured, Oracle.ranks). The oracle answers
+linenav's side alphabet {NEG, POS, MID, UNRES, SINGLE} by member NAME from SIDE, total over FEATURES x LOCI (one-curve family: SINGLE). Its evidence
+is always FiniteStored(source = "<declaration id>:<seal hash>"), never Sharp. It reads only the Census object (the pinned bytes it carries) and the
+tables as values: it constructs no Path and opens nothing."""
 import enum
 from dataclasses import dataclass
 
@@ -119,24 +118,25 @@ KIND = {   # (does the bracket touch a span end, is it wider than w_c of the fas
 SIGMA_COL = {"COLUMN": lambda a: a[:, 2], "NONE": lambda a: np.zeros(len(a))}   # role order: fast, measured, uncertainty (intake_read.role_columns)
 
 
-def located(a, z, kind, wc, width):
-    """The Feature of a curve of n >= 3 samples `a` (rows in ascending fast order): the argmax rank, its bracket, and the kind KIND gives it.
-    Its width in span units is (fast at hi - fast at lo) / width, the end samples' measured fast values over the plane's fast span width."""
-    r = int(np.argmax(a[:, 1]))
-    lo, hi, tiering = BRACKET[kind](a[:, 1], SIGMA_COL[kind](a), z, r)
-    return KIND[(lo == 0 or hi == len(a) - 1, (a[hi, 0] - a[lo, 0]) / width > wc)](len(a), r, lo, hi, tiering)
+def located(a, z, kind, wc, width, i):
+    """The Feature of rows `a` (ascending fast) read over its in-domain ranks i (>= 3, consecutive; its ends are span ends): the argmax, its bracket,
+    the kind KIND gives it (width in span units: (fast at hi - fast at lo) / the fast span width), as the curve's own ranks; n is every sample."""
+    w = np.asarray(a, float)[i]
+    r = int(np.argmax(w[:, 1]))
+    lo, hi, tiering = BRACKET[kind](w[:, 1], SIGMA_COL[kind](w), z, r)
+    return KIND[(lo == 0 or hi == len(w) - 1, (w[hi, 0] - w[lo, 0]) / width > wc)](len(a), *(int(x + i[0]) for x in (r, lo, hi)), tiering)
 
 
-SIZED = {   # has the curve at least three samples -> (its rows, Z, uncertainty kind, w_c, fast span width) -> its Feature; total over the two answers
-    False: lambda rows, z, kind, wc, width: Absent(len(rows)),
-    True: lambda rows, z, kind, wc, width: located(np.asarray(sorted(rows, key=lambda r: r[0]), float), z, kind, wc, width),   # stable: the stored order breaks a fast tie
-}
+SIZED = {   # has the curve at least three samples in its domain -> (samples, Z, uncertainty kind, w_c, span width, in-domain ranks) -> its Feature
+    False: lambda a, z, kind, wc, width, i: Absent(len(a)), True: located}   # E0: fewer than 2 in-window samples (and 2: no interior) is Absent
 
 
-def feature(rows, z, kind, wc, width):
-    """One curve's Feature from its rows (role order), its samples taken in ascending fast order; wc = the corridor's w_c in span units,
-    width = the plane's fast span width (Span.width[1]) in the fast knob's unit."""
-    return SIZED[len(rows) >= 3](rows, z, kind, wc, width)
+def feature(rows, z, kind, wc, width, ends=(-np.inf, np.inf)):
+    """One curve's Feature from its rows (role order), its samples taken in ascending fast order (stable: the stored order breaks a fast tie);
+    wc = the corridor's w_c in span units, width = the fast span width (Span.width[1]); ends = the domain, by fast VALUE (E0; never rank)."""
+    a = sorted(rows, key=lambda r: r[0])
+    i = np.flatnonzero([ends[0] <= r[0] <= ends[1] for r in a])
+    return SIZED[len(i) >= 3](a, z, kind, wc, width, i)
 
 
 WIDTH = {True: lambda lo, hi: 1.0, False: lambda lo, hi: hi - lo}   # is a knob's span one point -> its declared width (a point span: 1, the map a translation)
@@ -157,9 +157,12 @@ class Span:
         return tuple(lo + float(a) * w for a, lo, w in zip(u, self.lo, self.width))
 
 
-def span(cs):
-    """The Span of the curves `cs` (each with one slow value and its rows in role order, fast first)."""
-    ends = ((min(c.slow[0] for c in cs), max(c.slow[0] for c in cs)), (min(r[0] for c in cs for r in c.rows), max(r[0] for c in cs for r in c.rows)))
+FAST_ENDS = {True: lambda cs, w: (min(r[0] for c in cs for r in c.rows), max(r[0] for c in cs for r in c.rows)), False: lambda cs, w: w}   # no window?
+
+
+def span(cs, window=None):
+    """The Span of the curves `cs` (each with one slow value and its rows in role order, fast first); fast: the declared window (E0) if any."""
+    ends = ((min(c.slow[0] for c in cs), max(c.slow[0] for c in cs)), FAST_ENDS[window is None](cs, window))
     return Span(tuple(float(a) for a, _ in ends), tuple(float(WIDTH[a == b](a, b)) for a, b in ends))
 
 
@@ -246,15 +249,15 @@ def oracle(t, census, seal, corridor, alphabet=Side):
     return on(t, cs, census, seal, corridor, alphabet)
 
 
-def on(t, cs, census, seal, corridor, alphabet=Side):
+def on(t, cs, census, seal, corridor, alphabet=Side, window=None):
     """The side oracle over the curves `cs` of a census, in slow order (plan 1176 D, A-E6: a plane's curves, intake_suspect.Plane.source, so
-    the oracle's curve rank is the suspect's): an Oracle, or Unprojected when POLICY declares no feature projection."""
-    return DECLARED[(KEY in look(t["policy"], "feature_projection", {}), SPAN_KEY in look(t["policy"], "coordinate", {}))](t, cs, census, seal, corridor, alphabet)
+    the oracle's curve rank is the suspect's), its domain the plane's window (E0): an Oracle, or Unprojected when POLICY declares no projection."""
+    return DECLARED[(KEY in look(t["policy"], "feature_projection", {}), SPAN_KEY in look(t["policy"], "coordinate", {}))](t, cs, census, seal, corridor, alphabet, window)
 
 
-def _build(t, cs, census, seal, corridor, alphabet):
+def _build(t, cs, census, seal, corridor, alphabet, window=None):
     d = census.pinned.declaration.data
     z, kind, wc = t["policy"]["policy"]["tier_z"], d["measured"]["uncertainty"]["kind"], linenav.PARAMS[corridor]["wc"]   # w_c: the frozen PARAMS, never a knob here
-    ev, sp = FiniteStored(SOURCE[seal.status](census.pinned.declaration.id, seal.record)), span(cs)
-    return Oracle(tuple(feature(c.rows, z, kind, wc, sp.width[1]) for c in cs), tuple(float(c.slow[0]) for c in cs),
+    ev, sp = FiniteStored(SOURCE[seal.status](census.pinned.declaration.id, seal.record)), span(cs, window)
+    return Oracle(tuple(feature(c.rows, z, kind, wc, sp.width[1], FAST_ENDS[window is None](cs, window)) for c in cs), tuple(float(c.slow[0]) for c in cs),
                   tuple(np.asarray(sorted(r[0] for r in c.rows), float) for c in cs), sp, ev, alphabet)

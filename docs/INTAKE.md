@@ -1,4 +1,4 @@
-# The intake pipeline (stage table 1165-v1, policy 1176-v2)
+# The intake pipeline (stage table 1165-v1, policy 1176-v3)
 
 Generated from intake/STAGES.toml and intake/POLICY.toml by `bin/cc intake explain` (docs/gen-intake.py); never edit it by hand.
 This is the intake's explain. `bin/cc explain <input> <point>` is a different command: it explains one point of a measured input.
@@ -198,7 +198,7 @@ The second declared lane passes the same census-level checks as the first, so th
 | NO_INTERIOR_FAST_MAXIMUM | live | (plan 1160 A39.2: half of SECOND_LANE_INFEASIBLE) An ALTERNATIVE step is location-anchored (projection ARGMAX_FAST, or bridge PAIR_NEAREST_FAST, whose anchor is the fast value at each curve's maximum), and on some curve the maximum sits at a fast end: no interior location exists there. Next: robustness is unavailable, not mis-chosen; no location-anchored second lane exists on such a family, and robustness needs a second observable. |
 | ANCHOR_OUTSIDE_NEIGHBOUR_SPAN | live | (plan 1160 A39.2: the other half of SECOND_LANE_INFEASIBLE) Every anchor is interior, but the ALTERNATIVE bridge PAIR_NEAREST_FAST finds a curve's anchor outside a slow neighbour's fast span (ragged or shifted grids). Next: select curves on a common fast span, or bridge CHAIN_SLOW. |
 
-## Policy (POLICY, 1176-v2)
+## Policy (POLICY, 1176-v3)
 
 The plan 1118 banks were used to CHOOSE these rows; they cannot validate them (A1.10). Validation needs fresh held-out planted banks.
 

@@ -48,6 +48,9 @@
 # units, each normalised to its declared span (POLICY [coordinate.PLANE_SPAN_UNIT]), walked by linenav in CONTINUOUS mode with its frozen
 # PARAMS (w_c 0.15 of each span). "grid" stays admitted (a v14 declaration lints identically) but `cc navigate family` refuses it typed
 # (CORRIDOR_GRID_RETIRED): open decision 2 reversed, grid cells to physical units. Additive.
+# v16 against v15 (plan 1176 amendment E0, still schema 5): an optional [plane.fast_window] (lo, hi), in the fast knob's physical unit,
+# declared before data: the DOMAIN of the feature projection (POLICY [feature_projection.FEATURE_ARGMAX_FAST] domain), never a value
+# transform and never a row filter (no curve is edited). Absent: the whole span (every v15 declaration lints and navigates identically).
 # A reader's `comment` prefixes are PREFIXES: an empty prefix marks every line a comment, so it is refused (COMMENT_PREFIX_EMPTY).
 # A field row: type = str | int | num | list | table | ref (cc/intake_blind.py TYPE); check = one of cc/intake_blind.py CHECK:
 #   TEXT      any text but the template's "TODO"
@@ -66,7 +69,8 @@
 # A key that is no field row is FIELD_IS_STAMPED when it is in `stamped`, FIELD_IS_DERIVED when in `derived`, else FIELD_UNKNOWN.
 schema = 1
 kind = "intake-format"
-version = "1160-v15"   # plan 1176 phase C'': [suspect] corridor gains "continuous" (span units), schema 5
+version = "1160-v16"   # plan 1176 amendment E0: optional [plane.fast_window] (lo, hi), the feature projection's domain, schema 5
+# was "1160-v15"   # plan 1176 phase C'': [suspect] corridor gains "continuous" (span units), schema 5
 # was "1160-v14"   # plan 1176 phase A: optional [plane] (axes, [plane.slice]) and [suspect] (vertices, corridor), schema 5
 # was "1160-v13"   # plan 1160 A41: [source] kind BLINDED (root under <cc-blind>/, blinded_from, key_sha256), schema 5;
 # was "1160-v12"   # plan 1160 A33: [replicate.key] VARIANT on kind NONE | FILE_NAME (separator, field) | COLUMN (column), in schema 5 (loop 4 builds v5 whole);
@@ -295,6 +299,13 @@ required = false
 [fields.plane.fields.slice.fields]
 column = { type = "ref", check = "REF" }   # the [replicate.key] column, as declared there
 value = { type = "num", check = "NUMBER" }   # the curves whose key is exactly this value
+[fields.plane.fields.fast_window]   # optional (plan 1176 E0): the feature projection's DOMAIN on the fast knob, declared before data
+type = "table"
+check = "TABLE"
+required = false
+[fields.plane.fields.fast_window.fields]
+lo = { type = "num", check = "NUMBER" }   # the fast knob's physical unit; lo < hi, inside the plane's measured fast span (typed, never clamped)
+hi = { type = "num", check = "NUMBER" }
 
 [fields.suspect]   # the declarer's guess of a line, in the declared knobs' units: never data, never a checkpoint
 type = "table"

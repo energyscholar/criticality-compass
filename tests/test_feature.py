@@ -26,7 +26,19 @@ seal state. It reads no real data. Each check names its red mutation (applied wi
  B13. a located point re-projects on output to its enclosing measured pair (curves for slow, samples of its nearest curve for fast; at a
      sample: that sample twice; beyond the span: the end twice). Red: Oracle.measured returns the point's own fast value.
  B14. POLICY holds [coordinate.PLANE_SPAN_UNIT] with non-empty map, preserves and discards; without it the oracle is the typed refusal
-     COORDINATE_UNDECLARED; Span maps the plane's extent onto [0, 1] x [0, 1]. Red: the row removed from intake/POLICY.toml."""
+     COORDINATE_UNDECLARED; Span maps the plane's extent onto [0, 1] x [0, 1]. Red: the row removed from intake/POLICY.toml.
+ Plan 1176 amendment E0: a declared [plane.fast_window] is the feature projection's DOMAIN, read through the declared path (the suspect's
+ Plane, navfamily.oracle_for). Planted: a two-peak curve, fast 10, 12, .., 30, its SMALL peak at 16 inside the window [11, 21] and its LARGE
+ peak at 26 outside it (each seen red by its mutation, applied with `bin/cc mutate`):
+ B15. the in-window small peak is Located (rank 3), never the taller out-of-window one (rank 8); with no window the taller one. Red: the window
+     ignored (_build's domain FAST_ENDS[True], the whole span); navfamily.oracle_for not handing on cells.plane.window.
+ B16. a window edge IS a span end: on [10, 15] the maximum sits on the window's last sample (rank 2), AtSpanEnd. Red: an edge maximum typed
+     Located (KIND's span-end test against the CURVE's ends, `lo + i[0] == 0 or hi + i[0] == len(a) - 1`).
+ B17. not a row filter: every sample stays in the curve (Oracle.fasts all 11), so T 26 (outside the window, inside the curve's span) sides
+     POS, not UNRES. Red: the oracle's fasts filtered to the window (the curve's span shrinks).
+ B18. the window is in the fast knob's VALUE unit, never ranks: [12, 18] holds ranks 1..4 (by rank it would hold none). Red: the domain read on ranks (enumerate index).
+ B19. the plane's fast span unit and Broad are the WINDOW's: Span fast (lo 11, width 10); a curve with fewer than three in-window samples
+     ([12.5, 13.5]: none) is Absent. Red: the span map built over the whole extent (span(cs) without the window)."""
 import itertools
 import json
 import shutil
@@ -40,6 +52,8 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "tests")]
 import intake  # noqa: E402
 import intake_feature as F  # noqa: E402
+import intake_suspect as S  # noqa: E402
+import navfamily as NF  # noqa: E402
 import intake_seal  # noqa: E402
 import intake_synth  # noqa: E402
 from intake_plant import long_table, rooted, run, write_long  # noqa: E402
@@ -148,6 +162,34 @@ def planted():
         nocoord = {**T, "policy": {k: v for k, v in T["policy"].items() if k != "coordinate"}}
         check("B14. without it the oracle is the typed refusal COORDINATE_UNDECLARED", F.oracle(nocoord, census, seal, "continuous") == F.Unprojected("COORDINATE_UNDECLARED"),
               repr(F.oracle(nocoord, census, seal, "continuous"))[:200])
+
+        # ---- B15-B19 the declared fast window (E0), through the declared path: [plane.fast_window] -> Plane.window -> navfamily.oracle_for
+        two = [0.0, 1.0, 3.0, 5.0, 3.0, 1.0, 0.0, 4.0, 20.0, 4.0, 0.0]   # small peak at rank 3 (fast 16), large at rank 8 (fast 26)
+        planted2 = [(h, [f"{10.0 + 2 * j:.4f},{c:.4f},0.0300" for j, c in enumerate(two)]) for h in (0.1, 0.2, 0.3)]
+
+        def windowed(ident, lo, hi):
+            """The oracle over a planted two-peak family declaring [plane.fast_window] lo, hi (None: no window), via the suspect's Plane."""
+            (banks / ident).mkdir()
+            write_long(banks / ident, planted2)
+            win = {True: "", False: f"[plane.fast_window]\nlo = {lo}\nhi = {hi}\n"}[lo is None]
+            tail = f'\n[plane]\naxes = "slow-fast"\n{win}\n[suspect]\nvertices = [[0.1, 16.0], [0.3, 16.0]]\ncorridor = "continuous"\n'
+            out = run(T, tmp, ident, long_table(m, ident).replace("<long-test>/pf", f"<long-test>/{ident}") + tail)
+            census, seal = out["S5"].result.evidence, out["S2"].result.evidence
+            return NF.oracle_for(rooted(T, tmp), S.suspect(rooted(T, tmp), census), census, seal)
+
+        ow, on = windowed("win", 11.0, 21.0), windowed("nowin", None, None)
+        check("B15. the in-window small peak is Located (rank 3), never the taller out-of-window one", ow.features[0] == F.Located(11, 3, 3, 3, "TIERED"), str(ow.features[0]))
+        check("B15. with no window the taller peak is Located (rank 8)", on.features[0] == F.Located(11, 8, 8, 8, "TIERED"), str(on.features[0]))
+        oe = windowed("winedge", 10.0, 15.0)
+        check("B16. a window edge is a span end: the maximum on the window's last sample is AtSpanEnd", type(oe.features[0]) is F.AtSpanEnd and oe.features[0].rank == 2, str(oe.features[0]))
+        check("B17. not a row filter: every sample stays in the curve", [len(v) for v in ow.fasts] == [11] * 3, str([len(v) for v in ow.fasts]))
+        check("B17. T 26 (outside the window, inside the curve's span) sides POS, not UNRES", ow.at(0, 26.0) == "POS", ow.at(0, 26.0))
+        ov = windowed("winv", 12.0, 18.0)
+        check("B18. the window is in value units: [12, 18] holds ranks 1..4, the small peak Located at rank 3", ov.features[0] == F.Located(11, 3, 3, 3, "TIERED"),
+              repr(ov.features[0]))
+        check("B19. the plane's fast span unit is the window's (lo 11, width 10)", (ow.span.lo[1], ow.span.width[1]) == (11.0, 10.0), repr(ow.span))
+        check("B19. with no window the fast span is the measured extent (lo 10, width 20)", (on.span.lo[1], on.span.width[1]) == (10.0, 20.0), repr(on.span))
+        check("B19. fewer than three in-window samples ([12.5, 13.5]: none) is Absent", type(windowed("winnone", 12.5, 13.5).features[0]) is F.Absent, "")
 
         # ---- B4 one curve
         o1, _, _ = oracle([(0.1, rows(PEAK))], "one")
