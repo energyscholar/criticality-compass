@@ -154,6 +154,7 @@ SKIP = { rows = { type = "int", check = "NUMBER" } }   # `rows` header lines, no
 NAMES = { rows = { type = "int", check = "NUMBER" }, names = { type = "int", check = "NUMBER" } }   # `names`: the 1-based header line of column names
 NAMES_UNITS = { rows = { type = "int", check = "NUMBER" }, names = { type = "int", check = "NUMBER" }, units = { type = "int", check = "NUMBER" } }   # and of units
 NAMES_UNITS_IN_NAMES = { rows = { type = "int", check = "NUMBER" }, names = { type = "int", check = "NUMBER" }, unit_syntax = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { PAREN = "ADMIT", SLASH = "ADMIT" } } }   # 1160 P2: each names cell "name (unit)" (PAREN) or "name/unit" (SLASH)
+[fields.reader.variants."hdf5-table-v1"]    # plan 1205 P1: ONE 2-D float dataset whose `column_names` attribute names its columns; a declared column is a NAME (never a position); no field of its own. Additive; `version` is NOT bumped here (tests/test_suspect.py A4 pins it)
 [fields.reader.variants.P1]
 [fields.reader.variants.L5]
 [fields.reader.variants.F1]

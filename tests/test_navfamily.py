@@ -189,7 +189,7 @@ def cli_checks():
         cc("navigate", "family", "plant")
         flog = (w / "results" / "navigate" / "plant.access.jsonl").read_text()
         slog = (w / "results" / "navigate" / "plant.score.access.jsonl")
-        check("D5. checkpoints on the planted line score FOLLOWED (3 of 3 within w_c)", "3 of 3 checkpoints within w_c 0.15 span units -> FOLLOWED" in sc and src == 0, sc[-500:])
+        check("D5. checkpoints on the planted line: 3 of 3 reached, 3 within w_c (plan 1201 A1 wording; Argus edit, plan 1205 P2 gate)", "3 of 3 checkpoints reached, 3 within w_c and 0 beyond w_c" in sc and src == 0, sc[-500:])
         check("D5. the family access log never holds the checkpoints path", str(held) not in flog and "checkpoints.toml" not in flog, "the family log names it")
         check("D5. the score access log holds it (score opened it; the log can see an open)", slog.is_file() and str(held) in slog.read_text(), "absent from the score log")
         check("D5. the family access log holds the bank it read (every open is logged)", str(banks / "plant" / "bank.csv") in flog, flog[:300])

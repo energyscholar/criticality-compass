@@ -117,7 +117,7 @@ The first selected file has the declared columns or keys, units and axes, as its
 
 | reason | live | what it means |
 |---|---|---|
-| READER_NOT_LIVE | live | The declared reader has no body in the Compass yet (csv-curve-v1 and table-curve-v1 are live); the file cannot be read. |
+| READER_NOT_LIVE | live | The declared reader has no body in the Compass yet (csv-curve-v1, table-curve-v1 and hdf5-table-v1 are live); the file cannot be read. |
 | READER_REFUSED | live | The declared reader refused the file; its own reason is shown. |
 | COLUMNS_DIFFER | live | The file's columns or keys differ from the declared ones (count, names or order; the declared columns are fast, measured, the uncertainty column if declared, and the slow column of a long table). |
 | UNIT_DIFFERS | live | The file states a unit that differs from the declared unit. |
@@ -136,6 +136,14 @@ The first selected file has the declared columns or keys, units and axes, as its
 | XLSX_READER_ABSENT | live | The file is declared xlsx and openpyxl is not installed on this machine, so it cannot be read here. |
 | NOT_AN_XLSX | live | The file is declared xlsx and its bytes are not a workbook openpyxl can open. |
 | SHEET_ABSENT | live | The declared sheet is not a sheet of the workbook. |
+| HDF5_READER_ABSENT | live | The file is declared hdf5 and h5py is not installed on this machine, so it cannot be read here. |
+| NOT_AN_HDF5 | live | The file is declared hdf5 and its bytes are not an HDF5 file h5py can open. |
+| NO_2D_DATASET | live | The HDF5 file holds no 2-D dataset. |
+| MORE_THAN_ONE_2D_DATASET | live | The HDF5 file holds more than one 2-D dataset, so the table is not the one dataset; their names are shown. |
+| DATASET_NOT_FLOAT | live | The 2-D dataset is not a floating-point dataset (no cast is made); its dtype is shown. |
+| COLUMN_NAMES_ATTRIBUTE_ABSENT | live | The 2-D dataset has no `column_names` attribute, so no column can be found by name. |
+| COLUMN_NAMES_COUNT_DIFFERS | live | The `column_names` attribute holds another number of names than the dataset has columns. |
+| COLUMN_NOT_BY_NAME | live | A column of an HDF5 table is declared by position; only a name finds a column of hdf5-table-v1. |
 
 ## S5 CENSUS (LIVE)
 

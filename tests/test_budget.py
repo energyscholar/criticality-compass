@@ -28,16 +28,16 @@ import tomllib
 from pathlib import Path
 
 CAP = 5000
-CORE_CAP = 1200   # plan 1164: was INTAKE_CAP over the one role intake; now the sum over the roles of CORE, the core split by invariant
+CORE_CAP = 1240   # plan 1205 P1 (Auditor): +40 for the hdf5-table-v1 reader. plan 1164: was INTAKE_CAP over the one role intake; now the sum over the roles of CORE, the core split by invariant
 CORE = {"intake": 100, "intake_fold": 160, "intake_evidence": 150, "intake_bytes": 100, "intake_census": 140, "intake_say": 100,   # plan 1164: role -> cap
-        "intake_blind": 200, "intake_seal": 160, "intake_read": 200}   # (BLOAT-REVIEW 1160 section 4, Layout C)
+        "intake_blind": 200, "intake_seal": 160, "intake_read": 215}   # (BLOAT-REVIEW 1160 section 4, Layout C)
 HANDOFF_CAP = 900   # plan 1160 P3: checks.toml [roles] intake_handoff, the conversion and peek (cc/intake_convert.py)
 CHOICES_CAP = 120   # plan 1160 P4: checks.toml [roles] intake_choices, S1 CHOICES (every row), moved out of intake_blind so INTAKE_CAP is not raised
 NAMES_CAP = 120
 FEASIBLE_CAP = 120   # plan 1160 P5: checks.toml [roles] intake_feasible, S7, S8 and S9 (cc/intake_feasible.py), so INTAKE_CAP is not raised   # plan 1160 P2: checks.toml [roles] intake_names, the name classifier and Detail, moved out of the intake so INTAKE_CAP is not raised
 BLINDVIEW_CAP = 80   # plan 1160 A41: checks.toml [roles] intake_blindview, `bin/cc intake blind` (cc/intake_blindview.py), so CORE_CAP is not raised
 DIFFERS_CAP = 60   # plan 1160 A34: checks.toml [roles] intake_differs, what a file differs from the first in (cc/intake_differs.py), so CORE_CAP is not raised
-AGAINST_CAP = 80   # plan 1165 D5: checks.toml [roles] intake_against, the cross-check split from intake_profile (cc/intake_against.py)
+AGAINST_CAP = 85   # plan 1205 P1 (Auditor): +5 for the 8 hdf5 reader codes. plan 1165 D5: checks.toml [roles] intake_against, the cross-check split from intake_profile (cc/intake_against.py)
 FINDINGS_CAP = 160   # plan 1165 fix S11.P2b F3: checks.toml [roles] intake_findings, the findings table split from intake_profile (cc/intake_findings.py)
 PROFILE_CAP = 320   # plan 1165 D5: checks.toml [roles] intake_profile, `bin/cc intake profile` (cc/intake_profile.py), so CORE_CAP is not raised
 NEW_CAP = 60   # plan 1164: checks.toml [roles] intake_new, `bin/cc new intake` (cc/intake_new.py), moved out of the intake

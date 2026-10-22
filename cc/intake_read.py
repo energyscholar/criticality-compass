@@ -207,6 +207,44 @@ def _numbers(body, named, roles, names, head):
                  lambda: Grid(tuple(ref for _, ref in roles), units, tuple(tuple(_numeric(c[k])[1](c[k]) for k in at) for _, c in body), head))
 
 
+# ---- hdf5-table-v1: one 2-D float dataset, its `column_names` attribute naming the columns (a declared column is a NAME, never a position)
+def _hdf5(data, d):
+    """The Grid of the one 2-D float dataset of an HDF5 file's bytes, or Unreadable (HDF5_READER_ABSENT is read_hdf5's). float32 is read as written: widening to float64 is exact."""
+    import h5py
+    import numpy as np
+    roles, found = role_columns(d), []
+    try:   # the decoding boundary: h5py raises OSError for bytes that are no HDF5 file
+        f = h5py.File(io.BytesIO(data), "r")
+    except OSError as e:
+        return Unreadable("NOT_AN_HDF5", detail(words=[type(e).__name__]))
+    with f:
+        f.visititems(lambda n, o: found.append((n, o)) if getattr(o, "ndim", 0) == 2 else None)   # visititems stops on a non-None return
+        ds = (found + [(None, None)])[0][1]
+        names = [n.decode() if isinstance(n, bytes) else str(n) for n in np.atleast_1d(ds.attrs.get("column_names", []))] if len(found) == 1 else []
+        named = [(lambda: all(isinstance(r, str) for _, r in roles), "COLUMN_NOT_BY_NAME", lambda: detail(columns=[r for _, r in roles if not isinstance(r, str)]))]
+        return first([(lambda: len(found) > 0, "NO_2D_DATASET", lambda: detail(counts={"2-D datasets": 0})),
+                      (lambda: len(found) < 2, "MORE_THAN_ONE_2D_DATASET", lambda: detail(words=[n for n, _ in found[:3]], counts={"2-D datasets": len(found)})),
+                      (lambda: ds.dtype.kind == "f", "DATASET_NOT_FLOAT", lambda: detail(words=[f"dtype {ds.dtype}"])),
+                      (lambda: "column_names" in ds.attrs, "COLUMN_NAMES_ATTRIBUTE_ABSENT", lambda: detail(words=["attribute 'column_names'"])),
+                      (lambda: len(names) == ds.shape[1], "COLUMN_NAMES_COUNT_DIFFERS", lambda: detail(counts={"column_names": len(names), "columns of the dataset": ds.shape[1]})),
+                      (lambda: ds.shape[0] > 0, "NO_DATA_ROW", lambda: detail(counts={"data rows": 0}))] + named
+                     + [row for _, ref in roles for row in _resolve(ref, names, len(names))], lambda: _hdf5_rows(ds, roles, names))
+
+
+def _hdf5_rows(ds, roles, names):
+    import numpy as np
+    a = ds[()][:, [names.index(ref) for _, ref in roles]]
+    bad = np.argwhere(~np.isfinite(a))
+    return first([(lambda: len(bad) == 0, "CELL_NOT_A_NUMBER", lambda: detail(rows=[int(bad[0][0]) + 1], columns=[roles[bad[0][1]][1]], counts={"cells of declared columns that are not numbers": len(bad)}))],
+                 lambda: Grid(tuple(ref for _, ref in roles), (), tuple(map(tuple, a.astype(np.float64).tolist())), ()))
+
+
+def read_hdf5(data, d):
+    """hdf5-table-v1: the one 2-D float dataset, columns by NAME from its `column_names` attribute, to a Grid | Unreadable (HDF5_READER_ABSENT without h5py)."""
+    return {True: lambda: _hdf5(data, d),
+            False: lambda: Unreadable("HDF5_READER_ABSENT", detail(words=["h5py is not installed on this machine, so an hdf5 file cannot be read here"]))}[importlib.util.find_spec("h5py") is not None]()
+
+
 def read_table(data, d):
     """table-curve-v1: the declared format, comment prefixes, header and columns (role_columns) to a Grid | Unreadable."""
     spec = d["reader"]
@@ -226,10 +264,10 @@ def read_csv(data, d):
 
 
 def readers(t):
-    """The reader of each FORMAT [reader] name: csv-curve-v1 and table-curve-v1 are live; every other name reads to Unreadable
+    """The reader of each FORMAT [reader] name: csv-curve-v1, table-curve-v1 and hdf5-table-v1 are live; every other name reads to Unreadable
     READER_NOT_LIVE (S4 refuses READER_NOT_LIVE first, from LIVE below). Total over FORMAT's reader names."""
     return {**{r: (lambda data, d, r=r: Unreadable("READER_NOT_LIVE", detail(words=[f"reader '{r}' has no body yet"]))) for r in t["format"]["fields"]["reader"]["variants"]},
-            "csv-curve-v1": read_csv, "table-curve-v1": read_table}
+            "csv-curve-v1": read_csv, "table-curve-v1": read_table, "hdf5-table-v1": read_hdf5}
 
 
-LIVE = ("csv-curve-v1", "table-curve-v1")
+LIVE = ("csv-curve-v1", "table-curve-v1", "hdf5-table-v1")
