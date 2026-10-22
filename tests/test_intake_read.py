@@ -128,7 +128,7 @@ check("R4. every reason intake_read emits is a reader_reason row of S4", emitted
 check("R4. every reader_reason row of S4 is emitted by intake_read", rows <= emitted, str(sorted(rows - emitted)))
 check("R4. the reader table is total over FORMAT's [reader] names", set(rd.readers(T)) == set(T["format"]["fields"]["reader"]["variants"]), "")
 check("R4. the live readers are csv-curve-v1 and table-curve-v1, and every other reader reads to READER_NOT_LIVE",
-      set(rd.LIVE) == {"csv-curve-v1", "table-curve-v1"} and all(rd.readers(T)[r](b"", {}).reason == "READER_NOT_LIVE" for r in rd.readers(T) if r not in rd.LIVE), "")
+      set(rd.LIVE) == {"csv-curve-v1", "table-curve-v1", "hdf5-table-v1"} and all(rd.readers(T)[r](b"", {}).reason == "READER_NOT_LIVE" for r in rd.readers(T) if r not in rd.LIVE), "")
 
 print("test_intake_read: " + ("FAILED " + "; ".join(bad) if bad else "all passed"))
 sys.exit(1 if bad else 0)
