@@ -1,0 +1,18 @@
+# tests/breakers-plane/1176-two-row-curve.toml - a PLANE BREAKER (data; plan 1176 phase C). Evaluated by tests/test_synth_plane.py.
+schema = 1
+kind = "plane-breaker"
+id = "1176-two-row-curve"
+rule = "a family of two-row curves is never walked: no interior sample exists (Absent), and the intake refuses it"
+why = """Two samples have no interior (phase B B2: Absent). The intake's S8 needs 3 points per curve, so `navigate family` \
+names the refused stage (INTAKE_REFUSED_AT)."""
+break = "HOLDS"
+
+[case]
+family = "sharp"
+densities = ["dense"]
+seed = 1176
+edit = "two-row-curve"
+
+[expect]
+never = ["FOLLOWED_IN_CORRIDOR"]
+only = ["INTAKE_REFUSED_AT"]

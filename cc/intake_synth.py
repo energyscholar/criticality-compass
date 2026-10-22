@@ -50,6 +50,76 @@ def write(bank, truth, ident, seed, k):
     return rows
 
 
+# ---- plan 1176 phase C: the planted real-shaped 2-D bank (`--plane FAMILY --density D`). The same Lorentzian MODEL family, on a declared plane
+# of curves (slow h) x samples (fast T); every parameter is fixed here BEFORE any run (no value below was chosen by looking at a verdict).
+PLANE_GRID = np.linspace(1.5, 3.5, 30)   # the aligned fast grid: 30 samples per curve (dense and sparse)
+DT = float(PLANE_GRID[1] - PLANE_GRID[0])   # one sample, in T
+WC = 5   # linenav grid w_c, in cells (samples): the decoy's width is stated against it
+MASTER = np.linspace(1.5, 3.5, 61)   # the misaligned variant: each curve keeps a seeded subset of this grid, n_k uniform over [24, 36]
+DENSITY = {"dense": (30, (0.0,)), "sparse": (9, (0.0, 1.0, 2.0, 3.0))}   # density -> (curves per slice, the slice values of the second knob p)
+TP2 = 0.05   # the line (and the arc) moves by 0.05 in T per unit of the second knob p (sparse slices)
+SAG, ARC0 = 0.20, 2.50   # decoy arc: T_arc(h, p) = ARC0 + SAG (1 - 4 h^2) + TP2 p (its ends at h = +-0.5 on ARC0; SAG = 2.9 samples, inside w_c, so FOLLOWED is reachable: the gate CAN fire)
+A_D, W_D, S_D = 1.0, 3 * WC * DT, 0.5   # decoy: height 1, half-width 3 w_c (15 samples, width >> w_c), sigma half the height (comparable to it)
+M_NULL = 0.5   # null: C = B + M_NULL (T - 1.5) + eps, monotone in T (no interior maximum anywhere)
+sharp_c = lambda h, p: TP0 + TP1 * h + TP2 * p   # noqa: E731  the planted line: the existing MODEL's T_p(h), shifted per slice
+arc_c = lambda h, p: ARC0 + SAG * (1 - 4 * h ** 2) + TP2 * p   # noqa: E731
+lor = lambda t, a, c, w: a / (1 + ((t - c) / w) ** 2)   # noqa: E731
+PLANE = {   # family -> (the curve's C without noise at (t, h, p), sigma, the declarer's guessed line (h, p) -> T, its kind, grid kind); total over FAMILIES
+    "sharp": (lambda t, h, p: B + lor(t, A0 + A1 * np.exp(-(h - H_STAR) ** 2 / (2 * S ** 2)), sharp_c(h, p), W), SIGMA, sharp_c, "LINE", "ALIGNED"),
+    "decoy": (lambda t, h, p: B + lor(t, A_D, arc_c(h, p), W_D), S_D, arc_c, "CROSSOVER_ARC", "ALIGNED"),
+    "null": (lambda t, h, p: B + M_NULL * (t - 1.5), SIGMA, sharp_c, "NONE", "ALIGNED"),   # no line: the guess is the sharp family's line
+    "misaligned": (lambda t, h, p: B + lor(t, A0 + A1 * np.exp(-(h - H_STAR) ** 2 / (2 * S ** 2)), sharp_c(h, p), W), SIGMA, sharp_c, "LINE", "SUBSET"),
+}
+FAMILIES = tuple(PLANE)
+GRIDS = {"ALIGNED": lambda rng: PLANE_GRID, "SUBSET": lambda rng: MASTER[np.sort(rng.choice(MASTER.size, int(rng.integers(24, 37)), replace=False))]}
+PLANE_DRAW = ("one numpy default_rng(seed) per bank; for each slice p in order, each curve h in order: (SUBSET grid only) n_k = rng.integers(24, 37), "
+              "the kept MASTER indices = sort(rng.choice(61, n_k, replace=False)); then eps = rng.normal(0, sigma, n_k), in ascending T")
+LAYOUT = {"dense": "PER_FILE", "sparse": "LONG_TABLE"}   # a second knob is a [replicate.key] COLUMN, so the sparse lattice is one long table
+
+
+def plane_curves(rng, family, density):
+    """[(p, h, T values, C values, sigma)] in DRAW_ORDER: slices in order, curves in slow order."""
+    k, ps = DENSITY[density]
+    f, sig, _, _, grid = PLANE[family]
+    hs = [round(float(h), 10) for h in np.linspace(-0.5, 0.5, k)]
+    out = []
+    for p in ps:
+        for h in hs:
+            t = GRIDS[grid](rng)
+            out.append((p, h, t, f(t, h, p) + rng.normal(0, sig, t.size), sig))
+    return out
+
+
+def plane_write(bank, truth, ident, seed, family, density):
+    """Write a plane bank (dense: one csv-curve-v1 file per curve; sparse: bank.csv, table-curve-v1 with columns T,C,sigma,p,h) and MANIFEST.json
+    into `bank`, and truth.json into `truth` (outside the bank): the family, its parameters and the declarer's guessed line per curve."""
+    rng, code = np.random.default_rng(seed), hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+    cs, (_, sig, guess, kind, grid) = plane_curves(rng, family, density), PLANE[family]
+    bank.mkdir(parents=True)
+    row = lambda t, c, s, extra="": "".join(f"{a:.4f},{b:.10f},{s}{extra}\n" for a, b in zip(t, c))   # noqa: E731
+    files = {"PER_FILE": lambda: [(PATTERN.format(index=i), "T,C,sigma\n" + row(t, c, s), h) for i, (p, h, t, c, s) in enumerate(cs)],
+             "LONG_TABLE": lambda: [("bank.csv", "# plan 1176 phase C: the sparse plane as one long table\nT,C,sigma,p,h\n"
+                                     + "".join(row(t, c, s, f",{p},{h}") for p, h, t, c, s in cs), None)]}[LAYOUT[density]]()
+    rows = []
+    for name, text, h in files:
+        (bank / name).write_bytes(text.encode())
+        rows.append({"name": name, "h": h, "n": text.count("\n") - 1, "size": len(text), "sha256": hashlib.sha256(text.encode()).hexdigest()})
+    (bank / "MANIFEST.json").write_text(json.dumps({
+        "schema": 1, "kind": "intake-synth-manifest", "id": ident, "seed": seed, "draw_order": PLANE_DRAW, "reader": "csv-curve-v1", "pattern": PATTERN,
+        "layout": LAYOUT[density], "columns": ["T", "C", "sigma"], "slow": {"name": "h", "unit": "dimensionless"},
+        "fast": {"name": "T", "unit": "dimensionless", "column": "T"}, "measured": {"name": "C", "unit": "dimensionless", "column": "C"}, "replicate": "NONE",
+        "slices": {"column": "p", "values": list(DENSITY[density][1])}, "curves": [{"p": p, "h": h, "n": int(t.size)} for p, h, t, _, _ in cs],
+        "generator": {"path": "cc/intake_synth.py", "sha256": code}, "files": rows}, indent=1) + "\n")
+    truth.mkdir(parents=True)
+    (truth / "truth.json").write_text(json.dumps({
+        "schema": 1, "kind": "intake-synth-plane-truth", "id": ident, "seed": seed, "family": family, "density": density, "line_kind": kind, "grid": grid,
+        "sigma": sig, "parameters": {"B": B, "w": W, "T_p": [TP0, TP1, TP2], "A": [A0, A1], "s": S, "h_star": H_STAR, "decoy": {"A": A_D, "w": W_D, "sigma": S_D, "arc": [ARC0, SAG]},
+                                     "null_slope": M_NULL, "fast_grid": [1.5, 3.5, 30], "master": [1.5, 3.5, 61]},
+        "guess": [{"p": p, "h": h, "T": float(guess(h, p))} for p, h, _, _, _ in cs],   # the declarer's guessed line on each curve (the suspect's ends, the checkpoints)
+        "generator": {"path": "cc/intake_synth.py", "sha256": code}}, indent=1) + "\n")
+    return rows
+
+
 def _flag(args, name, absent):
     return {True: lambda: args[args.index(name) + 1], False: lambda: absent}[name in args and args.index(name) + 1 < len(args)]()
 
@@ -67,12 +137,15 @@ def cli(root, args):
     usage = [u for ok, u in ((re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]*", ident) is not None, "an id (letters, digits, _ . -)"),
                              (re.fullmatch(r"\d+", seed) is not None, "--seed N (a non-negative integer)"),
                              (re.fullmatch(r"\d+", k) is not None and int(k) >= 2, "--curves K (an integer, at least 2)")) if not ok]
+    fam, dens = _flag(args, "--plane", ""), _flag(args, "--density", "dense")   # plan 1176 C: a plane bank (no --plane: the plan 1139 bank)
+    usage += [u for ok, u in ((fam in ("",) + FAMILIES, f"--plane one of {' '.join(FAMILIES)}"), (dens in DENSITY, f"--density one of {' '.join(DENSITY)}")) if not ok]
     out = Path(_flag(args, "--out", str(Path(root) / "scratch" / "intake-synth")))
     bank, truth = out / ident, out / f"{ident}-TRUTH"
-    refuse = lambda why: print(f"bin/cc intake synth: {why}\n  usage: bin/cc intake synth <id> --seed N [--curves K] [--out DIR]\n  Next: bin/cc intake explain") or 1
+    refuse = lambda why: print(f"bin/cc intake synth: {why}\n  usage: bin/cc intake synth <id> --seed N [--curves K] [--plane FAMILY [--density dense|sparse]] [--out DIR]\n  Next: bin/cc intake explain") or 1
     exists = lambda: print(f"synth {ident}: refused, {bank} or {truth} exists; a bank is never overwritten\n  Next: rm -r {bank} {truth}   (or choose another id)") or 1
+    made = {False: lambda: write(bank, truth, ident, int(seed), int(k)), True: lambda: plane_write(bank, truth, ident, int(seed), fam, dens)}
     return {True: lambda: refuse("needs " + "; ".join(usage)),
-            False: lambda: {True: exists, False: lambda: _done(bank, truth, ident, write(bank, truth, ident, int(seed), int(k)))}[bank.exists() or truth.exists()]()}[len(usage) > 0]()
+            False: lambda: {True: exists, False: lambda: _done(bank, truth, ident, made[fam != ""]())}[bank.exists() or truth.exists()]()}[len(usage) > 0]()
 
 
 def declare(m, ident, sid):

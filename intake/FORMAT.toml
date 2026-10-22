@@ -44,6 +44,10 @@
 # PARAMS, w_c 5 cells). The suspect is the declarer's GUESS, never data: cc/intake_suspect.py converts it to cells (curve rank, sample
 # rank) by an exact slow match and the in-span nearest sample, and refuses it typed otherwise. Additive: every v13 declaration is a v14
 # declaration and lints byte-identically.
+# v15 against v14 (plan 1176 phase C'', O4, still schema 5): [suspect] corridor gains "continuous": the plane in the declared knobs' physical
+# units, each normalised to its declared span (POLICY [coordinate.PLANE_SPAN_UNIT]), walked by linenav in CONTINUOUS mode with its frozen
+# PARAMS (w_c 0.15 of each span). "grid" stays admitted (a v14 declaration lints identically) but `cc navigate family` refuses it typed
+# (CORRIDOR_GRID_RETIRED): open decision 2 reversed, grid cells to physical units. Additive.
 # A reader's `comment` prefixes are PREFIXES: an empty prefix marks every line a comment, so it is refused (COMMENT_PREFIX_EMPTY).
 # A field row: type = str | int | num | list | table | ref (cc/intake_blind.py TYPE); check = one of cc/intake_blind.py CHECK:
 #   TEXT      any text but the template's "TODO"
@@ -62,7 +66,8 @@
 # A key that is no field row is FIELD_IS_STAMPED when it is in `stamped`, FIELD_IS_DERIVED when in `derived`, else FIELD_UNKNOWN.
 schema = 1
 kind = "intake-format"
-version = "1160-v14"   # plan 1176 phase A: optional [plane] (axes, [plane.slice]) and [suspect] (vertices, corridor), schema 5
+version = "1160-v15"   # plan 1176 phase C'': [suspect] corridor gains "continuous" (span units), schema 5
+# was "1160-v14"   # plan 1176 phase A: optional [plane] (axes, [plane.slice]) and [suspect] (vertices, corridor), schema 5
 # was "1160-v13"   # plan 1160 A41: [source] kind BLINDED (root under <cc-blind>/, blinded_from, key_sha256), schema 5;
 # was "1160-v12"   # plan 1160 A33: [replicate.key] VARIANT on kind NONE | FILE_NAME (separator, field) | COLUMN (column), in schema 5 (loop 4 builds v5 whole);
 # was "1160-v11"   # plan 1160 A35: [knobs.slow] kind QUANTITY | ORDINAL, schema 5; plan 1160 A21: [reader.format] XLSX sheet a name or a position; plan 1160 A17: [knobs.fast] control, schema 4
@@ -297,7 +302,7 @@ check = "TABLE"
 required = false
 [fields.suspect.fields]
 vertices = { type = "list", check = "ITEMS", item = "list" }   # [[slow, fast], ...]: two numbers each, at least two (cc/intake_suspect.py)
-corridor = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { grid = "ADMIT" } }   # frozen linenav grid PARAMS, w_c 5 cells
+corridor = { type = "str", check = "CLOSED", admit = [], absent = "VALUE_NOT_LISTED", values = { grid = "ADMIT", continuous = "ADMIT" } }   # a linenav PARAMS key: continuous (C'', span units, w_c 0.15) | grid (retired by navigate)
 
 [interval_fields.STATED]   # plan 1160 P4: no field beyond method; the interval of each point is the declared uncertainty column
 required = {}

@@ -4,7 +4,8 @@
 schema = 1
 kind = "intake-policy"
 status = "POLICY"
-version = "1176-v1"   # plan 1176 phase B: + [feature_projection.FEATURE_ARGMAX_FAST] (was 1136-v1)
+version = "1176-v2"   # plan 1176 phase C'': + [coordinate.PLANE_SPAN_UNIT]; Broad in span units
+# was "1176-v1"   # plan 1176 phase B: + [feature_projection.FEATURE_ARGMAX_FAST] (was 1136-v1)
 evidence_note = "The plan 1118 banks were used to CHOOSE these rows; they cannot validate them (A1.10). Validation needs fresh held-out planted banks."
 
 [projection.ARGMAX_FAST]     # A1.2 'argmax_T': the location along the fast knob of a curve's maximum measured value
@@ -37,13 +38,23 @@ fails_when = "the ridge moves between neighbouring curves by more than the grid 
 
 [feature_projection.FEATURE_ARGMAX_FAST]   # plan 1176 phase B (ruling R1): the per-curve feature, a declared projection in M; read by the side oracle
 # (cc/intake_feature.py), never by S10: it is not a [projection] bias a declaration may cite (S1 admits [projection] keys only).
-estimand = "fast location of each curve's sigma-indistinguishable maximum: the argmax sample rank and its sigma-plateau [lo, hi] (consecutive samples with value + tier_z sigma >= max - tier_z sigma_max); UNRES at a span end or when absent"
+estimand = "fast location of each curve's sigma-indistinguishable maximum: the argmax sample rank and its sigma-plateau [lo, hi] (consecutive samples with value + tier_z sigma >= max - tier_z sigma_max); UNRES at a span end, when absent, or when Broad (plan 1176 C': an interior plateau wider than the declared corridor's frozen w_c; C'': its end samples' fast values farther apart than w_c of the plane's fast span)"
 preserves = "per-curve shape (where along the fast knob each curve's maximum sits, at sample resolution, with its sigma-plateau); the declared slow order of the curves"
-discards = "cross-curve pointwise comparison (no fast value is compared between curves); the amplitude of the maximum"
+discards = "cross-curve pointwise comparison (no fast value is compared between curves); the amplitude of the maximum; the bracket width beyond the corridor (read as Broad)"
 measured_by = "plan 1176 phase B planted tests (tests/test_feature.py) only; phase C's planted 2-D bank measures it"
 cannot = "locate a maximum between measured samples; see a line that runs along the curves (ruling R2, phase 2b)"
 depends_on = "the fast-knob density of each curve near its peak and the stated sigma column (none: the bracket is the argmax sample alone, UNTIERED)"
-fails_when = "a curve's maximum is at or beyond an end of its measured span (AtSpanEnd: UNRES), or a curve has fewer than three samples (Absent: UNRES)"
+fails_when = "a curve's maximum is at or beyond an end of its measured span (AtSpanEnd: UNRES), or a curve has fewer than three samples (Absent: UNRES), or its sigma-plateau is wider than w_c of the fast span (Broad: UNRES)"
+
+[coordinate.PLANE_SPAN_UNIT]   # plan 1176 phase C'' (O4, open decision 2 reversed): the plane's coordinates; read by the side oracle (cc/intake_feature.py Span)
+map = "per knob u = (x - lo) / (hi - lo): slow over [least, greatest] curve slow value, fast over [least, greatest] measured sample of every curve of the plane; a span of one point has width 1 (a translation)"
+estimand = "where in the plane a measured point or a declared vertex sits, each knob as a fraction of its declared span, so linenav's continuous PARAMS (w_c 0.15) are fractions of each span"
+preserves = "every measured value (a coordinate map, not a value transform); the order along each knob; the measured slow values of the curves and fast values of the samples, which are the only places a side changes"
+discards = "the knobs' absolute units and offsets inside the navigator (restored on output: a located point is re-projected to its enclosing measured pair); grid-cell (rank) coordinates"
+measured_by = "plan 1176 phase C'' planted bank (tests/test_synth_plane.py, tests/test_feature.py B11-B14)"
+cannot = "make two knobs' physical scales commensurate (each knob is a fraction of its own span; w_c is anisotropic in physical units by construction)"
+depends_on = "the plane's measured extent (a family whose span changes changes every u)"
+fails_when = "an outlying curve or sample stretches a span, so w_c of that span is wider than the physics warrants"
 
 [policy]
 real_data_lanes = 2                   # D5 / A1.11: real data are taken in through two lanes

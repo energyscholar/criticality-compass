@@ -1,0 +1,18 @@
+# tests/breakers-plane/1176-suspect-off-plane.toml - a PLANE BREAKER (data; plan 1176 phase C). Evaluated by tests/test_synth_plane.py.
+schema = 1
+kind = "plane-breaker"
+id = "1176-suspect-off-plane"
+rule = "a suspect vertex off the plane is a typed refusal, never snapped onto it"
+why = """The first vertex's fast value 9.9 lies beyond every curve's measured span [1.5, 3.5]: phase A refuses it \
+(SUSPECT_FAST_OUT_OF_SPAN); nothing beyond a measured sample is formed."""
+break = "HOLDS"
+
+[case]
+family = "sharp"
+densities = ["dense"]
+seed = 1176
+edit = "suspect-off-plane"
+
+[expect]
+never = ["FOLLOWED_IN_CORRIDOR"]
+only = ["SUSPECT_FAST_OUT_OF_SPAN"]

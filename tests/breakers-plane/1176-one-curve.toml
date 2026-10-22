@@ -1,0 +1,18 @@
+# tests/breakers-plane/1176-one-curve.toml - a PLANE BREAKER (data; plan 1176 phase C). Evaluated by tests/test_synth_plane.py.
+schema = 1
+kind = "plane-breaker"
+id = "1176-one-curve"
+rule = "a one-curve family is never walked: it is a typed refusal, never a verdict"
+why = """One curve has no slow direction to follow; the intake's S8 needs at least 3 curves, so `navigate family` names the \
+refused stage (INTAKE_REFUSED_AT) and no line is claimed."""
+break = "HOLDS"
+
+[case]
+family = "sharp"
+densities = ["dense"]
+seed = 1176
+edit = "one-curve"
+
+[expect]
+never = ["FOLLOWED_IN_CORRIDOR"]
+only = ["INTAKE_REFUSED_AT"]

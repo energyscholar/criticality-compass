@@ -1,0 +1,19 @@
+# tests/breakers-plane/1176-monotone.toml - a PLANE BREAKER (data; plan 1176 phase C). Evaluated by tests/test_synth_plane.py.
+schema = 1
+kind = "plane-breaker"
+id = "1176-monotone"
+rule = "a null (monotone) family acquires no line: every curve is AtSpanEnd, every read UNRES, the verdict INDETERMINATE"
+why = """A monotone curve has its maximum at a span end (phase B B1: AtSpanEnd, UNRES everywhere). Frozen linenav types a \
+no-acquisition corridor of UNREAD windows INDETERMINATE (VERDICT_NOACQ); ABSENT_IN_CORRIDOR needs CLEAR (resolved) reads, \
+which no monotone curve can give."""
+break = "HOLDS"
+
+[case]
+family = "null"
+densities = ["dense", "sparse"]
+seed = 1176
+edit = "none"
+
+[expect]
+never = ["FOLLOWED_IN_CORRIDOR"]
+only = ["INDETERMINATE"]

@@ -1,0 +1,18 @@
+# tests/breakers-plane/1176-broad-arc.toml - a PLANE BREAKER (data; plan 1176 phase C). Evaluated by tests/test_synth_plane.py.
+schema = 1
+kind = "plane-breaker"
+id = "1176-broad-arc"
+rule = "a decoy crossover arc (E412 type) is never FOLLOWED_IN_CORRIDOR"
+why = """A broad bump (half-width 3 w_c) with sigma half its height, whose maximum drifts in an arc that stays inside the \
+suspect's corridor (sag 0.10 of the fast span < w_c 0.15; plan 1176 C'': span units): a navigator that follows the apparent maximum reads FOLLOWED, so the gate CAN fire. \
+The sigma-plateau bracket makes the band of indistinguishable samples one MID band (or touches a span end: UNRES)."""
+break = "HOLDS"
+
+[case]
+family = "decoy"
+densities = ["dense", "sparse"]
+seed = 1176
+edit = "none"
+
+[expect]
+never = ["FOLLOWED_IN_CORRIDOR"]

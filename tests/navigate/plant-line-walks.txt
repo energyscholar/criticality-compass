@@ -1,13 +1,15 @@
 $ bin/cc navigate family plant
 UNTESTED: cc navigate (family mode) is tested on planted families only (tests/test_navfamily.py); no real family's transcript has been scored against a known line.
-family plant (family mode): 12 curves x up to 40 samples; plane (0, 0) .. (11, 39) in cells
+family plant (family mode): 12 curves x up to 40 samples; plane [0, 1] x [0, 1] in span units (PLANE_SPAN_UNIT)
 oracle: FEATURE_ARGMAX_FAST side oracle over the suspect's plane; evidence FiniteStored(plant:UNSEALED)
-suspect: (0, 8) (11, 30) (corridor grid: linenav grid PARAMS, w_c 5 cells)
+suspect: (0, 8) (11, 30) as (curve rank, nearest sample rank) (corridor continuous: w_c 0.15 of each span)
 verdict: FOLLOWED_IN_CORRIDOR
 terminals: backward EDGE, forward EDGE
-path (cells): (0, 8) (1, 10) (2, 12) (4, 16) (6, 20) (8, 24) (10, 28) (11, 30)
-reads: 8 distinct cells of budget 400
-results: results/navigate/plant.toml (the polyline in physical units, as measured brackets)
+path (23 points, as (nearest curve rank: enclosing sample ranks)): (0: 8-8) (1: 8-9) (1: 10-11) (2: 10-11) (2: 12-13) (3: 12-13) (3: 13-14) (3: 14-15) (4: 16-17) (5: 16-17) (5: 17-18) (5: 18-19) (6: 20-21) (6: 20-21) (7: 21-22) (8: 22-23) (8: 24-25) (9: 24-25) (9: 26-27) (9: 26-27) (10: 27-28) (11: 28-29) (11: 30-31)
+census: Located 12, Broad 0, AtSpanEnd 0, Absent 0 (curves per Feature kind)
+path kinds: Located Located Located Located Located Located Located Located Located Located Located Located Located Located Located Located Located Located Located Located Located Located Located (each traced point's curve)
+reads: 362 distinct points of budget 3000
+results: results/navigate/plant.toml (the polyline in span units, and each point's enclosing measured pair)
 T23 access log: results/navigate/plant.access.jsonl (every open of this process); reads outside this loader (a shell, another process, another copy of the bytes) are not logged
 exit 0
 --- results/navigate/plant.toml
@@ -17,6 +19,9 @@ id = "plant"
 verdict = "FOLLOWED_IN_CORRIDOR"
 terminals = "backward EDGE, forward EDGE"
 evidence = "plant:UNSEALED"
-# the traced polyline: in cells, and per point the measured values of its neighbouring cells ([slow lo, slow hi], [fast lo, fast hi]); nothing between measured points is formed
-cells = [[0.0, 8.0], [1.0, 10.0], [2.0, 12.0], [4.0, 16.0], [6.0, 20.0], [8.0, 24.0], [10.0, 28.0], [11.0, 30.0]]
-physical = [[[0.1, 0.1], [9.0, 9.0]], [[0.2, 0.2], [11.0, 11.0]], [[0.3, 0.3], [13.0, 13.0]], [[0.5, 0.5], [17.0, 17.0]], [[0.7, 0.7], [21.0, 21.0]], [[0.9, 0.9], [25.0, 25.0]], [[1.1, 1.1], [29.0, 29.0]], [[1.2, 1.2], [31.0, 31.0]]]
+# the traced polyline: in span units (each knob over its declared span), and per point its enclosing measured pair ([slow lo, slow hi] of the enclosing curves, [fast lo, fast hi] of the enclosing samples of its nearest curve); nothing between measured points is formed
+span = [[0.0, 0.20512820512820512], [0.04558678967385267, 0.20572839862360492], [0.08491685470772507, 0.2568756039180427], [0.13654989385040822, 0.26763059782274334], [0.1689545492601559, 0.30821635804447023], [0.22761316177063484, 0.3125675421758864], [0.26431340042729484, 0.35853337848443406], [0.3180878308810574, 0.36678421204071526], [0.35184313138837886, 0.4105345870409416], [0.4094315889300444, 0.41662434754294775], [0.44493768232002706, 0.4612304901376827], [0.4996777743966454, 0.46878283708703183], [0.5339209359957326, 0.5132552612249042], [0.5905130008481281, 0.5201638660581733], [0.6254468637406545, 0.5640958117060291], [0.6821399669101317, 0.5701193221455498], [0.7174918692665901, 0.6159860707198649], [0.7730971967192573, 0.6236305578760891], [0.8075319760593168, 0.666848165361944], [0.8632533132144307, 0.673595254411758], [0.8982300617136703, 0.717493064031612], [0.9549290201806155, 0.7234612072741629], [0.9903256973992789, 0.7692934106564763]]
+physical = [[[0.1, 0.1], [9.0, 9.0]], [[0.1, 0.2], [9.0, 10.0]], [[0.1, 0.2], [11.0, 12.0]], [[0.2, 0.3], [11.0, 12.0]], [[0.2, 0.3], [13.0, 14.0]], [[0.3, 0.4], [13.0, 14.0]], [[0.3, 0.4], [14.0, 15.0]], [[0.4, 0.5], [15.0, 16.0]], [[0.4, 0.5], [17.0, 18.0]], [[0.5, 0.6], [17.0, 18.0]], [[0.5, 0.6], [18.0, 19.0]], [[0.6, 0.7], [19.0, 20.0]], [[0.6, 0.7], [21.0, 22.0]], [[0.7, 0.8], [21.0, 22.0]], [[0.7, 0.8], [22.0, 23.0]], [[0.8, 0.9], [23.0, 24.0]], [[0.8, 0.9], [25.0, 26.0]], [[0.9, 1.0], [25.0, 26.0]], [[0.9, 1.0], [27.0, 28.0]], [[1.0, 1.1], [27.0, 28.0]], [[1.0, 1.1], [28.0, 29.0]], [[1.1, 1.2], [29.0, 30.0]], [[1.1, 1.2], [31.0, 32.0]]]
+# the feature census (plan 1176 C', O2): curves per Feature kind, and per traced point its curve's kind; value-free
+census = { Located = 12, Broad = 0, AtSpanEnd = 0, Absent = 0 }
+path_kinds = ["Located", "Located", "Located", "Located", "Located", "Located", "Located", "Located", "Located", "Located", "Located", "Located", "Located", "Located", "Located", "Located", "Located", "Located", "Located", "Located", "Located", "Located", "Located"]

@@ -8,7 +8,9 @@ It reads no real data. Each check names its red mutation (applied by hand, seen 
  A3. every existing planted declaration (declarations/*, the PER_FILE and LONG_TABLE plants, every CHOICE_PLANTS edit) lints identically under
      v14 and under v13 (FORMAT's tables without [plane] and [suspect]); a declaration with them passes S0 under v14 and is FIELD_UNKNOWN under
      v13. Red: [fields.suspect] required = true in intake/FORMAT.toml.
- A4. intake.tables() reports FORMAT 1160-v14, header schema still 5. Red: the version line left at "1160-v13".
+ A4. intake.tables() reports FORMAT 1160-v15 (plan 1176 C'': was v14, the version check moved with the additive corridor word), header schema
+     still 5. Red: the version line left at "1160-v14".
+ A7. (plan 1176 C'') the [suspect] corridor alphabet is exactly {grid, continuous}, each a key of linenav.PARAMS. Red: continuous removed.
  A5. a family whose curves carry two values of a second knob ([replicate.key] COLUMN p) without [plane.slice] is PLANE_NEEDS_A_SLICE; with the
      slice it converts on that slice's curves; a slice naming another column is PLANE_SLICE_NOT_THE_SECOND_KNOB. Red: the column ignored
      (_curves keys every curve "").
@@ -30,6 +32,7 @@ import intake_suspect as S  # noqa: E402
 import intake_synth  # noqa: E402
 from intake_evidence import Census  # noqa: E402
 from intake_plant import CHOICE_PLANTS, long_table, per_file, rooted, run, write_long  # noqa: E402
+from linenav import PARAMS as S_PARAMS  # noqa: E402
 
 T = intake.tables(ROOT)
 T13 = {**T, "format": {**T["format"], "version": "1160-v13", "fields": {k: v for k, v in T["format"]["fields"].items() if k not in ("plane", "suspect")}}}
@@ -67,7 +70,9 @@ def lint(t, d, text, findings):
 
 
 # ---- A4 the version
-check("A4. intake.tables() reports FORMAT 1160-v14", T["format"]["version"] == "1160-v14", T["format"]["version"])
+check("A4. intake.tables() reports FORMAT 1160-v15", T["format"]["version"] == "1160-v15", T["format"]["version"])
+corr = set(T["format"]["fields"]["suspect"]["fields"]["corridor"]["values"])
+check("A7. the corridor alphabet is {grid, continuous}, each a linenav PARAMS key", corr == {"grid", "continuous"} and corr <= set(S_PARAMS), str(corr))
 check("A4. the header schema stays 5 (additive v14)", T["format"]["header"] == {"schema": 5, "kind": "intake"}, str(T["format"]["header"]))
 
 

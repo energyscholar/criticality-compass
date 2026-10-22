@@ -1,0 +1,17 @@
+# tests/breakers-plane/1176-misaligned-grids.toml - a PLANE BREAKER (data; plan 1176 phase C). Evaluated by tests/test_synth_plane.py.
+schema = 1
+kind = "plane-breaker"
+id = "1176-misaligned-grids"
+rule = "R1 does not care about misaligned grids: the sharp line on per-curve subsets (n_k 24..36 of 61) is FOLLOWED"
+why = """R1 reads each curve alone (its own argmax and plateau, in its own sample ranks); no cross-curve pointwise comparison \
+and no interpolation is formed, so differing per-curve grids change the samples read, not the relation (plan 1176 C'': the plane is in span units)."""
+break = "HOLDS"
+
+[case]
+family = "misaligned"
+densities = ["dense"]
+seed = 1176
+edit = "none"
+
+[expect]
+only = ["FOLLOWED_IN_CORRIDOR"]

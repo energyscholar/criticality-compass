@@ -25,6 +25,6 @@ cc - Criticality Compass   (ADVANCED)
   bin/cc new family <id>                                                             start a family declaration from the template
   bin/cc intake explain | (lint | seal | run) <id>                                   the intake pipeline of a raw-data declaration declarations/<id>/ (explain prints its stage table; not `explain <input> <point>`)
   bin/cc intake convert <id> [--verify] | peek <id> <cc-datasets>/<name>/raw/<file>  convert a deposit into a canonical bank per declarations/<id>/CONVERSION.toml, or print the head of a raw file without a value (docs/INTAKE-CONVERSION.md)
-  bin/cc intake synth <id> --seed N [--curves K]                                     write a planted synthetic bank to scratch/intake-synth/<id> (docs/INTAKE-QUICKSTART.md)
+  bin/cc intake synth <id> --seed N [--curves K | --plane FAMILY [--density D]]      write a planted synthetic bank to scratch/intake-synth/<id> (docs/INTAKE-QUICKSTART.md)
   bin/cc new intake <id> [--from-synth <id>]                                         start a declaration declarations/<id>/ from the template (--from-synth fills the bank's metadata)
 exit 0
