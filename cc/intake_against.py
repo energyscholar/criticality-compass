@@ -23,6 +23,8 @@ NOT_PREDICTABLE = {   # plan 1165 section 5: the live reasons no profile can pre
     "CURVE_REPEATED": "a slow value's recurrence is a value fact, and the profile holds no value", "SLOW_KEY_UNRESOLVED": "a FILE_KEY slow value is a header cell's value, which the profile masks",
     "REPLICATE_KEY_UNRESOLVED": "a replicate key is a value of a file name field or a column, which the profile does not hold", "UNIT_DIFFERS": "a unit is compared as declared text; the profile masks every numeral in it",
     "NOT_AN_XLSX": "openpyxl's parse of the cells, not a structure the profile states", "XLSX_READER_ABSENT": "a fact of the machine that runs the reader, not of the files",
+    **{c: "the profile reads no HDF5 structure (plan 1205 P1), only text tables and workbooks" for c in ("HDF5_READER_ABSENT", "NOT_AN_HDF5", "NO_2D_DATASET", "MORE_THAN_ONE_2D_DATASET",
+       "DATASET_NOT_FLOAT", "COLUMN_NAMES_ATTRIBUTE_ABSENT", "COLUMN_NAMES_COUNT_DIFFERS", "COLUMN_NOT_BY_NAME")},
     "READER_NOT_LIVE": "a fact of the declaration's reader name, not of the files", "READER_REFUSED": "the wrapper of a reader reason; each reader reason has its own row",
 }
 NUMERIC, PREDICTED = ("NUMERIC", "NUMERIC_WITH_EMPTY"), "the profile did not predict this"

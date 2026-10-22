@@ -165,7 +165,7 @@ needs = ["S3"]
 implemented = true
 verdict = "PRIMARY"
 reason = [
-  { code = "READER_NOT_LIVE",   live = true,  sentence = "The declared reader has no body in the Compass yet (csv-curve-v1 and table-curve-v1 are live); the file cannot be read." },
+  { code = "READER_NOT_LIVE",   live = true,  sentence = "The declared reader has no body in the Compass yet (csv-curve-v1, table-curve-v1 and hdf5-table-v1 are live); the file cannot be read." },
   { code = "READER_REFUSED",    live = true,  sentence = "The declared reader refused the file; its own reason is shown." },
   { code = "COLUMNS_DIFFER",    live = true,  sentence = "The file's columns or keys differ from the declared ones (count, names or order; the declared columns are fast, measured, the uncertainty column if declared, and the slow column of a long table)." },
   { code = "UNIT_DIFFERS",      live = true,  sentence = "The file states a unit that differs from the declared unit." },
@@ -183,6 +183,14 @@ reader_reason = [   # plan 1145: the reasons a live reader gives for a file it c
   { code = "XLSX_READER_ABSENT",           live = true,  sentence = "The file is declared xlsx and openpyxl is not installed on this machine, so it cannot be read here." },
   { code = "NOT_AN_XLSX",                  live = true,  sentence = "The file is declared xlsx and its bytes are not a workbook openpyxl can open." },
   { code = "SHEET_ABSENT",                 live = true,  sentence = "The declared sheet is not a sheet of the workbook." },
+  { code = "HDF5_READER_ABSENT",            live = true,  sentence = "The file is declared hdf5 and h5py is not installed on this machine, so it cannot be read here." },
+  { code = "NOT_AN_HDF5",                  live = true,  sentence = "The file is declared hdf5 and its bytes are not an HDF5 file h5py can open." },
+  { code = "NO_2D_DATASET",                live = true,  sentence = "The HDF5 file holds no 2-D dataset." },
+  { code = "MORE_THAN_ONE_2D_DATASET",     live = true,  sentence = "The HDF5 file holds more than one 2-D dataset, so the table is not the one dataset; their names are shown." },
+  { code = "DATASET_NOT_FLOAT",            live = true,  sentence = "The 2-D dataset is not a floating-point dataset (no cast is made); its dtype is shown." },
+  { code = "COLUMN_NAMES_ATTRIBUTE_ABSENT", live = true, sentence = "The 2-D dataset has no `column_names` attribute, so no column can be found by name." },
+  { code = "COLUMN_NAMES_COUNT_DIFFERS",   live = true,  sentence = "The `column_names` attribute holds another number of names than the dataset has columns." },
+  { code = "COLUMN_NOT_BY_NAME",           live = true,  sentence = "A column of an HDF5 table is declared by position; only a name finds a column of hdf5-table-v1." },
 ]
 
 [[stage]]

@@ -1,9 +1,12 @@
 """intake_census - S4 SHAPE and S5 CENSUS of the intake: the pinned files through the declared reader, cut into curves and counted.
 Invariant: it reads bytes only from a Pinned (what S3 read), never from a path, and its tables are total over FORMAT's alphabets; it
 constructs no Path and opens nothing, and it holds counts and names, never a value, in what it passes on."""
+import functools
 import itertools
 import re
 import statistics
+
+import numpy as np
 
 import intake_against
 import intake_read
@@ -19,19 +22,20 @@ def read(t, d, f):
 
 
 NAMING = lambda d: [i for i, (k, _) in enumerate(intake_read.role_columns(d)) if k in ("replicate", "slow")]   # the role columns that name a curve
-BREAK = {   # LONG_TABLE [selection] block -> (the declaration) -> (previous row, row) -> does a new curve begin at row; total over FORMAT's blocks
-    "EXACT": lambda d: lambda p, r: [p[i] for i in NAMING(d)] != [r[i] for i in NAMING(d)],   # the slow value or (1160 A33) a replicate column changes
-    "FAST_RESTART": lambda d: lambda p, r: RESTARTS[SWEEP[d["acquisition"]["row_order"]](d["acquisition"])](p[0], r[0]),   # the fast knob turns back (S1: it has a direction)
+BREAK = {   # LONG_TABLE [selection] block -> (the declaration) -> (previous rows, rows: arrays, one row each) -> does a new curve begin at each row; total over FORMAT's blocks
+    "EXACT": lambda d: lambda p, r: np.any(p[:, NAMING(d)] != r[:, NAMING(d)], axis=1),   # the slow value or (1160 A33) a replicate column changes
+    "FAST_RESTART": lambda d: lambda p, r: RESTARTS[SWEEP[d["acquisition"]["row_order"]](d["acquisition"])](p[:, 0], r[:, 0]),   # the fast knob turns back (S1: it has a direction)
 }
 
 
 def _blocks(f, g, d):
     """LONG_TABLE: the blocks of consecutive rows the declared block rule (BREAK) cuts the file into, in file order, each one Curve whose slow
-    value is its FIRST row's (a value as measured, never a mean)."""
-    brk, rows = BREAK[d["selection"]["block"]](d), tuple(g.rows)
-    ids = itertools.accumulate(int(brk(p, r)) for p, r in zip(rows[:1] + rows[:-1], rows))
-    runs = [[r for _, r in rs] for _, rs in itertools.groupby(zip(ids, rows), key=lambda x: x[0])]
-    return [Curve(f"{f.name} block {i}", (rs[0][-1],), tuple(rs), len({r[-1] for r in rs})) for i, rs in enumerate(runs, 1)]
+    value is its FIRST row's (a value as measured, never a mean). (plan 1205 P1) The cut is one vectorised comparison of every row with its
+    predecessor, never a row-by-row walk: the same blocks, at the size of a 4,000,000-row table."""
+    a = np.array(g.rows, dtype=float).reshape(len(g.rows), -1)
+    at = np.flatnonzero(np.concatenate([[True], BREAK[d["selection"]["block"]](d)(a[:-1], a[1:])]))
+    ends = np.concatenate([at[1:], [len(a)]])
+    return [Curve(f"{f.name} block {i}", (g.rows[b][-1],), g.rows[b:e], len(np.unique(a[b:e, -1]))) for i, (b, e) in enumerate(zip(at.tolist(), ends.tolist()), 1)]
 
 
 SLOW = {   # PER_FILE [selection.slow] source -> (its row, the files' grids) -> each curve's slow values (a tuple); total over FORMAT's PER_FILE sources
@@ -128,7 +132,7 @@ def census(pinned, shaped, t):
     key, acq = KEYED[d["replicate"]["identity"]](d["selection"]["layout"], d["replicate"]["key"]["kind"]), d["acquisition"]
     other = [f.name for f, g in zip(pinned.files, grids) if g.columns != shaped.columns]
     what = [differs(pinned.files[0].data, f.data, d) for f, g in zip(pinned.files, grids) if g.columns != shaped.columns]   # 1160 A34: what each differs in
-    curves = lambda: CURVES[d["selection"]["layout"]](d, pinned.files, grids)
+    curves = functools.cache(lambda: CURVES[d["selection"]["layout"]](d, pinned.files, grids))   # (plan 1205 P1) cut once: every clause below reads the same curves
     unkeyed = lambda: KEYS[d["selection"]["layout"]](d, pinned.files, grids)
     points = lambda c: POINTS[(d["knobs"]["fast"]["control"], d["replicate"]["identity"])](c.rows)   # grouped BEFORE the repeat check: a run of readings is never a repeat
     twice = lambda: [c.where for c in curves() if len({k for k, _, _ in points(c)}) != len(points(c))]
