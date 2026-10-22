@@ -1,0 +1,7 @@
+# The settings grid of plan 1205 AMENDMENT 1, declared in research/1205/LL1-PRE-v3.md (sha256 752636432401d5ba302ccb4348de65116c9990b06016fb565de1c1e0091d467c)
+# before any data was read: w_c in {0.05, 0.10, 0.15, 0.25} of the fast span (0.15 is the frozen default, kept as one cell) x the three
+# feature lanes of v1. Read by `bin/cc chain <id> --grid intake/grids/ll1-pre-v3.toml` (cc/chain.py). Data, never a code constant.
+schema = 1
+kind = "chain-grid"
+wc = [0.05, 0.10, 0.15, 0.25]
+lanes = ["ARGMAX_FAST", "ARGMIN_FAST", "ARGMAX_ABS_A_FAST"]

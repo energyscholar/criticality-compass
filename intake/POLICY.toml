@@ -4,7 +4,8 @@
 schema = 1
 kind = "intake-policy"
 status = "POLICY"
-version = "1176-v3"   # plan 1176 amendment E0: FEATURE_ARGMAX_FAST gains its domain (the declared [plane.fast_window])
+version = "1205-v1"   # plan 1205 P2: + [feature_projection.FEATURE_ARGMIN_FAST] and [feature_projection.FEATURE_ARGMAX_ABS_A_FAST], the lanes of `cc chain`
+# was "1176-v3"   # plan 1176 amendment E0: FEATURE_ARGMAX_FAST gains its domain (the declared [plane.fast_window])
 # was "1176-v2"   # plan 1176 phase C'': + [coordinate.PLANE_SPAN_UNIT]; Broad in span units
 # was "1176-v1"   # plan 1176 phase B: + [feature_projection.FEATURE_ARGMAX_FAST] (was 1136-v1)
 evidence_note = "The plan 1118 banks were used to CHOOSE these rows; they cannot validate them (A1.10). Validation needs fresh held-out planted banks."
@@ -47,6 +48,26 @@ measured_by = "plan 1176 phase B planted tests (tests/test_feature.py) only; pha
 cannot = "locate a maximum between measured samples; see a line that runs along the curves (ruling R2, phase 2b)"
 depends_on = "the fast-knob density of each curve near its peak and the stated sigma column (none: the bracket is the argmax sample alone, UNTIERED)"
 fails_when = "a curve's maximum is at or beyond an end of its measured span (AtSpanEnd: UNRES), or a curve has fewer than three samples (Absent: UNRES), or its sigma-plateau is wider than w_c of the fast span (Broad: UNRES)"
+
+[feature_projection.FEATURE_ARGMIN_FAST]   # plan 1205 P2 (lane ARGMIN_FAST of `cc chain`, cc/chain.py); read by cc chain only
+estimand = "fast location of each curve's sigma-indistinguishable minimum: FEATURE_ARGMAX_FAST's projection applied to the observable's negation (the minimum of x is the maximum of -x: the projection's definition, not a value transform), its bracket and kind by the same rules"
+preserves = "per-curve shape (where along the fast knob each curve's minimum sits, at sample resolution, with its sigma-plateau); the declared slow order of the curves"
+domain = "as FEATURE_ARGMAX_FAST (plan 1176 E0): the declared [plane.fast_window], else the plane's whole fast span"
+discards = "cross-curve pointwise comparison; the depth of the minimum; the bracket width beyond the cell's w_c (read as Broad); the shape outside the declared window"
+measured_by = "plan 1205 P2 planted tests (tests/test_chain_1205.py) only"
+cannot = "locate a minimum between measured samples; tell a class of line (a segment is a feature line)"
+depends_on = "the fast-knob density near the minimum and the stated sigma column (none: UNTIERED)"
+fails_when = "the minimum is at a window end (AtSpanEnd), fewer than three in-window samples (Absent), or its plateau is wider than w_c of the fast span (Broad)"
+
+[feature_projection.FEATURE_ARGMAX_ABS_A_FAST]   # plan 1205 P2 (ruling R5, lane ARGMAX_ABS_A_FAST of `cc chain`, cc/chain.py); read by cc chain only
+estimand = "fast location of each curve's steepest step: the argmax of |A_fast(x)|, A_fast the kernel's A over the declared fast neighbour relation (in-window samples in ascending fast order, edges (j, j+1)), |.| a projection after A; before A only x + c (c = 0). The edge's place is the centre of its two measured fast values (its coordinate). The bracket is the sigma-plateau of |A| (an edge's sigma: sqrt(s_j^2 + s_j+1^2)), or the argmax edge alone UNTIERED"
+preserves = "where along the fast knob each curve changes fastest, at edge resolution; the declared slow order of the curves"
+domain = "as FEATURE_ARGMAX_FAST (plan 1176 E0); fewer than four in-window samples (three edges) is Absent; an argmax plateau touching the first or last edge is AtSpanEnd"
+discards = "the sign of the step; the step's size; every edge but the argmax plateau; cross-curve pointwise comparison"
+measured_by = "plan 1205 P2 planted tests (tests/test_chain_1205.py) only"
+cannot = "place the step between two measured samples finer than its edge; tell a class of line"
+depends_on = "the fast-knob density at the step and the stated sigma column"
+fails_when = "the steepest step is at a window end (AtSpanEnd), the plateau of |A| is wider than w_c (Broad), or fewer than four in-window samples (Absent)"
 
 [coordinate.PLANE_SPAN_UNIT]   # plan 1176 phase C'' (O4, open decision 2 reversed): the plane's coordinates; read by the side oracle (cc/intake_feature.py Span)
 map = "per knob u = (x - lo) / (hi - lo): slow over [least, greatest] curve slow value, fast over [least, greatest] measured sample of every curve of the plane; a span of one point has width 1 (a translation)"
