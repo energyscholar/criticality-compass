@@ -121,12 +121,12 @@ check("H2. DIAG 10/10 arm: lane ARGMAX_FAST at w_c 0.15 is SEGMENT_SPANS_FAMILY 
 
 
 # ---- H5 identity and robustness (pure)
-check("H5. IDENTITY: ranges sharing a curve rank are one segment; disjoint ranges are two", chain.overlaps((0, 3), (3, 6)) and chain.overlaps((2, 5), (0, 8)) and not chain.overlaps((0, 3), (4, 6)))
+check("H5. IDENTITY: ranges sharing a curve rank are one segment; disjoint ranges are two (A1 containment)", chain.contained((3, 4), (0, 9)) and chain.contained((2, 5), (2, 5)) and not chain.contained((0, 9), (3, 4)) and not chain.contained((0, 3), (3, 6)) and not chain.contained((0, 3), (4, 6)))
 check("H5. Robustness: 4 cells -> m 3, 4 ROBUST; m 2 INTERMEDIATE; m 1 FRAGILE; 1 cell -> m 1 ROBUST (three quarters first)",
       [chain.robustness(m, 4).name for m in (4, 3, 2, 1)] + [chain.robustness(1, 1).name] == ["ROBUST", "ROBUST", "INTERMEDIATE", "FRAGILE", "ROBUST"])
 toy = {chain.Lane.ARGMAX_FAST: {0.05: (None, None, [(0, 2)], None), 0.10: (None, None, [(1, 5)], None), 0.15: (None, None, [(4, 8)], None), 0.25: (None, None, [(6, 8)], None)}}
-counts = [sum(any(chain.overlaps(s, o) for o in toy[chain.Lane.ARGMAX_FAST][w][2]) for w in WCS) for s in ((0, 2), (1, 5), (4, 8), (6, 8))]
-check("H5. a chain of overlaps is counted per segment, not transitively: (0,2) 2 cells, (1,5) 3, (4,8) 3, (6,8) 2", counts == [2, 3, 3, 2], str(counts))
+counts = [sum(any(chain.contained(s, o) for o in toy[chain.Lane.ARGMAX_FAST][w][2]) for w in WCS) for s in ((0, 2), (1, 5), (4, 8), (6, 8))]
+check("H5. a chain of overlaps is counted per segment, not transitively: (0,2) 1 cell, (1,5) 1, (4,8) 1, (6,8) 2 (A1 containment)", counts == [1, 1, 1, 2], str(counts))
 
 
 # ---- H6 co-location (in process)

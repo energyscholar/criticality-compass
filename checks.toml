@@ -36,7 +36,7 @@ test_infrastructure = ["cc/intake_synth.py", "tests/test_chain_1205_p2b_bank.py"
 methods = ["cc/detect.py"]
 tests = [
   "tests/test_closure.py", "tests/test_0973.py", "tests/test_0978.py",
-  "tests/test_budget.py", "tests/test_chain_1205.py", "tests/test_chain_1205_p2b.py", "tests/test_score_words_1201.py",
+  "tests/test_budget.py", "tests/test_chain_1205.py", "tests/test_chain_1205_p2b.py", "tests/test_chain_1205_p2c.py","tests/test_score_words_1201.py",
   "tests/test_kernel.py", "tests/test_sign.py", "tests/test_resample.py", "tests/test_kernel_rs.py",
   "tests/test_declare.py", "tests/test_transducer.py", "tests/test_tables_cli.py",
   "tests/test_needle_x8.py", "tests/test_b7.py", "tests/test_w2.py", "tests/test_two_start_c2.py",

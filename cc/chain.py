@@ -9,7 +9,7 @@ A family at intake S5 (its plane: the curves in slow order and the declared fast
   the position and bracket in fast span units, the curve rank and slow value.
 - Per adjacent pair and cell: one Step atom. Nothing is walked, interpolated or bridged between curves (plan 1205 R3).
 - SEGMENTS: the maximal runs of STEP_WITHIN_WC; per lane and cell a FamilyAtom; across the lane's cells a Robustness per segment, by the
-  declared identity rule IDENTITY (overlap in curve ranks).
+  declared identity rule IDENTITY (CONTAINMENT in curve ranks, plan 1205 amendment A1: s recurs in a cell iff that cell holds a segment containing s).
 - CO_LOCATION (--with <id2>): a second observable on the same family, per curve, lane and cell, read from <id2>'s own typed result
   (results/chain/<id2>.json, run first under the same grid): one intake run per process (intake_bytes: one loader per run).
 The output is typed rows (results/chain/<id>.json) and ONE sentence per lane built from the rows. A segment is a feature line: it is never
@@ -109,12 +109,13 @@ ROBUST = {(True, True): Robustness.ROBUST, (True, False): Robustness.ROBUST,   #
 CO = {(False, False): CoLocation.NOT_COMPARABLE, (False, True): CoLocation.NOT_COMPARABLE,   # (both Located, d <= w_c) -> CoLocation; total
       (True, True): CoLocation.CO_LOCATED, (True, False): CoLocation.APART_BEYOND_WC}
 FIT = {True: StrideFit.STRIDE_FITS_WINDOW, False: StrideFit.STRIDE_EXCEEDS_WINDOW}   # (m - k >= 3) -> StrideFit; total
-IDENTITY = "two segments of one lane in two cells are ONE segment when their curve-rank ranges [lo, hi] overlap (share at least one curve rank)"
+IDENTITY = ("a segment s = [lo, hi] of a lane in a cell RECURS in another cell of the lane iff that cell holds a segment [lo', hi'] with lo' <= lo and hi <= hi' "
+            "(CONTAINMENT in curve ranks); m(s) counts the lane's cells in which s recurs, its own included")
 
 
-def overlaps(a, b):
-    """The declared identity rule IDENTITY over curve-rank ranges (lo, hi), inclusive."""
-    return a[0] <= b[1] and b[0] <= a[1]
+def contained(a, b):
+    """The declared identity rule IDENTITY over curve-rank ranges (lo, hi), inclusive: a is contained in b (b's range holds every rank of a)."""
+    return b[0] <= a[0] and a[1] <= b[1]
 
 
 @dataclass(frozen=True)
@@ -336,14 +337,14 @@ def label(c):
 def rows(fam, g, ev):
     """The typed rows: the grid, per (lane, cell) the curves, steps, segments with robustness, the family atom; per lane the atom robustness."""
     n = {lane: len(keys(g, lane)) for lane in g.lanes}
-    seg_m = lambda lane, s: sum(any(overlaps(s, o) for o in ev[lane][k][2]) for k in keys(g, lane))   # noqa: E731
+    seg_m = lambda lane, s: sum(any(contained(s, o) for o in ev[lane][k][2]) for k in keys(g, lane))   # noqa: E731
     cells = [{"lane": lane.name, "wc": wc_of(key), **stride_row(key), "family": ev[lane][key][3].name,
               "curves": [{"rank": k, "slow": fam.slows[k], "kind": p.kind, "sample_ranks": [p.rank, p.lo, p.hi], "position": p.pos,
                           "bracket": list(p.bracket) if p.bracket else None, **curve_stride(key, p)} for k, p in enumerate(ev[lane][key][0])],
               "steps": [{"pair": [k, k + 1], "slow": [fam.slows[k], fam.slows[k + 1]], "step": s.name,
                          "d": abs(ev[lane][key][0][k + 1].pos - ev[lane][key][0][k].pos) if s is not Step.UNMEASURED_BETWEEN else None}
                         for k, s in enumerate(ev[lane][key][1])],
-              "segments": [{"ranks": [lo, hi], "slow": [fam.slows[lo], fam.slows[hi]], "curves": hi - lo + 1, "located_fraction": 1.0,
+              "segments": [{"ranks": [lo, hi], "slow": [fam.slows[lo], fam.slows[hi]], "curves": hi - lo + 1,
                             "family_fraction": (hi - lo + 1) / len(fam.slows), "cells": seg_m(lane, (lo, hi)),
                             "robustness": robustness(seg_m(lane, (lo, hi)), n[lane]).name} for lo, hi in ev[lane][key][2]]}
              for lane in g.lanes for key in keys(g, lane)]

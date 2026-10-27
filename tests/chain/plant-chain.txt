@@ -12,9 +12,9 @@ cell ARGMAX_ABS_A_FAST w_c 0.05: NO_SEGMENT; steps STEP_BEYOND_WC STEP_BEYOND_WC
 cell ARGMAX_ABS_A_FAST w_c 0.1: SEGMENTS_PARTIAL; steps STEP_WITHIN_WC STEP_WITHIN_WC STEP_WITHIN_WC STEP_WITHIN_WC STEP_WITHIN_WC STEP_BEYOND_WC STEP_BEYOND_WC STEP_WITHIN_WC; kinds Located Located Located Located Located Located Located Located Located
 cell ARGMAX_ABS_A_FAST w_c 0.15: SEGMENTS_PARTIAL; steps STEP_WITHIN_WC STEP_WITHIN_WC STEP_WITHIN_WC STEP_WITHIN_WC STEP_WITHIN_WC STEP_BEYOND_WC STEP_BEYOND_WC STEP_WITHIN_WC; kinds Located Located Located Located Located Located Located Located Located
 cell ARGMAX_ABS_A_FAST w_c 0.25: SEGMENTS_PARTIAL; steps STEP_WITHIN_WC STEP_WITHIN_WC STEP_WITHIN_WC STEP_WITHIN_WC STEP_WITHIN_WC STEP_BEYOND_WC STEP_WITHIN_WC STEP_WITHIN_WC; kinds Located Located Located Located Located Located Located Located Located
-Lane ARGMAX_FAST over 9 curves (0.1 -> 0.9 dimensionless), 4 w_c cells: SEGMENTS_PARTIAL in 3 of 4 cells (ROBUST), NO_SEGMENT in 1 of 4 cells (FRAGILE). Per cell, w_c 0.05: NO_SEGMENT; w_c 0.1: SEGMENTS_PARTIAL, feature line segment 0.1 -> 0.6 dimensionless (6 curves, in 3 of 4 cells, ROBUST), feature line segment 0.8 -> 0.9 dimensionless (2 curves, in 3 of 4 cells, ROBUST); w_c 0.15: SEGMENTS_PARTIAL, feature line segment 0.1 -> 0.6 dimensionless (6 curves, in 3 of 4 cells, ROBUST), feature line segment 0.8 -> 0.9 dimensionless (2 curves, in 3 of 4 cells, ROBUST); w_c 0.25: SEGMENTS_PARTIAL, feature line segment 0.1 -> 0.6 dimensionless (6 curves, in 3 of 4 cells, ROBUST), feature line segment 0.7 -> 0.9 dimensionless (3 curves, in 3 of 4 cells, ROBUST). Breaks: STEP_BEYOND_WC at 0.1|0.2 dimensionless (w_c 0.05); STEP_BEYOND_WC at 0.2|0.3 dimensionless (w_c 0.05); STEP_BEYOND_WC at 0.3|0.4 dimensionless (w_c 0.05); STEP_BEYOND_WC at 0.4|0.5 dimensionless (w_c 0.05); STEP_BEYOND_WC at 0.5|0.6 dimensionless (w_c 0.05); STEP_BEYOND_WC at 0.6|0.7 dimensionless (w_c 0.05, 0.1, 0.15, 0.25); STEP_BEYOND_WC at 0.7|0.8 dimensionless (w_c 0.05, 0.1, 0.15); STEP_BEYOND_WC at 0.8|0.9 dimensionless (w_c 0.05). Nothing is walked or bridged between curves; chain cannot classify: a segment is a feature line, never a class (a crossover ridge chains the same as any other line; the class belongs to the Detector's typed verdict).
+Lane ARGMAX_FAST over 9 curves (0.1 -> 0.9 dimensionless), 4 w_c cells: SEGMENTS_PARTIAL in 3 of 4 cells (ROBUST), NO_SEGMENT in 1 of 4 cells (FRAGILE). Per cell, w_c 0.05: NO_SEGMENT; w_c 0.1: SEGMENTS_PARTIAL, feature line segment 0.1 -> 0.6 dimensionless (6 curves, in 3 of 4 cells, ROBUST), feature line segment 0.8 -> 0.9 dimensionless (2 curves, in 3 of 4 cells, ROBUST); w_c 0.15: SEGMENTS_PARTIAL, feature line segment 0.1 -> 0.6 dimensionless (6 curves, in 3 of 4 cells, ROBUST), feature line segment 0.8 -> 0.9 dimensionless (2 curves, in 3 of 4 cells, ROBUST); w_c 0.25: SEGMENTS_PARTIAL, feature line segment 0.1 -> 0.6 dimensionless (6 curves, in 3 of 4 cells, ROBUST), feature line segment 0.7 -> 0.9 dimensionless (3 curves, in 1 of 4 cells, FRAGILE). Breaks: STEP_BEYOND_WC at 0.1|0.2 dimensionless (w_c 0.05); STEP_BEYOND_WC at 0.2|0.3 dimensionless (w_c 0.05); STEP_BEYOND_WC at 0.3|0.4 dimensionless (w_c 0.05); STEP_BEYOND_WC at 0.4|0.5 dimensionless (w_c 0.05); STEP_BEYOND_WC at 0.5|0.6 dimensionless (w_c 0.05); STEP_BEYOND_WC at 0.6|0.7 dimensionless (w_c 0.05, 0.1, 0.15, 0.25); STEP_BEYOND_WC at 0.7|0.8 dimensionless (w_c 0.05, 0.1, 0.15); STEP_BEYOND_WC at 0.8|0.9 dimensionless (w_c 0.05). Nothing is walked or bridged between curves; chain cannot classify: a segment is a feature line, never a class (a crossover ridge chains the same as any other line; the class belongs to the Detector's typed verdict).
 Lane ARGMIN_FAST over 9 curves (0.1 -> 0.9 dimensionless), 4 w_c cells: NO_SEGMENT in 4 of 4 cells (ROBUST). Per cell, w_c 0.05: NO_SEGMENT; w_c 0.1: NO_SEGMENT; w_c 0.15: NO_SEGMENT; w_c 0.25: NO_SEGMENT. Breaks: UNMEASURED_BETWEEN at 0.1|0.2 dimensionless (w_c 0.05, 0.1, 0.15, 0.25); UNMEASURED_BETWEEN at 0.2|0.3 dimensionless (w_c 0.05, 0.1, 0.15, 0.25); UNMEASURED_BETWEEN at 0.3|0.4 dimensionless (w_c 0.05, 0.1, 0.15, 0.25); UNMEASURED_BETWEEN at 0.4|0.5 dimensionless (w_c 0.05, 0.1, 0.15, 0.25); UNMEASURED_BETWEEN at 0.5|0.6 dimensionless (w_c 0.05, 0.1, 0.15, 0.25); UNMEASURED_BETWEEN at 0.6|0.7 dimensionless (w_c 0.05, 0.1, 0.15, 0.25); UNMEASURED_BETWEEN at 0.7|0.8 dimensionless (w_c 0.05, 0.1, 0.15, 0.25); UNMEASURED_BETWEEN at 0.8|0.9 dimensionless (w_c 0.05, 0.1, 0.15, 0.25). Nothing is walked or bridged between curves; chain cannot classify: a segment is a feature line, never a class (a crossover ridge chains the same as any other line; the class belongs to the Detector's typed verdict).
-Lane ARGMAX_ABS_A_FAST over 9 curves (0.1 -> 0.9 dimensionless), 4 w_c cells: SEGMENTS_PARTIAL in 3 of 4 cells (ROBUST), NO_SEGMENT in 1 of 4 cells (FRAGILE). Per cell, w_c 0.05: NO_SEGMENT; w_c 0.1: SEGMENTS_PARTIAL, feature line segment 0.1 -> 0.6 dimensionless (6 curves, in 3 of 4 cells, ROBUST), feature line segment 0.8 -> 0.9 dimensionless (2 curves, in 3 of 4 cells, ROBUST); w_c 0.15: SEGMENTS_PARTIAL, feature line segment 0.1 -> 0.6 dimensionless (6 curves, in 3 of 4 cells, ROBUST), feature line segment 0.8 -> 0.9 dimensionless (2 curves, in 3 of 4 cells, ROBUST); w_c 0.25: SEGMENTS_PARTIAL, feature line segment 0.1 -> 0.6 dimensionless (6 curves, in 3 of 4 cells, ROBUST), feature line segment 0.7 -> 0.9 dimensionless (3 curves, in 3 of 4 cells, ROBUST). Breaks: STEP_BEYOND_WC at 0.1|0.2 dimensionless (w_c 0.05); STEP_BEYOND_WC at 0.2|0.3 dimensionless (w_c 0.05); STEP_BEYOND_WC at 0.3|0.4 dimensionless (w_c 0.05); STEP_BEYOND_WC at 0.4|0.5 dimensionless (w_c 0.05); STEP_BEYOND_WC at 0.5|0.6 dimensionless (w_c 0.05); STEP_BEYOND_WC at 0.6|0.7 dimensionless (w_c 0.05, 0.1, 0.15, 0.25); STEP_BEYOND_WC at 0.7|0.8 dimensionless (w_c 0.05, 0.1, 0.15); STEP_BEYOND_WC at 0.8|0.9 dimensionless (w_c 0.05). Nothing is walked or bridged between curves; chain cannot classify: a segment is a feature line, never a class (a crossover ridge chains the same as any other line; the class belongs to the Detector's typed verdict).
+Lane ARGMAX_ABS_A_FAST over 9 curves (0.1 -> 0.9 dimensionless), 4 w_c cells: SEGMENTS_PARTIAL in 3 of 4 cells (ROBUST), NO_SEGMENT in 1 of 4 cells (FRAGILE). Per cell, w_c 0.05: NO_SEGMENT; w_c 0.1: SEGMENTS_PARTIAL, feature line segment 0.1 -> 0.6 dimensionless (6 curves, in 3 of 4 cells, ROBUST), feature line segment 0.8 -> 0.9 dimensionless (2 curves, in 3 of 4 cells, ROBUST); w_c 0.15: SEGMENTS_PARTIAL, feature line segment 0.1 -> 0.6 dimensionless (6 curves, in 3 of 4 cells, ROBUST), feature line segment 0.8 -> 0.9 dimensionless (2 curves, in 3 of 4 cells, ROBUST); w_c 0.25: SEGMENTS_PARTIAL, feature line segment 0.1 -> 0.6 dimensionless (6 curves, in 3 of 4 cells, ROBUST), feature line segment 0.7 -> 0.9 dimensionless (3 curves, in 1 of 4 cells, FRAGILE). Breaks: STEP_BEYOND_WC at 0.1|0.2 dimensionless (w_c 0.05); STEP_BEYOND_WC at 0.2|0.3 dimensionless (w_c 0.05); STEP_BEYOND_WC at 0.3|0.4 dimensionless (w_c 0.05); STEP_BEYOND_WC at 0.4|0.5 dimensionless (w_c 0.05); STEP_BEYOND_WC at 0.5|0.6 dimensionless (w_c 0.05); STEP_BEYOND_WC at 0.6|0.7 dimensionless (w_c 0.05, 0.1, 0.15, 0.25); STEP_BEYOND_WC at 0.7|0.8 dimensionless (w_c 0.05, 0.1, 0.15); STEP_BEYOND_WC at 0.8|0.9 dimensionless (w_c 0.05). Nothing is walked or bridged between curves; chain cannot classify: a segment is a feature line, never a class (a crossover ridge chains the same as any other line; the class belongs to the Detector's typed verdict).
 results: results/chain/line2.json (typed rows: per cell the curves, steps, segments with robustness; per lane the family atoms)
 exit 0
 --- results/chain/line2.json
@@ -36,7 +36,7 @@ exit 0
   ],
   "sha256": "78a031ab92ec1ceb899300aea01df3ddd590f54c39e655c0a2e87ac5f80fca92"
  },
- "identity_rule": "two segments of one lane in two cells are ONE segment when their curve-rank ranges [lo, hi] overlap (share at least one curve rank)",
+ "identity_rule": "a segment s = [lo, hi] of a lane in a cell RECURS in another cell of the lane iff that cell holds a segment [lo', hi'] with lo' <= lo and hi <= hi' (CONTAINMENT in curve ranks); m(s) counts the lane's cells in which s recurs, its own included",
  "limit": "chain cannot classify: a segment is a feature line, never a class (a crossover ridge chains the same as any other line; the class belongs to the Detector's typed verdict)",
  "slow_unit": "dimensionless",
  "fast_span": [
@@ -535,7 +535,6 @@ exit 0
       0.6000000000000001
      ],
      "curves": 6,
-     "located_fraction": 1.0,
      "family_fraction": 0.6666666666666666,
      "cells": 3,
      "robustness": "ROBUST"
@@ -550,7 +549,6 @@ exit 0
       0.9
      ],
      "curves": 2,
-     "located_fraction": 1.0,
      "family_fraction": 0.2222222222222222,
      "cells": 3,
      "robustness": "ROBUST"
@@ -807,7 +805,6 @@ exit 0
       0.6000000000000001
      ],
      "curves": 6,
-     "located_fraction": 1.0,
      "family_fraction": 0.6666666666666666,
      "cells": 3,
      "robustness": "ROBUST"
@@ -822,7 +819,6 @@ exit 0
       0.9
      ],
      "curves": 2,
-     "located_fraction": 1.0,
      "family_fraction": 0.2222222222222222,
      "cells": 3,
      "robustness": "ROBUST"
@@ -1079,7 +1075,6 @@ exit 0
       0.6000000000000001
      ],
      "curves": 6,
-     "located_fraction": 1.0,
      "family_fraction": 0.6666666666666666,
      "cells": 3,
      "robustness": "ROBUST"
@@ -1094,10 +1089,9 @@ exit 0
       0.9
      ],
      "curves": 3,
-     "located_fraction": 1.0,
      "family_fraction": 0.3333333333333333,
-     "cells": 3,
-     "robustness": "ROBUST"
+     "cells": 1,
+     "robustness": "FRAGILE"
     }
    ]
   },
@@ -2556,7 +2550,6 @@ exit 0
       0.6000000000000001
      ],
      "curves": 6,
-     "located_fraction": 1.0,
      "family_fraction": 0.6666666666666666,
      "cells": 3,
      "robustness": "ROBUST"
@@ -2571,7 +2564,6 @@ exit 0
       0.9
      ],
      "curves": 2,
-     "located_fraction": 1.0,
      "family_fraction": 0.2222222222222222,
      "cells": 3,
      "robustness": "ROBUST"
@@ -2828,7 +2820,6 @@ exit 0
       0.6000000000000001
      ],
      "curves": 6,
-     "located_fraction": 1.0,
      "family_fraction": 0.6666666666666666,
      "cells": 3,
      "robustness": "ROBUST"
@@ -2843,7 +2834,6 @@ exit 0
       0.9
      ],
      "curves": 2,
-     "located_fraction": 1.0,
      "family_fraction": 0.2222222222222222,
      "cells": 3,
      "robustness": "ROBUST"
@@ -3100,7 +3090,6 @@ exit 0
       0.6000000000000001
      ],
      "curves": 6,
-     "located_fraction": 1.0,
      "family_fraction": 0.6666666666666666,
      "cells": 3,
      "robustness": "ROBUST"
@@ -3115,10 +3104,9 @@ exit 0
       0.9
      ],
      "curves": 3,
-     "located_fraction": 1.0,
      "family_fraction": 0.3333333333333333,
-     "cells": 3,
-     "robustness": "ROBUST"
+     "cells": 1,
+     "robustness": "FRAGILE"
     }
    ]
   }
@@ -3203,7 +3191,7 @@ exit 0
   ],
   "sha256": "78a031ab92ec1ceb899300aea01df3ddd590f54c39e655c0a2e87ac5f80fca92"
  },
- "identity_rule": "two segments of one lane in two cells are ONE segment when their curve-rank ranges [lo, hi] overlap (share at least one curve rank)",
+ "identity_rule": "a segment s = [lo, hi] of a lane in a cell RECURS in another cell of the lane iff that cell holds a segment [lo', hi'] with lo' <= lo and hi <= hi' (CONTAINMENT in curve ranks); m(s) counts the lane's cells in which s recurs, its own included",
  "limit": "chain cannot classify: a segment is a feature line, never a class (a crossover ridge chains the same as any other line; the class belongs to the Detector's typed verdict)",
  "slow_unit": "dimensionless",
  "fast_span": [
@@ -3702,7 +3690,6 @@ exit 0
       0.9
      ],
      "curves": 9,
-     "located_fraction": 1.0,
      "family_fraction": 1.0,
      "cells": 3,
      "robustness": "ROBUST"
@@ -3959,7 +3946,6 @@ exit 0
       0.9
      ],
      "curves": 9,
-     "located_fraction": 1.0,
      "family_fraction": 1.0,
      "cells": 3,
      "robustness": "ROBUST"
@@ -4216,7 +4202,6 @@ exit 0
       0.9
      ],
      "curves": 9,
-     "located_fraction": 1.0,
      "family_fraction": 1.0,
      "cells": 3,
      "robustness": "ROBUST"
@@ -5678,7 +5663,6 @@ exit 0
       0.9
      ],
      "curves": 9,
-     "located_fraction": 1.0,
      "family_fraction": 1.0,
      "cells": 3,
      "robustness": "ROBUST"
@@ -5935,7 +5919,6 @@ exit 0
       0.9
      ],
      "curves": 9,
-     "located_fraction": 1.0,
      "family_fraction": 1.0,
      "cells": 3,
      "robustness": "ROBUST"
@@ -6192,7 +6175,6 @@ exit 0
       0.9
      ],
      "curves": 9,
-     "located_fraction": 1.0,
      "family_fraction": 1.0,
      "cells": 3,
      "robustness": "ROBUST"
@@ -6785,7 +6767,7 @@ exit 0
   ],
   "sha256": "78a031ab92ec1ceb899300aea01df3ddd590f54c39e655c0a2e87ac5f80fca92"
  },
- "identity_rule": "two segments of one lane in two cells are ONE segment when their curve-rank ranges [lo, hi] overlap (share at least one curve rank)",
+ "identity_rule": "a segment s = [lo, hi] of a lane in a cell RECURS in another cell of the lane iff that cell holds a segment [lo', hi'] with lo' <= lo and hi <= hi' (CONTAINMENT in curve ranks); m(s) counts the lane's cells in which s recurs, its own included",
  "limit": "chain cannot classify: a segment is a feature line, never a class (a crossover ridge chains the same as any other line; the class belongs to the Detector's typed verdict)",
  "slow_unit": "dimensionless",
  "fast_span": [
@@ -9746,7 +9728,7 @@ exit 0
   ],
   "sha256": "78a031ab92ec1ceb899300aea01df3ddd590f54c39e655c0a2e87ac5f80fca92"
  },
- "identity_rule": "two segments of one lane in two cells are ONE segment when their curve-rank ranges [lo, hi] overlap (share at least one curve rank)",
+ "identity_rule": "a segment s = [lo, hi] of a lane in a cell RECURS in another cell of the lane iff that cell holds a segment [lo', hi'] with lo' <= lo and hi <= hi' (CONTAINMENT in curve ranks); m(s) counts the lane's cells in which s recurs, its own included",
  "limit": "chain cannot classify: a segment is a feature line, never a class (a crossover ridge chains the same as any other line; the class belongs to the Detector's typed verdict)",
  "slow_unit": "dimensionless",
  "fast_span": [
@@ -10245,7 +10227,6 @@ exit 0
       0.4
      ],
      "curves": 4,
-     "located_fraction": 1.0,
      "family_fraction": 0.4444444444444444,
      "cells": 3,
      "robustness": "ROBUST"
@@ -10260,7 +10241,6 @@ exit 0
       0.9
      ],
      "curves": 4,
-     "located_fraction": 1.0,
      "family_fraction": 0.4444444444444444,
      "cells": 3,
      "robustness": "ROBUST"
@@ -10517,7 +10497,6 @@ exit 0
       0.4
      ],
      "curves": 4,
-     "located_fraction": 1.0,
      "family_fraction": 0.4444444444444444,
      "cells": 3,
      "robustness": "ROBUST"
@@ -10532,7 +10511,6 @@ exit 0
       0.9
      ],
      "curves": 4,
-     "located_fraction": 1.0,
      "family_fraction": 0.4444444444444444,
      "cells": 3,
      "robustness": "ROBUST"
@@ -10789,7 +10767,6 @@ exit 0
       0.4
      ],
      "curves": 4,
-     "located_fraction": 1.0,
      "family_fraction": 0.4444444444444444,
      "cells": 3,
      "robustness": "ROBUST"
@@ -10804,7 +10781,6 @@ exit 0
       0.9
      ],
      "curves": 4,
-     "located_fraction": 1.0,
      "family_fraction": 0.4444444444444444,
      "cells": 3,
      "robustness": "ROBUST"
@@ -12266,7 +12242,6 @@ exit 0
       0.4
      ],
      "curves": 4,
-     "located_fraction": 1.0,
      "family_fraction": 0.4444444444444444,
      "cells": 3,
      "robustness": "ROBUST"
@@ -12281,7 +12256,6 @@ exit 0
       0.9
      ],
      "curves": 4,
-     "located_fraction": 1.0,
      "family_fraction": 0.4444444444444444,
      "cells": 3,
      "robustness": "ROBUST"
@@ -12538,7 +12512,6 @@ exit 0
       0.4
      ],
      "curves": 4,
-     "located_fraction": 1.0,
      "family_fraction": 0.4444444444444444,
      "cells": 3,
      "robustness": "ROBUST"
@@ -12553,7 +12526,6 @@ exit 0
       0.9
      ],
      "curves": 4,
-     "located_fraction": 1.0,
      "family_fraction": 0.4444444444444444,
      "cells": 3,
      "robustness": "ROBUST"
@@ -12810,7 +12782,6 @@ exit 0
       0.4
      ],
      "curves": 4,
-     "located_fraction": 1.0,
      "family_fraction": 0.4444444444444444,
      "cells": 3,
      "robustness": "ROBUST"
@@ -12825,7 +12796,6 @@ exit 0
       0.9
      ],
      "curves": 4,
-     "located_fraction": 1.0,
      "family_fraction": 0.4444444444444444,
      "cells": 3,
      "robustness": "ROBUST"
