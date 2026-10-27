@@ -1,0 +1,12 @@
+# The settings grid of plan 1205 P2b, declared in research/1205/LL1-PRE-v6.md (sha256 0f446e09fb59cde7326f946c4462d37cbec1d7d71baedcec81fdb823eae09565)
+# before any LL1 observable value was read: ll1-pre-v3.toml's w_c x lanes, plus a STRIDE axis for the edge lane ARGMAX_ABS_A_FAST only.
+# A stride k is a declared fast relation {(i, i + k)}; A_fast over it is the kernel's A (a[i+k] - a[i]); nothing before A but x + c.
+# The strides: 1 sample, and 0.001, 0.004, 0.016 of the fast span (k = that fraction of the curve's in-window sample intervals, rounded to
+# the nearest sample, at least 1). A geometric ladder x4, fixed from no data. The edge lane's cells are (stride, w_c) = 4 x 4 = 16; the
+# sample lanes' are (w_c). Read by `bin/cc chain <id> --grid intake/grids/ll1-pre-v6.toml`. Data, never a code constant.
+schema = 1
+kind = "chain-grid"
+wc = [0.05, 0.10, 0.15, 0.25]
+lanes = ["ARGMAX_FAST", "ARGMIN_FAST", "ARGMAX_ABS_A_FAST"]
+stride_samples = [1]
+stride_span = [0.001, 0.004, 0.016]
