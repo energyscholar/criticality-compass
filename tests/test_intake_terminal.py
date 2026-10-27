@@ -12,6 +12,9 @@
      plan 1118's reduce_ (studies/DIAL1118/dial/methods.py, run in a subprocess, read only: -B, no bytecode written there): a Bracket is a
      MaxLocated (1160 A15: was Located) with the same flanking ranks and tier when n_tied = 1 (the same m and tier, and a span that holds 1118's, when n_tied > 1);
      Refuse("max at path end") is MaxAtPathEnd.
+     (plan 1281 B5) methods.py is read from the toolset's git history at the declared commit DIAL_COMMIT (toolset branch plan-1118-dial), the
+     toolset being CC_TOOLSET, else the parent of CC_DATA_ROOT (the convention of test_claims, test_x5, test_two_start_c2); a host whose toolset does
+     not hold that commit FAILS a named T4 check ("not evaluable here"), never passes. Was: a worktree path under the home directory.
 Seen RED: see the P6.2 lines of the scratchpad's p6-seenred.txt (each mutation applied, the test run, the mutation reverted)."""
 import json
 import os
@@ -33,7 +36,9 @@ import intake_synth  # noqa: E402
 import intake_terminal as term  # noqa: E402
 from intake_plant import SHIFT, long_table, per_file, run, write_long  # noqa: E402
 
-DIAL = Path.home() / "software" / "scratch" / "wt-1118b" / "studies" / "DIAL1118" / "dial"
+DIAL_COMMIT = "ce46e7631921f8a555a8ff89ce373f9f720eca0c"   # plan 1281 B5: toolset plan-1118-dial, Plan 1118 T6 (methods.py's last change); was a worktree path
+DIAL_FILE = "studies/DIAL1118/dial/methods.py"
+TOOLSET = os.environ.get("CC_TOOLSET") or (str(Path(os.environ["CC_DATA_ROOT"]).parent) if os.environ.get("CC_DATA_ROOT") else "")
 T = intake.tables(ROOT)
 Z = T["policy"]["policy"]["tier_z"]
 bad = []
@@ -136,6 +141,14 @@ for cs in json.load(sys.stdin):
     out.append({True: ["Bracket", r[3], r[4], r[2]] if type(r).__name__ == "Bracket" else None, False: ["Refuse", r[0]]}[type(r).__name__ == "Bracket"])
 print(json.dumps({"Z": Z, "out": out}))
 """
+DIALDIR = tempfile.TemporaryDirectory()
+DIAL = Path(DIALDIR.name)
+held = subprocess.run(["git", "-C", TOOLSET or str(DIAL), "show", f"{DIAL_COMMIT}:{DIAL_FILE}"], capture_output=True,
+                      env={k: v for k, v in os.environ.items() if not k.startswith("GIT_")})   # a hook's GIT_DIR / GIT_INDEX_FILE would point -C at the hook's repo
+check("T4. the toolset holds plan 1118's methods.py at the declared commit (plan 1281 B5)", bool(TOOLSET) and held.returncode == 0,
+      f"not evaluable here: no toolset holding {DIAL_COMMIT[:12]}:{DIAL_FILE} (toolset = CC_TOOLSET, else the parent of CC_DATA_ROOT: "
+      f"{TOOLSET or 'neither is set'}; {held.stderr.decode().strip()[:200]})")
+(DIAL / "methods.py").write_bytes(held.stdout)
 p = subprocess.run([sys.executable, "-B", "-I", "-c", PROBE, str(DIAL)], input=json.dumps(BANKS), capture_output=True, text=True, timeout=600,
                    cwd=tempfile.gettempdir(), env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"})
 check("T4. plan 1118's methods.py ran in a subprocess (read only)", p.returncode == 0 and DIAL.is_dir(), (p.stderr or str(DIAL))[-400:])

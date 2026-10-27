@@ -1,0 +1,192 @@
+# tests/sealed-records.toml - plan 1281 B1 (ruling 2026-10-26): results records SEALED in the toolset that still carry the pre-0985 data-root
+# keys (~ paths) in their read map. tests/test_no_host_paths.py exempts a file listed here ONLY while its bytes hash to `sha256`; a changed or
+# missing listed file FAILS, and only results/ paths may be listed. `seal` is the toolset file that pins the sha (toolset master); `manifest_row`
+# is the input name of its row in toolset results/0937-a7-F5-manifest.tsv (record_json_sha256), "" when it has none. Never edit a row by hand.
+schema = 1
+kind = "sealed-records"
+
+[[record]]
+path = "results/b7-at-line-2-ch@v10-rules.json"
+sha256 = "31496a058e3fabcd1b2c7774c73eea7c44abfcbe9e24f5afa6726c5755f3e663"
+seal = "toolset:results/0937-t1/SHA256SUMS"
+manifest_row = "b7-at-line-2-ch"
+
+[[record]]
+path = "results/b7-at-line-3-ch@v10-rules.json"
+sha256 = "5d064ea2c859815cbfdc54f5babd45d6034f2902ca539fd54945ff6da0e76467"
+seal = "toolset:results/0937-t1/SHA256SUMS"
+manifest_row = "b7-at-line-3-ch"
+
+[[record]]
+path = "results/b7-at-line-4-ch@v10-rules.json"
+sha256 = "6702b982df4bc23a03349ced820ba04bbda7179d7c1b74b25431f97da42a393d"
+seal = "toolset:results/0937-t1/SHA256SUMS"
+manifest_row = "b7-at-line-4-ch"
+
+[[record]]
+path = "results/b7-at-line-5-ch@v10-rules.json"
+sha256 = "8134bd5454d1b465ed2fa0ce3adf160cbd543c354e3a3a66912171375dcd5bd4"
+seal = "toolset:results/0937-t1/SHA256SUMS"
+manifest_row = "b7-at-line-5-ch"
+
+[[record]]
+path = "results/b7-at-line-ch@v10-rules.json"
+sha256 = "0ddb70fd452ba2d057e856146ecf9845d8eed76cc3f9fc1b9e5714bc851b0556"
+seal = "toolset:results/0937-t1/SHA256SUMS"
+manifest_row = "b7-at-line-ch"
+
+[[record]]
+path = "results/c2-bc-two-start-ch@v10-rules.json"
+sha256 = "871ac96ec521209f97aa4cef3a5ddd7d1d81f34c6281b40e0cf1eb7a8521f6c9"
+seal = "toolset:results/0937-t1/SHA256SUMS"
+manifest_row = "c2-bc-two-start-ch"
+
+[[record]]
+path = "results/k4-m1-ch@v10-rules.json"
+sha256 = "3f7a97036e307dfc81d3619e1311baefc409994fef3aeb3d4803e13a4b7a752a"
+seal = "toolset:results/0937-t2c/SHA256SUMS"
+manifest_row = ""
+
+[[record]]
+path = "results/w1-potts-ch@v10-rules.json"
+sha256 = "9f7aaddf989ca53140aca7c730f4048a883aff0f2c171f404774dfb88cbef970"
+seal = "toolset:results/0937-t1/SHA256SUMS"
+manifest_row = "w1-potts-ch"
+
+[[record]]
+path = "results/w2-potts-2-ch@v10-rules.json"
+sha256 = "8f9ca7180f9731316f2e1a273376932ae2680e7f929c65c63c69ee03710dc90d"
+seal = "toolset:results/0937-t2a/SHA256SUMS"
+manifest_row = "w2-potts-2-ch"
+
+[[record]]
+path = "results/w2-potts-ch@v10-rules.json"
+sha256 = "0e7a636dc2c30b53ce41ff8079d91fe7b6e53f63b07ffd3477d1ae7057a8d896"
+seal = "toolset:results/0937-t2a/SHA256SUMS"
+manifest_row = "w2-potts-ch"
+
+[[record]]
+path = "results/w3-potts-ch@v10-rules.json"
+sha256 = "c01d9230309fb4ccde24390088abfc4f9fc5fdd71a73e82e1b89db1c680ae5f2"
+seal = "toolset:results/0937-t2b/SHA256SUMS"
+manifest_row = "w3-potts-ch"
+
+[[record]]
+path = "results/x2-xy-line-2-ch@v10-rules.json"
+sha256 = "eaf5f3f3f87e57b4b2cc9c17d817a8be7b96b598ad2c1e44cc392134d7474165"
+seal = "toolset:results/0937-t2a/SHA256SUMS"
+manifest_row = "x2-xy-line-2-ch"
+
+[[record]]
+path = "results/x2-xy-line-3-ch@v10-rules.json"
+sha256 = "ac2d9ea9449471f8ab37f288d95cefbf7e611d1909baae6eed6c21492866f466"
+seal = "toolset:results/0937-t2a/SHA256SUMS"
+manifest_row = "x2-xy-line-3-ch"
+
+[[record]]
+path = "results/x2-xy-line-ch@v10-rules.json"
+sha256 = "a668fc3dad64e90ee35f5a656e9f54a236be9a94184a08a2c6f47fc0a381ce4e"
+seal = "toolset:results/0937-t2a/SHA256SUMS"
+manifest_row = "x2-xy-line-ch"
+
+[[record]]
+path = "results/x3-clock6-2-ch@v10-rules.json"
+sha256 = "cf105b53d6297aa1d235f498c2e9a25c9c6d7564a12959e87ca3647ae440eb59"
+seal = "toolset:results/0937-t2a/SHA256SUMS"
+manifest_row = "x3-clock6-2-ch"
+
+[[record]]
+path = "results/x3-clock6-3-ch@v10-rules.json"
+sha256 = "110bb2136119e9f9452ca1f2cb67af2d91f686896f2def793d3d179a4a481cf1"
+seal = "toolset:results/0937-t2a/SHA256SUMS"
+manifest_row = "x3-clock6-3-ch"
+
+[[record]]
+path = "results/x3-clock6-ch@v10-rules.json"
+sha256 = "3057cdbd6af2668e645baa872b483d411a1a4d1a19d6c3db403583ac4eded4c2"
+seal = "toolset:results/0937-t2a/SHA256SUMS"
+manifest_row = "x3-clock6-ch"
+
+[[record]]
+path = "results/x4-ising-field-2-ch@v10-rules.json"
+sha256 = "b69b45e021aad4808f3f78e78c3d8fdc1d4d5b806a3ed753d2278d42b2514c1a"
+seal = "toolset:results/0937-t2a/SHA256SUMS"
+manifest_row = "x4-ising-field-2-ch"
+
+[[record]]
+path = "results/x4-ising-field-3-ch@v10-rules.json"
+sha256 = "60cb8e7d646f9cc6f5a4d1393195750bc5925d620214b92601843e72fc4522a2"
+seal = "toolset:results/0937-t2a/SHA256SUMS"
+manifest_row = "x4-ising-field-3-ch"
+
+[[record]]
+path = "results/x4-ising-field-ch@v10-rules.json"
+sha256 = "c339b62d4f0f92f8413fa1001d294869310454736b11c378fbc85ba2558cc1e1"
+seal = "toolset:results/0937-t2a/SHA256SUMS"
+manifest_row = "x4-ising-field-ch"
+
+[[record]]
+path = "results/x4s-stack-ch@v10-rules.json"
+sha256 = "86614e73c3c319169eaaec9a24c2c921ae3596c1c14918ee9e11f93c0b2e75e6"
+seal = "toolset:results/0937-t1/SHA256SUMS"
+manifest_row = "x4s-stack-ch"
+
+[[record]]
+path = "results/x5-bilayer-2-ch@v10-rules.json"
+sha256 = "35e6f986c271005ae74a5cc4a02770747469931ac45e948573e6f608620aac3b"
+seal = "toolset:results/0937-t2a/SHA256SUMS"
+manifest_row = "x5-bilayer-2-ch"
+
+[[record]]
+path = "results/x5-bilayer-ch@v10-rules.json"
+sha256 = "2b74d65a287d2bb99a685ee039f7d97cb7f7864a14d1ce7ecb49f085ba8fe70e"
+seal = "toolset:results/0937-t2a/SHA256SUMS"
+manifest_row = "x5-bilayer-ch"
+
+[[record]]
+path = "results/x5n-bilayer-2-ch@v10-rules.json"
+sha256 = "8f4d701053867416fbf4348f4826eb70f1811979a0c94a9323234a57e93fff33"
+seal = "toolset:results/0937-t2b/SHA256SUMS"
+manifest_row = "x5n-bilayer-2-ch"
+
+[[record]]
+path = "results/x5n-bilayer-3-ch@v10-rules.json"
+sha256 = "f7a1ab33ff373e38dff72724996925d205580eaad98306121008ec3b352ddce7"
+seal = "toolset:results/0937-t2b/SHA256SUMS"
+manifest_row = "x5n-bilayer-3-ch"
+
+[[record]]
+path = "results/x5n-bilayer-ch@v10-rules.json"
+sha256 = "dd8609e6a7e341eb8f244fb4a048b5768d7242218435de5944314ffd9239e400"
+seal = "toolset:results/0937-t2b/SHA256SUMS"
+manifest_row = "x5n-bilayer-ch"
+
+[[record]]
+path = "results/x7a-bc-ch@v10-rules.json"
+sha256 = "5c0d8d644575828856ac3d9878a602b582f398dd2e79aab8bae6e07f3d449eb6"
+seal = "toolset:results/0937-t1/SHA256SUMS"
+manifest_row = "x7a-bc-ch"
+
+[[record]]
+path = "results/x7a-nnn-ch@v10-rules.json"
+sha256 = "9f136cab4cc2219f58edd98558d3ffa2fd343faf1b3ea313aff3716ce6336f9a"
+seal = "toolset:results/0937-t1/SHA256SUMS"
+manifest_row = "x7a-nnn-ch"
+
+[[record]]
+path = "results/x8-ising-needle-ch@v10-rules.json"
+sha256 = "e4e8975f7076b1989bcc2bb13ca64bf3bff4822dcd810de6d9f0c4e9c2d437d6"
+seal = "toolset:results/0937-t1/SHA256SUMS"
+manifest_row = "x8-ising-needle-ch"
+
+[[record]]
+path = "results/x9c-potts-2-ch@v10-rules.json"
+sha256 = "0217232fe09a9f58a5406e1013541026d18c27d4f9a57372439e9235ba5dffad"
+seal = "toolset:results/0937-t2b/SHA256SUMS"
+manifest_row = "x9c-potts-2-ch"
+
+[[record]]
+path = "results/x9c-potts-ch@v10-rules.json"
+sha256 = "cbf98fd8bc59ef7da9ec88394a2930dffe3dfb2319c6c7728574b8fea0002ac5"
+seal = "toolset:results/0937-t2b/SHA256SUMS"
+manifest_row = "x9c-potts-ch"

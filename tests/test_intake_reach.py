@@ -53,7 +53,7 @@ import readout  # noqa: E402
 import intake_read as rd  # noqa: E402
 import intake_seal  # noqa: E402
 import intake_synth  # noqa: E402
-from intake_plant import ALL_ALTERNATIVE, PRIMARY_PAIR, SHIFT, ARGMAX_LANE, BLOCK, BLOCK_NO_FLOOR, IID, PAIR_LANE, SAME_FAST, VALIDATED, CHOICE_PLANTS, AT_S3, converted, key_lines, long_table, outcome, per_file, profiled, rooted, run, slow_source, write_long, xlsx  # noqa: E402
+from intake_plant import ALL_ALTERNATIVE, PRIMARY_PAIR, SHIFT, ARGMAX_LANE, BLOCK, BLOCK_NO_FLOOR, IID, PAIR_LANE, SAME_FAST, VALIDATED, CHOICE_PLANTS, AT_S3, converted, h5_table, hdf5_reader, key_lines, long_table, outcome, per_file, profiled, rooted, run, slow_source, write_long, xlsx  # noqa: E402
 import intake_against as against  # noqa: E402
 
 bad = []
@@ -69,6 +69,10 @@ T = intake.tables(ROOT)
 ST = tomllib.loads((ROOT / "intake" / "STAGES.toml").read_text())
 ROWS = [(s, k, r) for s in ST["stage"] for k in ("reason", "reader_reason") for r in blind.look(s, k, [])]
 HAS_XLSX = importlib.util.find_spec("openpyxl") is not None
+HAS_H5 = importlib.util.find_spec("h5py") is not None
+# ---- E0. (plan 1281 B2, ruling 2026-10-26) openpyxl and h5py are DECLARED requirements of a commit host: absent, this test FAILS by name, never skips
+check("E0. requires openpyxl: a declared commit-host requirement (plan 1281 B2)", HAS_XLSX, "openpyxl is not installed on this machine")
+check("E0. requires h5py: a declared commit-host requirement (plan 1281 B2)", HAS_H5, "h5py is not installed on this machine")
 
 # ---- E1. the live flag
 check("E1. every reason and reader_reason row carries live = true | false", all(type(blind.look(r, "live", None)) is bool for _, _, r in ROWS),
@@ -353,13 +357,43 @@ with tempfile.TemporaryDirectory() as tmp:
     ]
     XLSX = {False: [("XLSX_READER_ABSENT", "an xlsx bank without openpyxl (S4)", lambda: lt(bank(raw=xlsx([["T", "C", "sigma", "h"]] + rows, "data")), xl("data")))],
             True: [("XLSX_READER_ABSENT", "the reader table's no-openpyxl row (intake_read.XLSX[False])", lambda: rd.XLSX[False](b"", {}).reason),
-                   ("NOT_AN_XLSX", "bytes that are no workbook", lambda: lt(bank(raw=b"T,C,sigma,h\n"), xl("data"))),
+                   ("NOT_AN_XLSX", "(plan 1281 B8: was text bytes, PROFILE_CONTRADICTED first) a workbook whose names load and one number cell does not parse",
+                    lambda: lt(bank(raw=xlsx([["T", "C", "sigma", "h"]] + rows[:1] + [[rows[1][0], b"x", rows[1][2], rows[1][3]]], "data")), xl("data"))),
                    ("SHEET_ABSENT", "sheet 'data' declared, the workbook holds 'Sheet1'", lambda: lt(bank(raw=xlsx([["T", "C", "sigma", "h"]] + rows, "Sheet1")), xl("data"))),
                    ("XLSX_GRID", "(not a reason) an xlsx bank passes S5 with the comma bank's census label", lambda: {True: "XLSX_GRID", False: "x"}[
                        census(bank(raw=xlsx([["T", "C", "sigma", "h"]] + rows, "data")), xl("data")) == census(bank())])]}[HAS_XLSX]
     NOT_HERE = {False: ["NOT_AN_XLSX", "SHEET_ABSENT"], True: []}[HAS_XLSX]
+
+    def h5_bank(raw):
+        """(plan 1281 B2) A planted LONG_TABLE bank directory under <tmp>/banks holding `raw` as bank.h5 (read by hdf5_reader's declaration)."""
+        name = f"b{next(n)}"
+        (banks / name).mkdir()
+        (banks / name / "bank.h5").write_bytes(raw)
+        return name
+
+    def without_h5py(plant):
+        """(plan 1281 B2) One plant run with h5py's import made to fail (importlib.util.find_spec, as tests/test_intake_hdf5.py H4)."""
+        real = importlib.util.find_spec
+        importlib.util.find_spec = lambda name, *a, **k: None if name == "h5py" else real(name, *a, **k)
+        try:
+            return plant()
+        finally:
+            importlib.util.find_spec = real
+    # (plan 1281 B2) S4 reader reasons (hdf5-table-v1), each the detail of READER_REFUSED: 92f0df0 made these rows live and reached them only
+    # in tests/test_intake_hdf5.py, directly through the reader; seen RED here first (each "live, never reached" in E2's totality)
+    R5 = lambda: __import__("numpy").array(rows)
+    NAMES = ["T", "C", "sigma", "h"]
+    HDF5 = {False: [("HDF5_READER_ABSENT", "an hdf5 bank without h5py (S4)", lambda: lt(h5_bank(b"\x89HDF\r\n\x1a\n"), hdf5_reader))],
+            True: [("HDF5_READER_ABSENT", "an hdf5 bank with h5py's import made to fail (S4)", lambda: without_h5py(lambda: lt(h5_bank(h5_table(("table", R5(), NAMES))), hdf5_reader))),
+                   ("NOT_AN_HDF5", "bytes that are no HDF5 file", lambda: lt(h5_bank(b"not an hdf5 file at all"), hdf5_reader)),
+                   ("NO_2D_DATASET", "only a 1-D dataset", lambda: lt(h5_bank(h5_table(("v", R5()[:, 0], None))), hdf5_reader)),
+                   ("MORE_THAN_ONE_2D_DATASET", "two 2-D datasets", lambda: lt(h5_bank(h5_table(("table", R5(), NAMES), ("second", R5()[:2, :2], None))), hdf5_reader)),
+                   ("DATASET_NOT_FLOAT", "an int32 dataset (no cast)", lambda: lt(h5_bank(h5_table(("table", R5().astype("int32"), NAMES))), hdf5_reader)),
+                   ("COLUMN_NAMES_ATTRIBUTE_ABSENT", "no column_names attribute", lambda: lt(h5_bank(h5_table(("table", R5(), None))), hdf5_reader)),
+                   ("COLUMN_NAMES_COUNT_DIFFERS", "a column_names attribute of 3 names on 4 columns", lambda: lt(h5_bank(h5_table(("table", R5(), NAMES[:3]))), hdf5_reader)),
+                   ("COLUMN_NOT_BY_NAME", "the slow column declared by position 4 (never by index)", lambda: lt(h5_bank(h5_table(("table", R5(), NAMES))), hdf5_reader, slow="4"))]}[HAS_H5]
     reached, UNPREDICTED = set(), []
-    for code, what, plant in PLANTS + XLSX:
+    for code, what, plant in PLANTS + XLSX + HDF5:
         got = plant()
         reached |= {got}
         check(f"E2. {code}: {what}" + {True: f" (1165: profiled, PROFILE_CONTRADICTED, first {AT_S3.get(code)})", False: ""}[code in AT_S3],

@@ -36,6 +36,7 @@ BINARY = re.compile("[\x00-\x08\x0e-\x1f\x7f]")   # a decoded control character 
 BIN = {2: 0, **{n: 1 for n in range(3, 10)}, 10: 2}   # an equal run's length (10 for 10 or more) -> its equal_runs bin (2, 3-9, 10+); a run of 1 none
 DIRECTION = {None: "FLAT", True: "ASCENDING", False: "DESCENDING"}   # the first step of a column's numbers (equal values merged) -> first_direction
 READER_ABSENT = "NONE_READER_ABSENT"   # an XLSX's `sheets` on a machine without openpyxl (XLSX_READER_ABSENT: the kind stays XLSX)
+CELLS_UNREADABLE = "NONE_CELLS_UNREADABLE"   # (plan 1281 B8) an XLSX's `sheets` when its names load and a sheet's cells do not parse: the reader names it (S4 NOT_AN_XLSX)
 CLASSES = ("#", "%", ";", "//", "!", "[")   # comment prefix classes: a line's first characters (the reader's own test, startswith)
 
 
@@ -173,17 +174,17 @@ def _text_file(head, enc, text):
     return FileProfile(*head, "TEXT_TABLE", enc, (table(lines, delimiter, widths),), encoding_lines=ENCODING_LINES[enc](lines))
 
 
-def _sheet(k, name, raw):
-    cut = [(n, [c.strip() for c in cs], "") for n, cs in sheet_rows(raw, k)]
+def _sheet(k, name, rows):
+    cut = [(n, [c.strip() for c in cs], "") for n, cs in rows]
     return Sheet(k, {Name.TEXT: masked, Name.NUMERIC: lambda n: f"#{k}"}[classify(name)](name), len(cut), max([len(cs) for _, cs, _ in cut], default=0),
                  cells_table(cut, "NONE", ()))
 
 
 def sheets(raw):
-    """An XLSX's sheets, each profiled as a table of its cells (intake_convert.sheet_rows, the SHEET_TO_CSV cut), or READER_ABSENT without openpyxl; a workbook openpyxl cannot open has none."""
+    """An XLSX's sheets, each profiled as a table of its cells (intake_convert.sheet_rows, the SHEET_TO_CSV cut), or READER_ABSENT without openpyxl; a workbook openpyxl cannot open has none; (plan 1281 B8) a Refuse from sheet_rows, by type, makes it CELLS_UNREADABLE."""
     has = importlib.util.find_spec("openpyxl") is not None
-    names = {True: lambda: _book_names(raw) or [], False: lambda: None}[has]()
-    return {True: lambda: tuple(_sheet(k, n, raw) for k, n in enumerate(names, 1)), False: lambda: READER_ABSENT}[has]()
+    got = [(k, n, sheet_rows(raw, k)) for k, n in enumerate({True: lambda: _book_names(raw) or [], False: lambda: []}[has](), 1)]
+    return {(True, False): lambda: tuple(_sheet(k, n, g) for k, n, g in got), (True, True): lambda: CELLS_UNREADABLE, (False, False): lambda: READER_ABSENT}[(has, Refuse in {type(g) for _, _, g in got})]()
 
 
 KINDS = {   # (is it a zip, does it hold xl/workbook.xml, does it decode as text) -> its FileProfile; total over the 8 keys; by content, never by name
@@ -261,8 +262,8 @@ def md(p, sha):
     out = [f"# Profile of {p.path}", "", f"PROFILE.json sha256 {sha}; {len(p.files)} files; {len(p.findings)} findings.", ""]
     for f in p.files:
         out += [f"## {f.name}", f"- {f.kind}; encoding {f.encoding}; {f.bytes} bytes; sha256 {f.sha256}"] + [f"- member {m} ({n} bytes)" for m, n in f.members]
-        out += {True: [f"- sheets: openpyxl is not installed here ({READER_ABSENT})"], False: [f"- sheet #{x.position} '{x.name}': {x.rows} rows, {x.columns} columns"
-                for x in {True: f.sheets, False: ()}[isinstance(f.sheets, tuple)]]}[f.sheets == READER_ABSENT] + [""]
+        out += {True: lambda: [f"- sheets: {({READER_ABSENT: 'openpyxl is not installed here', CELLS_UNREADABLE: 'a sheet whose cells do not parse (the reader refuses NOT_AN_XLSX)'}[f.sheets])} ({f.sheets})"],
+                False: lambda: [f"- sheet #{x.position} '{x.name}': {x.rows} rows, {x.columns} columns" for x in f.sheets]}[isinstance(f.sheets, str)]() + [""]
         out += [x for k, t in tables_of(f) for x in _table_md(t, {True: "the table", False: f"sheet #{k}"}[k == 0])]
     where = lambda x: "".join(" lines " + ", ".join(f"{a}-{b}" for a, b in x.ranges[:12]) for _ in x.ranges[:1]) + f" (+{len(x.ranges) - 12} more in PROFILE.json)" * (len(x.ranges) > 12)
     out += ["## Findings", ""] + [f"- {x.code}: {x.file}" + f" sheet #{x.sheet}" * (x.sheet > 0) + where(x) + f" column {x.column}" * (x.column > 0)   # (fix F4) every range

@@ -96,7 +96,7 @@ def fam(ident, curves, kind="COLUMN"):
 ALL = chain.Grid(WCS, tuple(chain.Lane), "planted")
 
 
-# ---- H2 the DIAG arm (plan 1201 DIAG section 4; jill ~/scratch/1201-diag/plant1201.py oracle(seed, -0.12, "COLUMN", None, 1))
+# ---- H2 the DIAG arm (plan 1201 DIAG section 4; the compute host's ~/scratch/1201-diag/plant1201.py oracle(seed, -0.12, "COLUMN", None, 1))
 def diag(seed, frac=-0.12, ri=1):
     rng = np.random.default_rng(seed)
     hs = [round(float(h), 10) for h in np.linspace(-0.5, 0.5, 9)]

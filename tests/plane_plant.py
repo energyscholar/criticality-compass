@@ -1,5 +1,5 @@
 """plane_plant - plan 1176 phase C: the planted 2-D bank (cc/intake_synth.py --plane) as intake declarations in a scratch copy of the Compass,
-walked by `bin/cc navigate family` and scored by `bin/cc navigate score` (shared by tests/test_synth_plane.py and the RECON run on jill).
+walked by `bin/cc navigate family` and scored by `bin/cc navigate score` (shared by tests/test_synth_plane.py and the RECON run on the compute host).
 Test infrastructure (checks.toml [roles] test_infrastructure). It reads no real data.
 The DECLARER here is this file: it reads the plant's truth.json (outside the bank) for the guessed line, writes [suspect] = the guess's two END
 vertices (the first and last curve of the slice) and the checkpoints = the guess on every interior curve to <tmp>/held-out/, outside

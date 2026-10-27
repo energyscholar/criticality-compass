@@ -78,7 +78,7 @@ import intake_say  # noqa: E402
 import intake_seal  # noqa: E402
 import intake_against as against  # noqa: E402
 import intake_synth  # noqa: E402
-from intake_plant import ALL_ALTERNATIVE, PRIMARY_PAIR, SHIFT, BLOCK, BLOCK_NO_FLOOR, IID, PAIR_LANE, SAME_FAST, VALIDATED, CHOICE_PLANTS, AT_S3, conversion, long_table, per_file, slow_source, workbook, write_long, xlsx  # noqa: E402
+from intake_plant import ALL_ALTERNATIVE, PRIMARY_PAIR, SHIFT, BLOCK, BLOCK_NO_FLOOR, IID, PAIR_LANE, SAME_FAST, VALIDATED, CHOICE_PLANTS, AT_S3, conversion, h5_table, hdf5_reader, long_table, per_file, slow_source, workbook, write_long, xlsx  # noqa: E402
 
 bad = []
 
@@ -90,6 +90,10 @@ def check(name, ok, why=""):
 
 
 HAS_XLSX = importlib.util.find_spec("openpyxl") is not None
+HAS_H5 = importlib.util.find_spec("h5py") is not None
+# ---- K0. (plan 1281 B2, ruling 2026-10-26) openpyxl and h5py are DECLARED requirements of a commit host: absent, this test FAILS by name, never skips
+check("K0. requires openpyxl: a declared commit-host requirement (plan 1281 B2)", HAS_XLSX, "openpyxl is not installed on this machine")
+check("K0. requires h5py: a declared commit-host requirement (plan 1281 B2)", HAS_H5, "h5py is not installed on this machine")
 K = 5   # curves
 SENT = re.compile(rb"-7357\.\d+")   # a sentinel cell as written in a bank file or a declaration
 cell = lambda k, j, r: f"-7357.{8 - k}{99 - j:02d}{r}"   # curve k, point j, role r (1 fast, 2 measured, 3 sigma): fast ascends in j; no rounding carry
@@ -388,10 +392,36 @@ with tempfile.TemporaryDirectory() as tmp:
     ]
     XL = lt_bank(raw=xlsx([["T", "C", "sigma", "h"]] + rows, "data"))
     PLANTS += {False: [("XLSX_READER_ABSENT", "an xlsx sentinel bank without openpyxl", (lt(XL, xl), XL, full(XL)))],
-               True: [("NOT_AN_XLSX", "bytes that are no workbook", (lt(B8 := lt_bank(raw=b"T,C,sigma,h\n"), xl), B8, full(B8))),
+               True: [("NOT_AN_XLSX", "(plan 1281 B8: was text bytes, PROFILE_CONTRADICTED first) a workbook whose names load and one number cell does not parse",
+                       (lt(B8 := lt_bank(raw=xlsx([["T", "C", "sigma", "h"]] + rows[:1] + [[rows[1][0], b"x", rows[1][2], rows[1][3]]], "data")), xl), B8, full(B8))),
                       ("SHEET_ABSENT", "sheet 'data' declared, the workbook holds 'Sheet1'", (lt(B9 := lt_bank(raw=xlsx([["T", "C", "sigma", "h"]] + rows, "Sheet1")), xl), B9, full(B9))),
                       ("PASS", "the xlsx sentinel bank", (lt(XL, xl), XL, full(XL)))]}[HAS_XLSX]
     NOT_HERE = {False: ["NOT_AN_XLSX", "SHEET_ABSENT"], True: ["XLSX_READER_ABSENT"]}[HAS_XLSX]
+
+    def h5_bank(raw):
+        """(plan 1281 B2) A planted LONG_TABLE bank directory holding `raw` as bank.h5 (read by hdf5_reader's declaration)."""
+        name = f"lt{next(n)}"
+        (banks / name).mkdir(parents=True)
+        (banks / name / "bank.h5").write_bytes(raw)
+        return name
+    REAL_SPEC = importlib.util.find_spec   # (plan 1281 B2) a step pair that makes h5py's import fail for one plant (as tests/test_intake_hdf5.py H4)
+    hide_h5py = lambda b: setattr(importlib.util, "find_spec", lambda name, *a, **k: None if name == "h5py" else REAL_SPEC(name, *a, **k))
+    show_h5py = lambda b: setattr(importlib.util, "find_spec", REAL_SPEC)
+    # (plan 1281 B2) S4 reader reasons (hdf5-table-v1) on the sentinel rows, each the detail of READER_REFUSED: 92f0df0 made these rows live and
+    # reached them only in tests/test_intake_hdf5.py, directly through the reader; seen RED here first (each "live, never reached" in K2's totality)
+    R5 = lambda: __import__("numpy").array(rows)
+    NAMES = ["T", "C", "sigma", "h"]
+    H5 = lambda raw, **k: (lt(B := h5_bank(raw), hdf5_reader, **k), B, full(B))
+    PLANTS += {False: lambda: [("HDF5_READER_ABSENT", "an hdf5 sentinel bank without h5py (S4)", H5(b"\x89HDF\r\n\x1a\n"))],   # built only on its branch: h5_table needs h5py
+               True: lambda: [("HDF5_READER_ABSENT", "an hdf5 sentinel bank with h5py's import made to fail (S4)",
+                       (lambda B: (lt(B, hdf5_reader), B, (hide_h5py, *full(B), show_h5py)))(h5_bank(h5_table(("table", R5(), NAMES))))),
+                      ("NOT_AN_HDF5", "bytes that are no HDF5 file", H5(b"not an hdf5 file at all")),
+                      ("NO_2D_DATASET", "only a 1-D dataset", H5(h5_table(("v", R5()[:, 0], None)))),
+                      ("MORE_THAN_ONE_2D_DATASET", "two 2-D datasets", H5(h5_table(("table", R5(), NAMES), ("second", R5()[:2, :2], None)))),
+                      ("DATASET_NOT_FLOAT", "an int32 dataset (no cast)", H5(h5_table(("table", R5().astype("int32"), NAMES)))),
+                      ("COLUMN_NAMES_ATTRIBUTE_ABSENT", "no column_names attribute", H5(h5_table(("table", R5(), None)))),
+                      ("COLUMN_NAMES_COUNT_DIFFERS", "a column_names attribute of 3 names on 4 columns", H5(h5_table(("table", R5(), NAMES[:3])))),
+                      ("COLUMN_NOT_BY_NAME", "the slow column declared by position 4 (never by index)", H5(h5_table(("table", R5(), NAMES)), slow="4"))]}[HAS_H5]()
     # (plan 1165 section 6) intake_plant.AT_S3: the rows a profiled plant reaches PROFILE_CONTRADICTED first; K2's totality counts them through it
 
     # ---- K1. the sentinel alphabet: every numeric cell of every bank and every declared slow value

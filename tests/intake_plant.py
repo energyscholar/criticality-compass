@@ -18,6 +18,24 @@ def xlsx(rows, sheet="data"):
     return workbook({sheet: rows})
 
 
+def h5_table(*sets):
+    """(plan 1281 B2) The bytes of a planted HDF5 file: each (name, array, column_names) a dataset, its column_names attribute written unless
+    None (the reader hdf5-table-v1, cc/intake_read.py). Needs h5py, a declared requirement of a commit host (tests/test_intake_reach.py E0)."""
+    import h5py
+    import numpy as np
+    buf = io.BytesIO()
+    with h5py.File(buf, "w") as f:
+        for name, a, names in sets:
+            f.create_dataset(name, data=a).attrs.update({True: {}, False: {"column_names": np.array(names or [], dtype="S")}}[names is None])
+    return buf.getvalue()
+
+
+def hdf5_reader(text):
+    """(plan 1281 B2) A LONG_TABLE declaration (long_table) restated to read bank.h5 with hdf5-table-v1, as tests/test_intake_hdf5.py does."""
+    text = text.replace('file = "bank.csv"', 'file = "bank.h5"')
+    return text.replace(text[text.index("\n[reader]\n") + 1:text.index("[selection]")], '[reader]\nname = "hdf5-table-v1"\n\n')
+
+
 def workbook(sheets):
     """A minimal xlsx workbook (inline strings, numbers as numbers), written with zipfile only: the planted xlsx file, one worksheet per
     {name: rows} entry in order (plan 1160 P3: a two-sheet workbook). A bytes value is written as a number cell's raw text (a workbook whose

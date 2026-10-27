@@ -1,6 +1,6 @@
 """test_intake_hdf5 - plan 1205 P1: the reader hdf5-table-v1 (cc/intake_read.py), on planted files only (no real data). Each check was seen RED under a
 stated mutation (the plan-1205 report lists them). Needs h5py for every check that writes an HDF5 file; where it is absent those checks print a
-NOT RUN line (penguin has no h5py; jill has it) and the h5py-absent refusal (H4) still runs, by making the import fail.
+NOT RUN line (a host without h5py; the compute host has it) and the h5py-absent refusal (H4) still runs, by making the import fail.
  H1. The synthetic bank (seed 1, 9 curves) written as ONE float32 HDF5 table (columns T, C, sigma, h; the slow knob h a column), read as a
      LONG_TABLE with hdf5-table-v1, gives the SAME census label as the PER_FILE bank read with csv-curve-v1 (plan 1145's test, re-used). The
      same file as float64 gives it too. Values are as written: a float32 dataset reads to exactly its float32 values widened (no rounding).
@@ -138,7 +138,7 @@ with tempfile.TemporaryDirectory() as tmp:
         print(f"  NULL map: S5 outcome {nl[0]}" + (f" {getattr(nl[1], 'label', '')}" if nl[0] == "PASS" else ""))
         check("H3. a noise-only map is read by the reader (S4 SHAPE passes) and reaches the census (S5 gives a verdict, reported not asserted)", s4[0] == "PASS" and nl[0] not in ("READER_NOT_LIVE", "READER_REFUSED"), f"{s4[0]} {nl[0]} {str(nl[1])[:200]}")
     else:
-        print("  NOT RUN (h5py is not installed on this machine): H1, H2 and H3 write HDF5 files; run them on jill")
+        print("  NOT RUN (h5py is not installed on this machine): H1, H2 and H3 write HDF5 files; run them on a host with h5py (the compute host)")
 
     # ---- H4. h5py absent: the import made to fail
     real = importlib.util.find_spec
