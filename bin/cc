@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """cc - Criticality Compass CLI (plumbing). Root = parent of the directory holding this script."""
+import fnmatch
 import json
 import os
 import re
@@ -182,6 +183,7 @@ def cmd_validate(args):
     print("\n".join(declared)) if declared else None   # plan 0884 amendment 5: a declared refusal prints ONE line; the report: lines belong to the run transcript
     if "--advanced" in args:
         print("checked: " + ", ".join(f"{v} {k}" for k, v in sorted(n.items())))
+    print(f"validate: NOT EVALUABLE HERE:{absent_lines([f for f in found if isinstance(f, declare.NotEvaluableHere)])}") if any(isinstance(f, declare.NotEvaluableHere) for f in found) else None
     print(f"validate: {len(found)} findings" if found else "validate: clean")
     if "--mvt" in args:
         import score
@@ -233,6 +235,20 @@ def cmd_baseline():
     return 1
 
 
+def staged():
+    """The paths the commit being made changes (the index against HEAD; under the hook, its GIT_INDEX_FILE), or None outside a git work tree."""
+    r = subprocess.run(["git", "diff", "--cached", "--no-renames", "--name-only", "-z"], cwd=ROOT, capture_output=True, text=True)
+    return r.stdout.split("\0")[:-1] if r.returncode == 0 else None
+
+
+def absent_lines(absent):
+    """One line per absent resource (plan 1273): how many checks it left not evaluated, and why; never one line per check."""
+    by = {}
+    for f in absent:
+        by.setdefault(f.resource, []).append(f)
+    return "".join(f"\n  {r}: {len(fs)} checks not evaluated here: {fs[0].reason}" for r, fs in sorted(by.items()))
+
+
 def cmd_check(args):
     import declare
     if (gone := tests_absent()):
@@ -245,12 +261,21 @@ def cmd_check(args):
         return cmd_baseline()
     t0, fast = time.time(), "--fast" in args
     found, _, declared = declare.validate_scored(ROOT)
-    if found:
-        print("\n".join(declare.fmt(f) for f in found))
-        print("check: FAILED: validate\n  Next: fix each finding above, then bin/cc check")
+    kinds = {declare.F: [], declare.NotEvaluableHere: []}   # plan 1273: a finding's TYPE says what it is evidence about (the files, or this host); total over the two
+    for f in found:
+        kinds[type(f)].append(f)
+    content, absent = kinds.values()
+    res, touched = sorted({f.resource for f in absent}), staged()
+    hit = [x for x in touched if any(fnmatch.fnmatch(x, g) for g in config()["check"]["validate_domain"])] if touched is not None else ["(no git index here)"]
+    if content:
+        print("check: FAILED: content\n" + "\n".join(declare.fmt(f) for f in content) + absent_lines(absent) + "\n  Next: fix each finding above, then bin/cc check")
         return 1
+    if absent and hit:
+        print(f"check: NOT EVALUABLE HERE: {', '.join(res)}" + absent_lines(absent) + f"\n  this commit touches the validate domain (cc.toml [check] validate_domain): {' '.join(hit[:8])}"
+              f"\n  Next: commit from a host with {' and '.join(res)} (the data root: --data-root PATH or CC_DATA_ROOT; the toolset: a clone holding registry.toml's source_commit)")
+        return 3
     print("\n".join(declared) + "\n" if declared else "", end="")
-    print("check: validate clean")
+    print(f"check: validate: not evaluated ({', '.join(res)} absent; this commit touches no file in the validate domain)" if absent else "check: validate clean")
     slow = config()["check"]["slow"] if fast else []
     res, _, _ = run_tests([], slow)
     bad = [r for r in res if not r[1]]

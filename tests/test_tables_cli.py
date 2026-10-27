@@ -60,7 +60,9 @@ with tempfile.TemporaryDirectory() as t:
     check("new input --points writes the renamed blocks",
           rc == 0 and 'id = "w2b"' in m and 'path = "w2/q6-L27-random.npz"' in m
           and 'path = "w2/q7-L243-ordered.npz"' in m, out + m[:300])
-    rc, out = cc("validate")
+    fx = tempfile.mkdtemp(dir=t)   # plan 1273 A2: a fixture data root, so the content check runs on every host
+    (Path(fx) / "fixture").mkdir()
+    rc, out = cc("validate", "--data-root", fx)
     gone = [f"w2/q{q}-L{s}-{st}.npz" for q in (6, 7) for s in (27, 81, 243) for st in ("random", "ordered")]
     check("validate names every missing data file (12: six per new point)",
           rc == 1 and all(f"{g} does not exist under the data root" in out for g in gone), out)

@@ -1,4 +1,5 @@
 """test_declare - the door's breakers: planted bad plugins must be refused with their exact finding and Next line."""
+import os
 import shutil
 import sys
 import tempfile
@@ -34,7 +35,12 @@ for pl in plants:
             shutil.copytree(ROOT, base, ignore=shutil.ignore_patterns(".git", "__pycache__", "results", "rust"))
             [(base / d).unlink() for d in pl["drop"]]
         top = base if pl.get("drop") else ROOT
+        fx = tempfile.mkdtemp(dir=t)   # plan 1273 A2: a fixture data root, so the content check runs on every host
+        (Path(fx) / "fixture").mkdir()
+        if name == "input-data-absent.toml":
+            os.environ["CC_DATA_ROOT"] = fx
         got = found(top / "tests" / "planted" / name, over, top)
+        os.environ.pop("CC_DATA_ROOT", None)
     check(f"plant {name} gives its finding", want in got, f"wanted\n{want}\n  got {got}")
     if pl["fix"]:
         text = (P / name).read_text()

@@ -13,6 +13,7 @@ import formats
 import readout
 import reduce
 from transducer import chk_transducer
+from host import NotEvaluableHere, holder  # noqa: F401  (plan 1273: a finding about the host, not the files)
 from schema import ROOT, F, at, rel, _parsed, parse, load, row_lines, Ctx, unit_blocks, _SHA_ONCE, hashing_once, _sha, sha, MEASURE_SEEDED, import_closure, measure_hash, code_hash, code_cols, declared_cols  # noqa: F401  (moved by plan 0886; re-exported: the call sites keep `declare.<name>`)
 
 SIGNS = ("SIG-", "NEG", "SLOW-", "ZERO!", "SLOW+", "POS", "SIG+", "UNRES")
@@ -216,7 +217,7 @@ def chk_cc(p, d, c, stem=None):
             for x in sorted((keeps | discards) - set(RESULT_FIELDS))]
     out += [at(p, "basic", f"field '{x}' is in both keeps and discards", "keep it in one list")
             for x in sorted(keeps & discards)]
-    out += shape(p, d["check"], {"fast_budget_s": int, "slow": list, "memory_gb": (int, float), "exclusive": list, "replay": str}, {"needs_data": list, "needs_rust": list}, pre="check.")   # plan 0881 P2.9: replay is required (it was optional only because a planted file predated it)
+    out += shape(p, d["check"], {"fast_budget_s": int, "slow": list, "memory_gb": (int, float), "exclusive": list, "replay": str, "validate_domain": list}, {"needs_data": list, "needs_rust": list}, pre="check.")   # plan 0881 P2.9: replay is required (it was optional only because a planted file predated it)
     out += when("replay" not in d["alphabets"], p, "alphabets.replay", "missing", 'write replay = ["locked", "all"]')
     out += inalpha(p, "check.replay", d["check"]["replay"], d["alphabets"].get("replay", [])) if "replay" in d["check"] else []   # plan 0886: which inputs test_run_all replays
     out += [at(p, f"refusal_fields.{k}", "must be a regex string (the field a refusal of this kind is reported at)", "write a pattern like '^interval\\.min_blocks$'")
@@ -385,6 +386,19 @@ def gamma_floor(p, iv, lengths, k):
                f"with k_gamma = {k} (cc.toml [interval_fields.gamma]), so this record admits tau_declared <= {n // k}")]
 
 
+def chk_file(p, loc, b, m, c, lengths):
+    """One declared data file on a host that holds its resource: it exists, and each declared array (its length appended to `lengths`)."""
+    fp = c.file(b["path"])
+    if not fp.is_file():
+        return [at(p, loc + ".path", f"{b['path']} does not exist under the data root", "fix the path, or put the file there")]
+    out = []
+    for name, a in b["arrays"].items():
+        got = chk_array(p, loc, name, a, b, fp, m, c)
+        out += got
+        lengths += [] if got else [(b["path"], a["key"], series_length(m, name, fp, a["key"], c))]
+    return out
+
+
 def chk_data(p, m, c):
     d, out, blocks, ax, lengths, seen = m["data"], [], {}, m["axes"], [], set()
     iv, c_spec = m["interval"], c.cfg["interval_fields"].get(m["interval"].get("method"), {})
@@ -408,15 +422,7 @@ def chk_data(p, m, c):
         out += inalpha(p, loc + ".point", key[0], ax["point"]) + inalpha(p, loc + ".size", key[1], ax["size"])
         out += inalpha(p, loc + ".start", key[2], ax["starts"])
         blocks.setdefault(key, []).append(b["arrays"])
-        fp = c.file(b["path"])
-        if not fp.is_file():
-            out.append(at(p, loc + ".path", f"{b['path']} does not exist under the data root",
-                          "fix the path, or put the file there"))
-            continue
-        for name, a in b["arrays"].items():
-            got = chk_array(p, loc, name, a, b, fp, m, c)
-            out += got
-            lengths += [] if got else [(b["path"], a["key"], series_length(m, name, fp, a["key"], c))]
+        out += holder(c, b["path"]).each(lambda _, b=b, loc=loc: chk_file(p, loc, b, m, c, lengths), p, loc + ".path")   # plan 1273: an absent data root makes it NotEvaluableHere
     out += block_floor(p, m["interval"], lengths)
     out += gamma_floor(p, m["interval"], lengths, c.cfg["interval_fields"]["gamma"]["k_gamma"])
     for iname in m["instruments"]:
@@ -564,8 +570,8 @@ def score_expected(root, found, input_id=None):
         if input_id and iid != input_id:
             continue
         pre = f"inputs/{iid}/"
-        if not isinstance(e, dict) or any(f.loc.startswith(pre + "m.toml:expect") for f in found):
-            continue   # no expectation, or a malformed one: its own findings stand and nothing is absorbed
+        if not isinstance(e, dict) or any(f.loc.startswith(pre + "m.toml:expect") or (isinstance(f, NotEvaluableHere) and f.loc.startswith(pre)) for f in found):
+            continue   # no expectation, a malformed one, or one not evaluable here (plan 1273): its own findings stand and nothing is absorbed
         got = [f for f in found if f.loc.startswith(pre + "m.toml:") and any(re.search(r, f.loc.split(":", 1)[1]) for r in refusal_fields)]   # only the refusal kinds of cc.toml [refusal_fields]
         want, here = sentences_of((root / e["sentences"]).read_text()), f"inputs/{iid}/m.toml"
         if not got:
@@ -1297,7 +1303,7 @@ def _validate(root, ctx, input_id, tables):
                f"write it: kind = \"couplings\", id, names (from the Hamiltonian) and probes (which of them across probes)")
             for i in ([input_id] if input_id else sorted(q.parent.name for q in (root / "inputs").glob("*/m.toml")))
             if reads_decl and not (root / "inputs" / i / "couplings.toml").is_file()]
-    if not out:
+    if all(isinstance(f, NotEvaluableHere) for f in out):   # plan 1273: an absent resource must not hide the content check of the tables
         out += [x for s in sets for x in factorisation(root, s)[0]]
     return out + (member_need(root, input_id, tables, ctx) if input_id and tables else []), n
 

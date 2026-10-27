@@ -7,6 +7,7 @@ import subprocess
 import tomllib
 from pathlib import Path
 from schema import at, sha
+from host import Held, probe, resource
 
 UPDATE = re.compile(r"((?:[a-z]+:)?)(\S+) sha256 ([0-9a-f]{64})")   # [route] path sha256 hex
 CC = Path(__file__).resolve().parent.parent
@@ -46,7 +47,7 @@ def chk_transducer(p, d, c, stem=None):
         outs = [cfg["phase1_output"], cfg["phase2_output"]]
         out += D.when(isinstance(t.get("output"), str) and t["output"] not in outs, p, "transducer.output", f"'{t['output']}' is not a declared output sentence",
                       "write exactly one of cc.toml [transducer] phase1_output / phase2_output: " + " | ".join(f'"{x}"' for x in outs))
-        out += update_findings(p, t.get("update"), c.data_root.parent) if isinstance(t.get("update"), list) else []
+        out += update_findings(p, t.get("update"), probe(c)[1]) if isinstance(t.get("update"), list) else []   # plan 1273: the toolset this host holds, or Absent
     for sec_name in ("reduction", "interval"):
         out += [at(p, f"{sec_name}.{k}", "is empty", f"write what the {sec_name} {k}") for k, v in d[sec_name].items() if isinstance(v, str) and not v.strip()]
     role = d["interval"].get("role")
@@ -89,23 +90,31 @@ def supplied(update, tools):
 
 
 def update_findings(p, update, tools):
-    """Each entry '<toolset path> sha256 <hex>' names content some commit of the toolset holds for that path (retrieve; D-0929-5). Total: no entry is skipped."""
+    """Each entry '<toolset path> sha256 <hex>' names content some commit of the toolset holds for that path (retrieve; D-0929-5). Total: no entry is skipped.
+    `tools`: the toolset's path, or the host's toolset resource (plan 1273): an Absent toolset makes each of its entries NotEvaluableHere; a Compass route is always held."""
+    routes = {**{k: Held("compass", v) for k, v in ROUTES.items()}, "": resource(tools)}
     out = [at(p, "transducer.update", "must have at least one entry", 'write update = ["<toolset path> sha256 <64 hex>"]')] if not update else []
     for i, e in enumerate(update):
         m = UPDATE.fullmatch(e) if isinstance(e, str) else None
         if m is None:
             out.append(at(p, f"transducer.update[{i}]", f"'{e}' is not '<toolset-relative path> sha256 <64 hex>'", "write the path, the word sha256 and the 64 hex digits of sha256sum"))
             continue
-        base, rel, want = routed(tools, m)
-        if base is None:
+        if m[1] not in routes:
             out.append(at(p, f"transducer.update[{i}]", f"route '{m[1]}' is not declared", f"use a route of cc.toml [transducer] update_routes {sorted(ROUTES)}, or none (the toolset)"))
             continue
-        if retrieve(base, rel, want) is None:
-            head = _git(base, "show", f"HEAD:{rel}")
-            if head is not None:   # the pinned content is in no commit; the newest committed content of that path is the pin to write
-                got = hashlib.sha256(head).hexdigest()
-                out.append(at(p, f"transducer.update[{i}]", f"{rel} sha256 {want} differs from the toolset file's {got}", f"write {rel} sha256 {got}"))
-            else:
-                out.append(at(p, f"transducer.update[{i}]", f"{rel} sha256 {want} is in no commit of the toolset's history, and {rel} is not committed there",
-                              f"name a committed sampler file of the toolset (git -C <toolset> log --all -- {rel})"))
+        out += routes[m[1]].each(lambda base, rel=m[2], want=m[3], i=i: pin_findings(p, i, base, rel, want), p, f"transducer.update[{i}]")
+    return out
+
+
+def pin_findings(p, i, base, rel, want):
+    """One update pin on a held toolset (or Compass route) `base`: retrievable from its history, else the finding naming what to write."""
+    out = []
+    if retrieve(base, rel, want) is None:
+        head = _git(base, "show", f"HEAD:{rel}")
+        if head is not None:   # the pinned content is in no commit; the newest committed content of that path is the pin to write
+            got = hashlib.sha256(head).hexdigest()
+            out.append(at(p, f"transducer.update[{i}]", f"{rel} sha256 {want} differs from the toolset file's {got}", f"write {rel} sha256 {got}"))
+        else:
+            out.append(at(p, f"transducer.update[{i}]", f"{rel} sha256 {want} is in no commit of the toolset's history, and {rel} is not committed there",
+                          f"name a committed sampler file of the toolset (git -C <toolset> log --all -- {rel})"))
     return out
