@@ -4,12 +4,12 @@
 # as cc/transducer.py: the toolset is the data root's parent), that the toolset commit holds that path with those bytes.
 schema = 1
 kind = "vendor-pin"
-commit = "fb0d7db83698b280481f24c625518d5a5f2e0910"   # toolset master when copied
+commit = "e4cb21f28860c951cd4653b6410f73512e90013f"   # toolset plan-1257 (t23_v2, PTL-229); holds adapters/intake.py unchanged; on branch plan-1257 until Argus merges it to master (merge or fast-forward, never squash/rebase: T1 must stay in history)
 
 [[file]]
 copy = "vendor/toolset/t23.py"
-path = "studies/TAX-B1b/t23.py"
-sha256 = "abc7ef72198676fc958b637071dd3da23ad4594cb3b380a4d10b61b30fad7134"
+path = "studies/TAX-B1b/t23_v2.py"
+sha256 = "65b7c79401931b6bec9d3cf7673dc45a2195514611ea6c07380ab9de01655c34"
 
 [[file]]
 copy = "vendor/toolset/intake.py"

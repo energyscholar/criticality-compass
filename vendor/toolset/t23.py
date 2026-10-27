@@ -1,12 +1,17 @@
-"""t23.py — T23 (CONTRACTS v1, v1.1, v1.2 G): exploration log + sealed tests + claim register, with a LOGGING LOADER and a seal checker
-that NEVER claims complete protection. NOT REGISTERED (Argus gates and registers).
+"""t23_v2.py — plan 1257 / PTL-229: T23 v2, a new version beside t23.py (not a replacement). Only R3 and the Loader's hook machinery
+change: ONE audit hook per module instance, bypass lines owned by partition. Everything else is t23.py (T23, CONTRACTS v1, v1.1, v1.2 G)
+verbatim: exploration log + sealed tests + claim register, with a LOGGING LOADER and a seal checker that NEVER claims complete protection.
+NOT REGISTERED (Argus gates and registers).
 
 DECLARED RULES (written before any control ran):
  R1 Partitions are DECLARED: a map {path prefix -> partition name}. A path under no declared prefix is partition "undeclared".
  R2 Every read through Loader.read()/np_load() appends ONE JSON line to the append-only ACCESS LOG (O_APPEND) BEFORE the bytes are returned:
     {t_ns, partition, path, sha256 (of the bytes read), size, argv, pid, git_head, route:"loader"}. Reproducible identifiers = path + sha256 + git HEAD.
- R3 In-process bypass (a Python open() of a declared-partition path NOT via the loader) is caught by a sys.addaudithook and logged with
-    route:"in-process-bypass". This is the only bypass class the module can SEE.
+ R3 (v2, plan 1257) ONE audit hook per module instance, installed when the module executes. Module-level registry of hooked loaders (a list:
+    strong references, the lifetime the per-instance hook gave) and a module-level record of the loader inside read(). An open during a
+    read() belongs to the reading loader (its loader line, R2). A read-open outside every read() whose path is no registered access log is
+    ONE in-process-bypass line in the log of EACH registered loader whose partition(path) != undeclared, and of no other.
+    In-process bypass (a Python open() of a declared-partition path NOT via a loader) is the only bypass class the module can SEE.
  R4 UNENFORCED read paths are LISTED in every checker output (constant UNENFORCED below) — never omitted, never summarised away:
     direct shell reads (cat/less/head/cp/rsync/scp), other processes and external tools (MATLAB, editors, another Python without this module,
     Jupyter kernels), reads on another host or another copy of the bytes, memory of a human who looked.
@@ -27,6 +32,7 @@ import json
 import os
 import subprocess
 import sys
+import threading
 import time
 from pathlib import Path
 
@@ -52,14 +58,23 @@ def _head(where):
     return r.stdout.strip() or "NO-GIT"                                    # plumbing: honest null when not a repo
 
 
+_LIVE = []   # R3: hooked loaders of this module instance; a list (strong references) keeps the lifetime the per-instance hook gave
+
+
+class _Reading(threading.local):
+    loader = None   # R3: the loader whose read() is in progress in THIS thread; None = outside every read()
+
+
+_READING = _Reading()
+
+
 class Loader:
     def __init__(self, partitions, access_log, hook=True):
         self.parts = {str(Path(k).resolve()): v for k, v in partitions.items()}
         self.log = Path(access_log)
-        self._inside = False
         self.head = _head(Path(next(iter(self.parts))).parent) if self.parts else "NO-GIT"
-        if hook:
-            sys.addaudithook(self._audit)
+        if hook:                                                           # plumbing: declared parameter, registers with the module's one hook
+            _LIVE.append(self)
 
     def partition(self, path):
         p = str(Path(path).resolve())
@@ -72,12 +87,12 @@ class Loader:
                     argv=sys.argv, pid=os.getpid(), git_head=self.head)
 
     def read(self, path):
-        self._inside = True
+        outer, _READING.loader = _READING.loader, self                     # R3: an open during this read() belongs to this loader
         t0 = time.time_ns()
         try:
             data = Path(path).read_bytes()
         finally:
-            self._inside = False
+            _READING.loader = outer
         _append(self.log, dict(self._rec(path, data, "loader"), t_start_ns=t0))   # R2: logged before the bytes are returned
         return data
 
@@ -86,13 +101,19 @@ class Loader:
         import numpy as np
         return np.load(io.BytesIO(self.read(path)))
 
-    def _audit(self, event, args):
-        reading = event == "open" and (isinstance(args[1], str) and "r" in args[1] and "+" not in args[1]
-                                       or args[1] is None and isinstance(args[2], int) and args[2] & os.O_ACCMODE == os.O_RDONLY)
-        if reading and not self._inside and isinstance(args[0], (str, bytes, os.PathLike)) and str(args[0]) != str(self.log):
-            part = self.partition(os.fsdecode(args[0]))
-            if part != "undeclared":                                       # R3: only declared-partition paths are bypasses
-                _append(self.log, self._rec(os.fsdecode(args[0]), None, "in-process-bypass"))
+
+def _audit(event, args):
+    reading = event == "open" and (isinstance(args[1], str) and "r" in args[1] and "+" not in args[1]
+                                   or args[1] is None and isinstance(args[2], int) and args[2] & os.O_ACCMODE == os.O_RDONLY)
+    if reading and _READING.loader is None and isinstance(args[0], (str, bytes, os.PathLike)) \
+            and str(args[0]) not in {str(x.log) for x in _LIVE}:
+        path = os.fsdecode(args[0])
+        for x in _LIVE:
+            if x.partition(path) != "undeclared":                          # R3: only declared-partition paths are bypasses, in each owner's log
+                _append(x.log, x._rec(path, None, "in-process-bypass"))
+
+
+sys.addaudithook(_audit)   # R3 / INV-3: exactly one hook per module instance, installed when the module executes
 
 
 def seal(text, sealed_file, seal_log):

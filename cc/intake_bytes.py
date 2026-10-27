@@ -2,6 +2,7 @@
 Invariant: the only intake stage module that opens a data byte, and only through the vendored t23 logged loader (declarations/<id>/access.log),
 once per file, in S3; and the only one that reads that access log (S6). Every refusal is a value: a check is a (holds, reason, detail) row and
 `gate` returns the first row that does not hold."""
+import functools
 import hashlib
 import importlib.util
 import re
@@ -17,6 +18,7 @@ from intake_evidence import Census, File, Lineage, Pinned
 ROOT = Path(__file__).resolve().parent.parent
 
 
+@functools.cache
 def _t23():
     """The vendored logged loader (vendor/toolset/t23.py, pinned by vendor/toolset/PIN.toml), loaded by path: vendor/toolset is never put on
     sys.path, where its intake.py would shadow cc/intake.py."""
