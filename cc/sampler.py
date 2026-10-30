@@ -7,10 +7,14 @@ import hashlib
 import importlib.util
 import json
 import math
+import zipfile
 from pathlib import Path
 from types import SimpleNamespace
 
 import numpy as np
+
+import formats
+import schema
 
 KC = math.log(1 + math.sqrt(2)) / 2
 LABELS = {x: float(x) * KC for x in ("0.90", "0.95", "0.98", "1.00", "1.02", "1.05", "1.10")}   # label (K/K_c) -> K
@@ -116,3 +120,30 @@ def entry(path, point, L, start, chain):
 
 def transducer_model(F):
     return f"2D Ising in a uniform field h = {FAMILY_H[F]:g} (held fixed), heat bath (tools/lattice_field.py), K/K_c 0.90-1.10"
+
+
+CARRIES_L = {"npz-v1": False, "npy-v1": False, "snapshots-v1": False, "image-stack-v1": False, "island-table-v1": False, "npz-sized-v1": True}   # total over cc.toml [alphabets] formats: does the format carry L by construction (A4.9)
+CARRIED = tuple(k for k, v in CARRIES_L.items() if v)
+
+
+def sized(p, loc, b, heads, fp, fmt):
+    """The door's L check (plan 1282 P1b, A4.8): [] unless fmt carries L; else the finding, named by its field (.L.header/absent/shape/object/dtype/value), of the first row that does not hold.
+    `fmt in CARRIED` is by equality, so a missing, non-str or unknown format never reaches the table (it stays the data.format finding). The dtype is read from L's header, so an object L is never unpickled."""
+    if fmt not in CARRIED:
+        return []
+    h, row = heads(), lambda arm, msg, nxt: [schema.at(p, f"{loc}.L.{arm}", msg, nxt)]   # noqa: E731
+    if not isinstance(h, dict):
+        return row("header", "the file is not an npz: npz-sized-v1 stores keyed arrays", "write it with np.savez")
+    if "L" not in h:
+        return row("absent", "`L` missing: the file cannot show its size", "write the file with its 0-d `L` (npz-sized-v1 requires it)")
+    if h["L"] != ():
+        return row("shape", f"`L` has shape {h['L']}: it must be a 0-d scalar", "store L as a 0-d integer")
+    with zipfile.ZipFile(fp) as z, z.open("L.npy") as f:
+        dtype = formats.head_of(f)[1]
+    if dtype.hasobject:
+        return row("object", "`L` is an object array: npz-sized-v1 stores a plain integer", "store L as a 0-d integer")
+    if not np.issubdtype(dtype, np.integer):
+        return row("dtype", f"`L` has dtype {dtype}: it must be an integer", "store L as a 0-d integer")
+    with np.load(fp) as z:
+        stored = int(z["L"])
+    return row("value", f"`L` stores {stored} but the file is declared at size {b['size']}", "declare the file at the size it stores, or fix the file") if stored != b["size"] else []

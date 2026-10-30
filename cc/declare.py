@@ -13,6 +13,7 @@ import formats
 import readout
 import reduce
 from transducer import chk_transducer
+import sampler   # plan 1282 P1b: the npz-sized-v1 L check (its table and messages live in sampler)
 from host import NotEvaluableHere, holder  # noqa: F401  (plan 1273: a finding about the host, not the files)
 from schema import ROOT, F, at, rel, _parsed, parse, load, row_lines, Ctx, unit_blocks, _SHA_ONCE, hashing_once, _sha, sha, MEASURE_SEEDED, import_closure, measure_hash, code_hash, code_cols, declared_cols  # noqa: F401  (moved by plan 0886; re-exported: the call sites keep `declare.<name>`)
 
@@ -391,7 +392,7 @@ def chk_file(p, loc, b, m, c, lengths):
     fp = c.file(b["path"])
     if not fp.is_file():
         return [at(p, loc + ".path", f"{b['path']} does not exist under the data root", "fix the path, or put the file there")]
-    out = []
+    out = sampler.sized(p, loc, b, lambda: shapes_of(c, fp), fp, m["data"].get("format"))   # plan 1282 P1b: [] unless the format carries L
     for name, a in b["arrays"].items():
         got = chk_array(p, loc, name, a, b, fp, m, c)
         out += got

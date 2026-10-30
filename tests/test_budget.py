@@ -1,5 +1,5 @@
 """test_budget - the plumbing line budget (plan 0863 appendix 13; plan 0870 P-1: Origin declaration Q7 as corrected 2026-10-03).
-Counts non-blank lines of every plumbing file in checks.toml, minus the verbatim copies; CAP = 5030. Tests are
+Counts non-blank lines of every plumbing file in checks.toml, minus the verbatim copies; CAP = 5031. Tests are
 printed, never capped. Raising CAP is the Auditor's planned edit, never the Generator's.
 Plan 1145: the intake pipeline (checks.toml [roles] intake) has its own role and its own cap, INTAKE_CAP = 1200 non-blank lines
 (1145 measured 1023 at the end of phase 1); it is no longer counted in plumbing.
@@ -28,11 +28,12 @@ Plan 1273 A1: what this HOST holds (cc/host.py) is the role host, HOST_CAP = 80 
 HOST_CAP made 40 (the cap assert FAILS); cc/host.py also listed under plumbing (the disjointness assert FAILS).
 Plan 1282 P1a: the sampler adapter (cc/sampler.py) is the role sampler, SAMPLER_CAP = 200 (P1a holds it at 160 or fewer; P1b adds), disjoint from every other role, host included.
 Seen RED: SAMPLER_CAP made 10 (the cap assert FAILS); cc/sampler.py also listed under plumbing (the disjointness assert FAILS).
-Plan 1335: CAP 5000 -> 5030 (Auditor-authorised; macOS platform table). Seen RED: at CAP 5000 after edits 1-3 the cap assert FAILS."""
+Plan 1335: CAP 5000 -> 5030 (Auditor-authorised; macOS platform table). Seen RED: at CAP 5000 after edits 1-3 the cap assert FAILS.
+Plan 1282 P1b: CAP 5030 -> 5031 (owner-granted up to +4; the door's one call into cc/sampler.py for the L check). Seen RED: at CAP 5030 after the edit the cap assert FAILS."""
 import tomllib
 from pathlib import Path
 
-CAP = 5030
+CAP = 5031
 CORE_CAP = 1240   # plan 1205 P1 (Auditor): +40 for the hdf5-table-v1 reader. plan 1164: was INTAKE_CAP over the one role intake; now the sum over the roles of CORE, the core split by invariant
 CORE = {"intake": 100, "intake_fold": 160, "intake_evidence": 150, "intake_bytes": 100, "intake_census": 140, "intake_say": 100,   # plan 1164: role -> cap
         "intake_blind": 200, "intake_seal": 160, "intake_read": 215}   # (BLOAT-REVIEW 1160 section 4, Layout C)
