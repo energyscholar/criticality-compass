@@ -42,12 +42,6 @@ seal = "toolset:results/0937-t1/SHA256SUMS"
 manifest_row = "c2-bc-two-start-ch"
 
 [[record]]
-path = "results/k4-m1-ch@v10-rules.json"
-sha256 = "3f7a97036e307dfc81d3619e1311baefc409994fef3aeb3d4803e13a4b7a752a"
-seal = "toolset:results/0937-t2c/SHA256SUMS"
-manifest_row = ""
-
-[[record]]
 path = "results/w1-potts-ch@v10-rules.json"
 sha256 = "9f7aaddf989ca53140aca7c730f4048a883aff0f2c171f404774dfb88cbef970"
 seal = "toolset:results/0937-t1/SHA256SUMS"
@@ -120,12 +114,6 @@ seal = "toolset:results/0937-t2a/SHA256SUMS"
 manifest_row = "x4-ising-field-3-ch"
 
 [[record]]
-path = "results/x4-ising-field-ch@v10-rules.json"
-sha256 = "c339b62d4f0f92f8413fa1001d294869310454736b11c378fbc85ba2558cc1e1"
-seal = "toolset:results/0937-t2a/SHA256SUMS"
-manifest_row = "x4-ising-field-ch"
-
-[[record]]
 path = "results/x4s-stack-ch@v10-rules.json"
 sha256 = "86614e73c3c319169eaaec9a24c2c921ae3596c1c14918ee9e11f93c0b2e75e6"
 seal = "toolset:results/0937-t1/SHA256SUMS"
@@ -172,12 +160,6 @@ path = "results/x7a-nnn-ch@v10-rules.json"
 sha256 = "9f136cab4cc2219f58edd98558d3ffa2fd343faf1b3ea313aff3716ce6336f9a"
 seal = "toolset:results/0937-t1/SHA256SUMS"
 manifest_row = "x7a-nnn-ch"
-
-[[record]]
-path = "results/x8-ising-needle-ch@v10-rules.json"
-sha256 = "e4e8975f7076b1989bcc2bb13ca64bf3bff4822dcd810de6d9f0c4e9c2d437d6"
-seal = "toolset:results/0937-t1/SHA256SUMS"
-manifest_row = "x8-ising-needle-ch"
 
 [[record]]
 path = "results/x9c-potts-2-ch@v10-rules.json"
