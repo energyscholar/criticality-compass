@@ -28,6 +28,8 @@ Plan 1273 A1: what this HOST holds (cc/host.py) is the role host, HOST_CAP = 80 
 HOST_CAP made 40 (the cap assert FAILS); cc/host.py also listed under plumbing (the disjointness assert FAILS).
 Plan 1282 P1a: the sampler adapter (cc/sampler.py) is the role sampler, SAMPLER_CAP = 200 (P1a holds it at 160 or fewer; P1b adds), disjoint from every other role, host included.
 Seen RED: SAMPLER_CAP made 10 (the cap assert FAILS); cc/sampler.py also listed under plumbing (the disjointness assert FAILS).
+Plan 1282 P1c: the seal refusals (cc/seal_reach.py) are the role seal_reach, SEAL_REACH_CAP = 120, disjoint from every other role, host and sampler included.
+Seen RED: SEAL_REACH_CAP made 10 (the cap assert FAILS); cc/seal_reach.py also listed under plumbing (the disjointness assert FAILS).
 Plan 1335: CAP 5000 -> 5030 (Auditor-authorised; macOS platform table). Seen RED: at CAP 5000 after edits 1-3 the cap assert FAILS.
 Plan 1282 P1b: CAP 5030 -> 5031 (owner-granted up to +4; the door's one call into cc/sampler.py for the L check). Seen RED: at CAP 5030 after the edit the cap assert FAILS."""
 import tomllib
@@ -53,6 +55,7 @@ SUSPECT_CAP = 160   # plan 1176 phase A: checks.toml [roles] intake_suspect, FOR
 TERMINAL_CAP = 200   # plan 1160 P6: checks.toml [roles] intake_terminal, S10 KERNEL_HANDOFF and the terminal (cc/intake_terminal.py), so INTAKE_CAP is not raised
 HOST_CAP = 80   # plan 1273 A1: checks.toml [roles] host, what this host holds of the data root and the toolset (cc/host.py), split from plumbing so CAP is not raised
 SAMPLER_CAP = 200   # plan 1282 P1a: checks.toml [roles] sampler, the declared sampler adapter (cc/sampler.py), its own role so CAP is not raised
+SEAL_REACH_CAP = 120   # plan 1282 P1c: checks.toml [roles] seal_reach, the seal's seed, reach and licence refusals (cc/seal_reach.py), its own role so CAP is not raised
 VERBATIM = [
     "cc/admit.py", "cc/reduce.py", "cc/gamma.py", "tests/test_kernel.py", "tests/test_sign.py", "tests/test_resample.py",
     "tests/test_kernel_rs.py", "tests/reference/verdict_x.py",
@@ -87,6 +90,7 @@ suspect = {f: lines(f) for f in roles["intake_suspect"]}
 navfamily = {f: lines(f) for f in roles["navigate_family"]}
 host = {f: lines(f) for f in roles["host"]}
 sampler = {f: lines(f) for f in roles["sampler"]}
+seal_reach = {f: lines(f) for f in roles["seal_reach"]}
 for f, n in {**counts, **intake, **names, **choices, **tests, **maths}.items():
     print(f"  {f}: {n}")
 total = sum(counts.values())
@@ -108,6 +112,7 @@ print(f"intake_suspect total {sum(suspect.values())} of {SUSPECT_CAP}")
 print(f"navigate_family total {sum(navfamily.values())} of {NAVFAMILY_CAP}")
 print(f"host total {sum(host.values())} of {HOST_CAP}")
 print(f"sampler total {sum(sampler.values())} of {SAMPLER_CAP}")
+print(f"seal_reach total {sum(seal_reach.values())} of {SEAL_REACH_CAP}")
 assert not set(intake) & set(roles["plumbing"]), f"a file in both plumbing and intake: {sorted(set(intake) & set(roles['plumbing']))}"
 assert sum(intake.values()) <= CORE_CAP, f"intake line budget exceeded: {sum(intake.values())} > {CORE_CAP}; stop and report which files grew"
 for r, c in CORE.items():
@@ -145,5 +150,7 @@ assert sum(host.values()) <= HOST_CAP, f"host line budget exceeded: {sum(host.va
 assert not set(host) & (set(intake) | set(names) | set(choices) | set(feasible) | set(handoff) | set(terminal) | set(new) | set(differs) | set(blindview) | set(against) | set(profile) | set(findings) | set(feature) | set(suspect) | set(navfamily) | set(roles["plumbing"])), "host shares a file with another capped role"
 assert sum(sampler.values()) <= SAMPLER_CAP, f"sampler line budget exceeded: {sum(sampler.values())} > {SAMPLER_CAP}"
 assert not set(sampler) & {f for r, fs in roles.items() if r != "sampler" for f in fs}, "sampler shares a file with another role"
+assert sum(seal_reach.values()) <= SEAL_REACH_CAP, f"seal_reach line budget exceeded: {sum(seal_reach.values())} > {SEAL_REACH_CAP}"
+assert not set(seal_reach) & {f for r, fs in roles.items() if r != "seal_reach" for f in fs}, "seal_reach shares a file with another role"
 assert total <= CAP, f"line budget exceeded: {total} > {CAP}; stop and report which files grew"
 print("test_budget: all passed")
