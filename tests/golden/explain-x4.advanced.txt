@@ -3,7 +3,7 @@ explain x4-ising-field 0.5   rules: v01-rules
 sink
   1 DATA      x4/K0.5000-h0.0000-L81-plus.npz [GL key G] ... 2 blocks; sha256 matches fixtures/data/x4-ising-field.toml
   2 REDUCE    row 0: 0 0.8728, 1 0.9704, 2 0.9993, 3 1, 4 0.8728, 5 0.9701, 6 0.9994
-  3 COMPARISON matched: matched, Coupling   big 243: L0..L3   small 81: L0..L2   edges: (243,L1)->(81,L0) (243,L2)->(81,L1) (243,L3)->(81,L2)
+  3 COMPARISON matched: matched, declared report   big 243: L0..L3   small 81: L0..L2   edges: (243,L1)->(81,L0) (243,L2)->(81,L1) (243,L3)->(81,L2)
   4 C         operator A over matched; row 0: velocity [0.0005781]; d_ord [0]; d_dis [1]; v_all [0.09766, 0.02914, 0.0005781]; g_final [1]
   5 READING   d_ord 0  interval [0, 0]  (95 %, 400 block resamples, b 400)
   6 SIGN      cuts -0.02 0 +0.02 (eps sink): bL 1, bU 2 -> ZERO!
@@ -40,21 +40,21 @@ stability
 two_start
   1 DATA      L27 x4/K0.5000-h0.0000-L27-plus.npz [Q key O] ... 2 blocks; sha256 matches fixtures/data/x4-ising-field.toml
   2 REDUCE    L27 row 0: 0 0.8738, 1 0.873
-  3 COMPARISON L27 start: pair, Coupling   random <- ordered
+  3 COMPARISON L27 start: pair, declared report   random <- ordered
   4 C         L27 operator A over start; row 0: D [-0.0008066]
   5 READING   L27 D -0.0008066  interval [-0.002141, 0.0008542]  (95 %, 400 block resamples, b 400)
   6 SIGN      L27 cuts -0.01 0 +0.01 (eps two_start): bL 1, bU 2 -> ZERO!
   7 CODE      L27 two_start: codes.toml line 136: ZERO! -> INDEP
   1 DATA      L81 x4/K0.5000-h0.0000-L81-plus.npz [Q key O] ... 2 blocks; sha256 matches fixtures/data/x4-ising-field.toml
   2 REDUCE    L81 row 0: 0 0.8728, 1 0.8729
-  3 COMPARISON L81 start: pair, Coupling   random <- ordered
+  3 COMPARISON L81 start: pair, declared report   random <- ordered
   4 C         L81 operator A over start; row 0: D [0.0001518]
   5 READING   L81 D 0.0001518  interval [-0.0004184, 0.0004931]  (95 %, 400 block resamples, b 400)
   6 SIGN      L81 cuts -0.01 0 +0.01 (eps two_start): bL 1, bU 2 -> ZERO!
   7 CODE      L81 two_start: codes.toml line 136: ZERO! -> INDEP
   1 DATA      L243 x4/K0.5000-h0.0000-L243-plus.npz [Q key O] ... 2 blocks; sha256 matches fixtures/data/x4-ising-field.toml
   2 REDUCE    L243 row 0: 0 0.8728, 1 0.8728
-  3 COMPARISON L243 start: pair, Coupling   random <- ordered
+  3 COMPARISON L243 start: pair, declared report   random <- ordered
   4 C         L243 operator A over start; row 0: D [-5.491e-05]
   5 READING   L243 D -5.491e-05  interval [-0.0002068, 0.0001417]  (95 %, 400 block resamples, b 400)
   6 SIGN      L243 cuts -0.01 0 +0.01 (eps two_start): bL 1, bU 2 -> ZERO!
