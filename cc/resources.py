@@ -3,16 +3,37 @@ memory in its result (`peak_rss_mb`); a pool of measuring workers is SIZED from 
 and those recorded peaks, so the sum of its workers' peaks cannot exceed the budget. Nothing here retries or catches a kill."""
 import json
 import resource
+import sys
 from pathlib import Path
+from typing import NamedTuple
 
 
-def reset_peak():
-    """Zero this process's high-water mark (Linux: clear_refs 5), so the next peak_mb() is that of one measurement alone."""
-    Path("/proc/self/clear_refs").write_text("5")
+def _clear_refs():
+    Path("/proc/self/clear_refs").write_text("5")   # Linux: clear_refs 5 zeroes this process's high-water mark
+    return True
 
 
-def peak_mb():
-    return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024   # Linux reports KiB
+def _no_row():
+    raise ImportError(f"cc/resources: no platform row for {sys.platform!r}; add one to PLATFORMS")
+
+
+class Platform(NamedTuple):
+    reset: object       # a function that zeroes the high-water mark and returns True, or None where the OS has none
+    unit_bytes: int     # bytes per ru_maxrss unit (Linux KiB, macOS bytes)
+
+
+PLATFORMS = {"linux": Platform(_clear_refs, 1024), "darwin": Platform(None, 1)}
+ROW = PLATFORMS.get(sys.platform) or _no_row()
+
+
+def reset_peak(row=None):
+    """Zero the high-water mark where the platform can; True iff it did (plan 1335), so a peak is recorded only after a real reset."""
+    row = row or ROW
+    return bool(row.reset and row.reset())
+
+
+def peak_mb(row=None):
+    return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * (row or ROW).unit_bytes / 2**20
 
 
 def recorded_peaks(root, names, tables):

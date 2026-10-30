@@ -516,9 +516,9 @@ def run_keyed(input_id, tables, write, tables_dir=None, reuse=True):
         if write:
             (ROOT / "results" / f"{rid}.json").write_text(json.dumps(res, indent=1) + "\n")
         return res, "re-verdicted"
-    resources.reset_peak()
+    did = resources.reset_peak()
     out = measure(m, c, reg, T)
-    peak = resources.peak_mb()   # the high-water mark of this one input's measurement (plan 0881 P1.1)
+    peak = resources.peak_mb() if did else None   # plan 1335: no reset on this platform => no peak (an honest null), never a whole-process figure
     cols = schema.code_cols(T.codes)
     direct = {s["from"]: n for n, s in cols.items() if isinstance(s["from"], str)}
     readings, reports, vectors, signature = [], [], {}, []
@@ -554,7 +554,7 @@ def run_keyed(input_id, tables, write, tables_dir=None, reuse=True):
         r = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True)
         commit = r.stdout.strip() or "none"
     res = {"schema": 1, "kind": "result", "run_id": rid, "input": input_id, "tables": tables,
-           "derived_from": None, "code_commit": commit, "code_hash": chash, "measure_hash": mhash, "data_root_source": c.data_root_source, "peak_rss_mb": round(peak, 1), "interval": dict(m["interval"]), "read": read,
+           "derived_from": None, "code_commit": commit, "code_hash": chash, "measure_hash": mhash, "data_root_source": c.data_root_source, "peak_rss_mb": None if peak is None else round(peak, 1), "peak_rss_why": None if did else f"no in-process high-water reset on {sys.platform}", "interval": dict(m["interval"]), "read": read,
            "vectors": f"results/{rid}.npz",
            "readings": readings, "pair_readings": pair_readings, "reports": reports + pair_reports,
            "signature_columns": list(T.codes["columns"]["signature"]), "signature": signature, "pairs": pairs,
