@@ -1,6 +1,7 @@
 """tau_1282_p1 - plan 1282 P1a: the tau_int pilot (A4.7, A4.8). One adapter call per cell of the 84, three integrated autocorrelation times (Sokal, c = 5,
 window_max = N // 10) of level-0 |M|, level-1 block M and level-1 g1, one TSV row per cell. A tool, not a test: python tests/tau_1282_p1.py --toolset <dir> [--cells tiny|all] [--out F] [--time-only].
-A window that reaches window_max is a lower bound (never re-run); a series that does not vary has no tau (undefined); a cell is never shortened to fit a budget."""
+A window that reaches window_max is a lower bound (never re-run); a series that does not vary has no tau (undefined); a cell is never shortened to fit a budget.
+P1a.1 (PRE A4.11): the second input is |level-1 block M|, matching the |.| A4.7 puts on level 0."""
 import os
 
 os.environ["OMP_NUM_THREADS"] = os.environ["OPENBLAS_NUM_THREADS"] = "1"   # before numpy loads: one core per worker
@@ -71,7 +72,7 @@ def tn(t):
 def fields(F, k, L, s, run, ch):
     """The TSV columns of one cell up to burn, from its chain."""
     wmax = run.N // 10
-    m0, m1, g1 = (tau_sokal(a, wmax) for a in (np.abs(ch.O[:, 1]), ch.M1, ch.G[:, 1]))
+    m0, m1, g1 = (tau_sokal(a, wmax) for a in (np.abs(ch.O[:, 1]), np.abs(ch.M1), ch.G[:, 1]))
     ti = combine(m0, m1)
     return [F, k, str(L), s, str(run.N), tn(m0), str(m0.W), m0.form, tn(m1), str(m1.W), m1.form, tn(ti), ti.form, tn(g1), str(g1.W), g1.form, *COUNT[ti.form](ti)]
 

@@ -1,7 +1,8 @@
 """test_tau_1282 - plan 1282 P1a: the tau_int tool (tests/tau_1282_p1.py). T1-T3 the Sokal estimator on known series (AR(1) tau 1.5, white noise tau 0.5, a random walk that never
 converges is a lower bound); T4 the tool's tiny run writes the header and exactly 2 rows; T4b the random row equals an outside recomputation; T5 combine is a total table on forms;
 T6 a constant series has no tau. Reads the author's data root (cc.toml [check] needs_data).
-Seen RED on 1f4ab4b (tests/tau_1282_p1.py absent); T4b also seen RED by mutation (tau_M0 fed O[:,0] instead of |O[:,1]|)."""
+Seen RED on 1f4ab4b (tests/tau_1282_p1.py absent); T4b also seen RED by mutation (tau_M0 fed O[:,0] instead of |O[:,1]|).
+P1a.1: T7 seen RED on c1175fa."""
 import importlib.util
 import math
 import os
@@ -85,7 +86,7 @@ def t4():
         run = sampler.Run(200, 1, 20)
         ch, _ = sampler.sample(t, sampler.LABELS["1.00"], sampler.FAMILY_H["poc"], 27, "random", sampler.seed_of("1282-v10", "poc", "1.00", 27, "random", "pilot"), run)
         wm = run.N // 10
-        m0, m1, g1 = (m.tau_sokal(a, wm) for a in (np.abs(ch.O[:, 1]), ch.M1, ch.G[:, 1]))
+        m0, m1, g1 = (m.tau_sokal(a, wm) for a in (np.abs(ch.O[:, 1]), np.abs(ch.M1), ch.G[:, 1]))
         ti = m.combine(m0, m1)
         tn = lambda x: "undefined" if x.tau is None else repr(float(x.tau))  # noqa: E731
         cnt = {"converged": ("", ""), "lower-bound": (">=", ">="), "undefined": None}[ti.form]   # A4.3: skip 2 tau, burn 20 tau, a count only; a lower bound is prefixed
@@ -96,7 +97,26 @@ def t4():
         shutil.rmtree(tmp, ignore_errors=True)
 
 
-for n, f in (("T1-T3", t1_t3), ("T4", t4), ("T5-T6", t5_t6)):
+def t7():
+    import sampler
+    import types
+    m = tool()
+    N = 20000
+    rng = np.random.default_rng(7)
+    e = rng.standard_normal(N)
+    a = np.zeros(N)
+    for t in range(1, N):
+        a[t] = 0.5 * a[t - 1] + e[t]
+    sgn = np.array([1 if (t // 1000) % 2 == 0 else -1 for t in range(N)])
+    M1 = sgn * (5.0 + a)
+    ch = types.SimpleNamespace(O=np.stack([np.zeros(N), np.abs(M1)], 1), G=np.stack([np.zeros(N), a], 1), M1=M1)
+    r = m.fields("poc", "1.00", 27, "random", sampler.Run(20000, 1, 2000), ch)
+    want = m.tau_sokal(np.abs(M1), 2000)
+    check("T7 tau_M1 is tau of |M1|", r[8] == m.tn(want) and r[10] == want.form, f"{r[8]} {r[10]} vs {m.tn(want)} {want.form}")
+    check("T7 the sign flips do not set tau_M1", r[8] != m.tn(m.tau_sokal(M1, 2000)), f"{r[8]}")
+
+
+for n, f in (("T1-T3", t1_t3), ("T4", t4), ("T5-T6", t5_t6), ("T7", t7)):
     guarded(n, f)
 print("test_tau_1282: " + ("FAILED" if bad else "all passed"))
 sys.exit(1 if bad else 0)
