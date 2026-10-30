@@ -3,7 +3,6 @@ y1, y2 are the growth exponents of ln(s R) over the two size steps (R = cov(G, E
 matched pair over |v| of the previous pair, as needle_chain); equivalently y_inf = y2 + r (y2 - y1)/(1 - r), the limit of a correction that decays by r per step."""
 import numpy as np
 import project
-from kernel import A
 
 
 def reduce(arrays, ctx):
@@ -29,13 +28,13 @@ def from_means(ms, ctx):
 
 def velocity(x, ctx):
     """A over the matched chain: the previous and top velocities (as needle_chain); R per size is the trailing block. All go to the log door."""
-    v = A(x, ctx.rel["chain"]).spatial
+    v = project.compared(x, ctx.rel["chain"])
     return {"delta": np.hstack([x.data[:, -ctx.n_size:], np.stack([v[:, -1], v[:, ctx.coarsest]], axis=1)])}
 
 
 def ratio(x, ctx):
     """x holds ln(s R) per size, then ln|v| of (previous, top): y1, y2 by A over the size chain, and ln r = ln|v_top| - ln|v_prev|."""
-    y = A(x, ctx.rel["size"]).spatial / ctx.log_ratio
+    y = project.compared(x, ctx.rel["size"]) / ctx.log_ratio
     return {"y1": y[:, 0], "y2": y[:, ctx.top], "lnr": x.data[:, ctx.n_size + 1] - x.data[:, ctx.n_size]}
 
 

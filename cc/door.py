@@ -6,6 +6,7 @@ import os
 import tomllib
 from dataclasses import dataclass
 from pathlib import Path
+from typing import NamedTuple
 import numpy as np
 import admit
 import gamma
@@ -91,6 +92,19 @@ def relations_for(m, name):
     return admit.declare(n, edges, [Provenance(r["provenance"])] * len(edges))
 
 
+def comparison_for(m, name):
+    """The declared comparison `name` inside projection C (plan 1337): relations_for's index pairs, never through admit.declare; no provenance is read."""
+    r = m["relations"][name]
+    n, pairs = TEMPLATES[r["template"]][1](m, r)
+    return project.Comparison(n, np.array([s for s, _ in pairs], dtype=int).reshape(-1), np.array([t for _, t in pairs], dtype=int).reshape(-1))
+
+
+Standing = NamedTuple("Standing", [("build", object), ("says", object), ("fields", tuple)])
+C = Standing(comparison_for, lambda r: "declared report", ())
+STANDING = {"size": C, "matched": C, "chain": C, "start": C,   # plan 1337: relation name -> (its builder, what a result says it is, its declared standing fields); TOTAL over instruments/*.toml
+            "control": Standing(relations_for, lambda r: r["provenance"], ("provenance",))}   # the one kernel relation (pending an external verifier (ruling R2))
+
+
 def control_pairs(m, name="control"):
     """The (a, b) point labels of every edge of the declared control relation, in its edge order (A = x[b] - x[a])."""
     r = m["relations"][name]
@@ -113,11 +127,10 @@ ROW_COUNT = {"block": lambda iv: iv["resamples"] + 1, "iid": lambda iv: iv["resa
 
 
 def context(m, inst, size=None):
-    sizes, rel = m["axes"]["size"], {n: relations_for(m, n) for n in inst["relations"]}
+    sizes, rel = m["axes"]["size"], {n: STANDING[n].build(m, n) for n in inst["relations"]}
     k = len(sizes) - 1
     if "size" in rel:
-        prov = Provenance(m["relations"]["size"]["provenance"])
-        rel["steps"] = admit.declare(k, [(i + 1, i) for i in range(k - 1)], [prov] * (k - 1))
+        rel["steps"] = project.Comparison(k, np.arange(1, k), np.arange(k - 1))   # the size steps (i+1, i), a comparison inside C
     rm = m.get("relations", {})
     big = rm["matched"]["big"] if "matched" in rel else rm["chain"]["pairs"][0][0] if "chain" in rel else None   # the top pair's big size
     nb = m["observable"]["levels"][sizes.index(big)] if big is not None else 0

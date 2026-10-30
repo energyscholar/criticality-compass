@@ -558,6 +558,7 @@ def run_keyed(input_id, tables, write, tables_dir=None, reuse=True):
            "vectors": f"results/{rid}.npz",
            "readings": readings, "pair_readings": pair_readings, "reports": reports + pair_reports,
            "signature_columns": list(T.codes["columns"]["signature"]), "signature": signature, "pairs": pairs,
+           "standing": {n: door.STANDING[n].says(m["relations"][n]) for i in m["instruments"] for n in reg[i][0]["relations"]},   # plan 1337: what each relation's numbers ARE (a comparison: a declared report)
            **({"declared": {k.split(".", 1)[1]: v for k, v in decl.items()}} if decl else {})}
     if write:
         (ROOT / "results").mkdir(exist_ok=True)

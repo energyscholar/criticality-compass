@@ -1,7 +1,6 @@
 """needle.py - matched flow velocity and sink position (maths; the stages of instruments/needle.toml)."""
 import numpy as np
 import project
-from kernel import A
 
 
 def reduce(arrays, ctx):
@@ -22,7 +21,7 @@ def from_means(ms, ctx):
 
 def matched(x, ctx):
     """A over the matched relation; the coarsest edge is the velocity; distances to the two declared sinks."""
-    v_all = A(x, ctx.rel["matched"]).spatial
+    v_all = project.compared(x, ctx.rel["matched"])
     g_final = x.data[:, ctx.big_final]
     return {"velocity": v_all[:, ctx.coarsest], "d_ord": ctx.sink_ordered - g_final,
             "d_dis": g_final - ctx.sink_disordered, "v_all": v_all, "g_final": g_final}

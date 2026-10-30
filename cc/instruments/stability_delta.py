@@ -27,9 +27,9 @@ def delta(x, ctx):
 
 def growth(x, ctx):
     """x holds ln(s Delta) per size; A over the size chain divided by the declared ln of the size ratio gives the step exponents yD1, yD2 (raw: no transform)."""
-    return {"y_steps": A(x, ctx.rel["size"]).spatial / ctx.log_ratio}
+    return {"y_steps": project.compared(x, ctx.rel["size"]) / ctx.log_ratio}
 
 
 def curvature(x, ctx):
     """d = yD2 - yD1 for EVERY resample: A over the steps chain at its last edge."""
-    return {"d": A(x, ctx.rel["steps"]).spatial[:, ctx.top_steps]}
+    return {"d": project.compared(x, ctx.rel["steps"])[:, ctx.top_steps]}

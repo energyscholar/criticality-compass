@@ -6,6 +6,7 @@ import tomllib
 from datetime import date
 from pathlib import Path
 import declare
+import door
 
 
 class Was(str):
@@ -154,7 +155,7 @@ def add_instruments(m, ids, reg):
             m.setdefault(k, {f: blank(t) for f, t in declare.SIDECAR_SHAPE[k].items()})
         for r in inst["relations"]:
             m.setdefault("relations", {}).setdefault(
-                r, {"template": "TODO", "axis": "TODO", "provenance": "TODO", "direction_from": "TODO"})
+                r, {"template": "TODO", "axis": "TODO", **dict.fromkeys(door.STANDING[r].fields, "TODO"), "direction_from": "TODO"})
         for e in inst["columns"].values():
             m["eps"].setdefault(e, "TODO")
         m["kernel"]["uses"] = sorted(set(m["kernel"]["uses"]) | set(inst["operators"]))

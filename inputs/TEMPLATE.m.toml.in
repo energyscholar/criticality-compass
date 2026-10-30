@@ -30,10 +30,9 @@ keeps = "TODO"
 discards = "TODO"
 limited = "none"                               # none | assigned | resolution-limited: a limited input must also set [observable] level_floor = 1 (level 0 excluded)
 
-[relations.TODO]                               # rename TODO: size | matched | start
+[relations.TODO]                               # rename TODO: size | matched | chain | start (a comparison: no provenance); [relations.control] alone adds provenance = "Coupling" | "Continuation"
 template = "TODO"                              # chain | pair | matched (+ that template's fields)
 axis = "TODO"
-provenance = "TODO"                            # Coupling | Continuation (kernel edge provenance)
 direction_from = "TODO"
 
 [conjugate]

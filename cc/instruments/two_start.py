@@ -1,7 +1,6 @@
 """two_start.py - do two declared starts disagree: A over the start pair (maths)."""
 import numpy as np
 import project
-from kernel import A
 
 
 def reduce(arrays, ctx):
@@ -21,4 +20,4 @@ def from_means(ms, ctx):
 
 def difference(x, ctx):
     """D = Q[b] - Q[a] for the first declared pair."""
-    return {"D": A(x, ctx.rel["start"]).spatial[:, 0]}
+    return {"D": project.compared(x, ctx.rel["start"])[:, 0]}

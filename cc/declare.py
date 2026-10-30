@@ -20,7 +20,7 @@ SIGNS = ("SIG-", "NEG", "SLOW-", "ZERO!", "SLOW+", "POS", "SIG+", "UNRES")
 RESULT_FIELDS = (  # the result field set that cc.toml [basic] must partition (view.py reads it from here)
     "instrument", "unit", "column", "eps_key", "eps", "estimate", "lo", "hi", "cell", "code", "per_size",
     "flags", "reason", "vector_key", "point", "obtained", "verdict", "verdict_class", "row_line", "why",
-    "read", "code_commit", "code_hash", "measure_hash", "peak_rss_mb", "peak_rss_why", "interval", "reports", "derived_from", "pair_readings", "pairs", "geometry", "order", "axis_lines", "declared")
+    "read", "code_commit", "code_hash", "measure_hash", "peak_rss_mb", "peak_rss_why", "interval", "reports", "derived_from", "pair_readings", "pairs", "geometry", "order", "axis_lines", "declared", "standing")
 RESERVED = {"door", "declare", "author", "detect", "view", "score", "admit"}
 DECLARED = {"probe": ("COMPLETE", "INCOMPLETE", "UNKNOWN")}   # code columns read from an input's declaration (couplings.toml), never from data
 SIZE_KEY = "L"                 # the one scalar a data file holds that is the lattice size, not a coupling
@@ -462,14 +462,14 @@ def chk_relations(p, d, c, use, sz):
     rels, need, out = d.get("relations", {}), {r for i in use for r in i["relations"]}, []
     out += [at(p, f"relations.{rn}", "missing required relation", f"add [relations.{rn}]")
             for rn in need if rn not in rels]
-    for rn, r in rels.items():
+    for rn, r in ((rn, r) for rn, r in rels.items() if rn in door.STANDING):   # plan 1337: a name outside door.STANDING gets the unused finding below
         t = TEMPLATES.get(r.get("template"))
         if t is None:
             out.append(at(p, f"relations.{rn}.template", f"unknown template '{r.get('template')}'",
                           f"use one of: {' '.join(TEMPLATES)}"))
             continue
-        out += shape(p, r, {"template": str, "provenance": str, "direction_from": str, **t}, {"coupling": str} if rn == "control" else None, pre=f"relations.{rn}.")
-        out += inalpha(p, f"relations.{rn}.provenance", r.get("provenance"), ("Coupling", "Continuation"))
+        out += shape(p, r, {"template": str, "direction_from": str, **t, **{f: str for f in door.STANDING[rn].fields}}, {"provenance": str, **({"coupling": str} if rn == "control" else {})}, pre=f"relations.{rn}.")   # plan 1337: provenance is optional and never read on a comparison
+        out += [x for k in ("provenance",) if k in r for x in inalpha(p, f"relations.{rn}.{k}", r[k], ("Coupling", "Continuation"))]
         prs = r["pairs"] if r["template"] == "matched-chain" else [[r.get("big"), r.get("small")]]
         for big, small in (x for x in prs if r["template"] in ("matched", "matched-chain") and "observable" in d and len(x) == 2 and set(x) <= set(sz)):
             lb, ls = (d["observable"]["levels"][sz.index(x)] for x in (big, small))
