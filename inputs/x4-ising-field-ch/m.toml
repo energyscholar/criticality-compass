@@ -33,7 +33,6 @@ discards = "the magnitude of the local magnetisation"
 [relations.size]
 template = "chain"
 axis = "size"
-provenance = "Coupling"
 direction_from = "the declared blocking map: one more blocking step relates L to L/3"
 
 [relations.matched]
@@ -41,14 +40,12 @@ template = "matched"
 axis = "size"
 big = 243
 small = 81
-provenance = "Coupling"
 direction_from = "one extra declared blocking step at equal block-lattice size ([P2] relations)"
 
 [relations.start]
 template = "pair"
 axis = "starts"
 pairs = [["random", "ordered"]]
-provenance = "Coupling"
 direction_from = "two runs at the same point differing only in the declared initial state"
 
 [sinks]

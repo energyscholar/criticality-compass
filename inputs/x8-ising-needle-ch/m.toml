@@ -44,7 +44,6 @@ template = "matched"
 axis = "size"
 big = 243
 small = 81
-provenance = "Coupling"                        # kernel EDGE provenance (Coupling | Continuation)
 direction_from = "one extra declared blocking step at equal block-lattice size ([P2] relations)"
 
 [sinks]

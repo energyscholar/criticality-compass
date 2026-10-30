@@ -1,7 +1,6 @@
 """across.py - growth of the linear response R = cov(G, E) with system size (maths)."""
 import numpy as np
 import project
-from kernel import A
 
 
 def reduce(arrays, ctx):
@@ -21,5 +20,5 @@ def from_means(ms, ctx):
 
 def growth(x, ctx):
     """x holds ln(sR) per size; A over the size chain divided by the declared ln of the size ratio."""
-    y = A(x, ctx.rel["size"]).spatial / ctx.log_ratio
+    y = project.compared(x, ctx.rel["size"]) / ctx.log_ratio
     return {"y_steps": y, "y_last": y[:, ctx.top]}

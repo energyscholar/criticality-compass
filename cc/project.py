@@ -1,5 +1,25 @@
 """project.py - the declared projections the instruments read (maths; no branches, no literals)."""
+from dataclasses import dataclass
 import numpy as np
+
+
+@dataclass(frozen=True)
+class Comparison:
+    """A declared comparison: ordered differences inside projection C (KERNEL-IN-CC.md). It has no provenance and no src/tgt fields,
+    so admit.declare cannot take it as a provenance and kernel.A/B cannot read it (plan 1337)."""
+    n: int
+    hi: np.ndarray      # int[P]: the minuend index of each declared difference
+    lo: np.ndarray      # int[P]: the subtrahend index
+
+
+def compared(x, c):
+    """The declared differences inside C: x[hi] - x[lo] (the same float operation as kernel.A, so bit-identical)."""
+    return x.data[:, c.hi] - x.data[:, c.lo]
+
+
+def continued(g, c):
+    """C's chain sum: g[e] plus g over the comparisons leaving lo(e) (kernel.B's expression, read over a comparison)."""
+    return np.array([s + np.bincount(c.hi, weights=s, minlength=c.n)[c.lo] for s in g]).reshape(g.shape)
 
 
 def level_means(gl):

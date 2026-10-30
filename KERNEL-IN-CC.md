@@ -15,22 +15,28 @@ enough). Read it when you want to know what a number means, or before you touch 
   independently, each through its own M, that the analysis supplies: the blocking-map comparison of independent
   sizes (`size`, `matched`, `chain`: one blocking step relates L to L/3) and the two-start difference (`start`,
   pending an external verifier (ruling R1)). It is not a kernel relation and claims no provenance (not Coupling, not Continuation, not
-  Persistence); it is admissible in a downstream projection C. `m.toml` still declares both in its `[relations.*]`
-  tables, from a closed set of templates, until plan 0893 P2. In `explain`, step 3 prints each by its name as
+  Persistence); it is admissible in a downstream projection C. `m.toml` declares both in its `[relations.*]`
+  tables, from a closed set of templates; plan 1337 moved the comparisons into C (`project.Comparison`, built only by
+  `door.comparison_for`, with no provenance and no src/tgt, so neither `admit.declare` nor `kernel.A`/`B` can take one).
+  `door.STANDING` is the total table name -> standing: on a comparison `provenance` is optional and never read, on
+  `control` it is required; every result records it as `standing`. In `explain`, step 3 prints each by its name as
   COMPARISON or RELATION (`cc.toml [step_labels]`), and `cc.toml [projections.<name>]` says what each comparison
   keeps and discards.
 - An **EdgeField** is one scalar for each declared edge.
 - **A** is the kernel's one operator that takes a NodeField to an EdgeField: for each declared edge,
   `A(x)[edge] = x[source] - x[target]`, the difference of the two node values. The size-direction differences are
   the same arithmetic computed as a C comparison, not a relational reading ("A over that size edge as the needle:
-  NOT ADMISSIBLE"): the code still calls `kernel.A` for them until plan 0893 P2 moves them out, and step 4 of
+  NOT ADMISSIBLE"): plan 1337 moved them into C (`project.Comparison`, read by `project.compared`), and step 4 of
   `explain` prints `C` (or `C+KERNEL` where a control edge is also read) to say what the number is. Where CC wants a
   NodeField again it declares a projection and says what the projection keeps and discards.
 - **B** (accumulation along continuation) and **R** (circulation) are unused as kernel operators on any current
   input. `along` (below) sums the steps of its size comparison to the top edge: `B(g)[e] = g[e]` plus the sum of
-  `g[f]` over the edges that continue `e`, which over a comparison is the plain C sum it already is (the code calls
-  `kernel.B` until plan 0893 P2). `kernel.uses` lists what the code calls today: `["A"]`, or `["A", "B"]` when
-  `along` is declared.
+  `g[f]` over the edges that continue `e`, which over a comparison is the plain C sum it already is: since plan 1337 the code computes it inside C
+  (`project.continued`) and calls `kernel.B` nowhere. `kernel.uses` lists `["A"]`, or `["A", "B"]` when `along` is
+  declared: after plan 1337 a frozen `operators` field lists the operators the instrument's *design* names, and the
+  comparisons now run inside C (only `control` reaches `kernel.A`). Plan 1337 is a measurement epoch: door, project and the instruments sit inside
+  `schema.measure_hash`, so every stored result's reuse key moves (the frozen ones included) and each is re-measured
+  before it is reused or frozen; what a result says does not change, but for the new `standing` field.
 - **M** is what an input declares: its `m.toml`. It says which nodes, which comparisons and relations, which
   margins; CC refuses to run anything the M did not declare.
 
@@ -271,8 +277,8 @@ reads are themselves sign cells of declared comparisons: the blocking-map compar
 matched levels, the size chains) and the two-start difference (pending an external verifier (ruling R1)), each computed inside C, not A over a
 kernel relation. The per-point verdict is a **declared report** too; `show` prints the label `cc.toml [report] verdict` once
 under each result header, and `explain` labels steps 3 and 4 COMPARISON and C. Both labels are one table, `cc.toml [report]`;
-the verdict words and the tables are unchanged. The code that computes the per-point differences still calls `kernel.A`
-until plan 0893 P2 (a change that moves every measure key); the labels say what the numbers are now.
+the verdict words and the tables are unchanged. The code that computes the per-point differences calls `kernel.A`
+no more: plan 1337 moved them into C (`project.Comparison`; a change that moves every measure key, the plan 1337 epoch); the labels say what the numbers are.
 
 The declared interior rule `interior = "mid-run-open"` is a projection C over the needle sign cells: it keeps the MID run (less the end a sink lies beyond), discards every value and every other column, and reads nothing else.
 

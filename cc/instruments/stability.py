@@ -1,7 +1,6 @@
 """stability.py - does the growth exponent change between size steps: A over the steps chain (maths)."""
 import numpy as np
 import project
-from kernel import A
 
 
 def reduce(arrays, ctx):
@@ -21,9 +20,9 @@ def from_means(ms, ctx):
 
 def growth(x, ctx):
     """per-step growth y of ln(sR), one row per resample."""
-    return {"y_steps": A(x, ctx.rel["size"]).spatial / ctx.log_ratio}
+    return {"y_steps": project.compared(x, ctx.rel["size"]) / ctx.log_ratio}
 
 
 def curvature(x, ctx):
     """d = y_last - y_prev for EVERY resample: A over the steps chain at its last edge."""
-    return {"d": A(x, ctx.rel["steps"]).spatial[:, ctx.top_steps]}
+    return {"d": project.compared(x, ctx.rel["steps"])[:, ctx.top_steps]}

@@ -1,7 +1,6 @@
 """needle_chain.py - the matched velocity of TWO size pairs and the drift of the needle between them (maths)."""
 import numpy as np
 import project
-from kernel import A
 
 
 def reduce(arrays, ctx):
@@ -22,11 +21,11 @@ def from_means(ms, ctx):
 
 def chain(x, ctx):
     """A over both matched pairs: the coarsest edge of each is its velocity. [previous, top] go to the log door."""
-    v = A(x, ctx.rel["chain"]).spatial
+    v = project.compared(x, ctx.rel["chain"])
     both = np.stack([v[:, -1], v[:, ctx.coarsest]], axis=1)
     return {"delta": both, "velocity_prev": both[:, 0]}
 
 
 def drift(x, ctx):
     """omega_eff - 1: x holds ln|v| of (previous, top); A over that step, divided by the declared ln of the size ratio."""
-    return {"drift": -A(x, ctx.rel["steps"]).spatial[:, 0] / ctx.log_ratio[ctx.top] - 1}
+    return {"drift": -project.compared(x, ctx.rel["steps"])[:, 0] / ctx.log_ratio[ctx.top] - 1}

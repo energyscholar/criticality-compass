@@ -242,7 +242,7 @@ def trace(m, res, r, sz):
                        f"fixtures/data/{res['input']}.toml"),
            (2, "REDUCE", "row 0: " + ", ".join(f"{k} {v:.4g}" for k, v in zip(lab, x0)))]
     three, four = step_labels(inst, config())
-    out += [(3, three[n], f"{n}: {m['relations'][n]['template']}, {m['relations'][n]['provenance']}   "
+    out += [(3, three[n], f"{n}: {m['relations'][n]['template']}, {door.STANDING[n].says(m['relations'][n])}   "
                           f"{ascii_relation(m, n)}") for n in inst["relations"]]
     x = x0[None]
     for step in inst["pipeline"][1:]:

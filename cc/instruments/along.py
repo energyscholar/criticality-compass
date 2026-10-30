@@ -1,7 +1,7 @@
 """along.py - the B7 statistic: growth with size of the difference of a declared control pair (maths)."""
 import numpy as np
 import project
-from kernel import A, B
+from kernel import A
 
 
 def reduce(arrays, ctx):
@@ -25,5 +25,5 @@ def delta(x, ctx):
 
 
 def growth(x, ctx):
-    """x holds ln(s Delta) per size; y_along = B(A(x, size), size) at the top edge over the declared ln size span."""
-    return {"y_along": B(A(x, ctx.rel["size"]), ctx.rel["size"]).spatial[:, ctx.top] / ctx.log_span}
+    """x holds ln(s Delta) per size; y_along = continued(compared(x, size), size) at the top edge (a chain sum inside C, plan 1337) over the declared ln size span."""
+    return {"y_along": project.continued(project.compared(x, ctx.rel["size"]), ctx.rel["size"])[:, ctx.top] / ctx.log_span}
