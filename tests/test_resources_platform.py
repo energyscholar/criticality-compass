@@ -3,10 +3,13 @@ macOS has no in-process reset and reports bytes; an unknown platform is an Impor
 import importlib
 import resource
 import sys
+import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "cc" / "instruments")]
+import numpy  # noqa: E402
+import door  # noqa: E402
 import resources  # noqa: E402
 
 bad = []
@@ -66,7 +69,24 @@ def t3():
     check("T3 unrecorded keeps a null peak", resources.unrecorded({"x": None}) == ["x"])
 
 
+def t5():
+    """No data file outlives its read (plan 1335 P1b): 300 npz files load under a soft limit of 64 open files."""
+    with tempfile.TemporaryDirectory() as d:
+        names = [f"f{i}.npz" for i in range(300)]
+        for f in names:
+            numpy.savez(Path(d) / f, x=numpy.arange(4))
+        m = {"data": {"format": "npz-v1", "files": [{"path": f, "point": 0, "size": 27, "start": "random", "arrays": {"x": {"key": "x"}}} for f in names]}}
+        soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
+        resource.setrlimit(resource.RLIMIT_NOFILE, (64, hard))
+        try:
+            blocks = door.load_blocks(m, d)
+        finally:
+            resource.setrlimit(resource.RLIMIT_NOFILE, (soft, hard))
+    check("T5 300 files load under a 64-file limit", len(blocks) == 300, len(blocks))
+
+
 t1()
 t2()
 t3()
+t5()
 sys.exit(1 if bad else 0)

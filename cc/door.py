@@ -166,6 +166,15 @@ def memo(cache, key, make):
     return cache[key]
 
 
+def _array(path, key):
+    """One stored array, read and closed (plan 1335 P1b): no file outlives its read, so no open-file limit binds on any platform."""
+    z = np.load(path)
+    if isinstance(z, np.ndarray):
+        return z
+    with z:
+        return z[key]
+
+
 def load_blocks(m, data_root, locate=None):
     """[(block key, {array name: ndarray})] in data.files order (the key is (point, size, start), and (point, size, start, chain) under method chains), each array cut to its declared level. In a stack format (cc.toml
     [formats.*]) the arrays of a kind it `reduces` are computed from the raw stack by the declared reduction (once per file and key)."""
@@ -173,7 +182,7 @@ def load_blocks(m, data_root, locate=None):
     for b in m["data"]["files"]:
         path, arrs = str((locate or (lambda x: Path(data_root) / x))(b["path"])), {}
         for name, a in b["arrays"].items():
-            z = memo(cache, (path, a["key"], "GL"), lambda: reduced(m, path, a["key"])) if name in sch["reduces"] else memo(cache, path, lambda: np.load(path))
+            z = memo(cache, (path, a["key"], "GL"), lambda: reduced(m, path, a["key"])) if name in sch["reduces"] else memo(cache, (path, a["key"]), lambda: _array(path, a["key"]))
             v = z if isinstance(z, np.ndarray) else z[a["key"]]
             arrs[name] = np.ascontiguousarray(v[:, a["level"]] if "level" in a else v)
         out.append(((b["point"], b["size"], b["start"], *([b["chain"]] if "chain" in b else [])), arrs))   # plan 0937: a block of method chains is keyed by its chain as well
