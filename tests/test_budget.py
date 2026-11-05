@@ -31,11 +31,14 @@ Seen RED: SAMPLER_CAP made 10 (the cap assert FAILS); cc/sampler.py also listed 
 Plan 1282 P1c: the seal refusals (cc/seal_reach.py) are the role seal_reach, SEAL_REACH_CAP = 120, disjoint from every other role, host and sampler included.
 Seen RED: SEAL_REACH_CAP made 10 (the cap assert FAILS); cc/seal_reach.py also listed under plumbing (the disjointness assert FAILS).
 Plan 1335: CAP 5000 -> 5030 (Auditor-authorised; macOS platform table). Seen RED: at CAP 5000 after edits 1-3 the cap assert FAILS.
-Plan 1282 P1b: CAP 5030 -> 5031 (owner-granted up to +4; the door's one call into cc/sampler.py for the L check). Seen RED: at CAP 5030 after the edit the cap assert FAILS."""
+Plan 1282 P1b: CAP 5030 -> 5031 (owner-granted up to +4; the door's one call into cc/sampler.py for the L check). Seen RED: at CAP 5030 after the edit the cap assert FAILS.
+Plan 1282 P2a: R-P2.1, CAP 5031 -> 5034 (owner-ruled at most 5034: the couplings no-[data] finding in cc/declare.py and the import of the one instrument loader in
+cc/schema.py and cc/detect.py). The loader (cc/instrument_decl.py) is the role instrument_decl, INSTRUMENT_DECL_CAP = 20, disjoint from every other role.
+Seen RED: at CAP 5031 after the edits the cap assert FAILS; INSTRUMENT_DECL_CAP made 10 (the cap assert FAILS)."""
 import tomllib
 from pathlib import Path
 
-CAP = 5031
+CAP = 5034   # plan 1282 P2a: R-P2.1
 CORE_CAP = 1240   # plan 1205 P1 (Auditor): +40 for the hdf5-table-v1 reader. plan 1164: was INTAKE_CAP over the one role intake; now the sum over the roles of CORE, the core split by invariant
 CORE = {"intake": 100, "intake_fold": 160, "intake_evidence": 150, "intake_bytes": 100, "intake_census": 140, "intake_say": 100,   # plan 1164: role -> cap
         "intake_blind": 200, "intake_seal": 160, "intake_read": 215}   # (BLOAT-REVIEW 1160 section 4, Layout C)
@@ -56,6 +59,7 @@ TERMINAL_CAP = 200   # plan 1160 P6: checks.toml [roles] intake_terminal, S10 KE
 HOST_CAP = 80   # plan 1273 A1: checks.toml [roles] host, what this host holds of the data root and the toolset (cc/host.py), split from plumbing so CAP is not raised
 SAMPLER_CAP = 200   # plan 1282 P1a: checks.toml [roles] sampler, the declared sampler adapter (cc/sampler.py), its own role so CAP is not raised
 SEAL_REACH_CAP = 120   # plan 1282 P1c: checks.toml [roles] seal_reach, the seal's seed, reach and licence refusals (cc/seal_reach.py), its own role so CAP is not raised
+INSTRUMENT_DECL_CAP = 20   # plan 1282 P2a (R-P2.3): checks.toml [roles] instrument_decl, the one instrument loader (cc/instrument_decl.py), its own role
 VERBATIM = [
     "cc/admit.py", "cc/reduce.py", "cc/gamma.py", "tests/test_kernel.py", "tests/test_sign.py", "tests/test_resample.py",
     "tests/test_kernel_rs.py", "tests/reference/verdict_x.py",
@@ -91,6 +95,7 @@ navfamily = {f: lines(f) for f in roles["navigate_family"]}
 host = {f: lines(f) for f in roles["host"]}
 sampler = {f: lines(f) for f in roles["sampler"]}
 seal_reach = {f: lines(f) for f in roles["seal_reach"]}
+instrument_decl = {f: lines(f) for f in roles["instrument_decl"]}
 for f, n in {**counts, **intake, **names, **choices, **tests, **maths}.items():
     print(f"  {f}: {n}")
 total = sum(counts.values())
@@ -113,6 +118,7 @@ print(f"navigate_family total {sum(navfamily.values())} of {NAVFAMILY_CAP}")
 print(f"host total {sum(host.values())} of {HOST_CAP}")
 print(f"sampler total {sum(sampler.values())} of {SAMPLER_CAP}")
 print(f"seal_reach total {sum(seal_reach.values())} of {SEAL_REACH_CAP}")
+print(f"instrument_decl total {sum(instrument_decl.values())} of {INSTRUMENT_DECL_CAP}")
 assert not set(intake) & set(roles["plumbing"]), f"a file in both plumbing and intake: {sorted(set(intake) & set(roles['plumbing']))}"
 assert sum(intake.values()) <= CORE_CAP, f"intake line budget exceeded: {sum(intake.values())} > {CORE_CAP}; stop and report which files grew"
 for r, c in CORE.items():
@@ -152,5 +158,7 @@ assert sum(sampler.values()) <= SAMPLER_CAP, f"sampler line budget exceeded: {su
 assert not set(sampler) & {f for r, fs in roles.items() if r != "sampler" for f in fs}, "sampler shares a file with another role"
 assert sum(seal_reach.values()) <= SEAL_REACH_CAP, f"seal_reach line budget exceeded: {sum(seal_reach.values())} > {SEAL_REACH_CAP}"
 assert not set(seal_reach) & {f for r, fs in roles.items() if r != "seal_reach" for f in fs}, "seal_reach shares a file with another role"
+assert sum(instrument_decl.values()) <= INSTRUMENT_DECL_CAP, f"instrument_decl line budget exceeded: {sum(instrument_decl.values())} > {INSTRUMENT_DECL_CAP}"
+assert not set(instrument_decl) & {f for r, fs in roles.items() if r != "instrument_decl" for f in fs}, "instrument_decl shares a file with another role"
 assert total <= CAP, f"line budget exceeded: {total} > {CAP}; stop and report which files grew"
 print("test_budget: all passed")

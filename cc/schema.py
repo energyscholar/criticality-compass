@@ -11,6 +11,7 @@ from collections import namedtuple
 from contextlib import contextmanager
 from functools import lru_cache
 from pathlib import Path
+from instrument_decl import fill   # plan 1282 P2a (R-P2.3): the registry's declarations carry their declared defaults
 
 ROOT = Path(__file__).resolve().parent.parent
 F = namedtuple("F", "loc msg nxt")
@@ -67,7 +68,7 @@ class Ctx:
     def __init__(self, root=ROOT, **over):
         self.root, self.over, self.shapes, self.heads = Path(root), over, {}, {}
         self.cfg = tomllib.loads((self.root / "cc.toml").read_text())
-        self.reg = {f.stem: load(f)[0] or {} for f in sorted((self.root / "instruments").glob("*.toml"))}
+        self.reg = {f.stem: fill(load(f)[0] or {}) for f in sorted((self.root / "instruments").glob("*.toml"))}
         self.checks = tomllib.loads(Path(over.get("checks") or self.root / "checks.toml").read_text())
         self.data_root, self.data_root_source = ((Path(over["data_root"]), "override") if over.get("data_root")
                                                  else resolve_data_root(self.cfg, DATA_ROOT_FLAG))

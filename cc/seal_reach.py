@@ -1,11 +1,10 @@
 """cc/seal_reach.py - plan 1282 P1c: the seal's three data-free refusals (seed uniqueness, reach, the licence table), each a VALUE of its output type."""
 import dataclasses
 import itertools
-import tomllib
-from pathlib import Path
 
 import detect
 import door
+import instrument_decl
 import sampler
 import schema
 
@@ -85,7 +84,7 @@ def atoms_of(T):
 
 def why_instrument(n, m, root):
     """None when atom prefix `n` is reached; else the first failing clause: (ii) a relation of the instrument not declared, (iii) a per_point instrument with a point no control pair touches."""
-    inst = tomllib.loads((Path(root) / "instruments" / f"{n}.toml").read_text())
+    inst = instrument_decl.load(n, root)   # plan 1282 P2a (R-P2.3): the one loader
 
     def relation():
         return next((f"relation {r} not declared" for r in inst["relations"] if r not in m.get("relations", {})), None)
@@ -95,7 +94,7 @@ def why_instrument(n, m, root):
         u = [p for p in m["axes"]["point"] if p not in touched]
         return f"points {u} touched by no control pair" if u else None
 
-    return next((w for w in (relation(), points() if inst.get("per_point", False) and relation() is None else None) if w), None)
+    return next((w for w in (relation(), points() if inst["per_point"] and relation() is None else None) if w), None)
 
 
 DECLARED = {"probe": lambda m, cp: (lambda v: None if v == "COMPLETE" else f"probe_of = {v}")(detect.probe_of(m, cp))}   # total on the declared kinds: another kind is a KeyError

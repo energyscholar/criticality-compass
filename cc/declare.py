@@ -15,7 +15,7 @@ import reduce
 from transducer import chk_transducer
 import sampler   # plan 1282 P1b: the npz-sized-v1 L check (its table and messages live in sampler)
 from host import NotEvaluableHere, holder  # noqa: F401  (plan 1273: a finding about the host, not the files)
-from schema import ROOT, F, at, rel, _parsed, parse, load, row_lines, Ctx, unit_blocks, _SHA_ONCE, hashing_once, _sha, sha, MEASURE_SEEDED, import_closure, measure_hash, code_hash, code_cols, declared_cols  # noqa: F401  (moved by plan 0886; re-exported: the call sites keep `declare.<name>`)
+from schema import ROOT, F, at, rel, _parsed, parse, load, row_lines, Ctx, fill, unit_blocks, _SHA_ONCE, hashing_once, _sha, sha, MEASURE_SEEDED, import_closure, measure_hash, code_hash, code_cols, declared_cols  # noqa: F401  (moved by plan 0886; re-exported: the call sites keep `declare.<name>`)
 
 SIGNS = ("SIG-", "NEG", "SLOW-", "ZERO!", "SLOW+", "POS", "SIG+", "UNRES")
 RESULT_FIELDS = (  # the result field set that cc.toml [basic] must partition (view.py reads it from here)
@@ -708,7 +708,7 @@ def chk_instrument(p, d, c, stem=None):
     out = header(p, d, "instrument") + shape(p, d, req, {"requires": list, "door_values": list, "quantity": str, "start": str, "per_point": bool, "member_default": str, "door_label": str})
     if out:
         return out
-    out += when(d.get("per_point") and d["unit"] != "pair", p, "per_point", "only a pair instrument is read per point (over the control pairs that touch it)",
+    out += when(fill(d)["per_point"] and d["unit"] != "pair", p, "per_point", "only a pair instrument is read per point (over the control pairs that touch it)",
                 'remove per_point, or set unit = "pair"')
     out += inalpha(p, "unit", d["unit"], ("point", "pair", "point-size"))
     out += when(d.get("member_default", "") not in ["", *d.get("door_values", [])], p, "member_default", f"'{d.get('member_default')}' is not in door_values {d.get('door_values', [])}",
@@ -767,7 +767,7 @@ def chk_column(p, loc, col, c, allc):
                        "name <instrument>.<column>")]
         else:
             unit = c.reg[inst]["unit"]
-            if unit == "pair" and not c.reg[inst].get("per_point"):
+            if unit == "pair" and not c.reg[inst]["per_point"]:
                 return [at(p, loc + ".from", f"'{src}' is a pair instrument's column and has no per-point cell",
                            f"declare per_point = true in instruments/{inst}.toml (its cells are combined over the control pairs that touch a point), or read a point instrument")]
             want, needs = list(SIGNS), unit == "point-size" or unit == "pair"
@@ -1143,8 +1143,9 @@ def chk_couplings(p, d, c, stem=None):
     out = header(p, d, "couplings") + shape(p, d, {"id": str, "names": (list, str), "probes": list})
     out += id_check(p, "id", d.get("id"), stem, "its directory")
     m, bad = load(Path(c.root, p).parent / "m.toml", c.root)
-    if out or bad:
-        return out + bad
+    lack = [] if out or bad else [f"[data].{k}" for k in ("format", "files") if k not in m.get("data", {})]   # plan 1282 P2a (R-P2.1): the scalars are read from [data]
+    if out or bad or lack:
+        return out + bad + when(bool(lack), p, "", f"cannot check couplings: m.toml declares no {' and no '.join(lack)}", "declare [data] format and files in m.toml")
     names, probes, have = d["names"], d["probes"], scalar_keys(m, c)
     out += when(names != "unknown" and (not names or not all(isinstance(x, str) for x in names)), p, "names",
                 "must be a list of coupling names, or the string unknown", 'write names = ["K"] or names = "unknown"')

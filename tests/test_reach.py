@@ -1,7 +1,9 @@
 """test_reach - plan 1282 P1c: cc/seal_reach.reach, licence_total and seal. The declaration (m.toml, couplings.toml) is edited IN MEMORY from inputs/k4-m1-ch; no file is written.
 B1 k4-m1-ch alone leaves the 3 needle_o atoms unreached; B2 x8-ising-needle-ch leaves 9; B3-old (the replaced section-2 line: names = [K], probes = [], no control relation) leaves six; B3-A4 (A4.1 + needle_o, A4.10)
-reaches all 12; B4 the licence table is total over verdict.toml's 14 refuse codes; B5/B6 seal returns the Unreachable / a Sealable; B7 a control relation that leaves five points untouched fails clause (iii).
-Data-free. Seen RED on e90c90f (cc/seal_reach.py absent: every case FAILs on ModuleNotFoundError)."""
+reaches all 12; B4 the licence table is total over verdict.toml's 14 refuse codes; B5/B6 seal returns the Unreachable / a Sealable; B7 a control relation that leaves five points untouched fails clause (iii). B8 (plan 1282 P2a, R-P2.2) isolates clause (ii): B3-A4 without relations.size (control still touches every point, so (iii)
+is evaluable and passes) fails (ii) by a refusal VALUE, "relation size not declared".
+Data-free. Seen RED on e90c90f (cc/seal_reach.py absent: every case FAILs on ModuleNotFoundError). B8 seen RED on 3e0b80f with seal_reach.why_instrument's relation()
+mutated to return None: B8 FAILs by value (a Reach), no KeyError."""
 import copy
 import sys
 import tomllib
@@ -139,7 +141,17 @@ def b7():
     check("B7 exactly across_delta.y_last and stability_delta.d, each with the untouched points", isinstance(r, R.Unreachable) and whys(r) == {"across_delta.y_last": why, "stability_delta.d": why}, repr(r)[:300])
 
 
-for name, fn in (("B1", b1), ("B2", b2), ("B3-old", b3_old_case), ("B3-A4", b3_a4_case), ("B4", b4), ("B5", b5), ("B6", b6), ("B7", b7)):
+
+def b8():
+    import seal_reach as R
+    m, cp = b3_a4()
+    del m["relations"]["size"]
+    r = R.reach(m, cp, tables(), ROOT)
+    want = dict.fromkeys(["across.y_last", "across_delta.y_last", "needle_chain.drift", "stability_delta.d"], "relation size not declared")
+    check("B8 clause (ii) alone: exactly the four atoms reading relation size, each not declared", isinstance(r, R.Unreachable) and whys(r) == want, repr(r)[:300])
+
+
+for name, fn in (("B1", b1), ("B2", b2), ("B3-old", b3_old_case), ("B3-A4", b3_a4_case), ("B4", b4), ("B5", b5), ("B6", b6), ("B7", b7), ("B8", b8)):
     guarded(name, fn)
 print("".join(f"FAILED {b}\n" for b in bad) + "test_reach: " + ("FAILED" if bad else "all passed"))
 sys.exit(1 if bad else 0)

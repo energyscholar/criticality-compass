@@ -11,6 +11,7 @@ from pathlib import Path
 import numpy as np
 import schema
 import door
+import instrument_decl
 import readout
 import registry
 import resources
@@ -61,7 +62,7 @@ def refused(msg, nxt):
 def instrument(name):
     """(the instrument's declaration, its module) through the one reader (cc/registry.py, plan 1016). A unit the registry refuses has NO module (None): the run gate
     (gate, below) refuses it before any reuse or measurement, and a stored result of it is still read."""
-    d = tomllib.loads((ROOT / "instruments" / f"{name}.toml").read_text())
+    d = instrument_decl.load(name, ROOT)   # plan 1282 P2a (R-P2.3): the one loader, its optional fields filled from its declared defaults
     e = registry.lookup(f"instrument.{name}", registry.ANY, ROOT)
     return d, None if isinstance(e, registry.Refuse) else e.load()
 
@@ -403,7 +404,7 @@ def point_rows(m, c, reg, out, pt, use, pending=()):
     read per point only when it declares per_point (plan 0872), one Reading per control pair that touches the point."""
     rows, flagmap = [], c.cfg["obtained_flag"]
     for n, (inst, _) in reg.items():
-        if (inst["unit"] == "pair" and not inst.get("per_point")) or n in pending:
+        if (inst["unit"] == "pair" and not inst["per_point"]) or n in pending:
             continue   # a pair instrument has no point row: its readings are pair_readings; a `pending` instrument (its membership reads these codes) is not read yet
         on = n in m["instruments"]
         flags = sorted(set(inst["flags"]) | {flagmap[m["obtained"][pt]]}) if on else []

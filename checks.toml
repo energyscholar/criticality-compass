@@ -8,6 +8,7 @@ maths = [
 ]
 plumbing = ["bin/cc", "cc/admit.py", "cc/schema.py", "cc/declare.py", "cc/author.py", "cc/door.py", "cc/formats.py", "cc/detect.py", "cc/resources.py", "cc/view.py", "cc/score.py", "cc/reverdict.py", "cc/family.py", "cc/registry.py", "cc/transducer.py", "cc/navmap.py", "cc/chain.py", "cc/scorewords.py", "tests/reference/verdict_x.py", "tests/trace/sitecustomize.py", "docs/gen-verdicts.py",
   ".githooks/pre-commit"]
+instrument_decl = ["cc/instrument_decl.py"]   # plan 1282 P2a (R-P2.3): the one instrument loader and its declared defaults, its own cap (tests/test_budget.py INSTRUMENT_DECL_CAP)
 seal_reach = ["cc/seal_reach.py"]   # plan 1282 P1c: the seal's three data-free refusals (seeds, reach, licence), its own cap (tests/test_budget.py SEAL_REACH_CAP)
 sampler = ["cc/sampler.py"]   # plan 1282 P1a: the declared sampler adapter, its own cap (tests/test_budget.py SAMPLER_CAP)
 host = ["cc/host.py"]   # plan 1273 A1: host resources, its own cap (tests/test_budget.py HOST_CAP)
@@ -55,6 +56,7 @@ tests = [
   "tests/test_resources_platform.py",   # plan 1335: the platform table of cc/resources.py
   "tests/test_standing.py", "tests/test_standing_numbers.py",   # plan 1337: a declared comparison is project.Comparison (T1-T5), and its numbers are unchanged (T6, slow, needs the data root)
   "tests/test_sampler.py", "tests/test_tau_1282.py", "tests/test_wrong_l.py", "tests/test_seeds.py", "tests/test_reach.py", "tests/test_seed_int.py",   # plan 1282 P1a: the sampler adapter and the tau_int tool; P1b: the door refuses a wrong or missing L
+  "tests/test_couplings_no_data.py", "tests/test_instrument_decl.py",   # plan 1282 P2a: an m.toml with no [data] is a couplings finding (R-P2.1); the one instrument loader (R-P2.3)
 ]
 
 [allow]
