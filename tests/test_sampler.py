@@ -3,6 +3,7 @@ S1 a written chain re-reads (keys O G L K), the transducer model sentences pass 
 couplings/transducer/data; S4 the tool pins (a changed byte is a Mismatch value); S5 a missing table key raises KeyError; S6 the same input without the alphabet entry is
 refused at data.format; S7 the declared seeds; S8 h comes only from FAMILY_H. Reads the author's data root (cc.toml [check] needs_data).
 Seen RED on 1f4ab4b (cc/sampler.py absent, "npz-sized-v1" not in cc.toml [alphabets] formats); S6 and S8 also seen RED by mutation (evidence in the plan's P1a report)."""
+import hashlib
 import json
 import os
 import re
@@ -66,7 +67,7 @@ def s1():
             z = np.load(tmp / f"{F}.npz")
             check(f"S1 {F}: the file holds exactly O G L K, L == 27, G has 2 levels", set(z.files) == {"O", "G", "L", "K"} and int(z["L"]) == 27 and z["G"].shape[1] == 2, str(z.files))
             check(f"S1 {F}: O is (20, 2), K is the label's coupling", z["O"].shape == (20, 2) and float(z["K"]) == sampler.LABELS["1.00"], str(z["O"].shape))
-            want = f"2D Ising in a uniform field h = {'0' if F == 'poc' else '0.02'} (held fixed), heat bath (tools/lattice_field.py), K/K_c 0.90-1.10"
+            want = f"2D Ising in a uniform field h = {'0' if F == 'poc' else '0.02'} (held fixed), compiled heat bath (tools/lattice_field_rs.py), K/K_c 0.90-1.10"
             check(f"S1 {F}: transducer_model is its sentence", sampler.transducer_model(F) == want, sampler.transducer_model(F))
             d = tmp / "inputs" / "x4-ising-field-ch"
             d.mkdir(parents=True, exist_ok=True)
@@ -153,9 +154,9 @@ def s4():
     tmp = Path(tempfile.mkdtemp(prefix="s4-"))
     try:
         (tmp / "data").mkdir()
-        (tmp / "tools").mkdir()
-        for n in sampler.PINS:
-            shutil.copyfile(REAL.parent / "tools" / f"{n}.py", tmp / "tools" / f"{n}.py")
+        for n in (*sampler.PINS, sampler.SO):
+            (tmp / n).parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(REAL.parent / n, tmp / n)
         check("S4 toolset_of(<tmp>/data) is <tmp>", sampler.toolset_of(tmp / "data") == tmp)
         check("S4 unchanged tools load", not isinstance(sampler.load(tmp), sampler.Mismatch))
         f = tmp / "tools" / "flow.py"
@@ -189,7 +190,30 @@ def s8():
     check("S8 Call.h is each family's value", (ca.h, cb.h) == (0.0, 0.02), str((ca.h, cb.h)))
 
 
-for n, f in (("S1", s1), ("S2", s2), ("S3/S6", s3_s6), ("S4", s4), ("S5", s5), ("S7", s7), ("S8", s8)):
+def s9():
+    """S9 the .so is bound to the pins: the toolset's isfield.rs changed by one byte, PINS patched to its new sha (restored after), no rebuild -> the built .so still carries the old source."""
+    import sampler
+    tmp, keep = Path(tempfile.mkdtemp(prefix="s9-")), dict(sampler.PINS)
+    try:
+        for n in (*sampler.PINS, sampler.SO):
+            (tmp / n).parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(REAL.parent / n, tmp / n)
+        check("S9 unchanged toolset (with its .so) loads", not isinstance(sampler.load(tmp), sampler.Mismatch))
+        f = tmp / sampler.SRC
+        f.write_bytes(f.read_bytes() + b"\n")
+        sampler.PINS[sampler.SRC] = hashlib.sha256(f.read_bytes()).hexdigest()
+        got = sampler.load(tmp)
+        check("S9 isfield.rs changed by one byte, pin patched, no rebuild: Mismatch('tools/rust_samplers.so')", got == sampler.Mismatch(sampler.SO), str(got))
+        (tmp / sampler.SO).unlink()
+        got = sampler.load(tmp)
+        check("S9 an absent .so is Mismatch('tools/rust_samplers.so')", got == sampler.Mismatch(sampler.SO), str(got))
+    finally:
+        sampler.PINS.clear()
+        sampler.PINS.update(keep)
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+for n, f in (("S1", s1), ("S2", s2), ("S3/S6", s3_s6), ("S4", s4), ("S5", s5), ("S7", s7), ("S8", s8), ("S9", s9)):
     guarded(n, f)
 print("test_sampler: " + ("FAILED" if bad else "all passed"))
 sys.exit(1 if bad else 0)

@@ -1,12 +1,13 @@
 """cc/sampler.py - plan 1282 P1a: the declared sampler adapter. One call, (K, h, L, start, seed, run) -> the arrays a chain file stores (O, G, L, K).
-The sampler is the toolset's heat bath (tools/lattice_field.py), loaded only after its three files match their pins; a mismatch is a VALUE (Mismatch),
-never an import of unpinned code. Every table is total: a missing key raises KeyError and nothing catches it into a default. h is not a coupling of
+The sampler is the toolset's compiled heat bath (tools/lattice_field_rs.py on tools/rust_samplers.so), loaded only after its five pinned files match their pins and the
+built .so reports the pinned isfield.rs; a mismatch is a VALUE (Mismatch), never an import of unpinned code. The .so is per host and untracked: Call.build records its sha256. Every table is total: a missing key raises KeyError and nothing catches it into a default. h is not a coupling of
 the file (couplings = {"K": K}); it is an argument of the call and is recorded in the Call."""
 import dataclasses
 import hashlib
 import importlib.util
 import json
 import math
+import sys
 import zipfile
 from pathlib import Path
 from types import SimpleNamespace
@@ -22,8 +23,11 @@ SIZES = {27: 2, 81: 3, 243: 4}                      # L -> the number of block l
 STARTS = {"ordered": "plus", "random": "random"}    # the declared start -> the sampler's start name
 CHAINS = range(10)
 FAMILY_H = {"poc": 0.0, "decoy": 0.02}              # family -> the field h, the only source of h
-PINS = {"lattice_field": "4162eb36e9e8f34fec82461e319beebd8bb2099bd533df5ef4a5859584cbb465", "scale": "1dff330d804d067e26f8c6c7dbe86739f0ee75635e5d1661f163d01bcf908f2b",
-        "flow": "5f5b225a2cbc49bf2eef8c2168a2059620476c304fe71524eb687b12e1b9cae7"}
+SO = "tools/rust_samplers.so"                       # the built extension: per host, untracked, bound to the pins by isfield_source()
+SRC = "tools/rust_samplers/src/isfield.rs"
+PINS = {"tools/lattice_field_rs.py": "c8572e792f6423ae2a0dbc7db0063e15948f9c90964b831fd8e73e5cb9d02892", SRC: "66a3f4a618521781a6b398ca10a85182f474d2444ffeeef87c40dee1b7a7b8c3",
+        "tools/rust_samplers/src/lib.rs": "10236358f2683ffb70cd82b6a301459350bc450e24694c5f9d6c6972e718e2cc", "tools/scale.py": "1dff330d804d067e26f8c6c7dbe86739f0ee75635e5d1661f163d01bcf908f2b",
+        "tools/flow.py": "5f5b225a2cbc49bf2eef8c2168a2059620476c304fe71524eb687b12e1b9cae7"}   # path -> sha256, at toolset commit fdb284fe3c3d1354f738e0ee2e07c3a534840df5
 Q = {"key": "O", "level": 0}
 GL = {27: {}, 81: {"GL": {"key": "G"}}, 243: {"GL": {"key": "G"}}}   # the full-depth G, stored for the sizes that have a second level to compare
 
@@ -52,6 +56,7 @@ class Call:
     start: str
     seed: int
     run: Run
+    build: str      # sha256 of the .so that ran the chain
 
 
 @dataclasses.dataclass(frozen=True)
@@ -69,21 +74,29 @@ def toolset_of(data_root):
 
 
 def load(toolset):
-    """The three pinned tools as a namespace (field, scale, flow), or the Mismatch of the first file whose sha256 is not its pin."""
-    paths = {n: Path(toolset) / "tools" / f"{n}.py" for n in PINS}
-    bad = [n for n, p in paths.items() if hashlib.sha256(p.read_bytes()).hexdigest() != PINS[n]]
+    """The pinned tools as a namespace (field, scale, flow, build), or the Mismatch of the first path whose sha256 is not its pin. The .so is bound to the pins by the source it
+    carries: sha256(isfield_source()) must be the isfield.rs pin. A stale .so has no isfield_source: AttributeError, loud by design (plan 1282 P2b OQ3)."""
+    root = Path(toolset)
+    bad = [n for n, sha in PINS.items() if hashlib.sha256((root / n).read_bytes()).hexdigest() != sha]
     if bad:
-        return Mismatch(f"tools/{bad[0]}.py")
+        return Mismatch(bad[0])
+    if not (root / SO).is_file():   # plumbing: an absent build is a value, not an exception
+        return Mismatch(SO)
+    rs = importlib.util.module_from_spec(importlib.util.spec_from_file_location("rust_samplers", root / SO))   # by path: tools/ never goes on sys.path (kernel, sign, resample shadow CC)
+    rs.__spec__.loader.exec_module(rs)
+    if hashlib.sha256(rs.isfield_source().encode("utf-8")).hexdigest() != PINS[SRC]:   # plumbing: the build is not the pinned source
+        return Mismatch(SO)
+    sys.modules["rust_samplers"] = rs
     mods = {}
-    for n, p in paths.items():
-        spec = importlib.util.spec_from_file_location(f"_sampler_{n}", p)
+    for n in ("lattice_field_rs", "scale", "flow"):
+        spec = importlib.util.spec_from_file_location(f"_sampler_{n}", root / "tools" / f"{n}.py")
         mods[n] = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(mods[n])
-    return SimpleNamespace(field=mods["lattice_field"], scale=mods["scale"], flow=mods["flow"])
+    return SimpleNamespace(field=mods["lattice_field_rs"], scale=mods["scale"], flow=mods["flow"], build=hashlib.sha256((root / SO).read_bytes()).hexdigest())
 
 
 def sample(tools, K, h, L, start, seed, run):
-    """(Chain, Call): run.N sweeps of the heat bath, each recorded as the (E, M) row, the g1 of every block level, and the level-1 block magnetisation."""
+    """(Chain, Call): run.N yields of the compiled heat bath, each recorded as the (E, M) row, the g1 of every block level, and the level-1 block magnetisation."""
     begin, nlev = STARTS[start], SIZES[L]
     rng = np.random.default_rng(seed)
     O, G, M1 = [], [], []
@@ -93,7 +106,7 @@ def sample(tools, K, h, L, start, seed, run):
         O.append(tools.field.observables(s))
         M1.append(lv[1].sum())
     arr = lambda a: np.array(a, dtype=np.float64)   # noqa: E731
-    return Chain(arr(O), arr(G), int(s.shape[-1]), {"K": K}, arr(M1)), Call(K, h, L, start, seed, run)
+    return Chain(arr(O), arr(G), int(s.shape[-1]), {"K": K}, arr(M1)), Call(K, h, L, start, seed, run, tools.build)
 
 
 def write(chain, path):
@@ -119,7 +132,7 @@ def entry(path, point, L, start, chain):
 
 
 def transducer_model(F):
-    return f"2D Ising in a uniform field h = {FAMILY_H[F]:g} (held fixed), heat bath (tools/lattice_field.py), K/K_c 0.90-1.10"
+    return f"2D Ising in a uniform field h = {FAMILY_H[F]:g} (held fixed), compiled heat bath (tools/lattice_field_rs.py), K/K_c 0.90-1.10"
 
 
 CARRIES_L = {"npz-v1": False, "npy-v1": False, "snapshots-v1": False, "image-stack-v1": False, "island-table-v1": False, "npz-sized-v1": True}   # total over cc.toml [alphabets] formats: does the format carry L by construction (A4.9)
