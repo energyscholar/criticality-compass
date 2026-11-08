@@ -16,7 +16,6 @@ declared in research/1205/LL1-PRE-v6.md). It reads no real data. Each check name
      Red: a member NOT_STRIDE_FITS_WINDOW added to the class and its ATOMS."""
 import json
 import re
-import shutil
 import subprocess
 import sys
 import tempfile
@@ -31,7 +30,7 @@ bootstrap(ROOT, "cc", "tests")
 import chain  # noqa: E402
 import intake_feature as F  # noqa: E402
 import intake_synth as S  # noqa: E402
-from intake_plant import long_table, write_long  # noqa: E402
+from intake_plant import plant_world, long_table, write_long  # noqa: E402
 
 V3, V6 = ROOT / "intake" / "grids" / "ll1-pre-v3.toml", ROOT / "intake" / "grids" / "ll1-pre-v6.toml"
 
@@ -119,12 +118,7 @@ def cli_checks():
     check("P1. the v3 CLI golden (tests/test_chain_1205.py: ll1-pre-v3 output byte for byte) passes", r.returncode == 0, (r.stdout + r.stderr)[-400:])
     with tempfile.TemporaryDirectory() as tmp:
         tmp = Path(tmp)
-        w, banks = tmp / "cc", tmp / "banks"
-        shutil.copytree(ROOT, w, ignore=shutil.ignore_patterns(".git", "__pycache__", "results", "benchmark", "fixtures", "data", "scratch"))
-        with (w / "intake" / "ROOTS.toml").open("a") as f:
-            f.write(f'\n"<chain-test>" = "{banks}"   # test_chain_1205_p2b: the planted banks\n')
-        S.write(banks / "pf", tmp / "pf-TRUTH", "pf", 1, 9)
-        man = json.loads((banks / "pf" / "MANIFEST.json").read_text())
+        w, banks, man = plant_world(tmp, "<chain-test>", "test_chain_1205_p2b")
 
         cc = lambda *args: run_cc(w, *args)[::-1]   # noqa: E731  (lib.cc returns (returncode, output); this call site reads (output, returncode))
 

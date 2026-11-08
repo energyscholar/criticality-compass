@@ -29,7 +29,6 @@ banks (tests/intake_plant.py). Each check names its red mutation (applied with `
 import json
 import os
 import re
-import shutil
 import sys
 import tempfile
 from dataclasses import dataclass
@@ -43,7 +42,7 @@ bootstrap(ROOT, "cc", "tests")
 import chain  # noqa: E402
 import intake_feature as F  # noqa: E402
 import intake_synth as S  # noqa: E402
-from intake_plant import long_table, write_long  # noqa: E402
+from intake_plant import plant_family, plant_world  # noqa: E402
 
 GOLD = ROOT / "tests" / "chain" / "plant-chain.txt"
 GRID = ROOT / "intake" / "grids" / "ll1-pre-v3.toml"
@@ -144,24 +143,12 @@ def end_curves():
 def cli_checks():
     with tempfile.TemporaryDirectory() as tmp:
         tmp = Path(tmp)
-        w, banks = tmp / "cc", tmp / "banks"
-        shutil.copytree(ROOT, w, ignore=shutil.ignore_patterns(".git", "__pycache__", "results", "benchmark", "fixtures", "data", "scratch"))
-        with (w / "intake" / "ROOTS.toml").open("a") as f:
-            f.write(f'\n"<chain-test>" = "{banks}"   # test_chain_1205: the planted banks\n')
-        S.write(banks / "pf", tmp / "pf-TRUTH", "pf", 1, 9)
-        m = json.loads((banks / "pf" / "MANIFEST.json").read_text())
+        w, banks, m = plant_world(tmp, "<chain-test>", "test_chain_1205")
 
         cc = lambda *args: run_cc(w, *args)[::-1]   # noqa: E731  (lib.cc returns (returncode, output); this call site reads (output, returncode))
 
         def plant(ident, curves, profile=True):
-            (banks / ident).mkdir()
-            write_long(banks / ident, rows_text(curves))
-            d = w / "declarations" / ident
-            d.mkdir()
-            text = long_table(m, ident).replace("<long-test>/pf", f"<chain-test>/{ident}") + '\n[plane]\naxes = "slow-fast"\n'
-            (d / "intake.toml").write_text(text)
-            (d / "transducer.toml").write_text(S.declare(m, ident, "pf")[2])
-            [cc("intake", "profile", ident, root) for root in re.findall(r'^root = "([^"]*)"', text, re.M)[:1] if profile]
+            plant_family(w, banks, m, cc, "<chain-test>", ident, rows_text(curves), '\n[plane]\naxes = "slow-fast"\n', profile)
 
         def refused(out):
             code = re.findall(r"^REFUSED ([A-Z_]+):", out, re.M)

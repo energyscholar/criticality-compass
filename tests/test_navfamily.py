@@ -32,7 +32,6 @@ import hashlib
 import json
 import os
 import re
-import shutil
 import subprocess
 import sys
 import tempfile
@@ -49,7 +48,7 @@ import intake_synth  # noqa: E402
 import linenav  # noqa: E402
 import navfamily  # noqa: E402
 from intake_evidence import Census  # noqa: E402
-from intake_plant import long_table, rooted, run, write_long  # noqa: E402
+from intake_plant import plant_family, plant_world, long_table, rooted, run, write_long  # noqa: E402
 
 T = intake.tables(ROOT)
 GOLD = ROOT / "tests" / "navigate" / "plant-line-walks.txt"
@@ -129,25 +128,12 @@ except Exception as e:   # a crash is a named FAIL, never a silent pass
 def cli_checks():
     with tempfile.TemporaryDirectory() as tmp:
         tmp = Path(tmp)
-        w, banks = tmp / "cc", tmp / "banks"
-        shutil.copytree(ROOT, w, ignore=shutil.ignore_patterns(".git", "__pycache__", "results", "benchmark", "fixtures", "data", "scratch"))
-        with (w / "intake" / "ROOTS.toml").open("a") as f:
-            f.write(f'\n"<nav-test>" = "{banks}"   # test_navfamily: the planted banks\n')
-        intake_synth.write(banks / "pf", tmp / "pf-TRUTH", "pf", 1, 9)
-        m = json.loads((banks / "pf" / "MANIFEST.json").read_text())
+        w, banks, m = plant_world(tmp, "<nav-test>", "test_navfamily")
 
         cc = lambda *args: run_cc(w, *args)[::-1]   # noqa: E731  (lib.cc returns (returncode, output); this call site reads (output, returncode))
 
         def plant(ident, blocks, tl, profile=True):
-            """A planted family declarations/<ident>/ on bank <nav-test>/<ident>, profiled as a declarer does before running."""
-            (banks / ident).mkdir()
-            write_long(banks / ident, blocks)
-            d = w / "declarations" / ident
-            d.mkdir()
-            text = long_table(m, ident).replace("<long-test>/pf", f"<nav-test>/{ident}") + tl
-            (d / "intake.toml").write_text(text)
-            (d / "transducer.toml").write_text(intake_synth.declare(m, ident, "pf")[2])
-            [cc("intake", "profile", ident, root) for root in re.findall(r'^root = "([^"]*)"', text, re.M)[:1] if profile]
+            plant_family(w, banks, m, cc, "<nav-test>", ident, blocks, tl, profile)
 
         def refused(out):
             code = re.findall(r"^REFUSED ([A-Z_]+):", out, re.M)

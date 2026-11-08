@@ -3,6 +3,7 @@ writer, the synthetic bank's declaration as PER_FILE and as LONG_TABLE, and an i
 import io
 import json
 import re
+import shutil
 import zipfile
 from pathlib import Path
 
@@ -262,3 +263,27 @@ def h5_bank(banks, name, raw, **mkdir):
     (banks / name).mkdir(**mkdir)
     (banks / name / "bank.h5").write_bytes(raw)
     return name
+
+
+def plant_world(tmp, tag, who):
+    """A scratch copy <tmp>/cc of the Compass whose intake/ROOTS.toml registers `tag` -> <tmp>/banks, and the synthetic bank <tmp>/banks/pf with its manifest.
+    Returns (w, banks, m). `who` names the test in the registration comment."""
+    w, banks = tmp / "cc", tmp / "banks"
+    shutil.copytree(ROOT, w, ignore=shutil.ignore_patterns(".git", "__pycache__", "results", "benchmark", "fixtures", "data", "scratch"))
+    with (w / "intake" / "ROOTS.toml").open("a") as f:
+        f.write(f'\n"{tag}" = "{banks}"   # {who}: the planted banks\n')
+    intake_synth.write(banks / "pf", tmp / "pf-TRUTH", "pf", 1, 9)
+    return w, banks, json.loads((banks / "pf" / "MANIFEST.json").read_text())
+
+
+def plant_family(w, banks, m, cc, tag, ident, rows, tail, profile=True):
+    """A planted family declarations/<ident>/ on bank <tag>/<ident> (`rows` written as its long table, `tail` appended to its declaration), profiled as a declarer
+    does before running. `cc(*args)` runs bin/cc of `w`."""
+    (banks / ident).mkdir()
+    write_long(banks / ident, rows)
+    d = w / "declarations" / ident
+    d.mkdir()
+    text = long_table(m, ident).replace("<long-test>/pf", f"{tag}/{ident}") + tail
+    (d / "intake.toml").write_text(text)
+    (d / "transducer.toml").write_text(intake_synth.declare(m, ident, "pf")[2])
+    [cc("intake", "profile", ident, root) for root in re.findall(r'^root = "([^"]*)"', text, re.M)[:1] if profile]
