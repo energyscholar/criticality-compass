@@ -542,11 +542,15 @@ def cmd_show(args, explain):
     return emit(view.show(res, jn, MODE, frozen_note(res["run_id"])))
 
 
+def all_results():
+    return [json.loads(p.read_text()) for p in sorted((ROOT / "results").glob("*.json"))]
+
+
 def cmd_diff(args):
     """tabulate --diff A B: print the diff and write NOTHING (plan 0864 O2/R14)."""
     import detect
     import score
-    results = [json.loads(p.read_text()) for p in sorted((ROOT / "results").glob("*.json"))]
+    results = all_results()
     a, b = args[args.index("--diff") + 1:][:2]
     ra, rb = ([r for r in results if r["tables"] == t] for t in (a, b))
     lines, _, _ = score.diff(detect.load_tables(a), detect.load_tables(b), ra, rb)
@@ -560,7 +564,7 @@ def cmd_tabulate(args):
     import score
     if "--diff" in args:
         return cmd_diff(args)
-    results = [json.loads(p.read_text()) for p in sorted((ROOT / "results").glob("*.json"))]
+    results = all_results()
     with declare.hashing_once():   # read-only: each data file is hashed once, not once per result that read it
         md, found = score.tabulate(results)
     (ROOT / "SIGNATURE-TABLE.md").write_text(md)

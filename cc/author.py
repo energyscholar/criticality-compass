@@ -92,16 +92,25 @@ def refuse(msg, nxt):
     return 1
 
 
-def new_case(root, cid):
-    p = Path(root) / "cases" / f"{cid}.toml"
-    if not re.fullmatch(r"[a-z0-9][a-z0-9-]*", cid):
-        return refuse(f"'{cid}' is not a case id (lower-case letters, digits, hyphens).", "bin/cc new case potts-q4")
+KIND_DIR = {"case": "cases", "family": "families"}   # a new file's kind -> the directory of its files and its TEMPLATE.toml.in
+
+
+def _stamp(root, kind, ident, example, said):
+    """Write <dir>/<id>.toml from the directory's template, printing `said`; a refusal (not an id, exists) prints and returns 1."""
+    d = KIND_DIR[kind]
+    p = Path(root) / d / f"{ident}.toml"
+    if not re.fullmatch(r"[a-z0-9][a-z0-9-]*", ident):
+        return refuse(f"'{ident}' is not a {kind} id (lower-case letters, digits, hyphens).", example)
     if p.exists():
-        return refuse(f"cases/{cid}.toml already exists.", "edit it, or pick another id")
-    p.write_text((Path(root) / "cases" / "TEMPLATE.toml.in").read_text().replace("<ID>", cid))
-    print(f"wrote cases/{cid}.toml\n  Next: fill every TODO in cases/{cid}.toml, map points to it in "
-          "inputs/<input>/points.toml, then bin/cc validate")
+        return refuse(f"{d}/{ident}.toml already exists.", "edit it, or pick another id")
+    p.write_text((Path(root) / d / "TEMPLATE.toml.in").read_text().replace("<ID>", ident))
+    print(said)
     return 0
+
+
+def new_case(root, cid):
+    return _stamp(root, "case", cid, "bin/cc new case potts-q4", f"wrote cases/{cid}.toml\n  Next: fill every TODO in cases/{cid}.toml, map points to it in "
+                  "inputs/<input>/points.toml, then bin/cc validate")
 
 
 def repoint(m, labels, pat):
@@ -240,15 +249,8 @@ def new_instrument(root, iid):
 
 def new_family(root, fid):
     """families/<id>.toml from the template; validate refuses it until every TODO is replaced."""
-    root, p = Path(root), Path(root) / "families" / f"{fid}.toml"
-    if not re.fullmatch(r"[a-z0-9][a-z0-9-]*", fid):
-        return refuse(f"'{fid}' is not a family id (lower-case letters, digits, hyphens).", "bin/cc new family b7-at-line-2")
-    if p.exists():
-        return refuse(f"families/{fid}.toml already exists.", "edit it, or pick another id")
-    p.write_text((root / "families" / "TEMPLATE.toml.in").read_text().replace("<ID>", fid))
-    print(f"wrote families/{fid}.toml\n  Next: replace every TODO (an input and its interior points), then bin/cc validate "
-          f"and bin/cc family {fid}")
-    return 0
+    return _stamp(root, "family", fid, "bin/cc new family b7-at-line-2", f"wrote families/{fid}.toml\n  Next: replace every TODO (an input and its interior points), then bin/cc validate "
+                  f"and bin/cc family {fid}")
 
 
 def data_add(root, iid):

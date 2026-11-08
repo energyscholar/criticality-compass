@@ -1,13 +1,11 @@
 """transducer.py - inputs/<id>/transducer.toml (plan 0883, Q0): the transducer (or the record), the per-locus reduction, the interval's role.
 Plumbing; outside the measurement closure. The schema is data (cc.toml [transducer], [alphabets] interval_method); nothing here reads a sentence."""
 import hashlib
-import os
 import re
-import subprocess
 import tomllib
 from pathlib import Path
 from schema import at, sha
-from host import Held, probe, resource
+from host import Held, probe, resource, git_bytes as _git
 
 UPDATE = re.compile(r"((?:[a-z]+:)?)(\S+) sha256 ([0-9a-f]{64})")   # [route] path sha256 hex
 CC = Path(__file__).resolve().parent.parent
@@ -53,12 +51,6 @@ def chk_transducer(p, d, c, stem=None):
     role = d["interval"].get("role")
     return out + D.when(isinstance(role, str) and role != cfg["interval_role"], p, "interval.role", f"'{role}' is not the declared role",
                         f'write role = "{cfg["interval_role"]}"')
-
-
-def _git(tools, *args):
-    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}   # a git hook exports GIT_DIR/GIT_INDEX_FILE: they would point -C at the hook's repo
-    r = subprocess.run(["git", "-C", str(tools), *args], capture_output=True, env=env)
-    return r.stdout if r.returncode == 0 else None
 
 
 def retrieve(tools, rel, want):

@@ -1,6 +1,7 @@
 """declare.py - plugin loaders, schemas, cross-references, the partition checker, validate (plumbing)."""
 import difflib
 import fnmatch
+import functools
 import itertools
 import re
 import tomllib
@@ -112,8 +113,11 @@ def load_case(path):
     return Case(**{f.name: d[f.name] for f in dc_fields(Case) if f.name in d})
 
 
-def load_truth(path):
-    return tomllib.loads(Path(path).read_text())["class_truth"]
+def load_key(path, key):
+    return tomllib.loads(Path(path).read_text())[key]
+
+
+load_truth = functools.partial(load_key, key="class_truth")
 
 
 def case_truths(c):
@@ -121,8 +125,7 @@ def case_truths(c):
     return {f.stem: load_truth(f) for f in sorted((c.root / "cases").glob("*.toml"))}
 
 
-def load_order_truth(path):
-    return tomllib.loads(Path(path).read_text())["order_truth"]
+load_order_truth = functools.partial(load_key, key="order_truth")
 
 
 def id_check(p, field, got, want, what):

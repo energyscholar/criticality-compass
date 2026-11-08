@@ -15,10 +15,8 @@ argument that could reach them. Beside the verdict, family reports the feature c
 traced point its curve's kind (value-free). Every file a command opens is appended to its own access log (T23, extended to every open of this process
 by an audit hook): results/navigate/<id>.access.jsonl for family, results/navigate/<id>.score.access.jsonl for score (LOG)."""
 import functools
-import json
 import os
 import sys
-import time
 import tomllib
 from dataclasses import dataclass
 from pathlib import Path
@@ -72,13 +70,8 @@ class Walked:
 def logged(root, ident, command):
     """Open the command's access log (append-only) and record every later open of this process in it: one JSON line per open, written
     with os.write on the log's own descriptor (os.write opens nothing, so the hook never records itself). Returns the log's path."""
-    path = Path(root) / "results" / "navigate" / LOG[command].format(id=ident)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o644)   # plumbing: append-only by open mode
-    base = dict(partition=f"family:{ident}", argv=sys.argv[1:], pid=os.getpid(), git_head=navmap._head(root), route=f"open:{command}")
-    line = lambda a: (json.dumps({**base, "t_ns": time.time_ns(), "path": str(a[0]), "mode": str(a[1])}, sort_keys=True) + "\n").encode()   # noqa: E731
-    sys.addaudithook(lambda event, a: {True: lambda: os.write(fd, line(a)), False: lambda: 0}[event == "open"]())
-    return path
+    return navmap.hook_log(Path(root) / "results" / "navigate" / LOG[command].format(id=ident),
+                           dict(partition=f"family:{ident}", argv=sys.argv[1:], pid=os.getpid(), git_head=navmap._head(root), route=f"open:{command}"))
 
 
 def census(root, ident):

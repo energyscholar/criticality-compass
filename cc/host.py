@@ -41,10 +41,14 @@ def _(x):
     return Held("toolset", x)   # a caller that names the toolset by its path located it: held
 
 
-def _git(where, *a):
+def git_bytes(where, *args):
     env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}   # a hook's GIT_DIR / GIT_INDEX_FILE would point -C at the hook's repo
-    r = subprocess.run(["git", "-C", str(where), *a], capture_output=True, text=True, env=env)
-    return r.stdout.strip() if r.returncode == 0 else None
+    r = subprocess.run(["git", "-C", str(where), *args], capture_output=True, env=env)
+    return r.stdout if r.returncode == 0 else None
+
+
+def _git(where, *a):
+    return (lambda b: None if b is None else b.decode().strip())(git_bytes(where, *a))   # git_bytes decoded: the text and stripped
 
 
 @lru_cache(maxsize=None)

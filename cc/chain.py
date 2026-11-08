@@ -20,7 +20,6 @@ import functools
 import json
 import os
 import sys
-import time
 import tomllib
 from dataclasses import dataclass
 from pathlib import Path
@@ -32,6 +31,7 @@ import intake_feature as F
 import intake_suspect
 import kernel
 import navfamily
+import navmap
 from intake_blind import Typed, bind, gate, look
 
 REFUSAL = {   # code -> sentence; every code this module emits is a row (tests/test_chain_1205.py reaches each)
@@ -375,13 +375,8 @@ def co_rows(cells, other):
 
 def logged(root, ident):
     """The chain's access log (append-only): one JSON line per open of this process, as navfamily.logged writes its own (T23)."""
-    path = Path(root) / "results" / "chain" / f"{ident}.access.jsonl"
-    path.parent.mkdir(parents=True, exist_ok=True)
-    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o644)
-    base = dict(partition=f"chain:{ident}", argv=sys.argv[1:], pid=os.getpid(), route="open:chain")
-    line = lambda a: (json.dumps({**base, "t_ns": time.time_ns(), "path": str(a[0]), "mode": str(a[1])}, sort_keys=True) + "\n").encode()   # noqa: E731
-    sys.addaudithook(lambda event, a: {True: lambda: os.write(fd, line(a)), False: lambda: 0}[event == "open"]())
-    return path
+    return navmap.hook_log(Path(root) / "results" / "chain" / f"{ident}.access.jsonl",
+                           dict(partition=f"chain:{ident}", argv=sys.argv[1:], pid=os.getpid(), git_head=navmap._head(root), route="open:chain"))
 
 
 def _second(root, fam, other, g):

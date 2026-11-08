@@ -60,6 +60,16 @@ class AccessLog:
         return data
 
 
+def hook_log(path, base):
+    """Open `path` append-only and record every later open of this process in it: one JSON line per open (`base` plus t_ns, path, mode), written
+    with os.write on the log's own descriptor (os.write opens nothing, so the hook never records itself). Returns the log's path."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o644)   # plumbing: append-only by open mode
+    line = lambda a: (json.dumps({**base, "t_ns": time.time_ns(), "path": str(a[0]), "mode": str(a[1])}, sort_keys=True) + "\n").encode()   # noqa: E731
+    sys.addaudithook(lambda event, a: {True: lambda: os.write(fd, line(a)), False: lambda: 0}[event == "open"]())
+    return path
+
+
 def _head(root):
     r = subprocess.run(["git", "-C", str(root), "rev-parse", "HEAD"], capture_output=True, text=True)
     return r.stdout.strip() or "NO-GIT"   # plumbing: an honest null when not a repository
