@@ -18,6 +18,9 @@ import tempfile
 import time
 from pathlib import Path
 
+for _k in [k for k in os.environ if k.startswith("GIT_")]:
+    del os.environ[_k]   # a git hook sets GIT_DIR/GIT_INDEX_FILE: the throwaway clones below must not act on the real worktree
+
 ROOT = Path(__file__).resolve().parent.parent
 from lib import bad, bootstrap, check, guarded, parse, real_root  # noqa: E402
 bootstrap(ROOT, "cc", "cc/instruments")
@@ -330,6 +333,24 @@ def f7():
     srv2.wait(timeout=60)
 
 
+def f9():
+    """F9: a worker kill -9 (BrokenProcessPool) makes the driver exit non-zero promptly, not after the surviving workers' chains."""
+    C = clone(TMP / "f9-clone")
+    D = build_in(C, TMP / "f9-out", "27,40,3000,3000,20")
+    srv = subprocess.Popen([sys.executable, str(C / "tests" / "frozen_run_1282.py"), "serve", "--run-dir", str(D), "--procs", "2"], stdout=subprocess.PIPE, text=True)
+    check("F9 two chains begin", wait_for(lambda: len(begins(D)) >= 2))
+    victim = int(begins(D)[0].rsplit("pid=", 1)[1])
+    os.kill(victim, signal.SIGKILL)
+    t0 = time.time()
+    try:
+        srv.wait(timeout=30)
+    except subprocess.TimeoutExpired:
+        srv.kill()
+        srv.wait()
+    check("F9 driver exits non-zero within 30 s of a worker kill -9 (survivors do not hold it)", srv.returncode == 70 and time.time() - t0 < 30, f"rc={srv.returncode} after {time.time() - t0:.1f}s")
+    check("F9 no worker of that life survives the driver's exit", not [ln for ln in subprocess.run(["pgrep", "-f", str(D)], capture_output=True, text=True).stdout.split() if int(ln) != os.getpid()], "")
+
+
 class Spy:
     """Stands in for the compiled module: records the sweeps of every isfield_sweeps_rs call."""
 
@@ -386,7 +407,7 @@ def f8():
         t.field.rs = real
 
 
-for n, f in (("F1", f1), ("F2", f2), ("F3", f3), ("F3b", f3b), ("F4", f4), ("F5/F6", f5_f6), ("F7", f7), ("F8", f8)):
+for n, f in (("F1", f1), ("F2", f2), ("F3", f3), ("F3b", f3b), ("F4", f4), ("F5/F6", f5_f6), ("F7", f7), ("F8", f8), ("F9", f9)):
     guarded(n, f)
 shutil.rmtree(TMP, ignore_errors=True)
 print("test_frozen_run_1282: " + ("FAILED" if bad else "all passed"))

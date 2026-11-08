@@ -535,6 +535,8 @@ def serve(D, procs):
                             log(D, "budget STOP")
         except BrokenProcessPool:
             log(D, "crash BrokenProcessPool")
+            for w in multiprocessing.active_children():
+                w.kill()   # the pool's workers ignore SIGTERM (H5), so the executor's own terminate_broken cannot stop them: without this the exit waits for their chains
             sys.exit(70)   # non-zero: launchd respawns, H3 resumes the work
     n = len(used)
     final = (RunState.FAILED if failed else RunState.DRAINED if (D / f"DRAIN.{me}").exists() else RunState.STOPPED if (D / "STOP").exists() and n < total else RunState.DONE if n == total else RunState.STOPPED)
