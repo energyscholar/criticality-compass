@@ -7,17 +7,10 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "cc" / "instruments")]
+from lib import bad, bootstrap, check  # noqa: E402
+bootstrap(ROOT, "cc", "cc/instruments")
 import detect  # noqa: E402
 import view  # noqa: E402
-
-bad = []
-
-
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
 
 
 def blocks(lines):

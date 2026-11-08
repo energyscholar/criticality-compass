@@ -14,18 +14,11 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "tests")]
+from lib import bad, bootstrap, check  # noqa: E402
+bootstrap(ROOT, "cc", "tests")
 import intake  # noqa: E402
 import intake_read as rd  # noqa: E402
 from intake_plant import xlsx  # noqa: E402
-
-bad = []
-
-
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
 
 
 T = intake.tables(ROOT)

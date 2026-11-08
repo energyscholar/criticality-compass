@@ -8,7 +8,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 default = tomllib.loads((ROOT / "cc.toml").read_text())["defaults"]["tables"]
 other = sorted(p.name for p in (ROOT / "tables").iterdir() if p.is_dir() and p.name != default)[0]
-bad = []
 
 
 def cc(*args):
@@ -16,10 +15,7 @@ def cc(*args):
     return r.stdout + r.stderr
 
 
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
+from lib import bad, check  # noqa: E402
 
 
 for label, args in (("family", ("family", default)), ("reverdict", ("reverdict", default, "--tables", other))):

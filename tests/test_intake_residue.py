@@ -25,7 +25,8 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "tests")]
+from lib import bad, bootstrap, check  # noqa: E402
+bootstrap(ROOT, "cc", "tests")
 import intake  # noqa: E402
 import intake_blind as blind  # noqa: E402
 import intake_bytes  # noqa: E402
@@ -35,14 +36,6 @@ import intake_seal  # noqa: E402
 import intake_terminal  # noqa: E402
 from intake_fold import before_data  # noqa: E402
 from intake_plant import conversion, rooted  # noqa: E402
-
-bad = []
-
-
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
 
 
 T = intake.tables(ROOT)

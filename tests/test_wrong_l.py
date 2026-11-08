@@ -15,30 +15,16 @@ import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "cc" / "instruments")]
+from lib import bad, bootstrap, check, guarded  # noqa: E402
+bootstrap(ROOT, "cc", "cc/instruments")
 import numpy as np  # noqa: E402
 import author  # noqa: E402
 import declare  # noqa: E402
 import sampler  # noqa: E402
 
-bad = []
 DATA = Path(os.environ["CC_DATA_ROOT"])
 PID = f"wl-{os.getpid()}"
 FIELD = "data.files[0].L"
-
-
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
-
-
-def guarded(name, fn):
-    """Run one test; an exception (an AttributeError on a tree without sampler.sized) is that test's FAIL, never a crash of the file."""
-    try:
-        fn()
-    except Exception as e:  # noqa: BLE001
-        check(name, False, f"{type(e).__name__}: {e}")
 
 
 def chain():

@@ -15,13 +15,9 @@ from pathlib import Path
 import numpy as np
 
 ROOT = Path(__file__).resolve().parent.parent
-bad = []
 
 
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
+from lib import bad, check  # noqa: E402
 
 
 S = 27
@@ -101,7 +97,6 @@ def table(path, frames):
 
 def files(blocks):
     return "".join(f'\n[[data.files]]\npoint = "{pt}"\nsize = 27\nstart = "asgrown"\npath = "planted/{name}"\n{extra}arrays.GL = {{ key = "csv" }}\n' for pt, name, extra in blocks)
-
 
 
 tmp = Path(tempfile.mkdtemp(prefix="expect-scratch-"))

@@ -29,7 +29,8 @@ import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "tests")]
+from lib import bad, bootstrap, check  # noqa: E402
+bootstrap(ROOT, "cc", "tests")
 import intake  # noqa: E402
 import intake_fold  # noqa: E402
 import intake_suspect as S  # noqa: E402
@@ -40,13 +41,7 @@ from linenav import PARAMS as S_PARAMS  # noqa: E402
 
 T = intake.tables(ROOT)
 T13 = {**T, "format": {**T["format"], "version": "1160-v13", "fields": {k: v for k, v in T["format"]["fields"].items() if k not in ("plane", "suspect")}}}
-bad, reached = [], set()
-
-
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
+reached = set()
 
 
 def code(r):

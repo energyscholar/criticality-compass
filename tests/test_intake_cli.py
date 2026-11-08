@@ -32,13 +32,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 CC = str(ROOT / "bin" / "cc")
-bad = []
 
 
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
+from lib import bad, bootstrap, check  # noqa: E402
 
 
 def cc(*args, cwd=ROOT):
@@ -216,7 +212,7 @@ with tempfile.TemporaryDirectory() as tmp:
         check(name, all(x in got for x in want) and "PRIMARY verdict: PRIMARY_REFUSED_AT" in got, "\n".join(x for x in got.splitlines() if "EXECUTED" in x or "verdict" in x)[:700])
 
 # ---- 7. (1160 A8) the data-host doc's worked record file passes the transducer check; the template names every required table
-sys.path.insert(0, str(ROOT / "cc"))
+bootstrap(ROOT, "cc")
 import intake  # noqa: E402
 
 DH = (ROOT / "docs" / "INTAKE-ON-A-DATA-HOST.md").read_text()

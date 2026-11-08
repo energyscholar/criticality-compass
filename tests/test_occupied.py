@@ -8,18 +8,11 @@ from pathlib import Path
 import numpy as np
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "cc" / "instruments")]
+from lib import bad, bootstrap, check  # noqa: E402
+bootstrap(ROOT, "cc", "cc/instruments")
 import reduce  # noqa: E402
 
 warnings.simplefilter("ignore", RuntimeWarning)   # 0 / 0 is the declared NaN null; numpy reports it as a warning
-
-bad = []
-
-
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
 
 
 A = np.array([[1, 1, 1], [1, -1, -1], [0, 0, 0]], np.int8)       # four +1, two -1, three vacant

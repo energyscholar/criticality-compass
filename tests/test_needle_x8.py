@@ -3,7 +3,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "cc" / "instruments")]
+from lib import bad, bootstrap, check  # noqa: E402
+bootstrap(ROOT, "cc", "cc/instruments")
 import detect  # noqa: E402
 
 PTS = ["0.90", "0.95", "0.98", "0.99", "1.00", "1.01", "1.02", "1.05", "1.10"]
@@ -13,13 +14,6 @@ V_ALL = [[-0.1414, -0.1994, -0.1454], [-0.0962, -0.177, -0.1895], [-0.0519, -0.1
          [0.072, 0.0849, 0.0673], [0.0993, 0.0809, 0.0228], [0.104, 0.0443, 0.0026]]
 CELL = ["SIG-"] * 4 + ["UNRES"] + ["SIG+"] * 3 + ["SLOW+"]
 D_ORD = ["SIG+"] * 6 + ["SLOW+"] + [{"SLOW+", "ZERO!", "SLOW-"}, {"ZERO!", "SLOW+", "SLOW-"}]
-bad = []
-
-
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
 
 
 def codes(column):

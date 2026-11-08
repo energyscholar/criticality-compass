@@ -9,18 +9,11 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "cc" / "instruments")]
+from lib import bad, bootstrap, check  # noqa: E402
+bootstrap(ROOT, "cc", "cc/instruments")
 os.environ.pop("CC_DATA_ROOT", None)   # the data root unset: resolve_data_root falls to the clone's data/
 import declare  # noqa: E402
 import host  # noqa: E402
-
-bad = []
-
-
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
 
 
 INPUT = "w2-potts"   # its data live under the data root (w2/...), not in the repo's local data

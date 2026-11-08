@@ -10,20 +10,13 @@ from pathlib import Path
 import numpy as np
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "cc" / "instruments")]
+from lib import bad, bootstrap, check  # noqa: E402
+bootstrap(ROOT, "cc", "cc/instruments")
 import detect  # noqa: E402
 import door  # noqa: E402
 import readout  # noqa: E402
 import reverdict  # noqa: E402
 import schema  # noqa: E402
-
-bad = []
-
-
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
 
 
 cfg = tomllib.loads((ROOT / "cc.toml").read_text())
@@ -31,7 +24,7 @@ nav = Path(schema.resolve_data_root(cfg)[0]).parent / "studies" / "NAV-AT" / "na
 check("nav2.py is the pinned reference (sha256 c5a52cf1...)", nav.is_file() and hashlib.sha256(nav.read_bytes()).hexdigest().startswith("c5a52cf1"), str(nav))
 spec = importlib.util.spec_from_file_location("nav2", nav)
 nav2 = importlib.util.module_from_spec(spec)
-sys.path.insert(0, str(nav.parent.parent.parent / "tools"))
+bootstrap(nav.parent.parent.parent, "tools")
 spec.loader.exec_module(nav2)
 rng = np.random.default_rng(937)
 same = off = 0

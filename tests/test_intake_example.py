@@ -15,18 +15,11 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path[:0] = [str(ROOT / "cc")]
+from lib import bad, bootstrap, check  # noqa: E402
+bootstrap(ROOT, "cc")
 import intake  # noqa: E402
 import intake_fold  # noqa: E402
 import intake_say  # noqa: E402
-
-bad = []
-
-
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
 
 
 ID = "dial1118-s1-v5"   # plan 1160 A35 (was dial1118-s1-v4, format v4: history; plan 1160 A17: was dial1118-s1-v3)

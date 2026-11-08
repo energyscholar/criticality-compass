@@ -13,13 +13,9 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-bad = []
 
 
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
+from lib import bad, check  # noqa: E402
 
 
 ENV = {k: v for k, v in os.environ.items() if k != "CC_DATA_ROOT" and not k.startswith("GIT_")}   # under the real hook GIT_INDEX_FILE names the REAL index

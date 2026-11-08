@@ -10,16 +10,12 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-bad = []
 WORKERS = max(2, (os.cpu_count() or 3) - 2)   # bin/cc: ThreadPoolExecutor(max(1, cpu_count - 2)); two ordinary tests are the least the parallel check needs
 ORD = [f"t_{i}" for i in range(WORKERS)]
 NAMES = ["t_x"] + ORD
 
 
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
+from lib import bad, check  # noqa: E402
 
 
 SCRIPT = 'import time\nfrom pathlib import Path\nL = Path(__file__).parent / "log.txt"\nwith L.open("a") as f: f.write(f"start {Path(__file__).stem} {time.time()}\\n")\ntime.sleep(1)\nwith L.open("a") as f: f.write(f"end {Path(__file__).stem} {time.time()}\\n")\n'

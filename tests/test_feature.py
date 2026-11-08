@@ -49,7 +49,8 @@ import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "tests")]
+from lib import bad, bootstrap, check  # noqa: E402
+bootstrap(ROOT, "cc", "tests")
 import intake  # noqa: E402
 import intake_feature as F  # noqa: E402
 import intake_suspect as S  # noqa: E402
@@ -60,13 +61,6 @@ from intake_plant import long_table, rooted, run, write_long  # noqa: E402
 
 T = intake.tables(ROOT)
 WC = F.linenav.PARAMS["continuous"]["wc"]   # the frozen continuous corridor's w_c (0.15 of the fast span): the Broad width (C'')
-bad = []
-
-
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
 
 
 def rows(cs, s=0.03):

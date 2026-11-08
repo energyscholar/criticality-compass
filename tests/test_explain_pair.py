@@ -6,13 +6,9 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-bad = []
 
 
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
+from lib import bad, check  # noqa: E402
 
 
 out = subprocess.run([sys.executable, str(ROOT / "bin" / "cc"), "explain", "x2b-xy-3", "0.85->0.89294", "--tables", "v08-rules"],

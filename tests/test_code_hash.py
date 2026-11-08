@@ -8,15 +8,11 @@ from pathlib import Path
 import frozen  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
-bad = []
 # plan 0881 P2.7: an input with NO frozen result under any set (b7-at-line has a frozen v03 parent, so a re-verdict stood on it and the plant could not be refused)
 INPUT = "b7-at-line-5"
 
 
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
+from lib import bad, check  # noqa: E402
 
 
 with tempfile.TemporaryDirectory() as t:

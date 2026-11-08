@@ -28,7 +28,8 @@ from pathlib import Path
 import numpy as np
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "tests")]
+from lib import bad, bootstrap, check  # noqa: E402
+bootstrap(ROOT, "cc", "tests")
 import door  # noqa: E402
 import intake  # noqa: E402
 import intake_evidence  # noqa: E402
@@ -41,13 +42,6 @@ DIAL_FILE = "studies/DIAL1118/dial/methods.py"
 TOOLSET = os.environ.get("CC_TOOLSET") or (str(Path(os.environ["CC_DATA_ROOT"]).parent) if os.environ.get("CC_DATA_ROOT") else "")
 T = intake.tables(ROOT)
 Z = T["policy"]["policy"]["tier_z"]
-bad = []
-
-
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
 
 
 def chain(r, s=None, bias="MAX_MEASURED"):

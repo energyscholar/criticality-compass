@@ -7,16 +7,12 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-bad = []
 PAIR = {"gamma": ("ZERO!", -0.08885391972571863, 5.873327646142151e-05), "bootstrap": ("SLOW-", -0.08474100401192806, -0.0032541638354447247)}
 # the ONE recorded difference (the pair 0.85->0.89294), as it appears in the pair readings and, per_point, in the rows of the two points it touches
 RECORDED = {("stability_delta", "d", ("0.85", "0.89294")): PAIR, ("stability_delta", "d", "0.85", "0.85->0.89294"): PAIR, ("stability_delta", "d", "0.89294", "0.85->0.89294"): PAIR}
 
 
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
+from lib import bad, check  # noqa: E402
 
 
 def cells(res):

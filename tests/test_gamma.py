@@ -4,18 +4,12 @@ Every check is also run on a PLANTED wrong estimator and must FAIL there (the sa
 a window far too wide (S = 15), and a record whose autocorrelation is not summable inside window_max (the declared null, never a number)."""
 import sys
 import numpy as np
-sys.path.insert(0, __file__.rsplit("/", 2)[0] + "/cc")
+from lib import bad, bootstrap, check  # noqa: E402
+bootstrap(__file__.rsplit("/", 2)[0], "cc")
 import gamma
 
 N, PHI, TMAX, S, SEEDS = 24000, 0.8, 400, 1.5, range(12)
 TRUE_SE = np.sqrt((1 / (1 - PHI ** 2)) * (1 + PHI) / (1 - PHI) / N)
-bad = []
-
-
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
 
 
 def ar1(seed, phi=PHI, n=N):

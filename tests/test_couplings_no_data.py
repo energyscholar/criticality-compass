@@ -10,24 +10,10 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "cc" / "instruments")]
+from lib import bad, bootstrap, check, guarded  # noqa: E402
+bootstrap(ROOT, "cc", "cc/instruments")
 
-bad = []
 SRC = "k4-m1"
-
-
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
-
-
-def guarded(name, fn):
-    """Run one test; an exception (the KeyError of a tree without the fix) is that test's FAIL, never a crash of the file."""
-    try:
-        fn()
-    except Exception as e:  # noqa: BLE001
-        check(name, False, f"{type(e).__name__}: {e}")
 
 
 def sections(text):

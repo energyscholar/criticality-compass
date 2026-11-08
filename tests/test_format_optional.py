@@ -11,13 +11,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 OPTIONAL = {"fields.plane", "fields.plane.fields.slice", "fields.plane.fields.fast_window", "fields.suspect"}   # only these may be absent (plan 1176 A; E0)
-bad = []
 
 
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
+from lib import bad, check  # noqa: E402
 
 
 KIDS = {dict: lambda node: node.items(), list: lambda node: ((str(i), v) for i, v in enumerate(node))}   # a table's or an array's children

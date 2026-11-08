@@ -41,7 +41,8 @@ import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path[:0] = [str(ROOT / "cc")]
+from lib import bad, bootstrap, check  # noqa: E402
+bootstrap(ROOT, "cc")
 import intake  # noqa: E402
 import intake_blind as blind  # noqa: E402
 import intake_choices  # noqa: E402
@@ -75,14 +76,6 @@ SIGNATURE = {
     "S9": sig(census=D.Census),
     "S10": sig(lineage=D.Lineage, plan=D.IntervalPlan, feasibility=D.Feasibility),
 }
-
-bad = []
-
-
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
 
 
 T = intake.tables(ROOT)

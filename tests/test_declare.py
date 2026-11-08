@@ -8,17 +8,11 @@ from pathlib import Path
 from dataclasses import fields
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(ROOT / "cc"))
+from lib import bad, bootstrap, check  # noqa: E402
+bootstrap(ROOT, "cc")
 import declare  # noqa: E402
 
 P = ROOT / "tests" / "planted"
-bad = []
-
-
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
 
 
 def found(path, over, root=ROOT):

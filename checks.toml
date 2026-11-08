@@ -36,7 +36,7 @@ intake_feature = ["cc/intake_feature.py"]   # plan 1176 phase B: the R1 feature 
 intake_suspect = ["cc/intake_suspect.py"]   # plan 1176 phase A: FORMAT v14's optional [plane] and [suspect], the suspect polyline in grid cells, its own cap (tests/test_budget.py SUSPECT_CAP)
 navigate_family = ["cc/navfamily.py"]   # plan 1176 phase D: `cc navigate family | score`, family mode over the frozen linenav, its own cap (tests/test_budget.py NAVFAMILY_CAP)
 intake_new = ["cc/intake_new.py"]   # plan 1164: `bin/cc new intake`, moved out of cc/intake.py with its own cap (tests/test_budget.py NEW_CAP)
-test_infrastructure = ["cc/intake_synth.py", "tests/test_chain_1205_p2b_bank.py", "tests/intake_plant.py", "tests/plane_plant.py", "tests/tau_1282_p1.py", "tests/kernel_identity_l.py"]   # plan 1176 C: the planted plane banks walked and scored; plan 1139: the planted synthetic bank of `bin/cc intake synth`; plan 1145: the planted inputs of the intake tests; outside the measurement closure
+test_infrastructure = ["tests/lib.py", "cc/intake_synth.py", "tests/test_chain_1205_p2b_bank.py", "tests/intake_plant.py", "tests/plane_plant.py", "tests/tau_1282_p1.py", "tests/kernel_identity_l.py"]   # plan 1176 C: the planted plane banks walked and scored; plan 1139: the planted synthetic bank of `bin/cc intake synth`; plan 1145: the planted inputs of the intake tests; outside the measurement closure
 methods = ["cc/detect.py"]
 tests = [
   "tests/frozen.py", "tests/test_bench.py", "tests/test_claims.py",   # plan 1427: declared so the plan may edit and run them

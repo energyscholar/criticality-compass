@@ -3,7 +3,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "cc" / "instruments")]
+from lib import bad, bootstrap, check  # noqa: E402
+bootstrap(ROOT, "cc", "cc/instruments")
 import detect  # noqa: E402
 
 Q = ["2", "3", "4", "5"]
@@ -12,13 +13,6 @@ D = {"2": [0.0004, 0.0001, -0.0000], "3": [0.0004, 0.0008, 0.0000], "4": [0.0014
      "5": [-0.0030, -0.0048, 0.0039]}
 Z, B3, B2 = "ZERO!", {"ZERO!", "SLOW+", "SLOW-"}, {"ZERO!", "SLOW+"}
 CELLS = {"2": [{Z, "SLOW+"}, B3, B3], "3": [Z, {"SLOW+", Z}, B3], "4": [Z, B2, Z], "5": [Z, "UNRES", {"UNRES", Z}]}
-bad = []
-
-
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
 
 
 res = detect.run("w2-potts", "verdict-x-rules", write=False)

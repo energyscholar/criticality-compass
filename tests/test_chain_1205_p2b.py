@@ -26,20 +26,14 @@ from pathlib import Path
 import numpy as np
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "tests")]
+from lib import bad, bootstrap, check  # noqa: E402
+bootstrap(ROOT, "cc", "tests")
 import chain  # noqa: E402
 import intake_feature as F  # noqa: E402
 import intake_synth as S  # noqa: E402
 from intake_plant import long_table, write_long  # noqa: E402
 
 V3, V6 = ROOT / "intake" / "grids" / "ll1-pre-v3.toml", ROOT / "intake" / "grids" / "ll1-pre-v6.toml"
-bad = []
-
-
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
 
 
 @dataclass(frozen=True)

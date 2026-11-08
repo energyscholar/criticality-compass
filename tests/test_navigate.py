@@ -14,18 +14,12 @@ from pathlib import Path
 import numpy as np
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path[:0] = [str(ROOT / "cc")]
+from lib import bad, bootstrap, check  # noqa: E402
+bootstrap(ROOT, "cc")
 import navigate  # noqa: E402
 
 MAP = "b7-at-line-ch"
 GOLD = ROOT / "tests" / "navigate" / f"{MAP}.txt"
-bad = []
-
-
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
 
 
 def cc(root, *args):

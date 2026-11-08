@@ -7,7 +7,8 @@ from pathlib import Path
 import numpy as np
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "cc" / "instruments")]
+from lib import bad, bootstrap, check  # noqa: E402
+bootstrap(ROOT, "cc", "cc/instruments")
 import admit  # noqa: E402
 import declare  # noqa: E402
 import detect  # noqa: E402
@@ -22,13 +23,6 @@ BC_PAIRS = [["0.0", "1.0"], ["1.0", "1.5"], ["1.5", "1.8"], ["1.8", "1.9"], ["1.
 BC_OFF = [["0.0", "1.0"], ["1.0", "1.5"], ["1.5"], ["1.9"], ["1.9"]]
 V = [0.0724, -0.0741, -0.0773, -0.0070, 0.0326, -0.0276]
 NNN_ALLOWED = {"NOT-EVALUATED", "UNRES"}   # declared before the run: the nnn stream is not X7a's, only the set is asserted
-bad = []
-
-
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
 
 
 def pairs(res):

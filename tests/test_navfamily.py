@@ -40,7 +40,8 @@ import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "tests")]
+from lib import bad, bootstrap, check  # noqa: E402
+bootstrap(ROOT, "cc", "tests")
 import intake  # noqa: E402
 import intake_feature as F  # noqa: E402
 import intake_suspect as S  # noqa: E402
@@ -57,13 +58,7 @@ LINENAV_SHA = "560e2712b83e0966e2c95113ff872f82999b35303a0d87197cc40c5f905e0ab2"
 B7_SHA = "9b212d899237cef15cfd8e833d045964805a9221329ca17ddb992037ec664f40"   # tests/navigate/b7-at-line-ch.txt at 80e113f (plan 1114)
 N, K, SLOPE = 40, 12, 2   # the walking plant: K curves of N samples, the peak of curve k at sample rank 8 + SLOPE * k
 HS = [round(0.1 * (k + 1), 1) for k in range(K)]
-bad, reached = [], set()
-
-
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
+reached = set()
 
 
 def sha(p):

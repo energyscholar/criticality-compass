@@ -5,7 +5,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "cc" / "instruments")]
+from lib import bad, bootstrap, check  # noqa: E402
+bootstrap(ROOT, "cc", "cc/instruments")
 import detect  # noqa: E402
 
 Z, S = "ZERO!", "SIG+"
@@ -14,13 +15,6 @@ KS = ["1.0", "1.2", "1.4", "1.6", "1.8", "2.0", "2.3", "2.6", "3.0"]
 WANT = {**{f"d2.0-K{k}": c for k, c in zip(KS, [B3, B2, Z, Z, Z, S, S, S, S])},
         **{f"d1.95-K{k}": c for k, c in zip(KS, [B3, Z, Z, Z, B3, B3, S, S, S])},
         **{f"d1.9-K{k}": c for k, c in zip(KS, [B3, B2, B2, B3, B3, B3, B3, B3, S])}}
-bad = []
-
-
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
 
 
 frozen = {}

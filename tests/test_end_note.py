@@ -6,18 +6,12 @@ import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "cc" / "instruments")]
+from lib import bad, bootstrap, check  # noqa: E402
+bootstrap(ROOT, "cc", "cc/instruments")
 import family  # noqa: E402
 import view  # noqa: E402
 
-bad = []
 NULLS = ["NOT-MEASURED", "NOT-EVALUATED"]
-
-
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
 
 
 SET = ROOT / "tables" / "v05-rules"

@@ -13,7 +13,8 @@ from pathlib import Path
 import numpy as np
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path[:0] = [str(ROOT / "cc")]
+from lib import bad, bootstrap, check  # noqa: E402
+bootstrap(ROOT, "cc")
 import chain  # noqa: E402
 import intake_feature as F  # noqa: E402
 
@@ -21,13 +22,6 @@ BANK = Path(os.environ.get("CC_P2B_BANK", Path.home() / "scratch" / "cc-1205-bre
 FILE = "bank-C-STEP-snr20.hd5"
 MANIFESTS = [Path(p) for p in (os.environ.get("CC_P2B_MANIFEST", ""),
                                BANK.parent / "bank-manifest.json", BANK / "bank-manifest.json") if str(p)]
-bad = []
-
-
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
 
 
 @dataclass(frozen=True)

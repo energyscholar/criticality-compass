@@ -10,27 +10,13 @@ import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "cc" / "instruments")]
+from lib import bad, bootstrap, check, guarded  # noqa: E402
+bootstrap(ROOT, "cc", "cc/instruments")
 
-bad = []
 LABELS = ["0.90", "0.95", "0.98", "1.00", "1.02", "1.05", "1.10"]
 A4_TEXT = "the declared order of the points: K increasing, 0.90 -> 1.10"
 NEEDLE_O = ["needle_o.d_dis", "needle_o.d_ord", "needle_o.velocity"]
 ALL12 = ["across.y_last", "across_delta.y_last", "declared.probe", "needle.d_dis", "needle.d_ord", "needle.velocity", "needle_chain.drift", *NEEDLE_O, "stability_delta.d", "two_start.D"]
-
-
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
-
-
-def guarded(name, fn):
-    """Run one test; an exception (a ModuleNotFoundError on a tree without cc/seal_reach.py) is that test's FAIL, never a crash of the file."""
-    try:
-        fn()
-    except Exception as e:  # noqa: BLE001
-        check(name, False, f"{type(e).__name__}: {e}")
 
 
 def load(i):
@@ -139,7 +125,6 @@ def b7():
     r = R.reach(m, cp, tables(), ROOT)
     why = "points ['0.98', '1.00', '1.02', '1.05', '1.10'] touched by no control pair"
     check("B7 exactly across_delta.y_last and stability_delta.d, each with the untouched points", isinstance(r, R.Unreachable) and whys(r) == {"across_delta.y_last": why, "stability_delta.d": why}, repr(r)[:300])
-
 
 
 def b8():

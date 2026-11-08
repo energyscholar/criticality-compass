@@ -9,7 +9,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "cc" / "instruments")]
+from lib import bad, bootstrap, check  # noqa: E402
+bootstrap(ROOT, "cc", "cc/instruments")
 import detect  # noqa: E402
 
 BASE = "1066c43"
@@ -17,13 +18,6 @@ SKIP = {"run_id", "code_commit", "code_hash", "measure_hash", "data_root_source"
 WANT = {"x4-ising-field-ch": {"size": "declared report", "matched": "declared report", "start": "declared report"},
         "k4-m1-ch": {"size": "declared report", "matched": "declared report", "start": "declared report", "chain": "declared report",
                      "control": "Coupling"}}
-bad = []
-
-
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
 
 
 def diff(a, b, path=""):

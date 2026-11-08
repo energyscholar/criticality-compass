@@ -16,13 +16,9 @@ import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-bad = []
 
 
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
+from lib import bad, bootstrap, check  # noqa: E402
 
 
 def py(root, code):
@@ -144,7 +140,7 @@ print("\\n".join(registry.scope_lines(["instrument.across", "instrument.needle"]
 """)
     check("2. a registered-partial row is RunScoped and its scope string is in the report lines", "RunScoped ('T4-components',)" in out and "scope: T4-components — across" in out, out)
 res = json.loads((ROOT / "results" / "b7-at-line-2@v03-rules.json").read_text())
-sys.path.insert(0, str(ROOT / "cc"))
+bootstrap(ROOT, "cc")
 import view  # noqa: E402
 import registry  # noqa: E402
 lines = registry.scope_lines(view.units_of(res), ROOT)

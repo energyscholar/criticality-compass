@@ -3,19 +3,13 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "cc" / "instruments")]
+from lib import bad, bootstrap, check  # noqa: E402
+bootstrap(ROOT, "cc", "cc/instruments")
 import detect  # noqa: E402
 
 PTS = ["0.0", "0.07", "0.14", "0.21", "0.2747"]
 Y = [1.009, 1.073, 1.175, 1.331, 1.321]
 EDGES = [(0.976, 1.045), (1.040, 1.106), (1.137, 1.223), (1.265, 1.391), (1.202, 1.423)]   # B7.txt, p lines
-bad = []
-
-
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
 
 
 res = detect.run("b7-at-line", "verdict-x-rules", write=False)

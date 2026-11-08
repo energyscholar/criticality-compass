@@ -9,16 +9,12 @@ from pathlib import Path
 import frozen  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
-bad = []
 # plan 0881 P2.7: an input with NO frozen result under any set. A re-verdict stands on its frozen parent (it measured nothing), so once the v03 results were
 # frozen the old input (b7-at-line, which has a v03 result) was judged by its parent and the closure plant could no longer be refused: the test must start from an unfrozen input.
 INPUT = "b7-at-line-5"
 
 
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
+from lib import bad, check  # noqa: E402
 
 
 def scenario(rel):

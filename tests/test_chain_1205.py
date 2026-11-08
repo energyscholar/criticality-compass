@@ -39,7 +39,8 @@ from pathlib import Path
 import numpy as np
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "tests")]
+from lib import bad, bootstrap, check  # noqa: E402
+bootstrap(ROOT, "cc", "tests")
 import chain  # noqa: E402
 import intake_feature as F  # noqa: E402
 import intake_synth as S  # noqa: E402
@@ -49,13 +50,7 @@ GOLD = ROOT / "tests" / "chain" / "plant-chain.txt"
 GRID = ROOT / "intake" / "grids" / "ll1-pre-v3.toml"
 REGOLDEN = os.environ.get("CC_REGOLDEN") == "1"
 WCS = (0.05, 0.10, 0.15, 0.25)
-bad, reached = [], set()
-
-
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
+reached = set()
 
 
 # ---- H1 the enum names

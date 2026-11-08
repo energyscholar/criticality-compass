@@ -37,7 +37,8 @@ import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "tests")]
+from lib import bad, bootstrap, check  # noqa: E402
+bootstrap(ROOT, "cc", "tests")
 import intake_synth  # noqa: E402
 import linenav  # noqa: E402
 import plane_plant as P  # noqa: E402
@@ -47,13 +48,6 @@ SEEDS = tuple(range(1176, 1186))   # O5: the declared seed list of every ensembl
 ENSEMBLE = [("sharp", "dense"), ("misaligned", "dense"), ("decoy", "dense"), ("decoy", "sparse"), ("null", "dense"), ("null", "sparse")]   # the cases C3, C3m, C4, C5 read
 SPAN_T = float(intake_synth.PLANE_GRID[-1] - intake_synth.PLANE_GRID[0])   # the bank's fast span (every aligned curve's; the master grid's ends)
 WC = linenav.PARAMS["continuous"]["wc"]   # C'': the frozen continuous corridor, a fraction of each span
-bad = []
-
-
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
 
 
 def digest(d):

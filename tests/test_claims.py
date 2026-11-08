@@ -51,13 +51,7 @@ def check_text(text, roots):
     return problems, resolved, unchecked
 
 
-bad = []
-
-
-def check(name, ok, why=""):
-    print(("ok   " if ok else "FAIL ") + name + ("" if ok else f": {why}"))
-    if not ok:
-        bad.append(name)
+from lib import bad, check  # noqa: E402
 
 
 roots = {"cc": ROOT, "toolset": toolset_root()}
