@@ -7,7 +7,6 @@ import hashlib
 import io
 import json
 import os
-import subprocess
 import sys
 import time
 import tomllib
@@ -71,9 +70,7 @@ def hook_log(path, base):
     return path
 
 
-def _head(root):
-    r = subprocess.run(["git", "-C", str(root), "rev-parse", "HEAD"], capture_output=True, text=True)
-    return r.stdout.strip() or "NO-GIT"   # plumbing: an honest null when not a repository
+_head = schema.git_head
 
 
 def _stored(root, input_id, m, key):

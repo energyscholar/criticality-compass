@@ -6,6 +6,7 @@ import resource
 import sys
 from pathlib import Path
 from typing import NamedTuple
+import schema
 
 
 def _clear_refs():
@@ -40,7 +41,7 @@ def recorded_peaks(root, names, tables):
     """{input: recorded peak MB, or None when its result under `tables` records none (or does not exist)}."""
     out = {}
     for n in names:
-        p = Path(root) / "results" / f"{n}@{tables}.json"
+        p = schema.result_path(root, n, tables)
         out[n] = json.loads(p.read_text()).get("peak_rss_mb") if p.is_file() else None
     return out
 

@@ -13,6 +13,7 @@ import intake_say
 import intake_seal
 from intake_seal import declared
 import intake_terminal
+import registry
 from intake_blind import Mark
 from intake_fold import Primary, before_data, fold, verdicts
 
@@ -23,7 +24,7 @@ ROOT = Path(__file__).resolve().parent.parent
 def tables(root=ROOT):
     """The intake's tables as plain values: STAGES, POLICY and FORMAT, cc.toml's alphabets and interval fields (with FORMAT's own), every sentence."""
     load = {n: tomllib.loads((Path(root) / "intake" / f"{n.upper()}.toml").read_text()) for n in ("stages", "policy", "format")}
-    cfg = tomllib.loads((Path(root) / "cc.toml").read_text())
+    cfg = registry.config(root)
     admit = {"policy.projection": load["policy"]["projection"], "policy.bridge": load["policy"]["bridge"],
              **{f"alphabet.{k}": v for k, v in cfg["alphabets"].items()}}
     sentences = {r["code"]: r["sentence"] for s in load["stages"]["stage"] for r in s["reason"]}

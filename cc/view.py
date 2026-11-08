@@ -15,10 +15,6 @@ ROOT = Path(__file__).resolve().parent.parent
 UNRES_REASON = "interval straddles 0 and a margin edge"   # sign.py's meaning of UNRES
 
 
-def config():
-    return tomllib.loads((ROOT / "cc.toml").read_text())
-
-
 def stale(res, root=ROOT):
     """The refusal text for a result whose recorded `read` hashes no longer match, else None."""
     c = declare.Ctx(root)
@@ -166,7 +162,7 @@ def show(res, join, mode, note="", tables_dir=None):
     bad = stale(res)
     if bad:
         return bad.splitlines()
-    cfg, T = config(), detect.load_tables(res["tables"], tables_dir)
+    cfg, T = registry.config(ROOT), detect.load_tables(res["tables"], tables_dir)
     cols, iv = declare.code_cols(T.codes), res["interval"]
     out = [f"{res['input']}   rules: {res['tables']}   result: results/{res['run_id']}.json {note}".rstrip(),
            f"report: {cfg['report']['verdict']}",   # plan 0893 R1: what every verdict below IS, once per result (cc.toml [report])
@@ -241,7 +237,7 @@ def trace(m, res, r, sz):
     out = [(1, "DATA", f"{files[0]['path']} [{keyed}] ... {len(files)} blocks; sha256 matches "
                        f"fixtures/data/{res['input']}.toml"),
            (2, "REDUCE", "row 0: " + ", ".join(f"{k} {v:.4g}" for k, v in zip(lab, x0)))]
-    three, four = step_labels(inst, config())
+    three, four = step_labels(inst, registry.config(ROOT))
     out += [(3, three[n], f"{n}: {m['relations'][n]['template']}, {door.STANDING[n].says(m['relations'][n])}   "
                           f"{ascii_relation(m, n)}") for n in inst["relations"]]
     x = x0[None]
@@ -271,7 +267,7 @@ def explain(res, pt, join, mode, tables_dir=None):
     bad = stale(res)
     if bad:
         return bad.splitlines()
-    cfg, T = config(), detect.load_tables(res["tables"], tables_dir)
+    cfg, T = registry.config(ROOT), detect.load_tables(res["tables"], tables_dir)
     cols, m = declare.code_cols(T.codes), detect.load_input(res["input"])
     sig, text, lv = {s["point"]: s for s in res["signature"]}[pt], T.paths[0].read_text(), res["interval"]
     direct = {s["from"]: n for n, s in cols.items() if isinstance(s["from"], str)}
@@ -394,7 +390,7 @@ def explain_pair(res, pair, mode, tables_dir=None):
     bad = stale(res)
     if bad:
         return bad.splitlines()
-    cfg, T, m = config(), detect.load_tables(res["tables"], tables_dir), detect.load_input(res["input"])
+    cfg, T, m = registry.config(ROOT), detect.load_tables(res["tables"], tables_dir), detect.load_input(res["input"])
     a, b = pair.split("->")
     fam = T.paths[0].parent / "family.toml"
     text = fam.read_text() if fam.is_file() else ""

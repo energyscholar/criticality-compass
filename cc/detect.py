@@ -3,7 +3,6 @@ The staged entry points the breakers and the scoreboard call are the same functi
 import dataclasses
 import functools
 import json
-import subprocess
 import sys
 import tomllib
 from dataclasses import dataclass
@@ -77,7 +76,7 @@ def gate(m):
 
 
 def load_input(input_id):
-    p = ROOT / "inputs" / input_id / "m.toml"
+    p = schema.input_path(ROOT, input_id)
     if not p.is_file():
         names = " ".join(sorted(q.parent.name for q in (ROOT / "inputs").glob("*/m.toml")))
         raise refused(f"no input '{input_id}'. Inputs: {names}", "bin/cc show <one of these>")
@@ -478,7 +477,7 @@ def stored(input_id, tables, read, mhash):
     under another set whose key differs only in tables/* and whose membership decided nothing different, to be re-verdicted
     (`derived_from` set, nothing measured). Hash equality is the only policy."""
     import reverdict
-    p = ROOT / "results" / f"{input_id}@{tables}.json"
+    p = schema.result_path(ROOT, input_id, tables)
     if p.is_file() and keyed(st := json.loads(p.read_text()), read, mhash):
         return st
     for q in sorted((ROOT / "results").glob(f"{input_id}@*.json")):
@@ -512,10 +511,10 @@ def run_keyed(input_id, tables, write, tables_dir=None, reuse=True):
         if st["tables"] == tables:
             return st, "stored"   # the stored result IS the result: nothing is re-written
         import reverdict
-        git = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip() if write else ""
+        git = schema.git_head(ROOT) if write else ""
         res = reverdict.reverdict_result(st, T, git or "none")
         if write:
-            (ROOT / "results" / f"{rid}.json").write_text(json.dumps(res, indent=1) + "\n")
+            schema.result_path(ROOT, input_id, tables).write_text(json.dumps(res, indent=1) + "\n")
         return res, "re-verdicted"
     did = resources.reset_peak()
     out = measure(m, c, reg, T)
@@ -550,10 +549,7 @@ def run_keyed(input_id, tables, write, tables_dir=None, reuse=True):
                           "flags": {s: f for s, f in flags.items() if f}, "verdict": verdict,
                           "verdict_class": cls, "row_line": line, "why": why, **axes_of(codes, T)})
     pair_readings, pairs, pair_reports = pair_results(m, c, reg, out, vectors)
-    commit = "none"
-    if write and (ROOT / ".git").exists():
-        r = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True)
-        commit = r.stdout.strip() or "none"
+    commit = schema.git_head(ROOT) if write else "none"
     res = {"schema": 1, "kind": "result", "run_id": rid, "input": input_id, "tables": tables,
            "derived_from": None, "code_commit": commit, "code_hash": chash, "measure_hash": mhash, "data_root_source": c.data_root_source, "peak_rss_mb": None if peak is None else round(peak, 1), "peak_rss_why": None if did else f"no in-process high-water reset on {sys.platform}", "interval": dict(m["interval"]), "read": read,
            "vectors": f"results/{rid}.npz",
@@ -563,6 +559,6 @@ def run_keyed(input_id, tables, write, tables_dir=None, reuse=True):
            **({"declared": {k.split(".", 1)[1]: v for k, v in decl.items()}} if decl else {})}
     if write:
         (ROOT / "results").mkdir(exist_ok=True)
-        (ROOT / "results" / f"{rid}.json").write_text(json.dumps(res, indent=1) + "\n")
+        schema.result_path(ROOT, input_id, tables).write_text(json.dumps(res, indent=1) + "\n")
         np.savez(ROOT / "results" / f"{rid}.npz", **vectors)
     return res, "measured"

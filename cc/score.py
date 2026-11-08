@@ -6,6 +6,7 @@ import numpy as np
 import declare
 import detect
 import family
+import registry
 import view
 from reverdict import membership_of, reverdict_refusal, recode, reverdict_result   # noqa: F401  (plan 0876 B: they live where the measurement key can follow them)
 
@@ -72,7 +73,7 @@ def family_ends(tset, inputs, tr, joins, root, findings):
                   + [f"  - point {p} (case `{jn[p]}`, truth BKT-END): {k}" for p, k in res]) or []
         for _, k in res:
             tally[k] += 1
-    rep = f"report: {view.config()['report']['family']}"   # plan 0892 R5: the declared label, cc.toml [report] family
+    rep = f"report: {registry.config(view.ROOT)['report']['family']}"   # plan 0892 R5: the declared label, cc.toml [report] family
     return (["", f"## Family ends ({tset})", rep, ""] + lines
             + ["", "Family end against truth: " + ", ".join(f"{n} {k}" for k, n in tally.items()) + f"   ({rep})"]) * bool(lines)
 
@@ -109,7 +110,7 @@ def tabulate(results, root=ROOT, joins=None):
     for tset, rs in sorted(by.items()):
         cols, groups, tally = rs[0]["signature_columns"], {}, {"agree": 0, "refused": 0, "disagree": 0, "no truth": 0}
         ax, scored = ["geometry", "order"] * ("geometry" in rs[0]["signature"][0]), []
-        out += [f"## Rules: {tset}", f"report: {view.config()['report']['verdict']}", "", "| run | point | case | truth | sizes | " + " | ".join(cols) + " | verdict | class |"
+        out += [f"## Rules: {tset}", f"report: {registry.config(view.ROOT)['report']['verdict']}", "", "| run | point | case | truth | sizes | " + " | ".join(cols) + " | verdict | class |"
                 + "".join(f" {a} |" for a in ax), "|" + "---|" * (len(cols) + 7 + len(ax))]
         for res in sorted(rs, key=lambda r: r["run_id"]):
             jn = (joins or {}).get(res["input"]) or join(res["input"], root)

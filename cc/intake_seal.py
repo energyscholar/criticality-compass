@@ -117,7 +117,7 @@ def ordering(d, t):
 
 def _git(root, *args):
     r = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True)
-    return {True: r.stdout.strip(), False: "NO-GIT"}[r.returncode == 0]
+    return {True: r.stdout.strip(), False: "none"}[r.returncode == 0]
 
 
 def listing(universe, glob):
@@ -181,7 +181,7 @@ def _stamp(d, decl, universe, have, who, root, tables, schema, counts):
         "schema": 1, "kind": "intake-seal", "id": decl.id, "sealed_at_ns": t, "sealed_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(t // 10**9)),
         **who, "mode": decl.mode, "declaration_sha256": sha, **dict(zip(("profile_sha256", "conversion_manifest_sha256"), intake_bytes.intake_profile.read(d, universe, Path.read_bytes)[1::2])),   # plan 1165, A1
         "files": {n: registry.sha256_of(Path(d) / n) for n in FILES},
-        "code_identity": {"commit": _git(root, "rev-parse", "HEAD"), "code_hash": schema.code_hash(root),
+        "code_identity": {"commit": schema.git_head(root), "code_hash": schema.code_hash(root),
                           "tree": {True: "CLEAN", False: "UNCOMMITTED_CHANGES"}[_git(root, "status", "--porcelain", "--", "cc", "bin/cc") == ""]},
         "protocol_identity": {n: {"sha256": registry.sha256_of(Path(root) / "intake" / n), "version": tables[k]["version"]}
                               for n, k in (("STAGES.toml", "stages"), ("POLICY.toml", "policy"), ("FORMAT.toml", "format"))},

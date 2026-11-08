@@ -45,11 +45,15 @@ def block_mean(f):
     return f.reshape(*n, L // 3, 3, L // 3, 3).mean(axis=(-3, -1))   # form: 3x3 blocks
 
 
-def levels_mean(f, count):
-    out = [f.astype(float)]
+def chain(step, first, count):
+    out = [first]
     for _ in range(count - 1):
-        out.append(block_mean(out[-1]))
+        out.append(step(out[-1]))
     return out
+
+
+def levels_mean(f, count):
+    return chain(block_mean, f.astype(float), count)
 
 
 def majority_occupied3(s):
@@ -59,10 +63,7 @@ def majority_occupied3(s):
 
 
 def levels_occupied(s, count):
-    out = [s]
-    for _ in range(count - 1):
-        out.append(majority_occupied3(out[-1]))
-    return out
+    return chain(majority_occupied3, s, count)
 
 
 def g1_occupied(s):

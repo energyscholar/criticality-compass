@@ -6,7 +6,6 @@ bank; the bank holds the curves and a MANIFEST of metadata (names, h, n, size, s
 import hashlib
 import json
 import re
-import tomllib
 from pathlib import Path
 
 import numpy as np
@@ -166,7 +165,7 @@ def declare(m, ident, sid):
         "measured.uncertainty.kind": q("COLUMN"), "measured.uncertainty.key": q(m["columns"][2]),
         "replicate.identity": q(m["replicate"]), "replicate.key.kind": q("NONE"),   # (1160 A33: was replicate.key "")
     }
-    cfg = tomllib.loads((Path(__file__).resolve().parent.parent / "cc.toml").read_text())["transducer"]
+    cfg = registry.config(Path(__file__).resolve().parent.parent)["transducer"]
     trans = (f"# declarations/{ident}/transducer.toml - written by bin/cc new intake {ident} --from-synth {sid}: the CC transducer file of a synthetic bank.\n"
              f"# The update pin is the generator cc/intake_synth.py of the Compass itself (route compass:, cc.toml [transducer] update_routes).\n"
              f'schema = 1\nkind = "transducer"\nid = {q(ident)}\n\n[transducer]\n'

@@ -12,6 +12,7 @@ import json
 import sys
 import tomllib
 from pathlib import Path
+import registry
 
 SCHEMA = 1
 RECIPE = 'set identity = sha256 of the sorted lines "<path>\\t<sha256>\\t<bytes>\\n" of its entries (path as in the manifest)'
@@ -24,12 +25,7 @@ class Refused(Exception):
 
 
 def sha_of(p):
-    h, n = hashlib.sha256(), 0
-    with open(p, "rb") as f:
-        for blk in iter(lambda: f.read(1 << 20), b""):
-            h.update(blk)
-            n += len(blk)
-    return h.hexdigest(), n
+    return registry.sha256_of(p), Path(p).stat().st_size
 
 
 def _toml_str(s):

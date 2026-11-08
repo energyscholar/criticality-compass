@@ -227,7 +227,7 @@ def _record(root, t, d, out, primary):
            "tier_z": t["policy"]["policy"]["tier_z"], "identifiability": k.identifiability,
            "max_bracket": out["S8"].result.evidence.max_bracket, "why_this_tier": HONEST[out["S8"].result.evidence.max_bracket],
            "confirmation": {True: "CONFIRMED", False: "UNCONFIRMED"}[out[t["stages"]["seal_stage"]].confirmed()],
-           "code_identity": {"commit": intake_seal._git(root, "rev-parse", "HEAD"), "code_hash": schema.code_hash(root),
+           "code_identity": {"commit": schema.git_head(root), "code_hash": schema.code_hash(root),
                              "terminal_sha256": registry.sha256_of(Path(__file__))},
            "seal_identity": identity(seal)}
     (Path(d) / "RESULT.json").write_text(json.dumps(rec, indent=1) + "\n")

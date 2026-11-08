@@ -2,19 +2,30 @@
 # never typed). Each entry: kinds (R read, S stat, D directory listed) and a path (~data/ = the data root, ~toolset/ = the rest of the toolset root).
 schema = 1
 kind = "golden-reads"
-key = "56471d29fcb1f22d0019a87e4a627c2738b931e27b636d75ffdf08fe311ca83e"
+key = "1947e39a751e137388d0bf0280a6f1474022245798e9f4e03ad6addccaa72c3b"
 paths = [
   "RS FROZEN.json",
   "RS bin/cc",
   "R cc.toml",
+  "R cc/admit.py",
   "R cc/author.py",
   "R cc/declare.py",
+  "R cc/door.py",
   "RS cc/formats.py",
+  "R cc/gamma.py",
+  "R cc/host.py",
+  "R cc/instrument_decl.py",
+  "R cc/kernel.py",
+  "R cc/project.py",
   "R cc/readout.py",
   "R cc/reduce.py",
+  "RS cc/registry.py",
+  "R cc/resample.py",
+  "R cc/sampler.py",
   "RS cc/schema.py",
   "R cc/sign.py",
-  "R cc/transducer.py",
+  "RS cc/transducer.py",
+  "R cc/windows.py",
   "R checks.toml",
   "DS instruments",
   "R instruments/across.toml",
@@ -24,6 +35,7 @@ paths = [
   "R instruments/needle.toml",
   "R instruments/needle_chain.toml",
   "R instruments/needle_o.toml",
+  "R instruments/report.toml",
   "R instruments/stability.toml",
   "R instruments/stability_delta.toml",
   "R instruments/transform.toml",

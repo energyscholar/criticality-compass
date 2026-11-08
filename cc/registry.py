@@ -51,8 +51,13 @@ def _import(name):
     return importlib.import_module(name)   # measure-key: seeded
 
 
+def config(root):
+    return tomllib.loads((Path(root) / "cc.toml").read_text())
+
+
 def sha256_of(path):
-    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+    with open(path, "rb") as f:
+        return hashlib.file_digest(f, "sha256").hexdigest()
 
 
 def table_keys(cfg):
@@ -73,7 +78,7 @@ def _stem(path):
 def parse(root):
     """(cfg, rows) or raises ValueError(reason): the pin checked, every id unique among live rows, every status in the alphabet."""
     root = Path(root)
-    cfg = tomllib.loads((root / "cc.toml").read_text())
+    cfg = config(root)
     f = root / "registry.toml"
     if not f.is_file():
         raise ValueError("registry pin mismatch: registry.toml is missing")
@@ -97,7 +102,7 @@ def parse(root):
 def dispatch(root=ROOT):
     """{(unit, obtained): Entry}. On any failure to load, EVERY key reads as the same Refuse (the release refuses to start, as a value)."""
     root = Path(root)
-    cfg = tomllib.loads((root / "cc.toml").read_text())
+    cfg = config(root)
     keys = [(u, o) for u in cfg["registry"]["units"] for o in [*cfg["alphabets"]["obtained"], ANY]]
     try:
         cfg, rows = parse(root)
@@ -120,7 +125,7 @@ def lookup(unit, obtained=ANY, root=ROOT):
 
 
 def pin(root=ROOT):
-    return tomllib.loads((Path(root) / "cc.toml").read_text())["registry"]["sha256"]
+    return config(root)["registry"]["sha256"]
 
 
 def refusal(units, obtained_values, root=ROOT):

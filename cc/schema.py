@@ -11,6 +11,7 @@ from collections import namedtuple
 from contextlib import contextmanager
 from functools import lru_cache
 from pathlib import Path
+import registry
 from instrument_decl import fill   # plan 1282 P2a (R-P2.3): the registry's declarations carry their declared defaults
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -67,7 +68,7 @@ class Ctx:
 
     def __init__(self, root=ROOT, **over):
         self.root, self.over, self.shapes, self.heads = Path(root), over, {}, {}
-        self.cfg = tomllib.loads((self.root / "cc.toml").read_text())
+        self.cfg = registry.config(self.root)
         self.reg = {f.stem: fill(load(f)[0] or {}) for f in sorted((self.root / "instruments").glob("*.toml"))}
         self.checks = tomllib.loads(Path(over.get("checks") or self.root / "checks.toml").read_text())
         self.data_root, self.data_root_source = ((Path(over["data_root"]), "override") if over.get("data_root")
@@ -76,7 +77,11 @@ class Ctx:
 
     def file(self, path):
         """Where the data file a [[data.files]] `path` names is: under the repo's data/ when its first directory is declared in cc.toml [data] local, else under the data root."""
-        return self.root / "data" / path if path.split("/")[0] in self.cfg["data"].get("local", []) else self.data_root / path
+        return self.root / "data" / path if self.is_local(path) else self.data_root / path
+
+    def is_local(self, path):
+        """True when the first directory of a [[data.files]] `path` is declared in cc.toml [data] local (held in the repository)."""
+        return path.split("/")[0] in self.cfg["data"].get("local", [])
 
     def physical(self, key):
         """Where the file a `read` key names is on this machine: the declared data root maps to the effective one."""
@@ -91,6 +96,26 @@ def unit_blocks(m, inst):
              else list(dict.fromkeys(x for pr in rels["chain"]["pairs"] for x in pr)) if "chain" in inst["relations"] else list(ax["size"]))
     pair = rels.get("start", {}).get("pairs", [[ax["main_start"]]])[0]
     return sizes, (list(pair) if "starts" in inst["axes"] else [inst.get("start", ax["main_start"])])   # `start`: read this start, not main_start (plan 0867)
+
+
+def result_rel(ident, tables):
+    """The repo-relative name of the stored result of input `ident` under table set `tables` (the key into FROZEN.json)."""
+    return f"results/{ident}@{tables}.json"
+
+
+def result_path(root, ident, tables):
+    return Path(root) / result_rel(ident, tables)
+
+
+def input_path(root, ident):
+    return Path(root) / "inputs" / ident / "m.toml"
+
+
+def git_head(root):
+    """HEAD of the repository at `root`; "none" when root holds no .git or git prints nothing (the one spelling of a null commit)."""
+    if not (Path(root) / ".git").exists():
+        return "none"
+    return subprocess.run(["git", "rev-parse", "HEAD"], cwd=root, capture_output=True, text=True).stdout.strip() or "none"
 
 
 _SHA_ONCE = None   # {absolute path: sha256} while a READ-ONLY operation holds hashing_once(); None otherwise
@@ -110,8 +135,7 @@ def hashing_once():
 
 
 def _sha(path):
-    with open(path, "rb") as f:
-        return hashlib.file_digest(f, "sha256").hexdigest()
+    return registry.sha256_of(path)
 
 
 def sha(path):
@@ -155,7 +179,7 @@ def interval_methods(root, tset, setdir=None):
     A total table over the sets: a set without the file reads the resampling methods and cannot read a chains result, and a set that carries the file (v10-rules) reads
     only what it names, so a block result under v10-rules, or a chains result under v09 and before, is refused by the loader (detect.run_keyed, reverdict_refusal)."""
     f = Path(setdir or Path(root) / "tables" / tset) / "interval.toml"   # setdir: a set kept outside root/tables (a test's scratch dir); cc.toml is always the root's
-    return list((tomllib.loads(f.read_text()) if f.is_file() else tomllib.loads((Path(root) / "cc.toml").read_text())["interval_binding"])["methods" if f.is_file() else "default"])
+    return list((tomllib.loads(f.read_text()) if f.is_file() else registry.config(root)["interval_binding"])["methods" if f.is_file() else "default"])
 
 
 def measure_hash(root, instrument_modules):

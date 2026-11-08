@@ -2,13 +2,13 @@
 names its raw dims, its dtypes, the array kinds the door REDUCES from it (`reduces`) and one reader module per file extension; this
 file holds no per-format code. A stack is s[N, L, L]; the levels it reduces to are derived from (L, final_size, factor), never trusted."""
 import importlib.util
-import tomllib
 import zipfile
 from functools import lru_cache
 from pathlib import Path
 import numpy as np
 from numpy.lib import format as npy
 import reduce
+import registry
 import windows
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parent.parent
 @lru_cache(maxsize=None)
 def schemas(root=str(ROOT)):
     """{format name: schema} for every stack format cc.toml declares (a format with no table is a plain array file)."""
-    return tomllib.loads((Path(root) / "cc.toml").read_text()).get("formats", {})
+    return registry.config(root).get("formats", {})
 
 
 def have(module):

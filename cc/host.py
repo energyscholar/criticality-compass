@@ -68,4 +68,4 @@ def probe(c):
 
 def holder(c, path):
     """The resource a [[data.files]] path lives in: the repository for a `local` first directory (always held), else the data root."""
-    return {True: Held("repo", Path(c.root) / "data"), False: probe(c)[0]}[path.split("/")[0] in c.cfg["data"].get("local", [])]
+    return {True: Held("repo", Path(c.root) / "data"), False: probe(c)[0]}[c.is_local(path)]

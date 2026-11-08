@@ -46,7 +46,7 @@ def reverdict_refusal(res, new, root=ROOT):
     """A refusal is a VALUE: the text saying why `res` cannot be re-verdicted under set `new`, else None.
     A set that changes what a door or membership read decided which units ran; those readings are not
     the ones the new set would have measured, so only a re-measure is honest."""
-    m = Path(root) / "inputs" / res["input"] / "m.toml"
+    m = schema.input_path(root, res["input"])
     declared = tomllib.loads(m.read_text()).get("instruments", []) if m.is_file() else []
     changed = membership_of(root, res["tables"], declared) != membership_of(root, new, declared)
     lacks = bool(schema.declared_cols(schema.load(Path(root) / "tables" / new / "codes.toml", root)[0] or {"columns": {}})) and "declared" not in res   # plan 0870: a declared column is read from couplings.toml at run time
@@ -90,7 +90,7 @@ def reverdict_result(res, T, commit="none"):
         signature.append({"point": pt, "obtained": old["obtained"], **sig, "flags": {s: f for s, f in flags.items() if f},
                           "verdict": verdict, "verdict_class": cls, "row_line": line, "why": why, **detect.axes_of(codes, T)})
     old_id = res["run_id"]
-    read = {f"results/{old_id}.json": schema.sha(ROOT / "results" / f"{old_id}.json"),
+    read = {schema.result_rel(res["input"], res["tables"]): schema.sha(schema.result_path(ROOT, res["input"], res["tables"])),
             **{k: h for k, h in res["read"].items() if not k.startswith("tables/")},
             **{f"tables/{T.name}/{q.name}": schema.sha(q) for q in T.paths},
             **({f"tables/{T.name}/membership.toml": schema.sha(T.membership_path)}

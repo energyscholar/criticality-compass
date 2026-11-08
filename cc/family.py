@@ -13,6 +13,7 @@ import door
 import fingerprint
 import readout
 import registry
+import schema
 import view
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -196,8 +197,7 @@ def run(root, fid, tables):
     found += declare.check_file(ft, root)
     if found:
         return "\n".join(declare.fmt(f) for f in found), None
-    rid = f"{decl['input']}@{tables}"
-    p = root / "results" / f"{rid}.json"
+    p = schema.result_path(root, decl['input'], tables)
     if not p.is_file():
         return f"no result for {decl['input']} under {tables} yet.\n  Next: bin/cc run {decl['input']} --tables {tables}", None
     res = json.loads(p.read_text())
@@ -254,6 +254,6 @@ def show(decl, out, tables):
     lines += [f"  end     {', '.join(f'{q} (bracket {a} .. {z})' for q, (a, z) in zip(out[k], out['end_bracket'])) or '(none)'}" for k in ("end_point",) if k in out]
     lines += [f"    {e['point']}: end of a LINE run ({e['side']} side, {e['kind']})" for e in out.get("ends", [])]
     return lines + [f"  => family report {out['verdict']}   class {out['class']}, family.toml line {out['line']}",
-                    f"     report: {view.config()['report']['family']}",
+                    f"     report: {registry.config(view.ROOT)['report']['family']}",
                     *[f"     {x}" for x in registry.scope_lines(["family"], view.ROOT)],   # plan 1016: the pinned registry and the family reader's scope   # plan 0892 (an external verifier (ruling Q19)): the declared label, cc.toml [report] family
                     f"     why: {out['why']}"]

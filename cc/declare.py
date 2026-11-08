@@ -13,10 +13,11 @@ import door
 import formats
 import readout
 import reduce
+import registry
 from transducer import chk_transducer
 import sampler   # plan 1282 P1b: the npz-sized-v1 L check (its table and messages live in sampler)
 from host import NotEvaluableHere, holder  # noqa: F401  (plan 1273: a finding about the host, not the files)
-from schema import ROOT, F, at, rel, _parsed, parse, load, row_lines, Ctx, fill, unit_blocks, _SHA_ONCE, hashing_once, _sha, sha, MEASURE_SEEDED, import_closure, measure_hash, code_hash, code_cols, declared_cols  # noqa: F401  (moved by plan 0886; re-exported: the call sites keep `declare.<name>`)
+from schema import ROOT, F, at, rel, input_path, _parsed, parse, load, row_lines, Ctx, fill, unit_blocks, _SHA_ONCE, hashing_once, _sha, sha, MEASURE_SEEDED, import_closure, measure_hash, code_hash, code_cols, declared_cols  # noqa: F401  (moved by plan 0886; re-exported: the call sites keep `declare.<name>`)
 
 SIGNS = ("SIG-", "NEG", "SLOW-", "ZERO!", "SLOW+", "POS", "SIG+", "UNRES")
 RESULT_FIELDS = (  # the result field set that cc.toml [basic] must partition (view.py reads it from here)
@@ -115,10 +116,6 @@ def load_case(path):
 
 def load_key(path, key):
     return tomllib.loads(Path(path).read_text())[key]
-
-
-def input_path(root, ident):
-    return Path(root) / "inputs" / ident / "m.toml"
 
 
 def sets_of(root):
@@ -576,7 +573,7 @@ def score_expected(root, found, input_id=None):
     frozen file (only that input's, when validate was scoped to one: the others were not checked, so they cannot be scored). An exact match (as a multiset) removes those findings and prints ONE line. Anything else leaves every finding standing and adds a finding for each: an ACCEPTED input
     declared refused, a missing sentence, a sentence that is not in the file (an extra refusal, or changed wording shows as one of each). Returns (findings, lines)."""
     root, lines = Path(root).resolve(), []
-    found, refusal_fields = list(found), list(tomllib.loads((root / "cc.toml").read_text())["refusal_fields"].values())
+    found, refusal_fields = list(found), list(registry.config(root)["refusal_fields"].values())
     for mp in sorted((root / "inputs").glob("*/m.toml")):
         iid, e = mp.parent.name, (load(mp, root)[0] or {}).get("expect")
         if input_id and iid != input_id:
@@ -1221,7 +1218,7 @@ def lifted(arr, cols, full, dom):
 def factorisation(root, tset):
     """(findings, rows proved): compose(geometry, order) equals verdict.toml's verdict on every row of the domain of the
     signature columns and every column an axis reads (a set with none of the three files has nothing to prove)."""
-    t, nulls = Path(root) / "tables" / tset, tomllib.loads((Path(root) / "cc.toml").read_text())["alphabets"]["nulls"]
+    t, nulls = Path(root) / "tables" / tset, registry.config(root)["alphabets"]["nulls"]
     have = [n for n in ("geometry", "order", "compose") if (t / f"{n}.toml").is_file()]
     pr = tomllib.loads((t / "probe.toml").read_text()) if (t / "probe.toml").is_file() else None
     at_ = f"tables/{tset}/compose.toml"

@@ -41,8 +41,8 @@ Plan 1427 P4: CAP 5034 -> 5036 (Auditor-authorised; positional, input_path, gen-
 import tomllib
 from pathlib import Path
 
-CAP = 5036   # plan 1427 P4: was 5034. plan 1282 P2a: R-P2.1
-CORE_CAP = 1249   # plan 1427 P3: was 1248. plan 1427 P1: was 1240. plan 1205 P1 (Auditor): +40 for the hdf5-table-v1 reader. plan 1164: was INTAKE_CAP over the one role intake; now the sum over the roles of CORE, the core split by invariant
+CAP = 5043   # plan 1427 P9: was 5036. plan 1427 P4: was 5034. plan 1282 P2a: R-P2.1
+CORE_CAP = 1250   # plan 1427 P9: was 1249 (registry.config import and the moved git head land in the core). plan 1427 P3: was 1248. plan 1427 P1: was 1240. plan 1205 P1 (Auditor): +40 for the hdf5-table-v1 reader. plan 1164: was INTAKE_CAP over the one role intake; now the sum over the roles of CORE, the core split by invariant
 CORE = {"intake": 100, "intake_fold": 160, "intake_evidence": 150, "intake_bytes": 100, "intake_census": 140, "intake_say": 100,   # plan 1164: role -> cap
         "intake_blind": 200, "intake_seal": 160, "intake_read": 215}   # (BLOAT-REVIEW 1160 section 4, Layout C)
 HANDOFF_CAP = 900   # plan 1160 P3: checks.toml [roles] intake_handoff, the conversion and peek (cc/intake_convert.py)

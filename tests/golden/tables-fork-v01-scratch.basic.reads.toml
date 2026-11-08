@@ -2,18 +2,29 @@
 # never typed). Each entry: kinds (R read, S stat, D directory listed) and a path (~data/ = the data root, ~toolset/ = the rest of the toolset root).
 schema = 1
 kind = "golden-reads"
-key = "25962744fc4a10c528ad07e2013bb1192cb629e774285193f7d3fde5446e4b45"
+key = "508c79a750e59f2376b77aede4544425c5cdd55c37fbe2822d3dd10867766b97"
 paths = [
   "RS bin/cc",
   "R cc.toml",
+  "R cc/admit.py",
   "R cc/author.py",
   "R cc/declare.py",
+  "R cc/door.py",
   "RS cc/formats.py",
+  "R cc/gamma.py",
+  "R cc/host.py",
+  "R cc/instrument_decl.py",
+  "R cc/kernel.py",
+  "R cc/project.py",
   "R cc/readout.py",
   "R cc/reduce.py",
+  "RS cc/registry.py",
+  "R cc/resample.py",
+  "R cc/sampler.py",
   "RS cc/schema.py",
   "R cc/sign.py",
-  "R cc/transducer.py",
+  "RS cc/transducer.py",
+  "R cc/windows.py",
   "DS tables",
   "DS tables/scratch",
   "S tables/scratch/codes.toml",

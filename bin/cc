@@ -16,6 +16,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "cc" / "instruments")]
+import registry
+import schema
 VERBOSE = False
 MODE = "basic"
 TOOLS = Path(os.environ["CC_STRUCTURE_CHECKS"]) if os.environ.get("CC_STRUCTURE_CHECKS") else None   # NAMED by CC_STRUCTURE_CHECKS, never a default location (plan 0985); the structure checker (checks.py, freeze.py); CC_STRUCTURE_CHECKS moves it (plan 0929)
@@ -50,10 +52,6 @@ ADVANCED = [
 ]
 
 
-def config():
-    return tomllib.loads((ROOT / "cc.toml").read_text())
-
-
 def inputs():
     d = ROOT / "inputs"
     names = [p.name for p in d.iterdir() if p.is_dir() and not p.name.startswith("TEMPLATE")] if d.is_dir() else []
@@ -70,7 +68,7 @@ def positional(args, *flags):   # the words that are not flags and not the value
 
 
 def help_text(advanced):
-    tables = config()["defaults"]["tables"]
+    tables = registry.config(ROOT)["defaults"]["tables"]
     if advanced:
         w = max(len(a) for a, _ in ADVANCED)
         body = "\n".join(f"  bin/cc {a.ljust(w)}  {b}" for a, b in ADVANCED)
@@ -109,7 +107,7 @@ def run_tests(names, skip=()):
         r = subprocess.run([sys.executable, str(t)], capture_output=True, text=True, cwd=ROOT)
         lines = (r.stdout + r.stderr).strip().splitlines()
         return (t.stem, r.returncode == 0, lines[-keep:], time.time() - t0, lines)   # the tail is for printing; the FULL output is for the scoreboard lines (plan 0881 P2.2)
-    alone = set(config()["check"]["exclusive"])   # cc.toml [check] exclusive: test NAMES that run by themselves, after the parallel batch (plan 0881)
+    alone = set(registry.config(ROOT)["check"]["exclusive"])   # cc.toml [check] exclusive: test NAMES that run by themselves, after the parallel batch (plan 0881)
     batch = [t for t in picked if t.stem not in alone]
     with ThreadPoolExecutor(max(1, (os.cpu_count() or 3) - 2)) as pool:   # each script is its own subprocess
         done = dict(zip((t.stem for t in batch), pool.map(one, batch)))   # map returns in submission order
@@ -158,7 +156,7 @@ def cmd_test(names):
 def report_classes(gold, before):
     """Tag every changed line of a regolden by cc.toml [golden.classes]; any (e) line undoes the regolden (a STOP)."""
     import declare
-    classes, found = config()["golden"]["classes"], []
+    classes, found = registry.config(ROOT)["golden"]["classes"], []
     after = {f.name: f.read_text() for f in gold.glob("*.txt")}
     for name in sorted(after):
         if after[name] != before.get(name):
@@ -213,18 +211,13 @@ def tree_hash():
         Path(env["GIT_INDEX_FILE"]).unlink(missing_ok=True)
 
 
-def head_hash():
-    r = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True)
-    return r.stdout.strip() or "none"
-
-
 RECORD = "tests/BASELINE.txt"
 
 
 def write_baseline(res, took):
     """A green check records what it ran on: tree, HEAD, and every test's NAME, status and seconds."""
     rows = [f"test {stem} {'ok' if ok else 'FAIL'} {sec:.1f}" for stem, ok, _, sec, _ in res]
-    (ROOT / RECORD).write_text(f"tree {tree_hash()}\nhead {head_hash()}\nseconds {took:.0f}\n" + "\n".join(rows) + "\n")
+    (ROOT / RECORD).write_text(f"tree {tree_hash()}\nhead {schema.git_head(ROOT)}\nseconds {took:.0f}\n" + "\n".join(rows) + "\n")
 
 
 def cmd_baseline():
@@ -270,7 +263,7 @@ def cmd_check(args):
         kinds[type(f)].append(f)
     content, absent = kinds.values()
     res, touched = sorted({f.resource for f in absent}), staged()
-    hit = [x for x in touched if any(fnmatch.fnmatch(x, g) for g in config()["check"]["validate_domain"])] if touched is not None else ["(no git index here)"]
+    hit = [x for x in touched if any(fnmatch.fnmatch(x, g) for g in registry.config(ROOT)["check"]["validate_domain"])] if touched is not None else ["(no git index here)"]
     if content:
         print("check: FAILED: content\n" + "\n".join(declare.fmt(f) for f in content) + absent_lines(absent) + "\n  Next: fix each finding above, then bin/cc check")
         return 1
@@ -280,7 +273,7 @@ def cmd_check(args):
         return 3
     print("\n".join(declared) + "\n" if declared else "", end="")
     print(f"check: validate: not evaluated ({', '.join(res)} absent; this commit touches no file in the validate domain)" if absent else "check: validate clean")
-    slow = config()["check"]["slow"] if fast else []
+    slow = registry.config(ROOT)["check"]["slow"] if fast else []
     res, _, _ = run_tests([], slow)
     bad = [r for r in res if not r[1]]
     skipped = f" (fast: {len(slow)} slow tests skipped; bin/cc check runs them)" if fast else ""
@@ -289,7 +282,7 @@ def cmd_check(args):
     print("check: seconds per test\n" + "\n".join(f"  {sec:7.1f} s  {stem}" for stem, _, _, sec, _ in res))
     for stem, _, tail, _, _ in bad:
         print(f"check: FAILED: {stem}\n" + "\n".join("    " + ln for ln in tail) + f"\n  Next: bin/cc test {stem}")
-    took, budget = time.time() - t0, config()["check"]["fast_budget_s"]
+    took, budget = time.time() - t0, registry.config(ROOT)["check"]["fast_budget_s"]
     if not bad:
         print(f"check: clean in {took:.0f} s (fast budget {budget} s)")
         if not fast:
@@ -386,8 +379,8 @@ def run_one(name, tables, dry, how=None):
     found, _ = declare.validate(ROOT, name, tables)
     if found:
         return "\n".join(declare.fmt(f) for f in found), None
-    if f"results/{name}@{tables}.json" in author.frozen(ROOT)[0] and not dry:
-        return (f"REFUSED: results/{name}@{tables}.json is frozen (a frozen result never changes).\n"
+    if schema.result_rel(name, tables) in author.frozen(ROOT)[0] and not dry:
+        return (f"REFUSED: {schema.result_rel(name, tables)} is frozen (a frozen result never changes).\n"
                 f"  Next: bin/cc tables fork {tables} <new-name>, edit tables/<new-name>/verdict.toml, "
                 f"then bin/cc run {name} --tables <new-name>"), None
     try:
@@ -405,13 +398,13 @@ def stamp_pins(res):
     Done here, not in cc/detect.py: detect.py is in the measurement closure, and a provenance field must not move measure_hash.
     A frozen record is never touched."""
     import transducer
-    path = ROOT / "results" / f"{res['run_id']}.json"
+    path = schema.result_path(ROOT, res["input"], res["tables"])
     t = tomllib.loads((ROOT / "inputs" / res["input"] / "transducer.toml").read_text()).get("transducer", {})
     import declare
     pins = transducer.supplied(t.get("update", []), declare.Ctx(ROOT).data_root.parent)
     import author
     frozen = author.frozen(ROOT)[0]
-    if pins and path.is_file() and f"results/{res['run_id']}.json" not in frozen and res.get("pins") != pins:
+    if pins and path.is_file() and schema.result_rel(res["input"], res["tables"]) not in frozen and res.get("pins") != pins:
         res["pins"] = pins
         path.write_text(json.dumps(res, indent=1) + "\n")
 
@@ -430,22 +423,22 @@ def reverdict_one(name, new, old):
         return f"no table set '{new}'. Sets: {' '.join(sets)}\n  Next: bin/cc reverdict {name} --tables <one of these>", None
     gate = structure_gate()
     found, _ = declare.validate(ROOT, name, new)
-    if f"results/{name}@{new}.json" in author.frozen(ROOT)[0]:
-        return f"REFUSED: results/{name}@{new}.json is frozen (a frozen result never changes).\n  Next: pick another table set", None
+    if schema.result_rel(name, new) in author.frozen(ROOT)[0]:
+        return f"REFUSED: {schema.result_rel(name, new)} is frozen (a frozen result never changes).\n  Next: pick another table set", None
     gone = view.stale(res)
     refusal = score.reverdict_refusal(res, new)
     first = gate or "\n".join(declare.fmt(f) for f in found) or gone or refusal
     if first:
         return first, None
     import detect
-    commit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip() or "none"
+    commit = schema.git_head(ROOT)
     out = score.reverdict_result(res, detect.load_tables(new), commit)
     (ROOT / "results" / f"{out['run_id']}.json").write_text(json.dumps(out, indent=1) + "\n")
     return None, out
 
 
 def cmd_reverdict(args):
-    new, old = opt(args, "--tables"), opt(args, "--from") or config()["defaults"]["tables"]
+    new, old = opt(args, "--tables"), opt(args, "--from") or registry.config(ROOT)["defaults"]["tables"]
     pos = positional(args, "--tables", "--from")
     if len(pos) != 1 or not new:
         print("usage: bin/cc reverdict <input> --tables SET [--from SET]\n  Next: bin/cc help --advanced")
@@ -456,13 +449,13 @@ def cmd_reverdict(args):
         return 1
     import score
     import view
-    print(f"reverdict {res['derived_from']} -> results/{res['run_id']}.json (no instrument was run)")
-    return emit(view.show(res, score.join(pos[0]), MODE, frozen_note(res["run_id"])))
+    print(f"reverdict {res['derived_from']} -> {schema.result_rel(res['input'], res['tables'])} (no instrument was run)")
+    return emit(view.show(res, score.join(pos[0]), MODE, frozen_note(res)))
 
 
 def cmd_family(args):
     import family
-    tables = opt(args, "--tables") or config()["defaults"]["tables"]
+    tables = opt(args, "--tables") or registry.config(ROOT)["defaults"]["tables"]
     pos = positional(args, "--tables")
     if len(pos) != 1:
         print("usage: bin/cc family <id> [--tables SET]\n  Next: bin/cc help --advanced")
@@ -472,10 +465,10 @@ def cmd_family(args):
     return got is None
 
 
-def frozen_note(rid, dry=False):
+def frozen_note(res, dry=False):
     import author
     frozen = author.frozen(ROOT)[0]
-    return "(dry: nothing written)" if dry else "(frozen)" if f"results/{rid}.json" in frozen else "(not frozen)"
+    return "(dry: nothing written)" if dry else "(frozen)" if schema.result_rel(res["input"], res["tables"]) in frozen else "(not frozen)"
 
 
 def emit(lines):
@@ -484,7 +477,7 @@ def emit(lines):
 
 
 def cmd_run(args):
-    tables = opt(args, "--tables") or config()["defaults"]["tables"]
+    tables = opt(args, "--tables") or registry.config(ROOT)["defaults"]["tables"]
     pos = positional(args, "--tables")
     names = inputs() if "--all" in args else pos
     if not names:
@@ -502,8 +495,8 @@ def cmd_run(args):
             continue
         import score
         import view
-        view_lines = view.show(res, score.join(name), MODE, frozen_note(res["run_id"], "--dry" in args))
-        print(f"run {res['run_id']}" + ("" if "--dry" in args else f" -> results/{res['run_id']}.json"))
+        view_lines = view.show(res, score.join(name), MODE, frozen_note(res, "--dry" in args))
+        print(f"run {res['run_id']}" + ("" if "--dry" in args else f" -> {schema.result_rel(res['input'], res['tables'])}"))
         bad += emit(view_lines)
         if len(names) > 1:
             print(f"{name}: ran")
@@ -517,7 +510,7 @@ def load_result(name, tables, cmd):
     """(refusal text, None) or (None, result): a result must exist before it can be shown."""
     if name not in inputs():
         return f"no input '{name}'. Inputs: {' '.join(inputs())}\n  Next: bin/cc {cmd} <one of these>", None
-    p = ROOT / "results" / f"{name}@{tables}.json"
+    p = schema.result_path(ROOT, name, tables)
     if not p.is_file():
         return (f"no result for {name} under {tables} yet.\n"
                 f"  Next: bin/cc run {name}   (or --dry to look without writing)"), None
@@ -527,7 +520,7 @@ def load_result(name, tables, cmd):
 def cmd_show(args, explain):
     import score
     import view
-    tables = opt(args, "--tables") or config()["defaults"]["tables"]
+    tables = opt(args, "--tables") or registry.config(ROOT)["defaults"]["tables"]
     pos = positional(args, "--tables")
     cmd = "explain" if explain else "show"
     if len(pos) != 1 + explain:
@@ -547,7 +540,7 @@ def cmd_show(args, explain):
     jn = score.join(pos[0])
     if explain:
         return emit(view.explain(res, pos[1], jn, MODE))
-    return emit(view.show(res, jn, MODE, frozen_note(res["run_id"])))
+    return emit(view.show(res, jn, MODE, frozen_note(res)))
 
 
 def all_results():
@@ -586,7 +579,7 @@ def cmd_tabulate(args):
 def freeze_files(rid, read, vectors):
     """The repo files to freeze for one result: itself, the vectors it names, what it read, and its table set."""
     tdir = f"tables/{rid.split('@')[1]}"
-    want = [f"results/{rid}.json", vectors] + [k for k in read if not k.startswith((config()["data"]["name"] + "/", "tables/"))]
+    want = [schema.result_rel(*rid.split("@")), vectors] + [k for k in read if not k.startswith((registry.config(ROOT)["data"]["name"] + "/", "tables/"))]
     return tdir, want + [f"{tdir}/{q.name}" for q in sorted((ROOT / tdir).iterdir())]
 
 
@@ -605,7 +598,7 @@ def committed_measure_hash(name):
 def cmd_freeze(args):
     import declare
     import view
-    tables = opt(args, "--tables") or config()["defaults"]["tables"]
+    tables = opt(args, "--tables") or registry.config(ROOT)["defaults"]["tables"]
     pos = positional(args, "--tables")
     done = (ROOT / "results").is_dir() and "--all" in args
     ids = sorted(p.stem for p in (ROOT / "results").glob(f"*@{tables}.json")) if done else pos
@@ -613,7 +606,8 @@ def cmd_freeze(args):
         print(f"no result to freeze.\n  Next: bin/cc run <input>, then bin/cc freeze <input>@{tables}")
         return 1
     for rid in ids:
-        p, (name, tset) = ROOT / "results" / f"{rid}.json", rid.split("@")
+        name, tset = rid.split("@")
+        p = schema.result_path(ROOT, name, tset)
         if not p.is_file():
             print(f"no result '{rid}'.\n  Next: bin/cc run {name}")
             return 1
@@ -624,7 +618,7 @@ def cmd_freeze(args):
             return 1
         frozen = json.loads((ROOT / "FROZEN.json").read_text())
         parent = res.get("derived_from")   # a re-verdicted result measured nothing: it stands on its parent, which is judged when frozen
-        judged = f"results/{rid}.json" in frozen["files"] or (parent is not None and f"results/{parent}.json" in frozen["files"])   # a frozen result was judged when it was frozen
+        judged = schema.result_rel(name, tset) in frozen["files"] or (parent is not None and schema.result_rel(*parent.split("@")) in frozen["files"])   # a frozen result was judged when it was frozen
         if not judged and res.get("measure_hash") != committed_measure_hash(name):
             print(f"REFUSED: {rid} was not made by the committed measurement (its measure_hash differs from the HEAD tree's, "
                   "or it records none; code_hash is provenance and is not compared).\n"
@@ -685,7 +679,6 @@ def cmd_mutate(args):
 
 def cmd_bench(a):   # plan 0932: the frozen benchmark suite as a manifest (cc/bench.py)
     import bench
-    import schema
     c = schema.Ctx(ROOT)
     return bench.main(a, {"cc": ROOT, "data": c.data_root}, ROOT)
 
@@ -757,14 +750,13 @@ def cmd_registry(args):
 def main(argv):
     global MODE
     advanced = "--advanced" in argv
-    MODE = "advanced" if advanced else config()["defaults"]["mode"]
+    MODE = "advanced" if advanced else registry.config(ROOT)["defaults"]["mode"]
     argv = [a for a in argv if a != "--advanced"]
     if "--data-root" in argv:   # global: where the data IS on this machine (the declared name in cc.toml [data] root is unchanged)
         i = argv.index("--data-root")
         if i + 1 >= len(argv):
             print("--data-root needs a path.\n  Next: bin/cc --data-root <dir> <command>")
             return 1
-        import schema
         schema.DATA_ROOT_FLAG = argv[i + 1]
         argv = argv[:i] + argv[i + 2:]
     cmd, rest = (argv[0] if argv else "help"), argv[1:]

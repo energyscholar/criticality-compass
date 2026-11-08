@@ -3,7 +3,6 @@ import functools
 import hashlib
 import itertools
 import os
-import tomllib
 from dataclasses import dataclass
 from pathlib import Path
 from typing import NamedTuple
@@ -14,6 +13,7 @@ import schema
 import formats
 import project
 import reduce
+import registry
 import resample
 from kernel import Provenance
 
@@ -272,13 +272,13 @@ def gamma_stat(lin, v, iv):
 @functools.lru_cache(maxsize=None)
 def diff_step():
     """The finite-difference step of method gamma's linearisation rows, from cc.toml [interval_fields.gamma] (a fraction of each primary's naive SE)."""
-    return tomllib.loads((schema.ROOT / "cc.toml").read_text())["interval_fields"]["gamma"]["diff_step"]
+    return registry.config(schema.ROOT)["interval_fields"]["gamma"]["diff_step"]
 
 
 @functools.lru_cache(maxsize=None)
 def z_of(level):
     """The z of a declared level, from cc.toml [levels] (validate refuses a level the table does not hold)."""
-    return tomllib.loads((schema.ROOT / "cc.toml").read_text())["levels"][str(level)]
+    return registry.config(schema.ROOT)["levels"][str(level)]
 
 
 def nodefield(x, ctx):
