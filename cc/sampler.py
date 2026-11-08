@@ -30,9 +30,9 @@ def cells():
     return itertools.product(FAMILY_H, LABELS, SIZES, STARTS)   # (family, label, L, start): the 84 cells, one product for every walker
 SO = "tools/rust_samplers.so"                       # the built extension: per host, untracked, bound to the pins by isfield_source()
 SRC = "tools/rust_samplers/src/isfield.rs"
-PINS = {"tools/lattice_field_rs.py": "c8572e792f6423ae2a0dbc7db0063e15948f9c90964b831fd8e73e5cb9d02892", SRC: "66a3f4a618521781a6b398ca10a85182f474d2444ffeeef87c40dee1b7a7b8c3",
-        "tools/rust_samplers/src/lib.rs": "10236358f2683ffb70cd82b6a301459350bc450e24694c5f9d6c6972e718e2cc", "tools/scale.py": "1dff330d804d067e26f8c6c7dbe86739f0ee75635e5d1661f163d01bcf908f2b",
-        "tools/flow.py": "5f5b225a2cbc49bf2eef8c2168a2059620476c304fe71524eb687b12e1b9cae7"}   # path -> sha256, at toolset commit fdb284fe3c3d1354f738e0ee2e07c3a534840df5
+PINS = {"tools/lattice_field_rs.py": "c8572e792f6423ae2a0dbc7db0063e15948f9c90964b831fd8e73e5cb9d02892", SRC: "877e8a225943109a325fae0332376969c1357e330f9d4eee5fbef613cad73da0",
+        "tools/rust_samplers/src/lib.rs": "b8cb23dc1496acf750faccb1d574f0ed1dbf740fb96b1373977a713a31ab489c", "tools/scale.py": "1dff330d804d067e26f8c6c7dbe86739f0ee75635e5d1661f163d01bcf908f2b",
+        "tools/flow.py": "5f5b225a2cbc49bf2eef8c2168a2059620476c304fe71524eb687b12e1b9cae7"}   # path -> sha256, at toolset commit fc38c165477acf89d440a953534950354c441c46
 Q = {"key": "O", "level": 0}
 GL = {27: {}, 81: {"GL": {"key": "G"}}, 243: {"GL": {"key": "G"}}}   # the full-depth G, stored for the sizes that have a second level to compare
 
