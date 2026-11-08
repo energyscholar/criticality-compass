@@ -14,6 +14,7 @@ import tomllib
 from dataclasses import dataclass
 from pathlib import Path
 import numpy as np
+import declare
 import navigate
 import readout
 import schema
@@ -102,7 +103,7 @@ STORED = ("chains", "npz-v1", True)   # declared (plan 1114): method chains (m i
 
 
 def _declared(root, input_id):
-    m = tomllib.loads((root / "inputs" / input_id / "m.toml").read_text())
+    m = tomllib.loads(declare.input_path(root, input_id).read_text())
     key = (m["interval"]["method"], m["data"]["format"], all("G" in f["arrays"] for f in m["data"]["files"]))
     return {STORED: _stored}.get(key, _not_a_map)(root, input_id, m, key)   # form: one declared shape is a stored map; every other shape is the refusal
 

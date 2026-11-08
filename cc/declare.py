@@ -117,6 +117,10 @@ def load_key(path, key):
     return tomllib.loads(Path(path).read_text())[key]
 
 
+def input_path(root, ident):
+    return Path(root) / "inputs" / ident / "m.toml"
+
+
 def sets_of(root):
     return sorted(t.name for t in (Path(root) / "tables").glob("*") if t.is_dir())
 
@@ -283,7 +287,7 @@ def chk_points(p, d, c, stem=None):
     if out:
         return out
     out = list(todos(p, d)) + id_check(p, "input", d["input"], stem, "its directory")
-    m, bad = load(c.over.get("input") or c.root / "inputs" / d["input"] / "m.toml", c.root)
+    m, bad = load(c.over.get("input") or input_path(c.root, d["input"]), c.root)
     if bad:
         return out + bad
     pts, known = list(m["axes"]["point"]), set(case_truths(c)) | {"none"}
@@ -693,7 +697,7 @@ def chk_manifest(p, d, c, stem=None):
     if out:
         return out
     out += id_check(p, "input", d["input"], stem, "the file name")
-    m, bad = load(c.over.get("input") or c.root / "inputs" / d["input"] / "m.toml", c.root)
+    m, bad = load(c.over.get("input") or input_path(c.root, d["input"]), c.root)
     if bad:
         return out + bad
     paths, iid = {b["path"] for b in m["data"]["files"]}, d["input"]
@@ -1027,7 +1031,7 @@ def chk_family_decl(p, d, c, stem=None):
     out = out or id_check(p, "id", d["id"], stem, "the file name")
     if out:
         return out
-    m, bad = load(c.root / "inputs" / d["input"] / "m.toml", c.root)
+    m, bad = load(input_path(c.root, d["input"]), c.root)
     if bad:
         return [at(p, "input", f"no input '{d['input']}'",
                    f"use one of: {' '.join(sorted(q.parent.name for q in (c.root / 'inputs').glob('*/m.toml')))}")]
@@ -1283,7 +1287,7 @@ def validate(root=ROOT, input_id=None, tables=None):
 def _validate(root, ctx, input_id, tables):
     sets = [tables] if tables else sets_of(root)
     if input_id:
-        m = root / "inputs" / input_id / "m.toml"
+        m = input_path(root, input_id)
         names = (load(m, root)[0] or {}).get("instruments", [])
         files = [root / "cc.toml", m] + [root / "instruments" / f"{i}.toml" for i in names]
         files += [root / "fixtures" / "data" / f"{input_id}.toml"]
@@ -1319,7 +1323,7 @@ def _validate(root, ctx, input_id, tables):
 
 def member_need(root, input_id, tset, ctx=None):
     """A table set must hold a valid membership rule for every declared instrument that runs door:off_manifold."""
-    m, c = load(root / "inputs" / input_id / "m.toml", root)[0] or {}, ctx or Ctx(root)
+    m, c = load(input_path(root, input_id), root)[0] or {}, ctx or Ctx(root)
     mp = root / "tables" / tset / "membership.toml"
     have = (load(mp, root)[0] or {}) if mp.is_file() else {}
     need = [n for n in m.get("instruments", []) if "door:off_manifold" in c.reg.get(n, {}).get("pipeline", [])]

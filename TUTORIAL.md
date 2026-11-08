@@ -10,12 +10,11 @@ Read `README.md` first for the words.
 ```
 $ bin/cc show w2-potts
 w2-potts   rules: v01-rules   result: results/w2-potts@v01-rules.json (frozen)
-report: declared report — a projection C over sign cells of declared comparisons (the blocking-map comparison of independent sizes; the two-start difference), not a relational reading (an external verifier, 2026-10-06)
-…
-point 5   case potts-q5
-  sink       BLANK (NOT-MEASURED: needle is not declared on this input)
-  needle     BLANK (NOT-MEASURED: needle is not declared on this input)
-  flow       BLANK (NOT-MEASURED: needle is not declared on this input)
+```
+
+(Here the head of the `show` report, from its first line to the point 5 rows is the same text that HOWTO prints, once: see [Re-verdicting without measuring](HOWTO.md#re-verdicting-without-measuring).)
+
+```
   across     1.679 [1.417, 1.932] SIG+ -> RELEVANT
   stability  0.08076 [-0.3098, 0.5382] BLANK (UNRES: interval straddles 0 and a margin edge)
   two_start  BLANK (UNRES: interval straddles 0 and a margin edge)
@@ -178,16 +177,11 @@ input as it goes; the lines that matter are the tables below.
 ### Compare
 
 ```
-$ bin/cc tabulate --diff v01-rules scratch
-1512 cells change verdict between v01-rules and scratch
-REFUSE-EQUIL -> LINE: 12 cells in 1 patterns
-  when.needle = ["MID"]; when.flow = ["STOPPED", "SLOW"]; when.across = ["MARGINAL"]; when.stability = ["STABLE"]; when.two_start = ["UNRES"]
-REFUSE-EQUIL -> NOT: 252 cells in 1 patterns
-  when.needle = ["MID"]; when.flow = ["FLOWING"]; when.two_start = ["UNRES"]
-REFUSE-EQUIL -> POINT: 6 cells in 1 patterns
-  when.needle = ["MID"]; when.flow = ["STOPPED"]; when.across = ["RELEVANT"]; when.stability = ["STABLE"]; when.two_start = ["UNRES"]
-…
-REFUSE-EQUIL -> WALKING: 12 cells in 1 patterns
+```
+
+(Here the head of the `tabulate --diff` listing is the same text that HOWTO prints, once: see [Reading the whole rulebook, and comparing two](HOWTO.md#reading-the-whole-rulebook-and-comparing-two).)
+
+```
   when.needle = ["MID"]; when.flow = ["STOPPED"]; when.across = ["RELEVANT", "MARGINAL"]; when.stability = ["CROSSING"]; when.two_start = ["UNRES"]
 0 fixture points change verdict
 tabulate --diff: wrote nothing (bin/cc tabulate writes SIGNATURE-TABLE.md and docs/verdict-table.html)
@@ -291,12 +285,11 @@ POINT manifolds of X7a do not reach f2 `MARGINAL`.
 **Why LINE, and how close it is.** Look at the boundary pair, `0.14->0.21`, with the pair trace of `explain`:
 
 ```
-$ bin/cc explain b7-at-line-2 0.14->0.21
-explain b7-at-line-2 0.14->0.21   rules: v01-rules
-along   (pair 0.14->0.21)
-  1 MEMBER    membership.toml [along] reads needle: 0.14 NOT-MEASURED -> UNCHECKED, 0.21 NOT-MEASURED -> UNCHECKED; lowest rank decides -> door RUN-FLAG-U   flags: truth point, membership unchecked (the upstream needle was not measured)
-  2 DELTA     A over the control edge 0.14->0.21, row 0: 27 0.05402, 81 0.05431, 243 0.04232
-  3 C         ln|Delta| [-2.918, -2.913, -3.162]; A over size [0.005433, -0.2495]; B at the top edge -0.244; over the log span 2.197: -0.1111
+```
+
+(Here the `explain` pair trace, steps 1 to 3 is the same text that HOWTO prints, once: see [Along, and membership as a door value](HOWTO.md#along-and-membership-as-a-door-value).)
+
+```
   4 READING   y_along -0.1111  interval [-0.2479, 0.005093]  (95 %, 400 block resamples)
   5 SIGN      cuts -0.25 0 +0.25 (eps y): bL 1, bU 2 -> ZERO!
   6 CODE      family.toml line 52 [f2.code]: ZERO! -> MARGINAL

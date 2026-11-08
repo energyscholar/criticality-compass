@@ -256,7 +256,7 @@ def new_family(root, fid):
 def data_add(root, iid):
     root = Path(root)
     p, c = root / "fixtures" / "data" / f"{iid}.toml", declare.Ctx(root)
-    m, bad = declare.load(root / "inputs" / iid / "m.toml", root)
+    m, bad = declare.load(declare.input_path(root, iid), root)
     if bad:
         return refuse(bad[0].msg, f"bin/cc new input {iid}")
     if p.exists():

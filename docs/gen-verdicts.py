@@ -5,6 +5,8 @@ Line numbers are those of the [[row]] / [[side_row]] headers, the same numbers `
 import sys, tomllib
 from pathlib import Path
 root = Path(sys.argv[1] if len(sys.argv) > 1 else Path(__file__).resolve().parent.parent)
+sys.path.insert(0, str(root / "cc"))   # plan 1427 D29: schema.row_lines is the one [[key]] line finder
+import schema  # noqa: E402
 name = sys.argv[2] if len(sys.argv) > 2 else "v07-rules"
 width = int(sys.argv[3]) if len(sys.argv) > 3 else 150
 mode = sys.argv[4] if len(sys.argv) > 4 else "full"      # full: every section prints when + why; compact: only the per-point partition prints `when`
@@ -13,7 +15,7 @@ tdir = root / "tables" / name
 
 def rows(path, key="row"):
     text = path.read_text()
-    lines = [i + 1 for i, l in enumerate(text.splitlines()) if l.strip() == f"[[{key}]]"]
+    lines = schema.row_lines(text, key)
     return list(zip(lines, tomllib.loads(text).get(key, [])))
 
 

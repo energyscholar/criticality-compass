@@ -43,6 +43,7 @@ tests = [
   "tests/test_closure.py", "tests/test_0973.py", "tests/test_0978.py",
   "tests/test_budget.py", "tests/test_chain_1205.py", "tests/test_chain_1205_p2b.py", "tests/test_chain_1205_p2c.py","tests/test_score_words_1201.py",
   "tests/test_carries_l_1427.py",   # plan 1427 D13: CARRIES_L names exactly the declared formats
+  "tests/test_positional_1427.py",   # plan 1427 D22: a positional equal to the default table set is the id
   "tests/test_hook_scope.py",   # plan 1257: PTL-229, one t23 module per process and partition-owned bypass lines
   "tests/test_kernel.py", "tests/test_sign.py", "tests/test_resample.py", "tests/test_kernel_rs.py",
   "tests/test_declare.py", "tests/test_transducer.py", "tests/test_tables_cli.py",

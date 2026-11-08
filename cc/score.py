@@ -78,7 +78,7 @@ def family_ends(tset, inputs, tr, joins, root, findings):
 
 
 def sizes_of(input_id, root):
-    p = Path(root) / "inputs" / input_id / "m.toml"
+    p = declare.input_path(root, input_id)
     return tomllib.loads(p.read_text())["axes"]["size"] if p.is_file() else []
 
 

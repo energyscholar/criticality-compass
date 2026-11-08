@@ -65,6 +65,10 @@ def opt(args, name, default=None):
     return flag(args, name, default)
 
 
+def positional(args, *flags):   # the words that are not flags and not the values the flags were GIVEN (a flag left out takes nothing away)
+    return [a for a in args if not a.startswith("--") and a not in {opt(args, f) for f in flags}]
+
+
 def help_text(advanced):
     tables = config()["defaults"]["tables"]
     if advanced:
@@ -442,7 +446,7 @@ def reverdict_one(name, new, old):
 
 def cmd_reverdict(args):
     new, old = opt(args, "--tables"), opt(args, "--from") or config()["defaults"]["tables"]
-    pos = [a for a in args if not a.startswith("--") and a not in (new, old)]
+    pos = positional(args, "--tables", "--from")
     if len(pos) != 1 or not new:
         print("usage: bin/cc reverdict <input> --tables SET [--from SET]\n  Next: bin/cc help --advanced")
         return 1
@@ -459,7 +463,7 @@ def cmd_reverdict(args):
 def cmd_family(args):
     import family
     tables = opt(args, "--tables") or config()["defaults"]["tables"]
-    pos = [a for a in args if not a.startswith("--") and a != tables]
+    pos = positional(args, "--tables")
     if len(pos) != 1:
         print("usage: bin/cc family <id> [--tables SET]\n  Next: bin/cc help --advanced")
         return 1
@@ -481,7 +485,7 @@ def emit(lines):
 
 def cmd_run(args):
     tables = opt(args, "--tables") or config()["defaults"]["tables"]
-    pos = [a for a in args if not a.startswith("--") and a != opt(args, "--tables")]
+    pos = positional(args, "--tables")
     names = inputs() if "--all" in args else pos
     if not names:
         print(f"no input named.\n  Next: bin/cc run <one of: {' '.join(inputs())}>   (or --all)")
@@ -524,7 +528,7 @@ def cmd_show(args, explain):
     import score
     import view
     tables = opt(args, "--tables") or config()["defaults"]["tables"]
-    pos = [a for a in args if not a.startswith("--") and a != opt(args, "--tables")]
+    pos = positional(args, "--tables")
     cmd = "explain" if explain else "show"
     if len(pos) != 1 + explain:
         print(f"usage: bin/cc {cmd} <input>{' <point>' * explain}\n  Next: bin/cc help")
@@ -602,7 +606,7 @@ def cmd_freeze(args):
     import declare
     import view
     tables = opt(args, "--tables") or config()["defaults"]["tables"]
-    pos = [a for a in args if not a.startswith("--") and a != opt(args, "--tables")]
+    pos = positional(args, "--tables")
     done = (ROOT / "results").is_dir() and "--all" in args
     ids = sorted(p.stem for p in (ROOT / "results").glob(f"*@{tables}.json")) if done else pos
     if not ids:

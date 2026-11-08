@@ -36,11 +36,12 @@ Plan 1282 P2a: R-P2.1, CAP 5031 -> 5034 (owner-ruled at most 5034: the couplings
 cc/schema.py and cc/detect.py). The loader (cc/instrument_decl.py) is the role instrument_decl, INSTRUMENT_DECL_CAP = 20, disjoint from every other role.
 Seen RED: at CAP 5031 after the edits the cap assert FAILS; INSTRUMENT_DECL_CAP made 10 (the cap assert FAILS).
 Plan 1427 P1: CORE_CAP 1240 -> 1248 (Auditor-authorised; homes of D3/D4/D9 in intake_blind/intake_seal; the plan is net-negative overall). Seen RED: at 1240 after P1 the cap assert FAILS.
-Plan 1427 P3: CORE_CAP 1248 -> 1249 (Auditor-authorised; `import registry` in the intake modules that hashed a file). Seen RED: at 1248 after P3 the cap assert FAILS (p3-budget-red.txt)."""
+Plan 1427 P3: CORE_CAP 1248 -> 1249 (Auditor-authorised; `import registry` in the intake modules that hashed a file). Seen RED: at 1248 after P3 the cap assert FAILS (p3-budget-red.txt).
+Plan 1427 P4: CAP 5034 -> 5036 (Auditor-authorised; positional, input_path, gen-verdicts on schema.row_lines). Seen RED: at 5034 after P4 the cap assert FAILS (5035 of 5034, p4-budget-red.txt)."""
 import tomllib
 from pathlib import Path
 
-CAP = 5034   # plan 1282 P2a: R-P2.1
+CAP = 5036   # plan 1427 P4: was 5034. plan 1282 P2a: R-P2.1
 CORE_CAP = 1249   # plan 1427 P3: was 1248. plan 1427 P1: was 1240. plan 1205 P1 (Auditor): +40 for the hdf5-table-v1 reader. plan 1164: was INTAKE_CAP over the one role intake; now the sum over the roles of CORE, the core split by invariant
 CORE = {"intake": 100, "intake_fold": 160, "intake_evidence": 150, "intake_bytes": 100, "intake_census": 140, "intake_say": 100,   # plan 1164: role -> cap
         "intake_blind": 200, "intake_seal": 160, "intake_read": 215}   # (BLOAT-REVIEW 1160 section 4, Layout C)
