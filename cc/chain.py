@@ -32,6 +32,7 @@ import intake_suspect
 import kernel
 import navfamily
 import navmap
+import registry
 from intake_blind import Typed, bind, gate, look
 
 REFUSAL = {   # code -> sentence; every code this module emits is a row (tests/test_chain_1205.py reaches each)
@@ -250,7 +251,7 @@ def grid(path):
           and isinstance(lanes, list) and len(lanes) > 0 and all(isinstance(x, str) and x in Lane.__members__ for x in lanes))
     return {(False, False): lambda: Refusal("GRID_UNDECLARED", "no --grid <file>"), (False, True): lambda: Refusal("GRID_UNDECLARED", "no --grid <file>"),
             (True, False): lambda: Refusal("GRID_UNREADABLE", p.name),
-            (True, True): lambda: Grid(tuple(float(x) for x in wcs), tuple(Lane[x] for x in lanes), _sha(p), strides)}[(bool(path), ok)]()
+            (True, True): lambda: Grid(tuple(float(x) for x in wcs), tuple(Lane[x] for x in lanes), registry.sha256_of(p), strides)}[(bool(path), ok)]()
 
 
 def _toml(p):
@@ -258,11 +259,6 @@ def _toml(p):
         return tomllib.loads(p.read_text())
     except (tomllib.TOMLDecodeError, UnicodeDecodeError):   # plumbing: an unreadable grid is the typed GRID_UNREADABLE
         return None
-
-
-def _sha(p):
-    import hashlib
-    return hashlib.sha256(p.read_bytes()).hexdigest()
 
 
 @dataclass(frozen=True)

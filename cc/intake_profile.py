@@ -23,6 +23,7 @@ from intake_blind import Refuse, detail, format_stage, gate
 from intake_convert import MANIFEST, SPLIT, _book_names, _decoded, _manifest, _split, _zipped, sheet_rows
 from intake_findings import NUMERIC_KINDS, RAISES, RESPONSE, Finding, FindingKind, Response, body, findings, frozen, tables_of   # (fix F3) the findings' own role
 from intake_names import NUMBER, Name, _runs, classify, masked, repeats
+import registry
 
 FileKind = enum.Enum("FileKind", "TEXT_TABLE XLSX ZIP UNPROFILED_FORMAT")   # by content, never by extension (plan 1165 2.2)
 Encoding = enum.Enum("Encoding", "UTF8 UTF8_SIG UTF16 LATIN1_ONLY UNDECODABLE NOT_APPLICABLE")   # by FileKind (KINDS): a text decoding; UNDECODABLE (empty or binary); NOT_APPLICABLE (a zip, an xlsx)
@@ -224,7 +225,7 @@ def profile(root, ident, path, t, out="PROFILE.json"):
         files = tuple(profiled(n, loader.read(Path(base) / n)) for n in listing(base))
         p, now = Profile(path, files, findings(files)), datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         (d / out).write_text(as_json(p))
-        sha = hashlib.sha256((d / out).read_bytes()).hexdigest()
+        sha = registry.sha256_of(d / out)
         (d / out).with_suffix(".md").write_text(md(p, sha))
         with (d / "profile.log").open("a") as log:
             log.write(json.dumps({"time": now, "path": path, "out": out, "files": len(files), "bytes": sum(f.bytes for f in files), "sha256": sha}) + "\n")
@@ -289,7 +290,7 @@ USAGE = ("usage: bin/cc intake profile <id> <root-named path> (PROFILE.json of t
 
 
 def _said(ident, p, out):
-    sha = hashlib.sha256((Path(out)).read_bytes()).hexdigest()
+    sha = registry.sha256_of(Path(out))
     return (f"profile {ident}: {p.path}: {len(p.files)} files ({sum(f.kind == 'UNPROFILED_FORMAT' for f in p.files)} unprofiled), {len(p.findings)} findings;"
             f" {Path(out).name} sha256 {sha}\n" + "".join(f"  {x}\n" for x in md(p, sha).split("## Findings\n\n")[1].split("\n\nUnprofiled")[0].splitlines())
             + f"  Next: read declarations/{ident}/{Path(out).with_suffix('.md').name}; each finding names its one response (docs/INTAKE-PREPROCESSING.md)")

@@ -1,6 +1,5 @@
 """cc/seal_reach.py - plan 1282 P1c: the seal's three data-free refusals (seed uniqueness, reach, the licence table), each a VALUE of its output type."""
 import dataclasses
-import itertools
 
 import detect
 import door
@@ -8,7 +7,7 @@ import instrument_decl
 import sampler
 import schema
 
-FAMILIES = ("poc", "decoy")
+FAMILIES = tuple(sampler.FAMILY_H)
 INVENTORY = ((0, 3_000_000_000, "earlier integer default_rng seeds (PRE A4.4)"),)   # half-open
 LICENCE = {**dict.fromkeys(("REFUSE-EQUIL", "REFUSE-SLOW", "REFUSE-FLOW", "REFUSE-WEAK", "REFUSE-OFF", "REFUSE-IRRELEVANT", "REFUSE-UNRES"), "MISS-licensing"),
            **dict.fromkeys(("REFUSE-NEEDLE-UNMEASURED", "REFUSE-TWO-START-UNMEASURED", "REFUSE-FLOW-UNMEASURED", "REFUSE-ACROSS-UNMEASURED",
@@ -63,7 +62,7 @@ class Sealable:
 
 def seal_seeds(S, *, seed_fn=sampler.seed_of, inventory=INVENTORY):
     """Seeds of the 840 run cells and 84 pilot cells, or the SeedClash of every duplicated seed and every seed inside an inventory range."""
-    cells = list(itertools.product(FAMILIES, sampler.LABELS, sampler.SIZES, sampler.STARTS))
+    cells = list(sampler.cells())
     keys = [(*c, j) for c in cells for j in (*sampler.CHAINS, "pilot")]
     seed = {k: int(seed_fn(S, *k)) for k in keys}
     by = {}

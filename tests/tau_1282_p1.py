@@ -7,7 +7,6 @@ import os
 os.environ["OMP_NUM_THREADS"] = os.environ["OPENBLAS_NUM_THREADS"] = "1"   # before numpy loads: one core per worker
 import argparse
 import dataclasses
-import itertools
 import math
 import multiprocessing
 import platform
@@ -95,7 +94,7 @@ def cell(task):
 def cells(which):
     if which == "tiny":
         return [("poc", "1.00", 27, s, TINY) for s in ("random", "ordered")]
-    return [(F, k, L, s, PILOT) for L in sorted(sampler.SIZES, reverse=True) for F, k, s in itertools.product(sampler.FAMILY_H, sampler.LABELS, sampler.STARTS)]
+    return [(F, k, L, s, PILOT) for F, k, L, s in sorted(sampler.cells(), key=lambda c: -c[2])]
 
 
 def main(argv):

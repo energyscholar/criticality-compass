@@ -281,17 +281,13 @@ def frozen(root):
     return set(fz["files"]), set(fz["dirs"])
 
 
-def sets_of(root):
-    return sorted(t.name for t in (Path(root) / "tables").glob("*") if t.is_dir())
-
-
 def unknown_set(root, name, nxt):
-    return refuse(f"no table set '{name}'. Sets: {' '.join(sets_of(root))}", nxt)
+    return refuse(f"no table set '{name}'. Sets: {' '.join(declare.sets_of(root))}", nxt)
 
 
 def fork(root, src, dst):
     root = Path(root)
-    if src not in sets_of(root):
+    if src not in declare.sets_of(root):
         return unknown_set(root, src, "bin/cc tables fork <one of these> <new-name>")
     if (root / "tables" / dst).exists():
         return refuse(f"tables/{dst} already exists.", f"pick another name, or bin/cc tables drop {dst} first")
@@ -305,7 +301,7 @@ def fork(root, src, dst):
 
 def drop(root, name, with_results):
     root = Path(root)
-    if name not in sets_of(root):
+    if name not in declare.sets_of(root):
         return unknown_set(root, name, "bin/cc tables drop <one of these>")
     if declare.Ctx(root).cfg["defaults"]["tables"] == name:
         return refuse(f"REFUSED: tables/{name} is the default rulebook (cc.toml [defaults] tables).",

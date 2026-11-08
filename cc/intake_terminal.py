@@ -6,7 +6,6 @@ CC's chain relation (door.TEMPLATES["chain"], admit.declare), the door admits th
 kernel.A gives the edges e_k = r_{k+1} - r_k. Nothing between measured points is ever formed: every result names curves by rank.
 Invariant: every dispatch is a dict total over its alphabet (tests/test_intake.py); a refusal's detail carries names, words and counts, never a
 value; RESULT.json (declarations/<id>/RESULT.json) holds the span's slow values, and the report never does."""
-import hashlib
 import json
 from dataclasses import dataclass
 from pathlib import Path
@@ -22,6 +21,7 @@ import kernel
 import schema
 from intake_blind import Mark, Pass, Refuse, detail, gate
 from intake_evidence import Feasibility, IntervalPlan, KernelInput, Lineage
+import registry
 
 ROUTE = {"CHAIN_SLOW": "chain", "PAIR_NEAREST_FAST": "pair-nearest-fast"}   # POLICY bridge -> its door template name; total (test). Only "chain" is in door.TEMPLATES
 VALUE = {"MAX_MEASURED": lambda c, i: c.rows[i][1], "ARGMAX_FAST": lambda c, i: c.rows[i][0]}   # POLICY projection -> (curve, its max row) -> r_k; total
@@ -228,7 +228,7 @@ def _record(root, t, d, out, primary):
            "max_bracket": out["S8"].result.evidence.max_bracket, "why_this_tier": HONEST[out["S8"].result.evidence.max_bracket],
            "confirmation": {True: "CONFIRMED", False: "UNCONFIRMED"}[out[t["stages"]["seal_stage"]].confirmed()],
            "code_identity": {"commit": intake_seal._git(root, "rev-parse", "HEAD"), "code_hash": schema.code_hash(root),
-                             "terminal_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest()},
+                             "terminal_sha256": registry.sha256_of(Path(__file__))},
            "seal_identity": identity(seal)}
     (Path(d) / "RESULT.json").write_text(json.dumps(rec, indent=1) + "\n")
 

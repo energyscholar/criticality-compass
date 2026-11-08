@@ -365,9 +365,10 @@ def structure_gate():
 
 def run_one(name, tables, dry, how=None):
     """(refusal text, None) or (None, result): checks first, then the run."""
+    import author
     import declare
     import detect
-    sets = sorted(t.name for t in (ROOT / "tables").glob("*") if t.is_dir())
+    sets = declare.sets_of(ROOT)
     if name not in inputs():
         return f"no input '{name}'. Inputs: {' '.join(inputs())}\n  Next: bin/cc run <one of these>", None
     if tables not in sets:
@@ -381,7 +382,7 @@ def run_one(name, tables, dry, how=None):
     found, _ = declare.validate(ROOT, name, tables)
     if found:
         return "\n".join(declare.fmt(f) for f in found), None
-    if f"results/{name}@{tables}.json" in json.loads((ROOT / "FROZEN.json").read_text())["files"] and not dry:
+    if f"results/{name}@{tables}.json" in author.frozen(ROOT)[0] and not dry:
         return (f"REFUSED: results/{name}@{tables}.json is frozen (a frozen result never changes).\n"
                 f"  Next: bin/cc tables fork {tables} <new-name>, edit tables/<new-name>/verdict.toml, "
                 f"then bin/cc run {name} --tables <new-name>"), None
@@ -404,7 +405,8 @@ def stamp_pins(res):
     t = tomllib.loads((ROOT / "inputs" / res["input"] / "transducer.toml").read_text()).get("transducer", {})
     import declare
     pins = transducer.supplied(t.get("update", []), declare.Ctx(ROOT).data_root.parent)
-    frozen = json.loads((ROOT / "FROZEN.json").read_text())["files"]
+    import author
+    frozen = author.frozen(ROOT)[0]
     if pins and path.is_file() and f"results/{res['run_id']}.json" not in frozen and res.get("pins") != pins:
         res["pins"] = pins
         path.write_text(json.dumps(res, indent=1) + "\n")
@@ -412,10 +414,11 @@ def stamp_pins(res):
 
 def reverdict_one(name, new, old):
     """(refusal text, None) or (None, result): re-verdict the stored result of `name` under set `new`."""
+    import author
     import declare
     import score
     import view
-    sets = sorted(t.name for t in (ROOT / "tables").glob("*") if t.is_dir())
+    sets = declare.sets_of(ROOT)
     msg, res = load_result(name, old, "reverdict")
     if res is None:
         return msg, None
@@ -423,7 +426,7 @@ def reverdict_one(name, new, old):
         return f"no table set '{new}'. Sets: {' '.join(sets)}\n  Next: bin/cc reverdict {name} --tables <one of these>", None
     gate = structure_gate()
     found, _ = declare.validate(ROOT, name, new)
-    if f"results/{name}@{new}.json" in json.loads((ROOT / "FROZEN.json").read_text())["files"]:
+    if f"results/{name}@{new}.json" in author.frozen(ROOT)[0]:
         return f"REFUSED: results/{name}@{new}.json is frozen (a frozen result never changes).\n  Next: pick another table set", None
     gone = view.stale(res)
     refusal = score.reverdict_refusal(res, new)
@@ -466,7 +469,8 @@ def cmd_family(args):
 
 
 def frozen_note(rid, dry=False):
-    frozen = json.loads((ROOT / "FROZEN.json").read_text())["files"]
+    import author
+    frozen = author.frozen(ROOT)[0]
     return "(dry: nothing written)" if dry else "(frozen)" if f"results/{rid}.json" in frozen else "(not frozen)"
 
 

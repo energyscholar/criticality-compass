@@ -117,6 +117,10 @@ def load_key(path, key):
     return tomllib.loads(Path(path).read_text())[key]
 
 
+def sets_of(root):
+    return sorted(t.name for t in (Path(root) / "tables").glob("*") if t.is_dir())
+
+
 load_truth = functools.partial(load_key, key="class_truth")
 
 
@@ -1277,7 +1281,7 @@ def validate(root=ROOT, input_id=None, tables=None):
 
 
 def _validate(root, ctx, input_id, tables):
-    sets = [tables] if tables else sorted(t.name for t in (root / "tables").glob("*") if t.is_dir())
+    sets = [tables] if tables else sets_of(root)
     if input_id:
         m = root / "inputs" / input_id / "m.toml"
         names = (load(m, root)[0] or {}).get("instruments", [])

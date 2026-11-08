@@ -12,6 +12,7 @@ from pathlib import Path
 import numpy as np
 
 from intake_blind import flag
+import registry
 
 MODEL = "C(T, h) = B + A(h) / (1 + ((T - T_p(h)) / w)^2) + eps; T_p(h) = 2.27 + 0.30 h; A(h) = 1.0 + 1.5 exp(-(h - h*)^2 / (2 * 0.12^2)); eps ~ N(0, sigma)"
 B, W, TP0, TP1, A0, A1, S, H_STAR, SIGMA = 0.5, 0.08, 2.27, 0.30, 1.0, 1.5, 0.12, 0.10, 0.03
@@ -32,7 +33,7 @@ def curve(rng, h):
 
 def write(bank, truth, ident, seed, k):
     """Write the K curves and MANIFEST.json into `bank` and truth.json into `truth` (both absent before; the caller's table refuses otherwise)."""
-    rng, code = np.random.default_rng(seed), hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+    rng, code = np.random.default_rng(seed), registry.sha256_of(Path(__file__))
     bank.mkdir(parents=True)
     hs = [round(float(h), 10) for h in np.linspace(-0.5, 0.5, k)]
     rows = []
@@ -95,7 +96,7 @@ def plane_curves(rng, family, density):
 def plane_write(bank, truth, ident, seed, family, density):
     """Write a plane bank (dense: one csv-curve-v1 file per curve; sparse: bank.csv, table-curve-v1 with columns T,C,sigma,p,h) and MANIFEST.json
     into `bank`, and truth.json into `truth` (outside the bank): the family, its parameters and the declarer's guessed line per curve."""
-    rng, code = np.random.default_rng(seed), hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+    rng, code = np.random.default_rng(seed), registry.sha256_of(Path(__file__))
     cs, (_, sig, guess, kind, grid) = plane_curves(rng, family, density), PLANE[family]
     bank.mkdir(parents=True)
     row = lambda t, c, s, extra="": "".join(f"{a:.4f},{b:.10f},{s}{extra}\n" for a, b in zip(t, c))   # noqa: E731

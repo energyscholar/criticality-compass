@@ -5,10 +5,10 @@ the file (couplings = {"K": K}); it is an argument of the call and is recorded i
 import dataclasses
 import hashlib
 import importlib.util
+import itertools
 import json
 import math
 import sys
-import zipfile
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -16,6 +16,7 @@ import numpy as np
 
 import formats
 import schema
+import registry
 
 KC = math.log(1 + math.sqrt(2)) / 2
 LABELS = {x: float(x) * KC for x in ("0.90", "0.95", "0.98", "1.00", "1.02", "1.05", "1.10")}   # label (K/K_c) -> K
@@ -23,6 +24,10 @@ SIZES = {27: 2, 81: 3, 243: 4}                      # L -> the number of block l
 STARTS = {"ordered": "plus", "random": "random"}    # the declared start -> the sampler's start name
 CHAINS = range(10)
 FAMILY_H = {"poc": 0.0, "decoy": 0.02}              # family -> the field h, the only source of h
+
+
+def cells():
+    return itertools.product(FAMILY_H, LABELS, SIZES, STARTS)   # (family, label, L, start): the 84 cells, one product for every walker
 SO = "tools/rust_samplers.so"                       # the built extension: per host, untracked, bound to the pins by isfield_source()
 SRC = "tools/rust_samplers/src/isfield.rs"
 PINS = {"tools/lattice_field_rs.py": "c8572e792f6423ae2a0dbc7db0063e15948f9c90964b831fd8e73e5cb9d02892", SRC: "66a3f4a618521781a6b398ca10a85182f474d2444ffeeef87c40dee1b7a7b8c3",
@@ -77,7 +82,7 @@ def load(toolset):
     """The pinned tools as a namespace (field, scale, flow, build), or the Mismatch of the first path whose sha256 is not its pin. The .so is bound to the pins by the source it
     carries: sha256(isfield_source()) must be the isfield.rs pin. A stale .so has no isfield_source: AttributeError, loud by design (plan 1282 P2b OQ3)."""
     root = Path(toolset)
-    bad = [n for n, sha in PINS.items() if hashlib.sha256((root / n).read_bytes()).hexdigest() != sha]
+    bad = [n for n, sha in PINS.items() if registry.sha256_of(root / n) != sha]
     if bad:
         return Mismatch(bad[0])
     if not (root / SO).is_file():   # plumbing: an absent build is a value, not an exception
@@ -92,7 +97,7 @@ def load(toolset):
         spec = importlib.util.spec_from_file_location(f"_sampler_{n}", root / "tools" / f"{n}.py")
         mods[n] = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(mods[n])
-    return SimpleNamespace(field=mods["lattice_field_rs"], scale=mods["scale"], flow=mods["flow"], build=hashlib.sha256((root / SO).read_bytes()).hexdigest())
+    return SimpleNamespace(field=mods["lattice_field_rs"], scale=mods["scale"], flow=mods["flow"], build=registry.sha256_of(root / SO))
 
 
 def sample(tools, K, h, L, start, seed, run):
@@ -151,8 +156,7 @@ def sized(p, loc, b, heads, fp, fmt):
         return row("absent", "`L` missing: the file cannot show its size", "write the file with its 0-d `L` (npz-sized-v1 requires it)")
     if h["L"] != ():
         return row("shape", f"`L` has shape {h['L']}: it must be a 0-d scalar", "store L as a 0-d integer")
-    with zipfile.ZipFile(fp) as z, z.open("L.npy") as f:
-        dtype = formats.head_of(f)[1]
+    dtype = formats.header(fp, "L")[1]
     if dtype.hasobject:
         return row("object", "`L` is an object array: npz-sized-v1 stores a plain integer", "store L as a 0-d integer")
     if not np.issubdtype(dtype, np.integer):

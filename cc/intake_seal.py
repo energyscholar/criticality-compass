@@ -14,6 +14,7 @@ from pathlib import Path
 
 import intake_bytes   # plan 1160 A20: located, the universe from the declared root (intake_bytes imports this module too; both use the other at call time only)
 from intake_blind import Absent, Pass, Refuse, detail, gate
+import registry
 
 FILES = ("intake.toml", "transducer.toml")   # the declaration: the two files its sha256 covers, in this order
 AUTHOR_KIND = {"human": "HUMAN", "ai-draft": "AI_DRAFT"}   # the --as word -> the sealed author_kind; a word outside it is a usage refusal
@@ -69,7 +70,7 @@ def _said(r):
 
 def declaration_sha(d):
     """sha256 over the sorted (name, sha256) lines of the declaration's two files."""
-    lines = "".join(f"{n}\0{hashlib.sha256((Path(d) / n).read_bytes()).hexdigest()}\n" for n in sorted(FILES))
+    lines = "".join(f"{n}\0{registry.sha256_of(Path(d) / n)}\n" for n in sorted(FILES))
     return hashlib.sha256(lines.encode()).hexdigest()
 
 
@@ -179,10 +180,10 @@ def _stamp(d, decl, universe, have, who, root, tables, schema, counts):
     rec = {
         "schema": 1, "kind": "intake-seal", "id": decl.id, "sealed_at_ns": t, "sealed_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(t // 10**9)),
         **who, "mode": decl.mode, "declaration_sha256": sha, **dict(zip(("profile_sha256", "conversion_manifest_sha256"), intake_bytes.intake_profile.read(d, universe, Path.read_bytes)[1::2])),   # plan 1165, A1
-        "files": {n: hashlib.sha256((Path(d) / n).read_bytes()).hexdigest() for n in FILES},
+        "files": {n: registry.sha256_of(Path(d) / n) for n in FILES},
         "code_identity": {"commit": _git(root, "rev-parse", "HEAD"), "code_hash": schema.code_hash(root),
                           "tree": {True: "CLEAN", False: "UNCOMMITTED_CHANGES"}[_git(root, "status", "--porcelain", "--", "cc", "bin/cc") == ""]},
-        "protocol_identity": {n: {"sha256": hashlib.sha256((Path(root) / "intake" / n).read_bytes()).hexdigest(), "version": tables[k]["version"]}
+        "protocol_identity": {n: {"sha256": registry.sha256_of(Path(root) / "intake" / n), "version": tables[k]["version"]}
                               for n, k in (("STAGES.toml", "stages"), ("POLICY.toml", "policy"), ("FORMAT.toml", "format"))},
         "universe": {"root": decl.data["source"]["root"], "location_name": Path(universe).resolve().name, "glob": decl.data["source"]["universe"], "listing": have,
                      "partition": counts},   # plan 1160 P1: the count of names in each part, counted as lists
