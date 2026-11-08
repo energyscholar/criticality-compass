@@ -139,6 +139,21 @@ def tn(t):
 
 
 # ---- the cost formula (the checkable form the owner's R5 needs) ----
+def chain_ms_of(L, skip, burn, N, bench):
+    """One chain's cost in ms at f = 1 (the single cost formula): burn * b(L) + N * y(L, s*) * skip / s*,
+    s* = the largest of BGRID <= skip. The one place the per-chain arithmetic lives; core_hours (grid
+    cells) and chain_core_h (scratch rows) are its two callers."""
+    sstar = max(g for g in BGRID if g <= skip)
+    per_yield = bench.y[(L, sstar)] * skip / sstar
+    return burn * bench.b[L] + N * per_yield
+
+
+def chain_core_h(L, skip, burn, N, bench, f=1.0):
+    """One chain's cost in core-hours: f * chain_ms_of(...) / 3.6e6. The per-chain row primitive (COST's
+    --scratch form); its inputs are a chain's own (L, skip, burn, N), never a tau."""
+    return f * chain_ms_of(L, skip, burn, N, bench) / 3.6e6
+
+
 def core_hours(cells, taus, bench, N, f=1.0):
     """(total, rows). cells: list of (F, k, L, s). taus: {cell: (tau, source, form)}; an `ordered-of` cell is resolved from its (F, k, L, "ordered") partner in taus (the partner
     need not be in `cells`). skip_c = ceil(2 tau), burn_c = ceil(20 tau) (an `ordered-of` cell: max(that, L^2)), s* = the largest of {1, 10, 100, 1000} <= skip_c, per-yield cost
@@ -152,9 +167,8 @@ def core_hours(cells, taus, bench, N, f=1.0):
         skip = math.ceil(2 * tau)
         burn = math.ceil(20 * tau)
         burn = max(burn, L * L) if source == "ordered-of" else burn
-        sstar = max(g for g in BGRID if g <= skip)
-        per_yield = bench.y[(L, sstar)] * skip / sstar
-        chain_ms = burn * bench.b[L] + N * per_yield
+        sstar = max(g for g in BGRID if g <= skip)   # recorded in the row; chain_ms_of recomputes it
+        chain_ms = chain_ms_of(L, skip, burn, N, bench)
         ms += 10 * chain_ms
         rows.append(dict(F=Fm, k=k, L=L, s=s, tau=tau, source=source, form=form, skip=skip, burn=burn, sstar=sstar, sweeps=burn + N * skip,
                          chain_core_h=f * chain_ms / 3.6e6, core_h=f * 10 * chain_ms / 3.6e6))
