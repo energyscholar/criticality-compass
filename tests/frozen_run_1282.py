@@ -1,5 +1,5 @@
 """frozen_run_1282 - plan 1282 P2d: the frozen-run harness. A manifest names its run; one chain is one unit of work with atomic outputs; completion is derived from the filesystem
-by a total table; a chain is a fold with a checkpoint at a yield boundary; STOP is read between compiled calls; the driver runs under a launchd user agent. Counts only: no detect,
+by a total table; a chain is a fold with a checkpoint at a yield boundary; STOP is read between compiled calls; the driver runs under a system LaunchDaemon (UserName drops privileges). Counts only: no detect,
 no verdict, no seal, no instrument. A tool, not a test.
 python tests/frozen_run_1282.py manifest|project|serve|up|down|status|verify|prefix ...   Every mode ends on ONE finish line: DONE <what>, STOPPED, DRAINED, FAILED <reason>, BLOCKED <reason> (exit 2), LOCKED."""
 import os
@@ -18,6 +18,7 @@ import math
 import multiprocessing
 import platform
 import plistlib
+import pwd
 import re
 import signal
 import subprocess
@@ -52,8 +53,6 @@ SCALE = {"rung1": 100, "rung2": 10, "full": 1, "scratch": 1}   # scale -> diviso
 STAGE_CAP = {"rung1": 9, "rung2": 45, "full": 400}   # the approved stage caps (core-h, contended)
 UPLIFT = {"": 1, "PILOT-SHORT": 4}   # cost-inputs.tsv flag -> the worst-case factor of the upper cost
 CKPT_KEYS = ("seed", "N", "skip", "burn", "stem")
-KICK = "launchd-kick"
-TAIL = "# launchd-kick"
 
 
 # ---- fsync, one function chosen by the platform table ----
@@ -557,41 +556,65 @@ def mode_serve(a):
     return EXIT[st]
 
 
-# ---- the agent ----
+# ---- the daemon: a system-domain LaunchDaemon (UserName drops to the invoking user); every privileged act is `sudo -n`, for this label only ----
 def run(*cmd, inp=None):
     return subprocess.run(list(cmd), capture_output=True, text=True, input=inp)
 
 
-def uid():
-    return os.getuid()
+def sudo(*cmd):
+    return run("sudo", "-n", *cmd)
 
 
-def loaded(label):
-    return run("launchctl", "print", f"user/{uid()}/{label}").returncode == 0
+class Launchd(enum.Enum):
+    """The state of a label in the system domain: a total table over (exit code, text), never a bare non-zero."""
+    RUNNING = "RUNNING"
+    LOADED = "LOADED"
+    ABSENT = "ABSENT"
+    ERROR = "ERROR"
+
+    @classmethod
+    def parse(cls, name):
+        return cls[name]
 
 
-def crontab():
-    r = run("crontab", "-l")
-    return r.stdout if r.returncode == 0 else ""
+def launchd_state(label):
+    r = sudo("launchctl", "print", f"system/{label}")
+    text = r.stdout + r.stderr
+    pid = bool(re.search(r"^\s*pid = \d+", text, re.M))
+    kind = {True: "ok"}.get(r.returncode == 0 and label in text) or {True: "gone"}.get(r.returncode != 0 and "Could not find service" in text) or "err"
+    return {("ok", True): Launchd.RUNNING, ("ok", False): Launchd.LOADED, ("gone", True): Launchd.ABSENT, ("gone", False): Launchd.ABSENT,
+            ("err", True): Launchd.ERROR, ("err", False): Launchd.ERROR}[(kind, pid)]
 
 
 def mode_up(a):
     D, label = Path(a.run_dir).resolve(), a.label
     m, _, _ = read_manifest(D)
     t0 = time.time()
-    plist = {"Label": label, "ProgramArguments": ["/usr/bin/caffeinate", "-i", "/usr/bin/nice", "-n", "10", sys.executable, str(CLONE / "tests" / "frozen_run_1282.py"), "serve", "--run-dir", str(D), "--procs", str(a.procs)],
-             "EnvironmentVariables": {"CC_DATA_ROOT": os.environ["CC_DATA_ROOT"], "OMP_NUM_THREADS": "1", "OPENBLAS_NUM_THREADS": "1"}, "WorkingDirectory": str(CLONE), "RunAtLoad": True,
-             "KeepAlive": {"SuccessfulExit": False}, "ThrottleInterval": 60, "ProcessType": "Standard", "ExitTimeOut": math.ceil(m["stop_bound_s"]) + 30,
+    if sudo("true").returncode != 0:
+        return finish("BLOCKED sudo -n true failed (passwordless sudo not configured)", 2)
+    user = pwd.getpwuid(os.getuid()).pw_name
+    plist = {"Label": label, "UserName": user,
+             "ProgramArguments": ["/usr/bin/caffeinate", "-i", "/usr/bin/nice", "-n", "10", sys.executable, str(CLONE / "tests" / "frozen_run_1282.py"), "serve", "--run-dir", str(D), "--procs", str(a.procs)],
+             "EnvironmentVariables": {"CC_DATA_ROOT": os.environ["CC_DATA_ROOT"], "HOME": str(Path.home()), "OMP_NUM_THREADS": "1", "OPENBLAS_NUM_THREADS": "1"},
+             "WorkingDirectory": str(CLONE), "RunAtLoad": True, "KeepAlive": {"SuccessfulExit": False}, "ThrottleInterval": 60,
+             "ProcessType": "Standard", "ExitTimeOut": math.ceil(m["stop_bound_s"]) + 30,
              "StandardOutPath": str(D / "agent.log"), "StandardErrorPath": str(D / "agent.log")}
     pl = D / f"{label}.plist"
     pl.write_bytes(plistlib.dumps(plist))
-    before = D / "crontab.before"
-    before.write_text(before.read_text() if before.exists() else crontab())
-    kick = f"launchctl print user/{uid()}/{label} >/dev/null 2>&1 || launchctl bootstrap user/{uid()} {pl}"
-    keep = [ln for ln in crontab().splitlines() if f"{TAIL} {label}" not in ln]
-    run("crontab", "-", inp="\n".join(keep + [f"@reboot sleep 60; {kick} {TAIL} {label}", f"*/5 * * * * {kick} {TAIL} {label}"]) + "\n")
-    {True: lambda: None, False: lambda: run("launchctl", "bootstrap", f"user/{uid()}", str(pl))}[loaded(label)]()
-    run("launchctl", "kickstart", f"user/{uid()}/{label}")
+    lint = run("plutil", "-lint", str(pl))
+    print(lint.stdout.strip() or lint.stderr.strip())
+    if lint.returncode != 0:
+        return finish("FAILED up plist-lint", 1)
+    (D / "agent.log").write_text("")   # created as the invoking user, so launchd never root-creates it under the UserName drop
+    target = f"/Library/LaunchDaemons/{label}.plist"
+    inst = sudo("install", "-o", "root", "-g", "wheel", "-m", "0644", str(pl), target)
+    if inst.returncode != 0:
+        return finish(f"FAILED up install-rc={inst.returncode}", 1)
+    print(run("ls", "-l", target).stdout.strip())
+    boot = {Launchd.ABSENT: lambda: sudo("launchctl", "bootstrap", "system", target).returncode}.get(launchd_state(label), lambda: 0)()   # loaded -> nothing
+    if launchd_state(label) in (Launchd.ABSENT, Launchd.ERROR):
+        return finish(f"FAILED up bootstrap-rc={boot}", 1)
+    sudo("launchctl", "kickstart", f"system/{label}")   # no -k; EALREADY and a race with RunAtLoad are judged by the print below, not the exit code
     sl = D / "status.line"
     while time.time() - t0 < 120:
         mt = re.search(r"pid=(\d+)", sl.read_text()) if sl.exists() and sl.stat().st_mtime >= t0 else None
@@ -606,21 +629,16 @@ def mode_down(a):
     m, _, _ = read_manifest(D)
     (D / "STOP").write_text("down\n")
     t0 = time.time()
-    while time.time() - t0 < m["stop_bound_s"] + 30 and "pid = " in run("launchctl", "print", f"user/{uid()}/{label}").stdout:
+    while time.time() - t0 < m["stop_bound_s"] + 60 and launchd_state(label) in (Launchd.RUNNING, Launchd.ERROR):
         time.sleep(1)
-    ours = [ln for ln in crontab().splitlines() if f"{TAIL} {label}" in ln]
-    rest = [ln for ln in crontab().splitlines() if f"{TAIL} {label}" not in ln]
-    run("crontab", "-", inp="\n".join(rest) + "\n" if rest else "")
-    if len(ours) != 2 or any(f"{TAIL} {label}" in ln for ln in crontab().splitlines()):
-        print("crontab lines carrying the label:", ours, "| after:", crontab())
-        return finish(f"FAILED down: {len(ours)} kick lines removed, expected 2", 1)
-    run("launchctl", "bootout", f"user/{uid()}/{label}")
-    (D / f"{label}.plist").unlink(missing_ok=True)
-    strip = lambda t: [ln for ln in t.splitlines() if TAIL not in ln]   # noqa: E731
-    if strip(crontab()) != strip((D / "crontab.before").read_text()):
-        print("SURPRISE crontab-differs")
-    gone = not loaded(label)
-    return finish(f"DONE down label={label} absent" if gone else "FAILED label-still-loaded", 0 if gone else 1)
+    waited = launchd_state(label) in (Launchd.RUNNING, Launchd.ERROR)
+    print("finding: down waited the full bound and the label still read RUNNING/ERROR" if waited else "down: nothing left to drain")
+    sudo("launchctl", "bootout", f"system/{label}")
+    sudo("rm", "-f", f"/Library/LaunchDaemons/{label}.plist")
+    st = launchd_state(label)
+    line = {Launchd.ABSENT: (f"DONE down label={label} absent", 0), Launchd.ERROR: ("FAILED label-unknown-state", 1),
+            Launchd.LOADED: ("FAILED label-still-loaded", 1), Launchd.RUNNING: ("FAILED label-still-loaded", 1)}[st]
+    return finish(*line)
 
 
 # ---- reading a run ----
