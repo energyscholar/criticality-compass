@@ -9,17 +9,44 @@ declarations/. The intake and the navigator never see truth.json: it is not unde
 import json
 import re
 import shutil
-import subprocess
 import sys
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
+
+import numpy as np
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "tests")]
 import intake_synth  # noqa: E402
 import linenav  # noqa: E402
 from intake_plant import long_table, per_file  # noqa: E402
+from lib import cc as run_cc  # noqa: E402
+
+SIZES, LEVELS, N = [27, 81, 243], [2, 3, 4], 3000
+# Delta(a->b)(L): yD1 = -0.5, yD2 = -0.05 (raw SLOW-); with r = 0.1 the transform reads (-0.05 + 0.05)/0.9 = 0 (ZERO!). Delta(b->c)(L): yD1 = 0, yD2 = +0.5 (RELEVANT, RAW).
+GROWTH = {("a", "b"): (-0.5, -0.05), ("b", "c"): (0.0, 0.5)}
+TOP = {"a": 0.004, "b": 0.004, "c": 0.08}     # needle velocity of the top matched pair; the previous pair's is 0.04, so r = 0.1 (a, b: CONVERGING) and r = 2 (c: PERSISTENT)
+
+
+def planted(tmp, instruments):
+    rng, files, mean = np.random.default_rng(11), [], {"a": {L: 0.5 for L in SIZES}}
+    for (p, q), (y1, y2) in GROWTH.items():
+        d = {27: 0.1, 81: 0.1 * 3 ** y1, 243: 0.1 * 3 ** (y1 + y2)}
+        mean[q] = {L: mean[p][L] + d[L] for L in SIZES}
+    for pt in "abc":
+        for L, nb in zip(SIZES, LEVELS):
+            lv = {27: [0.40, 0.46], 81: [0.30, 0.40, 0.50], 243: [0.2, 0.3, 0.4, 0.5 + TOP[pt]]}[L]
+            np.savez(Path(tmp) / f"{pt}-{L}.npz", G=mean[pt][L] + 0.01 * rng.standard_normal(N), GL=np.array(lv) + 0.01 * rng.standard_normal((N, nb)))
+            files.append({"point": pt, "size": L, "start": "random", "path": f"{pt}-{L}.npz", "arrays": {"G": {"key": "G"}, "GL": {"key": "GL"}}})
+    rel = lambda t, **kw: {"template": t, "provenance": "Coupling", **kw}   # noqa: E731
+    return {"instruments": instruments, "obtained": {p: "truth" for p in "abc"},
+            "axes": {"point": ["a", "b", "c"], "size": SIZES, "starts": ["random"], "main_start": "random"},
+            "observable": {"name": "g", "definition": "planted", "levels": LEVELS, "final_size": 9},
+            "relations": {"size": rel("chain", axis="size"), "control": rel("chain", axis="point"), "chain": rel("matched-chain", axis="size", pairs=[[243, 81], [81, 27]])},
+            "interval": {"method": "block", "b": 50, "resamples": 100, "level": 0.95, "seed": 3}, "eps": {"y": 0.25, "drift": 0.5},
+            "data": {"format": "npz-v1", "files": files}}
+
 
 RUN_P = lambda t: t.replace('identity = "NONE"', 'identity = "RUN"', 1).replace('[replicate.key]\nkind = "NONE"', '[replicate.key]\nkind = "COLUMN"\ncolumn = "p"', 1)  # noqa: E731
 CASES = [(f, "dense") for f in intake_synth.FAMILIES] + [(f, "sparse") for f in intake_synth.FAMILIES if f != "misaligned"]   # misaligned: a dense variant of sharp
@@ -75,8 +102,7 @@ def copy(tmp):
 
 
 def cc(w, *args):
-    r = subprocess.run([sys.executable, str(w / "bin" / "cc"), *args], capture_output=True, text=True, cwd=w)
-    return r.stdout + r.stderr, r.returncode
+    return run_cc(w, *args)[::-1]   # lib.cc returns (returncode, output); this module reads (output, returncode)
 
 
 def bank(banks, tmp, bid, seed, family, density):

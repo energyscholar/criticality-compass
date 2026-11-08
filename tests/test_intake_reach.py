@@ -54,7 +54,8 @@ import readout  # noqa: E402
 import intake_read as rd  # noqa: E402
 import intake_seal  # noqa: E402
 import intake_synth  # noqa: E402
-from intake_plant import ALL_ALTERNATIVE, PRIMARY_PAIR, SHIFT, ARGMAX_LANE, BLOCK, BLOCK_NO_FLOOR, IID, PAIR_LANE, SAME_FAST, VALIDATED, CHOICE_PLANTS, AT_S3, converted, h5_table, hdf5_reader, key_lines, long_table, outcome, per_file, profiled, rooted, run, slow_source, write_long, xlsx  # noqa: E402
+from intake_plant import convert as convert_plant, h5_bank as h5_plant, unlog, ALL_ALTERNATIVE, PRIMARY_PAIR, SHIFT, ARGMAX_LANE, BLOCK, BLOCK_NO_FLOOR, IID, PAIR_LANE, SAME_FAST, VALIDATED, CHOICE_PLANTS, AT_S3, converted, h5_table, hdf5_reader, key_lines, long_table, outcome, per_file, profiled, rooted, run, slow_source, write_long, xlsx  # noqa: E402
+convert = lambda text, root, frm="<cc-datasets>/pf/raw": convert_plant(text, root, frm)   # noqa: E731  (this test's default converted_from)
 import intake_against as against  # noqa: E402
 
 
@@ -137,12 +138,6 @@ with tempfile.TemporaryDirectory() as tmp:
         """(1160 P1) One more entry `name` in files and one more LISTED value, so S1 still passes."""
         return text.replace("files = [", f'files = ["{name}", ', 1).replace("values = [", 'values = ["9.5", ', 1)
 
-    def convert(text, root, frm="<cc-datasets>/pf/raw"):
-        """(1160 P1) The declaration with [source] kind CONVERTED, its root `root`, converted_from `frm` (1160 P3: CONVERSION-MANIFEST.json
-        excluded where MANIFEST.json was)."""
-        return re.sub(r'root = "[^"]*"', f'root = "{root}"', text.replace('kind = "DEPOSIT"', f'kind = "CONVERTED"\nconverted_from = "{frm}"', 1)
-                      .replace('file = "MANIFEST.json"', 'file = "CONVERSION-MANIFEST.json"', 1), count=1)
-
     def conv(edit=lambda raw, bank: None):
         """(1160 P3) The PER_FILE declaration of a bank `bin/cc intake convert` wrote from pf's curve files (each converted as it is), after
         `edit` (on the raw directory and the bank directory): its first code."""
@@ -218,10 +213,6 @@ with tempfile.TemporaryDirectory() as tmp:
         name = f"cv{next(n)}"
         converted(T, tmp, name, [(f["name"], f["name"], "") for f in m["files"]], {f["name"]: (banks / "pf" / f["name"]).read_bytes() for f in m["files"]})
         return name
-
-    def unlog(d, name):
-        """(1160 P4) The access log without the loader lines of file `name`."""
-        (d / "access.log").write_text("".join(ln + "\n" for ln in (d / "access.log").read_text().splitlines() if not json.loads(ln)["path"].endswith("/" + name)))
 
     base = per_file(m, "s0")
     s0 = lambda text, findings=(): {True: lambda g: g.reason, False: lambda g: "PASS"}[isinstance(blind.format_stage(text, list(findings), T), blind.Refuse)](blind.format_stage(text, list(findings), T))
@@ -358,11 +349,8 @@ with tempfile.TemporaryDirectory() as tmp:
     NOT_HERE = {False: ["NOT_AN_XLSX", "SHEET_ABSENT"], True: []}[HAS_XLSX]
 
     def h5_bank(raw):
-        """(plan 1281 B2) A planted LONG_TABLE bank directory under <tmp>/banks holding `raw` as bank.h5 (read by hdf5_reader's declaration)."""
-        name = f"b{next(n)}"
-        (banks / name).mkdir()
-        (banks / name / "bank.h5").write_bytes(raw)
-        return name
+        """(plan 1281 B2) A planted LONG_TABLE bank under the banks directory holding `raw` as bank.h5."""
+        return h5_plant(banks, f"b{next(n)}", raw)
 
     def without_h5py(plant):
         """(plan 1281 B2) One plant run with h5py's import made to fail (importlib.util.find_spec, as tests/test_intake_hdf5.py H4)."""

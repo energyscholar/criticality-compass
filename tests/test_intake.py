@@ -41,7 +41,7 @@ import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-from lib import bad, bootstrap, check  # noqa: E402
+from lib import bad, bootstrap, check, parse  # noqa: E402
 bootstrap(ROOT, "cc")
 import intake  # noqa: E402
 import intake_blind as blind  # noqa: E402
@@ -367,18 +367,6 @@ check("5. (extra) a transducer finding: refused TRANSDUCER_FILE_REFUSED", isinst
 
 # ---- binding rule: enum names are Boolean formulas
 ENUMS = [intake_fold.Execution, intake_fold.Cause, intake_fold.Upstream, intake_fold.Primary, intake_fold.Robustness, intake_fold.ReadsBytes, intake_fold.Scope, blind.Mark, intake_seal.SealStatus, intake_seal.Ordering]
-
-
-def parse(name, atoms):
-    """The set a constant name denotes: ATOM(_OR_ATOM)*, NOT_<ATOM> = the complement within the atoms; None when a part is no atom."""
-    out = set()
-    for part in name.split("_OR_"):
-        neg = part.startswith("NOT_") and part[4:] in atoms
-        lit = {True: atoms - {part[4:]}, False: {part} & atoms}[neg]
-        if not lit:
-            return None
-        out |= lit
-    return frozenset(out)
 
 
 check("binding: the parser reads NOT_EXECUTED as {STUB, WITHHELD} (breaker: a wrong name is seen)", parse("NOT_EXECUTED", {"STUB", "WITHHELD", "EXECUTED"}) == {"STUB", "WITHHELD"}, "")

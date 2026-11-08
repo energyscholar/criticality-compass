@@ -1,6 +1,7 @@
 """intake_plant - planted inputs shared by the plan-1145 intake tests (test_intake_read, test_intake_long, test_intake_reach): a minimal xlsx
 writer, the synthetic bank's declaration as PER_FILE and as LONG_TABLE, and an in-process run of every stage. It reads no real data."""
 import io
+import json
 import re
 import zipfile
 from pathlib import Path
@@ -242,3 +243,22 @@ def outcome(out, sid):
     return {True: lambda: ("PASS", out[sid].result.evidence), False: lambda: (getattr(first[0], "reason", out[sid].mark.name), str(first[0])[:300])}[out[sid].mark is intake.Mark.PASSED]()
 
 
+
+
+def unlog(d, name):
+    """(1160 P4) The access log of <d> without the loader lines of file `name`."""
+    (d / "access.log").write_text("".join(ln + "\n" for ln in (d / "access.log").read_text().splitlines() if not json.loads(ln)["path"].endswith("/" + name)))
+
+
+def convert(text, root, frm):
+    """(1160 P1) [source] kind CONVERTED, its root `root`, converted_from `frm` (1160 P3: CONVERSION-MANIFEST.json excluded where
+    MANIFEST.json was)."""
+    return re.sub(r'root = "[^"]*"', f'root = "{root}"', text.replace('kind = "DEPOSIT"', f'kind = "CONVERTED"\nconverted_from = "{frm}"', 1)
+                  .replace('file = "MANIFEST.json"', 'file = "CONVERSION-MANIFEST.json"', 1), count=1)
+
+
+def h5_bank(banks, name, raw, **mkdir):
+    """(plan 1281 B2) A planted LONG_TABLE bank directory <banks>/<name> holding `raw` as bank.h5 (read by hdf5_reader's declaration); `mkdir` is the directory's mkdir arguments."""
+    (banks / name).mkdir(**mkdir)
+    (banks / name / "bank.h5").write_bytes(raw)
+    return name

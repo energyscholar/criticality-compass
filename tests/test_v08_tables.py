@@ -16,6 +16,7 @@ bootstrap(ROOT, "cc", "cc/instruments")
 import declare  # noqa: E402
 import detect  # noqa: E402
 import frozen  # noqa: E402
+from plane_plant import planted  # noqa: E402
 
 
 T8, T7 = detect.load_tables("v08-rules"), detect.load_tables("v07-rules")
@@ -98,33 +99,13 @@ for why, edit, find in (
         check(why, any(find in x.msg for x in found), str([x.msg[:90] for x in found]))
 
 # --- T3: the Delta basis is RAW. A planted chain whose endpoints read drift CONVERGING is measured under both sets: v07 reads the pair TRANSFORMED, v08 RAW (no leak of the transform).
-SIZES, LEVELS, N = [27, 81, 243], [2, 3, 4], 3000
-GROWTH = {("a", "b"): (-0.5, -0.05), ("b", "c"): (0.0, 0.5)}   # Delta(a->b): yD1 -0.5, yD2 -0.05 (SLOW-); Delta(b->c): 0.0, +0.5
-TOP = {"a": 0.004, "b": 0.004, "c": 0.08}                      # the needle's top velocity; the previous pair's is 0.04: r = 0.1 (a, b CONVERGING), r = 2 (c PERSISTENT)
 
 
-def planted(tmp):
-    rng, files, mean = np.random.default_rng(11), [], {"a": {L: 0.5 for L in SIZES}}
-    for (p, q), (y1, y2) in GROWTH.items():
-        d = {27: 0.1, 81: 0.1 * 3 ** y1, 243: 0.1 * 3 ** (y1 + y2)}
-        mean[q] = {L: mean[p][L] + d[L] for L in SIZES}
-    for pt in "abc":
-        for L, nb in zip(SIZES, LEVELS):
-            lv = {27: [0.40, 0.46], 81: [0.30, 0.40, 0.50], 243: [0.2, 0.3, 0.4, 0.5 + TOP[pt]]}[L]
-            np.savez(Path(tmp) / f"{pt}-{L}.npz", G=mean[pt][L] + 0.01 * rng.standard_normal(N), GL=np.array(lv) + 0.01 * rng.standard_normal((N, nb)))
-            files.append({"point": pt, "size": L, "start": "random", "path": f"{pt}-{L}.npz", "arrays": {"G": {"key": "G"}, "GL": {"key": "GL"}}})
-    rel = lambda t, **kw: {"template": t, "provenance": "Coupling", **kw}   # noqa: E731
-    return {"instruments": ["needle_chain", "across_delta", "stability_delta"], "obtained": {p: "truth" for p in "abc"},
-            "axes": {"point": ["a", "b", "c"], "size": SIZES, "starts": ["random"], "main_start": "random"},
-            "observable": {"name": "g", "definition": "planted", "levels": LEVELS, "final_size": 9},
-            "relations": {"size": rel("chain", axis="size"), "control": rel("chain", axis="point"), "chain": rel("matched-chain", axis="size", pairs=[[243, 81], [81, 27]])},
-            "interval": {"method": "block", "b": 50, "resamples": 100, "level": 0.95, "seed": 3}, "eps": {"y": 0.25, "drift": 0.5},
-            "data": {"format": "npz-v1", "files": files}}
 
 
 def read(T):
     with tempfile.TemporaryDirectory() as tmp:
-        m = planted(tmp)
+        m = planted(tmp, ["needle_chain", "across_delta", "stability_delta"])
         c, reg = declare.Ctx(ROOT, data_root=tmp), {n: detect.instrument(n) for n in sorted(declare.Ctx(ROOT).reg)}
         out = detect.measure(m, c, reg, T)
         rows = {pt: detect.point_rows(m, c, reg, out, pt, detect.used(T)) for pt in "abc"}

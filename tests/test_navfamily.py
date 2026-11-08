@@ -40,7 +40,7 @@ import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-from lib import bad, bootstrap, check  # noqa: E402
+from lib import bad, bootstrap, cc as run_cc, check  # noqa: E402
 bootstrap(ROOT, "cc", "tests")
 import intake  # noqa: E402
 import intake_feature as F  # noqa: E402
@@ -136,9 +136,7 @@ def cli_checks():
         intake_synth.write(banks / "pf", tmp / "pf-TRUTH", "pf", 1, 9)
         m = json.loads((banks / "pf" / "MANIFEST.json").read_text())
 
-        def cc(*args):
-            r = subprocess.run([sys.executable, str(w / "bin" / "cc"), *args], capture_output=True, text=True, cwd=w)
-            return r.stdout + r.stderr, r.returncode
+        cc = lambda *args: run_cc(w, *args)[::-1]   # noqa: E731  (lib.cc returns (returncode, output); this call site reads (output, returncode))
 
         def plant(ident, blocks, tl, profile=True):
             """A planted family declarations/<ident>/ on bank <nav-test>/<ident>, profiled as a declarer does before running."""

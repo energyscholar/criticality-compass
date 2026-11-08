@@ -1,8 +1,8 @@
 """test_tables_cli - bin/cc authoring, run and freeze commands, as a subprocess inside a temp copy of the repo."""
+from functools import partial
 import json
 import os
 import shutil
-import subprocess
 import sys
 import tempfile
 from pathlib import Path
@@ -11,7 +11,7 @@ import frozen  # noqa: E402
 ROOT = Path(__file__).resolve().parent.parent
 
 
-from lib import bad, check  # noqa: E402
+from lib import bad, cc as run_cc, check  # noqa: E402
 
 
 with tempfile.TemporaryDirectory() as t:
@@ -19,9 +19,7 @@ with tempfile.TemporaryDirectory() as t:
     shutil.copytree(ROOT, repo, ignore=shutil.ignore_patterns(".git", "__pycache__"))
     frozen.thaw(repo)   # the copy only; the live tree is frozen
 
-    def cc(*args):
-        r = subprocess.run([sys.executable, str(repo / "bin" / "cc"), *args], capture_output=True, text=True, cwd=repo)
-        return r.returncode, r.stdout + r.stderr
+    cc = partial(run_cc, repo)
 
     rc, out = cc("tables", "fork", "verdict-x-rules", "t1")
     want = "Next: edit tables/t1/verdict.toml, then bin/cc validate, then bin/cc run --all --tables t1"

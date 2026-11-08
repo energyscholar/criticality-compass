@@ -1,9 +1,9 @@
 """test_family - the family layer: the four families against expected/<set>.toml [[family]], the bracket on synthetic codes
 through family.py's OWN function, the 240-cell partition, the declarations, and the commands."""
+from functools import partial
 import ast
 import json
 import math
-import subprocess
 import sys
 import tempfile
 import tomllib
@@ -11,7 +11,7 @@ import numpy as np
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-from lib import bad, bootstrap, check  # noqa: E402
+from lib import bad, bootstrap, cc as run_cc, check  # noqa: E402
 bootstrap(ROOT, "cc", "cc/instruments")
 import author  # noqa: E402
 import detect  # noqa: E402
@@ -19,9 +19,7 @@ import declare  # noqa: E402
 import family  # noqa: E402
 
 
-def cc(*args):
-    r = subprocess.run([sys.executable, str(ROOT / "bin" / "cc"), *args], capture_output=True, text=True, cwd=ROOT)
-    return r.returncode, r.stdout + r.stderr
+cc = partial(run_cc, ROOT)
 
 
 for f in sorted((ROOT / "expected").glob("*.toml")):

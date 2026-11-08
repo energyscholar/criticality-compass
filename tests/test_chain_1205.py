@@ -30,7 +30,6 @@ import json
 import os
 import re
 import shutil
-import subprocess
 import sys
 import tempfile
 from dataclasses import dataclass
@@ -39,7 +38,7 @@ from pathlib import Path
 import numpy as np
 
 ROOT = Path(__file__).resolve().parent.parent
-from lib import bad, bootstrap, check  # noqa: E402
+from lib import bad, bootstrap, cc as run_cc, check, parse  # noqa: E402
 bootstrap(ROOT, "cc", "tests")
 import chain  # noqa: E402
 import intake_feature as F  # noqa: E402
@@ -54,18 +53,6 @@ reached = set()
 
 
 # ---- H1 the enum names
-def parse(name, atoms):
-    """The binding rule's parser (tests/test_intake.py): ATOM(_OR_ATOM)*, NOT_<ATOM> = the complement within the atoms; None when a part is no atom."""
-    out = set()
-    for part in name.split("_OR_"):
-        neg = part.startswith("NOT_") and part[4:] in atoms
-        lit = {True: atoms - {part[4:]}, False: {part} & atoms}[neg]
-        if not lit:
-            return None
-        out |= lit
-    return frozenset(out)
-
-
 check("H1. the parser reads NOT_CO_LOCATED over {CO_LOCATED, NOT_CO_LOCATED, NOT_COMPARABLE} as two atoms (a wrong name is seen)",
       parse("NOT_CO_LOCATED", {"CO_LOCATED", "NOT_CO_LOCATED", "NOT_COMPARABLE"}) == {"NOT_CO_LOCATED", "NOT_COMPARABLE"})
 for E in (chain.Lane, chain.Step, chain.FamilyAtom, chain.Robustness, chain.CoLocation):
@@ -164,9 +151,7 @@ def cli_checks():
         S.write(banks / "pf", tmp / "pf-TRUTH", "pf", 1, 9)
         m = json.loads((banks / "pf" / "MANIFEST.json").read_text())
 
-        def cc(*args):
-            r = subprocess.run([sys.executable, str(w / "bin" / "cc"), *args], capture_output=True, text=True, cwd=w)
-            return r.stdout + r.stderr, r.returncode
+        cc = lambda *args: run_cc(w, *args)[::-1]   # noqa: E731  (lib.cc returns (returncode, output); this call site reads (output, returncode))
 
         def plant(ident, curves, profile=True):
             (banks / ident).mkdir()

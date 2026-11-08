@@ -79,7 +79,8 @@ import intake_say  # noqa: E402
 import intake_seal  # noqa: E402
 import intake_against as against  # noqa: E402
 import intake_synth  # noqa: E402
-from intake_plant import ALL_ALTERNATIVE, PRIMARY_PAIR, SHIFT, BLOCK, BLOCK_NO_FLOOR, IID, PAIR_LANE, SAME_FAST, VALIDATED, CHOICE_PLANTS, AT_S3, conversion, h5_table, hdf5_reader, long_table, per_file, slow_source, workbook, write_long, xlsx  # noqa: E402
+from intake_plant import convert as convert_plant, h5_bank as h5_plant, unlog, ALL_ALTERNATIVE, PRIMARY_PAIR, SHIFT, BLOCK, BLOCK_NO_FLOOR, IID, PAIR_LANE, SAME_FAST, VALIDATED, CHOICE_PLANTS, AT_S3, conversion, h5_table, hdf5_reader, long_table, per_file, slow_source, workbook, write_long, xlsx  # noqa: E402
+convert = lambda text, root, frm="<cc-datasets>/leak/raw": convert_plant(text, root, frm)   # noqa: E731  (this test's default converted_from)
 
 
 HAS_XLSX = importlib.util.find_spec("openpyxl") is not None
@@ -209,17 +210,7 @@ with tempfile.TemporaryDirectory() as tmp:
         (d / "intake-report.md").write_text(text)
         return text
 
-    def unlog(d, name):
-        """(1160 P4) The access log without the loader lines of file `name`."""
-        (d / "access.log").write_text("".join(ln + "\n" for ln in (d / "access.log").read_text().splitlines() if not json.loads(ln)["path"].endswith("/" + name)))
-
     PF, LT = pf_bank(), lt_bank()
-
-    def convert(text, root, frm="<cc-datasets>/leak/raw"):
-        """(1160 P1) [source] kind CONVERTED, its root `root`, converted_from `frm` (1160 P3: CONVERSION-MANIFEST.json excluded where
-        MANIFEST.json was)."""
-        return re.sub(r'root = "[^"]*"', f'root = "{root}"', text.replace('kind = "DEPOSIT"', f'kind = "CONVERTED"\nconverted_from = "{frm}"', 1)
-                      .replace('file = "MANIFEST.json"', 'file = "CONVERSION-MANIFEST.json"', 1), count=1)
 
     CONVERTED = {}   # (1160 P3) K6: what each conversion printed and wrote
 
@@ -392,11 +383,8 @@ with tempfile.TemporaryDirectory() as tmp:
     NOT_HERE = {False: ["NOT_AN_XLSX", "SHEET_ABSENT"], True: ["XLSX_READER_ABSENT"]}[HAS_XLSX]
 
     def h5_bank(raw):
-        """(plan 1281 B2) A planted LONG_TABLE bank directory holding `raw` as bank.h5 (read by hdf5_reader's declaration)."""
-        name = f"lt{next(n)}"
-        (banks / name).mkdir(parents=True)
-        (banks / name / "bank.h5").write_bytes(raw)
-        return name
+        """(plan 1281 B2) A planted LONG_TABLE bank under the banks directory holding `raw` as bank.h5."""
+        return h5_plant(banks, f"lt{next(n)}", raw, parents=True)
     REAL_SPEC = importlib.util.find_spec   # (plan 1281 B2) a step pair that makes h5py's import fail for one plant (as tests/test_intake_hdf5.py H4)
     hide_h5py = lambda b: setattr(importlib.util, "find_spec", lambda name, *a, **k: None if name == "h5py" else REAL_SPEC(name, *a, **k))
     show_h5py = lambda b: setattr(importlib.util, "find_spec", REAL_SPEC)

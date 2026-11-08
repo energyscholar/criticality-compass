@@ -1,5 +1,6 @@
 """test_code_hash - a result records the content hash of the code that made it (provenance); `freeze` refuses a result whose measure_hash (plan 0881 P1.3; was code_hash)
 hash is not the committed tree's (plan 0869 P2). Planted (plan 0876 B: an edit to a module in every closure, project.py; one in no closure keeps the reuse key, so a re-run would reuse): run, commit a code edit, freeze -> RED; run again -> green."""
+from functools import partial
 import shutil
 import subprocess
 import sys
@@ -12,7 +13,7 @@ ROOT = Path(__file__).resolve().parent.parent
 INPUT = "b7-at-line-5"
 
 
-from lib import bad, check  # noqa: E402
+from lib import bad, cc as run_cc, check  # noqa: E402
 
 
 with tempfile.TemporaryDirectory() as t:
@@ -20,9 +21,7 @@ with tempfile.TemporaryDirectory() as t:
     shutil.copytree(ROOT, repo, ignore=shutil.ignore_patterns(".git", "__pycache__"))
     frozen.thaw(repo)   # the copy only; the live tree is frozen
 
-    def cc(*args):
-        r = subprocess.run([sys.executable, str(repo / "bin" / "cc"), *args], capture_output=True, text=True, cwd=repo)
-        return r.returncode, r.stdout + r.stderr
+    cc = partial(run_cc, repo)
 
     def git(*args):
         subprocess.run(["git", "-c", "user.name=t", "-c", "user.email=t@t", *args], cwd=repo, capture_output=True, check=True)

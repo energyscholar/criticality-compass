@@ -29,7 +29,7 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-from lib import bad, bootstrap, check  # noqa: E402
+from lib import bad, bootstrap, check, parse  # noqa: E402
 bootstrap(ROOT, "cc", "tests")
 import intake_feature as F  # noqa: E402
 import intake_synth  # noqa: E402
@@ -43,18 +43,6 @@ V = linenav.Verdict
 
 
 # ---- W1 the enum name
-def parse(name, atoms):
-    """The binding rule's parser (tests/test_intake.py): ATOM(_OR_ATOM)*, NOT_<ATOM> = the complement within the atoms; None when a part is no atom."""
-    out = set()
-    for part in name.split("_OR_"):
-        neg = part.startswith("NOT_") and part[4:] in atoms
-        lit = {True: atoms - {part[4:]}, False: {part} & atoms}[neg]
-        if not lit:
-            return None
-        out |= lit
-    return frozenset(out)
-
-
 m = re.search(r"ATOMS: ([A-Z_\s|]+?)\.", W.Reach.__doc__ or "")
 atoms = set(re.sub(r"\s", "", m[1]).split("|")) if m else set()
 check("W1. Reach declares ATOMS and an Axiom, and its members are exactly the atoms", bool(atoms) and "Axiom" in W.Reach.__doc__ and {x.name for x in W.Reach} == atoms)

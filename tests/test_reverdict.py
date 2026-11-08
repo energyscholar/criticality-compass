@@ -1,15 +1,15 @@
 """test_reverdict - a stored result re-verdicted under another table set WITHOUT measuring (plan 0864 P1):
 it reproduces every frozen verdict, equals a real run under the new set, runs no instrument, and refuses
 when a set changes what a door or membership read."""
+from functools import partial
 import json
 import shutil
-import subprocess
 import sys
 import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-from lib import bad, bootstrap, check  # noqa: E402
+from lib import bad, bootstrap, cc as run_cc, check  # noqa: E402
 bootstrap(ROOT, "cc", "cc/instruments")
 import detect  # noqa: E402
 import door  # noqa: E402
@@ -65,9 +65,7 @@ with tempfile.TemporaryDirectory() as t:
     fz["files"] = {k: v for k, v in fz["files"].items() if "@v01-rules." not in k}
     (repo / "FROZEN.json").write_text(json.dumps(fz))
 
-    def cc(*a):
-        r = subprocess.run([sys.executable, str(repo / "bin" / "cc"), *a], capture_output=True, text=True, cwd=repo)
-        return r.returncode, r.stdout + r.stderr
+    cc = partial(run_cc, repo)
     rc, out = cc("reverdict", "x8-ising-needle", "--tables", "v01-rules", "--from", "verdict-x-rules")
     out_json = json.loads((repo / "results" / "x8-ising-needle@v01-rules.json").read_text()) if rc == 0 else {}
     check("the CLI writes a derived result and copies no vectors",

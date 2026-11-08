@@ -1,17 +1,15 @@
 """test_seed_int - plan 1282 P1c D5: the declared seed reaches numpy.random.default_rng as a plain int, the integer half of A4.4 (0937's SeedSequence streams are the other half).
 Characterises P1a's sampler, so it is RED-exempt: GREEN at the base (e90c90f) and at close. Reads the author's data root (cc.toml [check] needs_data)."""
 import sys
-import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-from lib import bad, bootstrap, check  # noqa: E402
+from lib import bad, bootstrap, check, real_root  # noqa: E402
 bootstrap(ROOT, "cc", "cc/instruments")
 import numpy as np  # noqa: E402
-import schema  # noqa: E402
 import sampler  # noqa: E402
 
-REAL = schema.resolve_data_root(tomllib.loads((ROOT / "cc.toml").read_text()))[0]
+REAL = real_root()
 
 
 def d5():

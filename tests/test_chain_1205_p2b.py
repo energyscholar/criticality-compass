@@ -26,7 +26,7 @@ from pathlib import Path
 import numpy as np
 
 ROOT = Path(__file__).resolve().parent.parent
-from lib import bad, bootstrap, check  # noqa: E402
+from lib import bad, bootstrap, cc as run_cc, check, parse  # noqa: E402
 bootstrap(ROOT, "cc", "tests")
 import chain  # noqa: E402
 import intake_feature as F  # noqa: E402
@@ -105,17 +105,6 @@ check("P3. rows: the edge lane's cell counts in its family atoms sum to 16, a sa
       sum(v["cells"] for v in atoms[EDGE.name].values()) == 16 and sum(v["cells"] for v in atoms["ARGMAX_FAST"].values()) == 4, str(atoms))
 
 # ---- P6 names
-def parse(name, atoms):
-    out = set()
-    for part in name.split("_OR_"):
-        neg = part.startswith("NOT_") and part[4:] in atoms
-        lit = {True: atoms - {part[4:]}, False: {part} & atoms}[neg]
-        if not lit:
-            return None
-        out |= lit
-    return frozenset(out)
-
-
 E = chain.StrideFit
 m = re.search(r"ATOMS:\s+([A-Z_\s|]+?)\.", E.__doc__ or "")
 atoms_ = set(re.sub(r"\s", "", m[1]).split("|")) if m else set()
@@ -137,9 +126,7 @@ def cli_checks():
         S.write(banks / "pf", tmp / "pf-TRUTH", "pf", 1, 9)
         man = json.loads((banks / "pf" / "MANIFEST.json").read_text())
 
-        def cc(*args):
-            r = subprocess.run([sys.executable, str(w / "bin" / "cc"), *args], capture_output=True, text=True, cwd=w)
-            return r.stdout + r.stderr, r.returncode
+        cc = lambda *args: run_cc(w, *args)[::-1]   # noqa: E731  (lib.cc returns (returncode, output); this call site reads (output, returncode))
 
         ident = "short"
         (banks / ident).mkdir()

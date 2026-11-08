@@ -11,17 +11,16 @@ import shutil
 import subprocess
 import sys
 import tempfile
-import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-from lib import bad, bootstrap, check, guarded  # noqa: E402
+from lib import bad, bootstrap, check, guarded, real_root  # noqa: E402
 bootstrap(ROOT, "cc", "cc/instruments")
 import numpy as np  # noqa: E402
 import declare  # noqa: E402
 import schema  # noqa: E402
 
-REAL = schema.resolve_data_root(tomllib.loads((ROOT / "cc.toml").read_text()))[0]
+REAL = real_root()
 
 
 def tools():

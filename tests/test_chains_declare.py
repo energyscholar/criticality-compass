@@ -13,7 +13,7 @@ from pathlib import Path
 import numpy as np
 
 ROOT = Path(__file__).resolve().parent.parent
-from lib import bad, bootstrap, check  # noqa: E402
+from lib import bad, bootstrap, check, real_root  # noqa: E402
 bootstrap(ROOT, "cc", "cc/instruments")
 import declare  # noqa: E402
 import schema  # noqa: E402
@@ -21,7 +21,7 @@ import schema  # noqa: E402
 
 import tomllib  # noqa: E402
 cfg = tomllib.loads((ROOT / "cc.toml").read_text())
-REAL = schema.resolve_data_root(cfg)[0]
+REAL = real_root()
 M = 10
 X8 = ROOT / "inputs" / "x8-ising-needle"
 text = (X8 / "m.toml").read_text()

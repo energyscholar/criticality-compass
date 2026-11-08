@@ -17,37 +17,17 @@ import declare  # noqa: E402
 import detect  # noqa: E402
 import door  # noqa: E402
 import frozen  # noqa: E402
+from plane_plant import planted  # noqa: E402
 
 
-SIZES, LEVELS, N = [27, 81, 243], [2, 3, 4], 3000
 LN3 = np.log(3)
-# Delta(a->b)(L): yD1 = -0.5, yD2 = -0.05 (raw SLOW-); with r = 0.1 the transform reads (-0.05 + 0.05)/0.9 = 0 (ZERO!). Delta(b->c)(L): yD1 = 0, yD2 = +0.5 (RELEVANT, RAW).
-GROWTH = {("a", "b"): (-0.5, -0.05), ("b", "c"): (0.0, 0.5)}
-TOP = {"a": 0.004, "b": 0.004, "c": 0.08}     # needle velocity of the top matched pair; the previous pair's is 0.04, so r = 0.1 (a, b: CONVERGING) and r = 2 (c: PERSISTENT)
 
 
-def planted(tmp):
-    rng, files, mean = np.random.default_rng(11), [], {"a": {L: 0.5 for L in SIZES}}
-    for (p, q), (y1, y2) in GROWTH.items():
-        d = {27: 0.1, 81: 0.1 * 3 ** y1, 243: 0.1 * 3 ** (y1 + y2)}
-        mean[q] = {L: mean[p][L] + d[L] for L in SIZES}
-    for pt in "abc":
-        for L, nb in zip(SIZES, LEVELS):
-            lv = {27: [0.40, 0.46], 81: [0.30, 0.40, 0.50], 243: [0.2, 0.3, 0.4, 0.5 + TOP[pt]]}[L]
-            np.savez(Path(tmp) / f"{pt}-{L}.npz", G=mean[pt][L] + 0.01 * rng.standard_normal(N), GL=np.array(lv) + 0.01 * rng.standard_normal((N, nb)))
-            files.append({"point": pt, "size": L, "start": "random", "path": f"{pt}-{L}.npz", "arrays": {"G": {"key": "G"}, "GL": {"key": "GL"}}})
-    rel = lambda t, **kw: {"template": t, "provenance": "Coupling", **kw}   # noqa: E731
-    return {"instruments": ["needle_chain", "across_delta"], "obtained": {p: "truth" for p in "abc"},
-            "axes": {"point": ["a", "b", "c"], "size": SIZES, "starts": ["random"], "main_start": "random"},
-            "observable": {"name": "g", "definition": "planted", "levels": LEVELS, "final_size": 9},
-            "relations": {"size": rel("chain", axis="size"), "control": rel("chain", axis="point"), "chain": rel("matched-chain", axis="size", pairs=[[243, 81], [81, 27]])},
-            "interval": {"method": "block", "b": 50, "resamples": 100, "level": 0.95, "seed": 3}, "eps": {"y": 0.25, "drift": 0.5},
-            "data": {"format": "npz-v1", "files": files}}
 
 
 def read(tables):
     with tempfile.TemporaryDirectory() as tmp:
-        m, T = planted(tmp), detect.load_tables(tables)
+        m, T = planted(tmp, ["needle_chain", "across_delta"]), detect.load_tables(tables)
         c, reg = declare.Ctx(ROOT, data_root=tmp), {n: detect.instrument(n) for n in sorted(declare.Ctx(ROOT).reg)}
         out = detect.measure(m, c, reg, T)
         rows = {pt: detect.point_rows(m, c, reg, out, pt, detect.used(T)) for pt in "abc"}
@@ -109,7 +89,7 @@ rat = door.ratio_of("TRANSFORMED", lambda pt: drift[pt], ("p", "q"), lambda: LN3
 check("ratio table: TRANSFORMED is the mean of the endpoints' 3^-(drift+1); RAW is 0 and never reads the drift",
       np.allclose(rat, (1 / 9 + 1 / 81) / 2) and not door.ratio_of("RAW", lambda pt: 1 / 0, ("p", "q"), lambda: 1 / 0, 4).any())
 with tempfile.TemporaryDirectory() as tmp:
-    ctx = door.context(planted(tmp), inst, None)
+    ctx = door.context(planted(tmp, ["needle_chain", "across_delta"]), inst, None)
 ok = door.basis(admit.nodefield(np.zeros((4, 3))), dataclasses.replace(ctx, ratio=np.array([0.1, 0.2, 0.3, 0.9])))
 no = door.basis(admit.nodefield(np.zeros((4, 3))), dataclasses.replace(ctx, ratio=np.array([0.1, 0.2, 0.3, 1.0])))
 check("door:basis passes r < 1 at every resample and refuses r >= 1 at any (NOT-EVALUATED with a reason), a RAW r = 0 always passes",
