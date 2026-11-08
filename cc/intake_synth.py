@@ -11,6 +11,8 @@ from pathlib import Path
 
 import numpy as np
 
+from intake_blind import flag
+
 MODEL = "C(T, h) = B + A(h) / (1 + ((T - T_p(h)) / w)^2) + eps; T_p(h) = 2.27 + 0.30 h; A(h) = 1.0 + 1.5 exp(-(h - h*)^2 / (2 * 0.12^2)); eps ~ N(0, sigma)"
 B, W, TP0, TP1, A0, A1, S, H_STAR, SIGMA = 0.5, 0.08, 2.27, 0.30, 1.0, 1.5, 0.12, 0.10, 0.03
 GRID = np.linspace(1.5, 3.5, 161)   # the master fast-knob grid; each curve keeps its own subset
@@ -120,10 +122,6 @@ def plane_write(bank, truth, ident, seed, family, density):
     return rows
 
 
-def _flag(args, name, absent):
-    return {True: lambda: args[args.index(name) + 1], False: lambda: absent}[name in args and args.index(name) + 1 < len(args)]()
-
-
 def _done(bank, truth, ident, rows):
     print(f"synth {ident}: wrote {len(rows)} curves ({min(r['n'] for r in rows)} to {max(r['n'] for r in rows)} points each) and MANIFEST.json to {bank}\n"
           f"  the truth is in {truth / 'truth.json'}, outside the bank; no intake stage reads it\n  Next: bin/cc new intake {ident} --from-synth {ident}")
@@ -133,13 +131,13 @@ def _done(bank, truth, ident, rows):
 def cli(root, args):
     """bin/cc intake synth: a usage refusal (no id, a seed or curve count that is not an integer, fewer than 2 curves) or a bank that exists
     already (refused: a bank is never overwritten), else write. Every branch is a row of a two-row table."""
-    ident, seed, k = {True: lambda: args[0], False: lambda: ""}[len(args) > 0 and not args[0].startswith("--")](), _flag(args, "--seed", ""), _flag(args, "--curves", "9")
+    ident, seed, k = {True: lambda: args[0], False: lambda: ""}[len(args) > 0 and not args[0].startswith("--")](), flag(args, "--seed", ""), flag(args, "--curves", "9")
     usage = [u for ok, u in ((re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]*", ident) is not None, "an id (letters, digits, _ . -)"),
                              (re.fullmatch(r"\d+", seed) is not None, "--seed N (a non-negative integer)"),
                              (re.fullmatch(r"\d+", k) is not None and int(k) >= 2, "--curves K (an integer, at least 2)")) if not ok]
-    fam, dens = _flag(args, "--plane", ""), _flag(args, "--density", "dense")   # plan 1176 C: a plane bank (no --plane: the plan 1139 bank)
+    fam, dens = flag(args, "--plane", ""), flag(args, "--density", "dense")   # plan 1176 C: a plane bank (no --plane: the plan 1139 bank)
     usage += [u for ok, u in ((fam in ("",) + FAMILIES, f"--plane one of {' '.join(FAMILIES)}"), (dens in DENSITY, f"--density one of {' '.join(DENSITY)}")) if not ok]
-    out = Path(_flag(args, "--out", str(Path(root) / "scratch" / "intake-synth")))
+    out = Path(flag(args, "--out", str(Path(root) / "scratch" / "intake-synth")))
     bank, truth = out / ident, out / f"{ident}-TRUTH"
     refuse = lambda why: print(f"bin/cc intake synth: {why}\n  usage: bin/cc intake synth <id> --seed N [--curves K] [--plane FAMILY [--density dense|sparse]] [--out DIR]\n  Next: bin/cc intake explain") or 1
     exists = lambda: print(f"synth {ident}: refused, {bank} or {truth} exists; a bank is never overwritten\n  Next: rm -r {bank} {truth}   (or choose another id)") or 1

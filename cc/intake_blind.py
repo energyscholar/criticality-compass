@@ -236,6 +236,21 @@ def gate(checks, then, refuse=Refuse):
     return {True: then, False: lambda: refuse(failed[0][1], failed[0][2]())}[not failed]()
 
 
+def bind(x, f, kinds):
+    """f(x), or x when x is already one of the typed refusals `kinds`: the first refusal of a chain is its result."""
+    return {True: lambda: x, False: lambda: f(x)}[isinstance(x, kinds)]()
+
+
+@dataclass(frozen=True)
+class Typed:
+    """The base of a module's typed refusal. Invariant: `code` is a key of the subclass's TABLE (code -> sentence); `words()` prints code, sentence, detail."""
+    code: str
+    detail: str
+
+    def words(self):
+        return f"{self.code}: {self.TABLE[self.code]} Detail: {self.detail}"
+
+
 SWEEP = {   # [acquisition] row_order -> (the [acquisition] table) -> the direction the fast knob runs within a curve; total
     "ASCENDING": lambda acq: "ASCENDING", "DESCENDING": lambda acq: "DESCENDING", "ACQUISITION": lambda acq: acq["direction"],
 }

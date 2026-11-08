@@ -13,7 +13,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import intake_bytes   # plan 1160 A20: located, the universe from the declared root (intake_bytes imports this module too; both use the other at call time only)
-from intake_blind import Pass, Refuse, detail, gate
+from intake_blind import Absent, Pass, Refuse, detail, gate
 
 FILES = ("intake.toml", "transducer.toml")   # the declaration: the two files its sha256 covers, in this order
 AUTHOR_KIND = {"human": "HUMAN", "ai-draft": "AI_DRAFT"}   # the --as word -> the sealed author_kind; a word outside it is a usage refusal
@@ -53,6 +53,12 @@ class SealState:
 
     def confirmed(self):
         return self.status is SealStatus.SEALED and self.record["confirmed_by"] != ""
+
+
+def declared(d):
+    """S0's input: the text of declarations/<id>/intake.toml, or Absent when it is no file (S0 refuses DECLARATION_FILE_ABSENT)."""
+    f = Path(d) / "intake.toml"
+    return {True: lambda: f.read_text(), False: lambda: Absent(f"declarations/{Path(d).name}/intake.toml")}[f.is_file()]()
 
 
 def _said(r):

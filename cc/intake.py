@@ -11,6 +11,7 @@ import intake_choices
 import intake_feasible
 import intake_say
 import intake_seal
+from intake_seal import declared
 import intake_terminal
 from intake_blind import Mark
 from intake_fold import Primary, before_data, fold, verdicts
@@ -46,12 +47,6 @@ def _findings(root, d, ident):
     data, bad = schema.load(d / "transducer.toml", root)
     found = {True: lambda: bad, False: lambda: transducer.chk_transducer(f"declarations/{ident}/transducer.toml", data, schema.Ctx(root), ident)}[data is None]()
     return [f"{f.loc}: {f.msg} (Next: {f.nxt})" for f in found]
-
-
-def declared(d):
-    """S0's input: the text of declarations/<id>/intake.toml, or blind.Absent when it is no file (S0 refuses DECLARATION_FILE_ABSENT)."""
-    f = Path(d) / "intake.toml"
-    return {True: lambda: f.read_text(), False: lambda: blind.Absent(f"declarations/{Path(d).name}/intake.toml")}[f.is_file()]()
 
 
 def _go(root, ident, pick):

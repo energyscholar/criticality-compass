@@ -31,7 +31,7 @@ import intake_bytes
 import intake_census
 import intake_read
 import schema
-from intake_blind import NUMBER, Name, Pass, Refuse, classify, detail, flag, gate, look, parse
+from intake_blind import NUMBER, Name, Pass, Refuse, bind, classify, detail, flag, gate, look, parse
 from intake_names import masked
 
 MANIFEST = "CONVERSION-MANIFEST.json"
@@ -55,9 +55,7 @@ def _entry(f):
     return f"file '{f['from']}' -> '{f['to']}'"
 
 
-def _bind(x, f):
-    """f(x), or x when x is a Refuse: the chain of a conversion, in which the first refusal is the result."""
-    return {True: lambda: x, False: lambda: f(x)}[isinstance(x, Refuse)]()
+_bind = functools.partial(bind, kinds=Refuse)   # f(x), or x when x is a Refuse: the chain of a conversion, in which the first refusal is the result
 
 
 @dataclass(frozen=True)

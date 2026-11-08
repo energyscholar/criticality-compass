@@ -16,7 +16,7 @@ refusal's detail names vertex ordinals, the declared guess and curve ranks, neve
 from dataclasses import dataclass, field
 
 import intake_census
-from intake_blind import gate, look
+from intake_blind import Typed, gate, look
 
 REFUSAL = {   # code -> sentence; every code this module emits is a row (tests/test_suspect.py)
     "SUSPECT_ABSENT": "The declaration has no [suspect]: no line was declared, so there is nothing to follow (no default line exists).",
@@ -33,15 +33,10 @@ REFUSAL = {   # code -> sentence; every code this module emits is a row (tests/t
 }
 
 
-@dataclass(frozen=True)
-class Refused:
+class Refused(Typed):
     """A typed refusal of the plane or the suspect. Invariant: `code` is a key of REFUSAL; `detail` names ordinals, ranks and the declared
     guess, never a measured value."""
-    code: str
-    detail: str
-
-    def words(self):
-        return f"{self.code}: {REFUSAL[self.code]} Detail: {self.detail}"
+    TABLE = REFUSAL
 
 
 @dataclass(frozen=True)

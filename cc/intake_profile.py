@@ -18,7 +18,8 @@ from dataclasses import asdict, field, make_dataclass
 from pathlib import Path
 
 import intake_bytes
-from intake_blind import Absent, Refuse, detail, format_stage, gate
+import intake_seal
+from intake_blind import Refuse, detail, format_stage, gate
 from intake_convert import MANIFEST, SPLIT, _book_names, _decoded, _manifest, _split, _zipped, sheet_rows
 from intake_findings import NUMERIC_KINDS, RAISES, RESPONSE, Finding, FindingKind, Response, body, findings, frozen, tables_of   # (fix F3) the findings' own role
 from intake_names import NUMBER, Name, _runs, classify, masked, repeats
@@ -318,7 +319,7 @@ def read(d, bank, get):
 def check_cli(root, ident, args, t):
     """bin/cc intake profile <id> --check, the declarer's gate before lint: the declaration (S0) against PROFILE.json and its bank's manifest (intake_against.against); every contradiction printed (code, file, where), exit 1 on any or on no profile."""
     d = Path(root) / "declarations" / ident
-    s0 = format_stage({True: lambda: (d / "intake.toml").read_text(), False: lambda: Absent(f"declarations/{ident}/intake.toml")}[(d / "intake.toml").is_file()](), (), t)
+    s0 = format_stage(intake_seal.declared(d), (), t)
     p, sha, m, _ = {True: lambda: [EMPTY, "", {}, ""], False: lambda: read(d, intake_bytes.located(s0.evidence.data["source"]["root"], t["roots"]), Path.read_bytes)}[isinstance(s0, Refuse)]()
     found = {True: lambda: (), False: lambda: intake_bytes.intake_against.against(p, m, s0.evidence.data)}[sha == ""]()
     print(f"profile {ident} --check: " + {True: lambda: f"REFUSE {s0.reason}: the declaration does not pass FORMAT (bin/cc intake lint {ident})", False: lambda: {True: f"PROFILE_ABSENT: run bin/cc intake profile {ident} <root-named path> first",

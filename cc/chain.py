@@ -16,6 +16,7 @@ The output is typed rows (results/chain/<id>.json) and ONE sentence per lane bui
 a class, so the chain cannot classify (the E412 trap: a crossover ridge chains like any other line). Its words never name a verdict of
 linenav or a class (tests/test_chain_1205.py greps the goldens)."""
 import enum
+import functools
 import json
 import os
 import sys
@@ -31,7 +32,7 @@ import intake_feature as F
 import intake_suspect
 import kernel
 import navfamily
-from intake_blind import look
+from intake_blind import Typed, bind, gate, look
 
 REFUSAL = {   # code -> sentence; every code this module emits is a row (tests/test_chain_1205.py reaches each)
     "GRID_UNDECLARED": "No settings grid is named: the grid is declared data (--grid <grid.toml>), never a default.",
@@ -43,14 +44,9 @@ REFUSAL = {   # code -> sentence; every code this module emits is a row (tests/t
 }
 
 
-@dataclass(frozen=True)
-class Refusal:
+class Refusal(Typed):
     """A typed refusal of this module. Invariant: `code` is a key of REFUSAL."""
-    code: str
-    detail: str
-
-    def words(self):
-        return f"{self.code}: {REFUSAL[self.code]} Detail: {self.detail}"
+    TABLE = REFUSAL
 
 
 REFUSED = (*navfamily.REFUSED, Refusal)
@@ -399,13 +395,10 @@ def _second(root, fam, other, g):
 
 def gate_rows(rows, then):
     """`then` when every (holds, code, detail) row holds (lazily, in order), else the Refusal of the first that does not."""
-    failed = [r for _, r in zip(range(1), (r for r in rows if not r[0]()))]
-    return {True: lambda: then, False: lambda: Refusal(failed[0][1], failed[0][2])}[not failed]()
+    return gate([(h, c, (lambda d=d: d)) for h, c, d in rows], lambda: then, Refusal)
 
 
-def then(x, f):
-    """f(x), unless x is already a typed refusal (it passes through unchanged)."""
-    return {True: lambda: x, False: lambda: f(x)}[isinstance(x, REFUSED)]()
+then = functools.partial(bind, kinds=REFUSED)   # f(x), unless x is already a typed refusal (it passes through unchanged)
 
 
 def run(root, ident, grid_path, other=None):

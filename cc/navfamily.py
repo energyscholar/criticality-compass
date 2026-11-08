@@ -14,6 +14,7 @@ The checkpoints (`score`) are a STRUCTURAL hold-out: they live outside declarati
 argument that could reach them. Beside the verdict, family reports the feature census (plan 1176 C', O2): curves per Feature kind, and per
 traced point its curve's kind (value-free). Every file a command opens is appended to its own access log (T23, extended to every open of this process
 by an audit hook): results/navigate/<id>.access.jsonl for family, results/navigate/<id>.score.access.jsonl for score (LOG)."""
+import functools
 import json
 import os
 import sys
@@ -26,10 +27,12 @@ import numpy as np
 
 import intake
 import intake_feature
+import intake_seal
 import intake_suspect
 import linenav
 import navmap
 import scorewords
+from intake_blind import Typed, bind
 from intake_fold import Primary, verdicts
 
 UNTESTED = ("UNTESTED: cc navigate (family mode) is tested on planted families only (tests/test_navfamily.py); no real family's transcript "
@@ -45,22 +48,15 @@ LOG = {"family": "{id}.access.jsonl", "score": "{id}.score.access.jsonl"}   # co
 DIRS = {-1: "backward", 1: "forward"}   # linenav's direction keys -> words
 
 
-@dataclass(frozen=True)
-class Refusal:
+class Refusal(Typed):
     """A typed refusal of this module. Invariant: `code` is a key of REFUSAL."""
-    code: str
-    detail: str
-
-    def words(self):
-        return f"{self.code}: {REFUSAL[self.code]} Detail: {self.detail}"
+    TABLE = REFUSAL
 
 
 REFUSED = (Refusal, intake_suspect.Refused, intake_feature.Unprojected)   # every typed refusal a step may return (each has words())
 
 
-def then(x, f):
-    """f(x), unless x is already a typed refusal (it passes through unchanged): the steps of a walk stop at the first refusal."""
-    return {True: lambda: x, False: lambda: f(x)}[isinstance(x, REFUSED)]()
+then = functools.partial(bind, kinds=REFUSED)   # f(x), unless x is already a typed refusal (it passes through unchanged): the steps of a walk stop at the first refusal
 
 
 @dataclass(frozen=True)
@@ -231,4 +227,4 @@ def score(root, ident, f):
     w = then(have, lambda i: (logged(root, i, "score"), walk(root, i))[1])
     pts = then(w, lambda _: points(root, f))
     cps = then(pts, lambda ps: (lambda each: ([c for c in each if isinstance(c, REFUSED)] + [tuple(w.oracle.span.u(v) for v in ps)])[0])([intake_suspect.cell(w.cells.plane, i, v) for i, v in enumerate(ps)]))
-    return {True: lambda: (refusal_text(cps), 1), False: lambda: _scored(w, cps, tomllib.loads((Path(root) / 'declarations' / ident / 'intake.toml').read_text()))}[isinstance(cps, REFUSED)]()
+    return {True: lambda: (refusal_text(cps), 1), False: lambda: _scored(w, cps, tomllib.loads(intake_seal.declared(Path(root) / 'declarations' / ident)))}[isinstance(cps, REFUSED)]()
