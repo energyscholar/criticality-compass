@@ -3,6 +3,7 @@ The sampler is the toolset's compiled heat bath (tools/lattice_field_rs.py on to
 built .so reports the pinned isfield.rs; a mismatch is a VALUE (Mismatch), never an import of unpinned code. The .so is per host and untracked: Call.build records its sha256. Every table is total: a missing key raises KeyError and nothing catches it into a default. h is not a coupling of
 the file (couplings = {"K": K}); it is an argument of the call and is recorded in the Call."""
 import dataclasses
+import functools
 import hashlib
 import importlib.util
 import itertools
@@ -100,22 +101,72 @@ def load(toolset):
     return SimpleNamespace(field=mods["lattice_field_rs"], scale=mods["scale"], flow=mods["flow"], build=registry.sha256_of(root / SO))
 
 
-def sample(tools, K, h, L, start, seed, run):
-    """(Chain, Call): run.N yields of the compiled heat bath, each recorded as the (E, M) row, the g1 of every block level, and the level-1 block magnetisation."""
-    begin, nlev = STARTS[start], SIZES[L]
+CHUNK_SWEEPS = 50_000   # OQ11, part of the stream identity: a burn or a skip is ceil(n / CHUNK_SWEEPS) compiled calls (at least one), each with its own seed draw; a STOP is read between them
+
+
+@dataclasses.dataclass(frozen=True, eq=False)
+class Fold:
+    """The whole state after i completed yields; it is a VALUE (rng_state is the bit-generator's state dict, never a live Generator), so advance never mutates the fold it is given."""
+    s: np.ndarray
+    rng_state: dict
+    i: int
+    O: list
+    G: list
+    M1: list
+
+
+@dataclasses.dataclass(frozen=True)
+class NotStarted:
+    """begin was stopped inside the burn: no state is kept (the burn restarts from the seed, deterministically)."""
+
+
+@dataclasses.dataclass(frozen=True)
+class Stopped:
+    f: Fold   # the INPUT fold of the advance that was stopped: the last whole state
+
+
+def _sweeps(tools, s, K, h, n, rng, poll):
+    """n sweeps as ceil(n / CHUNK_SWEEPS) compiled calls (one call of 0 sweeps for n = 0, as the toolset's field_stream); (s, True) if poll stops between two of them."""
+    for j in range(max(1, -(-n // CHUNK_SWEEPS))):
+        if j and poll():
+            return s, True
+        s = tools.field.rs.isfield_sweeps_rs(s, float(K), float(h), min(CHUNK_SWEEPS, n - j * CHUNK_SWEEPS), tools.field._seed(rng))
+    return s, False
+
+
+def begin(tools, K, h, L, start, seed, run, poll):
+    """Fold | NotStarted: the start state from the seed, then the burn."""
     rng = np.random.default_rng(seed)
-    O, G, M1 = [], [], []
-    for s in tools.field.field_stream(L, K, h, run.N, run.skip, run.burn, rng, begin):
-        lv = tools.scale.levels(s[None], nlev)
-        G.append([tools.flow.g1(x)[0] for x in lv])
-        O.append(tools.field.observables(s))
-        M1.append(lv[1].sum())
+    s, stop = _sweeps(tools, tools.field.STARTS[STARTS[start]](L, rng), K, h, run.burn, rng, poll)
+    return NotStarted() if stop else Fold(s, rng.bit_generator.state, 0, [], [], [])
+
+
+def advance(tools, f, K, h, run, poll):
+    """Fold | Stopped(f): one yield (run.skip sweeps) and its reducer row: the (E, M) row, the g1 of every block level, the level-1 block magnetisation."""
+    bg = np.random.PCG64()
+    bg.state = f.rng_state   # the generator IS its saved state: default_rng is called once per chain (in begin), with the int seed
+    rng = np.random.Generator(bg)
+    s, stop = _sweeps(tools, f.s.copy(), K, h, run.skip, rng, poll)
+    if stop:
+        return Stopped(f)
+    lv = tools.scale.levels(s[None], SIZES[int(s.shape[-1])])
+    return Fold(s, rng.bit_generator.state, f.i + 1, f.O + [tools.field.observables(s)], f.G + [[tools.flow.g1(x)[0] for x in lv]], f.M1 + [lv[1].sum()])
+
+
+def finish(f, K, h, L, start, seed, run, build):
     arr = lambda a: np.array(a, dtype=np.float64)   # noqa: E731
-    return Chain(arr(O), arr(G), int(s.shape[-1]), {"K": K}, arr(M1)), Call(K, h, L, start, seed, run, tools.build)
+    return Chain(arr(f.O), arr(f.G), int(f.s.shape[-1]), {"K": K}, arr(f.M1)), Call(K, h, L, start, seed, run, build)
+
+
+def sample(tools, K, h, L, start, seed, run):
+    """(Chain, Call): run.N yields of the compiled heat bath, as the fold begin -> advance* -> finish (one code path, a resumed chain included)."""
+    never = lambda: False   # noqa: E731
+    f = functools.reduce(lambda f, _: advance(tools, f, K, h, run, never), range(run.N), begin(tools, K, h, L, start, seed, run, never))
+    return finish(f, K, h, L, start, seed, run, tools.build)
 
 
 def write(chain, path):
-    np.savez(path, O=chain.O, G=chain.G, L=chain.L, **chain.couplings)
+    np.savez(path, O=chain.O, G=chain.G, M1=chain.M1, L=chain.L, **chain.couplings)
 
 
 def write_call(call, path):

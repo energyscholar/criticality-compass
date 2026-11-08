@@ -50,7 +50,7 @@ def s1():
             ch, call = sampler.sample(t, sampler.LABELS["1.00"], sampler.FAMILY_H[F], 27, "random", sampler.seed_of("1282-v10", F, "1.00", 27, "random", 0), sampler.Run(20, 1, 10))
             sampler.write(ch, tmp / f"{F}.npz")
             z = np.load(tmp / f"{F}.npz")
-            check(f"S1 {F}: the file holds exactly O G L K, L == 27, G has 2 levels", set(z.files) == {"O", "G", "L", "K"} and int(z["L"]) == 27 and z["G"].shape[1] == 2, str(z.files))
+            check(f"S1 {F}: the file holds exactly O G L K, L == 27, G has 2 levels", set(z.files) == {"O", "G", "M1", "L", "K"} and int(z["L"]) == 27 and z["G"].shape[1] == 2, str(z.files))
             check(f"S1 {F}: O is (20, 2), K is the label's coupling", z["O"].shape == (20, 2) and float(z["K"]) == sampler.LABELS["1.00"], str(z["O"].shape))
             want = f"2D Ising in a uniform field h = {'0' if F == 'poc' else '0.02'} (held fixed), compiled heat bath (tools/lattice_field_rs.py), K/K_c 0.90-1.10"
             check(f"S1 {F}: transducer_model is its sentence", sampler.transducer_model(F) == want, sampler.transducer_model(F))
