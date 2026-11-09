@@ -386,4 +386,28 @@ with tempfile.TemporaryDirectory() as t:
     finally:
         schema.DATA_ROOT_FLAG = None
 
+# ---- plan 1458 P1: an arm DEFECT propagates (never masked as the usage refusal); a real usage error still refuses at status 2
+with tempfile.TemporaryDirectory() as t:
+    dr = Path(t) / "data"
+    run = dr / "1282" / "rung1-bbbbbbbbbbbb"
+    for label in oracle_measured.GRID:
+        for c in range(10):
+            write_rw_chain(run, label, 243, c, 1.0, 0.0)
+            write_rw_chain(run, label, 81, c, 0.0, oracle.KC)
+            p243 = run / oracle_measured.STEM.format(family="poc", label=label, L=243, start="random", chain=c)
+            z = np.load(p243)
+            np.savez(p243, O=z["O"][:, 0], G=z["G"], L=z["L"], K=z["K"])   # a malformed npz: 1-D O (O = X, not column_stack)
+    schema.DATA_ROOT_FLAG = str(dr)
+    try:
+        try:
+            got = oracle.cli(Path(t) / "repo", ["reweight", "--L", "243"])   # base behaviour: returned the usage tuple (..., 2) -- a defect masked as a CLI typo
+        except IndexError:
+            got = "IndexError"
+        check("B1a: a malformed npz (1-D O) in the reweight arm RAISES IndexError (an arm defect propagates), not the status-2 usage refusal", got == "IndexError", str(got)[:120])
+    finally:
+        schema.DATA_ROOT_FLAG = None
+    for nm, av in (("no --L", ["reweight"]), ("missing operand", ["declared", "--start", "0.35"]), ("no --dk", ["declared", "--start", "0.35", "0.60"]), ("unknown arm", ["bogus"])):
+        lu, su = oracle.cli(Path(t), av)
+        check(f"B1b: a genuine usage error ({nm}) still returns the usage REFUSE at status 2", su == 2 and lu[0].startswith("REFUSED"), str((lu[:1], su)))
+
 sys.exit(int(bool(__import__("lib").bad)))

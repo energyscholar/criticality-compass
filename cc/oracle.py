@@ -181,8 +181,10 @@ def cli(root, argv):
     pair = argv[i + 1:i + 3]
     dk = argv[argv.index("--dk") + 1] if "--dk" in argv[:-1] else None
     usage = (["REFUSED: need `declared --start LO HI --dk DK` or `measured --L 243`.\n  Next: bin/cc navigate --oracle declared --start 0.35 0.60 --dk 0.01"], 2)
-    arms = {"declared": lambda: _declared(root, float(pair[0]), float(pair[1]), float(dk)), "measured": lambda: _measured(root, int(argv[argv.index("--L") + 1])), "reweight": lambda: _reweight(root, int(argv[argv.index("--L") + 1]))}
+    big = lambda: int(argv[argv.index("--L") + 1])   # noqa: E731
+    parse = {"declared": lambda: (_declared, float(pair[0]), float(pair[1]), float(dk)), "measured": lambda: (_measured, big()), "reweight": lambda: (_reweight, big())}
     try:
-        return arms.get((argv[:1] or [""])[0], lambda: usage)()
-    except (IndexError, TypeError, ValueError):
+        fn, *operands = parse[(argv[:1] or [""])[0]]()   # ONLY argv parsing may fail as a usage error
+    except (IndexError, KeyError, ValueError, TypeError):
         return usage
+    return fn(root, *operands)   # an arm defect propagates (as on the Detector stack), never masked as a usage refusal
