@@ -15,7 +15,7 @@ import navigate
 import schema
 from navigate import Reading
 from oracle_measured import MeasuredStart, scan, load_rehearsal, load_sample, file_shas, PARTNER, GRID  # noqa: F401
-from oracle_reweight import Reweight, DenseStart, REWEIGHT_DECL, report_dense, make_reweight, dense_start  # noqa: F401  plan 1456 WIDTH: the dense reweight field, outside the measure_hash closure
+from oracle_reweight import Reweight, Refusal, DenseStart, REWEIGHT_DECL, report_dense, make_reweight, dense_start  # noqa: F401  plan 1456 WIDTH: the dense reweight field, outside the measure_hash closure
 from sign import Sign, sign
 
 S = Sign
@@ -95,8 +95,9 @@ class OracleLog:
 def reading(order, K, move_table):
     """The navigate.Reading at K: order(K) is a Sign or None; move_table is total over Sign + {None}. median_diff/interval None (no sampled interval), m 0."""
     cell = order(K)
-    return {True: lambda: Reading("REFUSE", None, None, None, 0, None, navigate.NE, move_table[None]),
-            False: lambda: Reading(navigate.SIDE[cell], cell, None, None, 0, None, "ESTABLISHED", move_table[cell])}[cell is None]()
+    status = {type(None): lambda: navigate.NE, Refusal: lambda: f"NOT_ESTABLISHED ({cell.reason})"}.get(type(cell), lambda: "ESTABLISHED")()   # a Refusal carries WHY in the status string; cell stays None
+    return {True: lambda: Reading("REFUSE", None, None, None, 0, None, status, move_table[None]),
+            False: lambda: Reading(navigate.SIDE[cell], cell, None, None, 0, None, status, move_table[cell])}[type(cell) in (type(None), Refusal)]()
 
 
 @dataclass(frozen=True)

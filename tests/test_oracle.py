@@ -261,7 +261,7 @@ check("B-ORIENT GREEN: the inverted pair (big=const K_c, small=X: Delta = K_c - 
 
 # ---- B-UNDERREP-REFUSE (seen REFUSE): fewer than m matched pools -> None -> refuse
 under = {243: {k: v for k, v in cross[243].items() if k != (0, 0)}, 81: cross[81]}   # chain 0 is no longer complete in big -> < m matched pools
-check("B-UNDERREP-REFUSE seen REFUSE: fewer than m=10 matched pools -> Reweight(K) is None -> refuse (a REFUSE value, never a clamp)", orw.Reweight(243, 81, 10, 2, under, "d")(0.44) is None, "under-replicated -> None")
+check("B-UNDERREP-REFUSE seen REFUSE: fewer than m=10 matched pools -> Reweight(K) is None -> refuse (a REFUSE value, never a clamp)", orw.Reweight(243, 81, 10, 2, under, "d")(0.44) == orw.Refusal("under_replication"), "under-replicated -> Refusal(under_replication)")
 
 # ---- B-NONMONOTONE-REFUSE (seen REFUSE, inherited): a disordered sign sequence refuses
 zigw = lambda K: S.SIG_PLUS if abs(K - STW.k(2)) < 1e-9 else (S.SIG_MINUS if K < oracle.KC else S.SIG_PLUS)  # noqa: E731
@@ -300,13 +300,13 @@ rg = np.random.default_rng(4)
 gapl = mk_load(lambda li, c, L: (lambda X: (X, X.copy() if L == 243 else np.full(len(X), 9.0)))(rg.normal(li * 3.0, 0.02, 300)))   # 7 tight disjoint clusters: the reweighted mean lands between clusters
 rw_gap = orw.Reweight(243, 81, 10, 2, gapl, "d")
 wg = scan_rw(rw_gap)
-refuses = sum(1 for j in range(NW) if rw_gap(STW.k(j)) is None)
-jref = next(j for j in range(NW) if rw_gap(STW.k(j)) is None)
+refuses = sum(1 for j in range(NW) if rw_gap(STW.k(j)) == orw.Refusal("coverage"))
+jref = next(j for j in range(NW) if rw_gap(STW.k(j)) == orw.Refusal("coverage"))
 Xg, gg, Nig = orw._pool(gapl[243], 0)
 xbar = orw.reweighted(Xg, gg, KIW, Nig, STW.k(jref))[1]
 allX = np.concatenate([gapl[243][(li, 0)][0] for li in range(7)])
 check("B-GAP-REFUSE seen REFUSE: a two-cluster support gap -> the per-label energy-coverage null fails at >= 40/45 dense nodes -> scan REFUSE, not a false bracket", wg.outcome == "REFUSE" and refuses >= 40, f"per-label refuses {refuses}/{NW}, scan {wg.outcome}")
-check("B-GAP-REFUSE RED for the mutant: the global-hull predicate (the tautology) COVERS at a refusing node, so a mutant using it would resolve a false reading", allX.min() <= xbar <= allX.max() and rw_gap(STW.k(jref)) is None, f"<X>={xbar:.3f} in hull [{allX.min():.2f},{allX.max():.2f}] yet per-label refuses")
+check("B-GAP-REFUSE RED for the mutant: the global-hull predicate (the tautology) COVERS at a refusing node, so a mutant using it would resolve a false reading", allX.min() <= xbar <= allX.max() and rw_gap(STW.k(jref)) == orw.Refusal("coverage"), f"<X>={xbar:.3f} in hull [{allX.min():.2f},{allX.max():.2f}] yet per-label refuses")
 
 # ---- B-FS-CONVERGE (GREEN + seen REFUSE): gauge invariance; a non-converging solve is None -> refuse (never a clamp)
 wgauge = float(np.max(np.abs(orw.weights(Xcw, KIW, Niw, K0, fsw) - orw.weights(Xcw, KIW, Niw, K0, fsw + 3.7))))
@@ -316,7 +316,7 @@ orw.FS_MAXIT = 1
 nonconv = rw_cross(0.44)
 fnone = orw.fs_solve(Xcw, KIW, Niw)
 orw.FS_MAXIT = _sv
-check("B-FS-CONVERGE seen REFUSE: a non-converging FS solve (FS_MAXIT=1) returns None -> Reweight refuses; restored, it reads again (a REFUSE value, never a clamp)", fnone is None and nonconv is None and rw_cross(0.44) is not None, str((fnone, nonconv)))
+check("B-FS-CONVERGE seen REFUSE: a non-converging FS solve (FS_MAXIT=1) returns None -> Reweight refuses; restored, it reads again (a REFUSE value, never a clamp)", fnone is None and nonconv == orw.Refusal("fs_nonconverge") and rw_cross(0.44) is not None, str((fnone, nonconv)))
 
 # ---- B-FINITE-L (premise characterization): the bracket contains K* unconditionally; K_c only if |K*-K_c| <= half-width
 rf = np.random.default_rng(7)
@@ -409,5 +409,17 @@ with tempfile.TemporaryDirectory() as t:
     for nm, av in (("no --L", ["reweight"]), ("missing operand", ["declared", "--start", "0.35"]), ("no --dk", ["declared", "--start", "0.35", "0.60"]), ("unknown arm", ["bogus"])):
         lu, su = oracle.cli(Path(t), av)
         check(f"B1b: a genuine usage error ({nm}) still returns the usage REFUSE at status 2", su == 2 and lu[0].startswith("REFUSED"), str((lu[:1], su)))
+
+# ---- plan 1458 P2 (B2a): the three refusal reasons are typed and pairwise distinct
+_R = getattr(orw, "Refusal", None)
+_rs = [orw.Reweight(243, 81, 10, 2, under, "d")(0.44), rw_gap(STW.k(jref))]
+orw.FS_MAXIT = 1
+_rs.append(rw_cross(0.44))
+orw.FS_MAXIT = _sv
+check("B2a: under-replication, coverage and fs-nonconvergence are three PAIRWISE-DISTINCT typed Refusal values", _R is not None and _rs == [_R("under_replication"), _R("coverage"), _R("fs_nonconverge")] and len(set(_rs)) == 3, str(_rs))
+_ok = rw_cross(0.44)
+check("B2b: a well-overlapped fixture still reads a normal Sign (typing the null does not refuse the happy path)", isinstance(_ok, Sign), str(_ok))
+_rd = oracle.reading(lambda K: _R and _R("coverage"), 0.44, oracle.MOVE_LIVE)
+check("B2c: reading() of a Refusal keeps cell None / move refuse and carries the reason in status", _R is not None and _rd.cell is None and _rd.move == "refuse" and "coverage" in _rd.status, str(_rd))
 
 sys.exit(int(bool(__import__("lib").bad)))

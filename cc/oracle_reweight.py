@@ -19,7 +19,7 @@ NL = len(GRID)                              # 7
 KI = np.array([sampler.LABELS[l] for l in GRID])   # the 7 sampled couplings K_i, in label order
 DK_DENSE = 0.002                            # plan 1456 (Auditor-confirmed, section 7.1): the dense FLANK resolution; it does NOT set the UNRES band (section 1e)
 FS_TOL = 1e-10                              # the FS f_i fixed-point residual (max |delta f|)
-FS_MAXIT = 1000                             # non-convergence within this -> the read is None (a REFUSE value, B-FS-CONVERGE), never a clamp
+FS_MAXIT = 1000                             # non-convergence within this -> the read is a typed Refusal (a REFUSE value, B-FS-CONVERGE), never a clamp
 REWEIGHT_DECL = (
     "reweight v1 (plan 1456): binless Ferrenberg-Swendsen multi-histogram estimate -- a DECLARED REPORT / conventional estimate, NOT a relational or kernel reading. "
     "KEEP: the reweighted typical g1 of each system at the target coupling K. "
@@ -133,8 +133,14 @@ def _system(cells, good, K):
 
 
 @dataclass(frozen=True)
+class Refusal:
+    """A typed REFUSE value (plan 1458): WHY the read is not established -- under_replication | fs_nonconverge | coverage; a value of the output type, never an exception."""
+    reason: str
+
+
+@dataclass(frozen=True)
 class Reweight:
-    """The dense reweighted matched-pair order field, BESIDE oracle.Measured: K -> Sign | None. Carries NO K_c. `load`/`digest` are K-independent, injected once (M2).
+    """The dense reweighted matched-pair order field, BESIDE oracle.Measured: K -> Sign | Refusal. Carries NO K_c. `load`/`digest` are K-independent, injected once (M2).
     The matched-pair difference Delta_c(K) = <g1_big,c>_K - <g1_small,c>_K over the m matched chains places the sign cell through the frozen navigate.interval + sign.sign."""
     big: int
     small: int
@@ -149,8 +155,10 @@ class Reweight:
         good = [c for c in sampler.CHAINS if all((li, c) in cb and (li, c) in cs for li in range(NL))]   # a chain MATCHED (complete in both) is a pool (M4)
         b = _system(cb, good, K) if len(good) >= self.m else None                                        # fewer than m matched pools -> None (under-replication)
         s = _system(cs, good, K) if len(good) >= self.m else None
-        covered = b is not None and s is not None and b[2] and s[2]                                      # the honest null: both systems in a sampled label's support (B1)
-        return {True: lambda: self._cell(b[0], s[0]), False: lambda: None}[covered]()
+        ok = b is not None and s is not None                                                              # both systems solved (FS converged)
+        key = (len(good) >= self.m, ok, bool(ok and b[2] and s[2]))                                       # (replicated, FS converged, covered): the honest nulls (B1)
+        return {(False, False, False): lambda: Refusal("under_replication"), (True, False, False): lambda: Refusal("fs_nonconverge"),
+                (True, True, False): lambda: Refusal("coverage"), (True, True, True): lambda: self._cell(b[0], s[0])}[key]()   # a total table over the live rows; the other keys cannot occur
 
     def _cell(self, gb, gs):
         lo, hi = navigate.interval(gb[:self.m] - gs[:self.m], self.m, self.r)
@@ -167,6 +175,6 @@ def make_reweight(root, big, m, r):
 
 def report_dense(st, big, w, bracket):
     """The dense report (the `reweight` header); a DECLARED REPORT, not a relational reading (C2)."""
-    trace = [f"  node {j} K={st.k(j):.4f} side={r.side} move={r.move}" for j, r in w.trace]
+    trace = [f"  node {j} K={st.k(j):.4f} side={r.side} move={r.move} {r.status}" for j, r in w.trace]
     head = f"navigate reweight (L {big} vs {oracle_measured.PARTNER[big]}, m 10; labels {st.labels[0]}..{st.labels[-1]}; a declared report, not a relational reading)"
     return [head] + trace + [f"navigate reweight: {w.outcome} [{bracket[0]:.4f}, {bracket[1]:.4f}]"], 0
