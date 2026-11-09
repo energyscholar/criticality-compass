@@ -10,6 +10,7 @@ plumbing = ["bin/cc", "cc/admit.py", "cc/schema.py", "cc/declare.py", "cc/author
   ".githooks/pre-commit"]
 oracle = ["cc/oracle.py"]   # plan 1282 P3: the total Oracle sum type and `cc navigate --oracle`, its own cap (tests/test_budget.py ORACLE_CAP)
 oracle_measured = ["cc/oracle_measured.py"]   # plan 1282 P5: the finite-L side of the oracle (scan terminal, MeasuredStart, loaders), its own cap (tests/test_budget.py ORACLE_MEASURED_CAP)
+oracle_reweight = ["cc/oracle_reweight.py"]   # plan 1456 WIDTH: the dense FS-reweight navigator (binless Ferrenberg-Swendsen, DenseStart, per-label coverage null), its own cap (tests/test_budget.py REWEIGHT_CAP)
 instrument_decl = ["cc/instrument_decl.py"]   # plan 1282 P2a (R-P2.3): the one instrument loader and its declared defaults, its own cap (tests/test_budget.py INSTRUMENT_DECL_CAP)
 seal_reach = ["cc/seal_reach.py"]   # plan 1282 P1c: the seal's three data-free refusals (seeds, reach, licence), its own cap (tests/test_budget.py SEAL_REACH_CAP)
 sampler = ["cc/sampler.py"]   # plan 1282 P1a: the declared sampler adapter, its own cap (tests/test_budget.py SAMPLER_CAP)

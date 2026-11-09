@@ -100,7 +100,7 @@ mut_lo, mut_hi = KS.k(first_unres), KS.k(first_unres + 1)   # (i) band-collapse 
 check("B-CONTAIN-MUTANT (i) seen RED: the band-collapse fold's bracket EXCLUDES K_c", not (mut_lo < KCV < mut_hi), str((mut_lo, mut_hi)))
 ww = navigate.walk(fake_of(faithful), NK)
 check("B-CONTAIN-MUTANT (ii) seen RED: navigate.walk on the same field is UNRESOLVED, not BRACKET (the terminal discriminator)", ww.outcome == "UNRESOLVED" and wf.outcome == "BRACKET", ww.outcome)
-check("B-CONTAIN-MUTANT: GREEN under the real fold (scan is the Measured terminal in TERMINAL)", oracle.TERMINAL[oracle.Measured] is oracle_measured.scan and oracle.TERMINAL[oracle.Exact] is navigate.walk and set(oracle.TERMINAL) == {oracle.Exact, oracle.Measured})
+check("B-CONTAIN-MUTANT: GREEN under the real fold (scan is the Measured terminal in TERMINAL)", oracle.TERMINAL[oracle.Measured] is oracle_measured.scan and oracle.TERMINAL[oracle.Exact] is navigate.walk and set(oracle.TERMINAL) == {oracle.Exact, oracle.Measured, oracle.Reweight})   # plan 1456 WIDTH: Reweight joins the terminal closed-world as a band field (TERMINAL[Reweight] is scan, asserted in the WIDTH block below)
 
 unfaithful = lambda K: S.SIG_MINUS if K < 0.425 else S.SIG_PLUS  # noqa: E731   # SIG+ at 0.43, below K_c = 0.4407: an unfaithful flank
 wu = scan_of(unfaithful)
@@ -191,6 +191,198 @@ with tempfile.TemporaryDirectory() as t:
     try:
         lines, status = oracle.cli(Path(t), ["measured", "--L", "243"])
         check("CLI measured with no data: a NAMED REFUSE value at status 2, not a crash", status == 2 and lines[0].startswith("REFUSED") and "no 1282/<run>/" in lines[0], str(lines))
+    finally:
+        schema.DATA_ROOT_FLAG = None
+
+# ===================== plan 1456 WIDTH: the dense Ferrenberg-Swendsen reweight navigator (a sibling band field BESIDE Measured) =====================
+import sign  # noqa: E402
+import oracle_reweight as orw  # noqa: E402
+
+KIW = orw.KI
+DKD = orw.DK_DENSE
+STW = orw.dense_start(oracle.KC)
+NW = STW.n()
+ksw = lambda w: (STW.k(w.lo), STW.k(w.hi))  # noqa: E731
+
+
+def scan_rw(order):
+    return oracle_measured.scan(lambda j: oracle.reading(order, STW.k(j), oracle.MOVE_LIVE), NW)   # the Measured terminal, on a dense grid
+
+
+def mk_load(gen, nchain=10):
+    return {L: {(li, c): gen(li, c, L) for li in range(7) for c in range(nchain)} for L in (243, 81)}   # {L: {(label_index, chain): (X, g1)}}
+
+
+# ---- B-RECOVER (GREEN): the binless FS estimator is correct math (self-consistency + single-source identity + loose pooled band + the sign-blind finding)
+rrw = np.random.default_rng(1)
+Xlw = [rrw.normal(k, 1.0, 300) for k in KIW]
+Niw = np.array([len(x) for x in Xlw])
+Xcw = np.concatenate(Xlw)
+fsw = orw.fs_solve(Xcw, KIW, Niw)
+Dcw = orw._logdenom(Xcw, KIW, Niw, fsw)
+rec_err = max(abs(orw._lse(KIW[i] * Xcw - Dcw, 0) - fsw[i]) for i in range(7))
+check("B-RECOVER GREEN (ii) multi-source: the binless FS exp(f_i) self-consistency identity sum_a exp(K_i X_a - D_a) = exp(f_i) holds EXACTLY across the 7 pooled sources (< 1e-10)", rec_err < 1e-10, f"max identity err {rec_err:.2e}")
+x0 = Xlw[0]
+g0 = 2 * x0 + 1   # an affine g1 series on label 0's samples
+gm0, xm0s = orw.reweighted(x0, g0, KIW[:1], np.array([len(x0)]), KIW[0])
+check("B-RECOVER GREEN (i) single-source: reweighting ONE label to its OWN K_i recovers that label's plain sample mean of BOTH g1 AND X to float tolerance", abs(gm0 - g0.mean()) < 1e-9 and abs(xm0s - x0.mean()) < 1e-9, f"<g1>={gm0:.6f} vs {g0.mean():.6f}; <X> diff {abs(xm0s - x0.mean()):.1e}")
+bands = [abs(float((Xcw * orw.weights(Xcw, KIW, Niw, KIW[i], fsw)).sum()) - Xlw[i].mean()) for i in range(7)]
+check("B-RECOVER GREEN (ii) multi-source loose pooled band: the pooled <X>_{K_i} is NEAR label i's mean within a LOOSE statistical band (<0.25) but is NOT float-equal (the WHAM optimal combined estimate is not the plain label mean -- never asserted as equality)", all(1e-4 < b < 0.25 for b in bands), f"bands {[round(b, 3) for b in bands]}")
+ff0 = orw.fs_solve(-Xcw, KIW, Niw)
+Df0 = orw._logdenom(-Xcw, KIW, Niw, ff0)
+flip_err = max(abs(orw._lse(KIW[i] * (-Xcw) - Df0, 0) - ff0[i]) for i in range(7))
+check("B-RECOVER FINDING (sign-blind): a conjugate-sign FLIP still satisfies the self-consistency identity, so B-RECOVER alone does NOT verify the sign convention -- B-ENERGY-DIRECTION is what pins it", flip_err < 1e-10, f"flipped-sign identity err {flip_err:.2e} (passes -> cannot catch the flip)")
+
+# ---- B-ENERGY-DIRECTION (seen RED): d<X>/dK = Var > 0 (fluctuation-response); flip the conjugate sign and it is -Var < 0 (RED)
+K0 = 0.44
+eps = 1e-4
+wq = orw.weights(Xcw, KIW, Niw, K0, fsw)
+Xm0 = float((Xcw * wq).sum())
+Varw = float(((Xcw - Xm0) ** 2 * wq).sum())
+slope = (float((Xcw * orw.weights(Xcw, KIW, Niw, K0 + eps, fsw)).sum()) - Xm0) / eps
+slope_flip = (float((Xcw * orw.weights(-Xcw, KIW, Niw, K0 + eps, ff0)).sum()) - float((Xcw * orw.weights(-Xcw, KIW, Niw, K0, ff0)).sum())) / eps
+check("B-ENERGY-DIRECTION seen RED: with the conjugate (energy) sign FLIPPED, d<X>/dK = -Var < 0 -- the wrong-direction response an energy-blind mutant would report", slope_flip < 0, f"flipped slope {slope_flip:.4f}")
+check("B-ENERGY-DIRECTION GREEN: the honest d<X>/dK equals the reweighted variance Var > 0 (fluctuation-response identity)", slope > 0 and abs(slope - Varw) < 1e-2 * Varw, f"slope {slope:.4f} == Var {Varw:.4f}")
+
+# ---- B-CROSS (GREEN): the faithful dense field brackets K_c with an interior UNRES band (big g1=X -> <g1>_K=K; small g1=K_c const -> Delta=K-K_c)
+rcw = np.random.default_rng(11)
+cross = mk_load(lambda li, c, L: (lambda X: (X, X.copy() if L == 243 else np.full(len(X), oracle.KC)))(rcw.normal(KIW[li], 1.0, 600)))
+rw_cross = orw.Reweight(243, 81, 10, 2, cross, "d")
+wc = scan_rw(rw_cross)
+uc = [j for j, r in wc.trace if r.move == "unresolved" and wc.lo < j < wc.hi]
+widthc = (wc.hi - wc.lo) * DKD
+check("B-CROSS GREEN: the faithful dense field BRACKETs, K_c inside, >= 1 interior UNRES node (the honest band); width = (band+1)*DK_DENSE (B2), >0.01 here is the honest alternative outcome, not scored red", wc.outcome == "BRACKET" and ksw(wc)[0] < oracle.KC < ksw(wc)[1] and len(uc) >= 1, str((wc.outcome, [round(k, 4) for k in ksw(wc)], f"band={len(uc)}", f"width={widthc:.4f}")))
+
+# ---- B-ORIENT (GREEN): the inverted pair (Delta = K_c - K) REFUSEs, never a false bracket
+roi = np.random.default_rng(21)
+inv = mk_load(lambda li, c, L: (lambda X: (X, np.full(len(X), oracle.KC) if L == 243 else X.copy()))(roi.normal(KIW[li], 1.0, 400)))
+wiv = scan_rw(orw.Reweight(243, 81, 10, 2, inv, "d"))
+check("B-ORIENT GREEN: the inverted pair (big=const K_c, small=X: Delta = K_c - K, SIG+ below) REFUSEs, never a false bracket; the faithful one BRACKETs", wiv.outcome == "REFUSE" and wc.outcome == "BRACKET", wiv.outcome)
+
+# ---- B-UNDERREP-REFUSE (seen REFUSE): fewer than m matched pools -> None -> refuse
+under = {243: {k: v for k, v in cross[243].items() if k != (0, 0)}, 81: cross[81]}   # chain 0 is no longer complete in big -> < m matched pools
+check("B-UNDERREP-REFUSE seen REFUSE: fewer than m=10 matched pools -> Reweight(K) is None -> refuse (a REFUSE value, never a clamp)", orw.Reweight(243, 81, 10, 2, under, "d")(0.44) is None, "under-replicated -> None")
+
+# ---- B-NONMONOTONE-REFUSE (seen REFUSE, inherited): a disordered sign sequence refuses
+zigw = lambda K: S.SIG_PLUS if abs(K - STW.k(2)) < 1e-9 else (S.SIG_MINUS if K < oracle.KC else S.SIG_PLUS)  # noqa: E731
+wz = oracle_measured.scan(lambda j: oracle.reading(zigw, STW.k(j), oracle.MOVE_LIVE), NW)
+check("B-NONMONOTONE-REFUSE seen REFUSE: a hi below the last lo -> scan disordered -> REFUSE (inherited P5 fold, not a WIDTH-specific guard)", wz.outcome == "REFUSE", wz.outcome)
+
+# ---- B-IGNORE-E (i) W=1 (seen RED by REFUSE): drop the energy weights -> Delta is K-independent -> no sign change -> scan REFUSE
+def delta_W1(load, K):
+    d = np.array([np.concatenate([load[243][(li, c)][1] for li in range(7)]).mean() - np.concatenate([load[81][(li, c)][1] for li in range(7)]).mean() for c in range(10)])
+    lo, hi = navigate.interval(d, 10, 2)
+    return sign.sign(lo, hi, navigate.EPS)[0]
+wW1 = oracle_measured.scan(lambda j: oracle.reading(lambda K: delta_W1(cross, K), STW.k(j), oracle.MOVE_LIVE), NW)
+check("B-IGNORE-E (i) W=1 seen RED (REFUSE): dropping the energy weights makes Delta(K) K-independent -> no sign change -> scan REFUSE (the real field BRACKETs)", wW1.outcome == "REFUSE" and wc.outcome == "BRACKET", wW1.outcome)
+
+# ---- B-IGNORE-E (ii) coarse-grid interpolation (seen RED by exclusion): FINDING -- displacement is a RED only on a COARSE grid; at native spacing it coincides (~2e-5)
+rI = np.random.default_rng(6)
+Kcoarse = np.array([0.20, 0.45, 0.70])
+cI = 1.0 + 0.45 ** 2   # <g1>_K = <X^2>_K = 1 + K^2 (nonlinear); true FS crossing at K=0.45
+XIl = [rI.normal(k, 1.0, 4000) for k in Kcoarse]
+NiI = np.array([len(x) for x in XIl])
+XI = np.concatenate(XIl)
+gI = XI ** 2
+fI = orw.fs_solve(XI, Kcoarse, NiI)
+dltI = lambda K: float((gI * orw.weights(XI, Kcoarse, NiI, K, fI)).sum()) - cI  # noqa: E731
+lo_, hi_ = 0.20, 0.70
+for _ in range(60):
+    mid = (lo_ + hi_) / 2
+    lo_, hi_ = (mid, hi_) if dltI(mid) < 0 else (lo_, mid)
+Kfs = (lo_ + hi_) / 2
+meanI = np.array([gI[NiI[:i].sum():NiI[:i + 1].sum()].mean() - cI for i in range(3)])
+Kinterp = float(np.interp(0.0, meanI, Kcoarse))
+check("B-IGNORE-E (ii) coarse-grid interpolation seen RED: linear interp of point means displaces the crossing >= 2*DK_DENSE from the FS crossing (an excluding bracket). FINDING: at native 0.0088 spacing the two coincide (~2e-5) -- the W=1 REFUSE is the RED at native spacing, not displacement", abs(Kfs - Kinterp) >= 2 * DKD, f"FS {Kfs:.5f} interp {Kinterp:.5f} disp {abs(Kfs - Kinterp):.5f}")
+
+# ---- B-GAP-REFUSE (seen REFUSE; the honest null): per-label coverage refuses where the global hull (the tautology) would not
+rg = np.random.default_rng(4)
+gapl = mk_load(lambda li, c, L: (lambda X: (X, X.copy() if L == 243 else np.full(len(X), 9.0)))(rg.normal(li * 3.0, 0.02, 300)))   # 7 tight disjoint clusters: the reweighted mean lands between clusters
+rw_gap = orw.Reweight(243, 81, 10, 2, gapl, "d")
+wg = scan_rw(rw_gap)
+refuses = sum(1 for j in range(NW) if rw_gap(STW.k(j)) is None)
+jref = next(j for j in range(NW) if rw_gap(STW.k(j)) is None)
+Xg, gg, Nig = orw._pool(gapl[243], 0)
+xbar = orw.reweighted(Xg, gg, KIW, Nig, STW.k(jref))[1]
+allX = np.concatenate([gapl[243][(li, 0)][0] for li in range(7)])
+check("B-GAP-REFUSE seen REFUSE: a two-cluster support gap -> the per-label energy-coverage null fails at >= 40/45 dense nodes -> scan REFUSE, not a false bracket", wg.outcome == "REFUSE" and refuses >= 40, f"per-label refuses {refuses}/{NW}, scan {wg.outcome}")
+check("B-GAP-REFUSE RED for the mutant: the global-hull predicate (the tautology) COVERS at a refusing node, so a mutant using it would resolve a false reading", allX.min() <= xbar <= allX.max() and rw_gap(STW.k(jref)) is None, f"<X>={xbar:.3f} in hull [{allX.min():.2f},{allX.max():.2f}] yet per-label refuses")
+
+# ---- B-FS-CONVERGE (GREEN + seen REFUSE): gauge invariance; a non-converging solve is None -> refuse (never a clamp)
+wgauge = float(np.max(np.abs(orw.weights(Xcw, KIW, Niw, K0, fsw) - orw.weights(Xcw, KIW, Niw, K0, fsw + 3.7))))
+check("B-FS-CONVERGE GREEN: the FS solve converges and the reweight weights are gauge-invariant under f -> f + const (< 1e-12)", fsw is not None and wgauge < 1e-12, f"max|dw| {wgauge:.1e}")
+_sv = orw.FS_MAXIT
+orw.FS_MAXIT = 1
+nonconv = rw_cross(0.44)
+fnone = orw.fs_solve(Xcw, KIW, Niw)
+orw.FS_MAXIT = _sv
+check("B-FS-CONVERGE seen REFUSE: a non-converging FS solve (FS_MAXIT=1) returns None -> Reweight refuses; restored, it reads again (a REFUSE value, never a clamp)", fnone is None and nonconv is None and rw_cross(0.44) is not None, str((fnone, nonconv)))
+
+# ---- B-FINITE-L (premise characterization): the bracket contains K* unconditionally; K_c only if |K*-K_c| <= half-width
+rf = np.random.default_rng(7)
+off = 0.02
+fll = mk_load(lambda li, c, L: (lambda X: (X, X.copy() if L == 243 else np.full(len(X), oracle.KC + off)))(rf.normal(KIW[li], 1.0, 2000)))   # N large -> a narrow band so K* is cleanly bracketed near span center
+wfl = scan_rw(orw.Reweight(243, 81, 10, 2, fll, "d"))
+ksf = ksw(wfl)
+Kstar = oracle.KC + off
+check("B-FINITE-L (premise characterization): a crossing K* offset from K_c is bracketed UNCONDITIONALLY; K_c is contained only if |K*-K_c| <= half-width (off=0.02 >> half-width here -> K_c excluded, reported not scored red)", wfl.outcome == "BRACKET" and ksf[0] < Kstar < ksf[1] and not (ksf[0] < oracle.KC < ksf[1]), str((wfl.outcome, [round(k, 4) for k in ksf])))
+
+# ---- structure: the sum type, the closure exclusion (measure_hash unchanged), the declared report, no new cutoff
+check("TERMINAL[Reweight] is scan (the dense band field scans like Measured); the terminal closed-world is {Exact, Measured, Reweight}", oracle.TERMINAL[oracle.Reweight] is oracle_measured.scan and set(oracle.TERMINAL) == {oracle.Exact, oracle.Measured, oracle.Reweight})
+check("Reweight carries .name='reweight' and a CONSTANT read_digest, and NO K_c/target (K_c lives only on the SCORER's DenseStart.target)", orw.Reweight.name == "reweight" and not hasattr(rw_cross, "kc") and not hasattr(rw_cross, "target") and rw_cross.read_digest(0.1) == rw_cross.read_digest(0.9))
+check("DenseStart spans the 7-label range at DK_DENSE and carries its OWN labels tuple (B6); K_c is on target, read by the scorer alone", STW.labels == tuple(oracle_measured.GRID) and abs(STW.lo - oracle_measured.sampler.LABELS[oracle_measured.GRID[0]]) < 1e-12 and STW.dk == DKD and STW.target == oracle.KC)
+treew = ast.parse((ROOT / "cc" / "oracle_reweight.py").read_text())
+impw = {a.name.split(".")[0] for n in ast.walk(treew) if isinstance(n, ast.Import) for a in n.names} | {n.module.split(".")[0] for n in ast.walk(treew) if isinstance(n, ast.ImportFrom)}
+check("oracle_reweight imports nothing from oracle, detect or door (acyclic; outside the measure_hash closure)", not impw & {"oracle", "detect", "door"} and {"navigate", "oracle_measured", "sign", "sampler"} <= impw, str(sorted(impw)))
+instr = [f"cc/instruments/{p.stem}.py" for p in sorted((ROOT / "cc" / "instruments").glob("*.py"))]
+clos = schema.import_closure(ROOT, ["cc/detect.py", "cc/door.py", *instr])
+check("oracle_reweight.py AND oracle.py are OUTSIDE the measure_hash import closure (detect/door/instruments) -> WIDTH leaves measure_hash byte-identical", "cc/oracle_reweight.py" not in clos and "cc/oracle.py" not in clos, f"{len(clos)} closure files, oracle* absent")
+for fpath in ("cc/navigate.py", "cc/oracle_measured.py", "cc/sign.py", "cc/sampler.py", "cc/readout.py", "cc/schema.py"):
+    rchk = subprocess.run(["git", "diff", "dba60ed", "--", fpath], cwd=ROOT, capture_output=True, text=True)
+    check(f"{fpath} byte-unchanged against the plan base dba60ed (WIDTH adds a sibling module, touches none of these)", rchk.returncode == 0 and rchk.stdout == "", rchk.stderr or rchk.stdout[:200])
+
+# ---- the loader fixture: the production layout (1282/<run>/<STEM>) with a real energy array O, driving the REAL CLI reweight end to end
+rng2 = np.random.default_rng(3)
+
+
+def write_rw_chain(run, label, L, c, slope, const):
+    run.mkdir(parents=True, exist_ok=True)
+    k = oracle_measured.sampler.LABELS[label]
+    X = rng2.normal(k, 1.0, 800)
+    G = np.zeros((800, oracle_measured.sampler.SIZES[L]))
+    G[:, -1] = const + slope * X
+    O = np.zeros((800, 2))
+    O[:, 0] = X   # the conjugate X = energy level 0, paired per configuration with g1
+    np.savez(run / oracle_measured.STEM.format(family="poc", label=label, L=L, start="random", chain=c), O=O, G=G, L=np.array(L), K=np.array(k))
+
+
+with tempfile.TemporaryDirectory() as t:
+    dr = Path(t) / "data"
+    run = dr / "1282" / "rung1-aaaaaaaaaaaa"
+    for label in oracle_measured.GRID:
+        for c in range(10):
+            write_rw_chain(run, label, 243, c, 1.0, 0.0)        # big: g1 = X -> <g1>_K = K
+            write_rw_chain(run, label, 81, c, 0.0, oracle.KC)   # small: g1 = K_c const -> Delta = K - K_c (crossing at K_c)
+    schema.DATA_ROOT_FLAG = str(dr)
+    try:
+        repo = Path(t) / "repo"
+        lines, status = oracle.cli(repo, ["reweight", "--L", "243"])
+        br = lines[-1]
+        lo_b, hi_b = (float(x) for x in br.split("[")[1].rstrip("]").split(","))
+        rlog = [json.loads(ln) for ln in (repo / "results" / "navigate" / "reweight.access.jsonl").read_text().splitlines()]
+        check("WIDTH loader fixture: the REAL CLI `reweight --L 243` returns status 0 and a BRACKET header line", status == 0 and lines[0].startswith("navigate reweight (L 243 vs 81") and br.startswith("navigate reweight: BRACKET"), str(lines[-1:]))
+        check("WIDTH loader fixture: the dense BRACKET contains K_c (the faithful synthetic crossing)", br.startswith("navigate reweight: BRACKET") and lo_b < oracle.KC < hi_b, br)
+        check("WIDTH loader fixture: the access log holds one declared record per dense node (45), partition reweight:, path declared:reweight, written BEFORE use", len(rlog) == NW and all(r["partition"].startswith("reweight:") and r["path"] == "declared:reweight" and r["route"] == "declared" for r in rlog), f"{len(rlog)} records vs {NW}")
+        l2, s2 = oracle.cli(repo, ["reweight", "--L", "27"])
+        check("WIDTH CLI: an L with no declared partner is a NAMED REFUSE (status 2)", s2 == 2 and l2[0].startswith("REFUSED") and "no declared partner" in l2[0], str(l2[:1]))
+    finally:
+        schema.DATA_ROOT_FLAG = None
+    empty2 = Path(t) / "empty2"
+    empty2.mkdir()
+    schema.DATA_ROOT_FLAG = str(empty2)
+    try:
+        l3, s3 = oracle.cli(Path(t), ["reweight", "--L", "243"])
+        check("WIDTH CLI: no 1282/<run>/ data -> a NAMED REFUSE at status 2, not a crash", s3 == 2 and l3[0].startswith("REFUSED") and "no 1282/<run>/" in l3[0], str(l3[:1]))
     finally:
         schema.DATA_ROOT_FLAG = None
 

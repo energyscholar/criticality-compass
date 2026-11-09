@@ -15,6 +15,7 @@ import navigate
 import schema
 from navigate import Reading
 from oracle_measured import MeasuredStart, scan, load_rehearsal, load_sample, file_shas, PARTNER, GRID  # noqa: F401
+from oracle_reweight import Reweight, DenseStart, REWEIGHT_DECL, report_dense, make_reweight, dense_start  # noqa: F401  plan 1456 WIDTH: the dense reweight field, outside the measure_hash closure
 from sign import Sign, sign
 
 S = Sign
@@ -130,6 +131,7 @@ def read_of(oracle):
 
 
 TERMINAL = {Exact: navigate.walk, Measured: scan}   # by order type, total: a point field bisects; a band field (finite L) scans for its flanks
+TERMINAL[Reweight] = scan   # plan 1456: the dense reweight field is a band field (the UNRES band + its flanks), so it scans exactly as Measured does
 
 
 def run(oracle):
@@ -163,13 +165,23 @@ def _report(st, big, w, bracket):
     return [f"navigate measured (L {big} vs {PARTNER[big]}, m 10; labels {st.labels[0]}..{st.labels[-1]})"] + trace + [f"navigate measured: {w.outcome} [{bracket[0]:.4f}, {bracket[1]:.4f}]"], 0
 
 
+def _reweight(root, big):
+    """`navigate --oracle reweight --L BIG` (plan 1456 WIDTH): the dense FS-reweighted matched-pair bracket over the 7-label chains; absent data is a NAMED REFUSE (status 2), mirroring _measured."""
+    data = schema.resolve_data_root(None, schema.DATA_ROOT_FLAG)[0]
+    why = [w for w, ok in ((f"no 1282/<run>/ chain files under {data}", bool(list((data / "1282").glob("*/*.npz")))), (f"L {big} has no declared partner {PARTNER}", big in PARTNER)) if not ok]
+    st = dense_start(KC)
+    log = OracleLog(Path(root) / "results" / "navigate" / "reweight.access.jsonl", f"reweight:{st.start_id()}", schema.git_head(root))
+    return {True: lambda: ([f"REFUSED: {'; '.join(why)}.\n  Next: bin/cc --data-root <dir> navigate --oracle reweight --L 243"], 2),
+            False: lambda: report_dense(st, big, *run(Declared(st, make_reweight(data, big, 10, 2), log)))}[bool(why)]()   # noqa: E731  r = readout.rank(10, 22/1024) = 2
+
+
 def cli(root, argv):
-    """`navigate --oracle declared --start LO HI --dk DK` | `--oracle measured --L BIG` -> (lines, status); never prints. The usage refusal is status 2."""
+    """`navigate --oracle declared --start LO HI --dk DK` | `--oracle measured --L BIG` | `--oracle reweight --L BIG` -> (lines, status); never prints. The usage refusal is status 2."""
     i = argv.index("--start") if "--start" in argv else len(argv)
     pair = argv[i + 1:i + 3]
     dk = argv[argv.index("--dk") + 1] if "--dk" in argv[:-1] else None
     usage = (["REFUSED: need `declared --start LO HI --dk DK` or `measured --L 243`.\n  Next: bin/cc navigate --oracle declared --start 0.35 0.60 --dk 0.01"], 2)
-    arms = {"declared": lambda: _declared(root, float(pair[0]), float(pair[1]), float(dk)), "measured": lambda: _measured(root, int(argv[argv.index("--L") + 1]))}
+    arms = {"declared": lambda: _declared(root, float(pair[0]), float(pair[1]), float(dk)), "measured": lambda: _measured(root, int(argv[argv.index("--L") + 1])), "reweight": lambda: _reweight(root, int(argv[argv.index("--L") + 1]))}
     try:
         return arms.get((argv[:1] or [""])[0], lambda: usage)()
     except (IndexError, TypeError, ValueError):
