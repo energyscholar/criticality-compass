@@ -63,6 +63,9 @@ HOST_CAP = 80   # plan 1273 A1: checks.toml [roles] host, what this host holds o
 SAMPLER_CAP = 200   # plan 1282 P1a: checks.toml [roles] sampler, the declared sampler adapter (cc/sampler.py), its own role so CAP is not raised
 SEAL_REACH_CAP = 120   # plan 1282 P1c: checks.toml [roles] seal_reach, the seal's seed, reach and licence refusals (cc/seal_reach.py), its own role so CAP is not raised
 INSTRUMENT_DECL_CAP = 20   # plan 1282 P2a (R-P2.3): checks.toml [roles] instrument_decl, the one instrument loader (cc/instrument_decl.py), its own role
+ORACLE_CAP = 150   # plan 1282 P3: checks.toml [roles] oracle, the total Oracle sum type and `cc navigate --oracle` (cc/oracle.py), its own role so CAP is not raised
+ORACLE_MEASURED_CAP = 120   # plan 1282 P5: checks.toml [roles] oracle_measured, the scan terminal, MeasuredStart and the loaders (cc/oracle_measured.py), its own role so ORACLE_CAP is not raised
+REWEIGHT_CAP = 170   # plan 1456 WIDTH: checks.toml [roles] oracle_reweight, the dense FS-reweight navigator (cc/oracle_reweight.py), its own role so no existing cap is raised
 VERBATIM = [
     "cc/admit.py", "cc/reduce.py", "cc/gamma.py", "tests/test_kernel.py", "tests/test_sign.py", "tests/test_resample.py",
     "tests/test_kernel_rs.py", "tests/reference/verdict_x.py",
@@ -99,6 +102,9 @@ host = {f: lines(f) for f in roles["host"]}
 sampler = {f: lines(f) for f in roles["sampler"]}
 seal_reach = {f: lines(f) for f in roles["seal_reach"]}
 instrument_decl = {f: lines(f) for f in roles["instrument_decl"]}
+oracle = {f: lines(f) for f in roles["oracle"]}
+oracle_measured = {f: lines(f) for f in roles["oracle_measured"]}
+oracle_reweight = {f: lines(f) for f in roles["oracle_reweight"]}
 for f, n in {**counts, **intake, **names, **choices, **tests, **maths}.items():
     print(f"  {f}: {n}")
 total = sum(counts.values())
@@ -121,6 +127,9 @@ print(f"navigate_family total {sum(navfamily.values())} of {NAVFAMILY_CAP}")
 print(f"host total {sum(host.values())} of {HOST_CAP}")
 print(f"sampler total {sum(sampler.values())} of {SAMPLER_CAP}")
 print(f"seal_reach total {sum(seal_reach.values())} of {SEAL_REACH_CAP}")
+print(f"oracle total {sum(oracle.values())} of {ORACLE_CAP}")
+print(f"oracle_measured total {sum(oracle_measured.values())} of {ORACLE_MEASURED_CAP}")
+print(f"oracle_reweight total {sum(oracle_reweight.values())} of {REWEIGHT_CAP}")
 print(f"instrument_decl total {sum(instrument_decl.values())} of {INSTRUMENT_DECL_CAP}")
 assert not set(intake) & set(roles["plumbing"]), f"a file in both plumbing and intake: {sorted(set(intake) & set(roles['plumbing']))}"
 assert sum(intake.values()) <= CORE_CAP, f"intake line budget exceeded: {sum(intake.values())} > {CORE_CAP}; stop and report which files grew"
@@ -163,5 +172,11 @@ assert sum(seal_reach.values()) <= SEAL_REACH_CAP, f"seal_reach line budget exce
 assert not set(seal_reach) & {f for r, fs in roles.items() if r != "seal_reach" for f in fs}, "seal_reach shares a file with another role"
 assert sum(instrument_decl.values()) <= INSTRUMENT_DECL_CAP, f"instrument_decl line budget exceeded: {sum(instrument_decl.values())} > {INSTRUMENT_DECL_CAP}"
 assert not set(instrument_decl) & {f for r, fs in roles.items() if r != "instrument_decl" for f in fs}, "instrument_decl shares a file with another role"
+assert sum(oracle.values()) <= ORACLE_CAP, f"oracle line budget exceeded: {sum(oracle.values())} > {ORACLE_CAP}"
+assert not set(oracle) & {f for r, fs in roles.items() if r != "oracle" for f in fs}, "oracle shares a file with another role"
+assert sum(oracle_measured.values()) <= ORACLE_MEASURED_CAP, f"oracle_measured line budget exceeded: {sum(oracle_measured.values())} > {ORACLE_MEASURED_CAP}"
+assert not set(oracle_measured) & {f for r, fs in roles.items() if r != "oracle_measured" for f in fs}, "oracle_measured shares a file with another role"
+assert sum(oracle_reweight.values()) <= REWEIGHT_CAP, f"oracle_reweight line budget exceeded: {sum(oracle_reweight.values())} > {REWEIGHT_CAP}"
+assert not set(oracle_reweight) & {f for r, fs in roles.items() if r != "oracle_reweight" for f in fs}, "oracle_reweight shares a file with another role"
 assert total <= CAP, f"line budget exceeded: {total} > {CAP}; stop and report which files grew"
 print("test_budget: all passed")
