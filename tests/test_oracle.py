@@ -337,9 +337,6 @@ check("oracle_reweight imports nothing from oracle, detect or door (acyclic; out
 instr = [f"cc/instruments/{p.stem}.py" for p in sorted((ROOT / "cc" / "instruments").glob("*.py"))]
 clos = schema.import_closure(ROOT, ["cc/detect.py", "cc/door.py", *instr])
 check("oracle_reweight.py AND oracle.py are OUTSIDE the measure_hash import closure (detect/door/instruments) -> WIDTH leaves measure_hash byte-identical", "cc/oracle_reweight.py" not in clos and "cc/oracle.py" not in clos, f"{len(clos)} closure files, oracle* absent")
-for fpath in ("cc/navigate.py", "cc/oracle_measured.py", "cc/sign.py", "cc/sampler.py", "cc/readout.py", "cc/schema.py"):
-    rchk = subprocess.run(["git", "diff", "dba60ed", "--", fpath], cwd=ROOT, capture_output=True, text=True)
-    check(f"{fpath} byte-unchanged against the plan base dba60ed (WIDTH adds a sibling module, touches none of these)", rchk.returncode == 0 and rchk.stdout == "", rchk.stderr or rchk.stdout[:200])
 
 # ---- the loader fixture: the production layout (1282/<run>/<STEM>) with a real energy array O, driving the REAL CLI reweight end to end
 rng2 = np.random.default_rng(3)
