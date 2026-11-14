@@ -1,0 +1,25 @@
+# Vendored verbatim from the frozen compass-toolset sampler. Plan 1511 T-pre.
+# These files are byte-identical copies (no header prepended — a header would change the sha).
+# Provenance and the pinned sha256 of each file live here, in exactly one place.
+# Test 6 re-computes each file's sha and asserts it equals the value below (it hardcodes no sha).
+
+rev = "82ee4d2"                 # compass-toolset git head at vendor time
+source_repo = "compass-toolset"
+vendored_by = "Argus (Auditor)"
+vendored_utc = "2026-11-14"
+
+[sha256]
+"lattice_at.py"     = "4f63c0016880c2ce9a55c77cd8de739755bac8f8b26418ad029f61ff3bec9886"
+"observables_at.py" = "a0486350954efe10a550418e012893618f6f711057ff99dd94c3e1ad6554afc2"
+"scale.py"          = "1dff330d804d067e26f8c6c7dbe86739f0ee75635e5d1661f163d01bcf908f2b"
+
+[source]
+"lattice_at.py"     = "tools/lattice_at.py"      # pin also carried in inputs/b7-at-line/transducer.toml
+"observables_at.py" = "tools/observables_at.py"
+"scale.py"          = "tools/scale.py"
+
+[purity]
+# Verified at vendor time: pure Python, numpy + scipy.sparse only; no rust_samplers / sw_graph /
+# subprocess / ctypes. observables_at.py does `from scale import levels` (satisfied by scale.py beside it).
+imports = ["numpy", "scipy.sparse", "scipy.sparse.csgraph", "scale"]
+native = "none"
