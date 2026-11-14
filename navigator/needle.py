@@ -55,6 +55,11 @@ def load_needle_cfg(path):
     return R.parse_needle_cfg(raw)
 
 
+def refuses_at_floor(n, k, tau):
+    """the finite-size floor (S13): a declared function of (n, k, tau) only — never sigma, never data."""
+    return n < k * tau
+
+
 def _declared(parsed):
     return R.parse_declared(parsed.fields) if isinstance(parsed, R.Reply) else R.Malformed("declared", "no declaration")
 
@@ -88,6 +93,8 @@ def run(needle_toml):
         decl = _declared(w.ask({"op": "declare"}))
         if isinstance(decl, R.Malformed):
             return RefusedToStart(decl.field, "A")
+        if refuses_at_floor(cfg.n, decl.k, decl.tau):  # evaluated once, here, before `where`; the loop is never entered
+            return Verdict("REFUSE", "floor", [], decl, None)
         edge = _edge(w.ask({"op": "where"}), 0)
         if isinstance(edge, R.Malformed):
             return RefusedToStart(edge.field, "A")

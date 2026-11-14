@@ -14,6 +14,7 @@ import time
 from pathlib import Path
 
 from environment import config as C
+from environment import score as S
 from navigator import needle as N
 from navigator import reader as R
 
@@ -87,7 +88,40 @@ def main(argv=None):
     ncfg = N.load_needle_cfg(a.needle)
     if isinstance(ncfg, R.Malformed):
         return refuse(run_dir, ncfg.field, "B", ncfg.detail)
-    raise NotImplementedError("T2: spawn server, run needle, score, write verdict.json")
+    env, at, tau = srv
+    run_dir.mkdir(parents=True, exist_ok=True)
+    (run_dir / "config.json").write_text(canon)
+    signal.signal(signal.SIGTERM, lambda *_: sys.exit(143))  # the finally below reaps the server on the way out
+    proc = None
+    try:
+        with open(run_dir / "server.log", "wb") as log:
+            proc = subprocess.Popen([sys.executable, "-m", "environment.server", "--env", str(a.env), "--at", str(at_path),
+                                     "--run-dir", str(run_dir)], cwd=ROOT, stdout=subprocess.DEVNULL, stderr=log)
+            wait_ready(proc, env.port)
+            result = N.run(a.needle)
+            reap(proc)  # the server writes perf.json as it exits; reap BEFORE reading/writing outputs
+    finally:
+        if proc is not None:
+            reap(proc)
+    if isinstance(result, N.RefusedToStart):
+        return refuse(run_dir, result.field, result.parse)
+    return write_verdict(run_dir, rid, at, ncfg, result)
+
+
+def write_verdict(run_dir, rid, at, ncfg, v):
+    """truth = present iff |K - K_c| <= w, from the edge the needle carried back; for REFUSE(floor) (needle never asked
+    `where`) the same K_c, w come from the environment config (the scorer's side) — the same expression either way (§3 test 5)."""
+    if v.edge is not None:
+        K_c, w = v.edge.K_c, v.edge.w
+    else:
+        K_c, w = float(C.load_plugin("at").lattice_at.self_dual_K(at.L4)), at.w
+    K = K_c + ncfg.u
+    truth = S.Truth.present if abs(K - K_c) <= w else S.Truth.absent
+    cell = S.score(truth, S.Verdict(v.kind))
+    doc = {"plan": "1511", "run_id": rid, "env_seed": at.seed, "declaration": v.declaration.raw, "truth": truth.value,
+           "verdict": {"kind": v.kind, "reason": v.reason}, "cell": cell.name, "rounds": v.rounds}
+    (run_dir / "verdict.json").write_text(json.dumps(doc, sort_keys=True) + "\n")
+    return 0
 
 
 if __name__ == "__main__":
