@@ -1,0 +1,8 @@
+# Plan 1511 needle config (golden). No seed: margin-constant-v0 reads no randomness.
+host             = "127.0.0.1"
+port             = 8787
+needle_structure = "margin-constant-v0"
+u                = 0.0     # margin, K-units (u >= 0); u <= w => LINE
+du               = 0.01    # retreat step (declared; unreached at Stage 1)
+N                = 8       # round budget
+n                = 450     # sweeps per step (>= k*tau = 402)

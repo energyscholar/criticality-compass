@@ -1,0 +1,4 @@
+# Plan 1511: the versioned declared tau. Replacing it is tau-v1 with the golden re-cut (K2).
+value  = 67
+source = "inputs/b7-at-line/m.toml interval b=400 > 6*tau_int => tau_int<66.7; v0 uses the implied ceiling"
+stamp  = "Argus 2026-11-14"

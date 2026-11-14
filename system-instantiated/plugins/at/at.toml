@@ -1,0 +1,11 @@
+# Plan 1511 AT plugin config (at-v0). The config is both the declaration and the unit of garbage.
+L_blocks   = 9            # L = 3 * L_blocks = 27, the smallest AT
+L4         = 0.14         # four-spin coupling; K_c = self_dual_K(L4) = 0.34888 (computed live)
+burn       = 400          # sweeps burned ONCE at construction; `set` never re-burns
+seed       = 22
+k          = 6            # floor multiplier: floor = k * tau
+nlev       = 1            # block levels computed by observables (E2 needs only 1)
+knobs_K    = [0.20, 0.50]
+w          = 0.02         # declared band half-width, K-units
+index_unit = "sweep"
+index_kind = "sample_counter"

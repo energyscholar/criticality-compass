@@ -1,0 +1,4 @@
+# Plan 1511 environment host config.
+system       = "at"
+port         = 8787
+run_dir_root = "~/software/scratch/1511-out/"
