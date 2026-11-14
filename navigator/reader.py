@@ -1,6 +1,7 @@
 """Plan 1511: the needle's reader — total maps (S1). Every parse is `input -> Value | Malformed`; no default is ever filled,
 no exception is the control path. Parse A = wire messages; Parse B = config files (§11.6).
 Pure: no clock, no I/O. (The server may import the Parse-B functions; this module imports nothing from environment.)"""
+import json
 from dataclasses import dataclass
 
 
@@ -159,3 +160,51 @@ def parse_tau_cfg(d):
         return Malformed("tau-v0.toml", "table required")
     v = _real(d, "value", lambda x: x > 0, "value>0")
     return v if isinstance(v, Malformed) else TauConfig(v)
+
+
+# ---- the reader's total map (S1): line -> Reply | Malformed | EOF ; judge -> Evaluated | NotEvaluated ----------------------
+@dataclass(frozen=True)
+class Reply:
+    op: str
+    index: object   # int, or None when the line carried no (int) index — which can never match an expected index
+    fields: dict
+
+
+@dataclass(frozen=True)
+class _Eof:
+    """absence: a closed connection. A value, not an exception."""
+
+
+EOF = _Eof()
+
+
+@dataclass(frozen=True)
+class Evaluated:
+    reply: Reply
+
+
+@dataclass(frozen=True)
+class NotEvaluated:
+    pass
+
+
+def parse_line(line):
+    """one wire line (str, or None/'' for a closed peer) -> Reply | Malformed | EOF. Total: no input raises."""
+    if line is None or line == "":
+        return EOF
+    try:
+        d = json.loads(line)
+    except ValueError:
+        return Malformed("line", "not JSON")
+    if not isinstance(d, dict) or not isinstance(d.get("op"), str):
+        return Malformed("line", "object with a str op required")
+    i = d.get("index")
+    return Reply(d["op"], i if isinstance(i, int) and not isinstance(i, bool) else None, d)
+
+
+def judge(parsed, expected_op, expected_i):
+    """Evaluated iff the reply's op is the expected op AND its index is the expected index (§11.1). Everything else —
+    nev (even with the matching index), a wrong op, a stale/future index, Malformed, EOF — is NotEvaluated."""
+    if isinstance(parsed, Reply) and parsed.op == expected_op and parsed.index == expected_i:
+        return Evaluated(parsed)
+    return NotEvaluated()
