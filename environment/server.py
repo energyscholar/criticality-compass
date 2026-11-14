@@ -57,6 +57,9 @@ def main(argv=None):
     declared = declared_msg(plugin, at, tau)
     perf = []
     run_dir = Path(a.run_dir)
+    run_dir.mkdir(parents=True, exist_ok=True)
+    # the declared edge crosses the process boundary as an artifact (R4-1): from the 5-function contract, before the port binds
+    (run_dir / "edge.json").write_text(json.dumps(plugin.edge(state), sort_keys=True))
     signal.signal(signal.SIGTERM, lambda *_: sys.exit(0))
     lsock = socket.socket()
     try:

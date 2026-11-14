@@ -126,6 +126,25 @@ def parse_edge(m):
     return bad if bad else Edge(float(K_c), float(w), i)
 
 
+@dataclass(frozen=True)
+class Obs:
+    E2: float
+    index: int
+
+
+def parse_obs(m):
+    """a `sense` reply -> Obs | Malformed. E2 must be a real float (an int/str/None/bool is Malformed): one validity home (R4-4)."""
+    if not isinstance(m, dict):
+        return Malformed("obs", "object required")
+    if m.get("op") != "obs":
+        return Malformed("op", "obs expected")
+    E2 = m.get("E2")
+    if not isinstance(E2, float):
+        return Malformed("E2", "float required")
+    i = _int(m, "index")
+    return i if isinstance(i, Malformed) else Obs(E2, i)
+
+
 # ---- Parse B: config files -------------------------------------------------------------------------------------------------
 def parse_needle_cfg(d):
     if not isinstance(d, dict):

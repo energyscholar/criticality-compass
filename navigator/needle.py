@@ -17,6 +17,14 @@ class RefusedToStart:
 
 
 @dataclass(frozen=True)
+class Unreachable:
+    """the server was not there to connect to: the run did not happen (exit 1), distinct from a refusal (exit 2)."""
+    host: str
+    port: int
+    why: str
+
+
+@dataclass(frozen=True)
 class Verdict:
     kind: str        # LINE | ABSENT | REFUSE
     reason: object   # None | "floor" | "budget"
@@ -79,16 +87,19 @@ def _round(w, K, n, exp):
     exp += n  # the running sum of every n SENT, so a substituted reply never desyncs a later round
     b = R.judge(w.ask({"op": "step", "n": n}), "ok", exp)
     c = R.judge(w.ask({"op": "sense"}), "obs", exp)
-    E2 = c.reply.fields.get("E2") if isinstance(c, R.Evaluated) else None
-    ok = isinstance(a, R.Evaluated) and isinstance(b, R.Evaluated) and isinstance(c, R.Evaluated) and isinstance(E2, float)
-    return ok, (E2 if ok else None), exp
+    obs = R.parse_obs(c.reply.fields) if isinstance(c, R.Evaluated) else None  # validity of E2 lives in Parse A only
+    ok = isinstance(a, R.Evaluated) and isinstance(b, R.Evaluated) and isinstance(obs, R.Obs)
+    return ok, (obs.E2 if ok else None), exp
 
 
 def run(needle_toml):
     cfg = load_needle_cfg(needle_toml)
     if isinstance(cfg, R.Malformed):
         return RefusedToStart(cfg.field, "B")
-    w = _Wire(cfg.host, cfg.port)
+    try:
+        w = _Wire(cfg.host, cfg.port)
+    except OSError as e:  # nothing listening: infrastructure absence, a value (R4-5), never a traceback
+        return Unreachable(cfg.host, cfg.port, type(e).__name__)
     try:
         decl = _declared(w.ask({"op": "declare"}))
         if isinstance(decl, R.Malformed):
@@ -117,6 +128,9 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--needle", required=True)
     r = run(ap.parse_args().needle)
+    if isinstance(r, Unreachable):
+        print(f"Unreachable {r.host}:{r.port} ({r.why})", file=sys.stderr)
+        sys.exit(1)
     if isinstance(r, RefusedToStart):
         print(f"RefusedToStart field={r.field} parse={r.parse}", file=sys.stderr)
         sys.exit(2)

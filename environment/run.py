@@ -1,7 +1,8 @@
 """Plan 1511: the orchestrator. Owns the server subprocess (and its port), calls the needle in-process, then writes the run
 artifacts (§11.8). The needle writes nothing. The server is reaped in `finally`, on every path including failure.
 Entry: python -m environment.run --env environment.toml --needle needle.toml [--at at.toml]
-Exit: 0 = verdict.json written (any REFUSE included); 2 = RefusedToStart (refused.json)."""
+Exit: 0 = verdict.json written (any REFUSE included); 2 = RefusedToStart (refused.json); 1 = infrastructure failure (the server
+never bound / exited early: the run did not happen)."""
 import argparse
 import hashlib
 import json
@@ -23,8 +24,9 @@ READY_WAIT = 120  # orchestrator-side (not the needle): poll-connect until the s
 
 
 def run_id(at, env, needle, tau, vendor):
-    """sha256 of the sorted-key canonical JSON of the five configs, minus host/runtime fields (§11.8)."""
+    """sha256 of the sorted-key canonical JSON of the five configs, minus host/runtime fields (§11.8, R4-2)."""
     env = {k: v for k, v in env.items() if k not in ("run_dir_root", "port")}
+    needle = {k: v for k, v in needle.items() if k not in ("host", "port")}
     canon = json.dumps({"at": at, "environment": env, "needle": needle, "tau_v0": tau, "vendor": vendor},
                        sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(canon.encode()).hexdigest()[:16], canon
@@ -43,15 +45,16 @@ def refuse(run_dir, field, parse, detail=""):
 
 
 def wait_ready(proc, port):
+    """-> None when the port accepts, else a str naming why the run cannot happen (infrastructure failure, exit 1)."""
     t0 = time.time()
     while True:
         with socket.socket() as s:
             if s.connect_ex(("127.0.0.1", port)) == 0:
-                return
+                return None
         if proc.poll() is not None:
-            raise RuntimeError(f"server exited early (code {proc.returncode})")
+            return f"server exited early (code {proc.returncode})"
         if time.time() - t0 > READY_WAIT:
-            raise RuntimeError("server never bound its port")
+            return "server never bound its port"
         time.sleep(0.05)
 
 
@@ -92,29 +95,30 @@ def main(argv=None):
     run_dir.mkdir(parents=True, exist_ok=True)
     (run_dir / "config.json").write_text(canon)
     signal.signal(signal.SIGTERM, lambda *_: sys.exit(143))  # the finally below reaps the server on the way out
-    proc = None
+    proc = down = result = None
     try:
         with open(run_dir / "server.log", "wb") as log:
             proc = subprocess.Popen([sys.executable, "-m", "environment.server", "--env", str(a.env), "--at", str(at_path),
                                      "--run-dir", str(run_dir)], cwd=ROOT, stdout=subprocess.DEVNULL, stderr=log)
-            wait_ready(proc, env.port)
-            result = N.run(a.needle)
+            down = wait_ready(proc, env.port)
+            result = N.run(a.needle) if down is None else None
             reap(proc)  # the server writes perf.json as it exits; reap BEFORE reading/writing outputs
     finally:
         if proc is not None:
             reap(proc)
+    if down is not None or isinstance(result, N.Unreachable):  # the run did not happen: exit 1, an honest third status (R4-5)
+        print(f"InfrastructureFailure {down or result}", file=sys.stderr)
+        return 1
     if isinstance(result, N.RefusedToStart):
         return refuse(run_dir, result.field, result.parse)
     return write_verdict(run_dir, rid, at, ncfg, result)
 
 
 def write_verdict(run_dir, rid, at, ncfg, v):
-    """truth = present iff |K - K_c| <= w, from the edge the needle carried back; for REFUSE(floor) (needle never asked
-    `where`) the same K_c, w come from the environment config (the scorer's side) — the same expression either way (§3 test 5)."""
-    if v.edge is not None:
-        K_c, w = v.edge.K_c, v.edge.w
-    else:
-        K_c, w = float(C.load_plugin("at").lattice_at.self_dual_K(at.L4)), at.w
+    """truth = present iff |K - K_c| <= w, with K_c, w read from the server's <run_dir>/edge.json — on EVERY path, normal and
+    REFUSE(floor) alike (R4-1). The orchestrator imports no plugin internal and names no system."""
+    edge = json.loads((run_dir / "edge.json").read_text())
+    K_c, w = edge["K_c"], edge["w"]
     K = K_c + ncfg.u
     truth = S.Truth.present if abs(K - K_c) <= w else S.Truth.absent
     cell = S.score(truth, S.Verdict(v.kind))

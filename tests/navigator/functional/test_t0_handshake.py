@@ -44,6 +44,14 @@ def test_malformed_edge_is_refused_to_start_not_refuse(tmp_path):
         assert isinstance(r, N.RefusedToStart) and r.parse == "A", edge
 
 
+def test_edge_reply_with_the_wrong_index_is_refused_to_start_index_A(tmp_path):
+    def resp(msg, raw):
+        out = honest_responder()(msg, raw)
+        return json.dumps({**json.loads(out), "index": 7}) if msg and msg.get("op") == "where" else out
+    r, _ = run_needle(tmp_path, resp)
+    assert r == N.RefusedToStart(field="index", parse="A")
+
+
 def test_negative_u_is_refused_before_connecting(tmp_path):
     r, fs = run_needle(tmp_path, honest_responder(), u=-0.1)
     assert r == N.RefusedToStart(field="u", parse="B")

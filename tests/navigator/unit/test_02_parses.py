@@ -51,6 +51,17 @@ def test_edge_honest_and_malformed():
     assert isinstance(R.parse_edge({"op": "nev", "index": 0}), R.Malformed)
 
 
+def test_obs_is_a_total_parse_beside_parse_edge():
+    o = R.parse_obs({"op": "obs", "E2": -100.0, "index": 3})
+    assert isinstance(o, R.Obs) and o.E2 == -100.0 and o.index == 3
+    for bad in [dict(E2="x"), dict(E2=None), dict(E2=3), dict(E2=True), dict(index="3")]:
+        m = R.parse_obs({"op": "obs", "E2": -100.0, "index": 3, **bad})
+        assert isinstance(m, R.Malformed) and m.field == next(iter(bad)), bad
+    assert isinstance(R.parse_obs({"op": "nev", "index": 3}), R.Malformed)
+    assert isinstance(R.parse_obs([1]), R.Malformed)
+    assert R.parse_obs({"op": "obs", "index": 3}).field == "E2"
+
+
 NEEDLE_BAD = [dict(u=-0.1), dict(du=0), dict(du=-0.01), dict(N=0), dict(n=0), dict(n=1.5), dict(port=0), dict(port="x"),
               dict(host=3), dict(needle_structure="other-v9"), dict(u="0")]
 
