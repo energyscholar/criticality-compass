@@ -42,6 +42,7 @@ intake_new = ["cc/intake_new.py"]   # plan 1164: `bin/cc new intake`, moved out 
 test_infrastructure = ["tests/lib.py", "cc/intake_synth.py", "tests/test_chain_1205_p2b_bank.py", "tests/intake_plant.py", "tests/plane_plant.py", "tests/tau_1282_p1.py", "tests/tau_1282_rung0.py", "tests/kernel_identity_l.py", "tests/frozen_run_1282.py"]   # plan 1176 C: the planted plane banks walked and scored; plan 1139: the planted synthetic bank of `bin/cc intake synth`; plan 1145: the planted inputs of the intake tests; outside the measurement closure
 methods = ["cc/detect.py"]
 tests = [
+  "contract/test_system_conformance.py", "contract/test_navigator_conformance.py",   # plan 1518: the two frozen Stage-2 acceptance tests (probe op + margin-batched-v0)
   "tests/frozen.py", "tests/test_bench.py", "tests/test_claims.py",   # plan 1427: declared so the plan may edit and run them
   "tests/test_closure.py", "tests/test_0973.py", "tests/test_0978.py",
   "tests/test_budget.py", "tests/test_chain_1205.py", "tests/test_chain_1205_p2b.py", "tests/test_chain_1205_p2c.py","tests/test_score_words_1201.py",

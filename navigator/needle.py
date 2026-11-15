@@ -92,6 +92,16 @@ def _round(w, K, n, exp):
     return ok, (obs.E2 if ok else None), exp
 
 
+def _round_batched(w, Ks, n, exp):
+    """ONE probe{Ks,n} = one reply carrying len(Ks) floats; Evaluated iff op=obs, index == exp + m*n, and E2 is m floats."""
+    m = len(Ks)
+    exp += m * n
+    c = R.judge(w.ask({"op": "probe", "Ks": list(Ks), "n": n}), "obs", exp)
+    obs = R.parse_obs_batch(c.reply.fields, m) if isinstance(c, R.Evaluated) else None
+    ok = isinstance(obs, R.ObsBatch)
+    return ok, (list(obs.E2) if ok else None), exp
+
+
 def run(needle_toml):
     cfg = load_needle_cfg(needle_toml)
     if isinstance(cfg, R.Malformed):
@@ -114,7 +124,11 @@ def run(needle_toml):
             return RefusedToStart("u", "u_range")
         K, exp, rounds = edge.K_c + cfg.u, 0, []
         for r in range(1, cfg.N + 1):  # all N rounds, never an early abort
-            ok, E2, exp = _round(w, K, cfg.n, exp)
+            if cfg.needle_structure == "margin-batched-v0":
+                ok, E2, exp = _round_batched(w, [K], cfg.n, exp)
+                E2 = E2[0] if ok else None  # m=1: same recorded shape as Stage-1
+            else:
+                ok, E2, exp = _round(w, K, cfg.n, exp)
             rounds.append({"round": r, "K": K, "index": exp, "evaluated": ok, "E2": E2})
         if not all(x["evaluated"] for x in rounds):
             return Verdict("REFUSE", "budget", rounds, decl, edge)

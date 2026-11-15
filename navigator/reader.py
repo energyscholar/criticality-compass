@@ -145,6 +145,26 @@ def parse_obs(m):
     return i if isinstance(i, Malformed) else Obs(E2, i)
 
 
+@dataclass(frozen=True)
+class ObsBatch:
+    E2: tuple
+    index: int
+
+
+def parse_obs_batch(m, count):
+    """a batched `probe` reply -> ObsBatch | Malformed. Total: E2 must be a list of exactly `count` floats (the number of
+    Ks sent) — fewer answers than questions cannot pass. Separate from the scalar parse_obs (Stage-1 path unchanged)."""
+    if not isinstance(m, dict):
+        return Malformed("obs", "object required")
+    if m.get("op") != "obs":
+        return Malformed("op", "obs expected")
+    E2 = m.get("E2")
+    if not isinstance(E2, list) or len(E2) != count or not all(isinstance(e, float) for e in E2):
+        return Malformed("E2", f"list of {count} floats required")
+    i = _int(m, "index")
+    return i if isinstance(i, Malformed) else ObsBatch(tuple(E2), i)
+
+
 # ---- Parse B: config files -------------------------------------------------------------------------------------------------
 def parse_needle_cfg(d):
     if not isinstance(d, dict):
@@ -154,7 +174,7 @@ def parse_needle_cfg(d):
     if isinstance(port, int) and port > 65535:
         port = Malformed("port", "<=65535")
     struct = _str(d, "needle_structure")
-    if isinstance(struct, str) and struct != "margin-constant-v0":
+    if isinstance(struct, str) and struct not in ("margin-constant-v0", "margin-batched-v0"):
         struct = Malformed("needle_structure", "unknown structure")
     u = _real(d, "u", lambda x: x >= 0, "u>=0")
     du = _real(d, "du", lambda x: x > 0, "du>0")
