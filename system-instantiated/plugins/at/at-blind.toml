@@ -1,0 +1,11 @@
+# Plan 1525 AT blind world (declared before data). L = 3 * L_blocks = 81. The lattice is burned at K_start, never at K_c.
+L_blocks   = 27
+L4         = 0.14
+burn       = 400
+seed       = 22
+k          = 6
+nlev       = 2
+knobs_K    = [0.20, 0.50]
+K_start    = 0.20
+index_unit = "sweep"
+index_kind = "sample_counter"

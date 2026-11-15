@@ -1,0 +1,3 @@
+# Plan 1525 score, declared before data. a = finite-size allowance (K-units); w_max = the width a located bracket must reach.
+a     = 0.003
+w_max = 0.02
