@@ -1,0 +1,4 @@
+# tau-v0.toml
+value  = 11
+source = "plan 1546 recon, seeds 110-112: tau_int (Sokal c=5, 20000 sweeps at K_c, h=0) of E, |M|, M^2 at L=27,45,81; max 5.43 (E, L=81)"
+stamp  = "Fable planner for Argus 2026-11-16T04:26Z"
