@@ -1,9 +1,12 @@
 """Plan 1545: the strict parser of an apparatus world (Parse B; contract/SCHEMA-1545.md section 2) and the tick grid.
 Every parse is `dict -> Value | navigator.reader.Malformed`; a fault is a refusal VALUE, no default is ever filled.
 The plugin supplies PARAMS and the HIDDEN domains, so this module names no parameter."""
+import importlib.util
 import math
 from dataclasses import dataclass
+from pathlib import Path
 
+from environment import config as C
 from environment import drift as DR
 from navigator import reader as R
 
@@ -125,3 +128,35 @@ def parse_world(d, params, hidden_domain):
     if not (lo < hidden[drift.target] + b_lo and hidden[drift.target] + b_hi <= hi):
         return R.Malformed("drift", f"the drift leaves the domain of {drift.target} within the horizon")
     return World(Lb, 3 * Lb, burn, seed, k, nlev, unit, kind, lag, horizon, dials, fixed, hidden, drift)
+
+
+def load_apparatus(system):
+    """the plugin's apparatus side, loaded by path (system-instantiated has a hyphen), as blind_server loads blind.py."""
+    f = C.plugin_dir(system) / "apparatus.py"
+    spec = importlib.util.spec_from_file_location(f"apparatus_{system}", f)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def load_apparatus_cfgs(env_path, at_path):
+    """-> (EnvConfig, World, TauConfig, plugin module) | Malformed. tau-v0.toml is a SIBLING of the world file."""
+    envd = C.load_toml(env_path)
+    if isinstance(envd, R.Malformed):
+        return envd
+    env = C.parse_env_cfg(envd)
+    if isinstance(env, R.Malformed):
+        return env
+    plug = load_apparatus(env.system)
+    at_path = Path(at_path)
+    atd = C.load_toml(at_path)
+    if isinstance(atd, R.Malformed):
+        return atd
+    world = parse_world(atd, plug.PARAMS, plug.HIDDEN)
+    if isinstance(world, R.Malformed):
+        return world
+    taud = C.load_toml(at_path.parent / "tau-v0.toml")
+    if isinstance(taud, R.Malformed):
+        return taud
+    tau = R.parse_tau_cfg(taud)
+    return tau if isinstance(tau, R.Malformed) else (env, world, tau, plug)
