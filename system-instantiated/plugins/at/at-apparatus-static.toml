@@ -1,0 +1,14 @@
+# The static control world: the same apparatus with nothing moving.
+L_blocks   = 27
+burn       = 400
+seed       = 110
+k          = 6
+nlev       = 2
+index_unit = "sweep"
+index_kind = "sample_counter"
+lag        = 48
+horizon    = 200000
+dials      = [{name = "K", lo = 0.20, hi = 0.50, T = 1200, max_nudge = 32, start = 0}]
+fixed      = {}
+hidden     = {L4 = 0.14}
+drift      = {target = "L4", law = "none"}

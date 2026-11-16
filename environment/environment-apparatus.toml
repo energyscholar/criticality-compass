@@ -1,0 +1,4 @@
+# Host config of the apparatus server.
+system       = "at"
+port         = 8789
+run_dir_root = "runs/"
