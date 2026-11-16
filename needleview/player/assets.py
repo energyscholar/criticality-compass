@@ -38,7 +38,7 @@ button.rnd.on{background:var(--now);color:var(--bg);border-color:var(--now)}
 .slot[data-state="unknown"]{font-style:italic;letter-spacing:.04em;color:var(--truth)}
 .slot[data-state="absent"],.slot[data-state="not-reported"]{color:var(--mute)}
 .why{margin:0;color:var(--truth);overflow-wrap:anywhere}
-svg.frame{display:block;width:100%;max-width:420px;height:auto;margin:0 auto;background:var(--panel);border:1px solid var(--line)}
+svg.frame{--w:min(84%,calc((100vh - 140px)*.9375));display:block;overflow:visible;width:var(--w);max-width:none;height:auto;margin:0 0 calc(var(--w)*.04) calc(var(--w)*.17);background:var(--panel);border:1px solid var(--line)}
 svg.frame text{fill:var(--mute);font-size:9px}
 svg.frame text.axis-title{fill:var(--fg);font-size:8px;font-weight:600}
 svg.frame text.sys-unknown{fill:var(--truth);font-style:italic}
@@ -62,8 +62,8 @@ polygon.truth-off{fill:var(--truth)}
 #full .ico{display:inline-block;width:14px;height:14px;vertical-align:middle;background:linear-gradient(currentColor,currentColor) left top/5px 2px no-repeat,linear-gradient(currentColor,currentColor) left top/2px 5px no-repeat,linear-gradient(currentColor,currentColor) right top/5px 2px no-repeat,linear-gradient(currentColor,currentColor) right top/2px 5px no-repeat,linear-gradient(currentColor,currentColor) left bottom/5px 2px no-repeat,linear-gradient(currentColor,currentColor) left bottom/2px 5px no-repeat,linear-gradient(currentColor,currentColor) right bottom/5px 2px no-repeat,linear-gradient(currentColor,currentColor) right bottom/2px 5px no-repeat}
 :root.fs-on{overflow:hidden}
 #player.fs-on{position:fixed;inset:0;z-index:1000;overflow:auto;margin:0;padding:8px 16px;background:var(--bg)}
-#player.fs-on svg.frame{width:100%;max-width:none;height:calc(100vh - 430px);min-height:200px}
-@media (max-width: 600px){#player.fs-on svg.frame{height:calc(100vh - 640px)}}
+#player.fs-on svg.frame{--w:min(84%,calc(max(200px,100vh - 446px)*.9375))}
+@media (max-width: 600px){#player.fs-on svg.frame{--w:min(84%,calc(max(200px,100vh - 654px)*.9375))}}
 @media (prefers-reduced-motion: reduce){*{transition:none !important;animation:none !important;scroll-behavior:auto !important}}
 """
 

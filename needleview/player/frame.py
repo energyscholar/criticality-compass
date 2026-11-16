@@ -139,17 +139,21 @@ def _system_rows(names, values):
 
 
 # ---------- the frame ----------
-def _axis_title(text, x, y, tip, anchor=None):
+def _axis_title(text, x, y, tip, anchor=None, rotate=False):
     attrs = [("class", "axis-title"), ("x", x), ("y", y)] + ([("text-anchor", anchor)] if anchor else [])
+    if rotate:
+        attrs.append(("transform", f"rotate(-90 {x} {y})"))
     return _tag("text", NAV, attrs, _e(text) + _tag("title", NAV, [], _e(tip)))
 
 
+# y-axis titles stand left of the tick labels, in the overflow area, centred on their plot's span (C 10-100, D 115-185,
+# Gs 200-270). D's title is long, so it takes its own column and never meets the others.
 def _titles():
-    return [_axis_title("C \u00b7 energy fluctuation", "40.00", "8.00", TIP_C),
-            _axis_title("D \u00b7 change of correlation on zooming out", "40.00", "112.00", TIP_D),
-            _axis_title("Gs \u00b7 block correlation", "40.00", "197.00", TIP_G),
+    return [_axis_title("C \u00b7 energy fluctuation", "-26.00", "55.00", TIP_C, "middle", True),
+            _axis_title("D \u00b7 change of correlation on zooming out", "-38.00", "150.00", TIP_D, "middle", True),
+            _axis_title("Gs \u00b7 block correlation", "-26.00", "235.00", TIP_G, "middle", True),
             _axis_title("K \u00b7 dial setting (unitless)", "160.00", "290.00", TIP_K, "middle"),
-            _axis_title("bracket, round by round", "40.00", "318.00", TIP_STRIP)]
+            _axis_title("bracket, round by round", "40.00", "328.00", TIP_STRIP)]
 
 
 def _tick_marks(r, x0, x1):
