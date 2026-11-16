@@ -113,6 +113,7 @@ class Drop:
         self.index, self.pos = d["index"], d["pos"][0]
         self.cmd, self.since = self.pos, self.index - self.lag      # the dial starts settled
         self.kstate, self.seq, self.stepno, self.segment, self.centre = (), 0, 0, 0, None
+        self.decl = d
 
     # -- the wire
     def ask(self, msg):
@@ -157,17 +158,30 @@ class Drop:
         return self.take({"op": "nudge", "d": [tick - self.pos]}, [tick], n_eq, S)
 
     # -- the records
+    def head(self):
+        """the map's head for this drop, as the drop stands before its first message."""
+        d, c = self.decl, self.cfg
+        clock = {k: d[k] for k in ("index_unit", "index_kind", "clock", "lag", "k", "tau")}
+        rule = {"observable": self.obs, "z": c["z"], "ordered_sign": self.sign, "ordered_side": self.side}
+        n_eq = {"ignite": c["ignite"]["n_eq"], "approach": c["approach"]["n_eq"], "hold": c["n_eq"]}
+        return HR.head(self.name, self.dial, {"tick": self.pos, "index": self.index}, clock, n_eq, self.skip, self.roles, rule, c["M"])
+
+    def record(self, phase, rs, kind, reason, ticks, extra, evaluated):
+        """the places and the step record of the step now ending, built and not written."""
+        n = self.stepno + 1
+        places = [HR.place(self.name, self.seq + j, self.dial, r, {"step": n, "phase": phase, "kind": kind}, self.sign) for j, r in enumerate(rs)]
+        payload = {**HR.common(self.segment, rs), **extra} if rs else {}
+        return places, HR.step(n, phase, self.index, evaluated, HR.verdict(kind, reason, self.dial["name"], ticks), payload)
+
     def finish(self, phase, rs, kind, reason, ticks, extra, evaluated=True):
         """places first (flushed), then the step. A step with no reading is `unread`'s kind and carries what it has."""
-        n = self.stepno + 1
-        for r in rs:
-            call = {"step": n, "phase": phase, "kind": kind}
-            self.mapf.write(json.dumps(HR.place(self.name, self.seq, self.dial, r, call, self.sign)) + "\n")
-            self.seq += 1
+        places, rec = self.record(phase, rs, kind, reason, ticks, extra, evaluated)
+        for p in places:
+            self.mapf.write(json.dumps(p) + "\n")
         self.mapf.flush()
-        payload = {**HR.common(self.segment, rs), **extra} if rs else {}
-        emit(HR.step(n, phase, self.index, evaluated, HR.verdict(kind, reason, self.dial["name"], ticks), payload))
-        self.stepno = n
+        emit(rec)
+        self.seq += len(places)
+        self.stepno += 1
         return kind
 
     def unread(self, phase, rs, readings, n_eq, S):
@@ -274,11 +288,7 @@ def main(argv=None):
             return refused(bad, "A")
         with open(a.map, "a", encoding="utf-8") as mapf:
             drop = Drop(sock, rf, cfg, d, a.drop, mapf)
-            n_eq = {"ignite": cfg["ignite"]["n_eq"], "approach": cfg["approach"]["n_eq"], "hold": cfg["n_eq"]}
-            clock = {k: d[k] for k in ("index_unit", "index_kind", "clock", "lag", "k", "tau")}
-            rule = {"observable": drop.obs, "z": cfg["z"], "ordered_sign": drop.sign, "ordered_side": drop.side}
-            mapf.write(json.dumps(HR.head(a.drop, drop.dial, {"tick": drop.pos, "index": drop.index}, clock, n_eq, drop.skip,
-                                          drop.roles, rule, cfg["M"])) + "\n")
+            mapf.write(json.dumps(drop.head()) + "\n")
             mapf.flush()
             emit(HR.start(cfg, cfg["ops"], drop.dial["name"], {k: v for k, v in d.items() if k != "op"}))
             last = drop.run()
