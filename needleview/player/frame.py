@@ -45,6 +45,60 @@ def _pair(p):
     return f"{p[0]!r}, {p[1]!r}"
 
 
+# ---------- tooltips: an abstract, one newline, then a paragraph ----------
+TIP_K = ("K is the dial: the setting the Navigator asked the System to hold for each measurement (unitless).\n"
+         "Each tick is one setting measured in this round. The Navigator knows only the range the System declared, not what K means "
+         "physically. The shaded band is the bracket it will search next round.")
+TIP_C = ("C = var(E)/N: how strongly the System's energy fluctuates at this setting, per unit of size (unitless).\n"
+         "Near a continuous critical point, fluctuations grow without limit in an infinite system and peak in a finite one, so a peak "
+         "in C is the first sign of criticality. Error bars are 20-block jackknife estimates. Filled points form set A: the points "
+         "statistically tied with the highest peak (within z = 2).")
+TIP_D = ("D = Gs(level 1) \u2212 Gs(level 0): does the correlation grow or shrink when the System is viewed one zoom step coarser? "
+         "(unitless)\n"
+         "Away from criticality, zooming out drives the correlation toward order on one side and toward disorder on the other, so D "
+         "has opposite signs on the two sides. At a critical point the System looks the same at every scale, so D crosses zero. The "
+         "dashed line is D = 0. Filled points form set B: the points next to the crossing.")
+TIP_G = ("Gs: how aligned neighbouring blocks are, measured at two zoom levels (unitless, 0 to 1).\n"
+         "Level 0 is the fine view and level 1 is one step coarser. The two curves cross where the System is scale-invariant, which "
+         "is the same crossing D measures. Level 0 is drawn as solid green points, level 1 as hollow purple rings.")
+TIP_STRIP = ("Bracket trail: where the Navigator has narrowed its search, round by round (K, unitless).\n"
+             "The first bar is round 1's full grid, each later bar is the bracket after that round, and the highlighted bar is the "
+             "round on show. A bar that shrinks while staying put means the Navigator is closing on one value of K.")
+TIP_TRUTH = ("True K_c: the critical value the test System declares about itself, shown only for known test systems.\n"
+             "The Navigator never sees this value; it is drawn so you can judge the Navigator. On a real, unknown System this reads "
+             "UNKNOWN.")
+TIP_ZONE = {
+    NAV: "NAVIGATOR: what the needle measured and decided.\nEverything in this zone comes from the needle's own report, "
+         "which is all the Navigator ever sees.",
+    SYS: "SYSTEM: what only the System knows about itself.\nThese values are shown for known test systems and are never given to "
+         "the Navigator. When nothing is known, each slot reads UNKNOWN.",
+}
+TIP_CAP = {
+    "belief": "What the needle believes it is running on.\nThe report does not carry this yet, so it reads not reported.",
+    "verdict": "The needle's closing statement for the run.\nIt is given once, after the last round, in the outcome block below.",
+    "kind": "Whether the needle located a critical region or declined to.\nLocated means it narrowed to a bracket; REFUSE means it "
+            "stopped without one.",
+    "reason": "Why the needle declined, if it did.\nfloor means there was too little data to start; budget means a round could not be "
+              "evaluated.",
+    "lo": "The lower end of the final bracket of K.\nThe critical value is searched for between lo and hi.",
+    "hi": "The upper end of the final bracket of K.\nThe critical value is searched for between lo and hi.",
+    "width": "The width of the final bracket, hi minus lo (K units).\nA narrower bracket is a sharper answer.",
+    "agree": "Whether the set A hull and the set B hull overlap.\nA is the points tied for the highest peak of C and B the points "
+             "next to the zero crossing of D. Two independent signs that agree make the bracket more trustworthy.",
+    "A_hull": "The span of K covered by the set A points of the last round.\nSet A is the points statistically tied with the highest "
+              "peak of C.",
+    "B_hull": "The span of K covered by the set B points of the last round.\nSet B is the points next to the zero crossing of D; it "
+              "may be empty.",
+    "truth_K_c": "The critical value the test System declares about itself (K units).\nThe Navigator never sees it.",
+    "a": "The finite-size allowance (K units).\nA bracket counts as containing the truth when the truth lies within a of its ends.",
+    "w_max": "The widest bracket that counts as narrow enough (K units).\nA wider bracket does not score as a success.",
+    "cell": "The score of this run against what the System declared.\nIt combines whether the bracket contains the truth and whether "
+            "it is narrow enough.",
+    "contains": "Whether the final bracket, widened by the allowance a, contains the declared critical value.\nIt is yes or no for a "
+                "located run and absent for a declined one.",
+}
+
+
 # ---------- slots and zones ----------
 def _slot(src, name, state, text):
     attrs = [("class", "slot"), ("data-slot", name), ("data-state", state)]
@@ -54,7 +108,8 @@ def _slot(src, name, state, text):
 
 
 def _row(src, name, state, text):
-    return _tag("div", src, [("class", "row")], _tag("span", src, [("class", "cap")], _e(name)) + _slot(src, name, state, text))
+    cap = [("class", "cap")] + ([("title", TIP_CAP[name])] if name in TIP_CAP else [])
+    return _tag("div", src, [("class", "row")], _tag("span", src, cap, _e(name)) + _slot(src, name, state, text))
 
 
 def _value(src, name, text):
@@ -74,7 +129,7 @@ def _maybe(name, v, fmt):
 
 
 def _zone(src, rows):
-    return _tag("div", src, [("class", "zone")], _tag("span", src, [("class", "zone-name")], src.upper()) + "".join(rows))
+    return _tag("div", src, [("class", "zone")], _tag("span", src, [("class", "zone-name"), ("title", TIP_ZONE[src])], src.upper()) + "".join(rows))
 
 
 def _system_rows(names, values):
@@ -84,6 +139,19 @@ def _system_rows(names, values):
 
 
 # ---------- the frame ----------
+def _axis_title(text, x, y, tip, anchor=None):
+    attrs = [("class", "axis-title"), ("x", x), ("y", y)] + ([("text-anchor", anchor)] if anchor else [])
+    return _tag("text", NAV, attrs, _e(text) + _tag("title", NAV, [], _e(tip)))
+
+
+def _titles():
+    return [_axis_title("C \u00b7 energy fluctuation", "40.00", "8.00", TIP_C),
+            _axis_title("D \u00b7 change of correlation on zooming out", "40.00", "112.00", TIP_D),
+            _axis_title("Gs \u00b7 block correlation", "40.00", "197.00", TIP_G),
+            _axis_title("K \u00b7 dial setting (unitless)", "160.00", "290.00", TIP_K, "middle"),
+            _axis_title("bracket, round by round", "40.00", "318.00", TIP_STRIP)]
+
+
 def _tick_marks(r, x0, x1):
     out = []
     for i, k in enumerate(r.grid):
@@ -170,9 +238,9 @@ def _frame(r, system, g0, g1, spans):
         marks = _tick_marks(r, x0, x1)
         marks.append(_tag("text", NAV, [("class", "not-evaluated"), ("x", "160.00"), ("y", "140.00"), ("text-anchor", "middle")],
                           "not evaluated"))
-    marks += _trail(spans, r.round, g0, g1)
+    marks += _trail(spans, r.round, g0, g1) + _titles()
     layers = (_tag("g", NAV, [("class", "layer")], "".join(marks)) +
-              _tag("g", SYS, [("class", "layer")], _system_mark(system, x0, x1)))
+              _tag("g", SYS, [("class", "layer")], _tag("title", SYS, [], _e(TIP_TRUTH)) + _system_mark(system, x0, x1)))
     return _tag("svg", NAV, [("class", "frame"), ("viewBox", VIEWBOX), ("data-round", str(r.round)), ("data-evaluated", _bool(ev)),
                              ("data-x0", repr(x0)), ("data-x1", repr(x1)), ("data-lo", repr(r.lo)), ("data-hi", repr(r.hi))], layers)
 

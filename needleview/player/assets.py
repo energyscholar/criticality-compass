@@ -40,6 +40,7 @@ button.rnd.on{background:var(--now);color:var(--bg);border-color:var(--now)}
 .why{margin:0;color:var(--truth);overflow-wrap:anywhere}
 svg.frame{display:block;width:100%;max-width:420px;height:auto;margin:0 auto;background:var(--panel);border:1px solid var(--line)}
 svg.frame text{fill:var(--mute);font-size:9px}
+svg.frame text.axis-title{fill:var(--fg);font-size:8px;font-weight:600}
 svg.frame text.sys-unknown{fill:var(--truth);font-style:italic}
 rect.box{fill:none;stroke:var(--line)}
 line.tick{stroke:var(--mute);stroke-width:1}
