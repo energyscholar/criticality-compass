@@ -1,0 +1,12 @@
+# plan 1546 world: field
+kind       = "field"
+h_ticks = 1000
+L          = 81
+burn       = 400
+seed       = 190
+k          = 6
+nlev       = 2
+knobs_K    = [0.42, 0.55]
+K_start    = 0.42
+index_unit = "sweep"
+index_kind = "sample_counter"
