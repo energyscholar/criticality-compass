@@ -1,0 +1,5 @@
+# Plan 1552 score settings, declared before data.
+# offset_K: where the L = 81 lattice's crossing sits against K_c, in the dial's value. out_run: the longest run of OUT steps a HELD run may have.
+offset_K = -0.0018
+out_run = 3
+plan = "1552"
