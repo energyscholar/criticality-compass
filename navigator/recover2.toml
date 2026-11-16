@@ -1,0 +1,9 @@
+# Plan 1533 needle config: stage 3a's, declared before data, with only the structure name changed. The floor: n_eq = 450 >= k * tau = 6 * 67 = 402.
+needle_structure = "recover-adaptive-v1"
+bracket          = [0.20, 0.50]
+m                = 9
+N                = 5
+n_eq             = 450
+S                = 2000
+skip             = 1
+z                = 2.0
