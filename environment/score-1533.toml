@@ -1,0 +1,4 @@
+# Plan 1533 score, declared before data. a = finite-size allowance (K-units); w_max = the width a located bracket must reach; plan = the stamp of verdict.json.
+a     = 0.003
+w_max = 0.02
+plan  = "1533"
