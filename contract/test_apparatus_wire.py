@@ -1,6 +1,11 @@
 """Plan 1545 — stage 5a-S acceptance: the emulated apparatus (contract/SCHEMA-1545.md). Launches the REAL apparatus
 server and drives it over a raw socket. FROZEN: the Generator makes this green; it does not edit this file.
 
+AMENDED by plan 1553 (owner ruling 2026-11-16, "Allow mid-move readings", which reverses plan 1545 OQ-A): the wire no
+longer refuses `nudge` and `scan` with n_eq < lag, and lag is a delay line (contract/SCHEMA-1553.md). Three things in
+this file changed and nothing else: `_Model` (the timing and two new truth keys per point), two refusal rows of a04,
+and docstrings on a04, a07 and a11. Every reply this file expects is the same number as before the amendment.
+
 What it pins:
   a01  the face has exactly four ops (declare, read, nudge, scan); every older op and every malformed line is `nev`;
   a02  the declaration: exact key set, dials as integer-tick grids, roles, no truth and no drift;
@@ -168,13 +173,17 @@ def _offset(drift, i):
 
 
 class _Model:
-    """SCHEMA-1545 sections 3 and 5, written out a second time, independently of the implementation."""
+    """SCHEMA-1545 section 3 and SCHEMA-1553 sections 2, 4 and 5, written out a second time, independently of the
+    implementation. Plan 1553 (owner ruling 2026-11-16, "Allow mid-move readings"): `pos` is the COMMANDED position, `dial`
+    the position in force, `due` the commanded moves that have not arrived yet. A move commanded at index c arrives at
+    c + lag whatever the call asks for; nothing shortens it and nothing drops it."""
 
     def __init__(self, world):
         self.lat, self.obs = _vendor()
         self.w = world
         self.L = 3 * world["L_blocks"]
         self.pos = [d["start"] for d in world["dials"]]
+        self.dial, self.due = list(self.pos), []
         self.rng = np.random.default_rng(world["seed"])
         Ss, Ts = self.lat.at_sw(self.L, self.K(self.pos), self.L4(0), 1, 0, world["burn"], self.rng)
         self.s, self.t, self.index, self.rows = Ss[0], Ts[0], 0, []
@@ -191,8 +200,15 @@ class _Model:
     def K_c(self, i):
         return float(self.lat.self_dual_K(self.L4(i)))
 
-    def _sweep(self, pos):
-        self.s, self.t = self.lat._step(self.s, self.t, self.K(pos), self.L4(self.index), self.rng)
+    def _arrive(self):
+        while self.due and self.due[0][0] <= self.index:
+            self.dial = self.due.pop(0)[1]
+
+    def _sweep(self, seen):
+        self._arrive()
+        if self.dial != seen[-1][1]:
+            seen.append([self.index, list(self.dial)])
+        self.s, self.t = self.lat._step(self.s, self.t, self.K(self.dial), self.L4(self.index), self.rng)
         self.index += 1
 
     def call(self, msg):
@@ -200,20 +216,22 @@ class _Model:
         op, n_eq, S, skip = msg["op"], msg["n_eq"], msg["S"], msg["skip"]
         points = {"read": lambda: [list(self.pos)], "nudge": lambda: [[p + d for p, d in zip(self.pos, msg["d"])]],
                   "scan": lambda: [list(p) for p in msg["ticks"]]}[op]()
-        lag = 0 if op == "read" else self.w["lag"]
         N, B = self.L * self.L, 20
         out = {"op": "reading", "pos": [], "window": [], "values": {"D": [], "C": []}, "errors": {"D": [], "C": []}}
         truth_points = []
         for cur in points:
-            for _ in range(lag):
-                self._sweep(self.pos)
-            for _ in range(n_eq - lag):
-                self._sweep(cur)
+            if op != "read":                                   # a read commands nothing
+                self.due.append((self.index + self.w["lag"], list(cur)))
+            self._arrive()
+            seen = [[self.index, list(self.dial)]]              # the dial over this point's sweeps, as runs
+            for _ in range(n_eq):
+                self._sweep(seen)
             E2, G = np.empty(S), np.empty((S, self.w["nlev"]))
+            sampling = self.index
             a = self.index + skip
             for i in range(S):
                 for _ in range(skip):
-                    self._sweep(cur)
+                    self._sweep(seen)
                 e2, _, gs, _ = self.obs.observables(self.s[None, :, :], self.t[None, :, :], self.w["nlev"])
                 E2[i], G[i] = e2[0], gs[0]
             blocks = np.array_split(np.arange(S), B)
@@ -227,12 +245,14 @@ class _Model:
             out["values"]["C"].append(float(E2.var() / N))
             out["errors"]["C"].append(jk(lambda idx: E2[idx].var() / N))
             out["pos"].append(list(cur)); out["window"].append([a, self.index])
-            truth_points.append({"pos": list(cur), "window": [a, self.index], "K_c": [self.K_c(a), self.K_c(self.index)]})
+            truth_points.append({"pos": list(cur), "window": [a, self.index], "K_c": [self.K_c(a), self.K_c(self.index)],
+                                 "sampling": sampling, "dial": seen})
             self.pos = list(cur)
         out["index"] = self.index
+        self._arrive()                                          # `actual` is the dial in force at the index after the call
         d = self.w["dials"]
         self.rows.append({"call": len(self.rows) + 1, "op": op, "index": self.index, "K_c": self.K_c(self.index), "pos": list(self.pos),
-                          "actual": [x["lo"] + t * (x["hi"] - x["lo"]) / x["T"] for x, t in zip(d, self.pos)], "points": truth_points})
+                          "actual": [x["lo"] + t * (x["hi"] - x["lo"]) / x["T"] for x, t in zip(d, self.dial)], "points": truth_points})
         return out
 
 
@@ -305,6 +325,8 @@ def test_a03_readings_match_the_declared_computation(tmp_path):
 
 
 def test_a04_a_refused_call_changes_nothing(tmp_path):
+    """Plan 1553 (owner ruling 2026-11-16, "Allow mid-move readings") removed two rows from `bad`: a nudge and a one-point
+    scan with n_eq = 1 < lag = 2. They are accepted calls now; contract/test_apparatus_midmove.py m02 holds them."""
     proc, c, _ = _server(tmp_path, WORLD)
     try:
         m = _Model(WORLD)
@@ -316,7 +338,6 @@ def test_a04_a_refused_call_changes_nothing(tmp_path):
             {"op": "nudge", "d": [1.0], **RQ}, {"op": "nudge", "d": [0.5], **RQ}, {"op": "nudge", "d": [True], **RQ},      # not ints
             {"op": "nudge", "d": ["1"], **RQ}, {"op": "nudge", "d": [None], **RQ}, {"op": "nudge", "d": 1, **RQ},
             {"op": "nudge", "d": [], **RQ}, {"op": "nudge", "d": [1, 1], **RQ}, {"op": "nudge", "d": [[1]], **RQ},        # wrong length
-            {"op": "nudge", "d": [1], "n_eq": 1, "S": 40, "skip": 1},                                                    # n_eq < lag
             {"op": "nudge", "d": [1], "n_eq": 3, "S": 39, "skip": 1}, {"op": "nudge", "d": [1], "n_eq": 3, "S": 40, "skip": 0},
             {"op": "nudge", "d": [1], "n_eq": 3.0, "S": 40, "skip": 1}, {"op": "nudge", "d": [1], "n_eq": True, "S": 40, "skip": 1},
             {"op": "nudge", "d": [1], "n_eq": 3, "S": 40.0, "skip": 1}, {"op": "nudge", "d": [1], "n_eq": 3, "S": 40, "skip": True},
@@ -327,7 +348,6 @@ def test_a04_a_refused_call_changes_nothing(tmp_path):
             {"op": "scan", "ticks": [[400, 400]], **RQ}, {"op": "scan", "ticks": [[True]], **RQ},
             {"op": "scan", "ticks": [[100], [200], [1201]], **RQ},        # the LAST point is illegal: nothing of the scan may run
             {"op": "scan", "ticks": [[100], [200.5], [300]], **RQ},
-            {"op": "scan", "ticks": [[100]], "n_eq": 1, "S": 40, "skip": 1},
         ]
         for msg in bad:
             assert c.ask(msg) == {"op": "nev", "index": i0}, f"{msg!r} was not refused as nev at index {i0}"
@@ -403,6 +423,8 @@ def test_a06_drift_never_reaches_the_needle(tmp_path):
 
 
 def test_a07_the_truth_lives_only_in_the_run_directory(tmp_path):
+    """Plan 1553 (owner ruling 2026-11-16, "Allow mid-move readings"): no line of this test changed. The rows it compares
+    come from `_Model`, whose truth points now carry `sampling` and `dial` (SCHEMA-1553 section 5)."""
     port = _free_port(); env_path, at_path = _write_cfgs(tmp_path, port, WORLD)
     run_dir = tmp_path / "run"
     proc = _wait_bound(_popen("environment.apparatus_server", env_path, at_path, run_dir), port, "apparatus server")
@@ -533,6 +555,8 @@ def test_a10_static_and_lagless_it_is_the_frozen_blind_face(tmp_path):
 
 
 def test_a11_step_and_sine_act_at_the_declared_index(tmp_path):
+    """Plan 1553 (owner ruling 2026-11-16, "Allow mid-move readings"): no line of this test changed. The rows it compares
+    come from `_Model`, whose truth points now carry `sampling` and `dial` (SCHEMA-1553 section 5)."""
     worlds = {
         "step": {**WORLD, "drift": {"target": "L4", "law": "step", "at": 60, "size": 0.05}},
         "sine": {**WORLD, "drift": {"target": "L4", "law": "sine", "amp": 0.04, "period": 37}},

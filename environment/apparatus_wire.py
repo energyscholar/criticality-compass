@@ -1,4 +1,4 @@
-"""Plan 1545: the apparatus face's total op -> reply map (contract/SCHEMA-1545.md section 4). Exactly four ops; everything else
+"""Plan 1545, amended by plan 1553 (contract/SCHEMA-1553.md: mid-move readings, n_eq >= 0 on every op): the apparatus face's total op -> reply map (contract/SCHEMA-1545.md section 4). Exactly four ops; everything else
 is `nev` at the current index. A request is validated WHOLE (keys, types, positions, the horizon) before anything runs: there
 is no clamp, no partial move and no partial scan. The reply builders receive only the public declaration and the measured
 values; the truth row goes to a list that only the server's exit path writes out."""
@@ -81,18 +81,17 @@ def _declare(engine, pub, rows, msg):
     return declared(pub, engine.pos, engine.index)
 
 
-def _measured(positions_of, lagged):
-    """lagged: a commanded move pays the lag, so n_eq must cover it; a read moves nothing."""
+def _measured(positions_of):
+    """plan 1553: any n_eq >= 0 is legal; a move still in transit is the delay line's business, not the door's."""
     def run(engine, pub, rows, msg):
         n_eq, S, skip = msg["n_eq"], msg["S"], msg["skip"]
-        lag = pub.lag if lagged else 0
-        if not (_int(n_eq) and n_eq >= lag and _int(S) and S >= 40 and _int(skip) and skip >= 1):
+        if not (_int(n_eq) and n_eq >= 0 and _int(S) and S >= 40 and _int(skip) and skip >= 1):
             return nev(engine.index)
         positions = positions_of(pub, engine.pos, msg)
         if positions is None or engine.index + len(positions) * (n_eq + S * skip) > pub.horizon:
             return nev(engine.index)
-        points = engine.run(positions, n_eq, S, skip, lag)
-        rows.append(engine.truth_row(len(rows) + 1, msg["op"], points))
+        points, spans = engine.run(positions, n_eq, S, skip)
+        rows.append(engine.truth_row(len(rows) + 1, msg["op"], points, spans))
         return reading(points, engine.index)
     return run
 
@@ -100,9 +99,9 @@ def _measured(positions_of, lagged):
 _COMMON = ("n_eq", "S", "skip")
 _TABLE = {
     "declare": (frozenset({"op"}), _declare),
-    "read": (frozenset({"op", *_COMMON}), _measured(_read_positions, False)),
-    "nudge": (frozenset({"op", "d", *_COMMON}), _measured(_nudge_positions, True)),
-    "scan": (frozenset({"op", "ticks", *_COMMON}), _measured(_scan_positions, True)),
+    "read": (frozenset({"op", *_COMMON}), _measured(_read_positions)),
+    "nudge": (frozenset({"op", "d", *_COMMON}), _measured(_nudge_positions)),
+    "scan": (frozenset({"op", "ticks", *_COMMON}), _measured(_scan_positions)),
 }
 OPS = tuple(_TABLE)
 
