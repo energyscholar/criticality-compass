@@ -200,6 +200,7 @@ SCRIPT = """
     markOn(sec, n);
     refresh();
     if (cur === 0 || still.matches) {
+      if (cur > 0) { bodyOf(sec, cur).hidden = true; }
       to.hidden = false;
       return;
     }
