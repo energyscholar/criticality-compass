@@ -63,7 +63,7 @@ polygon.truth-off{fill:var(--truth)}
 :root.fs-on{overflow:hidden}
 #player.fs-on{position:fixed;inset:0;z-index:1000;overflow:auto;margin:0;padding:8px 16px;background:var(--bg)}
 #player.fs-on svg.frame{--w:min(84%,calc(max(200px,100vh - 446px)*.9375))}
-@media (max-width: 600px){#player.fs-on svg.frame{--w:min(84%,calc(max(200px,100vh - 654px)*.9375))}}
+@media (max-width: 600px){#player.fs-on svg.frame{--w:min(84%,calc(max(180px,100vh - 674px)*.9375))}}
 @media (prefers-reduced-motion: reduce){*{transition:none !important;animation:none !important;scroll-behavior:auto !important}}
 """
 

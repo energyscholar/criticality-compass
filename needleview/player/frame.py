@@ -258,13 +258,18 @@ def _head(e):
     return _tag("div", NAV, [("class", "head"), ("data-ev", "run"), ("data-run", str(e.run))], nav + system)
 
 
+def _round_tip(n):
+    return (f"Show round {n} of this run.\nA round is one sweep of the needle: it measures the System at a row of dial settings, "
+            "then narrows to the range it will search next. Round 1 is the widest sweep, and later rounds are narrower.")
+
+
 def _round(e, earlier):
     r = e.rnd
     rounds = [x.rnd for x in earlier if isinstance(x, RoundEv)] + [r]
     g0, g1 = rounds[0].grid[0], rounds[0].grid[-1]
     spans = [(g0, g1)] + [(x.lo, x.hi) for x in rounds]
     system = earlier[0].system
-    button = _tag("button", NAV, [("class", "rnd"), ("type", "button"), ("data-round", str(r.round))], str(r.round))
+    button = _tag("button", NAV, [("class", "rnd"), ("type", "button"), ("data-round", str(r.round)), ("title", _round_tip(r.round))], str(r.round))
     body = _tag("div", NAV, [("class", "body"), ("hidden", None)],
                 _frame(r, system, g0, g1, spans) + _row(NAV, "verdict", "not-reported", LATER))
     return _tag("div", NAV, [("class", "round"), ("data-ev", "round"), ("data-run", str(e.run)), ("data-round", str(r.round)),
