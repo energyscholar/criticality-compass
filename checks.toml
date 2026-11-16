@@ -43,7 +43,7 @@ test_infrastructure = ["tests/lib.py", "cc/intake_synth.py", "tests/test_chain_1
 methods = ["cc/detect.py"]
 tests = [
   "contract/test_needleview_reader.py", "contract/test_needleview_page.py", "contract/test_needleview_blind.py",   # plan 1529
-  "contract/test_needleplayer_stream.py",   # plan 1531
+  "contract/test_needleplayer_stream.py", "contract/test_needleplayer_page.py", "contract/test_needleplayer_blind.py",   # plan 1531
   "contract/test_blind_system_conformance.py", "contract/test_narrow_unit.py", "contract/test_blind_navigator_conformance.py",   # plan 1525
   "contract/test_system_conformance.py", "contract/test_navigator_conformance.py",   # plan 1518: the two frozen Stage-2 acceptance tests (probe op + margin-batched-v0)
   "tests/frozen.py", "tests/test_bench.py", "tests/test_claims.py",   # plan 1427: declared so the plan may edit and run them
