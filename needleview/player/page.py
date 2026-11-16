@@ -49,7 +49,13 @@ def render(stream):
                 '<button id="play" type="button" aria-label="play" aria-pressed="false">play</button>'
                 '<button id="next" type="button" aria-label="next round">&#9654;</button>'
                 '<input id="scrub" type="range" min="1" step="1" aria-label="round" />'
-                '<output id="pos">no rounds</output>')
+                '<output id="pos">no rounds</output>'
+                '<span>slow</span>'
+                '<input id="speed" type="range" min="0.25" max="4" step="0.25" value="1" aria-label="speed" />'
+                '<span>fast</span>'
+                '<label><input id="loop" type="checkbox" aria-label="loop" />loop</label>'
+                '<label><input id="all" type="checkbox" aria-label="play all" />play all</label>'
+                '<button id="full" type="button" aria-label="full screen" aria-pressed="false"><span class="ico"></span></button>')
     return "".join([
         "<!doctype html>\n",
         '<html lang="en"><head><meta charset="utf-8">',

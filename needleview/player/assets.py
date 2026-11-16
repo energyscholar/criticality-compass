@@ -55,6 +55,14 @@ circle.g{stroke-width:1.2}
 circle.g.l0{fill:var(--g0);stroke:var(--g0)}circle.g.l1{fill:none;stroke:var(--g1)}circle.g.l2{fill:var(--mute);stroke:var(--mute)}
 line.truth{stroke:var(--truth);stroke-width:1.5;stroke-dasharray:4 2}
 polygon.truth-off{fill:var(--truth)}
+#speed{flex:0 1 90px;min-width:60px}
+.controls label{display:inline-flex;align-items:center;gap:4px}
+#full{padding:4px 8px}
+#full .ico{display:inline-block;width:14px;height:14px;vertical-align:middle;background:linear-gradient(currentColor,currentColor) left top/5px 2px no-repeat,linear-gradient(currentColor,currentColor) left top/2px 5px no-repeat,linear-gradient(currentColor,currentColor) right top/5px 2px no-repeat,linear-gradient(currentColor,currentColor) right top/2px 5px no-repeat,linear-gradient(currentColor,currentColor) left bottom/5px 2px no-repeat,linear-gradient(currentColor,currentColor) left bottom/2px 5px no-repeat,linear-gradient(currentColor,currentColor) right bottom/5px 2px no-repeat,linear-gradient(currentColor,currentColor) right bottom/2px 5px no-repeat}
+:root.fs-on{overflow:hidden}
+#player.fs-on{position:fixed;inset:0;z-index:1000;overflow:auto;margin:0;padding:8px 16px;background:var(--bg)}
+#player.fs-on svg.frame{width:100%;max-width:none;height:calc(100vh - 430px);min-height:200px}
+@media (max-width: 600px){#player.fs-on svg.frame{height:calc(100vh - 640px)}}
 @media (prefers-reduced-motion: reduce){*{transition:none !important;animation:none !important;scroll-behavior:auto !important}}
 """
 
@@ -68,6 +76,11 @@ SCRIPT = """
   var nextB = document.getElementById('next');
   var scrub = document.getElementById('scrub');
   var pos = document.getElementById('pos');
+  var speed = document.getElementById('speed');
+  var loopBox = document.getElementById('loop');
+  var allBox = document.getElementById('all');
+  var fullBtn = document.getElementById('full');
+  var rootEl = document.documentElement;
   var stepMs = parseFloat(player.getAttribute('data-step-ms'));
   var playMs = parseFloat(player.getAttribute('data-play-ms'));
   var still = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -75,6 +88,7 @@ SCRIPT = """
   var pending = null;
   var playing = false;
   var clock = null;
+  var fsOn = false;
 
   function all(root, selector) {
     return root.querySelectorAll(selector);
@@ -98,6 +112,10 @@ SCRIPT = """
     return 0;
   }
 
+  function pace() {
+    return parseFloat(speed.value);
+  }
+
   function refresh() {
     var sec = shownRun();
     var n = 0;
@@ -110,7 +128,7 @@ SCRIPT = """
       scrub.disabled = true;
       prevB.disabled = true;
       nextB.disabled = true;
-      playB.disabled = true;
+      playB.disabled = !allBox.checked;
       pos.textContent = 'no rounds';
       return;
     }
@@ -140,6 +158,8 @@ SCRIPT = """
     if (!p) { return; }
     pending = null;
     p.clone.parentNode.removeChild(p.clone);
+    p.fromSvg.removeAttribute('hidden');
+    p.from.hidden = true;
     p.to.hidden = false;
   }
 
@@ -185,6 +205,7 @@ SCRIPT = """
     var rounds;
     var cur;
     var from;
+    var fromSvg;
     var to;
     var clone;
     var moves;
@@ -205,11 +226,12 @@ SCRIPT = """
       return;
     }
     from = bodyOf(sec, cur);
-    clone = from.querySelector('svg').cloneNode(true);
+    fromSvg = from.querySelector('svg');
+    clone = fromSvg.cloneNode(true);
     moves = pairs(clone, to.querySelector('svg'));
-    from.parentNode.insertBefore(clone, from);
-    from.hidden = true;
-    mine = { clone: clone, to: to };
+    fromSvg.parentNode.insertBefore(clone, fromSvg);
+    fromSvg.setAttribute('hidden', '');
+    mine = { clone: clone, to: to, from: from, fromSvg: fromSvg };
     pending = mine;
     function frame(ts) {
       var t;
@@ -217,7 +239,7 @@ SCRIPT = """
       var e;
       if (pending !== mine) { return; }
       if (started === null) { started = ts; }
-      t = (ts - started) / stepMs;
+      t = (ts - started) * pace() / stepMs;
       if (t >= 1) { settle(); return; }
       e = ease(t);
       for (k = 0; k < moves.length; k = k + 1) {
@@ -233,7 +255,6 @@ SCRIPT = """
     var bodies = all(stage, 'div.body');
     var btns = all(stage, 'button.rnd');
     var i;
-    stopPlay();
     settle();
     for (i = 0; i < secs.length; i = i + 1) { secs[i].hidden = secs[i] !== sec; }
     for (i = 0; i < bodies.length; i = i + 1) { bodies[i].hidden = true; }
@@ -254,7 +275,7 @@ SCRIPT = """
     showRun(null);
   }
 
-  function chooseWorld() {
+  function chooseWorld(first) {
     var selects = all(player, 'select.pick-run');
     var chosen = null;
     var i;
@@ -262,29 +283,71 @@ SCRIPT = """
       selects[i].hidden = selects[i].getAttribute('data-world') !== pickWorld.value;
       if (!selects[i].hidden) { chosen = selects[i]; }
     }
-    if (chosen) { chooseRun(chosen); } else { showRun(null); }
+    if (chosen) {
+      if (first) { chosen.selectedIndex = 0; }
+      chooseRun(chosen);
+    } else { showRun(null); }
+  }
+
+  function shownSelect() {
+    var selects = all(player, 'select.pick-run');
+    var i;
+    for (i = 0; i < selects.length; i = i + 1) {
+      if (!selects[i].hidden) { return selects[i]; }
+    }
+    return null;
+  }
+
+  function nextRun() {
+    var sel = shownSelect();
+    if (!sel) { return false; }
+    if (sel.selectedIndex + 1 < sel.options.length) {
+      sel.selectedIndex = sel.selectedIndex + 1;
+      chooseRun(sel);
+      return true;
+    }
+    if (pickWorld.selectedIndex + 1 < pickWorld.options.length) {
+      pickWorld.selectedIndex = pickWorld.selectedIndex + 1;
+      chooseWorld(true);
+      return true;
+    }
+    if (loopBox.checked) {
+      pickWorld.selectedIndex = 0;
+      chooseWorld(true);
+      return true;
+    }
+    return false;
   }
 
   function loop(ts) {
     var sec;
     var cur;
+    var n;
     if (!playing) { return; }
     if (clock === null) { clock = ts; }
-    if (ts - clock >= playMs) {
+    if ((ts - clock) * pace() >= playMs) {
       clock = ts;
       sec = shownRun();
       cur = sec ? currentRound(sec) : 0;
-      goTo(cur + 1);
-      if (!sec || cur + 1 >= all(sec, 'div.round').length) { stopPlay(); return; }
+      n = sec ? all(sec, 'div.round').length : 0;
+      if (cur < n) {
+        goTo(cur + 1);
+        if (cur + 1 >= n && !loopBox.checked && !allBox.checked) { stopPlay(); return; }
+      } else if (allBox.checked) {
+        if (!nextRun()) { stopPlay(); return; }
+      } else if (loopBox.checked && n > 0) {
+        goTo(1);
+      } else { stopPlay(); return; }
     }
     window.requestAnimationFrame(loop);
   }
 
   function togglePlay() {
     var sec = shownRun();
+    var n = sec ? all(sec, 'div.round').length : 0;
     if (playing) { stopPlay(); return; }
-    if (!sec || all(sec, 'div.round').length === 0) { return; }
-    if (currentRound(sec) >= all(sec, 'div.round').length) { goTo(1); }
+    if (!sec || (n === 0 && !allBox.checked)) { return; }
+    if (n > 0 && currentRound(sec) >= n) { goTo(1); }
     playing = true;
     clock = null;
     playB.textContent = 'pause';
@@ -297,9 +360,55 @@ SCRIPT = """
     if (sec) { goTo(currentRound(sec) + by); }
   }
 
+  function setFull(on) {
+    fsOn = on;
+    if (on) {
+      player.classList.add('fs-on');
+      rootEl.classList.add('fs-on');
+    } else {
+      player.classList.remove('fs-on');
+      rootEl.classList.remove('fs-on');
+    }
+    fullBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  }
+
+  function quietly(promise) {
+    if (promise && promise.then) { promise.then(null, function () {}); }
+  }
+
+  function leaveBrowserFull() {
+    if (document.fullscreenElement && document.exitFullscreen) {
+      try { quietly(document.exitFullscreen()); } catch (err) { }
+    }
+  }
+
+  function enterFull() {
+    setFull(true);
+    if (player.requestFullscreen) {
+      try { quietly(player.requestFullscreen()); } catch (err) { }
+    }
+  }
+
+  function leaveFull() {
+    if (!fsOn) { return; }
+    setFull(false);
+    leaveBrowserFull();
+  }
+
+  fullBtn.addEventListener('click', function () {
+    if (fsOn) { leaveFull(); } else { enterFull(); }
+  });
+  document.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Escape') { leaveFull(); }
+  });
+  document.addEventListener('fullscreenchange', function () {
+    if (!document.fullscreenElement) { leaveFull(); } else if (!fsOn) { leaveBrowserFull(); }
+  });
+
   player.addEventListener('change', function (ev) {
-    if (ev.target === pickWorld) { chooseWorld(); }
-    if (ev.target.classList.contains('pick-run')) { chooseRun(ev.target); }
+    if (ev.target === pickWorld) { stopPlay(); chooseWorld(); }
+    if (ev.target.classList.contains('pick-run')) { stopPlay(); chooseRun(ev.target); }
+    if (ev.target === allBox) { refresh(); }
   });
   prevB.addEventListener('click', function () { stopPlay(); step(-1); });
   nextB.addEventListener('click', function () { stopPlay(); step(1); });

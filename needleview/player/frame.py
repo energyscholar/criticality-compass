@@ -98,7 +98,7 @@ def _tick_marks(r, x0, x1):
 def _plot_labels(name, dom, top, height):
     lo, hi = dom
     return [_shape("rect", NAV, [("class", "box"), ("x", "40.00"), ("y", _px(top)), ("width", "240.00"), ("height", _px(height))]),
-            _tag("text", NAV, [("x", "2.00"), ("y", _px(top + 8))], name),
+            _tag("text", NAV, [("class", "plot-name"), ("x", "284.00"), ("y", _px(top + 8))], name),
             _tag("text", NAV, [("x", "38.00"), ("y", _px(top + 8)), ("text-anchor", "end")], _n(hi)),
             _tag("text", NAV, [("x", "38.00"), ("y", _px(top + height)), ("text-anchor", "end")], _n(lo))]
 
