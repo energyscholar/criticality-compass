@@ -1,0 +1,282 @@
+# Plan 1561: the drift-world ladders (contract/SCHEMA-1561.md section 3.3). Each rung is the base world with a few keys
+# replaced; the world door (apparatus_config.parse_world) judges every one, and refuses, never clamps, a rung that leaves the domain.
+base = "at-apparatus.toml"
+
+# L4 0.14 falling to 0.08: UP the dial
+[[ladder]]
+name = "ramp"
+
+[[ladder.rungs]]
+label = "x1"
+severity = 1.0
+horizon = 210000
+hidden = {L4 = 0.14}
+drift = {target = "L4", law = "ramp-then-rest", at = 20000, rate = -4e-7, span = 150000}
+
+[[ladder.rungs]]
+label = "x2"
+severity = 2.0
+horizon = 135000
+hidden = {L4 = 0.14}
+drift = {target = "L4", law = "ramp-then-rest", at = 20000, rate = -8e-7, span = 75000}
+
+[[ladder.rungs]]
+label = "x3"
+severity = 3.0
+horizon = 110000
+hidden = {L4 = 0.14}
+drift = {target = "L4", law = "ramp-then-rest", at = 20000, rate = -1.2e-6, span = 50000}
+
+[[ladder.rungs]]
+label = "x4"
+severity = 4.0
+horizon = 97500
+hidden = {L4 = 0.14}
+drift = {target = "L4", law = "ramp-then-rest", at = 20000, rate = -1.6e-6, span = 37500}
+
+[[ladder.rungs]]
+label = "x6"
+severity = 6.0
+horizon = 85000
+hidden = {L4 = 0.14}
+drift = {target = "L4", law = "ramp-then-rest", at = 20000, rate = -2.4e-6, span = 25000}
+
+[[ladder.rungs]]
+label = "x8"
+severity = 8.0
+horizon = 78750
+hidden = {L4 = 0.14}
+drift = {target = "L4", law = "ramp-then-rest", at = 20000, rate = -3.2e-6, span = 18750}
+
+[[ladder.rungs]]
+label = "x12"
+severity = 12.0
+horizon = 72500
+hidden = {L4 = 0.14}
+drift = {target = "L4", law = "ramp-then-rest", at = 20000, rate = -4.8e-6, span = 12500}
+
+# L4 0.08 rising to 0.14: DOWN the dial, the same span
+[[ladder]]
+name = "ramp-reversed"
+
+[[ladder.rungs]]
+label = "x1"
+severity = 1.0
+horizon = 210000
+hidden = {L4 = 0.08}
+drift = {target = "L4", law = "ramp-then-rest", at = 20000, rate = 4e-7, span = 150000}
+
+[[ladder.rungs]]
+label = "x2"
+severity = 2.0
+horizon = 135000
+hidden = {L4 = 0.08}
+drift = {target = "L4", law = "ramp-then-rest", at = 20000, rate = 8e-7, span = 75000}
+
+[[ladder.rungs]]
+label = "x3"
+severity = 3.0
+horizon = 110000
+hidden = {L4 = 0.08}
+drift = {target = "L4", law = "ramp-then-rest", at = 20000, rate = 1.2e-6, span = 50000}
+
+[[ladder.rungs]]
+label = "x4"
+severity = 4.0
+horizon = 97500
+hidden = {L4 = 0.08}
+drift = {target = "L4", law = "ramp-then-rest", at = 20000, rate = 1.6e-6, span = 37500}
+
+[[ladder.rungs]]
+label = "x6"
+severity = 6.0
+horizon = 85000
+hidden = {L4 = 0.08}
+drift = {target = "L4", law = "ramp-then-rest", at = 20000, rate = 2.4e-6, span = 25000}
+
+[[ladder.rungs]]
+label = "x8"
+severity = 8.0
+horizon = 78750
+hidden = {L4 = 0.08}
+drift = {target = "L4", law = "ramp-then-rest", at = 20000, rate = 3.2e-6, span = 18750}
+
+[[ladder.rungs]]
+label = "x12"
+severity = 12.0
+horizon = 72500
+hidden = {L4 = 0.08}
+drift = {target = "L4", law = "ramp-then-rest", at = 20000, rate = 4.8e-6, span = 12500}
+
+# the narrow dial: the crossing passes T - g mid-run
+[[ladder]]
+name = "ramp-edge"
+
+[[ladder.rungs]]
+label = "x1"
+severity = 1.0
+horizon = 210000
+hidden = {L4 = 0.14}
+drift = {target = "L4", law = "ramp-then-rest", at = 20000, rate = -4e-7, span = 150000}
+dials = [{name = "K", lo = 0.2, hi = 0.375, T = 700, max_nudge = 32, start = 0}]
+
+[[ladder]]
+name = "sine"
+
+[[ladder.rungs]]
+label = "P800000"
+severity = 1.0
+horizon = 150000
+hidden = {L4 = 0.10}
+drift = {target = "L4", law = "sine", amp = 0.04, period = 800000}
+
+[[ladder.rungs]]
+label = "P400000"
+severity = 2.0
+horizon = 150000
+hidden = {L4 = 0.10}
+drift = {target = "L4", law = "sine", amp = 0.04, period = 400000}
+
+[[ladder.rungs]]
+label = "P200000"
+severity = 4.0
+horizon = 150000
+hidden = {L4 = 0.10}
+drift = {target = "L4", law = "sine", amp = 0.04, period = 200000}
+
+[[ladder.rungs]]
+label = "P100000"
+severity = 8.0
+horizon = 150000
+hidden = {L4 = 0.10}
+drift = {target = "L4", law = "sine", amp = 0.04, period = 100000}
+
+[[ladder.rungs]]
+label = "P50000"
+severity = 16.0
+horizon = 150000
+hidden = {L4 = 0.10}
+drift = {target = "L4", law = "sine", amp = 0.04, period = 50000}
+
+[[ladder]]
+name = "step"
+
+[[ladder.rungs]]
+label = "J4"
+severity = 1.0
+horizon = 100000
+hidden = {L4 = 0.10}
+drift = {target = "L4", law = "step", at = 40000, size = -0.004}
+
+[[ladder.rungs]]
+label = "J8"
+severity = 2.0
+horizon = 100000
+hidden = {L4 = 0.10}
+drift = {target = "L4", law = "step", at = 40000, size = -0.008}
+
+[[ladder.rungs]]
+label = "J12"
+severity = 3.0
+horizon = 100000
+hidden = {L4 = 0.10}
+drift = {target = "L4", law = "step", at = 40000, size = -0.012}
+
+[[ladder.rungs]]
+label = "J16"
+severity = 4.0
+horizon = 100000
+hidden = {L4 = 0.10}
+drift = {target = "L4", law = "step", at = 40000, size = -0.016}
+
+[[ladder.rungs]]
+label = "J24"
+severity = 6.0
+horizon = 100000
+hidden = {L4 = 0.10}
+drift = {target = "L4", law = "step", at = 40000, size = -0.024}
+
+[[ladder.rungs]]
+label = "J40"
+severity = 10.0
+horizon = 100000
+hidden = {L4 = 0.10}
+drift = {target = "L4", law = "step", at = 40000, size = -0.04}
+
+[[ladder]]
+name = "step-reversed"
+
+[[ladder.rungs]]
+label = "J8"
+severity = 2.0
+horizon = 100000
+hidden = {L4 = 0.10}
+drift = {target = "L4", law = "step", at = 40000, size = 0.008}
+
+[[ladder.rungs]]
+label = "J12"
+severity = 3.0
+horizon = 100000
+hidden = {L4 = 0.10}
+drift = {target = "L4", law = "step", at = 40000, size = 0.012}
+
+[[ladder.rungs]]
+label = "J16"
+severity = 4.0
+horizon = 100000
+hidden = {L4 = 0.10}
+drift = {target = "L4", law = "step", at = 40000, size = 0.016}
+
+[[ladder.rungs]]
+label = "J24"
+severity = 6.0
+horizon = 100000
+hidden = {L4 = 0.10}
+drift = {target = "L4", law = "step", at = 40000, size = 0.024}
+
+# seed 1561 is the plan number; its path is the same for every run seed
+[[ladder]]
+name = "walk"
+
+[[ladder.rungs]]
+label = "e20000"
+severity = 1.0
+horizon = 250000
+hidden = {L4 = 0.10}
+drift = {target = "L4", law = "walk", at = 20000, seed = 1561, every = 20000, stride = 0.008, knots = 10}
+
+[[ladder.rungs]]
+label = "e10000"
+severity = 2.0
+horizon = 150000
+hidden = {L4 = 0.10}
+drift = {target = "L4", law = "walk", at = 20000, seed = 1561, every = 10000, stride = 0.008, knots = 10}
+
+[[ladder.rungs]]
+label = "e6000"
+severity = 3.3333333333333335
+horizon = 110000
+hidden = {L4 = 0.10}
+drift = {target = "L4", law = "walk", at = 20000, seed = 1561, every = 6000, stride = 0.008, knots = 10}
+
+[[ladder.rungs]]
+label = "e4000"
+severity = 5.0
+horizon = 90000
+hidden = {L4 = 0.10}
+drift = {target = "L4", law = "walk", at = 20000, seed = 1561, every = 4000, stride = 0.008, knots = 10}
+
+[[ladder.rungs]]
+label = "e2500"
+severity = 8.0
+horizon = 75000
+hidden = {L4 = 0.10}
+drift = {target = "L4", law = "walk", at = 20000, seed = 1561, every = 2500, stride = 0.008, knots = 10}
+
+[[ladder.rungs]]
+label = "e1500"
+severity = 13.333333333333334
+horizon = 65000
+hidden = {L4 = 0.10}
+drift = {target = "L4", law = "walk", at = 20000, seed = 1561, every = 1500, stride = 0.008, knots = 10}
+
