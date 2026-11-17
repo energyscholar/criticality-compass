@@ -1,0 +1,70 @@
+# Plan 1558 setpoint needle settings, declared before data. SETTLED, FEEDBACK ON, sigma = 1.5 g on the declared safe side.
+needle_structure = "hold-setpoint-v1"
+ops = ["declare", "scan", "nudge"]
+g = 12
+step = 6
+n_eq = 450
+S = 500
+skip = 1
+z = 2.0
+sigma = 1.5   # a MEMBER of [dead_band].admissible (the type), never a free number
+lost = 3
+
+[ignite]
+steps = [100, 20]
+S = 100
+margin = 1
+n_eq = 450
+
+[approach]
+S = 40
+n_eq = 48
+
+[park]
+S = 500
+n_eq = 450
+
+[M]
+observable = "D"
+node = "one reading of the observable: its value at one dial tick, over the window and at the index the wire reports"
+relation = "path"
+edge = "from each reading of a drop to the reading the wire served just before it"
+direction = "the wire's index: the source is the later reading, so the difference is current minus prior"
+provenance = "steering (declared under the Origin's ruling, pending kernel revision)"
+transform = "none"
+rho_base = "not-declared"
+chi_0 = "not-declared"
+
+[dead_band]   # THE BAND ROW of this geometry: measured at these cells, refused at any other; `admissible` is the setpoint's type
+ticks = 13
+S = 500
+n_eq = 450
+z = 2.0
+g = 12
+step = 6
+park = { S = 500, n_eq = 450 }
+admissible = [1.5, 2]
+
+[dead_band.about]   # the type's description (SCHEMA-1558 2.3), written by the band writer: every surface renders this, nothing else
+meaning = "the setpoint: an UNSIGNED offset from the critical crossing; the needle parks the dial that far on the dial's declared SAFE side (away from its ordered_side) after every hold pair"
+units = "sigma, in pair half-widths g"
+conversion = { ticks = "sigma * g", g_ticks = 12, knob_per_tick = "(hi - lo) / T of the System's declared dial (the System's, read at run time: the reader's sigma().value)" }
+band = { ticks = 13, p95_max = 12.466508557340148, laws = ["ramp", "ramp-reversed", "sine", "walk"], bound_to = ["S", "n_eq", "z", "g", "step", "park"], promise = "per-run p95 of |park - edge - sigma*g| <= ticks on every HELD run of the laws, at the geometry bound_to names (this row's own cells); a member is band-measured and sigma*g is strictly outside the band" }
+cost = { unit = "sweeps per cycle, an upper bound (SCHEMA-1558 4.4): the precision-lag trade", max_nudge = 32, skip = 1, approach = { S = 40, n_eq = 48 } }
+provenance = { sha256 = "1b3ea87c823bfefee3c7e7767b28c36056000e1cae9e859e47ac5c6f4d44b4ba" }
+
+[[dead_band.about.members]]
+sigma = 1.5
+ticks = 18
+cycle = { plus = 2938, minus = 2850 }
+domain = ["ramp/forward/x1", "ramp-reversed/reversed/x1", "sine/reversed/P800000", "sine/reversed/P400000", "walk/reversed/e20000"]
+out = ["ramp/forward/x2", "walk/reversed/e10000"]
+label = "sigma 1.5 g = 18 ticks from the crossing, on the safe side; band 13 ticks; cycle <= 2938 sweeps on a + dial, 2850 on a - dial; held on 5 cells, out of its domain on: ramp/forward/x2, walk/reversed/e10000"
+
+[[dead_band.about.members]]
+sigma = 2
+ticks = 24
+cycle = { plus = 2938, minus = 2938 }
+domain = ["ramp/forward/x1", "ramp-reversed/reversed/x1", "sine/reversed/P800000", "sine/reversed/P400000", "walk/reversed/e20000"]
+out = ["ramp/forward/x2", "walk/reversed/e10000"]
+label = "sigma 2 g = 24 ticks from the crossing, on the safe side; band 13 ticks; cycle <= 2938 sweeps on a + dial, 2938 on a - dial; held on 5 cells, out of its domain on: ramp/forward/x2, walk/reversed/e10000"

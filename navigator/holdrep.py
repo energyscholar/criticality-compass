@@ -6,10 +6,17 @@ from navigator import report2 as P
 from navigator import steer as ST
 
 
+def sigma(settings):
+    """the start record's sigma, by shape: plan 1552's zero offset, or the setpoint with its ticks and its dead band."""
+    one = {"offset": settings["sigma"], "unit": ST.SIGMA_UNIT, "measured": "pair-half-width"}
+    return {HT.NEEDLE: lambda: one, HT.SETPOINT: lambda: {**one, "ticks": HT.offset(settings["sigma"], settings["g"]),
+                                                          "dead_band": settings["dead_band"]}}[settings["needle_structure"]]()
+
+
 def start(settings, ops, dial_name, fields):
-    return {"rec": "start", "schema": P.SCHEMA, "needle": HT.NEEDLE, "settings": settings,
+    return {"rec": "start", "schema": P.SCHEMA, "needle": settings["needle_structure"], "settings": settings,
             "mode": {"ops": list(ops), "feedback": ST.mode_of(ops)},
-            "sigma": {"offset": 0, "unit": ST.SIGMA_UNIT, "measured": "pair-half-width"},
+            "sigma": sigma(settings),
             "dials": [dial_name], "belief": P.belief(fields), "declared_other": P.declared_other(fields)}
 
 
@@ -28,7 +35,7 @@ def common(segment, rs):
 
 def step(n, phase, index, evaluated, verdict_, payload):
     return {"rec": "step", "step": n, "phase": phase, "index": index, "evaluated": evaluated, "verdict": verdict_,
-            HT.PAYLOAD[phase]: payload}
+            HT.PHASE_PAYLOAD[phase]: payload}
 
 
 def outcome(kind, reason, steps):
@@ -36,8 +43,8 @@ def outcome(kind, reason, steps):
             "steps": steps}
 
 
-def head(drop, dial, start_at, clock, n_eq, skip, roles, rule, m):
-    return {"rec": "head", "map": HT.MAP, "drop": drop, "needle": HT.NEEDLE, "dial": dial, "start": start_at, "clock": clock,
+def head(drop, dial, start_at, clock, n_eq, skip, roles, rule, m, needle=HT.NEEDLE):
+    return {"rec": "head", "map": HT.MAP, "drop": drop, "needle": needle, "dial": dial, "start": start_at, "clock": clock,
             "n_eq": n_eq, "skip": skip, "roles": roles, "sign_rule": rule, "M": m}
 
 

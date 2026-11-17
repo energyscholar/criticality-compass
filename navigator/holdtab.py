@@ -110,3 +110,55 @@ def kernel_next(prior, x):
     a = x - prior[0] if prior else NO_PREDECESSOR
     b = a + sum(prior[1:]) if prior else NO_PREDECESSOR
     return a, b, (x, a) if prior else (x,)
+
+
+# ---------------------------------------------------------------- plan 1558: the setpoint shape `hold-setpoint-v1` (contract/SCHEMA-1558.md 4.1)
+SETPOINT = "hold-setpoint-v1"
+SHAPES = (NEEDLE, SETPOINT)
+SAFE = {"+": -1, "-": 1}                     # the dial's ordered side -> the tick direction of its SAFE side (away from the ordered side)
+PHASE_PAYLOAD = {**PAYLOAD, "walk": "leg", "park": "park"}
+PHASES = {NEEDLE: tuple(PAYLOAD), SETPOINT: tuple(PHASE_PAYLOAD)}
+SETTLE = {"ignite": lambda c: c["ignite"], "approach": lambda c: c["approach"], "hold": lambda c: c,
+          "walk": lambda c: c["approach"], "park": lambda c: c["park"]}     # the settings a phase reads at
+PARKS = {NEEDLE: (), SETPOINT: ("park",)}
+PAIR_SETTLED = {NEEDLE: False, SETPOINT: True}   # the shape must read its hold pair settled (SCHEMA-1558 3 row 2)
+BAND_GEOMETRY = ("S", "n_eq", "z", "g", "step", "park")   # what a declared dead band is bound to
+ABOUT = ("meaning", "units", "conversion", "band", "cost", "provenance", "members")   # the fields of the type's description
+
+
+def sigma_ticks(sigma, g):
+    """sigma*g EXACTLY as (numerator, denominator): sigma is read as the decimal its shortest repr writes (finite sigma only)."""
+    mant, _, exp = repr(sigma).partition("e")
+    whole, _, frac = mant.partition(".")
+    n, d = int(whole + frac) * g, 10 ** len(frac)
+    e = int(exp or 0)
+    return n * 10 ** max(e, 0), d * 10 ** max(-e, 0)
+
+
+def offset(sigma, g):
+    """the whole ticks of sigma*g (whole by parse B)."""
+    n, d = sigma_ticks(sigma, g)
+    return n // d
+
+
+def setpoint(centre, off, side):
+    return centre + SAFE[side] * off
+
+
+def reach(g, off, side):
+    """(ticks the hold needs below its centre, ticks above it): the setpoint's `off` on the safe side, `g` on the other."""
+    return {"+": (max(g, off), g), "-": (g, max(g, off))}[side]
+
+
+def placed_at(kind, c, below, above, T):
+    return ("range-low", kind, "range-high")[1 + (c > T - above) - (c < below)]
+
+
+def hold_kind_at(cls, view, mode, centre, step, below, above, T):
+    call = CALL[tuple(view[c] for c in cls)]
+    kind = placed_at(call, centre + APPLIED[mode] * DIRECTION[call] * step, below, above, T)
+    return kind, APPLIED[mode] * DIRECTION[kind] * step
+
+
+def ignite_kind_at(br, below, above, T):
+    return {0: "no-bracket", 2: placed_at("bracketed", sum(br) // 2, below, above, T)}[len(br)]

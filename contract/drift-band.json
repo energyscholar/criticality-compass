@@ -1,0 +1,920 @@
+{
+ "absent": {
+  "ramp": [],
+  "sine": [
+   "forward"
+  ],
+  "step": [],
+  "walk": [
+   "forward"
+  ]
+ },
+ "declared_band_ticks": 15,
+ "domain": [
+  "ramp",
+  "ramp-reversed",
+  "sine",
+  "walk"
+ ],
+ "excluded": {
+  "ramp-reversed/x12": "ALL-BROKEN",
+  "ramp-reversed/x2": "MIXED",
+  "ramp-reversed/x3": "ALL-BROKEN",
+  "ramp-reversed/x4": "ALL-BROKEN",
+  "ramp-reversed/x6": "ALL-BROKEN",
+  "ramp-reversed/x8": "ALL-BROKEN",
+  "ramp/x12": "ALL-BROKEN",
+  "ramp/x3": "MIXED",
+  "ramp/x4": "ALL-BROKEN",
+  "ramp/x6": "ALL-BROKEN",
+  "ramp/x8": "ALL-BROKEN",
+  "sine/P100000": "ALL-BROKEN",
+  "sine/P200000": "MIXED",
+  "sine/P50000": "ALL-BROKEN",
+  "step-reversed/J12": "MIXED",
+  "step-reversed/J16": "ALL-BROKEN",
+  "step-reversed/J24": "ALL-BROKEN",
+  "step/J16": "ALL-BROKEN",
+  "step/J24": "ALL-BROKEN",
+  "step/J40": "ALL-BROKEN",
+  "walk/e1500": "ALL-BROKEN",
+  "walk/e2500": "ALL-BROKEN",
+  "walk/e4000": "ALL-BROKEN",
+  "walk/e6000": "ALL-BROKEN"
+ },
+ "geometry": {
+  "S": 500,
+  "g": 12,
+  "n_eq": 450,
+  "park": {
+   "S": 500,
+   "n_eq": 450
+  },
+  "step": 6,
+  "z": 2.0
+ },
+ "locks": {
+  "ramp--x1--SET--s210": "HELD",
+  "ramp--x1--SET--s211": "HELD",
+  "ramp--x1--SET--s212": "HELD",
+  "ramp--x1--SP15--s210": "HELD",
+  "ramp--x1--SP15--s211": "HELD",
+  "ramp--x1--SP15--s212": "HELD",
+  "ramp--x1--SP2--s210": "HELD",
+  "ramp--x1--SP2--s211": "HELD",
+  "ramp--x1--SP2--s212": "HELD",
+  "ramp--x2--SET--s210": "HELD",
+  "ramp--x2--SET--s211": "HELD",
+  "ramp--x2--SET--s212": "HELD",
+  "ramp--x2--SP15--s210": "RECOVERED",
+  "ramp--x2--SP15--s211": "HELD",
+  "ramp--x2--SP15--s212": "RECOVERED",
+  "ramp--x2--SP2--s210": "HELD",
+  "ramp--x2--SP2--s211": "RECOVERED",
+  "ramp--x2--SP2--s212": "RECOVERED",
+  "ramp-reversed--x1--SET--s210": "HELD",
+  "ramp-reversed--x1--SET--s211": "HELD",
+  "ramp-reversed--x1--SET--s212": "HELD",
+  "ramp-reversed--x1--SP15--s210": "HELD",
+  "ramp-reversed--x1--SP15--s211": "HELD",
+  "ramp-reversed--x1--SP15--s212": "HELD",
+  "ramp-reversed--x1--SP2--s210": "HELD",
+  "ramp-reversed--x1--SP2--s211": "HELD",
+  "ramp-reversed--x1--SP2--s212": "HELD",
+  "sine--P400000--SET--s210": "HELD",
+  "sine--P400000--SET--s211": "HELD",
+  "sine--P400000--SET--s212": "HELD",
+  "sine--P400000--SP15--s210": "HELD",
+  "sine--P400000--SP15--s211": "HELD",
+  "sine--P400000--SP15--s212": "HELD",
+  "sine--P400000--SP2--s210": "HELD",
+  "sine--P400000--SP2--s211": "HELD",
+  "sine--P400000--SP2--s212": "HELD",
+  "sine--P800000--SET--s210": "HELD",
+  "sine--P800000--SET--s211": "HELD",
+  "sine--P800000--SET--s212": "HELD",
+  "sine--P800000--SP15--s210": "HELD",
+  "sine--P800000--SP15--s211": "HELD",
+  "sine--P800000--SP15--s212": "HELD",
+  "sine--P800000--SP2--s210": "HELD",
+  "sine--P800000--SP2--s211": "HELD",
+  "sine--P800000--SP2--s212": "HELD",
+  "step--J12--SET--s210": "HELD",
+  "step--J12--SET--s211": "HELD",
+  "step--J12--SET--s212": "HELD",
+  "step--J12--SP15--s210": "HELD",
+  "step--J12--SP15--s211": "RECOVERED",
+  "step--J12--SP15--s212": "HELD",
+  "step--J12--SP2--s210": "HELD",
+  "step--J12--SP2--s211": "RECOVERED",
+  "step--J12--SP2--s212": "HELD",
+  "step--J4--SET--s210": "HELD",
+  "step--J4--SET--s211": "HELD",
+  "step--J4--SET--s212": "HELD",
+  "step--J4--SP15--s210": "HELD",
+  "step--J4--SP15--s211": "HELD",
+  "step--J4--SP15--s212": "HELD",
+  "step--J4--SP2--s210": "HELD",
+  "step--J4--SP2--s211": "HELD",
+  "step--J4--SP2--s212": "HELD",
+  "step--J8--SET--s210": "HELD",
+  "step--J8--SET--s211": "HELD",
+  "step--J8--SET--s212": "HELD",
+  "step--J8--SP15--s210": "HELD",
+  "step--J8--SP15--s211": "HELD",
+  "step--J8--SP15--s212": "HELD",
+  "step--J8--SP2--s210": "HELD",
+  "step--J8--SP2--s211": "HELD",
+  "step--J8--SP2--s212": "HELD",
+  "step-reversed--J8--SET--s210": "HELD",
+  "step-reversed--J8--SET--s211": "HELD",
+  "step-reversed--J8--SET--s212": "HELD",
+  "step-reversed--J8--SP15--s210": "HELD",
+  "step-reversed--J8--SP15--s211": "HELD",
+  "step-reversed--J8--SP15--s212": "HELD",
+  "step-reversed--J8--SP2--s210": "HELD",
+  "step-reversed--J8--SP2--s211": "HELD",
+  "step-reversed--J8--SP2--s212": "HELD",
+  "walk--e10000--SET--s210": "HELD",
+  "walk--e10000--SET--s211": "HELD",
+  "walk--e10000--SET--s212": "HELD",
+  "walk--e10000--SP15--s210": "RECOVERED",
+  "walk--e10000--SP15--s211": "RECOVERED",
+  "walk--e10000--SP15--s212": "RECOVERED",
+  "walk--e10000--SP2--s210": "RECOVERED",
+  "walk--e10000--SP2--s211": "RECOVERED",
+  "walk--e10000--SP2--s212": "RECOVERED",
+  "walk--e20000--SET--s210": "HELD",
+  "walk--e20000--SET--s211": "HELD",
+  "walk--e20000--SET--s212": "HELD",
+  "walk--e20000--SP15--s210": "HELD",
+  "walk--e20000--SP15--s211": "HELD",
+  "walk--e20000--SP15--s212": "HELD",
+  "walk--e20000--SP2--s210": "HELD",
+  "walk--e20000--SP2--s211": "HELD",
+  "walk--e20000--SP2--s212": "HELD"
+ },
+ "mismatch": [],
+ "needles": {
+  "SP15": 1.5,
+  "SP2": 2.0
+ },
+ "report_only": [
+  "step",
+  "step-reversed"
+ ],
+ "rows": [
+  {
+   "direction": "forward",
+   "law": "ramp",
+   "missing": [],
+   "needle": "SET",
+   "p95": [
+    9.158097646414376,
+    9.581394033522884,
+    7.779726715800734
+   ],
+   "p95_max": 9.581394033522884,
+   "p95_median": 9.158097646414376,
+   "rung": "x1",
+   "seeds": [
+    210,
+    211,
+    212
+   ],
+   "sigma": 0.0,
+   "within_declared_band": "n/a"
+  },
+  {
+   "direction": "forward",
+   "law": "ramp",
+   "missing": [],
+   "needle": "SP15",
+   "p95": [
+    8.07285103717777,
+    9.964934346993118,
+    8.706820836716474
+   ],
+   "p95_max": 9.964934346993118,
+   "p95_median": 8.706820836716474,
+   "rung": "x1",
+   "seeds": [
+    210,
+    211,
+    212
+   ],
+   "sigma": 1.5,
+   "within_declared_band": 3
+  },
+  {
+   "direction": "forward",
+   "law": "ramp",
+   "missing": [],
+   "needle": "SP2",
+   "p95": [
+    8.231313613582756,
+    9.281702037822356,
+    8.679534663417144
+   ],
+   "p95_max": 9.281702037822356,
+   "p95_median": 8.679534663417144,
+   "rung": "x1",
+   "seeds": [
+    210,
+    211,
+    212
+   ],
+   "sigma": 2.0,
+   "within_declared_band": 3
+  },
+  {
+   "direction": "forward",
+   "law": "ramp",
+   "missing": [],
+   "needle": "SET",
+   "p95": [
+    10.997974504360172,
+    10.337637852366242,
+    9.737027697651001
+   ],
+   "p95_max": 10.997974504360172,
+   "p95_median": 10.337637852366242,
+   "rung": "x2",
+   "seeds": [
+    210,
+    211,
+    212
+   ],
+   "sigma": 0.0,
+   "within_declared_band": "n/a"
+  },
+  {
+   "direction": "forward",
+   "law": "ramp",
+   "missing": [],
+   "needle": "SP15",
+   "p95": [
+    10.643268794594519,
+    9.19156856259383,
+    10.756862632442903
+   ],
+   "p95_max": 10.756862632442903,
+   "p95_median": 10.643268794594519,
+   "rung": "x2",
+   "seeds": [
+    210,
+    211,
+    212
+   ],
+   "sigma": 1.5,
+   "within_declared_band": 3
+  },
+  {
+   "direction": "forward",
+   "law": "ramp",
+   "missing": [],
+   "needle": "SP2",
+   "p95": [
+    9.584124398896279,
+    10.634775104523442,
+    9.972502194330673
+   ],
+   "p95_max": 10.634775104523442,
+   "p95_median": 9.972502194330673,
+   "rung": "x2",
+   "seeds": [
+    210,
+    211,
+    212
+   ],
+   "sigma": 2.0,
+   "within_declared_band": 3
+  },
+  {
+   "direction": "reversed",
+   "law": "ramp-reversed",
+   "missing": [],
+   "needle": "SET",
+   "p95": [
+    10.24321456121288,
+    10.807005581708609,
+    10.576260555431418
+   ],
+   "p95_max": 10.807005581708609,
+   "p95_median": 10.576260555431418,
+   "rung": "x1",
+   "seeds": [
+    210,
+    211,
+    212
+   ],
+   "sigma": 0.0,
+   "within_declared_band": "n/a"
+  },
+  {
+   "direction": "reversed",
+   "law": "ramp-reversed",
+   "missing": [],
+   "needle": "SP15",
+   "p95": [
+    9.824374555138775,
+    10.792451649707687,
+    10.143689440822527
+   ],
+   "p95_max": 10.792451649707687,
+   "p95_median": 10.143689440822527,
+   "rung": "x1",
+   "seeds": [
+    210,
+    211,
+    212
+   ],
+   "sigma": 1.5,
+   "within_declared_band": 3
+  },
+  {
+   "direction": "reversed",
+   "law": "ramp-reversed",
+   "missing": [],
+   "needle": "SP2",
+   "p95": [
+    9.235036176726226,
+    10.979588699171359,
+    11.040271414518656
+   ],
+   "p95_max": 11.040271414518656,
+   "p95_median": 10.979588699171359,
+   "rung": "x1",
+   "seeds": [
+    210,
+    211,
+    212
+   ],
+   "sigma": 2.0,
+   "within_declared_band": 3
+  },
+  {
+   "direction": "reversed",
+   "law": "sine",
+   "missing": [],
+   "needle": "SET",
+   "p95": [
+    9.049471584425419,
+    10.478478551995977,
+    10.20724628787309
+   ],
+   "p95_max": 10.478478551995977,
+   "p95_median": 10.20724628787309,
+   "rung": "P800000",
+   "seeds": [
+    210,
+    211,
+    212
+   ],
+   "sigma": 0.0,
+   "within_declared_band": "n/a"
+  },
+  {
+   "direction": "reversed",
+   "law": "sine",
+   "missing": [],
+   "needle": "SP15",
+   "p95": [
+    8.451908563370125,
+    8.98107815330934,
+    10.391506177959855
+   ],
+   "p95_max": 10.391506177959855,
+   "p95_median": 8.98107815330934,
+   "rung": "P800000",
+   "seeds": [
+    210,
+    211,
+    212
+   ],
+   "sigma": 1.5,
+   "within_declared_band": 3
+  },
+  {
+   "direction": "reversed",
+   "law": "sine",
+   "missing": [],
+   "needle": "SP2",
+   "p95": [
+    10.956503829662893,
+    10.329980809289054,
+    9.520053167517972
+   ],
+   "p95_max": 10.956503829662893,
+   "p95_median": 10.329980809289054,
+   "rung": "P800000",
+   "seeds": [
+    210,
+    211,
+    212
+   ],
+   "sigma": 2.0,
+   "within_declared_band": 3
+  },
+  {
+   "direction": "reversed",
+   "law": "sine",
+   "missing": [],
+   "needle": "SET",
+   "p95": [
+    10.649708949637443,
+    10.776262056990504,
+    10.776262056990504
+   ],
+   "p95_max": 10.776262056990504,
+   "p95_median": 10.776262056990504,
+   "rung": "P400000",
+   "seeds": [
+    210,
+    211,
+    212
+   ],
+   "sigma": 0.0,
+   "within_declared_band": "n/a"
+  },
+  {
+   "direction": "reversed",
+   "law": "sine",
+   "missing": [],
+   "needle": "SP15",
+   "p95": [
+    10.16341327044563,
+    10.348806166251848,
+    12.466508557340148
+   ],
+   "p95_max": 12.466508557340148,
+   "p95_median": 10.348806166251848,
+   "rung": "P400000",
+   "seeds": [
+    210,
+    211,
+    212
+   ],
+   "sigma": 1.5,
+   "within_declared_band": 3
+  },
+  {
+   "direction": "reversed",
+   "law": "sine",
+   "missing": [],
+   "needle": "SP2",
+   "p95": [
+    11.011077791620437,
+    10.741906386284654,
+    10.897042665934578
+   ],
+   "p95_max": 11.011077791620437,
+   "p95_median": 10.897042665934578,
+   "rung": "P400000",
+   "seeds": [
+    210,
+    211,
+    212
+   ],
+   "sigma": 2.0,
+   "within_declared_band": 3
+  },
+  {
+   "direction": "reversed",
+   "law": "walk",
+   "missing": [],
+   "needle": "SET",
+   "p95": [
+    11.058236247866034,
+    11.33076219396753,
+    11.058236247866034
+   ],
+   "p95_max": 11.33076219396753,
+   "p95_median": 11.058236247866034,
+   "rung": "e20000",
+   "seeds": [
+    210,
+    211,
+    212
+   ],
+   "sigma": 0.0,
+   "within_declared_band": "n/a"
+  },
+  {
+   "direction": "reversed",
+   "law": "walk",
+   "missing": [],
+   "needle": "SP15",
+   "p95": [
+    10.3634698006706,
+    10.205742202864826,
+    10.861802703720173
+   ],
+   "p95_max": 10.861802703720173,
+   "p95_median": 10.3634698006706,
+   "rung": "e20000",
+   "seeds": [
+    210,
+    211,
+    212
+   ],
+   "sigma": 1.5,
+   "within_declared_band": 3
+  },
+  {
+   "direction": "reversed",
+   "law": "walk",
+   "missing": [],
+   "needle": "SP2",
+   "p95": [
+    11.20449799556161,
+    11.423627035704271,
+    9.842699147950498
+   ],
+   "p95_max": 11.423627035704271,
+   "p95_median": 11.20449799556161,
+   "rung": "e20000",
+   "seeds": [
+    210,
+    211,
+    212
+   ],
+   "sigma": 2.0,
+   "within_declared_band": 3
+  },
+  {
+   "direction": "reversed",
+   "law": "walk",
+   "missing": [],
+   "needle": "SET",
+   "p95": [
+    13.507421194329709,
+    12.91393745397977,
+    13.52168507234228
+   ],
+   "p95_max": 13.52168507234228,
+   "p95_median": 13.507421194329709,
+   "rung": "e10000",
+   "seeds": [
+    210,
+    211,
+    212
+   ],
+   "sigma": 0.0,
+   "within_declared_band": "n/a"
+  },
+  {
+   "direction": "reversed",
+   "law": "walk",
+   "missing": [],
+   "needle": "SP15",
+   "p95": [
+    15.384474718658112,
+    13.630196543602665,
+    14.033562078976047
+   ],
+   "p95_max": 15.384474718658112,
+   "p95_median": 14.033562078976047,
+   "rung": "e10000",
+   "seeds": [
+    210,
+    211,
+    212
+   ],
+   "sigma": 1.5,
+   "within_declared_band": 2
+  },
+  {
+   "direction": "reversed",
+   "law": "walk",
+   "missing": [],
+   "needle": "SP2",
+   "p95": [
+    12.169045512788443,
+    15.630130733700184,
+    13.19929281812756
+   ],
+   "p95_max": 15.630130733700184,
+   "p95_median": 13.19929281812756,
+   "rung": "e10000",
+   "seeds": [
+    210,
+    211,
+    212
+   ],
+   "sigma": 2.0,
+   "within_declared_band": 2
+  },
+  {
+   "direction": "forward",
+   "law": "step",
+   "missing": [],
+   "needle": "SET",
+   "p95": [
+    4.584285833640251,
+    7.25557980331962,
+    7.415714166359749
+   ],
+   "p95_max": 7.415714166359749,
+   "p95_median": 7.25557980331962,
+   "rung": "J4",
+   "seeds": [
+    210,
+    211,
+    212
+   ],
+   "sigma": 0.0,
+   "within_declared_band": "n/a"
+  },
+  {
+   "direction": "forward",
+   "law": "step",
+   "missing": [],
+   "needle": "SP15",
+   "p95": [
+    2.7444201966803803,
+    6.335646984839627,
+    7.415714166359749
+   ],
+   "p95_max": 7.415714166359749,
+   "p95_median": 6.335646984839627,
+   "rung": "J4",
+   "seeds": [
+    210,
+    211,
+    212
+   ],
+   "sigma": 1.5,
+   "within_declared_band": 3
+  },
+  {
+   "direction": "forward",
+   "law": "step",
+   "missing": [],
+   "needle": "SP2",
+   "p95": [
+    2.7444201966803803,
+    7.25557980331962,
+    7.415714166359749
+   ],
+   "p95_max": 7.415714166359749,
+   "p95_median": 7.25557980331962,
+   "rung": "J4",
+   "seeds": [
+    210,
+    211,
+    212
+   ],
+   "sigma": 2.0,
+   "within_declared_band": 3
+  },
+  {
+   "direction": "forward",
+   "law": "step",
+   "missing": [],
+   "needle": "SET",
+   "p95": [
+    2.7444201966803803,
+    7.25557980331962,
+    8.347762996861547
+   ],
+   "p95_max": 8.347762996861547,
+   "p95_median": 7.25557980331962,
+   "rung": "J8",
+   "seeds": [
+    210,
+    211,
+    212
+   ],
+   "sigma": 0.0,
+   "within_declared_band": "n/a"
+  },
+  {
+   "direction": "forward",
+   "law": "step",
+   "missing": [],
+   "needle": "SP15",
+   "p95": [
+    7.439946190403589,
+    11.439946190403589,
+    7.439946190403589
+   ],
+   "p95_max": 11.439946190403589,
+   "p95_median": 7.439946190403589,
+   "rung": "J8",
+   "seeds": [
+    210,
+    211,
+    212
+   ],
+   "sigma": 1.5,
+   "within_declared_band": 3
+  },
+  {
+   "direction": "forward",
+   "law": "step",
+   "missing": [],
+   "needle": "SP2",
+   "p95": [
+    11.624312577487444,
+    15.624312577487444,
+    11.624312577487444
+   ],
+   "p95_max": 15.624312577487444,
+   "p95_median": 11.624312577487444,
+   "rung": "J8",
+   "seeds": [
+    210,
+    211,
+    212
+   ],
+   "sigma": 2.0,
+   "within_declared_band": 2
+  },
+  {
+   "direction": "forward",
+   "law": "step",
+   "missing": [],
+   "needle": "SET",
+   "p95": [
+    9.881289320791552,
+    13.881289320791552,
+    15.881289320791552
+   ],
+   "p95_max": 15.881289320791552,
+   "p95_median": 13.881289320791552,
+   "rung": "J12",
+   "seeds": [
+    210,
+    211,
+    212
+   ],
+   "sigma": 0.0,
+   "within_declared_band": "n/a"
+  },
+  {
+   "direction": "forward",
+   "law": "step",
+   "missing": [],
+   "needle": "SP15",
+   "p95": [
+    15.881289320791552,
+    19.881289320791552,
+    15.881289320791552
+   ],
+   "p95_max": 19.881289320791552,
+   "p95_median": 15.881289320791552,
+   "rung": "J12",
+   "seeds": [
+    210,
+    211,
+    212
+   ],
+   "sigma": 1.5,
+   "within_declared_band": 0
+  },
+  {
+   "direction": "forward",
+   "law": "step",
+   "missing": [],
+   "needle": "SP2",
+   "p95": [
+    21.881289320791552,
+    25.881289320791552,
+    21.881289320791552
+   ],
+   "p95_max": 25.881289320791552,
+   "p95_median": 21.881289320791552,
+   "rung": "J12",
+   "seeds": [
+    210,
+    211,
+    212
+   ],
+   "sigma": 2.0,
+   "within_declared_band": 0
+  },
+  {
+   "direction": "reversed",
+   "law": "step-reversed",
+   "missing": [],
+   "needle": "SET",
+   "p95": [
+    10.91897562768736,
+    7.25557980331962,
+    4.9189756276873595
+   ],
+   "p95_max": 10.91897562768736,
+   "p95_median": 7.25557980331962,
+   "rung": "J8",
+   "seeds": [
+    210,
+    211,
+    212
+   ],
+   "sigma": 0.0,
+   "within_declared_band": "n/a"
+  },
+  {
+   "direction": "reversed",
+   "law": "step-reversed",
+   "missing": [],
+   "needle": "SP15",
+   "p95": [
+    12.831697912183813,
+    8.831697912183813,
+    12.831697912183813
+   ],
+   "p95_max": 12.831697912183813,
+   "p95_median": 12.831697912183813,
+   "rung": "J8",
+   "seeds": [
+    210,
+    211,
+    212
+   ],
+   "sigma": 1.5,
+   "within_declared_band": 3
+  },
+  {
+   "direction": "reversed",
+   "law": "step-reversed",
+   "missing": [],
+   "needle": "SP2",
+   "p95": [
+    16.91897562768736,
+    12.91897562768736,
+    16.91897562768736
+   ],
+   "p95_max": 16.91897562768736,
+   "p95_median": 16.91897562768736,
+   "rung": "J8",
+   "seeds": [
+    210,
+    211,
+    212
+   ],
+   "sigma": 2.0,
+   "within_declared_band": 1
+  }
+ ],
+ "rule": "rows = each ladder's prefix of rungs HELD on every acceptance seed in SET (held-count table); broken or mixed rungs are in `excluded`, never rows; step laws are report-only (outside the band's domain)",
+ "rungs_from": "held-count table of the main runs",
+ "schema": "compass-drift-band/1",
+ "seeds_declared": [
+  210,
+  211,
+  212
+ ],
+ "statistic": "per-run p95 |park - edge - sigma*g| in ticks (sigma 0: |centre - truth tick| over hold steps)",
+ "step_report": {
+  "step-reversed/J8/s210": {
+   "jump_max_g": 1.2609097144379386,
+   "recovery_max_sweeps": 3800
+  },
+  "step-reversed/J8/s211": {
+   "jump_max_g": 1.2609097144379386,
+   "recovery_max_sweeps": 3800
+  },
+  "step-reversed/J8/s212": {
+   "jump_max_g": 1.2609097144379386,
+   "recovery_max_sweeps": 1900
+  },
+  "step/J12/s210": {
+   "jump_max_g": 1.9141068448419958,
+   "recovery_max_sweeps": 3800
+  },
+  "step/J12/s211": {
+   "jump_max_g": 1.9141068448419958,
+   "recovery_max_sweeps": 5700
+  },
+  "step/J12/s212": {
+   "jump_max_g": 1.9141068448419958,
+   "recovery_max_sweeps": 5700
+  },
+  "step/J4/s210": {
+   "jump_max_g": 0.6350083976900104,
+   "recovery_max_sweeps": "no-out-runs"
+  },
+  "step/J4/s211": {
+   "jump_max_g": 0.6350083976900104,
+   "recovery_max_sweeps": "no-out-runs"
+  },
+  "step/J4/s212": {
+   "jump_max_g": 0.6350083976900104,
+   "recovery_max_sweeps": "no-out-runs"
+  },
+  "step/J8/s210": {
+   "jump_max_g": 1.2730457983854915,
+   "recovery_max_sweeps": "no-out-runs"
+  },
+  "step/J8/s211": {
+   "jump_max_g": 1.2730457983854915,
+   "recovery_max_sweeps": 1900
+  },
+  "step/J8/s212": {
+   "jump_max_g": 1.2730457983854915,
+   "recovery_max_sweeps": 1900
+  }
+ }
+}

@@ -52,10 +52,73 @@ CHECKS = (
 )
 
 
+# plan 1558: the shape is a sum type: one check table per shape (SCHEMA-1558 2); a check reads (its value, the whole table)
+def _same(a, b):
+    """equal in value and in type all the way down; total over any value (False, never a raise)."""
+    if type(a) is not type(b):
+        return False
+    if type(a) is dict:
+        return set(a) == set(b) and all(_same(a[k], b[k]) for k in a)
+    if type(a) is list:
+        return len(a) == len(b) and all(_same(x, y) for x, y in zip(a, b))
+    return a == b
+
+
+def _finite(v):
+    return type(v) in (int, float) and v == v and abs(v) != float("inf")
+
+
+def _admissible(v, ticks, g):
+    """THE TYPE of the setpoint: non-empty, strictly increasing, every member a finite number > 0 whose sigma*g is whole and > ticks."""
+    def member(x):
+        n, d = HT.sigma_ticks(x, g)
+        return n % d == 0 and n // d > ticks
+    return (type(v) is list and bool(v) and all(_finite(x) and x > 0 and member(x) for x in v)
+            and all(a < b for a, b in zip(v, v[1:])))
+
+
+def _about(v):
+    return type(v) is dict and set(v) == set(HT.ABOUT) and all(bool(v[k]) for k in HT.ABOUT)
+
+
+def _band(v, raw):
+    """the band row of this geometry: its cells equal the table's own, its type and its description sound."""
+    return (type(v) is dict and set(v) == {"ticks", "admissible", "about", *HT.BAND_GEOMETRY} and _int(0)(v["ticks"])
+            and all(_same(v[k], raw[k]) for k in HT.BAND_GEOMETRY) and _admissible(v["admissible"], v["ticks"], raw["g"])
+            and _about(v["about"]))
+
+
+def _sigma(v, raw):
+    """a MEMBER of the band row's type, as sigma_ticks pairs (n*b == a*d: 2 and 2.0 are one member). Nothing else is checked here."""
+    if not (_finite(v) and v > 0):
+        return False
+    n, d = HT.sigma_ticks(v, raw["g"])
+    return any(n * b == a * d for a, b in (HT.sigma_ticks(m, raw["g"]) for m in raw["dead_band"]["admissible"]))
+
+
+_ONE = dict(CHECKS)
+_two = lambda f: lambda v, raw: f(v)
+TABLES = {
+    HT.NEEDLE: tuple((k, _two(f)) for k, f in CHECKS),
+    HT.SETPOINT: (("needle_structure", _two(lambda v: v == HT.SETPOINT)),
+                  *((k, _two(_ONE[k])) for k in ("ops", "g", "step", "n_eq", "S", "skip", "z")),
+                  ("dead_band", _band), ("sigma", _sigma),
+                  *((k, _two(_ONE[k])) for k in ("ignite", "approach")),
+                  ("park", _two(_table({"S": _int(40), "n_eq": _int(0)}))),
+                  *((k, _two(_ONE[k])) for k in ("lost", "M"))),
+}
+
+
+def shape(raw):
+    """the shape a settings table names; a name that is no shape is read with plan 1552's table."""
+    return raw.get("needle_structure") if raw.get("needle_structure") in HT.SHAPES else HT.NEEDLE
+
+
 def refusal_b(raw):
     """the field of the first refusal, or None. A missing or unknown key first (in sorted order), then the table's order."""
-    off = sorted(set(raw) ^ {k for k, _ in CHECKS})
-    return off[0] if off else next((k for k, ok in CHECKS if not ok(raw[k])), None)
+    table = TABLES[shape(raw)]
+    off = sorted(set(raw) ^ {k for k, _ in table})
+    return off[0] if off else next((k for k, ok in table if not ok(raw[k], raw)), None)
 
 
 # ---------------------------------------------------------------- the door (parse A): refuses after `declare`
@@ -88,7 +151,10 @@ def refusal_a(d, cfg):
     checks = ((shaped, "declared"), (shaped and d["wire"] == WIRE, "wire"), (one, "dials"), (numbers, "numbers"), (roles, "roles"),
               (roles and cross["name"] == cfg["M"]["observable"], "M"), (side, "ordered_side"),
               (side and 2 * cfg["g"] + cfg["step"] <= dl["max_nudge"] and 2 * cfg["g"] <= dl["T"], "g"),
-              (side and dl["T"] % cfg["ignite"]["steps"][0] == 0, "ignite"))
+              (side and dl["T"] % cfg["ignite"]["steps"][0] == 0, "ignite"),
+              (side and sum(HT.reach(cfg["g"], HT.offset(cfg["sigma"], cfg["g"]), d["ordered_side"][dl["name"]])) <= dl["T"], "sigma"),
+              (side and not (HT.PAIR_SETTLED[cfg["needle_structure"]] and not HT.settled(0, d["lag"], cfg["n_eq"], cfg["skip"])), "n_eq"),
+              (side and all(HT.settled(0, d["lag"], cfg[p]["n_eq"], cfg["skip"]) for p in HT.PARKS[cfg["needle_structure"]]), "park"))
     return ([field for ok, field in checks if not ok] + [None])[0]
 
 
@@ -108,6 +174,8 @@ class Drop:
         self.obs = cfg["M"]["observable"]
         self.sign = [r for r in d["roles"] if r["name"] == self.obs][0]["ordered_sign"]
         self.side = d["ordered_side"][dl["name"]]
+        self.off = HT.offset(cfg["sigma"], cfg["g"])
+        self.below, self.above = HT.reach(cfg["g"], self.off, self.side)    # the ticks the hold needs below / above its centre
         self.view = HT.ORIENT[(self.side, self.sign)]
         self.mode = ST.mode_of(cfg["ops"])
         self.index, self.pos = d["index"], d["pos"][0]
@@ -163,8 +231,9 @@ class Drop:
         d, c = self.decl, self.cfg
         clock = {k: d[k] for k in ("index_unit", "index_kind", "clock", "lag", "k", "tau")}
         rule = {"observable": self.obs, "z": c["z"], "ordered_sign": self.sign, "ordered_side": self.side}
-        n_eq = {"ignite": c["ignite"]["n_eq"], "approach": c["approach"]["n_eq"], "hold": c["n_eq"]}
-        return HR.head(self.name, self.dial, {"tick": self.pos, "index": self.index}, clock, n_eq, self.skip, self.roles, rule, c["M"])
+        n_eq = {p: HT.SETTLE[p](c)["n_eq"] for p in HT.PHASES[c["needle_structure"]]}
+        return HR.head(self.name, self.dial, {"tick": self.pos, "index": self.index}, clock, n_eq, self.skip, self.roles, rule, c["M"],
+                       c["needle_structure"])
 
     def record(self, phase, rs, kind, reason, ticks, extra, evaluated):
         """the places and the step record of the step now ending, built and not written."""
@@ -200,7 +269,7 @@ class Drop:
                 return self.unread("ignite", [], len(ticks), c["n_eq"], c["S"])
             cls = [r["cls"] for r in rs]
             br = HT.bracket(ticks, cls, self.view)
-            kind = HT.ignite_kind(br, self.cfg["g"], self.dial["T"])
+            kind = HT.ignite_kind_at(br, self.below, self.above, self.dial["T"])
             lo_, hi_ = br or (None, None)
             self.finish("ignite", rs, kind, "|".join(cls), None, {"round": rnd, "lo": lo_, "hi": hi_})
             if kind != "bracketed":
@@ -209,19 +278,41 @@ class Drop:
         self.centre = (lo + hi) // 2
         return "bracketed"
 
-    def approach(self):
+    def stride(self, phase, to):
+        """the whole strides of a walk to `to` (the last move, at most max_nudge, is left to the reading there)."""
         c = self.cfg["approach"]
-        for d in HT.legs(self.centre - self.cfg["g"] - self.pos, self.max_nudge):
+        for d in HT.legs(to - self.pos, self.max_nudge):
             rs = self.nudge(self.pos + d, c["n_eq"], c["S"])
             if rs is None:
-                return self.unread("approach", [], 1, c["n_eq"], c["S"])
-            self.finish("approach", rs, "moving", "stride", d, {"d": d})
+                return self.unread(phase, [], 1, c["n_eq"], c["S"])
+            self.finish(phase, rs, "moving", "stride", d, {"d": d})
         return "moving"
+
+    def approach(self):
+        return self.stride("approach", self.centre - self.cfg["g"])
+
+    def walk(self, to):
+        """plan 1558: strides between readings. FEEDBACK OFF moves nothing, so it has no step at all."""
+        return {"ON": self.stride, "OFF": lambda phase, to: "moving"}[self.mode]("walk", to)
+
+    def park(self, n):
+        """one reading AT the setpoint, after the hold pair's move: a nudge to it (ON) or a one-tick scan of it (OFF). It enters no table."""
+        c, s = self.cfg["park"], HT.setpoint(self.centre, self.off, self.side)
+        kind = self.walk(s)
+        if kind in HT.LAST_KINDS:
+            return kind
+        got = self.scan([s], c["n_eq"], c["S"]) if self.mode == "OFF" else self.nudge(s, c["n_eq"], c["S"])
+        if got is None:
+            return self.unread("park", [], 1, c["n_eq"], c["S"])
+        return self.finish("park", got, "park", got[0]["cls"], None, {"n": n, "centre": self.centre, "setpoint": s})
 
     def hold(self):
         cfg, g, n, streak = self.cfg, self.cfg["g"], 0, 0
         while True:
             n += 1
+            kind = self.walk(self.centre - g)       # to the low probe (empty under plan 1552's door: 2g + step <= max_nudge)
+            if kind in HT.LAST_KINDS:
+                return kind
             lo_t, hi_t = self.centre - g, self.centre + g
             rs = []
             for probe in HT.PLAN[self.mode](lo_t, hi_t):
@@ -230,15 +321,19 @@ class Drop:
                     return self.unread("hold", rs, len(probe), cfg["n_eq"], cfg["S"])
                 rs += got
             cls = [r["cls"] for r in rs]
-            kind, ticks = HT.hold_kind(cls, self.view, self.mode, self.centre, cfg["step"], g, self.dial["T"])
+            kind, ticks = HT.hold_kind_at(cls, self.view, self.mode, self.centre, cfg["step"], self.below, self.above, self.dial["T"])
             streak = (streak + 1) * (kind == "no-signal")
-            extra = {"n": n, "centre": self.centre, "setpoint": self.centre + cfg["sigma"] * g, "bracket": [lo_t, hi_t], "streak": streak}
+            extra = {"n": n, "centre": self.centre, "setpoint": HT.setpoint(self.centre, self.off, self.side), "bracket": [lo_t, hi_t], "streak": streak}
             self.finish("hold", rs, kind, "|".join(cls), ticks, extra)
             if kind in HT.LAST_KINDS:
                 return kind
             self.centre += ticks
             if HT.APPLIED[self.mode] and streak >= cfg["lost"]:
                 return "lost"
+            for phase in HT.PARKS[cfg["needle_structure"]]:
+                kind = {"park": self.park}[phase](n)
+                if kind in HT.LAST_KINDS:
+                    return kind
 
     def run(self):
         """segments of ignite, approach (ON only) and hold, until a step with no reading or a range kind ends the stream."""
