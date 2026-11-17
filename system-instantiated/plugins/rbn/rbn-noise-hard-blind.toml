@@ -1,0 +1,10 @@
+kind = "noise"
+eta_ticks = 250
+N = 2187
+p_ticks = 500
+seed = 260
+k = 6
+knobs_K = [1.0, 4.0]
+K_start = 1.0
+index_unit = "probe"
+index_kind = "sample_counter"
