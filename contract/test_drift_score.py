@@ -63,9 +63,9 @@ def _mods():
 
 def test_s01_cycle_and_top_speed():
     DS = _mods()
-    assert DS.cycle(PAIR, SETTINGS) == 1900
-    assert DS.cycle(PAIR, {**SETTINGS, "n_eq": 0}) == 1000
-    assert DS.cycle(PAIR, {**SETTINGS, "S": 40, "skip": 3}) == 2 * (450 + 120)
+    assert DS.cycle(_start()) == 1900                            # plan 1558 phase 4: cycle(start) = CYCLE[start["needle"]](start)
+    assert DS.cycle(_start(n_eq=0)) == 1000
+    assert DS.cycle(_start(S=40, skip=3)) == 2 * (450 + 120)
     m = DS.motion(_score([600.0, 601.0], [600, 600]), _start())
     assert m["top_speed"] == TOP
     m = DS.motion(_score([600.0, 601.0], [600, 600], di=1000), _start(n_eq=0, step=4))
@@ -295,23 +295,27 @@ def test_s10_purity():
 
 def test_s11_cycle_is_a_table_by_needle_shape():
     DS = _mods()
-    assert DS.cycle(PAIR, SETTINGS) == 1900 and DS.motion(_score([600.0, 601.0], [600, 600]), _start())["top_speed"] == TOP
-    # plan 1558 adds the setpoint row at its merge, and replaces this line with that row's numbers (its walk and park reading)
-    for shape in (SETPOINT, "hold-other-v9", None):
+    assert DS.cycle(_start()) == 1900 and DS.motion(_score([600.0, 601.0], [600, 600]), _start())["top_speed"] == TOP
+    # plan 1558's row (SCHEMA-1558 4.4): 2 r(cfg) + r(park) + max over m in (-step, 0, step) of W(m) r(approach); the side matters.
+    # The six values: SCHEMA-1558 4.4's formula, the same numbers the shipped band rows carry in about.members[].cycle.
+    sp = {"park": {"S": 500, "n_eq": 450}, "approach": {"S": 40, "n_eq": 48}}
+    for side, sigma, want in (("+", 1.5, 2938), ("+", 2, 2938), ("-", 1.5, 2850), ("-", 2, 2938), ("+", 4, 3114), ("-", 4, 3026)):
+        st = {**_start(side, SETPOINT, sigma=sigma, **sp), "declared_other": {"dials": [{"max_nudge": 32}]}}
+        assert DS.cycle(st) == want, (side, sigma, DS.cycle(st))
+    for needle in ("hold-other-v9", None):
         try:
-            DS.cycle(shape, SETTINGS)
+            DS.cycle({**_start(), "needle": needle})
         except KeyError:
             pass
         else:
-            raise AssertionError(f"cycle({shape!r}) answered: a shape with no row was given the pair formula")
+            raise AssertionError(f"cycle({needle!r}) answered: a shape with no row was given the pair formula")
     sc = _score([600.0, 606.0], [600, 600])
-    for start in (_start(needle=SETPOINT), {k: v for k, v in _start().items() if k != "needle"}):
-        try:
-            DS.motion(sc, start)
-        except KeyError:
-            pass
-        else:
-            raise AssertionError(f"motion answered for needle {start.get('needle')!r}: its top speed is not the pair's")
+    try:
+        DS.motion(sc, {k: v for k, v in _start().items() if k != "needle"})
+    except KeyError:
+        pass
+    else:
+        raise AssertionError("motion answered for a start with no needle: its top speed is not the pair's")
 
 
 _ONE = """base = "at-apparatus.toml"

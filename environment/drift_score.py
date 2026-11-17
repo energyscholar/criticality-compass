@@ -4,17 +4,31 @@ are measurements. Absence is a token, never a number."""
 import math
 from dataclasses import dataclass
 
+from navigator import holdtab as HT
+
 NO_STEPS, NO_MOVING, NO_RUNS = "no-hold-steps", "no-moving-steps", "no-out-runs"
 _PAIR_KEYS = ("slew_max", "slew_mean", "jump_max_g", "trail_along", "trail_along_g")
 
 
-# the needle's sweeps per hold pair, by the needle's shape. A shape with no row is a KeyError: it is never given another row's formula.
-CYCLE = {"hold-pair-v1": lambda settings: 2 * (settings["n_eq"] + settings["S"] * settings["skip"])}
+def _setpoint_cycle(start):
+    """plan 1558 (SCHEMA-1558 4.4): 2 r(cfg) + r(park) + the walks' strides (the worst of the centre's move m) at the approach settle."""
+    cfg, side = start["settings"], start["belief"]["ordered_side"]["declared"][start["dials"][0]]
+    r = lambda x: x["n_eq"] + x["S"] * cfg["skip"]
+    off, g, M = HT.offset(cfg["sigma"], cfg["g"]), cfg["g"], start["declared_other"]["dials"][0]["max_nudge"]
+    n = lambda d: len(HT.legs(d, M))
+    w = max(n(m + HT.SAFE[side] * off - g) + n(HT.SAFE[side] * off + g) for m in (-cfg["step"], 0, cfg["step"]))
+    return 2 * r(cfg) + r(cfg["park"]) + w * r(cfg["approach"])
 
 
-def cycle(shape, settings):
-    """the needle's sweeps per hold pair."""
-    return CYCLE[shape](settings)
+# the needle's sweeps per hold cycle, by the needle's shape, read from the start record. A shape with no row is a KeyError: it is
+# never given another row's formula.
+CYCLE = {"hold-pair-v1": lambda start: 2 * (start["settings"]["n_eq"] + start["settings"]["S"] * start["settings"]["skip"]),
+         "hold-setpoint-v1": _setpoint_cycle}
+
+
+def cycle(start):
+    """the needle's sweeps per hold cycle."""
+    return CYCLE[start["needle"]](start)
 
 
 def _out_runs(steps):
@@ -56,7 +70,7 @@ def _no_pairs(token):
 
 def motion(score, start):
     steps, settings = score["steps"], start["settings"]
-    top = settings["step"] / cycle(start["needle"], settings)
+    top = settings["step"] / cycle(start)
     runs = _out_runs(steps)
     ended = [r["sweeps"] for r in runs if r["sweeps"] != "never"]
     side = _SIDE[start["belief"]["ordered_side"]["declared"][start["dials"][0]]]
