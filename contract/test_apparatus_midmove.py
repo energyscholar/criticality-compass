@@ -107,8 +107,8 @@ BASE_61FB241 = [{'op': 'reading',
 PINS = {         # sha256 at main 61fb241
     "contract/SCHEMA-1545.md": "ef7a2a67fd64fb06bf190d6406da268dab51404dda7d9ebcf0471e25770ea320",
     "contract/SCHEMA-1525.md": "40ae7812cefb384bd1a2582751891464ce0928d1e643da87f2df0fa56ce169ec",
-    "contract/test_apparatus_drift.py": "19c331ecbf5005ae56ac0895ab15cbe5cba66e7a8924ac63ac0e14edc3202acc",
-    "environment/drift.py": "7999b67e0e546ddd7c256bcef0399e1c27f923649d38559bd89f07a3f0cddd2c",
+    "contract/test_apparatus_drift.py": "3586c1ec9930b059555fe2925af1cb7ce685f7b06e3b64e337cafac900e16261",   # plan 1561: line 45 names six laws
+    # "environment/drift.py" is no longer pinned: plan 1561 adds two laws; test_apparatus_drift.py and test_drift_laws.py hold the old four
     "environment/apparatus_config.py": "8d7104d561d5e927d70323c44b2edf0481be2f27df51b2be588a60851f522003",
     "environment/apparatus_server.py": "7a81c7c69ca30c00ba70a476a1fcffcd4711d49322c5f4004aaf1c7f6aa3c155",
     "environment/environment-apparatus.toml": "8d6f1962219fe08ba4cc2a460c5947bf01c160374f7e8925d3d1d9557a4c4b9a",

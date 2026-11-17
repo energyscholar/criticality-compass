@@ -42,7 +42,7 @@ def _mods():
 
 def test_the_laws_are_the_declared_expressions():
     DR, _, R = _mods()
-    assert tuple(DR.LAWS) == ("none", "linear", "sine", "step"), DR.LAWS
+    assert tuple(DR.LAWS) == ("none", "linear", "sine", "step", "ramp-then-rest", "walk"), DR.LAWS   # plan 1561 adds two laws (SCHEMA-1561 section 2)
     for law, table in TABLES.items():
         d = DR.parse_drift(dict(table), TARGETS)
         assert not isinstance(d, R.Malformed), (law, d)
