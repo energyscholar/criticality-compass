@@ -54,6 +54,7 @@ tests = [
   "contract/test_apparatus_midmove.py",   # plan 1553
   "contract/test_ising_core.py", "contract/test_ising_blind_conformance.py",   # plan 1546
   "contract/test_slots.py",   # plan 1559
+  "contract/test_rbn_core.py",   # plan 1560
   "contract/test_system_conformance.py", "contract/test_navigator_conformance.py",   # plan 1518: the two frozen Stage-2 acceptance tests (probe op + margin-batched-v0)
   "tests/frozen.py", "tests/test_bench.py", "tests/test_claims.py",   # plan 1427: declared so the plan may edit and run them
   "tests/test_closure.py", "tests/test_0973.py", "tests/test_0978.py",
