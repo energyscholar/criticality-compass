@@ -1,0 +1,15 @@
+# Plan 1569 world: the static control world, range R2. SCHEMA-1569 section 9; the shape of plugins/at/at-apparatus.toml.
+kind       = "critical"
+L_blocks   = 27
+burn       = 400
+seed       = 500
+k          = 6
+nlev       = 2
+index_unit = "sweep"
+index_kind = "sample_counter"
+lag        = 48
+horizon    = 200000
+dials      = [{name = "K", lo = 0.40, hi = 0.50, T = 400, max_nudge = 32, start = 400}]
+fixed      = {}
+hidden     = {dK = 0.0}
+drift      = {target = "dK", law = "none"}

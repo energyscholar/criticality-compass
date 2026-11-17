@@ -1,0 +1,16 @@
+# Plan 1569 world: the hard field decoy, range R1. SCHEMA-1569 section 9; the shape of plugins/at/at-apparatus.toml.
+kind       = "field"
+h_ticks    = 90
+L_blocks   = 27
+burn       = 400
+seed       = 500
+k          = 6
+nlev       = 2
+index_unit = "sweep"
+index_kind = "sample_counter"
+lag        = 48
+horizon    = 200000
+dials      = [{name = "K", lo = 0.42, hi = 0.545, T = 500, max_nudge = 32, start = 0}]
+fixed      = {}
+hidden     = {dK = 0.0}
+drift      = {target = "dK", law = "none"}
