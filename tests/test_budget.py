@@ -41,7 +41,7 @@ Plan 1427 P4: CAP 5034 -> 5036 (Auditor-authorised; positional, input_path, gen-
 import tomllib
 from pathlib import Path
 
-CAP = 5043   # plan 1427 P9: was 5036. plan 1427 P4: was 5034. plan 1282 P2a: R-P2.1
+CAP = 5046   # plan 1559: was 5043. plan 1427 P9: was 5036. plan 1427 P4: was 5034. plan 1282 P2a: R-P2.1
 CORE_CAP = 1250   # plan 1427 P9: was 1249 (registry.config import and the moved git head land in the core). plan 1427 P3: was 1248. plan 1427 P1: was 1240. plan 1205 P1 (Auditor): +40 for the hdf5-table-v1 reader. plan 1164: was INTAKE_CAP over the one role intake; now the sum over the roles of CORE, the core split by invariant
 CORE = {"intake": 100, "intake_fold": 160, "intake_evidence": 150, "intake_bytes": 100, "intake_census": 140, "intake_say": 100,   # plan 1164: role -> cap
         "intake_blind": 200, "intake_seal": 160, "intake_read": 215}   # (BLOAT-REVIEW 1160 section 4, Layout C)
@@ -65,6 +65,7 @@ SEAL_REACH_CAP = 120   # plan 1282 P1c: checks.toml [roles] seal_reach, the seal
 INSTRUMENT_DECL_CAP = 20   # plan 1282 P2a (R-P2.3): checks.toml [roles] instrument_decl, the one instrument loader (cc/instrument_decl.py), its own role
 ORACLE_CAP = 150   # plan 1282 P3: checks.toml [roles] oracle, the total Oracle sum type and `cc navigate --oracle` (cc/oracle.py), its own role so CAP is not raised
 ORACLE_MEASURED_CAP = 120   # plan 1282 P5: checks.toml [roles] oracle_measured, the scan terminal, MeasuredStart and the loaders (cc/oracle_measured.py), its own role so ORACLE_CAP is not raised
+SLOTS_CAP = 200   # plan 1559: checks.toml [roles] slots, the host-wide pool of worker slots (cc/slots.py), its own role so CAP is not raised
 REWEIGHT_CAP = 170   # plan 1456 WIDTH: checks.toml [roles] oracle_reweight, the dense FS-reweight navigator (cc/oracle_reweight.py), its own role so no existing cap is raised
 VERBATIM = [
     "cc/admit.py", "cc/reduce.py", "cc/gamma.py", "tests/test_kernel.py", "tests/test_sign.py", "tests/test_resample.py",
@@ -105,6 +106,7 @@ instrument_decl = {f: lines(f) for f in roles["instrument_decl"]}
 oracle = {f: lines(f) for f in roles["oracle"]}
 oracle_measured = {f: lines(f) for f in roles["oracle_measured"]}
 oracle_reweight = {f: lines(f) for f in roles["oracle_reweight"]}
+slots = {f: lines(f) for f in roles["slots"]}
 for f, n in {**counts, **intake, **names, **choices, **tests, **maths}.items():
     print(f"  {f}: {n}")
 total = sum(counts.values())
@@ -130,6 +132,7 @@ print(f"seal_reach total {sum(seal_reach.values())} of {SEAL_REACH_CAP}")
 print(f"oracle total {sum(oracle.values())} of {ORACLE_CAP}")
 print(f"oracle_measured total {sum(oracle_measured.values())} of {ORACLE_MEASURED_CAP}")
 print(f"oracle_reweight total {sum(oracle_reweight.values())} of {REWEIGHT_CAP}")
+print(f"slots total {sum(slots.values())} of {SLOTS_CAP}")
 print(f"instrument_decl total {sum(instrument_decl.values())} of {INSTRUMENT_DECL_CAP}")
 assert not set(intake) & set(roles["plumbing"]), f"a file in both plumbing and intake: {sorted(set(intake) & set(roles['plumbing']))}"
 assert sum(intake.values()) <= CORE_CAP, f"intake line budget exceeded: {sum(intake.values())} > {CORE_CAP}; stop and report which files grew"
@@ -178,5 +181,7 @@ assert sum(oracle_measured.values()) <= ORACLE_MEASURED_CAP, f"oracle_measured l
 assert not set(oracle_measured) & {f for r, fs in roles.items() if r != "oracle_measured" for f in fs}, "oracle_measured shares a file with another role"
 assert sum(oracle_reweight.values()) <= REWEIGHT_CAP, f"oracle_reweight line budget exceeded: {sum(oracle_reweight.values())} > {REWEIGHT_CAP}"
 assert not set(oracle_reweight) & {f for r, fs in roles.items() if r != "oracle_reweight" for f in fs}, "oracle_reweight shares a file with another role"
+assert sum(slots.values()) <= SLOTS_CAP, f"slots line budget exceeded: {sum(slots.values())} > {SLOTS_CAP}"
+assert not set(slots) & {f for r, fs in roles.items() if r != "slots" for f in fs}, "slots shares a file with another role"
 assert total <= CAP, f"line budget exceeded: {total} > {CAP}; stop and report which files grew"
 print("test_budget: all passed")

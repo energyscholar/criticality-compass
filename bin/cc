@@ -11,7 +11,6 @@ import sys
 import tempfile
 import time
 import tomllib
-from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -19,6 +18,7 @@ sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "cc" / "instruments")]
 import oracle
 import registry
 import schema
+import slots
 VERBOSE = False
 MODE = "basic"
 TOOLS = Path(os.environ["CC_STRUCTURE_CHECKS"]) if os.environ.get("CC_STRUCTURE_CHECKS") else None   # NAMED by CC_STRUCTURE_CHECKS, never a default location (plan 0985); the structure checker (checks.py, freeze.py); CC_STRUCTURE_CHECKS moves it (plan 0929)
@@ -103,16 +103,15 @@ def run_tests(names, skip=()):
     missing = [n for n in names if not any(n in key(t) for t in allt)]
     keep = 10**6 if os.environ.get("CC_REGOLDEN") == "1" else 99 if VERBOSE else 8   # a regolden must list every file
 
-    def one(t):
+    def one(t, slot):
         t0 = time.time()
-        r = subprocess.run([sys.executable, str(t)], capture_output=True, text=True, cwd=ROOT)
+        r = slots.run([sys.executable, str(t)], slot, capture_output=True, text=True, cwd=ROOT)   # the slot is held while the script runs (cc/slots.py)
         lines = (r.stdout + r.stderr).strip().splitlines()
         return (t.stem, r.returncode == 0, lines[-keep:], time.time() - t0, lines)   # the tail is for printing; the FULL output is for the scoreboard lines (plan 0881 P2.2)
     alone = set(registry.config(ROOT)["check"]["exclusive"])   # cc.toml [check] exclusive: test NAMES that run by themselves, after the parallel batch (plan 0881)
     batch = [t for t in picked if t.stem not in alone]
-    with ThreadPoolExecutor(max(1, (os.cpu_count() or 3) - 2)) as pool:   # each script is its own subprocess
-        done = dict(zip((t.stem for t in batch), pool.map(one, batch)))   # map returns in submission order
-    done.update({t.stem: one(t) for t in picked if t.stem in alone})
+    done = dict(zip((t.stem for t in batch), slots.fan(one, batch, max(1, (os.cpu_count() or 3) - 2))))   # each script is its own subprocess in a host-wide slot; results in submission order
+    done.update({t.stem: slots.fan(one, [t], 1)[0] for t in picked if t.stem in alone})
     return [done[t.stem] for t in picked], missing, allt   # the printed order is the checks.toml order, as before
 
 
@@ -768,7 +767,11 @@ def main(argv):
              "test": cmd_test, "run": cmd_run, "reverdict": cmd_reverdict, "family": cmd_family, "freeze": cmd_freeze, "check": cmd_check, "mutate": cmd_mutate, "bench": cmd_bench, "registry": cmd_registry, "intake": cmd_intake, "navigate": cmd_navigate, "chain": cmd_chain,
              "validate": lambda a: cmd_validate(a + (["--advanced"] if advanced else []))}
     if cmd in table:
-        return table[cmd](rest)
+        try:
+            return table[cmd](rest)
+        except slots.Refused as e:   # a pool setting refused by name (plan 1559)
+            print(e)
+            return 1
     if cmd in ("new", "data", "tables"):
         return cmd_author(cmd, rest)
     print(f"unknown command '{cmd}'.\n  Next: bin/cc help")
