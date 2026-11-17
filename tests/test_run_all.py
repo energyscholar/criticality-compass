@@ -8,13 +8,13 @@ import os
 import sys
 import time
 import tomllib
-from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path[:0] = [str(ROOT / "cc"), str(ROOT / "cc" / "instruments")]
 import detect  # noqa: E402
 import resources  # noqa: E402
+import slots  # noqa: E402
 
 SET = "v03-rules"
 
@@ -40,10 +40,8 @@ if __name__ == "__main__":
     alone, pooled = resources.unrecorded(peaks), [n for n in names if peaks[n] is not None]
     print(f"test_run_all: pool {workers} workers = floor({memory_gb} GB x 1024 / {max((p for p in peaks.values() if p is not None), default=memory_gb * 1024):.0f} MB "
           f"largest recorded peak), at most cpu_count-2, for {len(pooled)} inputs; {len(alone)} with no recorded peak run one at a time after it")
-    with ProcessPoolExecutor(workers) as pool:
-        done = list(pool.map(measure, pooled))
-    with ProcessPoolExecutor(1) as one:   # an input of unknown size gets the host to itself: never beside another measurement
-        done += list(one.map(measure, alone))
+    done = slots.fan(measure, pooled, workers, procs=True)   # each measurement in its own process, inside a host-wide slot
+    done += slots.fan(measure, alone, 1, procs=True)   # an input of unknown size gets the host to itself: never beside another measurement
     got = {name: g for name, g, _ in done}
     if os.environ.get("CC_VERBOSE") == "1":
         print("".join(f"seconds {sec:7.1f}  {name}\n" for name, _, sec in sorted(done, key=lambda d: -d[2])), end="")

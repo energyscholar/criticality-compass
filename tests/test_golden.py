@@ -19,7 +19,6 @@ import sys
 import tempfile
 import time
 import tomllib
-from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import numpy as np
@@ -30,6 +29,7 @@ ROOT = Path(__file__).resolve().parent.parent
 GOLD = ROOT / "tests" / "golden"
 TRACE = ROOT / "tests" / "trace"
 sys.path[:0] = [str(ROOT / "cc")]
+import slots  # noqa: E402
 import schema  # noqa: E402
 DATA = schema.resolve_data_root(tomllib.loads((ROOT / "cc.toml").read_text()))[0]   # where the data IS here: CC_DATA_ROOT, else the clone's data/
 TOOLSET = DATA.parent   # the toolset root: a transducer's `update` sha check reads the sampler files here (plan 0890 P3)
@@ -150,8 +150,7 @@ if not REGOLDEN and not UNKEYED:
         if rec and gold(case, mode, "txt").is_file() and key_of(case, mode, rec[0]) == rec[1]:
             keyed.add(i)
 todo = [(i, (*job, REGOLDEN)) for i, job in enumerate(jobs) if i not in keyed]
-with ThreadPoolExecutor(max(1, (os.cpu_count() or 3) - 2)) as pool:   # each transcript has its own temp copy
-    done = dict(zip((i for i, _ in todo), pool.map(timed, [job for _, job in todo])))   # in order: the output below is the same as when run serially
+done = dict(zip((i for i, _ in todo), slots.fan(lambda job, s: timed(job), [job for _, job in todo], max(1, (os.cpu_count() or 3) - 2))))   # each transcript has its own temp copy and a host-wide slot; in order: the output below is the same as when run serially
 bad, written, rekeyed = [], [], []
 for i, (case, mode) in enumerate(jobs):
     f = gold(case, mode, "txt")

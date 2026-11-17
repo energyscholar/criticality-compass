@@ -33,7 +33,8 @@ def spans(exclusive):
         (repo / "checks.toml").write_text("[roles]\ntests = [" + ", ".join(f'"tests/{n}.py"' for n in NAMES) + "]\n")
         cfg = (ROOT / "cc.toml").read_text().replace('exclusive = ["test_run_all"]', f"exclusive = {exclusive}")
         (repo / "cc.toml").write_text(cfg)
-        r = subprocess.run([sys.executable, str(repo / "bin" / "cc"), "test"], capture_output=True, text=True, cwd=repo)
+        env = {**os.environ, "CC_SLOTS": str(Path(t) / "slots"), "CC_JOBS": str(len(NAMES))}   # a private pool (plan 1559): the test asserts that ordinary tests overlap, which a busy host pool would hide
+        r = subprocess.run([sys.executable, str(repo / "bin" / "cc"), "test"], capture_output=True, text=True, cwd=repo, env=env)
         out = {}
         for ln in (repo / "tests" / "log.txt").read_text().splitlines():
             kind, name, ts = ln.split()
