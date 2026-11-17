@@ -54,6 +54,7 @@ tests = [
   "contract/test_apparatus_midmove.py",   # plan 1553
   "contract/test_apparatus_clock.py",   # plan 1565
   "contract/test_needle_clock.py", "contract/test_time_ledger.py",   # plan 1565
+  "contract/test_ising_port.py",   # plan 1569
   "contract/test_ising_core.py", "contract/test_ising_blind_conformance.py",   # plan 1546
   "contract/test_slots.py",   # plan 1559
   "contract/test_rbn_core.py",   # plan 1560

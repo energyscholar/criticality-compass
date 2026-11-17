@@ -41,7 +41,7 @@ def main(argv=None):
     a = ap.parse_args(argv)
 
     envd = C.load_toml(a.env)
-    env = C.parse_env_cfg(envd) if isinstance(envd, dict) else envd
+    env = AC.parse_env(envd) if isinstance(envd, dict) else envd
     if isinstance(env, R.Malformed):
         print(f"RefusedToStart field={env.field} parse=B {env.detail}", file=sys.stderr)
         return 2  # no run dir can be named without the env file's run_dir_root
@@ -60,7 +60,7 @@ def main(argv=None):
     scfg = HS.parse_score(score_raw)
     if isinstance(scfg, R.Malformed):
         return refuse(run_dir, scfg.field, "B", scfg.detail)
-    env = srv[0]
+    env, world, plug = srv[0], srv[1], srv[3]
     run_dir.mkdir(parents=True, exist_ok=True)
     for name in (*OUTPUTS, *SETPOINT["hold-setpoint-v1"]):
         (run_dir / name).unlink(missing_ok=True)       # one drop per run directory: nothing of an earlier run is read
@@ -100,7 +100,7 @@ def main(argv=None):
             shutil.copyfile(Path(tmp) / "needle-time.jsonl", run_dir / "needle-time.jsonl")
         stage["reap_s"] = time.perf_counter() - t0
     t0 = time.perf_counter()
-    rc = finish(run_dir, rid, (run_dir / "report.jsonl").read_text(), maptext, scfg)
+    rc = finish(run_dir, rid, (run_dir / "report.jsonl").read_text(), maptext, scfg, plug.transition(world))
     stage["finish_s"] = time.perf_counter() - t0
     if rc == 0:
         t0 = time.perf_counter()
@@ -110,15 +110,16 @@ def main(argv=None):
     return rc
 
 
-def finish(run_dir, rid, report, maptext, scfg):
+def finish(run_dir, rid, report, maptext, scfg, transition):
     st, mp = RH.read(report), RH.read_map(maptext)
     if isinstance(st, NS.Unreadable) or st.outcome is NS.PENDING:
         return refuse(run_dir, "needle_stdout", "B")
     if isinstance(mp, NS.Unreadable) or len(mp.drops) != 1 or RH.check(st, mp.drops[0]) is not None:
         return refuse(run_dir, "needle_map", "B")
     rows = json.loads((run_dir / "truth.json").read_text())["rows"]
+    scorer, overlayer = HS.SCORER[transition]
     try:
-        score, over = HS.score(st, rows, scfg), HS.overlay(mp.drops[0], rows, scfg.offset_K)
+        score, over = scorer(st, rows, scfg), overlayer(mp.drops[0], rows, scfg.offset_K)
         extra = {name: BUILD[name](st, rows, scfg) for name in SETPOINT[st.start["needle"]]}
     except KeyError:
         return refuse(run_dir, "truth_join", "B")

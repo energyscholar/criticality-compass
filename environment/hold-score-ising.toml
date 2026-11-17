@@ -1,0 +1,5 @@
+# Plan 1569 score settings, declared before data (SCHEMA-1569 section 9).
+# offset_K: where the L = 81 lattice's dU4 crossing sits against K_c, in the dial's value (recon r1). out_run: the longest run of OUT steps a HELD run may have.
+offset_K = -0.0050
+out_run = 3
+plan = "1569"

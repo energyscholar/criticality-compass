@@ -11,6 +11,7 @@ NO_STEPS = "no-hold-steps"
 LOCKS = ("HELD", "RECOVERED", "LOST", "LEFT-RANGE", "CUT-SHORT")
 STATS = ("in_fraction", "mean_e", "rms_e", "max_abs_e", "rms_e_g", "accuracy")
 PAYLOAD = HT.PHASE_PAYLOAD      # plan 1558: the walk and the park carry a payload too
+NO_TRANSITION = "no-transition"
 AGREE = {"ordered-side": None, "disordered-side": None, "critical-bracketed": "not-resolved", "in-transit": "not-resolved"}
 
 
@@ -153,3 +154,29 @@ def setpoint_score(stream, rows, cfg):
     return {"plan": cfg.plan, "offset_K": cfg.offset_K, "needle": st["needle"], "sigma": k["sigma"], "sigma_ticks": off, "g": g,
             "dead_band_ticks": band, "ordered_side": side, "feedback": st["mode"]["feedback"], "outcome": stream.outcome["kind"],
             "park_steps": n, **stats, "parks": parks}
+
+
+def _evaluated(stream):
+    return [r for r in stream.steps if r["evaluated"]]
+
+
+def score_none(stream, rows, cfg):
+    """plan 1569 (SCHEMA-1569 section 6): a world with no transition has no crossing to track, so there is no tracking error, no IN/OUT cell
+    and no accuracy: what the needle did (its steps, its calls, its outcome) and the lock `no-transition`."""
+    held = [r for r in _evaluated(stream) if r["phase"] == "hold"]
+    calls = {}
+    for r in held:
+        kind = r["verdict"][0]["kind"]
+        calls[kind] = calls.get(kind, 0) + 1
+    return {"plan": cfg.plan, "transition": "none", "feedback": stream.start["mode"]["feedback"], "outcome": stream.outcome["kind"],
+            "lock": NO_TRANSITION, "hold_steps": len(held), "calls": calls,
+            "segments": len({r[PAYLOAD[r["phase"]]]["segment"] for r in _evaluated(stream)}),
+            "ignite_steps": sum(1 for r in stream.steps if r["phase"] == "ignite")}
+
+
+def overlay_none(drop, rows, offset_K):
+    """no truth state to join: every place is counted `no-transition`, none is typed."""
+    return {"drop": drop.head["drop"], "places": [], "counts": {NO_TRANSITION: len(drop.places)}}
+
+
+SCORER = {"continuous": (score, overlay), "none": (score_none, overlay_none)}   # a total table on the System's transition

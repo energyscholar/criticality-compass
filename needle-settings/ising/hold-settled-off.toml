@@ -1,0 +1,32 @@
+# Plan 1552 hold needle settings, declared before data. SETTLED hold mode, FEEDBACK OFF. There is no hold.toml: neither hold mode is the default.
+needle_structure = "hold-pair-v1"
+ops = ["declare", "scan"]
+g = 12
+step = 6
+sigma = 0
+n_eq = 450
+S = 1500
+skip = 1
+z = 2.0
+lost = 3
+
+[ignite]
+steps = [100, 20]
+S = 400
+margin = 1
+n_eq = 450
+
+[approach]
+S = 40
+n_eq = 48
+
+[M]
+observable = "dU4"
+node = "one reading of the observable: its value at one dial tick, over the window and at the index the wire reports"
+relation = "path"
+edge = "from each reading of a drop to the reading the wire served just before it"
+direction = "the wire's index: the source is the later reading, so the difference is current minus prior"
+provenance = "steering (declared under the Origin's ruling, pending kernel revision)"
+transform = "none"
+rho_base = "not-declared"
+chi_0 = "not-declared"

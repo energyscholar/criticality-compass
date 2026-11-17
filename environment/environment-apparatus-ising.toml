@@ -1,0 +1,4 @@
+# Host config of the apparatus server for the Ising System (plan 1569). Port 8790 is the interactive port SCHEMA-1568 section 9 registers for 1569.
+system       = "ising"
+port         = 8790
+run_dir_root = "runs/"
