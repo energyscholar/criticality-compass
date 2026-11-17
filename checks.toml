@@ -52,6 +52,7 @@ tests = [
   "contract/test_apparatus_drift.py", "contract/test_apparatus_wire.py",   # plan 1545
   "contract/test_hold_needle.py", "contract/test_hold_reader.py", "contract/test_hold_score.py",   # plan 1552 phases 1-3
   "contract/test_apparatus_midmove.py",   # plan 1553
+  "contract/test_apparatus_clock.py",   # plan 1565
   "contract/test_ising_core.py", "contract/test_ising_blind_conformance.py",   # plan 1546
   "contract/test_slots.py",   # plan 1559
   "contract/test_rbn_core.py",   # plan 1560
