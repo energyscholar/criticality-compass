@@ -25,9 +25,23 @@ PARAMS = ("K",)
 HIDDEN = {"L4": (0.0, math.log(3) / 4)}   # (lo exclusive, hi inclusive)
 ORDERED_SIDE = {"K": "+"}                  # larger K is the ordered side
 ROLES = [{"name": "D", "role": "crossing", "ordered_sign": "+"}, {"name": "C", "role": "peak"}]
+# the Engine face (plan 1569, contract/SCHEMA-1569.md section 2): what the apparatus host used to hard-code for AT
+DYNAMICS = "algorithmic (Swendsen-Wang)"   # the wire's `clock`
+S_MIN = 40                                  # the fewest samples a reading may take
+EXTRA_KEYS = ()                             # AT has no world keys of its own
+
+
+def parse_extra(d):
+    return dict(d)
+
+
+def transition(world):
+    return "continuous"
 
 
 class Engine:
+    S_MIN = S_MIN
+
     def __init__(self, world):
         self.w = world
         self.track = DL.start(world.lag, [d.start for d in world.dials])
@@ -81,9 +95,10 @@ class Engine:
         N = w.L * w.L
         jk1 = blind._jackknife(S, lambda idx: G[idx, 1].mean())
         jk0 = blind._jackknife(S, lambda idx: G[idx, 0].mean())
-        return ({"pos": list(cur), "window": [sampling + skip, st.index], "D": float(G[:, 1].mean()) - float(G[:, 0].mean()),
-                 "D_err": math.sqrt(jk1 ** 2 + jk0 ** 2), "C": float(E2.var() / N),
-                 "C_err": blind._jackknife(S, lambda idx: E2[idx].var() / N)}, (first, sampling, st.index))
+        return ({"pos": list(cur), "window": [sampling + skip, st.index],
+                 "values": {"D": float(G[:, 1].mean()) - float(G[:, 0].mean()), "C": float(E2.var() / N)},
+                 "errors": {"D": math.sqrt(jk1 ** 2 + jk0 ** 2), "C": blind._jackknife(S, lambda idx: E2[idx].var() / N)}},
+                (first, sampling, st.index))
 
     def run(self, positions, n_eq, S, skip):
         done = [self.point(cur, n_eq, S, skip) for cur in positions]

@@ -1,6 +1,7 @@
 """Plan 1545: the strict parser of an apparatus world (Parse B; contract/SCHEMA-1545.md section 2) and the tick grid.
 Every parse is `dict -> Value | navigator.reader.Malformed`; a fault is a refusal VALUE, no default is ever filled.
 The plugin supplies PARAMS and the HIDDEN domains, so this module names no parameter."""
+import dataclasses
 import importlib.util
 import math
 from dataclasses import dataclass
@@ -42,6 +43,23 @@ class World:
     hidden: dict
     drift: DR.Drift
     world_clock: WC.WorldClock
+    extra: dict   # the plugin's own world keys (its EXTRA_KEYS), as its parse_extra returned them
+
+
+def systems():
+    """plan 1569: the Systems the apparatus host serves are exactly the plugin directories that hold an apparatus.py."""
+    return tuple(sorted(p.parent.name for p in C.PLUGINS.glob("*/apparatus.py")))
+
+
+def parse_env(d):
+    """config.parse_env_cfg's rules, with the host's own system set: the door is checked here, every other rule is config.py's."""
+    if not isinstance(d, dict):
+        return C.parse_env_cfg(d)
+    system = d.get("system")
+    if system not in systems():
+        return R.Malformed("system", f"one of {systems()}")
+    env = C.parse_env_cfg({**d, "system": C.SYSTEMS[0]})
+    return env if isinstance(env, R.Malformed) else dataclasses.replace(env, system=system)
 
 
 def tick_value(lo, hi, T, t):
@@ -100,11 +118,15 @@ def _table_of_floats(v, keys, name, domain=None):
     return dict(v)
 
 
-def parse_world(d, params, hidden_domain):
-    """params: the plugin's PARAMS; hidden_domain: {name: (lo exclusive, hi inclusive)} -> World | Malformed."""
-    bad = _unknown(d, TOP_KEYS, "at-apparatus.toml")
+def parse_world(d, params, hidden_domain, extra_keys, parse_extra):
+    """params: the plugin's PARAMS; hidden_domain: {name: (lo exclusive, hi inclusive)}; extra_keys and parse_extra: the plugin's
+    own world keys and their parse (a dict or Malformed) -> World | Malformed."""
+    bad = _unknown(d, TOP_KEYS + tuple(extra_keys), "at-apparatus.toml")
     if bad:
         return bad
+    extra = parse_extra({k: d[k] for k in extra_keys if k in d})
+    if isinstance(extra, R.Malformed):
+        return extra
     Lb, burn, seed = R._int(d, "L_blocks", 1), R._int(d, "burn", 0), R._int(d, "seed")
     k, nlev = R._int(d, "k", 1), R._int(d, "nlev", 2)
     unit, kind = R._str(d, "index_unit"), R._str(d, "index_kind")
@@ -132,7 +154,7 @@ def parse_world(d, params, hidden_domain):
     world_clock = WC.parse_world_clock(d.get("world_clock", WC.ABSENT))
     if isinstance(world_clock, R.Malformed):
         return world_clock
-    return World(Lb, 3 * Lb, burn, seed, k, nlev, unit, kind, lag, horizon, dials, fixed, hidden, drift, world_clock)
+    return World(Lb, 3 * Lb, burn, seed, k, nlev, unit, kind, lag, horizon, dials, fixed, hidden, drift, world_clock, extra)
 
 
 def load_apparatus(system):
@@ -149,7 +171,7 @@ def load_apparatus_cfgs(env_path, at_path):
     envd = C.load_toml(env_path)
     if isinstance(envd, R.Malformed):
         return envd
-    env = C.parse_env_cfg(envd)
+    env = parse_env(envd)
     if isinstance(env, R.Malformed):
         return env
     plug = load_apparatus(env.system)
@@ -157,7 +179,7 @@ def load_apparatus_cfgs(env_path, at_path):
     atd = C.load_toml(at_path)
     if isinstance(atd, R.Malformed):
         return atd
-    world = parse_world(atd, plug.PARAMS, plug.HIDDEN)
+    world = parse_world(atd, plug.PARAMS, plug.HIDDEN, plug.EXTRA_KEYS, plug.parse_extra)
     if isinstance(world, R.Malformed):
         return world
     taud = C.load_toml(at_path.parent / "tau-v0.toml")

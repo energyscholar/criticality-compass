@@ -109,8 +109,6 @@ PINS = {         # sha256 at main 61fb241
     "contract/SCHEMA-1525.md": "40ae7812cefb384bd1a2582751891464ce0928d1e643da87f2df0fa56ce169ec",
     "contract/test_apparatus_drift.py": "3586c1ec9930b059555fe2925af1cb7ce685f7b06e3b64e337cafac900e16261",   # plan 1561: line 45 names six laws
     # "environment/drift.py" is no longer pinned: plan 1561 adds two laws; test_apparatus_drift.py and test_drift_laws.py hold the old four
-    "environment/apparatus_config.py": "8d7104d561d5e927d70323c44b2edf0481be2f27df51b2be588a60851f522003",
-    "environment/apparatus_server.py": "7a81c7c69ca30c00ba70a476a1fcffcd4711d49322c5f4004aaf1c7f6aa3c155",
     "environment/environment-apparatus.toml": "8d6f1962219fe08ba4cc2a460c5947bf01c160374f7e8925d3d1d9557a4c4b9a",
     "system-instantiated/plugins/at/at-apparatus.toml": "8db2ceab38f5d2f20c2e8b411d8ef96160f0b32d8ca9fd7adc105c4499129eb3",
     "system-instantiated/plugins/at/at-apparatus-static.toml": "788bb649d187f6e85072c942ff7bbbbaf37db5249be2be424713e0e94a33a623",

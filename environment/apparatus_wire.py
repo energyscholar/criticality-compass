@@ -5,8 +5,6 @@ values; the truth row goes to a list that only the server's exit path writes out
 from dataclasses import dataclass
 
 WIRE = "compass-apparatus/1"
-CLOCK = "algorithmic (Swendsen-Wang)"
-TIME_LABEL = "lag and drift are in algorithmic (Swendsen-Wang) time"
 
 
 @dataclass(frozen=True)
@@ -23,12 +21,18 @@ class Public:
     L: int
     index_unit: str
     index_kind: str
+    dynamics: str
+
+
+def time_label(dynamics):
+    """plan 1569: the label is the plugin's declared dynamics, never a constant of the host."""
+    return f"lag and drift are in {dynamics} time"
 
 
 def public(world, tau, plug):
     dials = tuple({"name": d.name, "lo": d.lo, "hi": d.hi, "T": d.T, "max_nudge": d.max_nudge} for d in world.dials)
     return Public(dials, dict(world.fixed), dict(plug.ORDERED_SIDE), list(plug.ROLES), world.horizon, world.lag, tau, world.k,
-                  world.L, world.index_unit, world.index_kind)
+                  world.L, world.index_unit, world.index_kind, plug.DYNAMICS)
 
 
 def nev(index):
@@ -39,13 +43,14 @@ def declared(pub, pos, index):
     return {"op": "declared", "wire": WIRE, "dials": [dict(d) for d in pub.dials], "pos": list(pos), "fixed": dict(pub.fixed),
             "ordered_side": dict(pub.ordered_side), "roles": [dict(r) for r in pub.roles], "index": index, "horizon": pub.horizon,
             "lag": pub.lag, "tau": pub.tau, "k": pub.k, "L": pub.L, "index_unit": pub.index_unit, "index_kind": pub.index_kind,
-            "clock": CLOCK}
+            "clock": pub.dynamics}
 
 
-def reading(points, index):
+def reading(pub, points, index):
+    """one list per declared role, in the declared order; a role a point lacks raises KeyError (a crash, never a silent drop)."""
     return {"op": "reading", "pos": [p["pos"] for p in points], "window": [p["window"] for p in points],
-            "values": {"D": [p["D"] for p in points], "C": [p["C"] for p in points]},
-            "errors": {"D": [p["D_err"] for p in points], "C": [p["C_err"] for p in points]}, "index": index}
+            "values": {r["name"]: [p["values"][r["name"]] for p in points] for r in pub.roles},
+            "errors": {r["name"]: [p["errors"][r["name"]] for p in points] for r in pub.roles}, "index": index}
 
 
 def _int(v):
@@ -85,14 +90,14 @@ def _measured(positions_of):
     """plan 1553: any n_eq >= 0 is legal; a move still in transit is the delay line's business, not the door's."""
     def run(engine, pub, rows, msg):
         n_eq, S, skip = msg["n_eq"], msg["S"], msg["skip"]
-        if not (_int(n_eq) and n_eq >= 0 and _int(S) and S >= 40 and _int(skip) and skip >= 1):
+        if not (_int(n_eq) and n_eq >= 0 and _int(S) and S >= engine.S_MIN and _int(skip) and skip >= 1):
             return nev(engine.index)
         positions = positions_of(pub, engine.pos, msg)
         if positions is None or engine.index + len(positions) * (n_eq + S * skip) > pub.horizon:
             return nev(engine.index)
         points, spans = engine.run(positions, n_eq, S, skip)
         rows.append(engine.truth_row(len(rows) + 1, msg["op"], points, spans))
-        return reading(points, engine.index)
+        return reading(pub, points, engine.index)
     return run
 
 

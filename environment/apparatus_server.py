@@ -72,9 +72,10 @@ def main(argv=None):
     engine = plug.Engine(world)  # burn once, at the start position and the index-0 hidden values; the port binds only after
     pub = AW.public(world, tau.value, plug)
     rows, perf, book = [], [], {"ledger": WC.START, "turns": []}
+    label = AW.time_label(plug.DYNAMICS)
     run_dir = Path(a.run_dir)
     run_dir.mkdir(parents=True, exist_ok=True)
-    edge = {"time": AW.TIME_LABEL, "wire": AW.WIRE, "index": 0, "K_c": engine.K_c(0), "drift": world.drift.table, "hidden": world.hidden}
+    edge = {"time": label, "wire": AW.WIRE, "index": 0, "K_c": engine.K_c(0), "drift": world.drift.table, "hidden": world.hidden}
     (run_dir / "edge.json").write_text(json.dumps(edge, sort_keys=True))  # the truth is written here and at exit, nowhere else
     signal.signal(signal.SIGTERM, lambda *_: sys.exit(0))
     lsock = socket.socket()
@@ -88,9 +89,9 @@ def main(argv=None):
     finally:
         lsock.close()
         run_dir.mkdir(parents=True, exist_ok=True)
-        (run_dir / "truth.json").write_text(json.dumps({"time": AW.TIME_LABEL, "wire": AW.WIRE, "rows": rows}))
-        (run_dir / "perf.json").write_text(json.dumps({"time": AW.TIME_LABEL, "calls": perf}))
-        (run_dir / "turns.json").write_text(json.dumps({"time": AW.TIME_LABEL, "wire": AW.WIRE, "world_clock": world.world_clock.table,
+        (run_dir / "truth.json").write_text(json.dumps({"time": label, "wire": AW.WIRE, "rows": rows}))
+        (run_dir / "perf.json").write_text(json.dumps({"time": label, "calls": perf}))
+        (run_dir / "turns.json").write_text(json.dumps({"time": label, "wire": AW.WIRE, "world_clock": world.world_clock.table,
                                                         "turns": book["turns"]}))
     return 0
 
