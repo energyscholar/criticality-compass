@@ -101,7 +101,7 @@ class _Replay(HD.Drop):
             if self.i >= len(self.steps):
                 raise _Stop
             rec = self.steps[self.i]
-            p = rec[HT.PAYLOAD[rec["phase"]]]
+            p = rec[HT.PHASE_PAYLOAD[rec["phase"]]]
             self.queue = [(p["window"][j], {k: p["values"][k][j] for k in self.roles}, {k: p["errors"][k][j] for k in self.roles})
                           for j in range(len(p.get("window", ())))]
         return self.queue
@@ -217,7 +217,7 @@ def trail(stream):
 def sigma(stream):
     """the setpoint offset in units of g and in ticks (g is the half-width) and in the dial's value."""
     cfg, dl = stream.start["settings"], stream.dial
-    ticks = cfg["sigma"] * cfg["g"]
+    ticks = HT.offset(cfg["sigma"], cfg["g"])
     return {"g": cfg["sigma"], "ticks": ticks, "value": ticks * (dl["hi"] - dl["lo"]) / dl["T"], "ticks_per_g": cfg["g"]}
 
 
@@ -226,16 +226,28 @@ def settle(stream):
     cfg, bel = stream.start["settings"], stream.start["belief"]
     lag = stream.start["declared_other"]["lag"]
     floor = lag + bel["k"]["declared"] * bel["tau"]["declared"]
-    n_eq = {"ignite": cfg["ignite"]["n_eq"], "approach": cfg["approach"]["n_eq"], "hold": cfg["n_eq"]}
+    n_eq = {p: HT.SETTLE[p](cfg)["n_eq"] for p in (*HT.PAYLOAD, *HT.PARKS[cfg["needle_structure"]])}
     return {"lag": lag, "floor": floor, "n_eq": n_eq, "mid_move": {p: n < lag for p, n in n_eq.items()},
             "relaxed": {p: n >= floor for p, n in n_eq.items()}}
+
+
+def deadband(stream):
+    """plan 1558: the needle's MEASURED band, in ticks, from its own evaluated hold pairs: per pair z * rms(errors) / (|D_hi - D_lo| / 2g).
+    A flat pair has no finite band: it is counted in n and flat, never dropped. -> {n, flat, median, p95} (None when no pair is finite)."""
+    cfg = stream.start["settings"]
+    obs = cfg["M"]["observable"]
+    pairs = [r["pair"] for r in stream.steps if r["phase"] == "hold" and r["evaluated"]]
+    slopes = [abs(p["values"][obs][1] - p["values"][obs][0]) / (2 * cfg["g"]) for p in pairs]
+    bands = sorted(cfg["z"] * ((p["errors"][obs][0] ** 2 + p["errors"][obs][1] ** 2) / 2) ** 0.5 / m for p, m in zip(pairs, slopes) if m != 0)
+    at = lambda q: bands[min(len(bands) - 1, int(q * len(bands)))] if bands else None
+    return {"n": len(pairs), "flat": slopes.count(0), "median": at(0.5), "p95": at(0.95)}
 
 
 # ---------------------------------------------------------------- the map
 def _head(o):
     _keys(o, HEAD_KEYS, "the head")
     roles = o["roles"]
-    if o["needle"] != HT.NEEDLE or type(o["drop"]) is not str or not o["drop"]:
+    if o["needle"] not in HT.SHAPES or type(o["drop"]) is not str or not o["drop"]:
         _no("the head is not a drop of this needle")
     dial = _keys(o["dial"], ("name", "lo", "hi", "T"), "head.dial")
     if not (type(dial["name"]) is str and _num(dial["lo"]) and _num(dial["hi"]) and dial["lo"] < dial["hi"] and _int(dial["T"], 1)):
@@ -247,7 +259,7 @@ def _head(o):
     if not (all(type(clock[k]) is str for k in ("index_unit", "index_kind", "clock")) and _int(clock["lag"]) and _int(clock["k"])
             and _num(clock["tau"]) and clock["tau"] >= 0):
         _no("head.clock is not units, a lag, k and tau")
-    n_eq = _keys(o["n_eq"], HT.PAYLOAD, "head.n_eq")
+    n_eq = _keys(o["n_eq"], HT.PHASES[o["needle"]], "head.n_eq")
     if not all(_int(v) for v in n_eq.values()) or not _int(o["skip"], 1):
         _no("head.n_eq or head.skip is not a settle time or a skip")
     if not (type(roles) is list and roles and roles == sorted(set(roles)) and all(type(r) is str for r in roles)):
@@ -285,7 +297,7 @@ def _places(head, recs):
         ok = HT.settled(since, clock["lag"], w[0], head["skip"])
         a, b, kstate = HT.kernel_next(kstate, rd[obs]["value"])
         call = _keys(p["call"], ("step", "phase", "kind"), f"place {seq} call")
-        if not (_int(call["step"], 1) and call["phase"] in HT.PAYLOAD and type(call["kind"]) is str):
+        if not (_int(call["step"], 1) and call["phase"] in HT.PHASES[head["needle"]] and type(call["kind"]) is str):
             _no(f"place {seq}: the call is not a step, a phase and a kind")
         if not (p["class"] == cls and type(p["settled"]) is bool and p["settled"] == ok and p["state"] == HT.state(cls, rule["ordered_sign"], ok)):
             _no(f"place {seq}: the class, the settled mark or the state does not follow from its readings")
