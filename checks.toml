@@ -60,6 +60,7 @@ tests = [
   "contract/test_drift_score.py",   # plan 1561
   "contract/test_drift_worlds.py",   # plan 1561
   "contract/test_drift_laws.py",   # plan 1561
+  "contract/test_hold_setpoint.py",   # plan 1558
   "tests/frozen.py", "tests/test_bench.py", "tests/test_claims.py",   # plan 1427: declared so the plan may edit and run them
   "tests/test_closure.py", "tests/test_0973.py", "tests/test_0978.py",
   "tests/test_budget.py", "tests/test_chain_1205.py", "tests/test_chain_1205_p2b.py", "tests/test_chain_1205_p2c.py","tests/test_score_words_1201.py",

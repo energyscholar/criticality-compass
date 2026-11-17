@@ -4,12 +4,13 @@ prints nothing, and the needle side never imports it. The truth comes in as the 
 import math
 from dataclasses import dataclass
 
+from navigator import holdtab as HT
 from navigator import reader as R
 
 NO_STEPS = "no-hold-steps"
 LOCKS = ("HELD", "RECOVERED", "LOST", "LEFT-RANGE", "CUT-SHORT")
 STATS = ("in_fraction", "mean_e", "rms_e", "max_abs_e", "rms_e_g", "accuracy")
-PAYLOAD = {"ignite": "grid", "approach": "leg", "hold": "pair"}
+PAYLOAD = HT.PHASE_PAYLOAD      # plan 1558: the walk and the park carry a payload too
 AGREE = {"ordered-side": None, "disordered-side": None, "critical-bracketed": "not-resolved", "in-transit": "not-resolved"}
 
 
@@ -104,3 +105,51 @@ def overlay(drop, rows, offset_K):
         places.append({"seq": p["seq"], "tick": p["tick"], "index": p["index"], "truth_tick": truth, "true_state": true_state,
                        "state": p["state"], "agree": agree})
     return {"drop": head["drop"], "places": places, "counts": counts}
+
+
+# ---------------------------------------------------------------- plan 1558: the setpoint score (contract/SCHEMA-1558.md section 9)
+SP_STATS = ("safe_fraction", "mean_margin_g", "min_margin_g", "rms_set_e_g", "ordered_share", "ordered_depth_max", "ordered_depth_p95",
+            "edge_error_p95", "band_holds")
+
+
+def _p95(xs):
+    xs = sorted(xs)
+    return xs[min(len(xs) - 1, int(0.95 * len(xs)))]
+
+
+def _held(p):
+    """the tick the dial held over one point's window: its `dial` runs, each weighted by the samples of the window it covers."""
+    a, b = p["window"]
+    ends = [r[0] for r in p["dial"][1:]] + [b + 1]
+    cover = [(max(0, min(e - 1, b) - max(r[0], a) + 1), r[1][0]) for r, e in zip(p["dial"], ends)]
+    return sum(n * t for n, t in cover) / sum(n for n, _ in cover)
+
+
+def actual_ticks(rows):
+    """window -> the tick the dial ACTUALLY held over it (SCHEMA-1553 section 5; one dial), whatever the needle commanded."""
+    return {tuple(p["window"]): _held(p) for row in rows for p in row["points"]}
+
+
+def setpoint_score(stream, rows, cfg):
+    st, dial = stream.start, stream.dial
+    k, g = st["settings"], st["settings"]["g"]
+    side = st["belief"]["ordered_side"]["declared"][dial["name"]]
+    off, band = HT.offset(k["sigma"], g), k.get("dead_band", {"ticks": NO_STEPS})["ticks"]
+    tt, at = truth_ticks(rows, dial, cfg.offset_K), actual_ticks(rows)
+    dev = lambda w: HT.SAFE[side] * (at[tuple(w)] - tt[tuple(w)])        # the dial's displacement from the true crossing, safe side positive
+    parks = [{"step": r["step"], "index": r["index"], "centre": r["park"]["centre"], "setpoint": r["park"]["setpoint"],
+              "actual": at[tuple(r["park"]["window"][0])], "truth_tick": tt[tuple(r["park"]["window"][0])],
+              "margin": dev(r["park"]["window"][0]), "cell": "SAFE" if dev(r["park"]["window"][0]) > 0 else "UNSAFE"}
+             for r in stream.steps if r["phase"] == "park" and r["evaluated"]]
+    seen = [dev(w) for r in stream.steps if r["phase"] in ("hold", "walk", "park") and r["evaluated"] for w in r[HT.PHASE_PAYLOAD[r["phase"]]]["window"]]
+    ms = [q["margin"] for q in parks]
+    err = [abs(m - off) for m in ms]
+    n = len(parks)
+    stats = ({k_: NO_STEPS for k_ in SP_STATS} if not n else
+             {"safe_fraction": sum(1 for q in parks if q["cell"] == "SAFE") / n, "mean_margin_g": sum(ms) / n / g, "min_margin_g": min(ms) / g,
+              "rms_set_e_g": math.sqrt(sum((m - off) ** 2 for m in ms) / n) / g, "ordered_share": sum(1 for d in seen if d < 0) / len(seen),
+              "ordered_depth_max": max(max(0, -d) for d in seen), "ordered_depth_p95": _p95([max(0, -d) for d in seen]),
+              "edge_error_p95": _p95(err), "band_holds": _p95(err) <= band})
+    return {"plan": cfg.plan, "offset_K": cfg.offset_K, "needle": st["needle"], "sigma": k["sigma"], "sigma_ticks": off, "g": g,
+            "dead_band_ticks": band, "ordered_side": side, "feedback": st["mode"]["feedback"], "outcome": stream.outcome["kind"],
+            "park_steps": n, **stats, "parks": parks}

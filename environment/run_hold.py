@@ -24,6 +24,8 @@ from needlestream import read as NS
 from needlestream import read_hold as RH
 
 OUTPUTS = ("report.jsonl", "map.jsonl", "truth.json", "score.json", "map-truth.json")
+SETPOINT = {"hold-pair-v1": (), "hold-setpoint-v1": ("setpoint.json",)}     # plan 1558: the files a shape's run adds
+BUILD = {"setpoint.json": lambda st, rows, scfg: {**HS.setpoint_score(st, rows, scfg), "noise_band": RH.deadband(st)}}
 
 
 def _doc(rid, doc):
@@ -58,7 +60,7 @@ def main(argv=None):
         return refuse(run_dir, scfg.field, "B", scfg.detail)
     env = srv[0]
     run_dir.mkdir(parents=True, exist_ok=True)
-    for name in OUTPUTS:
+    for name in (*OUTPUTS, *SETPOINT["hold-setpoint-v1"]):
         (run_dir / name).unlink(missing_ok=True)       # one drop per run directory: nothing of an earlier run is read
     (run_dir / "config.json").write_text(canon)
     signal.signal(signal.SIGTERM, lambda *_: sys.exit(143))  # the finally below reaps the server on the way out
@@ -100,10 +102,13 @@ def finish(run_dir, rid, report, maptext, scfg):
     rows = json.loads((run_dir / "truth.json").read_text())["rows"]
     try:
         score, over = HS.score(st, rows, scfg), HS.overlay(mp.drops[0], rows, scfg.offset_K)
+        extra = {name: BUILD[name](st, rows, scfg) for name in SETPOINT[st.start["needle"]]}
     except KeyError:
         return refuse(run_dir, "truth_join", "B")
     (run_dir / "score.json").write_text(_doc(rid, score))
     (run_dir / "map-truth.json").write_text(_doc(rid, over))
+    for name, doc in extra.items():
+        (run_dir / name).write_text(_doc(rid, doc))
     return 0
 
 
