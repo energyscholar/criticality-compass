@@ -4,6 +4,7 @@ is MISMATCH, never read into a ladder. A rung with no directory is MISSING, so a
 clean bracket."""
 import argparse
 import json
+import math
 import sys
 import tomllib
 from pathlib import Path
@@ -13,8 +14,8 @@ from environment import drift_worlds as DW
 from navigator.reader import Malformed
 
 MODES = ("SET", "MID", "OFF")
-# mode -> (the needle steers, the needle settles): ("nudge" in ops, n_eq > 0)
-NEEDLE = {"SET": (True, True), "MID": (True, False), "OFF": (False, True)}
+# mode -> (the needle's shape, the needle steers, the needle settles): (needle_structure, "nudge" in ops, n_eq > 0)
+NEEDLE = {"SET": ("hold-pair-v1", True, True), "MID": ("hold-pair-v1", True, False), "OFF": ("hold-pair-v1", False, True)}
 _ABSENT = object()
 
 
@@ -32,8 +33,8 @@ def parse_name(name):
 def made_as(config, mode, rung, seed):
     """True when the run's own config says it was made as its name claims: the needle, the seed and every key the rung replaces."""
     needle, at = config["needle"], config["at"]
-    steers_settles = ("nudge" in needle["ops"], needle["n_eq"] > 0)
-    return (steers_settles == NEEDLE[mode] and at["seed"] == seed
+    made = (needle.get("needle_structure"), "nudge" in needle["ops"], needle["n_eq"] > 0)
+    return (made == NEEDLE[mode] and at["seed"] == seed
             and all(at.get(k, _ABSENT) == v for k, v in rung.table.items()))
 
 
@@ -63,12 +64,34 @@ def read_run(run_dir, mode, rung, seed):
         return "FAILED", None, None
 
 
+def _num(x):
+    return isinstance(x, (int, float)) and not isinstance(x, bool)
+
+
+def read_perf(run_dir):
+    """the run's perf.json totals {seconds, calls, by_op}, or a token: "no-perf" (no file), "unreadable-perf" (not that shape)."""
+    run = next(p for p in sorted((Path(run_dir) / "runs").glob("*")) if p.is_dir())
+    f = run / "perf.json"
+    if not f.exists():
+        return "no-perf"
+    try:
+        rows = [(c["op"], c["seconds"]) for c in json.loads(f.read_text())["calls"]]
+    except (OSError, ValueError, KeyError, TypeError):
+        return "unreadable-perf"
+    if not all(isinstance(op, str) and _num(sec) for op, sec in rows):
+        return "unreadable-perf"
+    ops = sorted({op for op, _ in rows})
+    return {"seconds": math.fsum(sec for _, sec in rows), "calls": len(rows),
+            "by_op": {op: {"calls": sum(o == op for o, _ in rows), "seconds": math.fsum(sec for o, sec in rows if o == op)} for op in ops}}
+
+
 def _cell(worlds, ladder, mode, seed, root):
     rungs = []
     for r in ladder.rungs:
         lock, motion, scorer = read_run(root / run_name(ladder.name, r.label, mode, seed), mode, r, seed)
         rungs.append({"label": r.label, "severity": r.severity, "lock": lock, "class": DS.rung_class(lock),
-                      "motion": motion, "scorer": scorer})
+                      "motion": motion, "scorer": scorer,
+                      "perf": None if motion is None else read_perf(root / run_name(ladder.name, r.label, mode, seed))})
     b = DS.breakpoint([(r["label"], r["class"]) for r in rungs])
     return {"ladder": ladder.name, "mode": mode, "seed": seed, "rungs": rungs,
             "break": {"kind": b.kind, "below": b.below, "above": b.above, "detail": list(b.detail)}}

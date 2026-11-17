@@ -14,8 +14,15 @@ What it pins:
   s09 the report: every rung of a ladder is listed, a missing rung is MISSING, strays are named, a run whose own config.json
       says it was made otherwise is MISMATCH, a refused worlds file or a missing root exits 2;
   s10 purity: motion and breakpoint change nothing they are handed and give the same answer twice.
+Phase 4 (the cross-plan review of 2026-11-17, findings 1 and 6):
+  s11 cycle is a TABLE keyed on the needle shape (the start record's "needle"): the hold pair's row gives today's numbers, and a
+      shape with no row raises KeyError, never the pair formula;
+  s12 the needle SHAPE is part of "made as named": a setpoint-shape run under a ladder root is MISMATCH, a run that names no shape
+      is MISMATCH, and a run whose start record names a shape with no cycle row is FAILED;
+  s13 the time report: each read rung carries its run's perf.json totals (seconds, calls, per op) or a token; time never decides
+      a lock, and a rung that was not read has no time.
 
-RED until environment/drift_score.py and environment/ladder_report.py exist.
+RED until environment/drift_score.py and environment/ladder_report.py exist (s11-s13: RED at the Phase-3 tip eca848e).
 Run from the repo root:  python contract/test_drift_score.py   (or pytest)
 """
 import copy
@@ -32,8 +39,11 @@ SETTINGS = {"g": 12, "step": 6, "n_eq": 450, "S": 500, "skip": 1}
 TOP = 6 / 1900
 
 
-def _start(side="+", **settings):
-    return {"rec": "start", "settings": {**SETTINGS, **settings}, "dials": ["K"],
+PAIR, SETPOINT = "hold-pair-v1", "hold-setpoint-v1"
+
+
+def _start(side="+", needle=PAIR, **settings):
+    return {"rec": "start", "needle": needle, "settings": {**SETTINGS, **settings}, "dials": ["K"],
             "belief": {"ordered_side": {"declared": {"K": side}}}}
 
 
@@ -53,9 +63,9 @@ def _mods():
 
 def test_s01_cycle_and_top_speed():
     DS = _mods()
-    assert DS.cycle(SETTINGS) == 1900
-    assert DS.cycle({**SETTINGS, "n_eq": 0}) == 1000
-    assert DS.cycle({**SETTINGS, "S": 40, "skip": 3}) == 2 * (450 + 120)
+    assert DS.cycle(PAIR, SETTINGS) == 1900
+    assert DS.cycle(PAIR, {**SETTINGS, "n_eq": 0}) == 1000
+    assert DS.cycle(PAIR, {**SETTINGS, "S": 40, "skip": 3}) == 2 * (450 + 120)
     m = DS.motion(_score([600.0, 601.0], [600, 600]), _start())
     assert m["top_speed"] == TOP
     m = DS.motion(_score([600.0, 601.0], [600, 600], di=1000), _start(n_eq=0, step=4))
@@ -167,8 +177,11 @@ def test_s08_breakpoint():
 NEEDLES = {"SET": (["declare", "scan", "nudge"], 450), "MID": (["declare", "scan", "nudge"], 0), "OFF": (["declare", "scan"], 450)}
 
 
-def _run(root, name, lock, truth, centres, refused=False, two=False, made=None, seed=None, drift=None, config=True):
-    """a run directory as run_hold leaves it. `made` = the needle it was REALLY made with (default: the one its name says)."""
+def _run(root, name, lock, truth, centres, refused=False, two=False, made=None, seed=None, drift=None, config=True,
+         shape=PAIR, started=PAIR, perf=None):
+    """a run directory as run_hold leaves it. `made` = the needle it was REALLY made with (default: the one its name says);
+    `shape` = its config's needle_structure (None: the key is absent); `started` = its start record's "needle";
+    `perf` = perf.json's text (None: no file)."""
     d = root / name / "runs" / "abc"
     d.mkdir(parents=True)
     if refused:
@@ -179,10 +192,13 @@ def _run(root, name, lock, truth, centres, refused=False, two=False, made=None, 
     at = {"seed": run_seed if seed is None else seed, "horizon": 1000, "drift": drift or {"target": "L4", "law": "none"},
           "hidden": {"L4": 0.1}, "k": 6}
     if config:
-        (d / "config.json").write_text(json.dumps({"at": at, "needle": {"ops": ops, "n_eq": n_eq, "g": 12},
+        needle = {"ops": ops, "n_eq": n_eq, "g": 12, **({} if shape is None else {"needle_structure": shape})}
+        (d / "config.json").write_text(json.dumps({"at": at, "needle": needle,
                                                    "score": {"out_run": 3, "offset_K": [0.27, -0.6], "plan": 1552}}))
     (d / "score.json").write_text(json.dumps(_score(truth, centres, lock=lock)))
-    (d / "report.jsonl").write_text(json.dumps(_start()) + "\n" + json.dumps({"rec": "outcome"}) + "\n")
+    (d / "report.jsonl").write_text(json.dumps(_start(needle=started)) + "\n" + json.dumps({"rec": "outcome"}) + "\n")
+    if perf is not None:
+        (d / "perf.json").write_text(perf)
     if two:
         (root / name / "runs" / "def").mkdir()
 
@@ -277,10 +293,106 @@ def test_s10_purity():
     assert DS.breakpoint(rungs) == DS.breakpoint(list(rungs)) and rungs == [("a", "held"), ("b", "broken")]
 
 
+def test_s11_cycle_is_a_table_by_needle_shape():
+    DS = _mods()
+    assert DS.cycle(PAIR, SETTINGS) == 1900 and DS.motion(_score([600.0, 601.0], [600, 600]), _start())["top_speed"] == TOP
+    # plan 1558 adds the setpoint row at its merge, and replaces this line with that row's numbers (its walk and park reading)
+    for shape in (SETPOINT, "hold-other-v9", None):
+        try:
+            DS.cycle(shape, SETTINGS)
+        except KeyError:
+            pass
+        else:
+            raise AssertionError(f"cycle({shape!r}) answered: a shape with no row was given the pair formula")
+    sc = _score([600.0, 606.0], [600, 600])
+    for start in (_start(needle=SETPOINT), {k: v for k, v in _start().items() if k != "needle"}):
+        try:
+            DS.motion(sc, start)
+        except KeyError:
+            pass
+        else:
+            raise AssertionError(f"motion answered for needle {start.get('needle')!r}: its top speed is not the pair's")
+
+
+_ONE = """base = "at-apparatus.toml"
+[[ladder]]
+name = "up"
+[[ladder.rungs]]
+label = "x1"
+severity = 1.0
+horizon = 1000
+drift = {target = "L4", law = "none"}
+[[ladder.rungs]]
+label = "x2"
+severity = 2.0
+horizon = 1000
+drift = {target = "L4", law = "none"}
+"""
+
+
+def _report(t, root):
+    (t / "w.toml").write_text(_ONE)
+    rc = subprocess.run([sys.executable, "-m", "environment.ladder_report", "--worlds", str(t / "w.toml"), "--root", str(root),
+                         "--out", str(t / "out.json")], cwd=ROOT, capture_output=True, text=True)
+    assert rc.returncode == 0, rc.stderr
+    return {(c["ladder"], c["mode"], c["seed"]): c for c in json.loads((t / "out.json").read_text())["cells"]}
+
+
+def test_s12_the_needle_shape_is_part_of_made_as_named():
+    with tempfile.TemporaryDirectory() as t:
+        t = Path(t)
+        root = t / "runs"
+        root.mkdir()
+        _run(root, "up--x1--SET--s200", "HELD", [600.0, 601.0], [600, 600])                                 # control
+        _run(root, "up--x2--SET--s200", "HELD", [600.0, 601.0], [600, 600], shape=SETPOINT, started=SETPOINT)  # a setpoint run
+        _run(root, "up--x1--MID--s200", "HELD", [600.0, 601.0], [600, 600], shape=SETPOINT, started=SETPOINT)
+        _run(root, "up--x2--MID--s200", "HELD", [600.0, 601.0], [600, 600], shape=None)                      # names no shape
+        _run(root, "up--x1--OFF--s200", "LOST", [600.0, 640.0], [600, 600], shape=SETPOINT, started=SETPOINT)
+        _run(root, "up--x1--SET--s201", "HELD", [600.0, 601.0], [600, 600], started=SETPOINT)  # pair config, setpoint start
+        _run(root, "up--x2--SET--s201", "HELD", [600.0, 601.0], [600, 600], started="hold-other-v9")
+        cells = _report(t, root)
+        locks = {k: [r["lock"] for r in c["rungs"]] for k, c in cells.items()}
+        assert locks[("up", "SET", 200)] == ["HELD", "MISMATCH"], "a setpoint-shape run under a ladder root was read as SET"
+        assert locks[("up", "MID", 200)] == ["MISMATCH", "MISMATCH"], locks[("up", "MID", 200)]
+        assert locks[("up", "OFF", 200)] == ["MISMATCH", "MISSING"], locks[("up", "OFF", 200)]
+        assert locks[("up", "SET", 201)] == ["FAILED", "FAILED"], "a start record with no cycle row was scored with the pair's"
+        assert cells[("up", "SET", 200)]["rungs"][0]["motion"]["top_speed"] == TOP
+
+
+def test_s13_the_time_report():
+    calls = [{"op": "scan", "seconds": 1.0}, {"op": "nudge", "seconds": 0.25}, {"op": "scan", "seconds": 0.5}]
+    with tempfile.TemporaryDirectory() as t:
+        t = Path(t)
+        root = t / "runs"
+        root.mkdir()
+        _run(root, "up--x1--SET--s200", "HELD", [600.0, 601.0], [600, 600], perf=json.dumps({"time": "t", "calls": calls}))
+        _run(root, "up--x2--SET--s200", "LOST", [600.0, 640.0], [600, 600])                                  # no perf.json
+        _run(root, "up--x1--MID--s200", "HELD", [600.0, 601.0], [600, 600], perf=json.dumps({"calls": [{"op": "scan"}]}))
+        _run(root, "up--x2--MID--s200", "HELD", [600.0, 601.0], [600, 600], perf="not json")
+        _run(root, "up--x1--OFF--s200", "LOST", [600.0, 640.0], [600, 600], perf=json.dumps({"calls": calls}), made="SET")
+        _run(root, "up--x1--SET--s201", "HELD", [600.0, 601.0], [600, 600], perf=json.dumps({"calls": []}))
+        _run(root, "up--x2--SET--s201", "HELD", [600.0, 601.0], [600, 600], perf=json.dumps({"calls": [{"op": "scan", "seconds": "1"}]}))
+        cells = _report(t, root)
+        keys = {"label", "severity", "lock", "class", "motion", "scorer", "perf"}
+        assert all(set(r) == keys for c in cells.values() for r in c["rungs"]), [sorted(r) for c in cells.values() for r in c["rungs"]]
+        s = cells[("up", "SET", 200)]["rungs"]
+        assert s[0]["perf"] == {"seconds": 1.75, "calls": 3, "by_op": {"nudge": {"calls": 1, "seconds": 0.25},
+                                                                        "scan": {"calls": 2, "seconds": 1.5}}}, s[0]["perf"]
+        assert (s[1]["lock"], s[1]["perf"]) == ("LOST", "no-perf"), s[1]
+        m = cells[("up", "MID", 200)]["rungs"]
+        assert [(r["lock"], r["perf"]) for r in m] == [("HELD", "unreadable-perf")] * 2, "time decided a lock, or a bad file was read"
+        o = cells[("up", "OFF", 200)]["rungs"]
+        assert [(r["lock"], r["perf"]) for r in o] == [("MISMATCH", None), ("MISSING", None)], "a run that was not read has a time"
+        e = cells[("up", "SET", 201)]["rungs"][0]["perf"]
+        assert e == {"seconds": 0.0, "calls": 0, "by_op": {}} and not isinstance(e["seconds"], bool), e
+        assert cells[("up", "SET", 201)]["rungs"][1]["perf"] == "unreadable-perf", "a call whose seconds is not a number was read"
+
+
 if __name__ == "__main__":
     _tests = [test_s01_cycle_and_top_speed, test_s02_slew_jump_travel, test_s03_the_trail_is_signed_by_the_motion,
               test_s04_the_ordered_share, test_s05_out_runs_and_recovery, test_s06_tokens_never_numbers, test_s07_rung_class,
-              test_s08_breakpoint, test_s09_the_report, test_s10_purity]
+              test_s08_breakpoint, test_s09_the_report, test_s10_purity,
+              test_s11_cycle_is_a_table_by_needle_shape, test_s12_the_needle_shape_is_part_of_made_as_named, test_s13_the_time_report]
     _fail = 0
     for _t in _tests:
         try:

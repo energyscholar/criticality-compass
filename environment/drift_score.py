@@ -8,9 +8,13 @@ NO_STEPS, NO_MOVING, NO_RUNS = "no-hold-steps", "no-moving-steps", "no-out-runs"
 _PAIR_KEYS = ("slew_max", "slew_mean", "jump_max_g", "trail_along", "trail_along_g")
 
 
-def cycle(settings):
+# the needle's sweeps per hold pair, by the needle's shape. A shape with no row is a KeyError: it is never given another row's formula.
+CYCLE = {"hold-pair-v1": lambda settings: 2 * (settings["n_eq"] + settings["S"] * settings["skip"])}
+
+
+def cycle(shape, settings):
     """the needle's sweeps per hold pair."""
-    return 2 * (settings["n_eq"] + settings["S"] * settings["skip"])
+    return CYCLE[shape](settings)
 
 
 def _out_runs(steps):
@@ -52,7 +56,7 @@ def _no_pairs(token):
 
 def motion(score, start):
     steps, settings = score["steps"], start["settings"]
-    top = settings["step"] / cycle(settings)
+    top = settings["step"] / cycle(start["needle"], settings)
     runs = _out_runs(steps)
     ended = [r["sweeps"] for r in runs if r["sweeps"] != "never"]
     side = _SIDE[start["belief"]["ordered_side"]["declared"][start["dials"][0]]]

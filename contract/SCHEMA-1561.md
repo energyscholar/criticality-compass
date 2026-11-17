@@ -13,6 +13,10 @@ needle files a run is made with: `SET` = `navigator/hold-settled.toml`, `MID` = 
 `navigator/hold-settled-off.toml` (plan 1552's shipped FEEDBACK OFF file: `ops = ["declare", "scan"]`). The **break** of a ladder is where its rungs stop
 holding.
 
+**Phase 4 (amended 2026-11-17, the cross-plan review's findings 1 and 6).** Three changes, each marked *Phase 4* below: `cycle`
+is a table keyed on the needle shape (§4); the shape is part of "made as named" (§5); each read rung carries its run's time
+(§5). They change only `drift_score.py` and `ladder_report.py`, the readers of finished runs; nothing a run executes.
+
 ## 1. Files
 
 | file | NEW / EDITED | holds |
@@ -131,10 +135,15 @@ choice made from data; its signs are `+ − + + + + + + + −` (prefix `0 1 0 1 
 It opens nothing and prints nothing; the needle side never imports it. Its inputs are plan 1552's `score.json` (as a
 dict) and the first line of the run's `report.jsonl` (the start record, as a dict).
 
-- `cycle(settings) == 2 * (settings["n_eq"] + settings["S"] * settings["skip"])` — the needle's sweeps per hold pair.
+- *Phase 4.* `cycle(shape, settings) == CYCLE[shape](settings)` — the needle's sweeps per hold pair, from a table keyed on the
+  needle SHAPE. `CYCLE` has exactly one row, `"hold-pair-v1"` (plan 1552): `2 * (settings["n_eq"] + settings["S"] *
+  settings["skip"])`. A shape with no row raises `KeyError`; it is never given the pair formula. Plan 1558 adds the
+  `"hold-setpoint-v1"` row at its merge (its walk and park reading, SCHEMA-1558 §4.2), and with it the line of s11 that
+  pins its numbers.
 - `motion(score, start)` returns a dict with exactly these keys:
   - `lock`, `outcome` — copied from the score; `hold_steps` — `len(score["steps"])`;
-  - `top_speed = settings["step"] / cycle(settings)` — the most ticks per sweep the needle can move;
+  - `top_speed = settings["step"] / cycle(start["needle"], settings)` — the most ticks per sweep the needle can move (the
+    start record's `needle` is the shape; a start record with no `needle` raises `KeyError`);
   - `out_runs` — the maximal runs of `cell == "OUT"` in step order, each `{"first": <the first OUT step's "step">,
     "steps": <its length>, "sweeps": <index of the next IN step − index of the first OUT step, or "never">}`;
   - `recovery_max` — the largest `sweeps` of a run that ended; `"never"` when there are runs and none ended; the token
@@ -176,10 +185,13 @@ A run directory is `<root>/<ladder>--<label>--<mode>--s<seed>` (`run_name(ladder
 (`None` for any other name). `read_run(dir, mode, rung, seed) -> (lock, motion | None, scorer | None)`: no such directory ⇒
 `MISSING`; not exactly one `runs/*/` directory, or `refused.json` in it ⇒ `REFUSED` (when any has `refused.json`) else
 `FAILED`; `config.json`, `score.json` or the first line of `report.jsonl` missing or unreadable ⇒ `FAILED`; the run's own
-`config.json` says it was not made as named ⇒ **`MISMATCH`**; a score `lock` outside `rung_class`'s table ⇒ `FAILED`;
+`config.json` says it was not made as named ⇒ **`MISMATCH`**; a score `lock` outside `rung_class`'s table, or (*Phase 4*) a
+start record whose `needle` is not a row of `CYCLE`, ⇒ `FAILED`;
 else the score's `lock`, `motion(score, start)` and `scorer = {"out_run", "offset_K"}` copied from `config.json`'s
-`score`. "Made as named" (`made_as(config, mode, rung, seed)`) is: the needle's `("nudge" in ops, n_eq > 0)` equals
-`NEEDLE[mode]` with `NEEDLE = {"SET": (True, True), "MID": (True, False), "OFF": (False, True)}`; `config["at"]["seed"] ==
+`score`. "Made as named" (`made_as(config, mode, rung, seed)`) is (*Phase 4*): the needle's `(needle_structure, "nudge" in ops,
+n_eq > 0)` equals `NEEDLE[mode]` with `NEEDLE = {"SET": ("hold-pair-v1", True, True), "MID": ("hold-pair-v1", True, False),
+"OFF": ("hold-pair-v1", False, True)}` (a needle with no `needle_structure` key is not made as any mode, so a setpoint-shape
+run filed under a ladder root is `MISMATCH`, never `SET`); `config["at"]["seed"] ==
 seed`; and every key of `rung.table` equals `config["at"]`'s. The name of a directory is a claim; the run's own config
 is the evidence.
 
@@ -187,8 +199,15 @@ The output (sorted keys) is `{"schema": "compass-drift-ladders/1", "base", "cell
 every directory under the root whose name is not a run of a declared ladder and rung. There is one cell for every
 `(ladder, mode, seed)` that has at least one run directory, sorted by those three; a cell lists **every rung of its
 ladder** in the declared order — a rung with no directory is `MISSING`, so a missing rung can never shorten a ladder
-into a clean bracket — each as `{label, severity, lock, class, motion, scorer}`, and the cell's `break` as `{kind, below, above,
-detail}`.
+into a clean bracket — each as `{label, severity, lock, class, motion, scorer, perf}`, and the cell's `break` as `{kind, below,
+above, detail}`.
+
+*Phase 4, the time report.* `perf` is `null` exactly when `motion` is (`MISSING`, `REFUSED`, `FAILED`, `MISMATCH`); else it is
+read from the run's own `perf.json` (`{"calls": [{"op": <str>, "seconds": <number>}, …]}`, as plan 1552's orchestrator
+writes it): `{"seconds": <fsum of every call's seconds>, "calls": <the number of calls>, "by_op": {<op>: {"calls", "seconds"}}}`
+with one `by_op` entry per op that occurs. No `perf.json` ⇒ the token `"no-perf"`; a file that is not that shape (not JSON,
+no `calls`, a call without a string `op` or a numeric `seconds`) ⇒ the token `"unreadable-perf"`. Time is report-only: it
+never changes a lock, a class or a break.
 
 ## 6. What stays as it was
 
