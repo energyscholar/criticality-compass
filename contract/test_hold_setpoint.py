@@ -690,8 +690,19 @@ def test_t15_the_tables_are_total_and_reduce_to_plan_1552():
 def test_t16_the_shipped_setpoint_files_and_plan_1552s_files():
     # the band's input is plan 1561's table shape, read as written: every setpoint row measured on every seed it names
     assert BAND_TABLE["schema"] == "compass-drift-band/1" and BAND_ROWS, BAND_TABLE.get("schema")
-    keys = {"law", "direction", "rung", "needle", "sigma", "seeds", "p95", "p95_max", "p95_median", "missing", "within_declared_band"}
+    keys = {"law", "direction", "rung", "needle", "sigma", "seeds", "p95", "p95_max", "p95_median", "missing", "within_declared_band", "state"}
     assert all(set(r) == keys for r in BAND_TABLE["rows"]), [sorted(set(r) ^ keys) for r in BAND_TABLE["rows"]]
+    # THE STATE the band covers (rev 7, owner ruling 2026-11-17, OQ-11 b): each row's `state` is the drift target's [lo, hi] over the
+    # readings its p95s were taken at (1561's band tool, from the rung's DECLARED world, never typed). The band's interval is the
+    # hull over the DOMAIN cells, the cells that set DEAD_BAND; acceptance (accept.py) classes every park reading by it. It lives
+    # in the table, sha-bound to the band row by `about.provenance`, never in the needle's settings (M2: no hidden-state word in a report).
+    fin = lambda x: type(x) in (int, float) and math.isfinite(x)
+    st = [r["state"] for r in BAND_ROWS]
+    assert all(type(x) is dict and set(x) == {"target", "lo", "hi"} and type(x["target"]) is str and fin(x["lo"]) and fin(x["hi"])
+               and x["lo"] <= x["hi"] for x in st), [x for x in st if type(x) is not dict]
+    assert len({x["target"] for x in st}) == 1, sorted({x["target"] for x in st})
+    dom = [r["state"] for r in BAND_ROWS if cell(r) in DOMAIN[r["sigma"]]]
+    assert dom and min(x["lo"] for x in dom) < max(x["hi"] for x in dom), "the band's domain covers no interval of the drift target"
     assert all(r["missing"] == [] and len(r["p95"]) == len(r["seeds"]) > 0 and r["p95_max"] == max(r["p95"]) for r in BAND_ROWS), BAND_ROWS
     assert not GAPS, f"band runs with no evidence (no lock class, no number): {GAPS[:6]}"
     assert PROVEN[0] <= DEAD_BAND <= PROVEN[1], f"DEAD_BAND {DEAD_BAND} is outside {PROVEN}, where the cases were proven: re-derive them (a finding)"

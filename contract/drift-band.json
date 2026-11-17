@@ -183,6 +183,11 @@
     212
    ],
    "sigma": 0.0,
+   "state": {
+    "hi": 0.14,
+    "lo": 0.08,
+    "target": "L4"
+   },
    "within_declared_band": "n/a"
   },
   {
@@ -204,6 +209,11 @@
     212
    ],
    "sigma": 1.5,
+   "state": {
+    "hi": 0.14,
+    "lo": 0.08,
+    "target": "L4"
+   },
    "within_declared_band": 3
   },
   {
@@ -225,6 +235,11 @@
     212
    ],
    "sigma": 2.0,
+   "state": {
+    "hi": 0.14,
+    "lo": 0.08,
+    "target": "L4"
+   },
    "within_declared_band": 3
   },
   {
@@ -246,6 +261,11 @@
     212
    ],
    "sigma": 0.0,
+   "state": {
+    "hi": 0.14,
+    "lo": 0.08,
+    "target": "L4"
+   },
    "within_declared_band": "n/a"
   },
   {
@@ -267,6 +287,11 @@
     212
    ],
    "sigma": 1.5,
+   "state": {
+    "hi": 0.14,
+    "lo": 0.08,
+    "target": "L4"
+   },
    "within_declared_band": 3
   },
   {
@@ -288,6 +313,11 @@
     212
    ],
    "sigma": 2.0,
+   "state": {
+    "hi": 0.14,
+    "lo": 0.08,
+    "target": "L4"
+   },
    "within_declared_band": 3
   },
   {
@@ -309,6 +339,11 @@
     212
    ],
    "sigma": 0.0,
+   "state": {
+    "hi": 0.14,
+    "lo": 0.08,
+    "target": "L4"
+   },
    "within_declared_band": "n/a"
   },
   {
@@ -330,6 +365,11 @@
     212
    ],
    "sigma": 1.5,
+   "state": {
+    "hi": 0.14,
+    "lo": 0.08,
+    "target": "L4"
+   },
    "within_declared_band": 3
   },
   {
@@ -351,6 +391,11 @@
     212
    ],
    "sigma": 2.0,
+   "state": {
+    "hi": 0.14,
+    "lo": 0.08,
+    "target": "L4"
+   },
    "within_declared_band": 3
   },
   {
@@ -372,6 +417,11 @@
     212
    ],
    "sigma": 0.0,
+   "state": {
+    "hi": 0.136764616,
+    "lo": 0.104245079,
+    "target": "L4"
+   },
    "within_declared_band": "n/a"
   },
   {
@@ -393,6 +443,11 @@
     212
    ],
    "sigma": 1.5,
+   "state": {
+    "hi": 0.136904729,
+    "lo": 0.104541724,
+    "target": "L4"
+   },
    "within_declared_band": 3
   },
   {
@@ -414,6 +469,11 @@
     212
    ],
    "sigma": 2.0,
+   "state": {
+    "hi": 0.136921913,
+    "lo": 0.10456919,
+    "target": "L4"
+   },
    "within_declared_band": 3
   },
   {
@@ -435,6 +495,11 @@
     212
    ],
    "sigma": 0.0,
+   "state": {
+    "hi": 0.13999623,
+    "lo": 0.10844221,
+    "target": "L4"
+   },
    "within_declared_band": "n/a"
   },
   {
@@ -456,6 +521,11 @@
     212
    ],
    "sigma": 1.5,
+   "state": {
+    "hi": 0.139994622,
+    "lo": 0.109024705,
+    "target": "L4"
+   },
    "within_declared_band": 3
   },
   {
@@ -477,6 +547,11 @@
     212
    ],
    "sigma": 2.0,
+   "state": {
+    "hi": 0.139999911,
+    "lo": 0.109078563,
+    "target": "L4"
+   },
    "within_declared_band": 3
   },
   {
@@ -498,6 +573,11 @@
     212
    ],
    "sigma": 0.0,
+   "state": {
+    "hi": 0.1558952,
+    "lo": 0.1,
+    "target": "L4"
+   },
    "within_declared_band": "n/a"
   },
   {
@@ -519,6 +599,11 @@
     212
    ],
    "sigma": 1.5,
+   "state": {
+    "hi": 0.1556,
+    "lo": 0.1,
+    "target": "L4"
+   },
    "within_declared_band": 3
   },
   {
@@ -540,6 +625,11 @@
     212
    ],
    "sigma": 2.0,
+   "state": {
+    "hi": 0.1557976,
+    "lo": 0.1,
+    "target": "L4"
+   },
    "within_declared_band": 3
   },
   {
@@ -561,6 +651,11 @@
     212
    ],
    "sigma": 0.0,
+   "state": {
+    "hi": 0.1556496,
+    "lo": 0.1,
+    "target": "L4"
+   },
    "within_declared_band": "n/a"
   },
   {
@@ -582,6 +677,11 @@
     212
    ],
    "sigma": 1.5,
+   "state": {
+    "hi": 0.1556912,
+    "lo": 0.1,
+    "target": "L4"
+   },
    "within_declared_band": 2
   },
   {
@@ -603,6 +703,11 @@
     212
    ],
    "sigma": 2.0,
+   "state": {
+    "hi": 0.1549168,
+    "lo": 0.1,
+    "target": "L4"
+   },
    "within_declared_band": 2
   },
   {
@@ -624,6 +729,11 @@
     212
    ],
    "sigma": 0.0,
+   "state": {
+    "hi": 0.1,
+    "lo": 0.096,
+    "target": "L4"
+   },
    "within_declared_band": "n/a"
   },
   {
@@ -645,6 +755,11 @@
     212
    ],
    "sigma": 1.5,
+   "state": {
+    "hi": 0.1,
+    "lo": 0.096,
+    "target": "L4"
+   },
    "within_declared_band": 3
   },
   {
@@ -666,6 +781,11 @@
     212
    ],
    "sigma": 2.0,
+   "state": {
+    "hi": 0.1,
+    "lo": 0.096,
+    "target": "L4"
+   },
    "within_declared_band": 3
   },
   {
@@ -687,6 +807,11 @@
     212
    ],
    "sigma": 0.0,
+   "state": {
+    "hi": 0.1,
+    "lo": 0.092,
+    "target": "L4"
+   },
    "within_declared_band": "n/a"
   },
   {
@@ -708,6 +833,11 @@
     212
    ],
    "sigma": 1.5,
+   "state": {
+    "hi": 0.1,
+    "lo": 0.092,
+    "target": "L4"
+   },
    "within_declared_band": 3
   },
   {
@@ -729,6 +859,11 @@
     212
    ],
    "sigma": 2.0,
+   "state": {
+    "hi": 0.1,
+    "lo": 0.092,
+    "target": "L4"
+   },
    "within_declared_band": 2
   },
   {
@@ -750,6 +885,11 @@
     212
    ],
    "sigma": 0.0,
+   "state": {
+    "hi": 0.1,
+    "lo": 0.088,
+    "target": "L4"
+   },
    "within_declared_band": "n/a"
   },
   {
@@ -771,6 +911,11 @@
     212
    ],
    "sigma": 1.5,
+   "state": {
+    "hi": 0.1,
+    "lo": 0.088,
+    "target": "L4"
+   },
    "within_declared_band": 0
   },
   {
@@ -792,6 +937,11 @@
     212
    ],
    "sigma": 2.0,
+   "state": {
+    "hi": 0.1,
+    "lo": 0.088,
+    "target": "L4"
+   },
    "within_declared_band": 0
   },
   {
@@ -813,6 +963,11 @@
     212
    ],
    "sigma": 0.0,
+   "state": {
+    "hi": 0.108,
+    "lo": 0.1,
+    "target": "L4"
+   },
    "within_declared_band": "n/a"
   },
   {
@@ -834,6 +989,11 @@
     212
    ],
    "sigma": 1.5,
+   "state": {
+    "hi": 0.108,
+    "lo": 0.1,
+    "target": "L4"
+   },
    "within_declared_band": 3
   },
   {
@@ -855,6 +1015,11 @@
     212
    ],
    "sigma": 2.0,
+   "state": {
+    "hi": 0.108,
+    "lo": 0.1,
+    "target": "L4"
+   },
    "within_declared_band": 1
   }
  ],

@@ -20,6 +20,15 @@ ramp-reversed, sine or walk whose every seed is HELD)` (rev 6, m4: a surviving s
 | RECOVERED, LOST, LEFT-RANGE | out | nothing: a named REPORT row, "out of the setpoint needle's domain"; the declared domain narrows by that (law, rung, sigma) |
 | CUT-SHORT, REFUSED, FAILED, MISSING, MISMATCH | gap | no evidence: the table is incomplete and nothing is accepted |
 
+**The band's domain has a STATE coordinate** (rev 7, owner ruling 2026-11-17, OQ-11 b). Each row of the table carries `state =
+{target, lo, hi}`: the drift target's value (L4 today) over the readings its p95s were taken at (σ > 0: the park readings; σ = 0:
+the hold steps), computed by plan 1561's `band` from the rung's DECLARED world for each seed, never typed. The band covers the
+hull of `state` over the DOMAIN cells, the cells that set `dead_band.ticks` (on 1561's full table: [0.08, 0.1557976]). A reading
+whose state lies outside that interval is OUT of the band's domain by construction: it is never band evidence and never held to
+the band (acceptance B1 classes every park reading by it; a HELD seed with no reading inside fails). The interval lives in the
+table, bound to the band row by `about.provenance` (the table's sha), and NEVER in the needle's settings: the needle never sees
+the hidden state, and no hidden-state word may reach a report or map (acceptance M2).
+
 A domain that does not hold forward ramp's first rung at every measured sigma is a finding for the owner, never a silent pass
 (t16, acceptance D1). **An inadmissible sigma is unrepresentable** (owner ruling 2026-11-17, replacing OQ-8's list-then-refuse):
 the setpoint is not a free number but a MEMBER of a type, `dead_band.admissible`, generated from this table by the band writer
