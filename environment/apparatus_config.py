@@ -8,9 +8,10 @@ from pathlib import Path
 
 from environment import config as C
 from environment import drift as DR
+from environment import world_clock as WC
 from navigator import reader as R
 
-TOP_KEYS = ("L_blocks", "burn", "seed", "k", "nlev", "index_unit", "index_kind", "lag", "horizon", "dials", "fixed", "hidden", "drift")
+TOP_KEYS = ("L_blocks", "burn", "seed", "k", "nlev", "index_unit", "index_kind", "lag", "horizon", "dials", "fixed", "hidden", "drift", "world_clock")   # plan 1565: `world_clock` may be absent (absent is WC.ABSENT, paused)
 DIAL_KEYS = ("name", "lo", "hi", "T", "max_nudge", "start")
 
 
@@ -40,6 +41,7 @@ class World:
     fixed: dict
     hidden: dict
     drift: DR.Drift
+    world_clock: WC.WorldClock
 
 
 def tick_value(lo, hi, T, t):
@@ -127,7 +129,10 @@ def parse_world(d, params, hidden_domain):
     lo, hi = hidden_domain[drift.target]
     if not (lo < hidden[drift.target] + b_lo and hidden[drift.target] + b_hi <= hi):
         return R.Malformed("drift", f"the drift leaves the domain of {drift.target} within the horizon")
-    return World(Lb, 3 * Lb, burn, seed, k, nlev, unit, kind, lag, horizon, dials, fixed, hidden, drift)
+    world_clock = WC.parse_world_clock(d.get("world_clock", WC.ABSENT))
+    if isinstance(world_clock, R.Malformed):
+        return world_clock
+    return World(Lb, 3 * Lb, burn, seed, k, nlev, unit, kind, lag, horizon, dials, fixed, hidden, drift, world_clock)
 
 
 def load_apparatus(system):

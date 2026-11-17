@@ -125,6 +125,9 @@ PINS = {         # sha256 at main 61fb241
     "environment/blind_config.py": "f5eb9d19e2a0c25ec635247a95f6efecf6dca92faf49dbce7c195267e42927f5",
     "environment/config.py": "65d1227a5cc269193825bf6f841613b01131f8998a7961b44109c246bf9f445a",
 }
+# AMENDED by plan 1565 (owner ruling 2026-11-16, the free-running apparatus): the world file gains an optional `clock` and the
+# server a turn loop and turns.json (contract/SCHEMA-1565.md), so these two of the 1545 files are no longer pinned here.
+PINS = {k: v for k, v in PINS.items() if k not in ("environment/apparatus_config.py", "environment/apparatus_server.py")}
 
 
 def _dial():
