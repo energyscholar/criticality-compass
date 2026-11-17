@@ -51,7 +51,7 @@ units = "sigma, in pair half-widths g"
 conversion = { ticks = "sigma * g", g_ticks = 12, knob_per_tick = "(hi - lo) / T of the System's declared dial (the System's, read at run time: the reader's sigma().value)" }
 band = { ticks = 13, p95_max = 12.466508557340148, laws = ["ramp", "ramp-reversed", "sine", "walk"], bound_to = ["S", "n_eq", "z", "g", "step", "park"], promise = "per-run p95 of |park - edge - sigma*g| <= ticks on every HELD run of the laws, at the geometry bound_to names (this row's own cells); a member is band-measured and sigma*g is strictly outside the band" }
 cost = { unit = "sweeps per cycle, an upper bound (SCHEMA-1558 4.4): the precision-lag trade", max_nudge = 32, skip = 1, approach = { S = 40, n_eq = 48 } }
-provenance = { sha256 = "1b3ea87c823bfefee3c7e7767b28c36056000e1cae9e859e47ac5c6f4d44b4ba" }
+provenance = { sha256 = "546a6491d84149ad4d439007c629276158e1054e36d9834de14cecb4a8c7d4f5" }
 
 [[dead_band.about.members]]
 sigma = 1.5
