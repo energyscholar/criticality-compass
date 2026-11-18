@@ -96,6 +96,17 @@ def commanded(cmd, since, to, at):
     return to, (since, at)[to != cmd]
 
 
+def began(first, n_eq, skip):
+    """plan 1565: the index at which a point began (and its command was given), read from its own window: the world may have run
+    free sweeps since the last reply, so the last reply's index is not the command's index."""
+    return first - skip - n_eq
+
+
+def index_of(reply, known):
+    """plan 1565: the world's index a refusal reports (a `nev` carries it); a lost wire reports nothing, and `known` stands."""
+    return reply["index"] if type(reply) is dict and reply.get("op") == "nev" and type(reply.get("index")) is int else known
+
+
 def settled(since, lag, first, skip):
     """the move had arrived before the first sampling sweep (a reading's window opens `skip` sweeps after it starts)."""
     return since + lag <= first - skip

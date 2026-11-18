@@ -205,12 +205,13 @@ class Drop:
         """one call -> its readings, or None when the reply is not a reading at exactly `ticks` (SCHEMA 4.5)."""
         r = self.ask({**msg, "n_eq": n_eq, "S": S, "skip": self.skip})
         if not self.is_reading(r, ticks):
+            self.index = HT.index_of(r, self.index)
             return None
         cls = HT.classes(r["values"][self.obs], r["errors"][self.obs], self.cfg["z"])
         out, at = [], self.index
         for j, t in enumerate(ticks):
-            self.cmd, self.since = HT.commanded(self.cmd, self.since, t, at)
             a, b = r["window"][j]
+            self.cmd, self.since = HT.commanded(self.cmd, self.since, t, HT.began(a, n_eq, self.skip))
             ok = HT.settled(self.since, self.lag, a, self.skip)
             A, B, self.kstate = HT.kernel_next(self.kstate, r["values"][self.obs][j])
             out.append({"tick": t, "window": [a, b], "values": {k: r["values"][k][j] for k in self.roles},

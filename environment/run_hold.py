@@ -11,11 +11,13 @@ import signal
 import subprocess
 import sys
 import tempfile
+import time
 from pathlib import Path
 
 from environment import apparatus_config as AC
 from environment import config as C
 from environment import hold_score as HS
+from environment import time_ledger as TL
 from environment.run import ROOT, reap, refuse, wait_ready
 from environment.run_blind import REFUSED_LINE, _raw, run_id
 from navigator import hold as HD
@@ -65,17 +67,21 @@ def main(argv=None):
     (run_dir / "config.json").write_text(canon)
     signal.signal(signal.SIGTERM, lambda *_: sys.exit(143))  # the finally below reaps the server on the way out
     proc = down = res = None
+    stage = {}
     with tempfile.TemporaryDirectory(prefix="hold-map-") as tmp:
         tmp_map = Path(tmp) / "map.jsonl"
         try:
             with open(run_dir / "server.log", "wb") as log:
                 proc = subprocess.Popen([sys.executable, "-m", "environment.apparatus_server", "--env", str(a.env), "--at", str(at_path),
                                          "--run-dir", str(run_dir)], cwd=ROOT, stdout=subprocess.DEVNULL, stderr=log)
+                t0 = time.perf_counter()
                 down = wait_ready(proc, env.port)
+                stage["ready_s"], t0 = time.perf_counter() - t0, time.perf_counter()
                 if down is None:
                     with open(run_dir / "report.jsonl", "wb") as out:
-                        res = subprocess.run([sys.executable, "-m", "navigator.hold", "--needle", str(a.needle), "--port", str(env.port),
+                        res = subprocess.run([sys.executable, "-m", "environment.needle_timer", "--out", str(Path(tmp) / "needle-time.jsonl"), "--", "--needle", str(a.needle), "--port", str(env.port),
                                               "--drop", rid, "--map", str(tmp_map)], cwd=ROOT, stdout=out, stderr=subprocess.PIPE, text=True)
+                stage["needle_s"], t0 = time.perf_counter() - t0, time.perf_counter()
                 reap(proc)  # the server writes truth.json as it exits; reap BEFORE reading or writing outputs
         finally:
             if proc is not None:
@@ -90,7 +96,18 @@ def main(argv=None):
         maptext = tmp_map.read_text() if tmp_map.exists() else ""
         if tmp_map.exists():
             shutil.copyfile(tmp_map, run_dir / "map.jsonl")
-    return finish(run_dir, rid, (run_dir / "report.jsonl").read_text(), maptext, scfg)
+        if (Path(tmp) / "needle-time.jsonl").exists():
+            shutil.copyfile(Path(tmp) / "needle-time.jsonl", run_dir / "needle-time.jsonl")
+        stage["reap_s"] = time.perf_counter() - t0
+    t0 = time.perf_counter()
+    rc = finish(run_dir, rid, (run_dir / "report.jsonl").read_text(), maptext, scfg)
+    stage["finish_s"] = time.perf_counter() - t0
+    if rc == 0:
+        t0 = time.perf_counter()
+        doc = TL.ledger(run_dir)
+        stage["ledger_s"] = time.perf_counter() - t0
+        (run_dir / "ledger.json").write_text(json.dumps({**doc, "orchestrator": stage}))
+    return rc
 
 
 def finish(run_dir, rid, report, maptext, scfg):

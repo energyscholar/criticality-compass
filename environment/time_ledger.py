@@ -20,7 +20,7 @@ from navigator import holdtab as HT
 
 CATEGORIES = ("idle", "lag-wait", "relax", "scan", "approach", "read-lo", "read-hi", "walk", "park")
 _READING = {"ignite": ("scan",), "approach": ("approach",), "hold": ("read-lo", "read-hi"), "walk": ("walk",), "park": ("park",)}
-PAYLOAD = HT.PAYLOAD                                    # phase -> its step record's payload key: the needle's one table of phases
+PAYLOAD = HT.PHASE_PAYLOAD                                    # phase -> its step record's payload key: the needle's one table of phases
 SAMPLE = {ph: _READING[ph] for ph in PAYLOAD}           # phase -> category by reading j; KeyError here = a phase with no category
 SETTLE = ("lag-wait", "relax")      # indexed by: the position is in force
 

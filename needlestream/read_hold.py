@@ -110,7 +110,7 @@ class _Replay(HD.Drop):
         q = self._readings()
         ticks = [t[0] for t in msg["ticks"]] if msg["op"] == "scan" else [self.pos + msg["d"][0]]
         if len(q) < len(ticks):
-            return None                                      # the report holds no such reading: the wire did not answer
+            return {"op": "nev", "index": self.steps[self.i]["index"]}   # no such reading: refused at the index the step reports (plan 1565)
         got, self.queue[:] = q[:len(ticks)], q[len(ticks):]
         at = self.index
         for w, _, _ in got:
@@ -293,12 +293,12 @@ def _places(head, recs):
             if not (_keys(v, ("value", "error"), f"place {seq} reading") and _num(v["value"]) and _num(v["error"])):
                 _no(f"place {seq}: a reading is not a number and its error")
         cls = HT.classes([rd[obs]["value"]], [rd[obs]["error"]], rule["z"])[0]
-        cmd, since = HT.commanded(cmd, since, t, at)
-        ok = HT.settled(since, clock["lag"], w[0], head["skip"])
         a, b, kstate = HT.kernel_next(kstate, rd[obs]["value"])
         call = _keys(p["call"], ("step", "phase", "kind"), f"place {seq} call")
         if not (_int(call["step"], 1) and call["phase"] in HT.PHASES[head["needle"]] and type(call["kind"]) is str):
             _no(f"place {seq}: the call is not a step, a phase and a kind")
+        cmd, since = HT.commanded(cmd, since, t, HT.began(w[0], head["n_eq"][call["phase"]], head["skip"]))   # plan 1565
+        ok = HT.settled(since, clock["lag"], w[0], head["skip"])
         if not (p["class"] == cls and type(p["settled"]) is bool and p["settled"] == ok and p["state"] == HT.state(cls, rule["ordered_sign"], ok)):
             _no(f"place {seq}: the class, the settled mark or the state does not follow from its readings")
         if not _same(p["kernel"], {"A": a, "B": b, "R": HT.R_NOT_EVALUATED}):
