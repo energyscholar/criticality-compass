@@ -37,7 +37,8 @@ cc/schema.py and cc/detect.py). The loader (cc/instrument_decl.py) is the role i
 Seen RED: at CAP 5031 after the edits the cap assert FAILS; INSTRUMENT_DECL_CAP made 10 (the cap assert FAILS).
 Plan 1427 P1: CORE_CAP 1240 -> 1248 (Auditor-authorised; homes of D3/D4/D9 in intake_blind/intake_seal; the plan is net-negative overall). Seen RED: at 1240 after P1 the cap assert FAILS.
 Plan 1427 P3: CORE_CAP 1248 -> 1249 (Auditor-authorised; `import registry` in the intake modules that hashed a file). Seen RED: at 1248 after P3 the cap assert FAILS (p3-budget-red.txt).
-Plan 1427 P4: CAP 5034 -> 5036 (Auditor-authorised; positional, input_path, gen-verdicts on schema.row_lines). Seen RED: at 5034 after P4 the cap assert FAILS (5035 of 5034, p4-budget-red.txt)."""
+Plan 1427 P4: CAP 5034 -> 5036 (Auditor-authorised; positional, input_path, gen-verdicts on schema.row_lines). Seen RED: at 5034 after P4 the cap assert FAILS (5035 of 5034, p4-budget-red.txt).
+Plan 1634: the manual-run driver (manual/*.py) is the role manual, MANUAL_CAP = 400; no cap rises. Seen RED: MANUAL_CAP made 10 (the cap assert FAILS); manual/hold.py also listed under plumbing (the disjointness assert FAILS)."""
 import tomllib
 from pathlib import Path
 
@@ -67,6 +68,7 @@ ORACLE_CAP = 150   # plan 1282 P3: checks.toml [roles] oracle, the total Oracle 
 ORACLE_MEASURED_CAP = 120   # plan 1282 P5: checks.toml [roles] oracle_measured, the scan terminal, MeasuredStart and the loaders (cc/oracle_measured.py), its own role so ORACLE_CAP is not raised
 SLOTS_CAP = 200   # plan 1559: checks.toml [roles] slots, the host-wide pool of worker slots (cc/slots.py), its own role so CAP is not raised
 REWEIGHT_CAP = 170   # plan 1456 WIDTH: checks.toml [roles] oracle_reweight, the dense FS-reweight navigator (cc/oracle_reweight.py), its own role so no existing cap is raised
+MANUAL_CAP = 400   # plan 1634: checks.toml [roles] manual, the driver of `compass hold` and its record (manual/*.py), its own role so CAP is not raised
 VERBATIM = [
     "cc/admit.py", "cc/reduce.py", "cc/gamma.py", "tests/test_kernel.py", "tests/test_sign.py", "tests/test_resample.py",
     "tests/test_kernel_rs.py", "tests/reference/verdict_x.py",
@@ -107,6 +109,7 @@ oracle = {f: lines(f) for f in roles["oracle"]}
 oracle_measured = {f: lines(f) for f in roles["oracle_measured"]}
 oracle_reweight = {f: lines(f) for f in roles["oracle_reweight"]}
 slots = {f: lines(f) for f in roles["slots"]}
+manual = {f: lines(f) for f in roles["manual"]}
 for f, n in {**counts, **intake, **names, **choices, **tests, **maths}.items():
     print(f"  {f}: {n}")
 total = sum(counts.values())
@@ -133,6 +136,7 @@ print(f"oracle total {sum(oracle.values())} of {ORACLE_CAP}")
 print(f"oracle_measured total {sum(oracle_measured.values())} of {ORACLE_MEASURED_CAP}")
 print(f"oracle_reweight total {sum(oracle_reweight.values())} of {REWEIGHT_CAP}")
 print(f"slots total {sum(slots.values())} of {SLOTS_CAP}")
+print(f"manual total {sum(manual.values())} of {MANUAL_CAP}")
 print(f"instrument_decl total {sum(instrument_decl.values())} of {INSTRUMENT_DECL_CAP}")
 assert not set(intake) & set(roles["plumbing"]), f"a file in both plumbing and intake: {sorted(set(intake) & set(roles['plumbing']))}"
 assert sum(intake.values()) <= CORE_CAP, f"intake line budget exceeded: {sum(intake.values())} > {CORE_CAP}; stop and report which files grew"
@@ -183,5 +187,7 @@ assert sum(oracle_reweight.values()) <= REWEIGHT_CAP, f"oracle_reweight line bud
 assert not set(oracle_reweight) & {f for r, fs in roles.items() if r != "oracle_reweight" for f in fs}, "oracle_reweight shares a file with another role"
 assert sum(slots.values()) <= SLOTS_CAP, f"slots line budget exceeded: {sum(slots.values())} > {SLOTS_CAP}"
 assert not set(slots) & {f for r, fs in roles.items() if r != "slots" for f in fs}, "slots shares a file with another role"
+assert sum(manual.values()) <= MANUAL_CAP, f"manual line budget exceeded: {sum(manual.values())} > {MANUAL_CAP}"
+assert not set(manual) & {f for r, fs in roles.items() if r != "manual" for f in fs}, "manual shares a file with another role"
 assert total <= CAP, f"line budget exceeded: {total} > {CAP}; stop and report which files grew"
 print("test_budget: all passed")
