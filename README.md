@@ -1,10 +1,12 @@
 # Criticality Compass (CC)
 
 CC reads what was measured at a set of points, codes each reading by where its interval sits against
-declared margins, and looks the codes up in a rulebook you can edit. It never guesses: when something was
-not measured, or the interval cannot say, CC prints `BLANK` and says why. The cases (what each model is
+declared margins, and looks the codes up in a rulebook you can edit. When something was
+not measured, or the interval cannot decide between two codes (the cell `UNRES`, `cc/sign.py:19`), CC prints `BLANK` and says why. The cases (what each model is
 supposed to be) and the rulebook (which codes mean which verdict) are plain TOML files. You change them by
 editing data, never code, and every old result stays readable after you do.
+
+The code that `compass hold` runs is written in an unusual style, on purpose; `docs/READING-THE-CODE.md` explains it and says where it is only convention.
 
 To run a system by hand, start with "Run a system by hand" below. For the rulebook, start with the first hour. `TUTORIAL.md` walks one point
 from data to verdict, `HOWTO.md` covers the weekly loop and the advanced commands, and `KERNEL-IN-CC.md`

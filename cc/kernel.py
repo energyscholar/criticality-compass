@@ -18,7 +18,7 @@ Operators (formulas exactly as operators.rs at the pinned rev):
 
 Why this file is shaped this way (read before editing). A is the graph incidence operator, and B and R build on it; the maths is standard. This file
 relies on a rule about what reaches it: only `x + c` before A, every relation declared with its provenance, inadmissible input refused with a reason
-at the door. Each value arrives built by the door as a frozen type, so this file holds no `if`: a cycle, an undeclared provenance, a non-finite value and an out-of-range endpoint cannot reach it. Do not add smoothing,
+at the door. Each value arrives built by the door as a frozen type, so this file holds no `if`: a cycle, an undeclared provenance, a non-finite value and an out-of-range endpoint are refused at the door before they reach it. Do not add smoothing,
 interpolation, clamps or guards here, and do not accept an undeclared relation; if an input is wrong, extend the door's refusal in `admit.py`.
 The reasons and the idioms are in KERNEL-IN-CC.md ("Why CC uses relational math") and docs/READING-THE-CODE.md.
 """

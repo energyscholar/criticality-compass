@@ -1,6 +1,6 @@
 # Try to break it
 
-Six commands that try to feed CC something invalid. Run each from the root of a clone, with numpy installed. Each one fails, and the last line it prints is shown under it. `tests/test_try_to_break_it.py` runs them and compares, so this page cannot drift from the code. Why each is refused is in `docs/READING-THE-CODE.md`.
+Six commands that try to feed CC something invalid. Run each from the root of a clone, with numpy installed. Each one fails, and the last line it prints is shown under it. `tests/test_try_to_break_it.py` runs them and compares, so this page cannot drift from the code. Why each is refused is in `docs/READING-THE-CODE.md`. These are the attacks the door refuses today; what it does not yet refuse is listed at the end.
 
 ## 1. A relation with a cycle
 
@@ -73,3 +73,7 @@ python3 -c "import sys; sys.path.insert(0, 'cc'); import chain; chain.Refusal('N
 ```text
 KeyError: 'NOT_A_CODE'
 ```
+
+## What is not refused yet
+
+Two things are not stopped by the code today, and are kept by review: an element of an edge array inside a declared relation can be written in place (the types are frozen, the arrays are not yet read-only), and a kernel type can be built directly, without going through `cc/admit.py` (`cc/kernel.py:36`). This page has no command for them because they are not refused.

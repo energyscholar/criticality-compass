@@ -94,9 +94,13 @@ def build(T):
     rc, o = sh([sys.executable, "-m", "pip", "wheel", "--no-deps", "--no-build-isolation", "-q", "-w", T / "d1", src], T)
     out["wheel"] = next(iter(sorted((T / "d1").glob("*.whl"))), None)
     check("T6 the code wheel builds", rc == 0 and out["wheel"] is not None, o[-300:])
-    rc, o = sh([TOOLS, "-m", "build", "--sdist", "--no-isolation", "-o", T / "d2", src], T)
-    out["sdist"] = next(iter(sorted((T / "d2").glob("*.tar.gz"))), None)
-    check("T6 the sdist builds", rc == 0 and out["sdist"] is not None, o[-300:])
+    if sh([TOOLS, "-c", "import build"], T)[0] != 0:   # plan 1639 5c (F1): a missing build tool is a SKIP with its reason, not a FAIL of the sdist
+        print(f"SKIP T6 the sdist, the wheel built from it, and every check that needs them (T5, T7, T9, T12, the scans): `build` is not importable by {TOOLS}; set CC_RELEASE_TOOLS to a python that has build and twine")
+        out["sdist"] = None
+    else:
+        rc, o = sh([TOOLS, "-m", "build", "--sdist", "--no-isolation", "-o", T / "d2", src], T)
+        out["sdist"] = next(iter(sorted((T / "d2").glob("*.tar.gz"))), None)
+        check("T6 the sdist builds", rc == 0 and out["sdist"] is not None, o[-300:])
     if out["sdist"]:
         x = T / "fromsdist"
         tarfile.open(out["sdist"]).extractall(x)

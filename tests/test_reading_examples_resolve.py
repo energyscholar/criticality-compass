@@ -1,5 +1,5 @@
 """test_reading_examples_resolve - plan 1639 amendment A2: every `file:line` that docs/READING-THE-CODE.md, AGENTS.md and the "Why CC uses relational math" section of
-KERNEL-IN-CC.md name resolves at head. A visible `path:N` or `path:N-M` must have a row `ref path:N = keyword` in the comment at the end of READING-THE-CODE.md, the file must
+KERNEL-IN-CC.md and the top of README.md name resolves at head. A visible `path:N` or `path:N-M` must have a row `ref path:N = keyword` in the comment at the end of READING-THE-CODE.md, the file must
 exist, the lines must lie inside it and hold the keyword. A moved line fails here, by name. Breakers: a shifted reference, a missing row and a missing file are each found."""
 import re
 import sys
@@ -47,7 +47,8 @@ def main():
     kern = (ROOT / "KERNEL-IN-CC.md").read_text()
     sec = kern[kern.index("## Why CC uses relational math"):kern.index("## Kernel V8 on one page")]
     side = reading.split("<!-- refs")[1]
-    text = visible(reading) + "\n" + agents + "\n" + sec
+    readme = (ROOT / "README.md").read_text().split("## Run a system by hand")[0]   # phase 5c: the claim near the top of the README
+    text = visible(reading) + "\n" + agents + "\n" + sec + "\n" + readme
     n = len(REF.findall(text))
     check("there are references to resolve", n >= 20, f"{n}")
     got = problems(text, side)
