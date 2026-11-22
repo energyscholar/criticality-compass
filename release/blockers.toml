@@ -142,13 +142,13 @@ check = ""
 [[row]]
 id = "plan-numbers-rejudged"
 state = "owner-gated"
-ruling = ""
+ruling = "Ruled by the owner 2026-11-22T20:49Z: KEEP plan numbers in history and comments as provenance; the plans themselves never ship."
 check = ""
 
 [[row]]
 id = "opsec-review"
 state = "owner-gated"
-ruling = ""
+ruling = "Ruled by the owner 2026-11-22T20:49Z: ACCEPT the public scan (0 hits, 57 sha-exempt) plus the reviewer's OPSEC gate on every merge as the OPSEC review."
 check = ""
 
 [[row]]
@@ -178,7 +178,7 @@ check = "file:cleanroom-linux.txt"
 [[row]]
 id = "a2-section4-list-ruled"
 state = "owner-gated"
-ruling = "DECLARED by G-1639: the two convention-not-necessity items of docs/READING-THE-CODE.md section 4 (the bool-keyed EXT, the print-or-0 dispatch) are style, left as they are; replacing them with plain code is a follow-on outside plan 1639, not done. The reviewer rules."
+ruling = "Ruled by the reviewer: the bool-keyed dictionaries were rewritten where the key is provably bool and the arms are lazy or effect-free (124 sites, the rest kept by reason; docs/READING-THE-CODE.md and release/dispatch-sweep.toml agree, checked by tests/test_docs_match.py T12), and the rewriter leaves every kept site unchanged (tests/test_dispatch_keep.py). The print-or-0 dispatch entry of cc/intake.py is KEPT as a lambda: no published pin covers the file, but a named function needs a declared edit of the dispatch rewrite check, which is a reviewer decision."
 check = ""
 
 [[row]]
