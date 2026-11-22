@@ -122,7 +122,7 @@ def _handoff(pick):
 
 INTAKE = {"explain": lambda root, a: print(intake_say.explain(tables(root)), end="") or 0, "lint": _with_id(lint), "seal": _with_id(seal), "run": _with_id(run),
           "synth": synth, "convert": _handoff(lambda c, b, p: c.convert_cli), "peek": _handoff(lambda c, b, p: c.peek_cli),
-          "blind": _handoff(lambda c, b, p: b.blind_cli), "profile": _handoff(lambda c, b, p: lambda r, i, a, t: (p.check_cli if "--check" in a else p.profile_cli)(r, i, a, t))}
+          "blind": _handoff(lambda c, b, p: b.blind_cli), "profile": _handoff(lambda c, b, p: lambda r, i, a, t: {True: p.check_cli, False: p.profile_cli}["--check" in a](r, i, a, t))}
 
 
 def cli(root, args):

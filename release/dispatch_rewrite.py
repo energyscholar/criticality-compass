@@ -77,6 +77,15 @@ class Rewrite(ast.NodeTransformer):
         return ast.IfExp(test=got[0], body=got[1], orelse=got[2]) if got else node
 
 
+    def visit_Call(self, node):
+        f = node.func
+        if isinstance(f, ast.Subscript) and isinstance(f.value, ast.Dict) and (node.args or node.keywords):   # a call WITH arguments is outside the form (the sweep's KEEP): the table stays, what is inside it is still visited
+            f.value, f.slice = self.visit(f.value), self.visit(f.slice)
+            node.args, node.keywords = [self.visit(a) for a in node.args], [self.visit(k) for k in node.keywords]
+            return node
+        return self.generic_visit(node)
+
+
 def transformed_digest(src):
     """ast_digest of the tree `Rewrite` makes from `src` (the base): what the head must equal."""
     t = Rewrite().visit(ast.parse(src))
@@ -100,6 +109,11 @@ def _has_comment(text):
         return "#" in text
 
 
+def rewrite_source(rel, src, root=ROOT):
+    """-> (new source, left for hand) of the file `rel` (relative to root): a maths-role or self-pinned file is returned as it is, the sweep's KEEP being the authority."""
+    return (src, []) if rel in maths(root) else rewrite_text(src)
+
+
 def rewrite_text(src):
     """-> (new source, [(line, why) left for a hand edit]). The text edit of the Rewrite: outermost sites first, repeated until none remain."""
     left = []
@@ -111,6 +125,8 @@ def rewrite_text(src):
             got = eligible(n)
             if not got or any(isinstance(p, ast.JoinedStr) for p in _up(parent, n)):
                 continue
+            if isinstance(n, ast.Subscript) and isinstance(parent.get(n), ast.Call) and parent[n].func is n and (parent[n].args or parent[n].keywords):
+                continue   # a call with arguments is outside the form: the sweep's KEEP
             a, b = starts[n.lineno - 1] + n.col_offset, starts[n.end_lineno - 1] + n.end_col_offset
             if any(a <= s and e <= b for s, e, _ in edits) or any(s <= a and b <= e for s, e, _ in edits):
                 continue   # an enclosing or enclosed site is edited this pass; this one is next pass
@@ -226,6 +242,6 @@ if __name__ == "__main__":
         sys.stdout.write(toml_text(sweep(Path(sys.argv[2]) if len(sys.argv) > 2 else ROOT)))
     else:
         for f in sys.argv[2:]:
-            new, left = rewrite_text(Path(f).read_text())
+            new, left = rewrite_source(Path(f).resolve().relative_to(ROOT).as_posix(), Path(f).read_text())
             Path(f).write_text(new)
             print(f, "left for hand:", left)

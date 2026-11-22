@@ -713,7 +713,7 @@ def peek_cli(root, ident, args, t):
     codes, enc = list(ct["fields"]["file"]["fields"]["steps"]["variants"]["DECODE"]["encoding"]["values"]), flag(args, "--encoding", "utf-8-sig")   # (A22)
     delim = flag(args, "--delimiter", "COMMA")   # (A43) a key of SPLIT: what each shown line's cell count is cut by
     rel, depth = args[0] if len(args) > 0 else "", flag(args, "--depth", "1")
-    sheet = (int if re.fullmatch(r"[1-9]\d*", flag(args, "--sheet", "")) is not None else str)(flag(args, "--sheet", ""))   # (A21) a position, or a name
+    sheet = {True: int, False: str}[re.fullmatch(r"[1-9]\d*", flag(args, "--sheet", "")) is not None](flag(args, "--sheet", ""))   # (A21) a position, or a name
     base = t["roots"]["<cc-datasets>"]
     at = listed(rel, base)   # (A42: was intake_bytes.located, a character class) "" for any other root, an absolute path, a ".." part or a bare name
     ok = rel != "" and not rel.startswith("--") and re.fullmatch(r"\d+", depth) is not None

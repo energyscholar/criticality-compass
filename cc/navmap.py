@@ -108,7 +108,7 @@ def _declared(root, input_id):
 def open_map(root, input_id):
     """StoredMap or Refusal for an input id."""
     known = {q.parent.name for q in (root / "inputs").glob("*/m.toml")}
-    return (_declared if input_id in known else _no_input)(root, input_id)
+    return {True: _declared, False: _no_input}[input_id in known](root, input_id)
 
 
 def node_reader(smap, ctx, log, found):
