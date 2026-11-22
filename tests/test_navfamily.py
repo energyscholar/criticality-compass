@@ -28,6 +28,7 @@ planted banks. It reads no real data. Each check names its red mutation (applied
  G1. a [suspect] corridor "grid" is REFUSED CORRIDOR_GRID_RETIRED, exit 1, no results file. Red: navfamily.CORRIDOR "grid" walks (-> lambda c: c).
  G2. every point of the results file's `physical` polyline is a pair of MEASURED values (slow pair among the curves' slow values, fast pair among
      the plant's sample values T = 1 .. N) that encloses the traced point. Red: the point's own fast value written (Oracle.measured returns x)."""
+import ast
 import hashlib
 import json
 import os
@@ -53,7 +54,8 @@ from intake_plant import plant_family, plant_world, long_table, rooted, run, wri
 T = intake.tables(ROOT)
 GOLD = ROOT / "tests" / "navigate" / "plant-line-walks.txt"
 REGOLDEN = os.environ.get("CC_REGOLDEN") == "1"
-LINENAV_SHA = "560e2712b83e0966e2c95113ff872f82999b35303a0d87197cc40c5f905e0ab2"   # LINENAV-FROZEN v2.1-T (toolset tools/linenav.py)
+LINENAV_FROZEN_SHA = "560e2712b83e0966e2c95113ff872f82999b35303a0d87197cc40c5f905e0ab2"   # LINENAV-FROZEN v2.1-T (toolset tools/linenav.py): provenance, named by docs/navigate.md
+LINENAV_AST = "fa623461a5e35af5bbdba9644ccad9c895b030cc9042933d58e00bb2dfa67a95"   # the AST digest (docstrings excluded; comments are not in an AST) of those frozen bytes, taken from cc/linenav.py at 16a21fb
 B7_SHA = "9b212d899237cef15cfd8e833d045964805a9221329ca17ddb992037ec664f40"   # tests/navigate/b7-at-line-ch.txt at 80e113f (plan 1114)
 N, K, SLOPE = 40, 12, 2   # the walking plant: K curves of N samples, the peak of curve k at sample rank 8 + SLOPE * k
 HS = [round(0.1 * (k + 1), 1) for k in range(K)]
@@ -76,11 +78,27 @@ def tail(vertices, plane=True, sl=""):
 PLANT = [(h, rows(8 + SLOPE * k)) for k, h in enumerate(HS)]
 SUSPECT = f"[[{HS[0]}, 9.0], [{HS[-1]}, 31.0]]"   # the planted line's end vertices at slope 2 (T = rank + 1): cells (0, 8), (11, 30)
 
+def _ser(n):
+    if isinstance(n, ast.AST):
+        return n.__class__.__name__ + "(" + ",".join(f"{f}={_ser(v)}" for f, v in ast.iter_fields(n) if v is not None and v != []) + ")"
+    if isinstance(n, list):
+        return "[" + ",".join(_ser(x) for x in n) + "]"
+    return repr(n)
+
+
+def ast_digest(src):   # the same digest as tests/test_dist.py T3: the code, with docstrings and comments excluded
+    t = ast.parse(src)
+    for n in ast.walk(t):
+        if isinstance(n, (ast.Module, ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)) and n.body and isinstance(n.body[0], ast.Expr) and isinstance(getattr(n.body[0], "value", None), ast.Constant) and isinstance(n.body[0].value.value, str):
+            n.body = n.body[1:] or [ast.Pass()]
+    return hashlib.sha256(_ser(t).encode()).hexdigest()
+
+
 # ---- D1, D2 the pinned bytes
 check("D1. 1114's stored-map golden b7-at-line-ch.txt is unchanged", sha(ROOT / "tests" / "navigate" / "b7-at-line-ch.txt") == B7_SHA)
-check("D2. cc/linenav.py is LINENAV-FROZEN v2.1-T byte for byte", sha(ROOT / "cc" / "linenav.py") == LINENAV_SHA, sha(ROOT / "cc" / "linenav.py"))
+check("D2. cc/linenav.py is LINENAV-FROZEN v2.1-T in its code: the AST digest (comments and docstrings excluded) equals the frozen file's", ast_digest((ROOT / "cc" / "linenav.py").read_text()) == LINENAV_AST, ast_digest((ROOT / "cc" / "linenav.py").read_text()))
 doc = re.findall(r"cc/linenav\.py sha256 `([0-9a-f]{64})`", (ROOT / "docs" / "navigate.md").read_text())
-check("D2. docs/navigate.md records that sha beside the LINENAV-FROZEN reference", doc == [LINENAV_SHA] and "LINENAV-FROZEN" in (ROOT / "docs" / "navigate.md").read_text(), str(doc))
+check("D2. docs/navigate.md names the frozen v2.1-T sha as the source, beside the LINENAV-FROZEN reference", doc == [LINENAV_FROZEN_SHA] and "LINENAV-FROZEN" in (ROOT / "docs" / "navigate.md").read_text(), str(doc))
 
 # ---- D6 roles, closure, caps
 roles = tomllib.loads((ROOT / "checks.toml").read_text())

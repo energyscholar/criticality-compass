@@ -1,4 +1,4 @@
 # Plan 1525 environment host config for the blind stage.
 system       = "at"
 port         = 8788
-run_dir_root = "~/software/scratch/1525-out/"
+run_dir_root = "runs/"

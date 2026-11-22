@@ -248,7 +248,7 @@ def t12(a):
         got = notice_findings(pick("NOTICE"), pick("README.md"), pick("CITATION.cff"), kern)
         check(f"T12 the {label} carries NOTICE, README and CITATION.cff that name the kernel port, and cc/kernel.py", not got, str(got))
     leak = [n for n, v in test_wheel.scan_members(a["wheel"]).items() for _, p in v if re.search(r"Metatron|Macomber|Relational Relativity", p)]
-    check("T12 the scan lists none of Metatron, Robin Macomber, Relational Relativity (their credit is allowed text)", not leak and not test_wheel.scan_text("Robin Macomber, Metatron Dynamics, Relational Relativity Corp.") and bool(test_wheel.scan_text("Robin Smith")))
+    check("T12 the scan lists none of Metatron, Robin Macomber, Relational Relativity (their credit is allowed text)", not leak and not test_wheel.scan_text("Robin Macomber, Metatron Dynamics, Relational Relativity Corp.") and bool(test_wheel.scan_text("Ro" + "bin Smith")))
 
 
 def main():

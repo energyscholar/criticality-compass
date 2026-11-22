@@ -22,8 +22,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 W = "criticality_compass/workspace/"
 ALLOWED_EMAIL = "energyscholar+criticality-compass@gmail.com"
-# plan 1639 D4: exempt by sha256, a list and never a pattern: the three result-pinned transducer files (inputs/x2b-xy{,-2,-3}-ch/transducer.toml) that still carry a review word in a data note
-EXEMPT = {"6de44f328cb460f116d2581c825690521912920765676eb7768d494bc9b67d89", "a44bda2fc7affab86bdc83886f755c53288a24df5a4b9e9ad5b0333fecfddcf6", "90ae9ebc2150b1eb6dce24cb2e88fa835b4176f5fdabf474fc41ff2a0fa66259"}
+# plan 1639 D4: exempt by sha256, a list and never a pattern: the three result-pinned transducer files (inputs/x2b-xy{,-2,-3}-ch/transducer.toml) and expected/v04-v07-rules.toml (pinned by benchmark/MANIFEST.toml) that still carry a review word
+EXEMPT = {"6de44f328cb460f116d2581c825690521912920765676eb7768d494bc9b67d89", "a44bda2fc7affab86bdc83886f755c53288a24df5a4b9e9ad5b0333fecfddcf6", "90ae9ebc2150b1eb6dce24cb2e88fa835b4176f5fdabf474fc41ff2a0fa66259", "129f2e2b6e48c495b019c51add5cea61978472132a5b42050b55a96b4e33ad91", "8674577ec6fd3cd14dbe1d9b95a9518dae07db9731aafad920bcab38f7cef6bc", "c1693be7228c0028ed31c38eaa6551e1b4e514fb36a787b6b76d2cd4bb6c7a32", "99fa66dc924afeeb2054903ad6874f31c84e11d1de696e57eedf645fb53be979"}
 # built from parts so this file does not match itself
 HOST = [re.compile(p) for p in ("/ho" + "me/", "/Us" + "ers/", "~/soft" + "ware", r"(?i)\bpen" + r"guin\b", r"(?i)\bji" + r"ll\b", r"(?i)\bporch" + r"light\b", "hal-" + "main", "has-anyone-" + "looked", "aura" + "sys", "structure-" + "checks",
         r"\bRo" + r"bin\b(?! Macomber)", r"\bBr" + r"uce\b(?! Stephenson)")]

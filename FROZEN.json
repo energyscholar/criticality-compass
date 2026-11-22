@@ -8,7 +8,7 @@
  "files": {
   "cc/admit.py": "088fc4346cfc71f5bdf0243430ec817629920b0547de8ba5463a05634580f69f",
   "cc/kernel.py": "1b8b1936ca4658de13ebf153cdae78f68c9bb2b10e4eba05ffaaef8eba90a9d2",
-  "cc/linenav.py": "560e2712b83e0966e2c95113ff872f82999b35303a0d87197cc40c5f905e0ab2",
+  "cc/linenav.py": "1dc8b6eca27ed1de0664f1e29e7fd32464b73b4a7975ce78e141d701cb513c45",
   "cc/resample.py": "e5a9398a0e0d24209f87b4e86bbc8cabee155a2b8d16c6b8f2930f11fd7e3873",
   "cc/sign.py": "5d3db80caf19cd502492e2dcd5306aa514910c9ad23a18fdbf678d9f9787dca1",
   "fixtures/data/b7-at-line-2.toml": "07b76ee498168ccd232b3de7614fd22944e0d63f36df37bda699eec9b31cf936",

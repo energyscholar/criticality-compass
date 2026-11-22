@@ -17,7 +17,7 @@ import sign
 GRID = oracle_measured.GRID                 # the 7 sampled labels, K/K_c order
 NL = len(GRID)                              # 7
 KI = np.array([sampler.LABELS[l] for l in GRID])   # the 7 sampled couplings K_i, in label order
-DK_DENSE = 0.002                            # plan 1456 (Auditor-confirmed, section 7.1): the dense FLANK resolution; it does NOT set the UNRES band (section 1e)
+DK_DENSE = 0.002                            # plan 1456 (confirmed, section 7.1): the dense FLANK resolution; it does NOT set the UNRES band (section 1e)
 FS_TOL = 1e-10                              # the FS f_i fixed-point residual (max |delta f|)
 FS_MAXIT = 1000                             # non-convergence within this -> the read is a typed Refusal (a REFUSE value, B-FS-CONVERGE), never a clamp
 REWEIGHT_DECL = (

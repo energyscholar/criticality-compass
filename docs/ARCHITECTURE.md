@@ -68,7 +68,7 @@ transducer file), `resources.py` 36, `author.py` 363 (authoring).
    order statistics `[v_(r), v_(m+1-r)]`. Two numbers then carry the name `estimate`, and they are different statistics: `readings[].estimate` is the
    **median** of the m chain readings (the sealed estimand); `reports[].estimate` is **row 0 = chain 0's reading** (a reported scalar, read by no sign cell).
    This is declared here, not changed: the v10 code and its stored records are frozen, and the next Detector version is where `reports[].estimate`
-   is to be made the median (plan 0937 amendment 7, F8; Fable #9 finding F8).
+   is to be made the median (plan 0937 amendment 7, F8; review finding #9 F8).
    **Provenance pins of the v10 chain inputs (plan 0937 amendment 9).** Each `-ch` input's `transducer.toml` pins, in `update`, the toolset files that
    produced its chains (the sampler named in every chain's header, plus the reducers): the Rust kernel for w2, w3, x3, x9c and x2b; the Tier E drop-ins
    `lattice_at2`, `lattice_bc2`, `lattice2`, `lattice_xy_e`, `lattice_bilayer2_e` for b7, c2, x7a-bc, x8, x7a-nnn (Ising points), x2, x5, x5n; and the frozen

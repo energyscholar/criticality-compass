@@ -106,7 +106,7 @@ CHUNK_SWEEPS = 50_000   # OQ11, part of the stream identity: a burn or a skip is
 
 @dataclasses.dataclass(frozen=True, eq=False)
 class Fold:
-    """The whole state after i completed yields; it is a VALUE (rng_state is the bit-generator's state dict, never a live Generator), so advance never mutates the fold it is given."""
+    """The whole state after i completed yields; it is a VALUE (rng_state is the bit-generator's state dict, never a live random generator), so advance never mutates the fold it is given."""
     s: np.ndarray
     rng_state: dict
     i: int

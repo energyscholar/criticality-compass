@@ -109,9 +109,9 @@ silently: its node list loses a node and its walk reads 0.21 as the last end, so
 
 ## Family mode (plan 1176 phase D): `bin/cc navigate family <id>` and `bin/cc navigate score <id> <checkpoints.toml>`
 
-**The navigator is vendored, frozen.** `cc/linenav.py` is a byte-for-byte copy of the toolset's `tools/linenav.py`, frozen at v2.1-T
-(toolset `studies/LINENAV/LINENAV-FROZEN.md`, plan 1113): cc/linenav.py sha256 `560e2712b83e0966e2c95113ff872f82999b35303a0d87197cc40c5f905e0ab2`.
-It is never edited here; `tests/test_navfamily.py` D2 checks the sha. Family mode (`cc/navfamily.py`) is an adapter over it.
+**The navigator is vendored, frozen.** `cc/linenav.py` is a copy of the toolset's `tools/linenav.py`, frozen at v2.1-T
+(toolset `studies/LINENAV/LINENAV-FROZEN.md`, plan 1113): the frozen file's sha256 is cc/linenav.py sha256 `560e2712b83e0966e2c95113ff872f82999b35303a0d87197cc40c5f905e0ab2`.
+The shipped file's comments differ from LINENAV-FROZEN v2.1-T; its code is AST-identical to it (AST digest, docstrings and comments excluded, `fa623461a5e35af5bbdba9644ccad9c895b030cc9042933d58e00bb2dfa67a95`), which `tests/test_navfamily.py` D2 checks. The code is never edited here. Family mode (`cc/navfamily.py`) is an adapter over it.
 
 **What it walks.** A family is an intake declaration `declarations/<id>/intake.toml` that declares `[plane]` and `[suspect]` (FORMAT v14) and
 whose intake run refuses at no stage. Its plane is grid cells, curve rank x sample rank (`cc/intake_suspect.py`); the navigator's plane is

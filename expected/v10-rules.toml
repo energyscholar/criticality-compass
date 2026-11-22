@@ -1,4 +1,4 @@
-# expected/v10-rules.toml - the SCOREBOARD LOCK for v10-rules (plan 0937 amendment 10 item 2; review research/compass-FABLE-09-0937-P5-2026-10-14.md section 3 step 6).
+# expected/v10-rules.toml - the SCOREBOARD LOCK for v10-rules (plan 0937 amendment 10 item 2; the 2026-10-14 review of plan 0937 phase 5, section 3 step 6).
 # Detector v10 is a DEVELOPMENT record: it is not registered and not frozen (ruling 2026-10-13). This lock is a regression lock on the 34 -ch inputs' STORED v10 readings
 # (202 point-verdicts, 17 families), not a claim that those verdicts are true. It is NOT truth: agreement with class_truth / order_truth is reported by bin/cc tabulate, never here.
 # Source of the cells: results/<input>@v10-rules.json (re-run 2026-10-14 under the true-producer pins, plan 0937 amendment 9; verdicts re-checked line for line against the toolset's

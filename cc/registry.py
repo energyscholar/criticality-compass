@@ -1,4 +1,4 @@
-"""registry.py - the ONE reader of the registry projection (plan 1016; draft compass-cc-registry-gate-2026-10-14 s2, amended by Argus rulings R1-R3).
+"""registry.py - the ONE reader of the registry projection (plan 1016; draft compass-cc-registry-gate-2026-10-14 s2, amended by rulings R1-R3).
 registry.toml is a generated projection of the toolset's REGISTRY.toml (id, status, scope, release_module; never gated_by or note). cc.toml [registry]
 pins its sha256, maps every unit this release can run (instrument.<name>, interval.<method>, family) to a registry id ([registry.units]) and holds the
 TOTAL table (status, obtained) -> Run | RunScoped | Refuse ([registry.table]). The registry is a property of the RELEASE: nothing here is written into a result file.

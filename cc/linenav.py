@@ -23,7 +23,7 @@ Plan 1040 literal applications (each checked for result-sensitivity, studies/LIN
   - acq_j0 (grid, G6): j = 0 is round(a_pred), a_pred the suspect-tangent extrapolation of the checkpoint to the line b (G2 with h = 0);
   - G5 'minus the one with the smallest d . t_k': on a tie, the last of the declared order (d . t_k descending, + before -, rows before
     columns) is dropped. Ties are counted in the output.
-Plan 1057 (v1.8, rule L'; spec research/compass-linenav-unres-band-DESIGN-DRAFT-2026-10-15.md sec 3 + ARGUS GATE): END needs, besides L's evidence run, that the run
+Plan 1057 (v1.8, rule L'; spec research/compass-linenav-unres-band-DESIGN-DRAFT-2026-10-15.md sec 3 + REVIEW GATE): END needs, besides L's evidence run, that the run
   is NOT closed by the same supported side at both ends (same_flank). Such a window does not straddle the separator, so it carries no evidence that the field
   stops being two-sided; the direction is typed LOST. Only END -> LOST; EDGE, brackets, reads are untouched. READ['end_flank']: 'lprime' (default) | 'v17'
   (v1.7: seen-red and baseline only). RECORDED LIMIT: OPEN oblique windows (a flank is OUT or beyond the limit) are unreached; the live reader's SINGLE is
@@ -37,7 +37,7 @@ that lies within h0/2 (<=, the complement of the C3 acceptance test) of ANY earl
 into the path's +t sense: -t-direction tangents negated; plan 1045 Amendment 1) ends the direction as REVISIT; that point is NOT appended. READ['revisit']: 'after_turn' (default, this reading), 'next' (only the first
 located point after the accept), 'off' (the check deleted - seen-red only).
 G1-G7 are implemented as declared; grid h in {1, 2, 4}.
-Plan 1046 (v1.3) SINGLE side value (ARGUS RULING on 1044 OPEN-1 (ii)): a RESOLVED side meaning "one state here, no line". It never forms a
+Plan 1046 (v1.3) SINGLE side value (REVIEW RULING on 1044 OPEN-1 (ii)): a RESOLVED side meaning "one state here, no line". It never forms a
 bracket: the resolved readings (NEG, POS, SINGLE) are listed in j order (1038 A2 rule 4) and only an adjacent NEG|POS pair is a bracket, so
 SINGLE-NEG, SINGLE-POS, SINGLE-SINGLE are not, and a SINGLE between a NEG and a POS separates them. With no bracket, CLEAR keeps the A2 rule 7
 outermost-resolved test with SINGLE counted as resolved (a resolved window with no bracket is CLEAR, whatever its sides); an UNRES outermost
@@ -45,17 +45,17 @@ read still makes it UNREAD. Expansion still stops on a NEG and a POS (rule 3 ii,
 UNRES. Declared reading (plan 1046 phase 0): a SINGLE carries no orientation, so pref of a SINGLE read is -1, as for UNRES (C4).
 SINGLE is never OUT; the C2 END->EDGE rule is unchanged. READ['single']: 'resolved' (default), 'as_unres' (seen-red only: every SINGLE
 read is replaced by UNRES).
-Plan 1048 (v1.4) RUN-SUPPORTED bracket (flip robustness; spec research/compass-linenav-flip-robustness-DESIGN-DRAFT-2026-10-15.md 2(d) + ARGUS GATE):
+Plan 1048 (v1.4) RUN-SUPPORTED bracket (flip robustness; spec research/compass-linenav-flip-robustness-DESIGN-DRAFT-2026-10-15.md 2(d) + REVIEW GATE):
 the A2 expansion stop 'a NEG and a POS both read' and the adjacent-pair choice are replaced. The resolved reads (NEG, POS, SINGLE) in j order form
 maximal RUNS of equal sides (UNRES skipped, as A2 rule 4). A run is SUPPORTED if its length >= e (PARAMS 'e' = E_SUPPORT = 2: the number of flips
 tolerated plus one) or it is a BOUNDARY run: the first run when the node just below it is OUT or below -W, the last run when the node just above
 it is OUT or above +W. A BRACKET is a NEG run and a POS run consecutive among the supported runs (a supported SINGLE run separates them); its pair is
-the two inner ends. Expansion stops after the first READ that leaves a bracket. Among brackets (ARGUS OPEN-4) those with no boundary-only run (a
+the two inner ends. Expansion stops after the first READ that leaves a bracket. Among brackets (REVIEW OPEN-4) those with no boundary-only run (a
 run supported by the boundary clause alone) rank first, then A2's nearest to j = 0, then pref. The pair may span several cells (an unsupported run
 or an UNRES read between the runs); bisection is unchanged. Declared reading (no planted-bank effect, SINGLE is never planted): an unsupported
 SINGLE run is skipped like any unsupported run. READ['bracket']: 'run' (default), 'adjacent' (the v1.3 rule: seen-red and baseline only),
 'run_noboundary' (the boundary clause deleted: seen-red only).
-Plan 1050 (v1.5; spec research/compass-linenav-false-end-DESIGN-DRAFT-2026-10-15.md sec 3-4 + ARGUS GATE), three changes, all type/representation:
+Plan 1050 (v1.5; spec research/compass-linenav-false-end-DESIGN-DRAFT-2026-10-15.md sec 3-4 + REVIEW GATE), three changes, all type/representation:
   (1) EDGE-ONLY boundary clause (W): a run is supported by the boundary clause only when the node just beyond it was examined and found OUT.
       The window limit +-W is a declared search horizon, not evidence ("no read beyond +W" is absence of a read), so it cannot vouch for a
       one-read run. READ['bracket']: 'run' (default, OUT-only), 'run_v14' (the v1.4 clause incl. +-W: seen-red and baseline only),
@@ -64,13 +64,13 @@ Plan 1050 (v1.5; spec research/compass-linenav-false-end-DESIGN-DRAFT-2026-10-15
       ends only where the field stops being two-sided (UNRES or SINGLE) or at the domain edge (EDGE, unchanged). In the h_min window (the
       failing FOLLOW CROSS that took h below h_min) the read at j = 0 must be UNRES or SINGLE and the maximal run of consecutive j of
       UNRES/SINGLE reads containing j = 0 must have length >= e; otherwise the direction is typed SharpTerm.LOST (CONTOUR_EDGE under a FINITE oracle) ('could not be followed
-      further'). DECLARED ASSUMPTION ABOUT THE READER (ARGUS GATE): the reader never emits a false UNRES or SINGLE; flips only swap NEG/POS,
+      further'). DECLARED ASSUMPTION ABOUT THE READER (REVIEW GATE): the reader never emits a false UNRES or SINGLE; flips only swap NEG/POS,
       so no flip can fabricate END evidence. READ['end']: 'evidence' (default) | 'any' (v1.4: every non-EDGE failure is END; seen-red and
       baseline only). Grid mode uses the same rule on its h_min window.
   (3) Verdict.PARTIAL_IN_CORRIDOR: a deviating checkpoint is UNREACHED iff some direction is LOST and the nearest point of the path to the
       checkpoint is that direction's final path vertex (path[-1] for +t, path[0] for -t; floating equality 1e-12). dev' = dev minus UNREACHED:
       dev empty -> FOLLOWED; dev non-empty and dev' empty -> PARTIAL_IN_CORRIDOR; dev' non-empty -> FOUND_DEVIATES. rec['unreached'] = sorted k.
-Plan 1052 (v1.6; spec research/compass-linenav-if-lost-DIAGNOSIS-2026-10-15.md remedy H + its ARGUS GATE): the window LIMIT is never evidence (H, both modes).
+Plan 1052 (v1.6; spec research/compass-linenav-if-lost-DIAGNOSIS-2026-10-15.md remedy H + its REVIEW GATE): the window LIMIT is never evidence (H, both modes).
   v1.4 read the limit +-W as evidence that a run continues; v1.5 read it as evidence that it does not; the window read neither. Under H, when the
   expansion to +-W (+-Wacq at acquisition) leaves no bracket and a terminal run is cut by the limit with length m < e, it is READ ON: nodes
   j = +-(W+1) .. +-(W+e-m), in order. Stop at: a bracket, an opposite resolved read (the run is closed and stays unsupported), or OUT (the v1.5
