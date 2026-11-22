@@ -40,7 +40,8 @@ Plan 1427 P1: CORE_CAP 1240 -> 1248 (Auditor-authorised; homes of D3/D4/D9 in in
 Plan 1427 P3: CORE_CAP 1248 -> 1249 (Auditor-authorised; `import registry` in the intake modules that hashed a file). Seen RED: at 1248 after P3 the cap assert FAILS (p3-budget-red.txt).
 Plan 1427 P4: CAP 5034 -> 5036 (Auditor-authorised; positional, input_path, gen-verdicts on schema.row_lines). Seen RED: at 5034 after P4 the cap assert FAILS (5035 of 5034, p4-budget-red.txt).
 Plan 1634: CAP 5046 -> 5066 (Auditor-authorised; compass hold help lines + cmd_hold). Seen RED: at CAP 5046 after the bin/cc edit the cap assert FAILS (5051 of 5046).
-Plan 1634: the manual-run driver (manual/*.py) is the role manual, MANUAL_CAP = 400; no cap rises. Seen RED: MANUAL_CAP made 10 (the cap assert FAILS); manual/hold.py also listed under plumbing (the disjointness assert FAILS)."""
+Plan 1634: the manual-run driver (manual/*.py) is the role manual, MANUAL_CAP = 400; no cap rises. Seen RED: MANUAL_CAP made 10 (the cap assert FAILS); manual/hold.py also listed under plumbing (the disjointness assert FAILS).
+Plan 1640: release/public_scan.py is the role public, PUBLIC_CAP = 220; no cap rises. Seen RED: PUBLIC_CAP made 0 (the cap assert FAILS: 1 > 0); release/public_scan.py also listed under plumbing (the disjointness assert FAILS)."""
 import tomllib
 from pathlib import Path
 
@@ -69,6 +70,7 @@ INSTRUMENT_DECL_CAP = 20   # plan 1282 P2a (R-P2.3): checks.toml [roles] instrum
 ORACLE_CAP = 150   # plan 1282 P3: checks.toml [roles] oracle, the total Oracle sum type and `cc navigate --oracle` (cc/oracle.py), its own role so CAP is not raised
 ORACLE_MEASURED_CAP = 120   # plan 1282 P5: checks.toml [roles] oracle_measured, the scan terminal, MeasuredStart and the loaders (cc/oracle_measured.py), its own role so ORACLE_CAP is not raised
 RELEASE_CAP = 250   # plan 1639: checks.toml [roles] release, the distribution tooling (release/*.py), its own role so CAP is not raised
+PUBLIC_CAP = 220   # plan 1640: checks.toml [roles] public, the tree and history scans of the public release (release/public_scan.py), its own role so no cap rises
 SLOTS_CAP = 200   # plan 1559: checks.toml [roles] slots, the host-wide pool of worker slots (cc/slots.py), its own role so CAP is not raised
 REWEIGHT_CAP = 170   # plan 1456 WIDTH: checks.toml [roles] oracle_reweight, the dense FS-reweight navigator (cc/oracle_reweight.py), its own role so no existing cap is raised
 MANUAL_CAP = 400   # plan 1634: checks.toml [roles] manual, the driver of `compass hold` and its record (manual/*.py), its own role so CAP is not raised
@@ -114,6 +116,7 @@ oracle_reweight = {f: lines(f) for f in roles["oracle_reweight"]}
 slots = {f: lines(f) for f in roles["slots"]}
 manual = {f: lines(f) for f in roles["manual"]}
 release = {f: lines(f) for f in roles["release"]}
+public = {f: lines(f) for f in roles["public"]}
 for f, n in {**counts, **intake, **names, **choices, **tests, **maths}.items():
     print(f"  {f}: {n}")
 total = sum(counts.values())
@@ -142,6 +145,7 @@ print(f"oracle_reweight total {sum(oracle_reweight.values())} of {REWEIGHT_CAP}"
 print(f"slots total {sum(slots.values())} of {SLOTS_CAP}")
 print(f"release total {sum(release.values())} of {RELEASE_CAP}")
 print(f"manual total {sum(manual.values())} of {MANUAL_CAP}")
+print(f"public total {sum(public.values())} of {PUBLIC_CAP}")
 print(f"instrument_decl total {sum(instrument_decl.values())} of {INSTRUMENT_DECL_CAP}")
 assert not set(intake) & set(roles["plumbing"]), f"a file in both plumbing and intake: {sorted(set(intake) & set(roles['plumbing']))}"
 assert sum(intake.values()) <= CORE_CAP, f"intake line budget exceeded: {sum(intake.values())} > {CORE_CAP}; stop and report which files grew"
@@ -194,6 +198,8 @@ assert sum(slots.values()) <= SLOTS_CAP, f"slots line budget exceeded: {sum(slot
 assert not set(slots) & {f for r, fs in roles.items() if r != "slots" for f in fs}, "slots shares a file with another role"
 assert sum(manual.values()) <= MANUAL_CAP, f"manual line budget exceeded: {sum(manual.values())} > {MANUAL_CAP}"
 assert not set(manual) & {f for r, fs in roles.items() if r != "manual" for f in fs}, "manual shares a file with another role"
+assert sum(public.values()) <= PUBLIC_CAP, f"public line budget exceeded: {sum(public.values())} > {PUBLIC_CAP}"
+assert not set(public) & {f for r, fs in roles.items() if r != "public" for f in fs}, "public shares a file with another role"
 assert total <= CAP, f"line budget exceeded: {total} > {CAP}; stop and report which files grew"
 assert sum(release.values()) <= RELEASE_CAP, f"release line budget exceeded: {sum(release.values())} > {RELEASE_CAP}"
 assert not set(release) & {f for r, fs in roles.items() if r != "release" for f in fs}, "release shares a file with another role"

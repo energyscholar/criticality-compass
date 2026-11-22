@@ -43,6 +43,7 @@ intake_suspect = ["cc/intake_suspect.py"]   # plan 1176 phase A: FORMAT v14's op
 navigate_family = ["cc/navfamily.py"]   # plan 1176 phase D: `cc navigate family | score`, family mode over the frozen linenav, its own cap (tests/test_budget.py NAVFAMILY_CAP)
 intake_new = ["cc/intake_new.py"]   # plan 1164: `bin/cc new intake`, moved out of cc/intake.py with its own cap (tests/test_budget.py NEW_CAP)
 test_infrastructure = ["tests/lib.py", "cc/intake_synth.py", "tests/test_chain_1205_p2b_bank.py", "tests/intake_plant.py", "tests/plane_plant.py", "tests/tau_1282_p1.py", "tests/tau_1282_rung0.py", "tests/kernel_identity_l.py", "tests/frozen_run_1282.py", "release/dispatch_rewrite.py", "release/get_sweep.py"]   # plan 1176 C: the planted plane banks walked and scored; plan 1139: the planted synthetic bank of `bin/cc intake synth`; plan 1145: the planted inputs of the intake tests; outside the measurement closure
+public = ["release/public_scan.py"]   # plan 1640: the tree and history scans of the public release, its own cap (tests/test_budget.py PUBLIC_CAP)
 methods = ["cc/detect.py"]
 tests = [
   "tests/test_manual_hold.py", "tests/test_wheel_hold.py", "tests/test_docs_match.py", "tests/test_dist.py", "tests/test_reading_examples_resolve.py", "tests/test_try_to_break_it.py",   # plan 1634: compass hold, the wheel that runs it, the documents
@@ -89,6 +90,7 @@ tests = [
   "tests/test_standing.py", "tests/test_standing_numbers.py",   # plan 1337: a declared comparison is project.Comparison (T1-T5), and its numbers are unchanged (T6, slow, needs the data root)
   "tests/test_sampler.py", "tests/test_tau_1282.py", "tests/test_tau_1282_rung0.py", "tests/test_wrong_l.py", "tests/test_seeds.py", "tests/test_reach.py", "tests/test_seed_int.py",   # plan 1282 P1a: the sampler adapter and the tau_int tool; P1b: the door refuses a wrong or missing L
   "tests/test_couplings_no_data.py", "tests/test_oracle.py", "tests/test_instrument_decl.py", "tests/test_frozen_run_1282.py",   # plan 1282 P2d: the frozen-run harness and its resumable fold (run explicitly with CC_DATA_ROOT set); plan 1282 P2a: an m.toml with no [data] is a couplings finding (R-P2.1); the one instrument loader (R-P2.3)
+  "tests/test_public.py",   # plan 1640: the repository can go public (slow; needs CC_PRIVATE_PATTERNS and a rehearsal for its history half)
 ]
 
 [allow]
