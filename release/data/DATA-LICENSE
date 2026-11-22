@@ -1,0 +1,22 @@
+Criticality Compass: benchmark and result data licence
+
+Copyright 2026 Bruce Stephenson
+
+The data in this repository's benchmark/ directory (the benchmark manifest and
+its declared row list) and results/ directory (the stored results and their
+arrays) are licensed under the Creative Commons Attribution 4.0 International
+licence (CC BY 4.0). The full legal code is at
+
+    https://creativecommons.org/licenses/by/4.0/legalcode
+
+You may share and adapt these data for any purpose, provided you give
+appropriate credit, provide a link to the licence, and indicate if changes
+were made.
+
+Scope:
+- The code (bin/, cc/, rust/, tests/ and the other source files) is licensed
+  separately under the Apache License, Version 2.0 (see LICENSE and NOTICE).
+- Third-party data keep their own licences. The files under data/l8/ are CC0 1.0
+  (see data/l8/ATTRIBUTION.md). Data files that the benchmark manifest names by
+  path and hash, but that are not in this repository, are licensed as stated by
+  their own deposits; this licence does not cover them.

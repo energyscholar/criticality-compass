@@ -1,4 +1,5 @@
-include cc.toml checks.toml FROZEN.json CLAIMS.md HOWTO.md TUTORIAL.md KERNEL-IN-CC.md SIGNATURE-TABLE.md LICENSE NOTICE DATA-LICENSE README.md
+include cc.toml checks.toml FROZEN.json CLAIMS.md HOWTO.md TUTORIAL.md KERNEL-IN-CC.md SIGNATURE-TABLE.md LICENSE NOTICE DATA-LICENSE README.md CITATION.cff CHANGELOG.md AGENTS.md registry.toml
+include release/partition.py
 recursive-include bin *
 recursive-include cc *.py *.toml
 recursive-include tables *

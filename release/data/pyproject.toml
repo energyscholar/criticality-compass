@@ -1,0 +1,25 @@
+# criticality-compass-data - the stored results of Criticality Compass that the code distribution does not carry (plan 1639 D1).
+# Built from a clone by release/release.sh, never by hand. It installs into criticality_compass/workspace/results/ of the code distribution (file-disjoint from it).
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "criticality-compass-data"
+version = "0.1.0"        # equal to the code distribution's (tests/test_dist.py)
+description = "Stored results of Criticality Compass (CC BY 4.0); installs into the criticality-compass workspace."
+requires-python = ">=3.11"
+dependencies = ["criticality-compass==0.1.0"]
+license = "CC-BY-4.0"
+license-files = ["DATA-LICENSE"]
+readme = "README.md"
+authors = [{ name = "Bruce Stephenson", email = "energyscholar+criticality-compass@gmail.com" }]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "Programming Language :: Python :: 3 :: Only",
+  "Operating System :: OS Independent",
+]
+
+[tool.setuptools]
+include-package-data = false
