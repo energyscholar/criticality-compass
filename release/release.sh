@@ -10,9 +10,9 @@ TOOLS=${CC_RELEASE_TOOLS:-python3}; CLEAN=${CC_CLEAN_PY:-python3}; UP=
 VER=$("$TOOLS" -c 'import tomllib; print(tomllib.load(open("pyproject.toml","rb"))["project"]["version"])')
 "$TOOLS" -c 'import sys; v=tuple(int(x) for x in sys.argv[1].split(".")); sys.exit(0 if v >= (0,1,0) else 1)' "$VER" || { [ -z "$UP" ] || { echo "REFUSED: no upload below 0.1.0 (the 0.0.1 name stub is the Auditor's)"; exit 1; }; }
 OUT=$(mktemp -d "${TMPDIR:-/tmp}/release.XXXXXX"); GATES=0
-nice -n 19 "$TOOLS" -m build --sdist --wheel -o "$OUT" . > "$OUT/build.log" 2>&1 || { tail -5 "$OUT/build.log"; echo "FAIL: build"; exit 1; }
-(cd release/data && nice -n 19 "$TOOLS" -m build --wheel -o "$OUT" . > "$OUT/build-data.log" 2>&1) || { tail -5 "$OUT/build-data.log"; echo "FAIL: build of the data wheel"; exit 1; }
-"$TOOLS" -m twine check "$OUT"/* || { echo "FAIL: twine check"; exit 1; }
+nice -n 19 "$TOOLS" -m build --sdist --wheel -o "$OUT" . > "$OUT.build.log" 2>&1 || { tail -5 "$OUT.build.log"; echo "FAIL: build"; exit 1; }
+(cd release/data && nice -n 19 "$TOOLS" -m build --wheel -o "$OUT" . > "$OUT.build-data.log" 2>&1) || { tail -5 "$OUT.build-data.log"; echo "FAIL: build of the data wheel"; exit 1; }
+"$TOOLS" -m twine check "$OUT"/*.whl "$OUT"/*.tar.gz || { echo "FAIL: twine check"; exit 1; }
 echo "== scan: every file of every artifact (vocabulary, host paths, addresses)"
 "$TOOLS" - "$OUT" <<'PYEOF' || { echo "GATE FAIL: the scan has hits"; GATES=1; }
 import sys, glob
