@@ -212,7 +212,7 @@ def t9(a):
 
 def t10():
     hc = ROOT / "release" / "handoff_check.py"
-    rc, o = sh([sys.executable, hc], ROOT)
+    rc, o = sh([sys.executable, hc, "--no-run"], ROOT)   # --no-run: the checks include this very test
     tab = tomllib.loads((ROOT / "release" / "blockers.toml").read_text()) if (ROOT / "release" / "blockers.toml").is_file() else {"row": []}
     tab.setdefault("row", [])
     open_rows = [r["id"] for r in tab["row"] if r.get("state") == "open"]

@@ -1,1 +1,182 @@
-# plan 1639 phase 8: one [[row]] per blocker (id, state, ruling, check). Stub at phase 1: no rows.
+# plan 1639 phase 8: one [[row]] per blocker. state = open | closed | owner-gated. A closed row names the check that is run; an owner-gated row needs a recorded ruling.
+# check = "tests/<stem>.py" (the test exits 0) | "tests/<stem>.py#<text>" (an "ok" line holds <text>, no "FAIL" line does) | "file:<name>" (a result file holds CLEANROOM OK)
+
+[[row]]
+id = "test-wheel-green"
+state = "open"
+ruling = "Awaits Phase 4: 1569's stamps are the remaining hits in the wheel."
+check = "tests/test_wheel.py"
+
+[[row]]
+id = "env-file-host-paths"
+state = "closed"
+ruling = "Scrubbed in Phase 3 (environment/*.toml)."
+check = "tests/test_no_host_paths.py"
+
+[[row]]
+id = "1569-stamps"
+state = "open"
+ruling = "Phase 4, gated on 1569 merging into compass-main."
+check = ""
+
+[[row]]
+id = "scan-extended"
+state = "open"
+ruling = "Scan extended in Phases 1 and 3; closes when the wheel scan is clean (Phase 4)."
+check = "tests/test_dist.py#T8 the scan of every file of the wheel"
+
+[[row]]
+id = "records-clean"
+state = "open"
+ruling = "T8 fresh records: closes after Phase 4 (tau-v0 stamp)."
+check = "tests/test_dist.py#T8 the ising record"
+
+[[row]]
+id = "R4"
+state = "closed"
+ruling = "registry.toml is in the wheel workspace (T4)."
+check = "tests/test_dist.py#T4 registry.toml"
+
+[[row]]
+id = "R5"
+state = "closed"
+ruling = "DATA-LICENSE is in the workspace and under dist-info/licenses (T4)."
+check = "tests/test_dist.py#T4 DATA-LICENSE"
+
+[[row]]
+id = "R8"
+state = "closed"
+ruling = "No criticality-compass-kernel and no kernel extra in METADATA (O3 ruling)."
+check = "tests/test_dist.py#T9 METADATA: no criticality-compass-kernel"
+
+[[row]]
+id = "D1"
+state = "closed"
+ruling = "Two distributions: code wheel (frozen and named results) and criticality-compass-data (ruled b)."
+check = "tests/test_dist.py#T7 every result is in exactly one place"
+
+[[row]]
+id = "D2"
+state = "closed"
+ruling = "The 28 sealed records are in no distribution (ruled a)."
+check = "tests/test_dist.py#T5"
+
+[[row]]
+id = "D3"
+state = "closed"
+ruling = "Docstring-only edits, AST identity, re-pin (ruled a; extended by D8 to byte-pins)."
+check = "tests/test_dist.py#T3"
+
+[[row]]
+id = "D4"
+state = "closed"
+ruling = "The x2b transducers are exempt by sha, never by pattern (ruled a)."
+check = "tests/test_no_host_paths.py"
+
+[[row]]
+id = "D5"
+state = "closed"
+ruling = "Plan numbers kept; FIRST-HOUR explains plan=NNNN as a provenance tag (re-judged at release: row plan-numbers-rejudged)."
+check = "tests/test_docs_match.py#T11 docs/FIRST-HOUR.md exists"
+
+[[row]]
+id = "D6"
+state = "closed"
+ruling = "tabulate fix is out of 1639; FIRST-HOUR says tabulate is clone-only."
+check = "tests/test_docs_match.py#T11 docs/FIRST-HOUR.md exists"
+
+[[row]]
+id = "D7"
+state = "closed"
+ruling = "The first real public version is 0.1.0."
+check = "tests/test_dist.py#T9 METADATA: version 0.1.0"
+
+[[row]]
+id = "O1"
+state = "owner-gated"
+ruling = "Reserve now as a minimal 0.0.1 stub (Auditor's spike). A bare pip install on 2026-11-21 listed 0.0.1 as an available version."
+check = ""
+
+[[row]]
+id = "O2"
+state = "closed"
+ruling = "Author Bruce Stephenson with the one public plus-address."
+check = "tests/test_dist.py#T9 METADATA: Author-email"
+
+[[row]]
+id = "O3"
+state = "closed"
+ruling = "Data wheel built locally; only criticality-compass is reserved; the kernel extra is dropped."
+check = "tests/test_dist.py#T9 the data wheel"
+
+[[row]]
+id = "O4"
+state = "closed"
+ruling = "No URLs in METADATA until the public release."
+check = "tests/test_dist.py#T9 METADATA: no Project-URL"
+
+[[row]]
+id = "O5"
+state = "closed"
+ruling = "NOTICE keeps and widens the Metatron line to cc/kernel.py (T12)."
+check = "tests/test_dist.py#T12 NOTICE, README and CITATION.cff"
+
+[[row]]
+id = "stub-0.0.1-uploaded"
+state = "owner-gated"
+ruling = "The index lists 0.0.1 (seen by the Generator, 2026-11-21); the Auditor confirms it is the stub."
+check = ""
+
+[[row]]
+id = "upload-go-0.1.0"
+state = "owner-gated"
+ruling = ""
+check = ""
+
+[[row]]
+id = "repo-url-at-release"
+state = "owner-gated"
+ruling = ""
+check = ""
+
+[[row]]
+id = "plan-numbers-rejudged"
+state = "owner-gated"
+ruling = ""
+check = ""
+
+[[row]]
+id = "opsec-review"
+state = "owner-gated"
+ruling = ""
+check = ""
+
+[[row]]
+id = "notice-names-kernel-port"
+state = "closed"
+ruling = "T12: NOTICE names cc/kernel.py and the change; the wheel carries cc/kernel.py."
+check = "tests/test_dist.py#T12 the wheel carries NOTICE"
+
+[[row]]
+id = "kernel-extra-dropped"
+state = "closed"
+ruling = "No kernel extra in pyproject (T9, test_launcher)."
+check = "tests/test_launcher.py"
+
+[[row]]
+id = "cleanroom-macos-arm64"
+state = "closed"
+ruling = "release/cleanroom.sh exits 0 on macOS arm64."
+check = "file:cleanroom-macos.txt"
+
+[[row]]
+id = "cleanroom-linux-x86_64"
+state = "closed"
+ruling = "release/cleanroom.sh exits 0 on Linux x86_64 with the same four hashes."
+check = "file:cleanroom-linux.txt"
+
+[[row]]
+id = "a2-section4-list-ruled"
+state = "owner-gated"
+ruling = "DECLARED by G-1639: the two convention-not-necessity items of docs/READING-THE-CODE.md section 4 (the bool-keyed EXT, the print-or-0 dispatch) are style, left as they are; replacing them with plain code is a follow-on outside plan 1639, not done. The Auditor rules."
+check = ""
