@@ -24,7 +24,7 @@ for a in sorted(glob.glob(sys.argv[1] + "/*.whl") + glob.glob(sys.argv[1] + "/*.
         n += 1; print(f"  {a.rsplit('/', 1)[-1]}: {name}: lines {[i for i, _ in hits][:6]}")
 print(f"  {n} file(s) with hits"); sys.exit(1 if n else 0)
 PYEOF
-echo "== hand-off check"; "$TOOLS" release/handoff_check.py || { echo "GATE FAIL: the hand-off check"; GATES=1; }
+echo "== hand-off check"; CC_TEST_PY="$CLEAN" "$TOOLS" release/handoff_check.py || { echo "GATE FAIL: the hand-off check"; GATES=1; }
 echo "== clean room"
 DW=$(ls "$OUT"/criticality_compass_data-*.whl); CW=$(ls "$OUT"/criticality_compass-*.whl)
 nice -n 19 sh release/cleanroom.sh --python "$CLEAN" --data-wheel "$DW" "$CW" || { echo "GATE FAIL: the clean room"; GATES=1; }

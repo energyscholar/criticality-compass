@@ -13,7 +13,7 @@ EXPECTED = ['test-wheel-green', 'env-file-host-paths', '1569-stamps', 'scan-exte
 
 def run_test(stem, cache):
     if stem not in cache:
-        r = subprocess.run([sys.executable, str(ROOT / stem)], capture_output=True, text=True, cwd=ROOT)
+        r = subprocess.run([os.environ.get("CC_TEST_PY", sys.executable), str(ROOT / stem)], capture_output=True, text=True, cwd=ROOT)
         cache[stem] = (r.returncode, [ln for ln in (r.stdout + r.stderr).splitlines() if ln.startswith(("ok ", "FAIL "))])
     return cache[stem]
 
