@@ -62,13 +62,27 @@ echo "$o" | grep -q '^ok   T9' || { echo "no T9 ok line"; exit 1; }
 
 [[row]]
 name = "ci-local-macos"
-state = "open"
-ruling = "release/ci-local.sh on a fresh clone of this tip, on the macOS host, must record this tree's hash and zero FAILED lines. After amendment C3 it records three FAILED lines: test_claims, test_intake_example and test_intake_terminal, the three undeclared-failing rows below (their findings are reported, nothing is edited). Becomes closed when those are ruled and a result file for the final tree has zero FAILED lines."
+state = "closed"
+ruling = "release/ci-local.sh on a fresh clone of this tip, on the macOS host (a commit host's venv, Python 3.11), records this tree's hash, no FAILED line and exit 0. The result file lives outside the tree (it names the tree it was made for): CC_CI_LOCAL_RESULT."
+check = '''
+f="${CC_CI_LOCAL_RESULT:-}"
+[ -n "$f" ] && [ -f "$f" ] || { echo "CC_CI_LOCAL_RESULT is not set to a file (the result of release/ci-local.sh on this tree)"; exit 1; }
+grep -q "^tree $(git rev-parse 'HEAD^{tree}')$" "$f" || { echo "the result is for another tree than HEAD's"; exit 1; }
+! grep -q '^FAILED ' "$f" || { grep '^FAILED ' "$f"; exit 1; }
+grep -q '^exit 0$' "$f" || { echo "the result does not end exit 0"; exit 1; }
+'''
 
 [[row]]
 name = "ci-local-linux"
-state = "open"
-ruling = "The same on a Linux x86_64 host. One further failure there: contract/test_ising_port.py, test_p04_at_is_unchanged_on_the_wire. Cause found (amendment C1): the platform libm differs by one unit in the last place in arcsinh(exp(-2*Lc))/2, the self_dual_K of system-instantiated/plugins/at/vendor/lattice_at.py (vendor, never edited), which feeds the wire's K_c. Lc comes from the world's hidden L4 plus a drift offset, so it is an open real, not a table entry; a closed-table fix does not apply. Neither the sha nor a tolerance is touched here: the reviewer rules it."
+state = "closed"
+ruling = "The same on a Linux x86_64 host (Python 3.12, a scratch clone under /tmp, nice 19, CC_JOBS=1): CC_CI_LOCAL_RESULT_LINUX. The two Linux-only failures found earlier are fixed by rulings D1 (the wire compares the AT truth to 4 ulp: the platform libm differs by one ulp in K_c) and D4 (ci-run.sh installs the build backend a 3.12 venv lacks)."
+check = '''
+f="${CC_CI_LOCAL_RESULT_LINUX:-}"
+[ -n "$f" ] && [ -f "$f" ] || { echo "CC_CI_LOCAL_RESULT_LINUX is not set to a file (the result of release/ci-local.sh on this tree)"; exit 1; }
+grep -q "^tree $(git rev-parse 'HEAD^{tree}')$" "$f" || { echo "the result is for another tree than HEAD's"; exit 1; }
+! grep -q '^FAILED ' "$f" || { grep '^FAILED ' "$f"; exit 1; }
+grep -q '^exit 0$' "$f" || { echo "the result does not end exit 0"; exit 1; }
+'''
 
 [[row]]
 name = "public-face"
