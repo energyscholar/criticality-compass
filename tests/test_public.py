@@ -326,11 +326,11 @@ else:
 cfgt = tomllib.loads((ROOT / "cc.toml").read_text())["check"]
 stems = [Path(f).stem for f in tomllib.loads((ROOT / "checks.toml").read_text())["roles"]["tests"]]
 fast = [x for x in stems if x not in cfgt["slow"]]
-skip_want = {x: n for n in ("needs_data", "needs_rust") for x in cfgt[n] if x in fast}
+skip_want = {x: n for n in ("needs_data", "needs_rust", "needs_commit_host") for x in cfgt[n] if x in fast}
 
 
-UNDECLARED_FAILING = ["test_claims", "test_intake_example", "test_intake_reach", "test_intake_leak", "test_intake_terminal"]   # AQ3: fail with the data root too, so they are a real failure and an open blocker row, never a skip
-check("T10 AQ3: test_frozen_run_1282 and test_docs_match (pass with the data root, fail without it) are in needs_data; the five that fail with it are in no skip list", {"test_frozen_run_1282", "test_docs_match"} <= set(cfgt["needs_data"]) and not set(UNDECLARED_FAILING) & (set(cfgt["needs_data"]) | set(cfgt["needs_rust"])), str(cfgt["needs_data"][-3:]))
+UNDECLARED_FAILING = ["test_claims", "test_intake_example", "test_intake_terminal"]   # AQ3: fail with the data root too, so they are a real failure and an open blocker row, never a skip
+check("T10 AQ3: test_frozen_run_1282 and test_docs_match (pass with the data root, fail without it) are in needs_data; the five that fail with it are in no skip list", {"test_frozen_run_1282", "test_docs_match"} <= set(cfgt["needs_data"]) and not set(UNDECLARED_FAILING) & (set(cfgt["needs_data"]) | set(cfgt["needs_rust"]) | set(cfgt["needs_commit_host"])), str(cfgt["needs_data"][-3:]))
 
 
 def totality(run, skipped, fast_):
@@ -352,7 +352,7 @@ if cr.is_file():
             (r / "release").mkdir(); (r / "bin").mkdir(); (r / "tests").mkdir()
             shutil.copy(cr, r / "release" / "ci-run.sh")
             (r / "checks.toml").write_text('[roles]\ntests = ["tests/test_a.py", "tests/test_b.py"]\n')
-            (r / "cc.toml").write_text("[check]\nslow = []\nneeds_data = []\nneeds_rust = [\'test_b\']\n")
+            (r / "cc.toml").write_text("[check]\nslow = []\nneeds_data = []\nneeds_rust = [\'test_b\']\nneeds_commit_host = []\n")
             (r / "bin" / "cc").write_text("import os, sys\nprint('STUB', sys.argv[1], 'JOBS=' + os.environ.get('CC_JOBS', 'unset'))\n")
             e = {k: v for k, v in os.environ.items() if k != "CC_JOBS"}
             e.update(env, PYTHON=sys.executable)

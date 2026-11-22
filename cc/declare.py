@@ -228,7 +228,7 @@ def chk_cc(p, d, c, stem=None):
             for x in sorted((keeps | discards) - set(RESULT_FIELDS))]
     out += [at(p, "basic", f"field '{x}' is in both keeps and discards", "keep it in one list")
             for x in sorted(keeps & discards)]
-    out += shape(p, d["check"], {"fast_budget_s": int, "slow": list, "memory_gb": (int, float), "exclusive": list, "replay": str, "validate_domain": list}, {"needs_data": list, "needs_rust": list}, pre="check.")   # plan 0881 P2.9: replay is required (it was optional only because a planted file predated it)
+    out += shape(p, d["check"], {"fast_budget_s": int, "slow": list, "memory_gb": (int, float), "exclusive": list, "replay": str, "validate_domain": list}, {"needs_data": list, "needs_rust": list, "needs_commit_host": list}, pre="check.")   # plan 0881 P2.9: replay is required (it was optional only because a planted file predated it)
     out += when("replay" not in d["alphabets"], p, "alphabets.replay", "missing", 'write replay = ["locked", "all"]')
     out += inalpha(p, "check.replay", d["check"]["replay"], d["alphabets"].get("replay", [])) if "replay" in d["check"] else []   # plan 0886: which inputs test_run_all replays
     out += [at(p, f"refusal_fields.{k}", "must be a regex string (the field a refusal of this kind is reported at)", "write a pattern like '^interval\\.min_blocks$'")
@@ -246,7 +246,7 @@ def chk_cc(p, d, c, stem=None):
         + [at(p, "check.exclusive", f"'{x}' is not a test in checks.toml", "name a test stem listed there")
            for x in d["check"].get("exclusive", []) if x not in stems]\
         + [at(p, f"check.{k}", f"'{x}' is not a test in checks.toml", "name a test stem listed there")
-           for k in ("needs_data", "needs_rust") for x in d["check"].get(k, []) if x not in stems]
+           for k in ("needs_data", "needs_rust", "needs_commit_host") for x in d["check"].get(k, []) if x not in stems]
 
 
 # ---------------------------------------------------------------- cases and joins

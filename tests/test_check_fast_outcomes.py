@@ -37,8 +37,8 @@ try:
     (repo / "tests" / "test_noop.py").write_text('print("test_noop: all passed")\n')
     ct = repo / "checks.toml"
     ct.write_text(re.sub(r"(?s)\ntests = \[.*?\n\]\n", '\ntests = ["tests/test_noop.py"]\n', ct.read_text(), count=1))
-    cc = repo / "cc.toml"   # validate names every slow/exclusive/needs_data/needs_rust test: the scratch lists only the one test it runs
-    cc.write_text(re.sub(r"(?m)^(slow|exclusive|needs_data|needs_rust) = \[.*?\]", r"\1 = []", cc.read_text()))
+    cc = repo / "cc.toml"   # validate names every slow/exclusive/needs_data/needs_rust/needs_commit_host test: the scratch lists only the one test it runs
+    cc.write_text(re.sub(r"(?m)^(slow|exclusive|needs_data|needs_rust|needs_commit_host) = \[.*?\]", r"\1 = []", cc.read_text()))
     git(repo, "init", "-q")
     git(repo, "add", "-A")
     git(repo, "commit", "-qm", "base")   # the scratch's own base commit (no hook is installed in it)

@@ -98,27 +98,33 @@ done
 [[row]]
 name = "undeclared-failing-test_claims"
 state = "open"
-ruling = "Fails both with and without the data root, so it is neither skipped nor edited (plan 1640 AQ3). Its toolset: cells name files of the author's private research repository; the reviewer rules a declared fix or a deferral."
+ruling = "Amendment C3(iii), diagnosed; nothing edited. CLAIMS.md line 24 (the detector interval coverage row) names the stored results as the prose tick `cc:results/*-ch@v10-rules.json`, a glob. tests/test_claims.py ANYTICK matches every `kind:...@...` tick; CELL requires `@` plus 64 hex, so the glob is reported as a malformed evidence cell. The tick has been in CLAIMS.md since before compass-main c628e52 (the same line is there); the failure is the same on compass-main. The fix is a ruling: write the glob without the kind and at-sign, or give the row real evidence cells."
 
 [[row]]
 name = "undeclared-failing-test_intake_example"
 state = "open"
-ruling = "Fails both with and without the data root, so it is neither skipped nor edited (plan 1640 AQ3). The reviewer rules a declared fix or a deferral."
+ruling = "Amendment C3(ii), a finding; nothing edited. With the data root it still fails: S0 FORMAT refuses TRANSDUCER_FILE_REFUSED because studies/DIAL1118/bank/sim.py (sha256 8a88f370...) is in no commit of the toolset at the commit host (the toolset at HEAD df17c83); the later stages are withheld after S0 and the committed report no longer reproduces. Same cause as test_intake_terminal: the toolset history the tests declare is not the history present. Not a skip: the requirement is a toolset COMMIT, and it is absent here."
 
 [[row]]
 name = "undeclared-failing-test_intake_reach"
-state = "open"
-ruling = "Fails both with and without the data root, so it is neither skipped nor edited (plan 1640 AQ3). The reviewer rules a declared fix or a deferral."
+state = "closed"
+ruling = "Amendment C3(i): the failure was a missing openpyxl, a declared requirement of the commit host (its K0 or E0 line says so). With openpyxl installed in the commit host's venv the test passes; it is now in cc.toml [check].needs_commit_host, which release/ci-run.sh SKIPs with that reason in public CI, and bin/cc check --fast still runs it on the commit host."
+check = '''
+sh release/ci-run.sh --list | grep -q "^SKIPPED test_intake_reach: .*needs_commit_host"
+'''
 
 [[row]]
 name = "undeclared-failing-test_intake_leak"
-state = "open"
-ruling = "Fails both with and without the data root, so it is neither skipped nor edited (plan 1640 AQ3). The reviewer rules a declared fix or a deferral."
+state = "closed"
+ruling = "Amendment C3(i): the failure was a missing openpyxl, a declared requirement of the commit host (its K0 or E0 line says so). With openpyxl installed in the commit host's venv the test passes; it is now in cc.toml [check].needs_commit_host, which release/ci-run.sh SKIPs with that reason in public CI, and bin/cc check --fast still runs it on the commit host."
+check = '''
+sh release/ci-run.sh --list | grep -q "^SKIPPED test_intake_leak: .*needs_commit_host"
+'''
 
 [[row]]
 name = "undeclared-failing-test_intake_terminal"
 state = "open"
-ruling = "Fails both with and without the data root, so it is neither skipped nor edited (plan 1640 AQ3). The reviewer rules a declared fix or a deferral."
+ruling = "Amendment C3(ii), a finding; nothing edited. Declared commit ce46e7631921f8a555a8ff89ce373f9f720eca0c (tests/test_intake_terminal.py DIAL_COMMIT, plan 1281 B5, toolset plan-1118-dial); actual: that object does not exist in the toolset at the commit host (git cat-file: not a valid object name; toolset HEAD df17c83, no commit touches studies/DIAL1118). The six DIAL1118 trees under the home directory are plain copies, not git repositories. The tests need the toolset commit to be fetched, or the declaration to be re-pointed by a ruling."
 
 [[row]]
 name = "OQ1"

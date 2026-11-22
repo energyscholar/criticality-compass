@@ -1,6 +1,6 @@
 #!/bin/sh
 # ci-run.sh - plan 1640: the one command the CI workflow runs (and release/ci-local.sh runs the same). The test set is DERIVED, never listed here:
-# the fast set = checks.toml [roles].tests minus cc.toml [check].slow; of it, a stem in [check].needs_data or [check].needs_rust is SKIPPED (one
+# the fast set = checks.toml [roles].tests minus cc.toml [check].slow; of it, a stem in [check].needs_data, [check].needs_rust or [check].needs_commit_host is SKIPPED (one
 # line each, saying which list), the rest RUN through `bin/cc test`. The two sets are checked to be disjoint and total over the fast set (a stem
 # in neither, or in both, is a refusal, exit 1).
 # usage: release/ci-run.sh [--list]     --list prints RUN / SKIPPED lines and exits 0 (or 1 if the sets are not total and disjoint)
@@ -14,9 +14,9 @@ root = Path(sys.argv[1])
 stems = [Path(f).stem for f in tomllib.loads((root / "checks.toml").read_text())["roles"]["tests"]]
 cfg = tomllib.loads((root / "cc.toml").read_text())["check"]
 fast = [s for s in stems if s not in cfg["slow"]]
-why = {"needs_data": "needs the author's data root or toolset", "needs_rust": "needs the Rust kernel build"}
+why = {"needs_data": "needs the author's data root or toolset", "needs_rust": "needs the Rust kernel build", "needs_commit_host": "needs a requirement of the commit host (openpyxl)"}
 skip = {}
-for lst in ("needs_data", "needs_rust"):   # a stem in both lists is reported under the second
+for lst in ("needs_data", "needs_rust", "needs_commit_host"):   # a stem in both lists is reported under the second
     for s in cfg[lst]:
         if s in fast:
             skip[s] = f"SKIPPED {s}: {why[lst]} (cc.toml [check].{lst})"
