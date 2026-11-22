@@ -118,9 +118,9 @@ def _table_of_floats(v, keys, name, domain=None):
     return dict(v)
 
 
-def parse_world(d, params, hidden_domain, extra_keys, parse_extra):
+def parse_world(d, params, hidden_domain, extra_keys=(), parse_extra=dict):
     """params: the plugin's PARAMS; hidden_domain: {name: (lo exclusive, hi inclusive)}; extra_keys and parse_extra: the plugin's
-    own world keys and their parse (a dict or Malformed) -> World | Malformed."""
+    own world keys and their parse (a dict or Malformed); a plugin with no extra keys (AT) may omit both -> World | Malformed."""
     bad = _unknown(d, TOP_KEYS + tuple(extra_keys), "at-apparatus.toml")
     if bad:
         return bad
