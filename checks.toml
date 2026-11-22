@@ -14,6 +14,7 @@ oracle_reweight = ["cc/oracle_reweight.py"]   # plan 1456 WIDTH: the dense FS-re
 instrument_decl = ["cc/instrument_decl.py"]   # plan 1282 P2a (R-P2.3): the one instrument loader and its declared defaults, its own cap (tests/test_budget.py INSTRUMENT_DECL_CAP)
 seal_reach = ["cc/seal_reach.py"]   # plan 1282 P1c: the seal's three data-free refusals (seeds, reach, licence), its own cap (tests/test_budget.py SEAL_REACH_CAP)
 sampler = ["cc/sampler.py"]   # plan 1282 P1a: the declared sampler adapter, its own cap (tests/test_budget.py SAMPLER_CAP)
+release = ["release/handoff_check.py"]   # plan 1639: the distribution tooling (partition, hand-off check, data wheel), its own cap (tests/test_budget.py RELEASE_CAP); the .sh files are not .py
 manual = ["manual/__init__.py", "manual/hold.py", "manual/record.py"]   # plan 1634: the driver of `compass hold` and its record, its own cap (tests/test_budget.py MANUAL_CAP)
 host = ["cc/host.py"]   # plan 1273 A1: host resources, its own cap (tests/test_budget.py HOST_CAP)
 slots = ["cc/slots.py"]   # plan 1559: the host-wide pool of worker slots, its own cap (tests/test_budget.py SLOTS_CAP)
@@ -44,7 +45,7 @@ intake_new = ["cc/intake_new.py"]   # plan 1164: `bin/cc new intake`, moved out 
 test_infrastructure = ["tests/lib.py", "cc/intake_synth.py", "tests/test_chain_1205_p2b_bank.py", "tests/intake_plant.py", "tests/plane_plant.py", "tests/tau_1282_p1.py", "tests/tau_1282_rung0.py", "tests/kernel_identity_l.py", "tests/frozen_run_1282.py"]   # plan 1176 C: the planted plane banks walked and scored; plan 1139: the planted synthetic bank of `bin/cc intake synth`; plan 1145: the planted inputs of the intake tests; outside the measurement closure
 methods = ["cc/detect.py"]
 tests = [
-  "tests/test_manual_hold.py", "tests/test_wheel_hold.py", "tests/test_docs_match.py",   # plan 1634: compass hold, the wheel that runs it, the documents
+  "tests/test_manual_hold.py", "tests/test_wheel_hold.py", "tests/test_docs_match.py", "tests/test_dist.py",   # plan 1634: compass hold, the wheel that runs it, the documents
   "contract/test_needleview_reader.py", "contract/test_needleview_page.py", "contract/test_needleview_blind.py",   # plan 1529
   "contract/test_needleplayer_stream.py", "contract/test_needleplayer_page.py", "contract/test_needleplayer_blind.py",   # plan 1531
   "contract/test_needleplayer_v2.py",   # plan 1535

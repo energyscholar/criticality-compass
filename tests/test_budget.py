@@ -3,6 +3,7 @@ Counts non-blank lines of every plumbing file in checks.toml, minus the verbatim
 printed, never capped. Raising CAP is the Auditor's planned edit, never the Generator's.
 Plan 1145: the intake pipeline (checks.toml [roles] intake) has its own role and its own cap, INTAKE_CAP = 1200 non-blank lines
 (1145 measured 1023 at the end of phase 1); it is no longer counted in plumbing.
+Plan 1639: release/*.py is the role release, RELEASE_CAP = 250. Seen RED: RELEASE_CAP made 10 (the cap assert FAILS); release/handoff_check.py also listed under plumbing (the disjointness assert FAILS).
 Plan 1160 P5: S7, S8 and S9 (cc/intake_feasible.py) are the role intake_feasible, FEASIBLE_CAP = 120 (83 at P5). Seen RED: FEASIBLE_CAP
 made 80 (the cap assert FAILS); cc/intake_feasible.py also listed under plumbing (the disjointness assert FAILS).
 Plan 1164: the intake core is split by invariant (Layout C): each module is its own role with its own cap (CORE below), and CORE_CAP = 1200,
@@ -67,6 +68,7 @@ SEAL_REACH_CAP = 120   # plan 1282 P1c: checks.toml [roles] seal_reach, the seal
 INSTRUMENT_DECL_CAP = 20   # plan 1282 P2a (R-P2.3): checks.toml [roles] instrument_decl, the one instrument loader (cc/instrument_decl.py), its own role
 ORACLE_CAP = 150   # plan 1282 P3: checks.toml [roles] oracle, the total Oracle sum type and `cc navigate --oracle` (cc/oracle.py), its own role so CAP is not raised
 ORACLE_MEASURED_CAP = 120   # plan 1282 P5: checks.toml [roles] oracle_measured, the scan terminal, MeasuredStart and the loaders (cc/oracle_measured.py), its own role so ORACLE_CAP is not raised
+RELEASE_CAP = 250   # plan 1639: checks.toml [roles] release, the distribution tooling (release/*.py), its own role so CAP is not raised
 SLOTS_CAP = 200   # plan 1559: checks.toml [roles] slots, the host-wide pool of worker slots (cc/slots.py), its own role so CAP is not raised
 REWEIGHT_CAP = 170   # plan 1456 WIDTH: checks.toml [roles] oracle_reweight, the dense FS-reweight navigator (cc/oracle_reweight.py), its own role so no existing cap is raised
 MANUAL_CAP = 400   # plan 1634: checks.toml [roles] manual, the driver of `compass hold` and its record (manual/*.py), its own role so CAP is not raised
@@ -111,6 +113,7 @@ oracle_measured = {f: lines(f) for f in roles["oracle_measured"]}
 oracle_reweight = {f: lines(f) for f in roles["oracle_reweight"]}
 slots = {f: lines(f) for f in roles["slots"]}
 manual = {f: lines(f) for f in roles["manual"]}
+release = {f: lines(f) for f in roles["release"]}
 for f, n in {**counts, **intake, **names, **choices, **tests, **maths}.items():
     print(f"  {f}: {n}")
 total = sum(counts.values())
@@ -137,6 +140,7 @@ print(f"oracle total {sum(oracle.values())} of {ORACLE_CAP}")
 print(f"oracle_measured total {sum(oracle_measured.values())} of {ORACLE_MEASURED_CAP}")
 print(f"oracle_reweight total {sum(oracle_reweight.values())} of {REWEIGHT_CAP}")
 print(f"slots total {sum(slots.values())} of {SLOTS_CAP}")
+print(f"release total {sum(release.values())} of {RELEASE_CAP}")
 print(f"manual total {sum(manual.values())} of {MANUAL_CAP}")
 print(f"instrument_decl total {sum(instrument_decl.values())} of {INSTRUMENT_DECL_CAP}")
 assert not set(intake) & set(roles["plumbing"]), f"a file in both plumbing and intake: {sorted(set(intake) & set(roles['plumbing']))}"
@@ -191,4 +195,6 @@ assert not set(slots) & {f for r, fs in roles.items() if r != "slots" for f in f
 assert sum(manual.values()) <= MANUAL_CAP, f"manual line budget exceeded: {sum(manual.values())} > {MANUAL_CAP}"
 assert not set(manual) & {f for r, fs in roles.items() if r != "manual" for f in fs}, "manual shares a file with another role"
 assert total <= CAP, f"line budget exceeded: {total} > {CAP}; stop and report which files grew"
+assert sum(release.values()) <= RELEASE_CAP, f"release line budget exceeded: {sum(release.values())} > {RELEASE_CAP}"
+assert not set(release) & {f for r, fs in roles.items() if r != "release" for f in fs}, "release shares a file with another role"
 print("test_budget: all passed")

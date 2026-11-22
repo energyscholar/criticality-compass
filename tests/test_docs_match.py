@@ -16,7 +16,7 @@ from lib import bad, check, guarded  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 MAN = ROOT / "docs" / "man" / "compass.1"
-DOCS = ("README.md", "HOWTO.md", "TUTORIAL.md")
+DOCS = ("README.md", "HOWTO.md", "TUTORIAL.md", "docs/FIRST-HOUR.md")   # plan 1639 T11 (declared edit): docs/FIRST-HOUR.md joins the documents run here
 ELIDE = ("…", "...")
 
 # READONLY: (document, command, n-th occurrence of that command in the document) -> None (run as written) or "verify" (the record argument is replaced by a record the test made).
@@ -148,7 +148,10 @@ def t10():
 
 def t11():
     items = []
+    check("T11 docs/FIRST-HOUR.md exists (plan 1639)", (ROOT / "docs" / "FIRST-HOUR.md").is_file(), "no such file")
     for d in DOCS:
+        if not (ROOT / d).is_file():
+            continue
         seen = Counter()
         for cmd, shown in extract((ROOT / d).read_text().split("\n"), True):
             items.append((d, cmd, seen[cmd], shown))
