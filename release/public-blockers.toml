@@ -21,8 +21,9 @@ echo "$o" | grep -q -E '^[0-9]+ rows, [0-9]+ problem' || { echo "no summary line
 
 [[row]]
 name = "idiom-followon"
-state = "open"
-ruling = "The follow-on plan for the idiom items of the 1639 A4 section 5 is neither merged nor declared: no plan number exists. Close this row by recording the plan number and the reviewer's ruling here."
+state = "closed"
+ruling = "Plan 1651 closes the idiom follow-on of the 1639 A4 section 5: the bool-keyed bullet of docs/READING-THE-CODE.md equals the counts of release/dispatch-sweep.toml (tests/test_docs_match.py T12), and the rewriter leaves every KEEP site of the sweep unchanged (tests/test_dispatch_keep.py). The one remaining idiom, the print-or-0 entry of cc/intake.py, is kept as written: rewriting it as a function needs a declared EDITED entry in tests/test_dispatch_rewrite.py (the dispatch rewrite check), which that plan did not edit."
+check = '"$PY" tests/test_dispatch_keep.py'
 
 [[row]]
 name = "tree-scan"
