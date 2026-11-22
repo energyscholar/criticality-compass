@@ -7,7 +7,8 @@ What it pins:
        serves exactly the plugin directories that hold an apparatus.py;
   p02  the port is carried by the declaration: navigator/ and needlestream/ are byte-identical to the base, no file added;
   p03  the host names no observable and no dynamics: the five host files hold no role name, no update rule, no sample floor;
-  p04  AT is unchanged on the wire: a fixed call sequence gives byte-identical replies, truth.json and perf.json (pinned at base);
+  p04  AT is unchanged on the wire: a fixed call sequence gives byte-identical replies, edge.json and perf.json (pinned at base), and a truth.json whose floats
+       are within 4 ulp of the base's and whose every other leaf is identical (the truth values are reproducible to 4 ulp across platforms, and bit-identical on one platform);
   p05  the Ising declaration: the key set of SCHEMA-1545, the Ising roles, its dynamics, and nothing of its kind, field or offset;
   p06  the Ising reading: one list per declared role in the declared order; the sample floor, the roles and the label are the
        plugin's (S = 39 is `nev`; a stub engine with S_MIN 20 and roles of its own is served by the same wire);
@@ -34,6 +35,7 @@ import importlib.util
 import json
 import math
 import socket
+import struct
 import subprocess
 import sys
 import time
@@ -67,7 +69,12 @@ AT_SEQUENCE = [{"op": "declare"}, {"op": "read", **RQ}, {"op": "nudge", "d": [7]
                {"op": "nudge", "d": [-32], "n_eq": 2, "S": 41, "skip": 2}, {"op": "scan", "ticks": [[100], [900], [410]], **RQ},
                {"op": "read", "n_eq": 0, "S": 40, "skip": 1}, {"op": "nudge", "d": [40], **RQ}, {"op": "read", "n_eq": 3, "S": 39, "skip": 1}]
 # ---- pinned at base 4df8a87 (the reviewer re-pins at the real base in a dated section of the plan before handoff) ----
-AT_BYTES = "658f7d53f2d69521bfdc09cfe5480dcf13cffefdb0e8fe59503ac93ed482b3d8"
+# plan 1640 amendment D1: the wire is pinned in two parts. The replies, edge.json and the call log of perf.json are pinned by sha256 (byte-identical on every platform);
+# truth.json is pinned as a parsed document (TRUTH_PIN) and compared by _truth_diffs: its K_c values are arcsinh(exp(-2 Lc)) / 2 of a hidden real, and the platform libm
+# does not round those correctly, so the truth values are reproducible to 4 ulp across platforms, and bit-identical on one platform.
+AT_BYTES = "887de304a3ad5a8d87dca98d3b64a0e1e224a61f1c345d9a5a227adca082a97e"   # sha256 of replies + edge.json + the call log of perf.json (the base's sha with truth.json taken out)
+ULP_BOUND = 4   # the libm accuracy bound for one exp plus one arcsinh plus one exact halving: at most 1 ulp each, and one more for the composition
+TRUTH_PIN = r'''{"time": "lag and drift are in algorithmic (Swendsen-Wang) time", "wire": "compass-apparatus/1", "rows": [{"call": 1, "op": "read", "index": 43, "K_c": 0.34875425989391357, "pos": [400], "actual": [0.30000000000000004], "points": [{"pos": [400], "window": [4, 43], "K_c": [0.348871817357449, 0.34875425989391357], "sampling": 3, "dial": [[0, [400]]]}]}, {"call": 2, "op": "nudge", "index": 86, "K_c": 0.3486246790834067, "pos": [407], "actual": [0.30175], "points": [{"pos": [407], "window": [47, 86], "K_c": [0.34874220436833114, 0.3486246790834067], "sampling": 46, "dial": [[43, [400]], [45, [407]]]}]}, {"call": 3, "op": "nudge", "index": 170, "K_c": 0.34837164683170535, "pos": [375], "actual": [0.29375], "points": [{"pos": [375], "window": [90, 170], "K_c": [0.3486126268582585, 0.34837164683170535], "sampling": 88, "dial": [[86, [407]], [88, [375]]]}]}, {"call": 4, "op": "scan", "index": 299, "K_c": 0.3479833252379394, "pos": [410], "actual": [0.3025], "points": [{"pos": [100], "window": [174, 213], "K_c": [0.3483596010542822, 0.3482421708157279], "sampling": 173, "dial": [[170, [375]], [172, [100]]]}, {"pos": [900], "window": [217, 256], "K_c": [0.3482301283391113, 0.34811273028402806], "sampling": 216, "dial": [[213, [100]], [215, [900]]]}, {"pos": [410], "window": [260, 299], "K_c": [0.3481006911083425, 0.3479833252379394], "sampling": 259, "dial": [[256, [900]], [258, [410]]]}]}, {"call": 5, "op": "read", "index": 339, "K_c": 0.3478629803104053, "pos": [410], "actual": [0.3025], "points": [{"pos": [410], "window": [300, 339], "K_c": [0.3479803162404928, 0.3478629803104053], "sampling": 299, "dial": [[299, [410]]]}]}]}'''   # truth.json as the base wrote it (macOS), unchanged
 TREE_PINS = "1afc8bb5734b45cb864c4720db836a5dca02c30e7b19cc1f7068db26a3800d94"
 HOST = ("environment/apparatus_wire.py", "environment/apparatus_server.py", "environment/apparatus_config.py",
         "environment/run_hold.py", "environment/hold_score.py")
@@ -163,16 +170,51 @@ def _tree_digest():
     return hashlib.sha256(json.dumps(out, sort_keys=True).encode()).hexdigest(), out
 
 
+def _ordered(x):
+    """A finite double as an integer that is monotone in the double: the IEEE bit pattern as int64, negatives folded about zero (so -0.0 and 0.0 are the same point)."""
+    i = struct.unpack("<q", struct.pack("<d", x))[0]
+    return -(1 << 63) - i if i < 0 else i
+
+
+def _ulp_distance(a, b):
+    """The number of representable doubles between a and b: an integer, from the bit patterns, never a difference of values."""
+    return abs(_ordered(a) - _ordered(b))
+
+
+def _step_ulp(x, n):
+    """The double n steps from x (n may be negative), by the same ordering."""
+    i = _ordered(x) + n
+    return struct.unpack("<d", struct.pack("<q", -(1 << 63) - i if i < 0 else i))[0]
+
+
+def _truth_diffs(want, got, path="truth"):
+    """The declared comparison type of truth.json: same keys, same list lengths, every non-float leaf identical (type included), every float leaf within ULP_BOUND ulp."""
+    if isinstance(want, dict) and isinstance(got, dict):
+        if want.keys() != got.keys():
+            return [f"{path}: keys {sorted(want)} != {sorted(got)}"]
+        return [d for k in want for d in _truth_diffs(want[k], got[k], f"{path}/{k}")]
+    if isinstance(want, list) and isinstance(got, list):
+        if len(want) != len(got):
+            return [f"{path}: length {len(want)} != {len(got)}"]
+        return [d for i, (a, b) in enumerate(zip(want, got)) for d in _truth_diffs(a, b, f"{path}[{i}]")]
+    if isinstance(want, float) and isinstance(got, float):
+        if not (math.isfinite(want) and math.isfinite(got)):
+            return [] if repr(want) == repr(got) else [f"{path}: {want!r} != {got!r}"]
+        d = _ulp_distance(want, got)
+        return [] if d <= ULP_BOUND else [f"{path}: {want!r} vs {got!r} is {d} ulp apart (bound {ULP_BOUND})"]
+    return [] if type(want) is type(got) and want == got else [f"{path}: {want!r} != {got!r}"]
+
+
 def _at_bytes(tmp):
     proc, c, run = _server(tmp, AT_WORLD, "at")
     try:
         lines = [c.raw(json.dumps(m)) for m in AT_SEQUENCE]
     finally:
         _stop(proc, c)
-    blob = "".join(lines) + (run / "truth.json").read_text() + (run / "edge.json").read_text()
+    blob = "".join(lines) + (run / "edge.json").read_text()
     perf = json.loads((run / "perf.json").read_text())
     blob += json.dumps({"time": perf["time"], "calls": [{k: v for k, v in r.items() if "sec" not in k and "time" not in k} for r in perf["calls"]]}, sort_keys=True)
-    return hashlib.sha256(blob.encode()).hexdigest()
+    return hashlib.sha256(blob.encode()).hexdigest(), json.loads((run / "truth.json").read_text())
 
 
 # ---------------------------------------------------------------- the tests
@@ -215,8 +257,29 @@ def test_p03_the_host_names_no_observable_and_no_dynamics():
 
 
 def test_p04_at_is_unchanged_on_the_wire(tmp_path):
-    got = _at_bytes(tmp_path)
-    assert got == AT_BYTES, f"the AT replies, truth or perf differ from the base (sha256 {got[:12]}…)"
+    got, truth = _at_bytes(tmp_path)
+    assert got == AT_BYTES, f"the AT replies, edge or perf differ from the base (sha256 {got[:12]}…)"
+    diffs = _truth_diffs(json.loads(TRUTH_PIN), truth)
+    assert not diffs, "the AT truth differs from the base: " + "; ".join(diffs[:3])
+
+
+def test_p04b_the_truth_comparison_can_fail():
+    """The comparison type of truth.json can say no (plan 1640 amendment D1): 4 ulp passes, 5 ulp fails, a changed non-float leaf fails, a changed key fails."""
+    ref = json.loads(TRUTH_PIN)
+    leaf = ref["rows"][0]["K_c"]
+    assert _truth_diffs(ref, json.loads(TRUTH_PIN)) == [], "the pin must equal itself"
+    for n, ok in ((1, True), (4, True), (5, False), (-4, True), (-5, False)):
+        moved = json.loads(TRUTH_PIN); moved["rows"][0]["K_c"] = _step_ulp(leaf, n)
+        assert (_truth_diffs(ref, moved) == []) is ok, (n, ok, _truth_diffs(ref, moved))
+    moved = json.loads(TRUTH_PIN); moved["rows"][0]["op"] = "scan"
+    assert _truth_diffs(ref, moved), "a changed non-float leaf must fail"
+    moved = json.loads(TRUTH_PIN); moved["rows"][0]["index"] += 1
+    assert _truth_diffs(ref, moved), "a changed integer leaf must fail"
+    moved = json.loads(TRUTH_PIN); moved["rows"][0]["extra"] = 1
+    assert _truth_diffs(ref, moved), "an added key must fail"
+    moved = json.loads(TRUTH_PIN); moved["rows"][0]["K_c"] = 1
+    assert _truth_diffs(ref, moved), "a float leaf that became an integer must fail"
+    assert _ulp_distance(0.0, -0.0) == 0 and _ulp_distance(1.0, 1.0) == 0 and _ulp_distance(1.0, _step_ulp(1.0, 1)) == 1
 
 
 def test_p05_the_ising_declaration(tmp_path):
