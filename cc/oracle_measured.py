@@ -15,6 +15,7 @@ BIG = 243
 PARTNER = {BIG: 81}   # declared (A2.1): the matched pair, big L -> partner L
 GRID = tuple(sampler.LABELS)   # the 7 labels, K/K_c: where production data exists (non-uniform)
 FAMILY = "poc"
+OUTCOME = {**{(a, b, c): "REFUSE" for a in (True, False) for b in (True, False) for c in (True, False)}, (True, True, False): "BRACKET"}   # (a down node, an up node above it, an up node below a down) -> the walk's outcome; total over the 8
 STEM = "{family}_{label}_L{L}_{start}_c{chain}.npz"   # production chain file: <data_root>/1282/<run>/<STEM>
 LABEL_RUN = {}   # label -> its one run dir; OWED to the P2f production run. The glob-count == 1 rule below is what enforces it.
 
@@ -44,7 +45,7 @@ def scan(read, n):
     his_above = [j for j in his if j > last_lo]
     first_hi = min(his_above, default=n)
     disordered = any(j < last_lo for j in his)   # an ORD node below a DIS node already falsifies faithfulness: refused, never bracketed
-    outcome = {(True, True, False): "BRACKET"}.get((bool(los), bool(his_above), disordered), "REFUSE")
+    outcome = OUTCOME[(bool(los), bool(his_above), disordered)]
     lo = last_lo if outcome == "BRACKET" else 0
     hi = {True: first_hi, False: n - 1}[outcome == "BRACKET"]
     return navigate.Walk(outcome, lo, hi, tuple(enumerate(readings)))

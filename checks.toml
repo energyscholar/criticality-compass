@@ -46,7 +46,7 @@ test_infrastructure = ["tests/lib.py", "cc/intake_synth.py", "tests/test_chain_1
 methods = ["cc/detect.py"]
 tests = [
   "tests/test_manual_hold.py", "tests/test_wheel_hold.py", "tests/test_docs_match.py", "tests/test_dist.py", "tests/test_reading_examples_resolve.py", "tests/test_try_to_break_it.py",   # plan 1634: compass hold, the wheel that runs it, the documents
-  "tests/test_door_types.py", "tests/test_dispatch_rewrite.py", "tests/test_dispatch_sweep.py", "tests/test_get_sweep.py",   # plan 1644: the door's guarantees are structural; the dispatch and `.get` sweeps are total
+  "tests/test_door_types.py", "tests/test_dispatch_rewrite.py", "tests/test_dispatch_sweep.py", "tests/test_get_sweep.py", "tests/test_get_fix.py",   # plan 1644: the door's guarantees are structural; the dispatch and `.get` sweeps are total
   "contract/test_needleview_reader.py", "contract/test_needleview_page.py", "contract/test_needleview_blind.py",   # plan 1529
   "contract/test_needleplayer_stream.py", "contract/test_needleplayer_page.py", "contract/test_needleplayer_blind.py",   # plan 1531
   "contract/test_needleplayer_v2.py",   # plan 1535

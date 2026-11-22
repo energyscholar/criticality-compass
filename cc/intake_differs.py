@@ -24,7 +24,7 @@ def lined(data, d):
     """A file's names line (the first non-blank line when the header names none) as cells under the reader's own format, None when that
     format's cell layer refuses the bytes; and the cell counts under each other text format."""
     spec = SPEC[d["reader"]["name"]](d)
-    at, kind = HEADER[spec["header"]["kind"]](spec["header"]).get("names", 1) - 1, spec["format"]["kind"]   # SKIP names no line: the first
+    at, kind = {"names": 1, **HEADER[spec["header"]["kind"]](spec["header"])}["names"] - 1, spec["format"]["kind"]   # SKIP names no line: the first
     return _line(data, spec, kind, at), tuple(len(x) for x in (_line(data, spec, k, at) for k in SPLIT if k != kind) if x is not None)
 
 

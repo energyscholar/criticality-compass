@@ -29,7 +29,7 @@ NOT_PREDICTABLE = {   # plan 1165 section 5: the live reasons no profile can pre
 }
 NUMERIC, PREDICTED = ("NUMERIC", "NUMERIC_WITH_EMPTY"), "the profile did not predict this"
 SPEC = {"csv-curve-v1": lambda d: intake_read.CSV_CURVE, "table-curve-v1": lambda d: d["reader"]}   # a live [reader] name -> the spec its reader reads by
-NAMES = {"NAMES_UNITS_IN_NAMES": lambda h, cs: [split_unit(c, h["unit_syntax"])[0] for c in cs]}   # [reader.header] kind -> its names from the line's cells
+NAMES = {**{k: lambda h, cs: list(cs) for k in intake_read.HEADER}, "NAMES_UNITS_IN_NAMES": lambda h, cs: [split_unit(c, h["unit_syntax"])[0] for c in cs]}   # [reader.header] kind -> its names from the line's cells; total over HEADER
 OPPOSITE = {"ASCENDING": "DESCENDING", "DESCENDING": "ASCENDING", "UNORDERED": "(none)"}   # a direction -> the first_direction that contradicts it
 NONE = {"rows": [], "header_lines": [], "columns": [], "widths": [], "delimiter": "NONE"}   # no table the declared reader reads (no sheet; no text table)
 COLUMN = {"text": 0, "empty": 0, "monotone_runs": 1, "first_direction": "FLAT", "equal_runs": [0], "revisited": 0}   # a declared column the names do not resolve
@@ -46,7 +46,7 @@ def _facts(fp, spec, d, ops):
     i, h = next((i for i, r in enumerate(live) if r["kind"] in NUMERIC), len(live)), spec["header"]
     head, at = [n for r in live[:i] for n in range(r["first"], r["last"] + 1)], {"names": 0, **intake_read.HEADER[h["kind"]](h)}["names"]
     cells = next((x["cells"] for x in t["header_lines"] if x["line"] == ([0] + head)[at * (at <= len(head))]), [] if at * (at <= len(head)) == 0 else None)
-    names = NAMES.get(h["kind"], lambda h, cs: list(cs))(h, cells) if cells is not None else None
+    names = NAMES[h["kind"]](h, cells) if cells is not None else None
     k = {str: lambda r: ([j for j, n in enumerate(names or [], 1) if n == masked(r)] + [0])[0], int: lambda r: r}
     return dict(fp=fp, t=t, live=live, body=live[i:], i=i, head=head, names=names, width={True: len(cells or ()), False: ([r["width"] for r in live[i:]] + [0])[0]}[bool(cells)],
                 col=lambda r: next((c for c in t["columns"] if c["position"] == k[type(r)](r)), COLUMN), spec=spec, d=d, ops=ops,

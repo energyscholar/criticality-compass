@@ -29,8 +29,10 @@ DECLARED = {"probe": ("COMPLETE", "INCOMPLETE", "UNKNOWN")}   # code columns rea
 SIZE_KEY = "L"                 # the one scalar a data file holds that is the lattice size, not a coupling
 SIDECARS = ("observable", "block_map", "conjugate", "sinks", "two_start")
 TEMPLATES = {k: v[0] for k, v in door.TEMPLATES.items()}   # plan 0973 F2: the field shapes of the one table in cc/door.py
+# partial by design: advisory message text only; a section without a row falls to the generic hint, and `.get` here is that fallback
 SECTION_HINT = {"obtained.": "write one of: truth | navigated | observed (cc.toml alphabets.obtained)",
                 "points.": 'write a case id from cases/ (see bin/cc help), or "none"'}
+# partial by design: advisory message text only; a key without a row falls to a generic hint, and `.get` here is that fallback
 HINT = {"family": "a short description of the model", "mechanism": "one sentence on what drives the transition",
         "key": "the array's key in the data file (np.load(path).files lists them)",
         "template": "one of: chain, pair, all-pairs, matched, matched-chain (and that template's fields)"}
@@ -491,6 +493,7 @@ def chk_relations(p, d, c, use, sz):
                   for rn in rels if rn not in need]
 
 
+# partial by design: which fields a sidecar section may also carry; a section without a row has none, and `.get` here is that absence
 SIDECAR_OPT = {"observable": {"level_floor": int}, "block_map": {"limited": str}}   # plan 0873: level 0 exclusion, declared
 
 

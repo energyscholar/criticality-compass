@@ -350,6 +350,7 @@ def pair_section(res, r, pair, mode, cfg, T, m, text, code_map):
     """One instrument's numbered trace of one control pair: membership door, the stored vectors, the kernel steps its own
     declared operators run, the interval against eps, the cell, the family's code. Every number is the stored one."""
     a, b = pair.split("->")
+    # frozen rule set: a membership rule exists for some instruments only (plan 0872: across_delta has none); None is no rule
     sig, rule = {s["point"]: s for s in res["signature"]}, T.membership.get(r["instrument"])   # plan 0872: across_delta has no membership rule
     out = [f"{r['instrument']}   (pair {pair})"]
     if rule:

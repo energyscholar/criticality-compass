@@ -29,13 +29,13 @@ FileKind = enum.Enum("FileKind", "TEXT_TABLE XLSX ZIP UNPROFILED_FORMAT")   # by
 Encoding = enum.Enum("Encoding", "UTF8 UTF8_SIG UTF16 LATIN1_ONLY UNDECODABLE NOT_APPLICABLE")   # by FileKind (KINDS): a text decoding; UNDECODABLE (empty or binary); NOT_APPLICABLE (a zip, an xlsx)
 Delimiter = enum.Enum("Delimiter", "COMMA SEMICOLON TAB WHITESPACE NONE")   # the election's tie order is this order
 RowKind = enum.Enum("RowKind", "BLANK NUMERIC NUMERIC_WITH_EMPTY TEXT")
-CUT = {d: SPLIT[d] for d in ("COMMA", "SEMICOLON", "TAB", "WHITESPACE")}   # Delimiter -> one line to its cells, in the election's tie order (NONE:
-# the line is one cell); the converter's own DELIMITER cuts, so a profile's widths are the widths DELIMITER from = d gives
+CUT = {d: SPLIT[d] for d in ("COMMA", "SEMICOLON", "TAB", "WHITESPACE")}   # Delimiter -> one line to its cells, in the election's tie order; the converter's own DELIMITER cuts, so a profile's widths are the widths DELIMITER from = d gives
+CELLS = {**CUT, "NONE": lambda t: [t]}   # the election's last delimiter, NONE: the line is one cell; total over Delimiter
 ENCODINGS = (   # (Encoding, does it hold, DECODE's name): the first that holds decodes the file (plan 1165 2.2); a BOM is structure, read first
     ("UTF8_SIG", lambda r: r.startswith(b"\xef\xbb\xbf"), "utf-8-sig"), ("UTF16", lambda r: r[:2] in (b"\xff\xfe", b"\xfe\xff"), "utf-16"),
     ("UTF8", lambda r: True, "utf-8"), ("LATIN1_ONLY", lambda r: True, "latin-1"))   # latin-1 decodes every byte: LATIN1_ONLY is "not UTF-8"
 BINARY = re.compile("[\x00-\x08\x0e-\x1f\x7f]")   # a decoded control character no text table holds: the bytes are a binary format
-BIN = {2: 0, **{n: 1 for n in range(3, 10)}, 10: 2}   # an equal run's length (10 for 10 or more) -> its equal_runs bin (2, 3-9, 10+); a run of 1 none
+BIN = {1: None, 2: 0, **{n: 1 for n in range(3, 10)}, 10: 2}   # an equal run's length (10 for 10 or more) -> its equal_runs bin (2, 3-9, 10+); a run of 1 none
 DIRECTION = {None: "FLAT", True: "ASCENDING", False: "DESCENDING"}   # the first step of a column's numbers (equal values merged) -> first_direction
 READER_ABSENT = "NONE_READER_ABSENT"   # an XLSX's `sheets` on a machine without openpyxl (XLSX_READER_ABSENT: the kind stays XLSX)
 CELLS_UNREADABLE = "NONE_CELLS_UNREADABLE"   # (plan 1281 B8) an XLSX's `sheets` when its names load and a sheet's cells do not parse: the reader names it (S4 NOT_AN_XLSX)
@@ -112,7 +112,7 @@ def order(pairs):
     xs = [x for _, x in pairs]
     runs, rep = _runs(xs), repeats([xs])
     ks = [k for k, _ in runs]
-    bins = Counter(BIN.get(min(n, 10)) for _, n in runs)
+    bins = Counter(BIN[min(n, 10)] for _, n in runs)
     g = [(k, [n for n, _ in grp]) for k, grp in itertools.groupby(pairs, key=lambda p: p[1])]   # the equal runs with their lines
     at = lambda sel: tuple((ls[0], ls[-1]) for i, (k, ls) in enumerate(g) if sel(i, k, len(ls)))
     first = {k: i for i, (k, _) in reversed(list(enumerate(g)))}   # each value's first run
@@ -139,7 +139,7 @@ def _name(cs, k):
 
 def table(lines, delimiter, widths):
     """The Table of numbered text lines cut by `delimiter` (lines: [(line, text)]; an xlsx sheet's rows come cut, delimiter NONE)."""
-    cut = CUT.get(delimiter, lambda t: [t])
+    cut = CELLS[delimiter]
     return cells_table([(n, cut(t), _prefix(t)) for n, t in lines], delimiter, widths)
 
 

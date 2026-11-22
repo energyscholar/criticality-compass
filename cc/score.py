@@ -37,6 +37,7 @@ def axis_tallies(rows, T, tr, otr):
     """The per-axis agreement lines of one table set whose results carry geometry and order. Order is read against
     order_truth through the set's [score] map; geometry against class_truth, over the points whose order_truth is not
     FIRST-ORDER (a first-order point has no geometry class to be right about). Points with no case are not scored."""
+    # frozen rule set: the [axes.probe] row is optional by declaration; absent, the geometry axis stands as the probe
     sc, g = T.axes["order"][0]["score"], T.axes.get("probe", T.axes["geometry"])[0]   # the geometry as the declared probe lets it stand
     cls = lambda v: "REFUSE" if v in g["refuse"] else g.get("class_of", {}).get(v, v)  # noqa: E731
     both = [(sig, case) for sig, case, _ in rows if case != "none" and case in tr]
@@ -234,6 +235,7 @@ def page(results, tables_dir=None, diffs=()):
                 hits.setdefault(sig["row_line"], []).append(f"{res['input']}:{sig['point']}")
         rows = [(r, T.lines[k], int((owner == k).sum())) for k, r in enumerate(T.verdict["row"])]
         assert sum(n for _, _, n in rows) == owner.size, "the rows of a table must cover its domain exactly once"
+        # frozen rule set: [verdict.class_of] is optional by declaration; a value with no row is its own class
         cls = lambda v: "REFUSE" if v in T.verdict["refuse"] else T.verdict.get("class_of", {}).get(v, v)  # noqa: E731
         out.append(f"<h2>Rules: {html.escape(tset)} ({owner.size} cells)</h2>")
         for c in sorted({cls(r["verdict"]) for r, _, _ in rows}, key=lambda c: order.index(c) if c in order else 99):

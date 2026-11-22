@@ -19,6 +19,10 @@ EDITED = {   # file -> top-level names another phase of plan 1644 edited on purp
     "cc/chain.py": {"=REFUSAL", "_edges", "_edge_feature"},   # phase 4 (D4): the value door and SAMPLE_NOT_FINITE
     "cc/intake_blind.py": {"Typed"},   # phase 3 (D3): the code is an Enum member
     "cc/intake_feature.py": {"#0", "Unprojected", "=Unprojected.Reason"},   # phase 3 (D3)
+    "cc/intake_against.py": {"=NAMES", "_facts"},   # phase 6 G-FIX-1: NAMES total over HEADER, indexed
+    "cc/intake_profile.py": {"=BIN", "=CELLS", "order", "table"},   # phase 6 G-FIX-2 and G-FIX-3
+    "cc/intake_differs.py": {"lined"},   # phase 6 G-FIX-4
+    "cc/oracle_measured.py": {"=OUTCOME", "scan"},   # phase 6 G-FIX-6
 }
 
 

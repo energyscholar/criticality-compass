@@ -10,7 +10,7 @@ These hold at the door. Where a limit is known today, it is stated.
 2. **Declare an edge with no declared provenance.** A relation is a set of edges, each a `Continuation` or a `Coupling`; any other value is refused, and `Provenance` has no member for "smoothed" or "inferred": `cc/admit.py:62`, `cc/admit.py:15`.
 3. **Admit a non-finite value as a `NodeField`.** `admit.nodefield` refuses a NaN: `cc/admit.py:88`. In the measurement path the same condition returns a typed null that carries its reason instead of a number: `cc/door.py:291`.
 4. **Reassign a field of a declared relation.** The types are frozen; assigning to a field raises: `cc/admit.py:45`. Limits today: the edge arrays inside a relation are not yet read-only, so an element can still be written in place, and nothing yet stops code from constructing a kernel type directly instead of through the door (`cc/admit.py:46`). Both are kept by review and by `AGENTS.md`.
-5. **Take a default for a missing key in a total table.** In the tables named in `AGENTS.md`, a key that is not there is a `KeyError`: `cc/intake_feasible.py:21`. Not every dictionary in `cc/` is total: `.get(key, default)` is used elsewhere, for example `cc/intake_against.py:49`.
+5. **Take a default for a missing key in a total table.** In the tables named in `AGENTS.md`, a key that is not there is a `KeyError`: `cc/intake_feasible.py:21`. Not every dictionary in `cc/` is total: `.get(key, default)` is used elsewhere, for example `cc/declare.py:69`.
 6. **Apply anything before A except `x + c`.** The one pre-A transform in the measurement path adds a constant and nothing else: `cc/intake_terminal.py:154`.
 
 `docs/try-to-break-it.md` has a command for each of 1 to 5.
@@ -100,7 +100,7 @@ ref cc/intake_blindview.py:25 = EXT[
 ref cc/intake.py:123 = INTAKE
 ref cc/sign.py:19 = UNRES
 ref cc/door.py:104 = STANDING
-ref cc/intake_against.py:49 = NAMES.get
+ref cc/declare.py:69 = .get(
 ref cc/intake_against.py:43 = True
 ref cc/intake_blind.py:77 = True
 -->
