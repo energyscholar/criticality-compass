@@ -26,7 +26,17 @@ TAIL = "CJDk5ZDNhYjEtNzE4ZC00YjQ5LWI2ZmQtNDc4MTFkODRlNjEyAAIqWzMsIjhkZjJlMzY0LTJ
 NOBODY = "t" + "@users.noreply.github.com"
 OWNER_ROWS = ["OQ1", "OQ2", "OQ3", "OQ4", "gh-noreply-form", "create-repo", "flip", "project-urls-0.1.0", "readme-clone-url"]
 LEAKS = ["release/public", "release/ci-", "release/turn-public-check.sh", ".github/", "CONTRIBUTING.md", "CODE_OF_CONDUCT.md", "SECURITY.md", ".gitleaks.toml"]
-from lib import bad, check  # noqa: E402
+from lib import bad, check as _check  # noqa: E402
+
+# CC_PUBLIC_ONLY=T7,T8 runs and prints only the checks of those blocks, and never reaches T11: release/turn-public-check.sh runs T7-T9 this way for its rows,
+# and T11 runs that script, so the one selector is what keeps the two from calling each other for ever.
+ONLY = [s for s in os.environ.get("CC_PUBLIC_ONLY", "").split(",") if s]
+
+
+def check(name, ok, why=""):
+    if ONLY and not any(name.startswith(o + " ") for o in ONLY):
+        return
+    _check(name, ok, why)
 
 
 def sh(*a, cwd=ROOT, env=None):
@@ -345,10 +355,15 @@ if res:
     tree = git(ROOT, "rev-parse", "HEAD^{tree}")
     check("T10 the ci-local result is for the current tree and has zero FAILED lines", f"tree {tree}" in rt and not re.search(r"^FAILED ", rt, re.M), f"tree {tree}: " + "; ".join(re.findall(r"^FAILED .*", rt, re.M))[:200])
 
+if ONLY and "T11" not in ONLY:
+    print("test_public: " + ("FAILED " + str(len(bad)) + ": " + "; ".join(bad) if bad else "ok") + " (only " + ",".join(ONLY) + ")")
+    sys.exit(1 if bad else 0)
 # ---- T11 the turn-public check can fail; nothing leaks into the wheel
 tp = ROOT / "release" / "turn-public-check.sh"
 if tp.is_file() and PAT:
     env = {"CC_PRIVATE_PATTERNS": PAT}
+    rc, o = sh("bash", tp, env={"CC_PRIVATE_PATTERNS": ""})
+    check("T11 without CC_PRIVATE_PATTERNS the check REFUSES with exit 2 (it does not scan nothing)", rc == 2 and "REFUSED" in o, f"exit {rc}: {o[-120:]}")
     rc, o = sh("bash", tp, env=env)
     check("T11 on today's tree the check exits 1 naming every owner-gated row and idiom-followon", rc == 1 and all(r in o for r in OWNER_ROWS + ["idiom-followon"]), f"exit {rc}")
     with tempfile.TemporaryDirectory() as t:
@@ -362,6 +377,10 @@ if tp.is_file() and PAT:
         blk.write_text(synth)
         rc, o = sh("bash", cp / "release" / "turn-public-check.sh", cwd=cp, env=env)
         check("T11 breaker: with every row closed by a passing check the script exits 0 (it can say yes)", rc == 0, f"exit {rc}: {o[-200:]}")
+        first_closed = next(r["name"] for r in rows if r["state"] == "closed")
+        blk.write_text(synth.replace(f'name = "{first_closed}"\nstate = "closed"', f'name = "{first_closed}"\nstate = "open"', 1))
+        rc, o = sh("bash", cp / "release" / "turn-public-check.sh", cwd=cp, env=env)
+        check("T11 an open row exits 1 naming it", rc == 1 and first_closed in o, f"exit {rc}: {o[-200:]}")
         blk.write_text(synth.replace('check = "true"', 'check = "false"', 1))
         rc, o = sh("bash", cp / "release" / "turn-public-check.sh", cwd=cp, env=env)
         check("T11 a closed row whose check fails is re-run and exits 1", rc == 1, f"exit {rc}")

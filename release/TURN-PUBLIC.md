@@ -2,6 +2,7 @@
 
 The owner runs every step. Nothing here is run by a script on its own, and nothing is pushed before step 4. Placeholders: `<private-origin>` (the private bare repository), `<out>` (a new directory), `<gh-remote>` (the GitHub remote of the new repository). No host, user or path is written in this file.
 
+Settled (OQ5): the plain author address on its commits is kept; only the commits made under a machine-name identity are rewritten.
 
 0. Run `release/turn-public-check.sh`. Only rows marked `owner-gated` may be open.
 1. In GitHub, Settings, Emails, read the noreply address. If it carries a numeric id prefix before the owner's name (the form `<id>+<owner>`) and is not the older form with no prefix, say so: the one constant in `release/public-rewrite.sh` changes and the rehearsal is run again before step 2.

@@ -1,0 +1,167 @@
+# plan 1640 phase 6: the closed table of what stands between this branch and a public repository. One [[row]] per blocker; `release/turn-public-check.sh`
+# holds the list of names that must be present (a deleted row is a failure, never a pass). state = closed | open | owner-gated.
+#   closed       `check` is a shell command run from the repository root with PY and CC_PRIVATE_PATTERNS exported; exit 0 proves the row. The script runs it; it never reads a result it did not produce.
+#   open         work that is not done. The script exits 1 while any row is open.
+#   owner-gated  a step only the owner can take, with its recorded ruling. It is listed, never run, and does not fail the check.
+# The tree scan (public_scan.py --tree) also runs unconditionally inside the script, so no edit of this table can route around it.
+
+[[row]]
+name = "1639-handoff"
+state = "closed"
+ruling = "The 1639 hand-off check exits 0, or exits 1 naming only its own four owner-gated rows: upload-go-0.1.0, repo-url-at-release, plan-numbers-rejudged, opsec-review. Needs CC_RELEASE_TOOLS (a python with build and twine) for its wheel rows."
+check = '''
+o=$("$PY" release/handoff_check.py 2>&1); rc=$?
+[ $rc -eq 0 ] && exit 0
+[ $rc -eq 1 ] || { echo "handoff_check exit $rc"; exit 1; }
+rest=$(echo "$o" | grep -E '^  [A-Za-z0-9.-]+: ' | grep -v -E '^  (upload-go-0.1.0|repo-url-at-release|plan-numbers-rejudged|opsec-review): ')
+[ -z "$rest" ] || { echo "$rest"; exit 1; }
+echo "$o" | grep -q -E '^[0-9]+ rows, [0-9]+ problem' || { echo "no summary line"; exit 1; }
+'''
+
+[[row]]
+name = "idiom-followon"
+state = "open"
+ruling = "The follow-on plan for the idiom items of the 1639 A4 section 5 is neither merged nor declared: no plan number exists. Close this row by recording the plan number and the reviewer's ruling here."
+
+[[row]]
+name = "tree-scan"
+state = "closed"
+ruling = "Every tracked text file is clean of the closed pattern table, bar the files listed by sha256 in release/public-tree-exempt.toml (each with its reason)."
+check = '"$PY" release/public_scan.py --private-patterns "$CC_PRIVATE_PATTERNS" --tree .'
+
+[[row]]
+name = "history-rehearsal"
+state = "closed"
+ruling = "A fresh rehearsal of the committed branch tip (a scratch bare copy, rewritten on a copy) passes release/public-verify.sh, V1 to V8. Needs git-filter-repo and gitleaks on PATH and CC_CI_BASELINE (a file of the failure names of release/ci-local.sh on this tip) for V7."
+check = '''
+set -e
+[ -z "$(git status --porcelain)" ] || { echo "the worktree is not clean: the rehearsal is of the committed tip"; exit 1; }
+[ -n "${CC_CI_BASELINE:-}" ] && [ -f "${CC_CI_BASELINE:-}" ] || { echo "CC_CI_BASELINE is not set to a file (V7 needs the failure names of this tip)"; exit 1; }
+d=$(mktemp -d "${TMPDIR:-/tmp}/turn-public.XXXXXX"); trap 'rm -rf "$d"' EXIT
+git clone -q --bare --no-local . "$d/origin.git"
+git -C "$d/origin.git" update-ref refs/heads/compass-main "$(git rev-parse HEAD)"
+sh release/public-rewrite.sh --origin "$d/origin.git" --out "$d/out.git"
+sh release/public-verify.sh "$d/out.git" "$d/origin.git"
+'''
+
+[[row]]
+name = "gitleaks-tree"
+state = "closed"
+ruling = "gitleaks on the working tree with .gitleaks.toml finds nothing."
+check = 'command -v gitleaks >/dev/null 2>&1 || { echo "no gitleaks on PATH"; exit 1; }; gitleaks dir --no-banner --exit-code 7 --config .gitleaks.toml .'
+
+[[row]]
+name = "ci-file"
+state = "closed"
+ruling = "The workflow file passes actionlint and the text checks of T9 (test_public, run for T9 only)."
+check = '''
+o=$(CC_PUBLIC_ONLY=T9 "$PY" tests/test_public.py 2>&1) || { echo "$o" | grep -E '^(FAIL|NOT RUN)'; exit 1; }
+echo "$o" | grep -q '^ok   T9' || { echo "no T9 ok line"; exit 1; }
+'''
+
+[[row]]
+name = "ci-local-macos"
+state = "open"
+ruling = "release/ci-local.sh on a fresh clone of this tip, on the macOS host, must record this tree's hash and zero FAILED lines. It records five FAILED lines, the five undeclared-failing rows below (the stems fail with and without the data root). Becomes closed when those are ruled and a result file for the final tree has zero FAILED lines."
+
+[[row]]
+name = "ci-local-linux"
+state = "open"
+ruling = "The same on a Linux x86_64 host. One further failure there: contract/test_ising_port.py, test_p04_at_is_unchanged_on_the_wire. Its pinned sha differs on Linux because four critical-coupling floats differ by one unit in the last place (a platform difference in the exp and arcsinh of numpy; the reply text and every other piece are byte-identical). The cause is numerical, not reply formatting, so neither the sha nor the tolerance is touched here: the reviewer rules it."
+
+[[row]]
+name = "public-face"
+state = "closed"
+ruling = "The public-face files (T7) and the README first screen (T8) are what the plan says (test_public, run for T7 and T8 only)."
+check = '''
+o=$(CC_PUBLIC_ONLY=T7,T8 "$PY" tests/test_public.py 2>&1) || { echo "$o" | grep -E '^(FAIL|NOT RUN)'; exit 1; }
+echo "$o" | grep -q '^ok   T7' || { echo "no T7 ok line"; exit 1; }
+echo "$o" | grep -q '^ok   T8' || { echo "no T8 ok line"; exit 1; }
+'''
+
+[[row]]
+name = "base"
+state = "closed"
+ruling = "This branch contains the tip of compass-main."
+check = 'git merge-base --is-ancestor compass-main HEAD'
+
+[[row]]
+name = "moved-base-shas"
+state = "open"
+ruling = "Three tests of the merged base name a base commit by sha, and the rewrite moves that sha (the commit carries the machine-name identity): tests/test_dispatch_rewrite.py (55eba02, T7), tests/test_door_types.py (55eba02, T3 and T4), tests/test_get_fix.py (c9954ba, T9). In a clone of the rewritten copy they fail with: the base commit is not in this clone. So the rehearsal fails at V7 (V6 reads only a sha on a line that calls git; these are held in a constant). Not edited here: the reviewer rules a declared fix (resolve the base through the commit map, or skip with a stated reason when the object is absent)."
+
+[[row]]
+name = "undeclared-failing-test_claims"
+state = "open"
+ruling = "Fails both with and without the data root, so it is neither skipped nor edited (plan 1640 AQ3). Its toolset: cells name files of the author's private research repository; the reviewer rules a declared fix or a deferral."
+
+[[row]]
+name = "undeclared-failing-test_intake_example"
+state = "open"
+ruling = "Fails both with and without the data root, so it is neither skipped nor edited (plan 1640 AQ3). The reviewer rules a declared fix or a deferral."
+
+[[row]]
+name = "undeclared-failing-test_intake_reach"
+state = "open"
+ruling = "Fails both with and without the data root, so it is neither skipped nor edited (plan 1640 AQ3). The reviewer rules a declared fix or a deferral."
+
+[[row]]
+name = "undeclared-failing-test_intake_leak"
+state = "open"
+ruling = "Fails both with and without the data root, so it is neither skipped nor edited (plan 1640 AQ3). The reviewer rules a declared fix or a deferral."
+
+[[row]]
+name = "undeclared-failing-test_intake_terminal"
+state = "open"
+ruling = "Fails both with and without the data root, so it is neither skipped nor edited (plan 1640 AQ3). The reviewer rules a declared fix or a deferral."
+
+[[row]]
+name = "OQ1"
+state = "owner-gated"
+ruling = "Ruled by the owner 2026-11-22T05:51Z: KEEP the external reviewer's ruling labels in history as they are; it is honest provenance. No anonymising flag is built."
+
+[[row]]
+name = "OQ2"
+state = "owner-gated"
+ruling = "Ruled by the owner 2026-11-22T05:51Z: KEEP host and repository nicknames in history. The only rewrite is the machine-name (.local) identity."
+
+[[row]]
+name = "OQ3"
+state = "owner-gated"
+ruling = "Ruled by the owner 2026-11-22T05:51Z: after the flip the public GitHub repository is canonical; the private origin becomes a read-only archive."
+
+[[row]]
+name = "OQ4"
+state = "owner-gated"
+ruling = "Ruled by the owner 2026-11-22T05:51Z: publish compass-main only, renamed main. The plan-* branches stay private."
+
+[[row]]
+name = "OQ5"
+state = "closed"
+ruling = "Ruled by the owner 2026-11-22T08:40Z: KEEP the plain gmail author on its commits; only the machine-name commits are rewritten. release/TURN-PUBLIC.md records it as settled."
+check = 'grep -q "OQ5" release/TURN-PUBLIC.md'
+
+[[row]]
+name = "gh-noreply-form"
+state = "owner-gated"
+ruling = "The owner reads the noreply address in GitHub, Settings, Emails, and confirms its form (with or without a numeric id prefix) before the rewrite; release/TURN-PUBLIC.md step 1."
+
+[[row]]
+name = "create-repo"
+state = "owner-gated"
+ruling = "The owner creates the empty public repository. No agent contacts GitHub."
+
+[[row]]
+name = "flip"
+state = "owner-gated"
+ruling = "The owner pushes main only (no tags, no other branch) from the verified rewritten copy; release/TURN-PUBLIC.md."
+
+[[row]]
+name = "project-urls-0.1.0"
+state = "owner-gated"
+ruling = "Project-URL entries are added to the package metadata at the 0.1.0 release, once the public repository exists; the 0.1.0 wheel carries none."
+
+[[row]]
+name = "readme-clone-url"
+state = "owner-gated"
+ruling = "The README's clone URL is set at the flip, once the public repository exists."
