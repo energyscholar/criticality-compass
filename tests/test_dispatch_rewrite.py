@@ -14,7 +14,7 @@ from lib import bad, check, guarded  # noqa: E402
 
 import dispatch_rewrite as D  # noqa: E402
 
-BASE = "c9954ba"   # the plan-1639-dist tip this plan branched from (D0)
+BASE = "55eba02"   # the plan-1639-dist tip this plan branched from (D0)
 EDITED = {   # file -> top-level names another phase of plan 1644 edited on purpose (declared in that phase's commit); compared nowhere else
     "cc/chain.py": {"=REFUSAL", "_edges", "_edge_feature"},   # phase 4 (D4): the value door and SAMPLE_NOT_FINITE
     "cc/intake_blind.py": {"Typed"},   # phase 3 (D3): the code is an Enum member
