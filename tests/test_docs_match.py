@@ -149,7 +149,9 @@ def t11():
                     run_cc(["hold", "ising", str(world), "--needle", "settled", "--out", recdir])
                     rec = next(p for p in Path(recdir).iterdir() if p.is_dir())
                 args = args[:2] + [str(rec)]
-            why = differs(shown, run_cc(args)) if shown else None
+            actual = run_cc(args)
+            norm = (lambda xs: [re.sub(r"\s+", " ", x).strip() for x in xs]) if d == "man" else (lambda xs: xs)   # the man renderer turns runs of spaces into tabs and indents literal blocks
+            why = differs(norm(shown), norm(actual)) if shown else None
             check(f"T11 {d}: `{cmd}` runs and its shown output matches", why is None, why or "")
         elif key in NOT_RUN_OCC:
             continue

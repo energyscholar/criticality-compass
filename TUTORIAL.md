@@ -10,6 +10,7 @@ Read `README.md` first for the words.
 ```
 $ bin/cc show w2-potts
 w2-potts   rules: v01-rules   result: results/w2-potts@v01-rules.json (frozen)
+…
 ```
 
 (Here the head of the `show` report, from its first line to the point 5 rows is the same text that HOWTO prints, once: see [Re-verdicting without measuring](HOWTO.md#re-verdicting-without-measuring).)
@@ -158,6 +159,8 @@ Add `"UNRES"` to the other 16 rows, so each reads `when.two_start = ["INDEP", "U
 ```
 $ bin/cc validate
 
+l8-tetris-600: refused as declared (5 sentences)
+l8-tetris-600-g: refused as declared (5 sentences)
 validate: clean
 ```
 

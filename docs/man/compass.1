@@ -1,8 +1,219 @@
-.Dd November 21, 2026
+.Dd November 22, 2026
 .Dt COMPASS 1
 .Os
 .Sh NAME
 .Nm compass
-.Nd Criticality Compass: run a system by hand, and the rulebook commands
+.Nd run a simulated system by hand and save the run; the Criticality Compass rulebook commands
+.Sh SYNOPSIS
+.Nm
+.Cm hold
+.Fl -list
+.Nm
+.Cm hold
+.Op Fl -dry
+.Fl -needle Ar MODE
+.Op Fl -seed Ar N
+.Op Fl -wall Ar SECONDS
+.Op Fl -out Ar DIR
+.Ar system Ar world
+.Nm
+.Cm hold
+.Fl -verify Ar RECORD
+.Nm
+.Ar command
+.Op Ar argument ...
 .Sh DESCRIPTION
-Placeholder for the packaging phase; the full page is written in the documents phase.
+.Nm
+.Cm hold
+runs one hold of a catalogue system.
+A needle steers a dial on a simulated system that is served over the apparatus wire,
+and the run is scored against the truth the server keeps.
+The command prints the input it resolved, one
+.Dq RUN
+line per step, and the scored output, and it saves the run as a record:
+a directory with the files the run read, the files it wrote, and a manifest of their sha256 values.
+.Pp
+.Ar system
+is a catalogue system and
+.Ar world
+is either one of its catalogue world names or the path of a world file ending in
+.Pa .toml .
+No hold mode is the default.
+A run with no
+.Fl -needle
+is refused (exit 2) and the message names the needles the system has.
+.Pp
+The command wraps
+.Dq python -m environment.run_hold
+and changes nothing in it.
+A run needs numpy and nothing else.
+.Sh CATALOGUE
+.Nm
+.Cm hold
+.Fl -list
+prints one line per world:
+the system, the world name, the needles that world accepts, and the world file.
+Ising has the worlds production, static, static-r2, static-r3, field and field-hard.
+AT has production and static.
+FHN is listed as pending and cannot be run.
+.Sh OPTIONS
+.Bl -tag -width Ds
+.It Fl -needle Ar MODE
+The hold mode: a catalogue needle name or the path of a needle
+.Pa .toml
+file.
+Required for a run.
+.It Fl -seed Ar N
+The one override.
+The command writes a copy of the world with this seed and runs the copy;
+the record says the seed was overridden.
+.It Fl -wall Ar SECONDS
+Wall-clock limit in seconds, 1800 by default.
+At the limit the run is stopped, nothing is left listening on its port, a record is still written, and the exit status is 3.
+.It Fl -out Ar DIR
+Where records go.
+The default is
+.Ev COMPASS_RUNS
+if it is set, else
+.Pa ./compass-runs
+under the directory you ran in.
+.It Fl -dry
+Print the resolved input and write nothing.
+.It Fl -list
+Print the catalogue.
+.It Fl -verify Ar RECORD
+Recompute every hash a record lists.
+It names each file that is missing or differs and exits 1, or exits 0.
+.El
+.Sh ENVIRONMENT
+.Bl -tag -width Ds
+.It Ev COMPASS_RUNS
+The directory records go to when
+.Fl -out
+is not given.
+.El
+.Sh FILES
+A record is the directory
+.Pa <UTC time>-<system>-<world>-<run id>-<4 hex>
+under the output directory.
+Every path in it is relative to the record.
+Two identical runs leave two records.
+.Bl -tag -width Ds
+.It Pa run.json
+The manifest, with sorted keys:
+argv, exit, finished_utc, inputs, needle, orchestrator_exit, outputs, port, record, run_id, schema, seed, seed_overridden, started_utc, status, summary, system, versions, wall_limit_s, wall_s, world.
+.Va versions
+holds compass, git (head and dirty, or not-a-clone), code_digest, python, numpy and platform.
+.Va outputs
+lists every other file in the record with its sha256 and size.
+.It Pa run.json.sha256
+The sha256 of
+.Pa run.json .
+.It Pa terminal.txt
+What the command printed.
+.It Pa input/
+The env, world, needle and score files the run read, and the tau file beside the world when the system has one.
+.It Pa run/
+What the orchestrator wrote:
+config.json, report.jsonl, map.jsonl, truth.json, score.json, map-truth.json, server.log, perf.json and edge.json for a scored run; refused.json for a refused one.
+.El
+.Sh EXIT STATUS
+.Bl -tag -width indent
+.It 0
+scored: the run finished and
+.Pa run/score.json
+was written, whatever the outcome.
+.It 1
+infrastructure-failure: the run could not be carried out.
+An exit code of the orchestrator that this table does not hold is recorded as unknown-exit and also exits 1.
+.It 2
+refused: the run was refused before it started, or no needle was named.
+.It 3
+wall-clock: the wall-clock limit stopped the run.
+.El
+.Pp
+.Fl -verify
+exits 0 when the record is as it was written and 1 when it is not.
+.Sh EXAMPLES
+List the catalogue:
+.Bd -literal -offset indent
+$ compass hold --list
+ising  production  needles: settled mid settled-off   (system-instantiated/plugins/ising/ising-apparatus.toml)
+ising  static      needles: settled mid settled-off   (system-instantiated/plugins/ising/ising-apparatus-static.toml)
+ising  static-r2   needles: settled mid settled-off   (system-instantiated/plugins/ising/ising-apparatus-static-r2.toml)
+ising  static-r3   needles: settled mid settled-off   (system-instantiated/plugins/ising/ising-apparatus-static-r3.toml)
+ising  field       needles: settled mid settled-off   (system-instantiated/plugins/ising/ising-apparatus-field.toml)
+ising  field-hard  needles: settled mid settled-off   (system-instantiated/plugins/ising/ising-apparatus-field-hard.toml)
+at     production  needles: settled mid settled-off mid-off mid-null   (system-instantiated/plugins/at/at-apparatus.toml)
+at     static      needles: settled mid settled-off mid-off mid-null   (system-instantiated/plugins/at/at-apparatus-static.toml)
+fhn    pending     not in this release
+.Ed
+.Pp
+Look at what a run would read, and write nothing:
+.Bd -literal -offset indent
+$ compass hold --dry ising production --needle settled
+INPUT
+  system ising  world production  needle settled  seed 500 (from the world file)
+  env    environment/environment-apparatus-ising.toml  sha256 0ab0802582ae
+…
+  needle needle-settings/ising/hold-settled.toml  sha256 c2159cac0b3e
+  needle params: needle_structure=hold-pair-v1 g=12 step=6 S=1500 n_eq=450
+  score  environment/hold-score-ising.toml  sha256 158dbcc14f0e
+dry run: nothing written
+.Ed
+.Pp
+Run it.
+The lines marked with an ellipsis are left out here; the run printed 53 RUN lines.
+.Bd -literal -offset indent
+$ compass hold ising production --needle settled
+INPUT
+  system ising  world production  needle settled  seed 500 (from the world file)
+  env    environment/environment-apparatus-ising.toml  sha256 0ab0802582ae
+  world  system-instantiated/plugins/ising/ising-apparatus.toml  sha256 93587cb627b5
+  needle needle-settings/ising/hold-settled.toml  sha256 c2159cac0b3e
+  needle params: needle_structure=hold-pair-v1 g=12 step=6 S=1500 n_eq=450
+  score  environment/hold-score-ising.toml  sha256 158dbcc14f0e
+  score params: offset_K=-0.005 out_run=3 plan=1569
+  code   compass 1.0.0a0  git 729f1ae0238e  digest 9eaa1dcbf166
+RUN step 1 phase ignite index 5100  t=10s
+…
+RUN step 53 phase hold index 198426  t=284s
+OUTPUT
+  outcome=HORIZON lock=HELD in_fraction=0.9583333333333334 rms_e_g=0.48005523022349245 mean_e=-4.748954039085869 hold_steps=48 accuracy=0.5625  run_id=0811b05bffd7880d
+record: 20261122T001603Z-ising-production-0811b05bffd7880d-0622
+exit 0: scored  (status scored)
+.Ed
+.Pp
+Check the record:
+.Bd -literal -offset indent
+$ compass hold --verify compass-runs/<record>
+.Ed
+.Sh COST
+A run is minutes of compute.
+Measured here, one run at a time, at nice 19, on an 8-core machine.
+.Bl -tag -width Ds
+.It Ising production, needle settled
+284 s, at 1-minute load 13.0 at the start and 8.6 at the end.
+.It AT production, needle settled
+501 s, at 1-minute load 2.7 at the start and 11.0 at the end.
+.El
+.Pp
+A short test world with horizon 1 finishes in about 2 s.
+.Sh KNOWN FINDINGS
+In the static worlds the needle can enter its hold before its pair of points brackets the crossing (seed 533).
+.Sh THE RULEBOOK COMMANDS
+.Nm
+with any other command runs the rulebook command line (help, show, explain, run, validate, tables, new, tabulate, family, and the rest).
+It is a second surface of the same tool and is unchanged.
+.Nm
+.Cm help
+lists the basic commands and
+.Nm
+.Cm help
+.Fl -advanced
+lists all of them.
+The commands run, check and freeze need the external structure checker named by
+.Ev CC_STRUCTURE_CHECKS
+and refuse without it.
+.Sh SEE ALSO
+README.md (Run a system by hand; The first hour), HOWTO.md, TUTORIAL.md, docs/ARCHITECTURE.md (The hold path).

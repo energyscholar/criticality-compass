@@ -6,11 +6,70 @@ not measured, or the interval cannot say, CC prints `BLANK` and says why. The ca
 supposed to be) and the rulebook (which codes mean which verdict) are plain TOML files. You change them by
 editing data, never code, and every old result stays readable after you do.
 
-You do not need to read any code to use it. Start with the first hour below. `TUTORIAL.md` walks one point
+To run a system by hand, start with "Run a system by hand" below. For the rulebook, start with the first hour. `TUTORIAL.md` walks one point
 from data to verdict, `HOWTO.md` covers the weekly loop and the advanced commands, and `KERNEL-IN-CC.md`
 explains what the instruments compute.
 
 Licences: the code is Apache-2.0 (`LICENSE`, `NOTICE`); the data in `benchmark/` and `results/` are CC BY 4.0 (`DATA-LICENSE`).
+
+## Run a system by hand (`compass hold`)
+
+`compass hold` runs one hold of a catalogue system: a needle steers a dial on a simulated system served over the apparatus wire, and the run is scored against the
+server's truth. It prints the input it resolved, the needle's progress, and the scored output, and it saves the run as a record (a directory) you can check later.
+`man compass` has the full page; the page is `docs/man/compass.1` in a clone and `<prefix>/share/man/man1/compass.1` in an installed wheel.
+
+```
+$ compass hold --list
+ising  production  needles: settled mid settled-off   (system-instantiated/plugins/ising/ising-apparatus.toml)
+ising  static      needles: settled mid settled-off   (system-instantiated/plugins/ising/ising-apparatus-static.toml)
+ising  static-r2   needles: settled mid settled-off   (system-instantiated/plugins/ising/ising-apparatus-static-r2.toml)
+ising  static-r3   needles: settled mid settled-off   (system-instantiated/plugins/ising/ising-apparatus-static-r3.toml)
+ising  field       needles: settled mid settled-off   (system-instantiated/plugins/ising/ising-apparatus-field.toml)
+ising  field-hard  needles: settled mid settled-off   (system-instantiated/plugins/ising/ising-apparatus-field-hard.toml)
+at     production  needles: settled mid settled-off mid-off mid-null   (system-instantiated/plugins/at/at-apparatus.toml)
+at     static      needles: settled mid settled-off mid-off mid-null   (system-instantiated/plugins/at/at-apparatus-static.toml)
+fhn    pending     not in this release
+```
+
+No hold mode is the default: a missing `--needle` is REFUSED (exit 2) and names the needles the system has. Run one (Ising, production world, the `settled` needle; this
+output was captured from a run that took 284 s on an 8-core machine at 1-minute load 13 falling to 8.6; the `RUN` lines are one per step, 53 in all):
+
+```
+$ compass hold ising production --needle settled
+INPUT
+  system ising  world production  needle settled  seed 500 (from the world file)
+  env    environment/environment-apparatus-ising.toml  sha256 0ab0802582ae
+  env params: system=ising port=8790 run_dir_root=runs/
+  world  system-instantiated/plugins/ising/ising-apparatus.toml  sha256 93587cb627b5
+  world params: kind=critical L_blocks=27 seed=500 horizon=200000 dials=[{'name': 'K', 'lo': 0.42, 'hi': 0.545, 'T': 500, 'max_nudge': 32, 'start': 0} …
+  needle needle-settings/ising/hold-settled.toml  sha256 c2159cac0b3e
+  needle params: needle_structure=hold-pair-v1 g=12 step=6 S=1500 n_eq=450
+  score  environment/hold-score-ising.toml  sha256 158dbcc14f0e
+  score params: offset_K=-0.005 out_run=3 plan=1569
+  code   compass 1.0.0a0  git 729f1ae0238e  digest 9eaa1dcbf166
+RUN step 1 phase ignite index 5100  t=10s
+…
+RUN step 53 phase hold index 198426  t=284s
+OUTPUT
+  outcome=HORIZON lock=HELD in_fraction=0.9583333333333334 rms_e_g=0.48005523022349245 mean_e=-4.748954039085869 hold_steps=48 accuracy=0.5625  run_id=0811b05bffd7880d
+record: 20261122T001603Z-ising-production-0811b05bffd7880d-0622
+exit 0: scored  (status scored)
+```
+
+The record is `compass-runs/<time>-ising-production-<run id>-<4 hex>/` under the directory you ran in (`--out DIR` or `COMPASS_RUNS` move it). It holds `run.json` (what was
+run, with which code, the status, a summary of the score, the sha256 of every file), `run.json.sha256`, `terminal.txt` (what was printed), `input/` (the exact files the run read)
+and `run/` (what the orchestrator wrote). Every path in it is relative to the record. Two identical runs leave two records. `compass hold --verify RECORD` recomputes the hashes
+and names the first file that differs (exit 1) or says nothing is wrong (exit 0).
+
+An installed wheel runs the same command from any directory and writes only under the current directory. Build and install one (measured with `--no-deps`, numpy already importable):
+
+```
+$ python3 -m pip wheel --no-deps --no-build-isolation -w dist .
+$ python3 -m venv hold-venv && hold-venv/bin/python -m pip install --no-deps dist/criticality_compass-*.whl
+```
+
+The rulebook commands in the rest of this document (`show`, `explain`, `run`, `validate`, ...) are a second surface of the same tool, unchanged. `run`, `check` and `freeze` need
+the external structure checker named under "The first hour".
 
 ## Glossary (14 terms)
 
@@ -46,7 +105,7 @@ Two places are never defaults, because a default would be one person's machine: 
 
 Other ways to install:
 
-- **A non-editable install** (`pip install .`, or a built wheel from `python3 -m build`) carries a copy of the workspace (`bin/`, `cc/`, `tables/`, `inputs/`, `cases/`, `results/`, `data/`, `docs/`, `benchmark/`, ...) inside the package, so `compass validate`, `compass show`, `compass explain` and `compass tabulate` work without a clone (given the data root and the structure checker above). Of `tests/` it carries only the files `FROZEN.json` names, which the structure gate needs; `compass check` and `compass test` REFUSE there and say to use a clone. Anything you write (`run`, `new`, `tables fork`) lands in that copy inside site-packages and is lost on reinstall; to author, use the editable install above. `compass --help` and `compass help` both print the help text; an unknown command exits non-zero.
+- **A non-editable install** (`pip install .`, or a built wheel from `python3 -m build`) carries a copy of the workspace (`bin/`, `cc/`, `tables/`, `inputs/`, `cases/`, `results/`, `data/`, `docs/`, `benchmark/`, `environment/`, `needle-settings/`, `manual/`, ...) inside the package, so `compass validate`, `compass show`, `compass explain` and `compass tabulate` work without a clone (given the data root and the structure checker above). Of `tests/` it carries only the files `FROZEN.json` names, which the structure gate needs; `compass check` and `compass test` REFUSE there and say to use a clone. Anything you write (`run`, `new`, `tables fork`) lands in that copy inside site-packages and is lost on reinstall; to author, use the editable install above. `compass --help` and `compass help` both print the help text; an unknown command exits non-zero.
 - Python 3.11 is the minimum and works; 3.12 is the version most tested.
 
 ## The Rust kernel (optional)
@@ -75,16 +134,18 @@ The repository also holds a prebuilt `cc/_ext/kernel_rs.so` (SHA256 beside it). 
 $ bin/cc help
 cc - Criticality Compass   (BASIC; `bin/cc help --advanced` lists every command)
 
-  bin/cc show <input>                   every reading of an input, and each point's verdict
-  bin/cc explain <input> <point>        the whole chain for one point: data -> verdict
-  bin/cc run <input> | --all [--dry]    measure under the working rules (--dry writes nothing)
+  bin/cc show <input>                   every reading of an input, and each point's verdict (a declared report)
+  bin/cc explain <input> <point>        the whole chain for one point: data -> verdict (a declared report)
+  bin/cc run <input> | --all [--dry]    measure under the working rules; verdicts are declared reports (--dry writes nothing)
   bin/cc new case <id>                  start a case file (taxonomy) from the template
   bin/cc tables fork <from> <to>        copy a rulebook so you can edit it
   bin/cc tables drop <set>              delete a rulebook you no longer want
   bin/cc validate                       check every file; each problem says what to do next
   bin/cc check                          validate + tests + scoreboard; run it before a commit
+  bin/cc hold <system> <world> --needle M  run a system by hand; the run is saved as a record (bin/cc hold --list)
+  bin/cc navigate <input>               UNTESTED: walk a stored map (stored-map mode only); every line it prints is untested
 
-inputs: b7-at-line b7-at-line-2 b7-at-line-3 c2-bc-two-start w2-potts w2-potts-2 x2-xy-line x2-xy-line-2 x3-clock6 x3-clock6-2 x4-ising-field x4-ising-field-2 x5-bilayer x5-bilayer-2 x7a-bc x7a-nnn x8-ising-needle
+…
 rules in use: v01-rules   (cc.toml [defaults] tables)
 BLANK (...) means "CC does not know"; the word in brackets says why.
 
@@ -131,7 +192,7 @@ sink       BLANK (NOT-MEASURED: needle is not declared on this input)
 across
   1 DATA      w2/q5-L27-random.npz [G key G, E key E] ... 3 blocks; sha256 matches fixtures/data/w2-potts.toml
   2 REDUCE    row 0: 27 14.42, 81 83.45, 243 527.7
-  3 COMPARISON size: chain, Coupling   27 <- 81 <- 243
+  3 COMPARISON size: chain, declared report   27 <- 81 <- 243
   4 C         operator A over size; row 0: y_steps [1.598, 1.679]; y_last [1.679]
   5 READING   y_last 1.679  interval [1.417, 1.932]  (95 %, 400 block resamples, b 400)
   6 SIGN      cuts -0.25 0 +0.25 (eps y): bL 3, bU 3 -> SIG+
@@ -171,6 +232,8 @@ the rows are a partition of every possible signature row, and `validate` checks 
 ```
 $ bin/cc validate
 
+l8-tetris-600: refused as declared (5 sentences)
+l8-tetris-600-g: refused as declared (5 sentences)
 validate: clean
 ```
 

@@ -106,6 +106,23 @@ The `transform` instrument is an **independent conventional estimate — not a C
 at infinite size; the shared-omega assumption is an undeclared prior). Its `y_inf` is stored and printed with that label (`cc.toml [conventional]`),
 and no verdict row in any set reads it; none in any set after v07 may.
 
+## The hold path (`compass hold`)
+
+A second path, separate from the verdict path above: it runs one simulated system under a needle and scores it. It reads no rulebook and no stored result.
+
+1. `bin/cc hold` (function `cmd_hold`) starts `python -m manual.hold` from the workspace root and passes the directory you stand in, so a relative `--out` lands there.
+2. `manual/hold.py` resolves the catalogue (`manual/catalogue.toml`: system, world name to world file, needle name to needle file, the env file and the score file), prints the
+   `INPUT` block with the sha256[:12] of the env, world, needle and score files, and builds the six configs.
+3. It copies the inputs into a staging directory whose env file has `run_dir_root = "run"` and the port it chose, and runs `python -m environment.run_hold --env --at --needle --score`
+   on them (`environment/run_hold.py`).
+4. `environment/run_hold.py` starts the apparatus server (`environment/apparatus_server.py`, the world's plugin under `system-instantiated/plugins/<system>/`), runs the needle
+   (`navigator/hold.py`, steered by the file in `needle-settings/` or `navigator/`) as a separate process, and scores it after the needle exits (`environment/hold_score.py`).
+   Exit 0 = `run/score.json` written; 2 = refused to start (`run/refused.json`); 1 = infrastructure failure.
+5. `manual/hold.py` prints the `RUN` progress lines and the `OUTPUT` line, kills the run at the wall-clock limit (exit 3), and `manual/record.py` writes the record:
+   `run.json` (sorted keys, schema `compass-manual-run/1`), `run.json.sha256`, `terminal.txt`, `input/`, `run/`. The status is looked up in a closed table keyed by the orchestrator's exit code
+   (`manual/record.py`, `STATUS`); an exit code the table does not hold gives `unknown-exit`.
+6. `compass hold --verify RECORD` recomputes every listed hash. The role `manual` in `checks.toml` has its own line budget (`tests/test_budget.py`).
+
 ## Provenance, reuse, freezing
 
 A result records `read` (sha256 of every file read), `code_hash` (all of `cc/` + `bin/cc`, provenance only) and
