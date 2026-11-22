@@ -243,18 +243,19 @@ def bind(x, f, kinds):
 
 @dataclass(frozen=True)
 class Typed:
-    """The base of a module's typed refusal. Invariant: `code` is a key of the subclass's TABLE (code -> sentence); `words()` prints code, sentence, detail."""
+    """The base of a module's typed refusal. `code` is a member of the subclass's `Code`, an Enum built from its TABLE (code -> sentence) when the subclass is defined, so a code outside the table cannot be constructed; `words()` prints code, sentence, detail."""
     code: str
     detail: str
+
+    def __init_subclass__(cls, **kw): cls.Code = enum.StrEnum("Code", {k: k for k in cls.TABLE}, module=cls.__module__, qualname=f"{cls.__qualname__}.Code")
+    __post_init__ = lambda self: object.__setattr__(self, "code", self.Code(self.code))
 
     def words(self):
         return f"{self.code}: {self.TABLE[self.code]} Detail: {self.detail}"
 
 
 SWEEP = {   # [acquisition] row_order -> (the [acquisition] table) -> the direction the fast knob runs within a curve; total
-    "ASCENDING": lambda acq: "ASCENDING", "DESCENDING": lambda acq: "DESCENDING", "ACQUISITION": lambda acq: acq["direction"],
-}
+    "ASCENDING": lambda acq: "ASCENDING", "DESCENDING": lambda acq: "DESCENDING", "ACQUISITION": lambda acq: acq["direction"]}
 RESTARTS = {   # a direction a curve runs in -> (previous fast value, fast value) -> does a new sweep begin (the fast knob turns back); S1's tables
     # (cc/intake_choices.py) and S5's (intake_census.BREAK) both read SWEEP and RESTARTS
-    "ASCENDING": lambda a, b: b < a, "DESCENDING": lambda a, b: b > a,   # UNORDERED has no row: S1 refuses BLOCK_RULE_HAS_NO_DIRECTION first
-}
+    "ASCENDING": lambda a, b: b < a, "DESCENDING": lambda a, b: b > a}   # UNORDERED has no row: S1 refuses BLOCK_RULE_HAS_NO_DIRECTION first

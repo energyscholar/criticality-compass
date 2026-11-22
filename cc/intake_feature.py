@@ -10,11 +10,8 @@ fast span width): a point's uncertainty is never larger than the verdict's toler
 linenav PARAMS[corridor]["wc"] of the declared [suspect] corridor word, never a knob here. The cross-curve relation is the declared slow order of
 the curves (curve rank = 0-based slow order). The plane (C'', O4): the declared knobs' physical units, each normalised to its declared span by the
 declared affine coordinate map Span (POLICY [coordinate.PLANE_SPAN_UNIT]), a coordinate map, never a value transform; linenav reads it in CONTINUOUS
-mode on [0, 1] x [0, 1]. At a point u: the NEAREST CURVE by slow (a tie to the lower rank), then the ORDER of u's fast against that curve's bracket
-END SAMPLE values (Below | Inside | Above; outside the curve's measured span OffSpan). Nothing between measured points is formed: a side changes
-only at a sample. On output a located point is re-projected to its ENCLOSING MEASURED PAIR (Oracle.measured, Oracle.ranks). The oracle answers
-linenav's side alphabet {NEG, POS, MID, UNRES, SINGLE} by member NAME from SIDE, total over FEATURES x LOCI (one-curve family: SINGLE). Its evidence
-is always FiniteStored(source = "<declaration id>:<seal hash>"), never Sharp. It reads only the Census object (the pinned bytes it carries) and the
+mode on [0, 1] x [0, 1]. At a point u: the NEAREST CURVE by slow (a tie to the lower rank), then the ORDER of u's fast against that curve's bracket END SAMPLE values (Below | Inside | Above; outside the curve's measured span OffSpan). Nothing between measured points is formed: a side changes
+only at a sample. On output a located point is re-projected to its ENCLOSING MEASURED PAIR (Oracle.measured, Oracle.ranks). The oracle answers linenav's side alphabet {NEG, POS, MID, UNRES, SINGLE} by member NAME from SIDE, total over FEATURES x LOCI (one-curve family: SINGLE). Its evidence is always FiniteStored(source = "<declaration id>:<seal hash>"), never Sharp. It reads only the Census object (the pinned bytes it carries) and the
 tables as values: it constructs no Path and opens nothing."""
 import enum
 from dataclasses import dataclass
@@ -230,11 +227,15 @@ class Unprojected:
     """A typed refusal, PROJECTION_UNDECLARED or COORDINATE_UNDECLARED (C''): POLICY lacks the row (UNDECLARED), so nothing is declared in M."""
     reason: str = "PROJECTION_UNDECLARED"
 
+    def __post_init__(self):
+        object.__setattr__(self, "reason", self.Reason(self.reason))
+
     def words(self):
         return f"{self.reason}: intake/POLICY.toml has no {UNDECLARED[self.reason]} row (estimand, preserves, discards); no oracle is built without it"
 
 
 UNDECLARED = {"PROJECTION_UNDECLARED": f"[feature_projection.{KEY}]", "COORDINATE_UNDECLARED": f"[coordinate.{SPAN_KEY}]"}   # reason -> the missing row
+Unprojected.Reason = enum.StrEnum("Reason", {k: k for k in UNDECLARED}, module=__name__, qualname="Unprojected.Reason")   # reason is a member of this closed alphabet: any other is refused at construction
 DECLARED = {   # (is the projection declared, is the coordinate map declared) -> (t, curves, census, seal, corridor, alphabet) -> Oracle | Unprojected
     (True, True): lambda *a: _build(*a), (True, False): lambda *a: Unprojected("COORDINATE_UNDECLARED"),
     (False, True): lambda *a: Unprojected(), (False, False): lambda *a: Unprojected(),
