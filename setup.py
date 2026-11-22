@@ -12,7 +12,8 @@ from setuptools.command.build_py import build_py
 #   results/ (frozen results: a run REFUSES without them), data/ (cc.toml [data] local: the CC0 l8 files; validate finds 'l8' absent without it), docs/ (tabulate writes
 #   docs/verdict-table.html), benchmark/ (bench verify) - and of tests/ ONLY the files FROZEN.json names (the structure gate's C7 REFUSES a run without them).
 #   The other tests are the clone's: `bin/cc check` in a workspace without them REFUSES (tests/test_install_refuses.py).
-TREES = ["bin", "cc", "tables", "inputs", "cases", "expected", "families", "fixtures", "instruments", "results", "benchmark", "docs", "data"]
+TREES = ["bin", "cc", "tables", "inputs", "cases", "expected", "families", "fixtures", "instruments", "results", "benchmark", "docs", "data",
+         "environment", "navigator", "needlestream", "common", "system-instantiated", "needle-settings", "manual", "needleview"]   # plan 1634: the stage-4 path `compass hold` runs
 FILES = ["cc.toml", "checks.toml", "FROZEN.json", "README.md", "CLAIMS.md", "LICENSE", "NOTICE", "HOWTO.md", "TUTORIAL.md", "KERNEL-IN-CC.md", "SIGNATURE-TABLE.md"]
 SKIP = shutil.ignore_patterns("__pycache__", "*.pyc", "reduced", "_ext")   # _ext: the committed kernel_rs.so is one platform's binary; the kernel is an extra
 
@@ -35,4 +36,4 @@ class build_py_workspace(build_py):
         (dest / "cc" / "_ext").mkdir(parents=True, exist_ok=True)
 
 
-setup(cmdclass={"build_py": build_py_workspace})
+setup(cmdclass={"build_py": build_py_workspace}, data_files=[("share/man/man1", ["docs/man/compass.1"])])   # plan 1634: `man compass`

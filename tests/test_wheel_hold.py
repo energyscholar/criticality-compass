@@ -19,10 +19,10 @@ ROOT = Path(__file__).resolve().parent.parent
 W = "criticality_compass/workspace/"
 BASELINE_FAILS = {"no file of the wheel names a home directory, one of the author's machines or trees, or a private person",
                   "no user-facing file of the wheel (help, docs, CLAIMS, code) uses the process vocabulary"}
-ADDED = ("environment/", "navigator/", "needlestream/", "common/", "system-instantiated/", "needle-settings/", "manual/")
+ADDED = ("environment/", "navigator/", "needlestream/", "common/", "system-instantiated/", "needle-settings/", "manual/", "needleview/")
 EXPECTED_NEW = {"environment/environment.toml", "environment/environment-blind.toml"}
 HOST = [re.compile(p) for p in ("/ho" + "me/", "/Us" + "ers/", "~/soft" + "ware", r"(?i)\bpen" + r"guin\b", r"(?i)\bji" + r"ll\b", r"(?i)\bporch" + r"light\b", "has-anyone-" + "looked", "aura" + "sys")]
-VOCAB = [re.compile(p) for p in (r"(?i)\bar" + r"gus\b", r"\bAudi" + r"tor\b", r"\bGene" + r"rator\b", r"(?i)\brel" + r"ay \d", r"\bLOG " + r"E\d+")]
+VOCAB = [re.compile(p) for p in (r"(?i)\bar" + r"gus\b", r"\bAudi" + r"tor\b", r"(?<!random\.)\bGene" + r"rator\b", r"(?i)\brel" + r"ay \d", r"\bLOG " + r"E\d+")]
 LOAD = os.getloadavg()[0]
 T = Path(tempfile.mkdtemp(prefix="t-wheel-hold-"))
 

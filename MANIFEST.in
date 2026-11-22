@@ -12,6 +12,14 @@ recursive-include instruments *
 recursive-include results *
 recursive-include benchmark *
 recursive-include docs *
+recursive-include environment *
+recursive-include navigator *
+recursive-include needlestream *
+recursive-include common *
+recursive-include system-instantiated *
+recursive-include needle-settings *
+recursive-include manual *
+recursive-include needleview *.py *.toml *.css *.js *.html
 recursive-include tests *
 recursive-include rust *.toml *.rs *.lock
 prune results/reduced

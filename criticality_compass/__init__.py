@@ -1,7 +1,8 @@
 """criticality_compass - the launcher of the `compass` console script (plan 0929, ruling D-0929-1 (i) and (v)).
 The clone IS the workspace: bin/cc finds its root as the parent of its own directory, the measurement keys hash the clone's cc/ and its git HEAD,
-and inputs/ results/ tables/ expected/ live beside the code. So the only supported install is an EDITABLE one (`pip install -e <clone>`), where this
-file is still inside the clone. This package holds no science and is not in any hash. It is named `compass`, never `cc` (a `cc` on PATH is the C compiler)."""
+and inputs/ results/ tables/ expected/ live beside the code. So the first-class install is an EDITABLE one (`pip install -e <clone>`), where this
+file is still inside the clone; a wheel carries a copy of the workspace (setup.py) and runs `compass hold` from it, writing records only under the
+current directory (`compass-runs/`). This package holds no science and is not in any hash. It is named `compass`, never `cc` (a `cc` on PATH is the C compiler)."""
 import runpy
 import sys
 from pathlib import Path
