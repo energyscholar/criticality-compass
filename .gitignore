@@ -8,3 +8,5 @@ build/
 dist/
 scratch/intake-synth/
 results/navigate/
+compass-runs/
+runs/

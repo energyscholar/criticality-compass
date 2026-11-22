@@ -40,6 +40,7 @@ ADVANCED = [
     ("check [--fast | --baseline]", "validate + tests; run it before a commit; --baseline reads the recorded green run of this tree"),
     ("test [-v] [--regolden [--classify]] [<name> ...]", "run the named tests (default all); --classify tags a regolden's changed lines a-e and undoes it on any (e)"),
     ("mutate <relpath> (--sed E | --py E) -- <test> ...", "run tests against a temporary mutation"),
+    ("hold <system> <world> --needle MODE | --list | --verify DIR", "run a hold of a catalogue system by hand, print its input and output and save the run as a record (plan 1634; man compass)"),
     ("help [--advanced]", "this text"),
     ("navigate <input> [--access-log PATH]", "UNTESTED: walk a stored map (an input with [interval] method chains) by the N0 bisection; reads only the nodes it visits, logged per T23"),
     ("navigate family <id> | score <id> <checkpoints.toml>", "follow an intake declaration's [suspect] line with the frozen linenav (grid cells); score it against checkpoints kept outside declarations/"),
@@ -84,6 +85,7 @@ def help_text(advanced):
   bin/cc tables drop <set>              delete a rulebook you no longer want
   bin/cc validate                       check every file; each problem says what to do next
   bin/cc check                          validate + tests + scoreboard; run it before a commit
+  bin/cc hold <system> <world> --needle M  run a system by hand; the run is saved as a record (bin/cc hold --list)
   bin/cc navigate <input>               UNTESTED: walk a stored map (stored-map mode only); every line it prints is untested
 
 inputs: {' '.join(inputs())}
@@ -711,6 +713,12 @@ def cmd_navigate(args):
     return status
 
 
+def cmd_hold(args):
+    """hold <system> <world> --needle MODE [--seed N] [--wall S] [--out DIR] [--dry] | --list | --verify DIR: plan 1634 (manual/hold.py). The driver runs from ROOT;
+    COMPASS_CWD is where the user stands, so a relative --out or path lands there, never inside an installed package."""
+    return subprocess.run([sys.executable, "-m", "manual.hold", *args], cwd=ROOT, env={**os.environ, "COMPASS_CWD": os.getcwd()}).returncode
+
+
 def cmd_chain(args):
     """chain <id> --grid <grid.toml> [--with <id2>]: plan 1205 P2 (cc/chain.py): every cell of a declared settings grid over one intake family,
     the data read once; typed rows in results/chain/<id>.json and one sentence per lane."""
@@ -764,7 +772,7 @@ def main(argv):
         print(help_text(advanced), end="")
         return 0
     table = {"show": lambda a: cmd_show(a, False), "explain": lambda a: cmd_show(a, True), "tabulate": cmd_tabulate,
-             "test": cmd_test, "run": cmd_run, "reverdict": cmd_reverdict, "family": cmd_family, "freeze": cmd_freeze, "check": cmd_check, "mutate": cmd_mutate, "bench": cmd_bench, "registry": cmd_registry, "intake": cmd_intake, "navigate": cmd_navigate, "chain": cmd_chain,
+             "test": cmd_test, "run": cmd_run, "reverdict": cmd_reverdict, "family": cmd_family, "freeze": cmd_freeze, "check": cmd_check, "mutate": cmd_mutate, "bench": cmd_bench, "registry": cmd_registry, "intake": cmd_intake, "navigate": cmd_navigate, "chain": cmd_chain, "hold": cmd_hold,
              "validate": lambda a: cmd_validate(a + (["--advanced"] if advanced else []))}
     if cmd in table:
         try:

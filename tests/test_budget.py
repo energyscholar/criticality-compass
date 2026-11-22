@@ -38,11 +38,12 @@ Seen RED: at CAP 5031 after the edits the cap assert FAILS; INSTRUMENT_DECL_CAP 
 Plan 1427 P1: CORE_CAP 1240 -> 1248 (Auditor-authorised; homes of D3/D4/D9 in intake_blind/intake_seal; the plan is net-negative overall). Seen RED: at 1240 after P1 the cap assert FAILS.
 Plan 1427 P3: CORE_CAP 1248 -> 1249 (Auditor-authorised; `import registry` in the intake modules that hashed a file). Seen RED: at 1248 after P3 the cap assert FAILS (p3-budget-red.txt).
 Plan 1427 P4: CAP 5034 -> 5036 (Auditor-authorised; positional, input_path, gen-verdicts on schema.row_lines). Seen RED: at 5034 after P4 the cap assert FAILS (5035 of 5034, p4-budget-red.txt).
+Plan 1634: CAP 5046 -> 5066 (Auditor-authorised; compass hold help lines + cmd_hold). Seen RED: at CAP 5046 after the bin/cc edit the cap assert FAILS (5051 of 5046).
 Plan 1634: the manual-run driver (manual/*.py) is the role manual, MANUAL_CAP = 400; no cap rises. Seen RED: MANUAL_CAP made 10 (the cap assert FAILS); manual/hold.py also listed under plumbing (the disjointness assert FAILS)."""
 import tomllib
 from pathlib import Path
 
-CAP = 5046   # plan 1559: was 5043. plan 1427 P9: was 5036. plan 1427 P4: was 5034. plan 1282 P2a: R-P2.1
+CAP = 5066   # plan 1634: was 5046. plan 1559: was 5043. plan 1427 P9: was 5036. plan 1427 P4: was 5034. plan 1282 P2a: R-P2.1
 CORE_CAP = 1250   # plan 1427 P9: was 1249 (registry.config import and the moved git head land in the core). plan 1427 P3: was 1248. plan 1427 P1: was 1240. plan 1205 P1 (Auditor): +40 for the hdf5-table-v1 reader. plan 1164: was INTAKE_CAP over the one role intake; now the sum over the roles of CORE, the core split by invariant
 CORE = {"intake": 100, "intake_fold": 160, "intake_evidence": 150, "intake_bytes": 100, "intake_census": 140, "intake_say": 100,   # plan 1164: role -> cap
         "intake_blind": 200, "intake_seal": 160, "intake_read": 215}   # (BLOAT-REVIEW 1160 section 4, Layout C)

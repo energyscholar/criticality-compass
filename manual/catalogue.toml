@@ -1,0 +1,33 @@
+# The catalogue of `compass hold`: every path is relative to the workspace root. A row that does not exist is a lookup miss, reported as REFUSED.
+[ising]
+env = "environment/environment-apparatus-ising.toml"
+score = "environment/hold-score-ising.toml"
+plugin = "system-instantiated/plugins/ising"
+[ising.worlds]
+production = "system-instantiated/plugins/ising/ising-apparatus.toml"
+static = "system-instantiated/plugins/ising/ising-apparatus-static.toml"
+static-r2 = "system-instantiated/plugins/ising/ising-apparatus-static-r2.toml"
+static-r3 = "system-instantiated/plugins/ising/ising-apparatus-static-r3.toml"
+field = "system-instantiated/plugins/ising/ising-apparatus-field.toml"
+field-hard = "system-instantiated/plugins/ising/ising-apparatus-field-hard.toml"
+[ising.needles]
+settled = "needle-settings/ising/hold-settled.toml"
+mid = "needle-settings/ising/hold-mid.toml"
+settled-off = "needle-settings/ising/hold-settled-off.toml"
+
+[at]
+env = "environment/environment-apparatus.toml"
+score = "environment/hold-score.toml"
+plugin = "system-instantiated/plugins/at"
+[at.worlds]
+production = "system-instantiated/plugins/at/at-apparatus.toml"
+static = "system-instantiated/plugins/at/at-apparatus-static.toml"
+[at.needles]
+settled = "navigator/hold-settled.toml"
+mid = "navigator/hold-mid.toml"
+settled-off = "navigator/hold-settled-off.toml"
+mid-off = "navigator/hold-mid-off.toml"
+mid-null = "navigator/hold-mid-null.toml"
+
+[pending.fhn]
+reason = "not in this release"

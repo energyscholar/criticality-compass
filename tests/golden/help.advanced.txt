@@ -18,6 +18,7 @@ cc - Criticality Compass   (ADVANCED)
   bin/cc check [--fast | --baseline]                                                 validate + tests; run it before a commit; --baseline reads the recorded green run of this tree
   bin/cc test [-v] [--regolden [--classify]] [<name> ...]                            run the named tests (default all); --classify tags a regolden's changed lines a-e and undoes it on any (e)
   bin/cc mutate <relpath> (--sed E | --py E) -- <test> ...                           run tests against a temporary mutation
+  bin/cc hold <system> <world> --needle MODE | --list | --verify DIR                 run a hold of a catalogue system by hand, print its input and output and save the run as a record (plan 1634; man compass)
   bin/cc help [--advanced]                                                           this text
   bin/cc navigate <input> [--access-log PATH]                                        UNTESTED: walk a stored map (an input with [interval] method chains) by the N0 bisection; reads only the nodes it visits, logged per T23
   bin/cc navigate family <id> | score <id> <checkpoints.toml>                        follow an intake declaration's [suspect] line with the frozen linenav (grid cells); score it against checkpoints kept outside declarations/
