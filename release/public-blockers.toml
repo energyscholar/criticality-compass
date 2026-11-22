@@ -62,12 +62,12 @@ echo "$o" | grep -q '^ok   T9' || { echo "no T9 ok line"; exit 1; }
 [[row]]
 name = "ci-local-macos"
 state = "open"
-ruling = "release/ci-local.sh on a fresh clone of this tip, on the macOS host, must record this tree's hash and zero FAILED lines. It records five FAILED lines, the five undeclared-failing rows below (the stems fail with and without the data root). Becomes closed when those are ruled and a result file for the final tree has zero FAILED lines."
+ruling = "release/ci-local.sh on a fresh clone of this tip, on the macOS host, must record this tree's hash and zero FAILED lines. After amendment C3 it records three FAILED lines: test_claims, test_intake_example and test_intake_terminal, the three undeclared-failing rows below (their findings are reported, nothing is edited). Becomes closed when those are ruled and a result file for the final tree has zero FAILED lines."
 
 [[row]]
 name = "ci-local-linux"
 state = "open"
-ruling = "The same on a Linux x86_64 host. One further failure there: contract/test_ising_port.py, test_p04_at_is_unchanged_on_the_wire. Its pinned sha differs on Linux because four critical-coupling floats differ by one unit in the last place (a platform difference in the exp and arcsinh of numpy; the reply text and every other piece are byte-identical). The cause is numerical, not reply formatting, so neither the sha nor the tolerance is touched here: the reviewer rules it."
+ruling = "The same on a Linux x86_64 host. One further failure there: contract/test_ising_port.py, test_p04_at_is_unchanged_on_the_wire. Cause found (amendment C1): the platform libm differs by one unit in the last place in arcsinh(exp(-2*Lc))/2, the self_dual_K of system-instantiated/plugins/at/vendor/lattice_at.py (vendor, never edited), which feeds the wire's K_c. Lc comes from the world's hidden L4 plus a drift offset, so it is an open real, not a table entry; a closed-table fix does not apply. Neither the sha nor a tolerance is touched here: the reviewer rules it."
 
 [[row]]
 name = "public-face"
