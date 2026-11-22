@@ -8,8 +8,9 @@ while [ $# -gt 0 ]; do case "$1" in
   --index) INDEX=$2; shift 2;; *) SRC=$1; shift;; esac; done
 # Constants: sha256 of run/{score,truth}.json, run/{map,report}.jsonl of the static world at horizon 1 (needle settled, default seed).
 # Recorded 2026-11-21 on macOS arm64 (python 3.11.17, numpy 2.4.x, scipy 1.17.x); Linux x86_64 gave the same bytes in recon.
-# Phase 4 (1569's stamps) changes run_id and so these hashes: re-measure with --print after Phase 4.
-EXPECT_score=58bc92e11acffeff736e71116c781d9415ca620ede26244637ac7fecee1baa0f; EXPECT_truth=fab35c28ed19faaa371b8851fd7296b996681a642010070a242fec16139c3a53; EXPECT_map=ac22e20411fa66576a9f192139134498aa0625267630d2fefb59faa83b7e2bd9; EXPECT_report=76dbba8209e4937d511640e3f6e4c1c2e7427f7259431e047568dc8cf310d3cb
+# Re-measured after the Phase 4 stamps (run_id df9bd9cf7ffa6785 -> bcbffe41b8a450d0; score.json and map.jsonl carry the run_id, truth.json and report.jsonl do not): macOS arm64, python 3.11.17, numpy 2.4.6, scipy 1.17.1.
+EXPECT_run_id=bcbffe41b8a450d0   # the run_id printed on the OUTPUT line, which docs/FIRST-HOUR.md shows (tests/test_dist.py T11 compares the two)
+EXPECT_score=e48a280628bffe666ef5c2d5226becd31ee9f064bd25abe6eb3a1654408f99de; EXPECT_truth=fab35c28ed19faaa371b8851fd7296b996681a642010070a242fec16139c3a53; EXPECT_map=a0e68fca049376d9b7190f94970663c2f06ae152900ef515a1999a078f27ee59; EXPECT_report=76dbba8209e4937d511640e3f6e4c1c2e7427f7259431e047568dc8cf310d3cb
 fail() { echo "CLEANROOM FAIL: $*"; exit 1; }
 "$PY" -c 'import sys; sys.exit(0 if sys.version_info >= (3, 11) else 1)' || fail "need Python 3.11 or later: $PY"
 T=$(mktemp -d "${TMPDIR:-/tmp}/cleanroom.XXXXXX") || fail "no temp dir"; trap 'rm -rf "$T"' EXIT
@@ -37,6 +38,7 @@ REC=$(ls -d "$T"/runs/*/ 2>/dev/null | head -1); [ -n "$REC" ] || fail "no recor
 [ -f "$V/share/man/man1/compass.1" ] || fail "man page missing"
 [ "$BEFORE" = "$(snap)" ] || fail "something was written inside site-packages"
 HP="/Us""ers/|/ho""me/"; if grep -rIlE "$HP" "$REC" > /dev/null 2>&1; then fail "a host path is in the record"; fi
+case "$(basename "$REC")" in *-"$EXPECT_run_id"-*) ;; *) fail "run_id differs: $(basename "$REC") (want $EXPECT_run_id)";; esac
 H() { "$V/bin/python" -c 'import hashlib,sys; print(hashlib.sha256(open(sys.argv[1],"rb").read()).hexdigest())' "$REC/run/$1"; }
 for f in score.json truth.json map.jsonl report.jsonl; do k=${f%%.*}; got=$(H "$f")
   if [ -n "$PRINT" ]; then echo "EXPECT_$k=$got"; continue; fi

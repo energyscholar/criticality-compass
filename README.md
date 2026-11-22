@@ -46,13 +46,13 @@ INPUT
   needle params: needle_structure=hold-pair-v1 g=12 step=6 S=1500 n_eq=450
   score  environment/hold-score-ising.toml  sha256 158dbcc14f0e
   score params: offset_K=-0.005 out_run=3 plan=1569
-  code   compass 1.0.0a0  git 729f1ae0238e  digest 9eaa1dcbf166
-RUN step 1 phase ignite index 5100  t=10s
+  code   compass 0.1.0  git not-a-clone  digest c191ac11415e
+RUN step 1 phase ignite index 5100  t=5s
 …
-RUN step 53 phase hold index 198426  t=284s
+RUN step 53 phase hold index 198426  t=164s
 OUTPUT
-  outcome=HORIZON lock=HELD in_fraction=0.9583333333333334 rms_e_g=0.48005523022349245 mean_e=-4.748954039085869 hold_steps=48 accuracy=0.5625  run_id=0811b05bffd7880d
-record: 20261122T001603Z-ising-production-0811b05bffd7880d-0622
+  outcome=HORIZON lock=HELD in_fraction=0.9583333333333334 rms_e_g=0.48005523022349245 mean_e=-4.748954039085869 hold_steps=48 accuracy=0.5625  run_id=34d021cf86b5547e
+record: 20261122T145559Z-ising-production-34d021cf86b5547e-24ac
 exit 0: scored  (status scored)
 ```
 

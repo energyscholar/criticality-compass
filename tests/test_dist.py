@@ -258,8 +258,17 @@ def t12(a):
     check("T12 the scan lists none of Metatron, Robin Macomber, Relational Relativity (their credit is allowed text)", not leak and not test_wheel.scan_text("Robin Macomber, Metatron Dynamics, Relational Relativity Corp.") and bool(test_wheel.scan_text("Ro" + "bin Smith")))
 
 
+def t11_constants():
+    """Plan 1639 phase 4 (A7 item 4): the run_id FIRST-HOUR.md shows is the one release/cleanroom.sh expects, so a change of run_id cannot leave the document behind."""
+    want = re.search(r"^EXPECT_run_id=([0-9a-f]{16})", (ROOT / "release" / "cleanroom.sh").read_text(), re.M)
+    shown = re.findall(r"run_id=([0-9a-f]{16})|ising-path-([0-9a-f]{16})-", (ROOT / "docs" / "FIRST-HOUR.md").read_text())
+    shown = {x for t in shown for x in t if x}
+    check("T11 docs/FIRST-HOUR.md shows the run_id that release/cleanroom.sh expects (and no other)", bool(want) and shown == {want.group(1)}, f"cleanroom {want and want.group(1)}; document {sorted(shown)}")
+
+
 def main():
     t3()
+    t11_constants()
     guarded("T10", t10)
     T = Path(tempfile.mkdtemp(prefix="t-dist-"))
     try:
