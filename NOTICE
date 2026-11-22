@@ -1,13 +1,20 @@
 Criticality Compass
 Copyright 2026 Bruce Stephenson
 Licensed under the Apache License, Version 2.0 (see LICENSE).
+The stored results and benchmark data are licensed under CC BY 4.0 (see DATA-LICENSE).
 
-This product includes software developed by others:
+This product includes software developed by others. Its Apache License, Version 2.0 section 4 notices follow.
 
-kernel_rs (rust/) binds the Rust ABR kernel metatron_kernel_v8, from
-https://github.com/Relational-Relativity-Corporation/abr-kernel
-at revision 5c7941e0ce644dba844d3732fc25f9063db40f33
-(rust/Cargo.toml; rust/src/lib.rs KERNEL_REV).
+cc/kernel.py is a Python port of operators.rs of the Rust ABR kernel metatron_kernel_v8
+(abr-kernel, https://github.com/Relational-Relativity-Corporation/abr-kernel)
+at revision 5c7941e0ce644dba844d3732fc25f9063db40f33.
 That software is licensed under the Apache License, Version 2.0 and is
 Copyright 2026 Metatron Dynamics, Inc. (its LICENSE, verbatim first line).
 It carries no NOTICE file of its own at that revision.
+Changes (section 4(b)): the operators were translated to Python/numpy and vectorised over declared relations.
+
+kernel_rs (rust/) binds that same Rust ABR kernel,
+metatron_kernel_v8, from
+https://github.com/Relational-Relativity-Corporation/abr-kernel
+at revision 5c7941e0ce644dba844d3732fc25f9063db40f33
+(rust/Cargo.toml; rust/src/lib.rs KERNEL_REV).

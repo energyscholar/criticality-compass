@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use Criticality Compass, please cite it as below, and cite the ABR kernel it builds on."
+title: "Criticality Compass"
+type: software
+version: "0.1.0"
+license: Apache-2.0
+authors:
+  - name: "Bruce Stephenson"
+references:
+  - type: software
+    title: "abr-kernel (metatron_kernel_v8)"
+    authors:
+      - name: "Metatron Dynamics, Inc."
+      - name: "Robin Macomber"
+    repository-code: "https://github.com/Relational-Relativity-Corporation/abr-kernel"
+    commit: "5c7941e0ce644dba844d3732fc25f9063db40f33"
+    license: Apache-2.0

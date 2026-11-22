@@ -1,24 +1,37 @@
-# Criticality Compass - packaging (plan 0929, ruling D-0929-1). Editable (`pip install -e .`) uses the clone as the workspace; a non-editable install carries a copy of it (setup.py, queue S6.6).
-# Nothing here is uploaded to a public index (queue S5.5: licence and name set; no PyPI upload, no public push).
+# Criticality Compass - packaging. Editable (`pip install -e .`) uses the clone as the workspace; a non-editable install carries a copy of it (setup.py).
+# The distribution `criticality-compass` carries the code, the frozen results and every result a shipped document names; the rest of the stored
+# results are the data distribution `criticality-compass-data` (release/data/), which installs into the same workspace.
 [build-system]
-requires = ["setuptools>=64"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "criticality-compass"          # queue S5.5; unclaimed on PyPI 2026-10-09 and NOT uploaded
-version = "1.0.0a0"
+name = "criticality-compass"
+version = "0.1.0"
 description = "Criticality Compass: declared comparisons of sign cells of an ABR-kernel readout, a rulebook, and a stored result for every point."
-requires-python = ">=3.11"           # 3.9 is end-of-life; the stored results were made with numpy 2.4.4 (D-0929-1 iv)
-dependencies = ["numpy", "scipy"]   # plan 1634: `compass hold` imports scipy.sparse in the Ising and AT plugins; a wheel installed alone must run it
-license = { text = "Apache-2.0" }   # LICENSE + NOTICE at the repository root (queue S5.5)
+requires-python = ">=3.11"           # 3.9 is end-of-life; the stored results were made with numpy 2.4.4
+dependencies = ["numpy>=2.0,<3", "scipy>=1.13,<2"]   # `compass hold` imports scipy.sparse in the Ising and AT plugins; a wheel installed alone must run it
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE", "DATA-LICENSE"]
 readme = "README.md"
+authors = [{ name = "Bruce Stephenson", email = "energyscholar+criticality-compass@gmail.com" }]
+keywords = ["criticality", "phase transitions", "critical slowing down", "early warning", "simulation"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering :: Physics",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Operating System :: OS Independent",
+]
 
 [project.optional-dependencies]
-kernel = ["criticality-compass-kernel"]  # the kernel_rs wheel, built from rust/ by maturin (`maturin build --release -m rust/Cargo.toml`); not on any index, so this extra is declared, not downloadable; README "The Rust kernel"
-test = ["scipy"]  # the test suite imports only numpy (runtime), the standard library and this repository; scipy is declared here for the test environment (queue S6.7). With the kernel: `pip install -e .[test,kernel]`
+test = ["scipy"]  # the test suite imports only numpy (runtime), the standard library and this repository; scipy is declared here for the test environment. The Rust kernel wheel, for the two kernel tests, is built by hand (README "The Rust kernel")
 
 [project.scripts]
-compass = "criticality_compass:main"   # never `cc`: it is the C compiler, and Rust links with it (seen red, memo section 2.3)
+compass = "criticality_compass:main"   # never `cc`: it is the C compiler, and Rust links with it
 
 [tool.setuptools]
 packages = ["criticality_compass"]     # the launcher; setup.py adds criticality_compass/workspace/ (the clone's bin/ cc/ tables/ inputs/ ... as package data); cc/ stays a flat directory (bare module names collide with PyPI packages)

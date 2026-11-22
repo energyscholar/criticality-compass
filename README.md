@@ -88,6 +88,8 @@ the external structure checker named under "The first hour".
 
 ## The first hour
 
+For a first hour from `pip install criticality-compass` (no clone), see `docs/FIRST-HOUR.md`. The steps below start from a clone.
+
 Install once, from a clone (the clone is the workspace: results, tables and inputs live beside the code, so the install is editable):
 
 ```
@@ -103,12 +105,12 @@ Two places are never defaults, because a default would be one person's machine: 
 
 Other ways to install:
 
-- **A non-editable install** (`pip install .`, or a built wheel from `python3 -m build`) carries a copy of the workspace (`bin/`, `cc/`, `tables/`, `inputs/`, `cases/`, `results/`, `data/`, `docs/`, `benchmark/`, `environment/`, `needle-settings/`, `manual/`, ...) inside the package, so `compass validate`, `compass show`, `compass explain` and `compass tabulate` work without a clone (given the data root and the structure checker above). Of `tests/` it carries only the files `FROZEN.json` names, which the structure gate needs; `compass check` and `compass test` REFUSE there and say to use a clone. Anything you write (`run`, `new`, `tables fork`) lands in that copy inside site-packages and is lost on reinstall; to author, use the editable install above. `compass --help` and `compass help` both print the help text; an unknown command exits non-zero.
+- **A non-editable install** (`pip install .`, or a built wheel from `python3 -m build`) carries a copy of the workspace (`bin/`, `cc/`, `tables/`, `inputs/`, `cases/`, `results/`, `data/`, `docs/`, `benchmark/`, `environment/`, `needle-settings/`, `manual/`, ...) inside the package, so `compass validate`, `compass show`, `compass explain` and `compass family` work without a clone (given the data root and the structure checker above); `compass tabulate` writes into the workspace, so it is for a clone only. Of `tests/` it carries only the files `FROZEN.json` names, which the structure gate needs; `compass check` and `compass test` REFUSE there and say to use a clone. Anything you write (`run`, `new`, `tables fork`) lands in that copy inside site-packages and is lost on reinstall; to author, use the editable install above. `compass --help` and `compass help` both print the help text; an unknown command exits non-zero.
 - Python 3.11 is the minimum and works; 3.12 is the version most tested.
 
 ## The Rust kernel (optional)
 
-Measurement runs the Python `cc/kernel.py`, which is the reference. The Rust kernel (`kernel_rs`, the pinned `abr-kernel`) is used only by the tests `test_kernel_rs` and `test_kernel_rs_bitwise`, which check that it equals the Python one. It is the optional extra `kernel` (`pip install -e '.[kernel]'`; the test environment is `pip install -e .[test,kernel]`), distribution `criticality-compass-kernel`, which is **not on any package index**: build the wheel yourself.
+Measurement runs the Python `cc/kernel.py`, which is the reference. The Rust kernel (`kernel_rs`, the pinned `abr-kernel`) is used only by the tests `test_kernel_rs` and `test_kernel_rs_bitwise`, which check that it equals the Python one. It is not a dependency or an extra of this package and it is **not on any package index**: build the wheel yourself (the test environment is `pip install -e .[test]` plus that wheel).
 
 ```
 $ pip install maturin
@@ -320,7 +322,11 @@ runs `validate`, every test and the scoreboard, and takes several minutes (about
 `git config core.hooksPath .githooks` once, so that a quicker version of the same check runs for you before
 every commit.
 
-The tests need the test extra, and two of them the kernel wheel: `pip install -e .[test,kernel]` (the kernel wheel is built by hand, see "The Rust kernel").
+The tests need the test extra, and two of them the kernel wheel: `pip install -e .[test]` and the kernel wheel, which is built by hand (see "The Rust kernel").
+
+## Acknowledgements
+
+The ABR relational-kernel method that CC computes with is credited to Robin Macomber and Metatron Dynamics, Inc. / Relational Relativity Corp. `cc/kernel.py` is a Python port of their `abr-kernel` (`metatron_kernel_v8`), licensed Apache-2.0, and the Rust binding `kernel_rs` (`rust/`) uses the same crate at a pinned revision. `NOTICE` gives the revision and the changes, and `CITATION.cff` the reference; if you use CC, please cite the kernel as well.
 
 ## Adding a case
 

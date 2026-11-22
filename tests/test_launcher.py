@@ -41,7 +41,7 @@ setup = (ROOT / "setup.py").read_text()
 check("setup.py packages the runtime trees", all(f'"{d}"' in setup for d in ("bin", "cc", "tables", "inputs", "results")))
 pp = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]
 check("the console script is `compass`, never `cc`", list(pp["scripts"]) == ["compass"], str(pp["scripts"]))
-check("the kernel is a declared optional extra", "kernel" in tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]["optional-dependencies"])
+check("the kernel is not a declared extra: its wheel is not on any index (plan 1639 declared edit)", "kernel" not in tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]["optional-dependencies"])
 check("requires-python is >=3.11", pp["requires-python"] == ">=3.11")
 print("test_launcher: " + ("FAILED " + ", ".join(bad) if bad else "ok"))
 sys.exit(1 if bad else 0)

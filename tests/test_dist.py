@@ -195,6 +195,7 @@ def t9(a):
         "License-Expression: Apache-2.0": "License-Expression: Apache-2.0" in m, "License-File LICENSE, NOTICE, DATA-LICENSE": all(f"License-File: {f}" in m for f in ("LICENSE", "NOTICE", "DATA-LICENSE")),
         "Requires-Python >=3.11": "Requires-Python: >=3.11" in m, "numpy and scipy have lower and upper bounds": ok("numpy") and ok("scipy"),
         "classifiers": all(c in m for c in ("Classifier: Programming Language :: Python :: 3 :: Only", "Classifier: Operating System :: OS Independent")),
+        "classifiers name Python 3.11 and 3.12 only (91 files import tomllib, so 3.10 cannot run CC)": all(f"Classifier: Programming Language :: Python :: {v}" in m for v in ("3.11", "3.12")) and not re.search(r"Python :: 3\.(?:[0-9]|10)\n", m),
         "no criticality-compass-kernel, no Provides-Extra: kernel": "criticality-compass-kernel" not in m and "Provides-Extra: kernel" not in m,
         "Author-email is the one public address": f"Author-email: Bruce Stephenson <{EMAIL}>" in m, "no Project-URL, no Home-page": "Project-URL" not in m and "Home-page" not in m, "version 0.1.0": "\nVersion: 0.1.0\n" in m}
     for k, v in want.items():
