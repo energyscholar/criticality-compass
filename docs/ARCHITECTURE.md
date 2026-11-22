@@ -115,7 +115,7 @@ A second path, separate from the verdict path above: it runs one simulated syste
    `INPUT` block with the sha256[:12] of the env, world, needle and score files, and builds the six configs.
 3. It copies the inputs into a staging directory whose env file has `run_dir_root = "run"` and the port it chose, and runs `python -m environment.run_hold --env --at --needle --score`
    on them (`environment/run_hold.py`).
-4. `environment/run_hold.py` starts the apparatus server (`environment/apparatus_server.py`, the world's plugin under `system-instantiated/plugins/<system>/`), runs the needle
+4. `environment/run_hold.py` starts the apparatus server (`environment/apparatus_server.py`, with the system's `apparatus.py` under `system-instantiated/plugins/<system>/`), runs the needle
    (`navigator/hold.py`, steered by the file in `needle-settings/` or `navigator/`) as a separate process, and scores it after the needle exits (`environment/hold_score.py`).
    Exit 0 = `run/score.json` written; 2 = refused to start (`run/refused.json`); 1 = infrastructure failure.
 5. `manual/hold.py` prints the `RUN` progress lines and the `OUTPUT` line, kills the run at the wall-clock limit (exit 3), and `manual/record.py` writes the record:
