@@ -1,6 +1,6 @@
 # SCHEMA-1560 — the random Boolean network System on the frozen stage-3a blind wire
 
-FROZEN by plan 1560 Phase 0. The Generator builds to this; it does not edit it. The tests that hold it are
+FROZEN by plan 1560 Phase 0. The implementer builds to this; it does not edit it. The tests that hold it are
 `contract/test_rbn_core.py` (k01–k08) and `contract/test_rbn_blind_conformance.py` (b01–b08).
 
 ## 1. Scope

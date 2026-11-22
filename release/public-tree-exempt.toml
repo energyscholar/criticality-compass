@@ -1,0 +1,286 @@
+# plan 1640 AQ4/AQ6: the tree scan's exemptions, by sha256 of the file (never a pattern, never a count). A row whose file changed or is missing is itself a hit.
+
+[[exempt]]
+path = "contract/SCHEMA-1525.md"
+sha256 = "40ae7812cefb384bd1a2582751891464ce0928d1e643da87f2df0fa56ce169ec"
+reason = "byte-pinned by a contract test's sha256 table; an edit needs a declared re-pin, which plan 1640 does not make"
+
+[[exempt]]
+path = "contract/SCHEMA-1552.md"
+sha256 = "35c76fa4ccb0a512bde063dac63193a9063498b0838e87a289f567e1bdc931d5"
+reason = "byte-pinned by a contract test's sha256 table; an edit needs a declared re-pin, which plan 1640 does not make"
+
+[[exempt]]
+path = "contract/test_apparatus_clock.py"
+sha256 = "ddd7628e485b56afebe8bbc1c959024a93a8c3bfd0c64b48aafbbf0e81294ebd"
+reason = "a frozen contract test: contract/*.py is outside plan 1640's edit list; one docstring line names a role"
+
+[[exempt]]
+path = "contract/test_apparatus_drift.py"
+sha256 = "3586c1ec9930b059555fe2925af1cb7ce685f7b06e3b64e337cafac900e16261"
+reason = "a frozen contract test: contract/*.py is outside plan 1640's edit list; one docstring line names a role"
+
+[[exempt]]
+path = "contract/test_apparatus_midmove.py"
+sha256 = "b27c8dbf09e17afeb6c48786ec01592abefe1cbb1e4cc404c676fb1047324b5a"
+reason = "a frozen contract test: contract/*.py is outside plan 1640's edit list; one docstring line names a role"
+
+[[exempt]]
+path = "contract/test_apparatus_wire.py"
+sha256 = "c9692e9cdfc0b0bef4f0ce474b1dcde98cfa9ccbde569a8e5b671066f298d6ff"
+reason = "a frozen contract test: contract/*.py is outside plan 1640's edit list; one docstring line names a role"
+
+[[exempt]]
+path = "contract/test_blind_navigator_conformance.py"
+sha256 = "009cb7455b4e3822d4fcf7b12aab69f350223ceb72739f6bf939bacf8677c224"
+reason = "a frozen contract test: contract/*.py is outside plan 1640's edit list; one docstring line names a role"
+
+[[exempt]]
+path = "contract/test_blind_system_conformance.py"
+sha256 = "3f258946fd9808cbe06c97451ce09692425ba65d3fae7f16855296903c34bb65"
+reason = "a frozen contract test: contract/*.py is outside plan 1640's edit list; one docstring line names a role"
+
+[[exempt]]
+path = "contract/test_drift_laws.py"
+sha256 = "cc46dd3e54cdcbb33008a1e930028bafc934bafdb605232d4e46d06c566985c7"
+reason = "a frozen contract test: contract/*.py is outside plan 1640's edit list; one docstring line names a role"
+
+[[exempt]]
+path = "contract/test_drift_score.py"
+sha256 = "4bc3d0eccc56993451798fb763212d1a2288ca08c1f729cccfe40fff8ca5c1d4"
+reason = "a frozen contract test: contract/*.py is outside plan 1640's edit list; one docstring line names a role"
+
+[[exempt]]
+path = "contract/test_drift_worlds.py"
+sha256 = "53de9717c7757340eddf8d1ba12672b22eb49881f2f3cbcc00a4c900b5d584b0"
+reason = "a frozen contract test: contract/*.py is outside plan 1640's edit list; one docstring line names a role"
+
+[[exempt]]
+path = "contract/test_hold_needle.py"
+sha256 = "272c7321321559572a6be69a3712c2636fe07aba6311c3050d088eff17696562"
+reason = "a frozen contract test: contract/*.py is outside plan 1640's edit list; one docstring line names a role"
+
+[[exempt]]
+path = "contract/test_hold_reader.py"
+sha256 = "bb82b9687ca7abfa4d862dc3aa2bd276d429653e7fc16bde66b2de6bccd949f9"
+reason = "a frozen contract test: contract/*.py is outside plan 1640's edit list; one docstring line names a role"
+
+[[exempt]]
+path = "contract/test_hold_score.py"
+sha256 = "66fc632baad7160b00737b1293335a173bc58d7b6d6b47ca5c749b537d7faf01"
+reason = "a frozen contract test: contract/*.py is outside plan 1640's edit list; one docstring line names a role"
+
+[[exempt]]
+path = "contract/test_hold_setpoint.py"
+sha256 = "f797a93ccda47d63c0ee405934a447668cd1659bfec5aa6c44ff8c5aaadadbd3"
+reason = "a frozen contract test: contract/*.py is outside plan 1640's edit list; one docstring line names a role"
+
+[[exempt]]
+path = "contract/test_ising_blind_conformance.py"
+sha256 = "72740468c072cdab7a3b34982b7c2b003039396087c28715d0118372981ec1fa"
+reason = "a frozen contract test: contract/*.py is outside plan 1640's edit list; one docstring line names a role"
+
+[[exempt]]
+path = "contract/test_ising_core.py"
+sha256 = "ff2a388d355a741c26f05565c1dd213fcfb326dc2aa2b4e0ea7a0de3448afb31"
+reason = "a frozen contract test: contract/*.py is outside plan 1640's edit list; one docstring line names a role"
+
+[[exempt]]
+path = "contract/test_narrow_unit.py"
+sha256 = "78781d6c121c9c6cce489bf7c089d520be750ca336dc89c80be0ca8f0acc9d0d"
+reason = "a frozen contract test: contract/*.py is outside plan 1640's edit list; one docstring line names a role"
+
+[[exempt]]
+path = "contract/test_navigator_conformance.py"
+sha256 = "04a12e5d8035b1abf291f8198a6bc07169596f35fe0b68c597e947d330f1969a"
+reason = "a frozen contract test: contract/*.py is outside plan 1640's edit list; one docstring line names a role"
+
+[[exempt]]
+path = "contract/test_needle_clock.py"
+sha256 = "7f2ef807f9aa26dbebe6cc5b359e376889eb3e32fa7ca6698e44fd39c9108e3c"
+reason = "a frozen contract test: contract/*.py is outside plan 1640's edit list; one docstring line names a role"
+
+[[exempt]]
+path = "contract/test_needleplayer_blind.py"
+sha256 = "828095025be0a4a1e4c7a5ce736e08bb5ca2e717316e3a480e1e1bb19794c106"
+reason = "a frozen contract test: contract/*.py is outside plan 1640's edit list; one docstring line names a role"
+
+[[exempt]]
+path = "contract/test_needleplayer_page.py"
+sha256 = "bfdd93cc97f3f60775f12fdadc14412b29943993602c456cf1b4fa24b7c8ef07"
+reason = "a frozen contract test: contract/*.py is outside plan 1640's edit list; one docstring line names a role"
+
+[[exempt]]
+path = "contract/test_needleplayer_stream.py"
+sha256 = "cd95a1ef3e36c20e7c578c21a1eac99b8ef30f7a12e1c7e4008f3bf44705facd"
+reason = "a frozen contract test: contract/*.py is outside plan 1640's edit list; one docstring line names a role"
+
+[[exempt]]
+path = "contract/test_needleview_blind.py"
+sha256 = "96f6fb02ecb78e4f65343a4d9a7e817a5d1bda9e43c2433f0168fcbd10add587"
+reason = "a frozen contract test: contract/*.py is outside plan 1640's edit list; one docstring line names a role"
+
+[[exempt]]
+path = "contract/test_needleview_page.py"
+sha256 = "1ad822897bd791aa33c7ff88ba272985d719ab1a23363aca233a735b535458ee"
+reason = "a frozen contract test: contract/*.py is outside plan 1640's edit list; one docstring line names a role"
+
+[[exempt]]
+path = "contract/test_needleview_reader.py"
+sha256 = "3b0706c09d442721f1a68c7dc3efbaf99588ba7aea33fdc4235d841a4e03f1fd"
+reason = "a frozen contract test: contract/*.py is outside plan 1640's edit list; one docstring line names a role"
+
+[[exempt]]
+path = "contract/test_rbn_blind_conformance.py"
+sha256 = "fc92a0f58d253616a987c926d8fc1910c1e88d27ca4b9bc6e076e24829fa9d0d"
+reason = "a frozen contract test: contract/*.py is outside plan 1640's edit list; one docstring line names a role"
+
+[[exempt]]
+path = "contract/test_rbn_core.py"
+sha256 = "0413ae749db1da34771c151413b2a4994df12e58bd652e48993693d72d03feb4"
+reason = "a frozen contract test: contract/*.py is outside plan 1640's edit list; one docstring line names a role"
+
+[[exempt]]
+path = "contract/test_report2_conformance.py"
+sha256 = "dfcb23f3b32cac6ffe5b926497646bf644a8c06dac724e756e4f5eb3a48cf298"
+reason = "a frozen contract test: contract/*.py is outside plan 1640's edit list; one docstring line names a role"
+
+[[exempt]]
+path = "contract/test_report2_reader.py"
+sha256 = "2395533d87884d45187636850e269c5925b89b58cda83a1f32a9ab630fb10295"
+reason = "a frozen contract test: contract/*.py is outside plan 1640's edit list; one docstring line names a role"
+
+[[exempt]]
+path = "contract/test_report2_table.py"
+sha256 = "3b55f5c1db920fbc61cd7ca4df8e5e10e8301d50c4813144f0e236a71708e330"
+reason = "a frozen contract test: contract/*.py is outside plan 1640's edit list; one docstring line names a role"
+
+[[exempt]]
+path = "contract/test_slots.py"
+sha256 = "c11020f39fed45841550fbe7f7a3fb7403985c4f6fb5449114f6c38cb56ed1f8"
+reason = "a frozen contract test: contract/*.py is outside plan 1640's edit list; one docstring line names a role"
+
+[[exempt]]
+path = "contract/test_system_conformance.py"
+sha256 = "25b6639201d4278e51bc1be15082bffa9d958b654ccc25dd40dbcf9ec249c2b3"
+reason = "a frozen contract test: contract/*.py is outside plan 1640's edit list; one docstring line names a role"
+
+[[exempt]]
+path = "contract/test_time_ledger.py"
+sha256 = "ab17caf11a8817aa08c2c0a4a0bce6c245ffa082877ecfcc4ed36453f82a1347"
+reason = "a frozen contract test: contract/*.py is outside plan 1640's edit list; one docstring line names a role"
+
+[[exempt]]
+path = "declarations/dial1118-s1-v2/SEAL.json"
+sha256 = "275a461443455e897916a54b7fa9740da2982646d370b1aaade97367e871eeee"
+reason = "a sealed declaration (its seal holds the sha); a seal is never edited"
+
+[[exempt]]
+path = "declarations/dial1118-s1-v2/intake-report.md"
+sha256 = "5a02e5e98bb0a5e71dc6444ecdf7b74bcf807e10912f93d78baa8f9bcc897de2"
+reason = "a sealed declaration (its seal holds the sha); a seal is never edited"
+
+[[exempt]]
+path = "declarations/dial1118-s1-v3/SEAL.json"
+sha256 = "0578eb5b24a12c014904788a1be90e484956044f6672a9e06f775e95835f1013"
+reason = "a sealed declaration (its seal holds the sha); a seal is never edited"
+
+[[exempt]]
+path = "declarations/dial1118-s1-v3/intake-report.md"
+sha256 = "660e3a106585c2d14301724bf4c7a043d39c71032a36ebe6dbe37cdcf54fbeba"
+reason = "a sealed declaration (its seal holds the sha); a seal is never edited"
+
+[[exempt]]
+path = "declarations/dial1118-s1-v4/SEAL.json"
+sha256 = "6e582022a5314a0666c5345fb90a9cc4c9a6799427e3124272301f0e0093c88b"
+reason = "a sealed declaration (its seal holds the sha); a seal is never edited"
+
+[[exempt]]
+path = "declarations/dial1118-s1-v4/intake-report.md"
+sha256 = "2579d93d4792dbd2e1db4053824685feaf8c4fc83c3a91dea5806c412c608ea9"
+reason = "a sealed declaration (its seal holds the sha); a seal is never edited"
+
+[[exempt]]
+path = "declarations/dial1118-s1-v5/SEAL.json"
+sha256 = "913dba6b85fe98e3789d299100a50d37321f53095bf6ccd82e0b9ed20703dad4"
+reason = "a sealed declaration (its seal holds the sha); a seal is never edited"
+
+[[exempt]]
+path = "declarations/dial1118-s1-v5/intake-report.md"
+sha256 = "881e62a0accbd89f44cd3ea08daac030dc02a25c6d394ea535841d464e427fa9"
+reason = "a sealed declaration (its seal holds the sha); a seal is never edited"
+
+[[exempt]]
+path = "declarations/dial1118-s1/SEAL.json"
+sha256 = "267d736ebb96ef5d6713ba91b576019b1cea4b9905c9cbfad8dd2826486e0c3f"
+reason = "a sealed declaration (its seal holds the sha); a seal is never edited"
+
+[[exempt]]
+path = "declarations/dial1118-s1/intake-report.md"
+sha256 = "d3143a7640dfe65c368d3999101b71e886923d1af32beda7acdb458ea5d2d492"
+reason = "a sealed declaration (its seal holds the sha); a seal is never edited"
+
+[[exempt]]
+path = "expected/v04-rules.toml"
+sha256 = "129f2e2b6e48c495b019c51add5cea61978472132a5b42050b55a96b4e33ad91"
+reason = "pinned by benchmark/MANIFEST.toml; exempt by sha in plan 1639 D4 as well"
+
+[[exempt]]
+path = "expected/v05-rules.toml"
+sha256 = "8674577ec6fd3cd14dbe1d9b95a9518dae07db9731aafad920bcab38f7cef6bc"
+reason = "pinned by benchmark/MANIFEST.toml; exempt by sha in plan 1639 D4 as well"
+
+[[exempt]]
+path = "expected/v06-rules.toml"
+sha256 = "c1693be7228c0028ed31c38eaa6551e1b4e514fb36a787b6b76d2cd4bb6c7a32"
+reason = "pinned by benchmark/MANIFEST.toml; exempt by sha in plan 1639 D4 as well"
+
+[[exempt]]
+path = "expected/v07-rules.toml"
+sha256 = "99fa66dc924afeeb2054903ad6874f31c84e11d1de696e57eedf645fb53be979"
+reason = "pinned by benchmark/MANIFEST.toml; exempt by sha in plan 1639 D4 as well"
+
+[[exempt]]
+path = "release/get-sweep.toml"
+sha256 = "1c2e5d67fc9a2d2a0f4b44c613c5b0fc9696bf93c2169b67e7497687a46e2401"
+reason = "string values of the table the dispatch sweep pins; an edit changes the table, not a comment"
+
+[[exempt]]
+path = "release/get_sweep.py"
+sha256 = "ead2098c63b1de27ad20a39d33f640d169076d6c3efa327b3533bf9b502e37bc"
+reason = "string values of the table the dispatch sweep pins; an edit changes the table, not a comment"
+
+[[exempt]]
+path = "tests/navigator/conftest.py"
+sha256 = "c2748ab8970529521080dd66b3dd27622ae255ae3491a00d94c7dd5f04f48ab4"
+reason = "a string value in code, not a comment or docstring: an AST-changing edit is outside plan 1640; the reviewer rules"
+
+[[exempt]]
+path = "tests/tau_1282_rung0.py"
+sha256 = "8bc6cf61d1fd5adc53560ea2da9c83ae035968874b0445e560d9e11fa02325e1"
+reason = "a string value in code, not a comment or docstring: an AST-changing edit is outside plan 1640; the reviewer rules"
+
+[[exempt]]
+path = "tests/test_dist.py"
+sha256 = "797caf2d75732ccae46b50b9322fbf5557de0f2371dc9b55b81087f73d7c8a76"
+reason = "plan 1639's test, not edited by plan 1640; it names the words it forbids"
+
+[[exempt]]
+path = "tests/test_navfamily.py"
+sha256 = "e4dca317c52d868936ade71b1064fed87622570c5d56eec9f0d61fc32b36b248"
+reason = "a string value in code, not a comment or docstring: an AST-changing edit is outside plan 1640; the reviewer rules"
+
+[[exempt]]
+path = "tests/test_wheel.py"
+sha256 = "2ff41314104732f66a238b89442328ef5a14944ce1b5648741f3b346ab321e6b"
+reason = "plan 1639's test, not edited by plan 1640; it names the words it forbids"
+
+[[exempt]]
+path = "vendor/toolset/intake.py"
+sha256 = "1dbce0292986c34b117713d02ee2a9c86814133b1fc2f1430d3ee13ef730f121"
+reason = "vendored verbatim and byte-pinned by vendor/toolset/PIN.toml"
+
+[[exempt]]
+path = "vendor/toolset/t23.py"
+sha256 = "65b7c79401931b6bec9d3cf7673dc45a2195514611ea6c07380ab9de01655c34"
+reason = "vendored verbatim and byte-pinned by vendor/toolset/PIN.toml"

@@ -1,6 +1,6 @@
 """Plan 1535 - the needle player v2 (contract/SCHEMA-1535.md): four new controls, the plot names, the script's text.
-FROZEN: the Generator makes this green; it does not edit it. The 23 tests of plan 1531 stay green beside it, unedited.
-No JavaScript runs here: what the controls DO is the Auditor's browser check.
+FROZEN: the implementer makes this green; it does not edit it. The 23 tests of plan 1531 stay green beside it, unedited.
+No JavaScript runs here: what the controls DO is the reviewer's browser check.
 
 Run:  python contract/test_needleplayer_v2.py   (or pytest)
 """

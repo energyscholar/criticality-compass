@@ -82,7 +82,7 @@ None of the five holds a role name, an update-rule name, `CLOCK`/`TIME_LABEL`, o
   Any other kind, a missing kind, or a key outside the kind's set is `Malformed` (p09).
 - **Critical value.** `K_c(index) = plugin.critical_K() - dK(index)` on a continuous world and `None` otherwise (p08). A
   truth row's `K_c` is taken at the row's index; a point's `K_c` is `[K_c(window[0]), K_c(window[1])]` (p08 checks both
-  ends). *Structure note, reviewed by the Auditor and not tested:* the choice is a table keyed on the transition (`_K_C`),
+  ends). *Structure note, reviewed by the plan's reviewer and not tested:* the choice is a table keyed on the transition (`_K_C`),
   not an `if`.
 - **Reading.** One reading at a position samples `S` configurations: `n_eq` sweeps first, then `skip` sweeps before each
   sample. On each sample it computes `_, msum, a, q = plugin.observe(s, nlev)`, with `m = msum / L²`.
@@ -94,7 +94,7 @@ None of the five holds a role name, an update-rule name, `CLOCK`/`TIME_LABEL`, o
   `measure_moments` at the same K and seed (dU4 = U4[1] − U4[0]; chi and chi_err exactly). With a dK it is the blind face
   at K + dK. Under a linear drift and under a step drift the values **and both errors** equal a direct loop within rel 1e-9
 (p07). That is the declared tolerance:
-  it is the only place where a Generator's float order may differ.
+  it is the only place where an implementer's float order may differ.
 
 ## 5. One jackknife
 
@@ -177,7 +177,7 @@ K_c − 20 on R1. `environment/hold-score-ising.toml` holds exactly `offset_K = 
 copy of these three values and scores every Ising run with that copy.
 
 **Registry (plan 1569).** Seeds 500–599 are 1569's. Recon 500–519; Part A acceptance 520–544 (never used before the
-acceptance); the planner's wiring run of the acceptance client 570–594 (burned as recon, cold audit M3); free for Part B
+acceptance); the plan author's wiring run of the acceptance client 570–594 (burned as recon, cold audit M3); free for Part B
 recon 545–569 and 595–599. Part B's scored and retry seeds lie outside this block and are requested from the
 registry owner (plan 1569 Phase 4). Ports: the block **10400–10499** (the acceptance client uses 10400–10463),
 disjoint from 1568's 9900–9908, 9960–9983, 10100–10144, 10200–10219 and 10300–10309 (SCHEMA-1568 §9). The shipped

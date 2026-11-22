@@ -1,6 +1,6 @@
 """Plan 1569 — Compass stage 4: the 2-D Ising System on the SAME blind face (the apparatus wire of plan 1545), carried by its
 declaration and by nothing in `navigator/` (contract/SCHEMA-1569.md). Launches the REAL apparatus server and the REAL
-orchestrator. FROZEN: the Generator makes this green; it does not edit this file.
+orchestrator. FROZEN: the implementer makes this green; it does not edit this file.
 
 What it pins:
   p01  the Engine face: every plugin the apparatus host serves exports the names of SCHEMA-1569 section 2, and the host
@@ -66,7 +66,7 @@ AT_WORLD = {"L_blocks": 3, "burn": 5, "seed": 7, "k": 2, "nlev": 2, "index_unit"
 AT_SEQUENCE = [{"op": "declare"}, {"op": "read", **RQ}, {"op": "nudge", "d": [7], **RQ},
                {"op": "nudge", "d": [-32], "n_eq": 2, "S": 41, "skip": 2}, {"op": "scan", "ticks": [[100], [900], [410]], **RQ},
                {"op": "read", "n_eq": 0, "S": 40, "skip": 1}, {"op": "nudge", "d": [40], **RQ}, {"op": "read", "n_eq": 3, "S": 39, "skip": 1}]
-# ---- pinned at base 4df8a87 (the Auditor re-pins at the real base in a dated section of the plan before handoff) ----
+# ---- pinned at base 4df8a87 (the reviewer re-pins at the real base in a dated section of the plan before handoff) ----
 AT_BYTES = "658f7d53f2d69521bfdc09cfe5480dcf13cffefdb0e8fe59503ac93ed482b3d8"
 TREE_PINS = "1afc8bb5734b45cb864c4720db836a5dca02c30e7b19cc1f7068db26a3800d94"
 HOST = ("environment/apparatus_wire.py", "environment/apparatus_server.py", "environment/apparatus_config.py",

@@ -1,6 +1,6 @@
 """test_budget - the plumbing line budget (plan 0863 appendix 13; plan 0870 P-1: Origin declaration Q7 as corrected 2026-10-03).
 Counts non-blank lines of every plumbing file in checks.toml, minus the verbatim copies; CAP = 5031. Tests are
-printed, never capped. Raising CAP is the Auditor's planned edit, never the Generator's.
+printed, never capped. Raising CAP is the reviewer's planned edit, never the implementer's.
 Plan 1145: the intake pipeline (checks.toml [roles] intake) has its own role and its own cap, INTAKE_CAP = 1200 non-blank lines
 (1145 measured 1023 at the end of phase 1); it is no longer counted in plumbing.
 Plan 1639: release/*.py is the role release, RELEASE_CAP = 250. Seen RED: RELEASE_CAP made 10 (the cap assert FAILS); release/handoff_check.py also listed under plumbing (the disjointness assert FAILS).
@@ -31,22 +31,22 @@ Plan 1282 P1a: the sampler adapter (cc/sampler.py) is the role sampler, SAMPLER_
 Seen RED: SAMPLER_CAP made 10 (the cap assert FAILS); cc/sampler.py also listed under plumbing (the disjointness assert FAILS).
 Plan 1282 P1c: the seal refusals (cc/seal_reach.py) are the role seal_reach, SEAL_REACH_CAP = 120, disjoint from every other role, host and sampler included.
 Seen RED: SEAL_REACH_CAP made 10 (the cap assert FAILS); cc/seal_reach.py also listed under plumbing (the disjointness assert FAILS).
-Plan 1335: CAP 5000 -> 5030 (Auditor-authorised; macOS platform table). Seen RED: at CAP 5000 after edits 1-3 the cap assert FAILS.
+Plan 1335: CAP 5000 -> 5030 (reviewer-authorised; macOS platform table). Seen RED: at CAP 5000 after edits 1-3 the cap assert FAILS.
 Plan 1282 P1b: CAP 5030 -> 5031 (owner-granted up to +4; the door's one call into cc/sampler.py for the L check). Seen RED: at CAP 5030 after the edit the cap assert FAILS.
 Plan 1282 P2a: R-P2.1, CAP 5031 -> 5034 (owner-ruled at most 5034: the couplings no-[data] finding in cc/declare.py and the import of the one instrument loader in
 cc/schema.py and cc/detect.py). The loader (cc/instrument_decl.py) is the role instrument_decl, INSTRUMENT_DECL_CAP = 20, disjoint from every other role.
 Seen RED: at CAP 5031 after the edits the cap assert FAILS; INSTRUMENT_DECL_CAP made 10 (the cap assert FAILS).
-Plan 1427 P1: CORE_CAP 1240 -> 1248 (Auditor-authorised; homes of D3/D4/D9 in intake_blind/intake_seal; the plan is net-negative overall). Seen RED: at 1240 after P1 the cap assert FAILS.
-Plan 1427 P3: CORE_CAP 1248 -> 1249 (Auditor-authorised; `import registry` in the intake modules that hashed a file). Seen RED: at 1248 after P3 the cap assert FAILS (p3-budget-red.txt).
-Plan 1427 P4: CAP 5034 -> 5036 (Auditor-authorised; positional, input_path, gen-verdicts on schema.row_lines). Seen RED: at 5034 after P4 the cap assert FAILS (5035 of 5034, p4-budget-red.txt).
-Plan 1634: CAP 5046 -> 5066 (Auditor-authorised; compass hold help lines + cmd_hold). Seen RED: at CAP 5046 after the bin/cc edit the cap assert FAILS (5051 of 5046).
+Plan 1427 P1: CORE_CAP 1240 -> 1248 (reviewer-authorised; homes of D3/D4/D9 in intake_blind/intake_seal; the plan is net-negative overall). Seen RED: at 1240 after P1 the cap assert FAILS.
+Plan 1427 P3: CORE_CAP 1248 -> 1249 (reviewer-authorised; `import registry` in the intake modules that hashed a file). Seen RED: at 1248 after P3 the cap assert FAILS (p3-budget-red.txt).
+Plan 1427 P4: CAP 5034 -> 5036 (reviewer-authorised; positional, input_path, gen-verdicts on schema.row_lines). Seen RED: at 5034 after P4 the cap assert FAILS (5035 of 5034, p4-budget-red.txt).
+Plan 1634: CAP 5046 -> 5066 (reviewer-authorised; compass hold help lines + cmd_hold). Seen RED: at CAP 5046 after the bin/cc edit the cap assert FAILS (5051 of 5046).
 Plan 1634: the manual-run driver (manual/*.py) is the role manual, MANUAL_CAP = 400; no cap rises. Seen RED: MANUAL_CAP made 10 (the cap assert FAILS); manual/hold.py also listed under plumbing (the disjointness assert FAILS).
 Plan 1640: release/public_scan.py is the role public, PUBLIC_CAP = 220; no cap rises. Seen RED: PUBLIC_CAP made 0 (the cap assert FAILS: 1 > 0); release/public_scan.py also listed under plumbing (the disjointness assert FAILS)."""
 import tomllib
 from pathlib import Path
 
 CAP = 5066   # plan 1634: was 5046. plan 1559: was 5043. plan 1427 P9: was 5036. plan 1427 P4: was 5034. plan 1282 P2a: R-P2.1
-CORE_CAP = 1250   # plan 1427 P9: was 1249 (registry.config import and the moved git head land in the core). plan 1427 P3: was 1248. plan 1427 P1: was 1240. plan 1205 P1 (Auditor): +40 for the hdf5-table-v1 reader. plan 1164: was INTAKE_CAP over the one role intake; now the sum over the roles of CORE, the core split by invariant
+CORE_CAP = 1250   # plan 1427 P9: was 1249 (registry.config import and the moved git head land in the core). plan 1427 P3: was 1248. plan 1427 P1: was 1240. plan 1205 P1 (reviewer): +40 for the hdf5-table-v1 reader. plan 1164: was INTAKE_CAP over the one role intake; now the sum over the roles of CORE, the core split by invariant
 CORE = {"intake": 100, "intake_fold": 160, "intake_evidence": 150, "intake_bytes": 100, "intake_census": 140, "intake_say": 100,   # plan 1164: role -> cap
         "intake_blind": 200, "intake_seal": 160, "intake_read": 215}   # (BLOAT-REVIEW 1160 section 4, Layout C)
 HANDOFF_CAP = 900   # plan 1160 P3: checks.toml [roles] intake_handoff, the conversion and peek (cc/intake_convert.py)
@@ -55,7 +55,7 @@ NAMES_CAP = 120
 FEASIBLE_CAP = 120   # plan 1160 P5: checks.toml [roles] intake_feasible, S7, S8 and S9 (cc/intake_feasible.py), so INTAKE_CAP is not raised   # plan 1160 P2: checks.toml [roles] intake_names, the name classifier and Detail, moved out of the intake so INTAKE_CAP is not raised
 BLINDVIEW_CAP = 80   # plan 1160 A41: checks.toml [roles] intake_blindview, `bin/cc intake blind` (cc/intake_blindview.py), so CORE_CAP is not raised
 DIFFERS_CAP = 60   # plan 1160 A34: checks.toml [roles] intake_differs, what a file differs from the first in (cc/intake_differs.py), so CORE_CAP is not raised
-AGAINST_CAP = 85   # plan 1205 P1 (Auditor): +5 for the 8 hdf5 reader codes. plan 1165 D5: checks.toml [roles] intake_against, the cross-check split from intake_profile (cc/intake_against.py)
+AGAINST_CAP = 85   # plan 1205 P1 (reviewer): +5 for the 8 hdf5 reader codes. plan 1165 D5: checks.toml [roles] intake_against, the cross-check split from intake_profile (cc/intake_against.py)
 FINDINGS_CAP = 160   # plan 1165 fix S11.P2b F3: checks.toml [roles] intake_findings, the findings table split from intake_profile (cc/intake_findings.py)
 PROFILE_CAP = 320   # plan 1165 D5: checks.toml [roles] intake_profile, `bin/cc intake profile` (cc/intake_profile.py), so CORE_CAP is not raised
 NEW_CAP = 60   # plan 1164: checks.toml [roles] intake_new, `bin/cc new intake` (cc/intake_new.py), moved out of the intake

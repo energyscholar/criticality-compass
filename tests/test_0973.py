@@ -1,4 +1,4 @@
-"""test_0973 - plan 0973: the structure-not-control cruft fixes (Fable #4 F1-F8). One section per phase; each section's mutation (its RED) is named in the commit message.
+"""test_0973 - plan 0973: the structure-not-control cruft fixes (external review #4 F1-F8). One section per phase; each section's mutation (its RED) is named in the commit message.
 F8: a ValueError that is a defect (not a declared refusal) must propagate out of bin/cc run_one; only detect.Refused is refusal text."""
 import sys
 from pathlib import Path

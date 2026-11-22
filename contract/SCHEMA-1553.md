@@ -16,7 +16,7 @@ A reading is **mid-move** when the position in force changed, or was not yet the
 | `environment/dial.py` | NEW: the delay line (§2). Pure; imports only `dataclasses`. |
 | `environment/apparatus_wire.py` | EDITED: the door rule (§3) |
 | `system-instantiated/plugins/at/apparatus.py` | EDITED: the engine reads the dial from the delay line (§2, §4); the truth row (§5) |
-| `contract/test_apparatus_wire.py` | EDITED by the Auditor (plan 1553 lists every edit); frozen again |
+| `contract/test_apparatus_wire.py` | EDITED by the reviewer (plan 1553 lists every edit); frozen again |
 | `contract/test_apparatus_midmove.py`, `contract/SCHEMA-1553.md` | NEW, frozen |
 | `checks.toml` | EDITED: one line declares the new test |
 

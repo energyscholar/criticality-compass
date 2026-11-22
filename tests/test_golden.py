@@ -6,7 +6,7 @@ directory, or a file's sha256; a directory that was listed by its sorted entries
 plant sources and of this harness. An equal key means the same function of the same inputs: the transcript is not run and the line
 reads `ok ... (keyed)`. Anything else runs the command and compares bytes, as before.
 CC_REGOLDEN=1 (bin/cc test --regolden) runs every transcript traced, rewrites the differing or missing ones (REGOLDENED) and the
-read sets that moved (REKEYED), and never deletes. CC_UNKEYED=1 runs every transcript and compares bytes (the Auditor's gate)."""
+read sets that moved (REKEYED), and never deletes. CC_UNKEYED=1 runs every transcript and compares bytes (the reviewer's gate)."""
 import difflib
 import fnmatch
 import hashlib

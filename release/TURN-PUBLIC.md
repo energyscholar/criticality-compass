@@ -2,8 +2,9 @@
 
 The owner runs every step. Nothing here is run by a script on its own, and nothing is pushed before step 4. Placeholders: `<private-origin>` (the private bare repository), `<out>` (a new directory), `<gh-remote>` (the GitHub remote of the new repository). No host, user or path is written in this file.
 
+
 0. Run `release/turn-public-check.sh`. Only rows marked `owner-gated` may be open.
-1. In GitHub, Settings, Emails, read the noreply address. If it is `<id>+energyscholar@users.noreply.github.com` and not the older form `energyscholar@users.noreply.github.com`, say so: the one constant in `release/public-rewrite.sh` changes and the rehearsal is run again before step 2.
+1. In GitHub, Settings, Emails, read the noreply address. If it carries a numeric id prefix before the owner's name (the form `<id>+<owner>`) and is not the older form with no prefix, say so: the one constant in `release/public-rewrite.sh` changes and the rehearsal is run again before step 2.
 2. Rewrite a copy, then verify it:
    - `release/public-rewrite.sh --origin <private-origin> --out <out>`
    - `release/public-verify.sh <out> <private-origin>` must exit 0 (checks V1 to V8).

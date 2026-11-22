@@ -40,7 +40,7 @@ screen is a class, never a style the script sets; and time still comes only from
 
 The style sheet contains `#player.fs-on` with `position:fixed`, and `:root.fs-on`.
 
-## The script — behaviour (required; checked by the Auditor in a browser, no JavaScript runs in the tests)
+## The script — behaviour (required; checked by the reviewer in a browser, no JavaScript runs in the tests)
 Everything in SCHEMA-1531 "Behaviour" holds when the four new controls are untouched. With them:
 
 - **Pace.** With `s` = the value of `#speed`: a step lasts `data-step-ms / s` and play waits `data-play-ms / s`

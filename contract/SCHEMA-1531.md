@@ -208,7 +208,7 @@ Tested on its text:
 - it contains `data-key`, `prefers-reduced-motion`, `data-step-ms`, `data-play-ms`, `requestAnimationFrame`,
   `cloneNode`, `addEventListener`, `hidden`.
 
-**Behaviour** (required; no JavaScript runs in the tests, the Auditor checks it in a browser at acceptance):
+**Behaviour** (required; no JavaScript runs in the tests, the reviewer checks it in a browser at acceptance):
 - On load: the first world is chosen, its run selector is the only one shown, its first run's section is the only one
   shown, and round 1's body is the only body shown. A run with no round (a floor refusal, an unreadable input) shows its
   section with no body; the scrubber is disabled and `#pos` says so.

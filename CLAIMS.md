@@ -6,6 +6,8 @@ Status words: **blind** = predictions stamped before the data were read, scored 
 
 Evidence cells read root:path@sha256 (in code font). `cc:` is this repository; `toolset:` is the study checkout that produced the data (CC_TOOLSET, else the parent of CC_DATA_ROOT).
 
+The `toolset:` cells name files in the author's private research repository, by sha256, so that a later deposit of those files can be checked against them; the files are not public, and a reader without them cannot resolve those cells.
+
 ## Claims
 
 | class | status | dataset | what is claimed | evidence |

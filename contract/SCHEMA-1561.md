@@ -4,7 +4,7 @@ Frozen by plan 1561 before any implementation. It adds two drift laws to plan 15
 drift-world ladders, a pure scorer of a moving crossing, a pure breakpoint table, and a reader that writes one report
 over finished runs. Nothing here runs the apparatus or the needle: runs are made by plan 1552's own orchestrator
 (`python -m environment.run_hold`), one per rung, and read afterwards. **Making the runs is out of scope**: no runner is
-shipped; the Auditor's acceptance makes them (materialise, write the world beside a copy of the plugin directory, one
+shipped; the reviewer's acceptance makes them (materialise, write the world beside a copy of the plugin directory, one
 `run_hold` per rung), and the report checks each run's own `config.json` against the name it was filed under (§5).
 
 Words: a **world** is one apparatus world table (SCHEMA-1545 §2). A **rung** is the base world with a few keys
@@ -22,8 +22,8 @@ is a table keyed on the needle shape (§4); the shape is part of "made as named"
 | file | NEW / EDITED | holds |
 |---|---|---|
 | `environment/drift.py` | EDITED (plan 1545's) | two more laws, `ramp-then-rest` and `walk` (§2). The four older laws are unchanged |
-| `contract/test_apparatus_drift.py` | EDITED by the Auditor (line 45 only) | the law tuple now has six names |
-| `contract/test_apparatus_midmove.py` | EDITED by the Auditor (lines 110–111 only) | the new sha of the drift test; `drift.py` is no longer pinned |
+| `contract/test_apparatus_drift.py` | EDITED by the reviewer (line 45 only) | the law tuple now has six names |
+| `contract/test_apparatus_midmove.py` | EDITED by the reviewer (lines 110–111 only) | the new sha of the drift test; `drift.py` is no longer pinned |
 | `environment/drift_worlds.py` | NEW | `parse_worlds`, `materialise`, `to_toml`, `ladder` (§3) |
 | `system-instantiated/plugins/at/drift-worlds.toml` | NEW | the declared ladders (§3.3) |
 | `environment/drift_score.py` | NEW | `cycle`, `motion`, `rung_class`, `breakpoint`, `Break` (§4) |
@@ -112,7 +112,7 @@ last bit (`repr`), a float stays a float (`1.0`, not `1`), and a string with quo
 ### 3.3 The declared ladders (`system-instantiated/plugins/at/drift-worlds.toml`, `base = "at-apparatus.toml"`)
 
 Every rung of every ladder, materialised with any run seed, is a world `parse_world` accepts. The table below IS the
-file's content; the Generator writes it, and `test_drift_worlds.py` w05 compares every rung with an independent
+file's content; the implementer writes it, and `test_drift_worlds.py` w05 compares every rung with an independent
 statement of this table (the file's bytes are not pinned). In L4 units; ticks are the dial's (0.00025 in K); `dK_c/dL4` is about −0.60 to −0.66 over L4 0.06–0.14, so 0.004
 in L4 is about 10 ticks. All ladders stay inside L4 0.06–0.14 (the range `offset_K` was set in, plan 1552 F6) except
 the walk, which reaches 0.156.

@@ -1,4 +1,4 @@
-"""test_registry - plan 1016: the registry gate (cc/registry.py, the ONE reader of registry.toml). Five tests of the draft (s3) and the table cells of Argus rulings R1-R3.
+"""test_registry - plan 1016: the registry gate (cc/registry.py, the ONE reader of registry.toml). Five tests of the draft (s3) and the table cells of reviewer rulings R1-R3.
 Each runs in a scratch copy of cc/, instruments/, cc.toml and a fixture registry.toml, in a subprocess, so no module of the live tree is imported or mutated.
   1. an unregistered id refuses: a built-not-registered row reads Refuse "mechanism not yet available", imports no module, and the run gate refuses before any reuse or measurement
   2. a registered-partial id carries its scope into the report lines

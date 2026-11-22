@@ -94,7 +94,7 @@ check = "tests/test_dist.py#T9 METADATA: version 0.1.0"
 [[row]]
 id = "O1"
 state = "owner-gated"
-ruling = "Reserve now as a minimal 0.0.1 stub (Auditor's spike). A bare pip install on 2026-11-21 listed 0.0.1 as an available version."
+ruling = "Reserve now as a minimal 0.0.1 stub (the reviewer's spike). A bare pip install on 2026-11-21 listed 0.0.1 as an available version."
 check = ""
 
 [[row]]
@@ -124,7 +124,7 @@ check = "tests/test_dist.py#T12 NOTICE, README and CITATION.cff"
 [[row]]
 id = "stub-0.0.1-uploaded"
 state = "owner-gated"
-ruling = "The index lists 0.0.1 (seen by the Generator, 2026-11-21); the Auditor confirms it is the stub."
+ruling = "The index lists 0.0.1 (seen by the implementer, 2026-11-21); the reviewer confirms it is the stub."
 check = ""
 
 [[row]]
@@ -178,7 +178,7 @@ check = "file:cleanroom-linux.txt"
 [[row]]
 id = "a2-section4-list-ruled"
 state = "owner-gated"
-ruling = "DECLARED by G-1639: the two convention-not-necessity items of docs/READING-THE-CODE.md section 4 (the bool-keyed EXT, the print-or-0 dispatch) are style, left as they are; replacing them with plain code is a follow-on outside plan 1639, not done. The Auditor rules."
+ruling = "DECLARED by G-1639: the two convention-not-necessity items of docs/READING-THE-CODE.md section 4 (the bool-keyed EXT, the print-or-0 dispatch) are style, left as they are; replacing them with plain code is a follow-on outside plan 1639, not done. The reviewer rules."
 check = ""
 
 [[row]]

@@ -2,7 +2,7 @@
 STANDING of a number, never the number. For k4-m1-ch and x4-ising-field-ch under v10-rules a fresh measure equals the result stored at
 1066c43 in every key and nested value but the run's provenance fields (run_id, code_commit, code_hash, measure_hash, data_root_source,
 peak_rss_mb, peak_rss_why, read), each pin's toolset `commit` (pins is run provenance stamped by bin/cc, never by detect.run) and the new `standing`, which must say "declared report" for every comparison and the declared provenance
-for control. Seen RED on 1066c43 (no `standing` key) by the Auditor on the data host (plan 1337 P-2)."""
+for control. Seen RED on 1066c43 (no `standing` key) by the reviewer on the data host (plan 1337 P-2)."""
 import json
 import subprocess
 import sys

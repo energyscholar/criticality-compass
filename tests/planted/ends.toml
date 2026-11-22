@@ -282,7 +282,7 @@ class = "LINE"
 end_point = ["b"]
 end_bracket = [["b", "d"]]
 
-# ---- plan 0871 G3 / G4 (Auditor decisions): the boundary is the end of the MID run that extends outward from the interior; a LINE with no readable end is a LINE
+# ---- plan 0871 G3 / G4 (reviewer decisions): the boundary is the end of the MID run that extends outward from the interior; a LINE with no readable end is a LINE
 
 [[plant]]
 name = "G3: [interior LINE | MID, MID | DIS]: the boundary is the SECOND MID (the end of the run), the beyond point the sink"

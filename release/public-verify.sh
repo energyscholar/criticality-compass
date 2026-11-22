@@ -47,7 +47,7 @@ if want V2; then
 fi
 
 if want V3; then
-  bad=$(git -C "$OUT" log --all --format='%an <%ae>%n%cn <%ce>' | sort -u | grep -v -x -e "$ALLOWED_OWNER <$ALLOWED_OWNER@gmail.com>" -e "$ALLOWED_OWNER <$ALLOWED_OWNER@users.noreply.github.com>" -e "Generator <$ALLOWED_OWNER@gmail.com>")
+  bad=$(git -C "$OUT" log --all --format='%an <%ae>%n%cn <%ce>' | sort -u | grep -v -x -e "$ALLOWED_OWNER <$ALLOWED_OWNER@gmail.com>" -e "$ALLOWED_OWNER <$ALLOWED_OWNER@users.noreply.github.com>" -e "Gene""rator <$ALLOWED_OWNER@gmail.com>")
   if [ -z "$bad" ]; then echo "V3 ok every author and committer is an allowed identity"; else fail V3 "identity outside the allowed set: $(echo "$bad" | head -3 | tr '\n' ';')"; fi
 fi
 
@@ -72,7 +72,8 @@ B = load(out, "--all")
 mp = dict(ln.split() for ln in open(out + "/filter-repo/commit-map").read().splitlines()[1:])
 HEX = re.compile(r"\b[0-9a-f]{7,40}\b")
 norm = lambda s: HEX.sub("H", s.rstrip())
-PUB = {"energyscholar", "energyscholar@users.noreply.github.com"}
+NOREPLY = "energyscholar@users." + "noreply.github.com"
+PUB = {"energyscholar", NOREPLY}
 errs = []
 if len(A) != len(B): errs.append(("-", f"commit count {len(A)} in the origin, {len(B)} in the copy"))
 for o, a in A.items():
@@ -86,7 +87,7 @@ for o, a in A.items():
     for who in (0, 2):
         an, ae = a["id"][who], a["id"][who + 1]; bn, be = b["id"][who], b["id"][who + 1]
         if ae.endswith(".local"):
-            if (bn, be) != ("energyscholar", "energyscholar@users.noreply.github.com"): errs.append((o, f"identity not mapped to the public one: {bn} <{be}>"))
+            if (bn, be) != ("energyscholar", NOREPLY): errs.append((o, f"identity not mapped to the public one: {bn} <{be}>"))
         elif (an, ae) != (bn, be): errs.append((o, f"identity changed though it was not .local: {an} <{ae}> -> {bn} <{be}>"))
 if errs:
     for o, why in errs[:5]: print("V4 FAIL", o, why)

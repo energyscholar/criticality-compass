@@ -44,7 +44,7 @@ existing changed), `navigator/hold.py`, `navigator/holdrep.py`, `needlestream/re
 `environment/run_hold.py`. NEW: `navigator/setpoint-settled.toml`, `navigator/setpoint-settled-2.toml` (and no other
 `navigator/setpoint*.toml`). Contract (NEW, frozen): this file,
 `contract/test_hold_setpoint.py` and `contract/drift-band.json` (the band's input, plan 1561's `compass-drift-band/1`; at build
-time it holds plan 1558's own recon rows, and the Auditor replaces it with plan 1561's accepted table, §2.1). ⛔ No new module under `navigator/`: 1552's frozen h12 allows the needle's three modules to
+time it holds plan 1558's own recon rows, and the reviewer replaces it with plan 1561's accepted table, §2.1). ⛔ No new module under `navigator/`: 1552's frozen h12 allows the needle's three modules to
 import only `hold, holdtab, holdrep, reader, report2, steer` from navigator. ⛔ No file named `navigator/hold*.toml` (h19).
 
 ## 2. Shapes: one settings table per shape, a sum type

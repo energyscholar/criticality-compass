@@ -28,8 +28,7 @@ PYEOF
 if [ "${1:-}" = "--list" ]; then echo "$SETS"; exit 0; fi
 echo "$SETS" | grep '^SKIPPED '
 STEMS=$(echo "$SETS" | sed -n 's/^RUN //p' | tr '\n' ' ')
-NCPU=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 2)
-CC_SLOTS=$(mktemp -d "${TMPDIR:-/tmp}/cc-slots.XXXXXX"); CC_JOBS=${CC_JOBS:-$NCPU}   # the runner's cores unless the caller caps it
+CC_SLOTS=$(mktemp -d "${TMPDIR:-/tmp}/cc-slots.XXXXXX"); CC_JOBS=${CC_JOBS:-2}   # two workers unless the caller says more: the 2-core limit of the hosts the suite is measured on (plan 1640 F3)
 export CC_SLOTS CC_JOBS
 trap 'rm -rf "$CC_SLOTS"' EXIT
 cd "$ROOT"
