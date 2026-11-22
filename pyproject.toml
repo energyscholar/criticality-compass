@@ -9,7 +9,7 @@ name = "criticality-compass"          # queue S5.5; unclaimed on PyPI 2026-10-09
 version = "1.0.0a0"
 description = "Criticality Compass: declared comparisons of sign cells of an ABR-kernel readout, a rulebook, and a stored result for every point."
 requires-python = ">=3.11"           # 3.9 is end-of-life; the stored results were made with numpy 2.4.4 (D-0929-1 iv)
-dependencies = ["numpy"]
+dependencies = ["numpy", "scipy"]   # plan 1634: `compass hold` imports scipy.sparse in the Ising and AT plugins; a wheel installed alone must run it
 license = { text = "Apache-2.0" }   # LICENSE + NOTICE at the repository root (queue S5.5)
 readme = "README.md"
 

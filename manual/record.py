@@ -9,7 +9,7 @@ from pathlib import Path
 SCHEMA = "compass-manual-run/1"
 STATUS = {0: "scored", 2: "refused", 1: "infrastructure-failure", "wall": "wall-clock"}   # keyed by the orchestrator's exit code; "wall" is the driver's kill
 UNKNOWN = "unknown-exit"
-EXIT = {"scored": 0, "refused": 2, "infrastructure-failure": 1, "wall-clock": 3, UNKNOWN: 1}   # the wrapper's exit codes
+EXIT = {"scored": 0, "refused": 2, "infrastructure-failure": 1, "wall-clock": 3, UNKNOWN: 1, "usage-error": 64}   # the wrapper's exit codes
 DIGEST_TREES = ("bin", "cc", "environment", "navigator", "needlestream", "common", "system-instantiated", "needle-settings", "manual")
 SCORE_FIELDS = ("outcome", "lock", "in_fraction", "rms_e_g", "mean_e", "hold_steps", "accuracy")
 
@@ -69,13 +69,24 @@ def write(rec, manifest):
     (rec / "run.json.sha256").write_text(f"{sha(rec / 'run.json')}  run.json\n")
 
 
+class Malformed(ValueError):
+    """run.json cannot be read as a manifest: REFUSED, not a crash."""
+
+
 def verify(rec):
-    """-> the list of problems (each names a file); empty means the record is as it was written."""
+    """-> the list of problems (each names a file); empty means the record is as it was written. Raises Malformed for a run.json that is not a manifest."""
     rec = Path(rec)
     if not (rec / "run.json").is_file() or not (rec / "run.json.sha256").is_file():
         return ["run.json: missing"]
     bad = [] if (rec / "run.json.sha256").read_text().split()[0] == sha(rec / "run.json") else ["run.json: sha256 does not match run.json.sha256"]
-    man = json.loads((rec / "run.json").read_text())
+    try:
+        man = json.loads((rec / "run.json").read_text())
+    except ValueError as e:
+        raise Malformed(f"run.json is not JSON: {e}") from e
+    if not isinstance(man, dict) or not isinstance(man.get("outputs"), list):
+        raise Malformed("run.json lists no outputs (a manifest has an `outputs` list)")
+    listed = {o["path"] for o in man["outputs"]}
+    bad += [f"{p.relative_to(rec).as_posix()}: in the record but not listed in run.json" for p in sorted(rec.rglob("*")) if p.is_file() and p.name not in ("run.json", "run.json.sha256") and p.relative_to(rec).as_posix() not in listed]
     for o in man["outputs"]:
         p = rec / o["path"]
         bad += [f"{o['path']}: missing"] if not p.is_file() else [f"{o['path']}: sha256 differs"] if sha(p) != o["sha256"] else []

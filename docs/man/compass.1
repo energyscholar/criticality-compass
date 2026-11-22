@@ -46,7 +46,21 @@ is refused (exit 2) and the message names the needles the system has.
 The command wraps
 .Dq python -m environment.run_hold
 and changes nothing in it.
-A run needs numpy and nothing else.
+A run needs numpy and scipy, and the wheel declares both.
+.Sh INSTALL
+Build the wheel from a clone and install it into a fresh virtual environment; pip brings numpy and scipy:
+.Bd -literal -offset indent
+$ python3 -m pip wheel --no-deps --no-build-isolation -w dist .
+$ python3 -m venv hold-venv
+$ hold-venv/bin/python -m pip install dist/criticality_compass-*.whl
+$ hold-venv/bin/compass hold --list
+.Ed
+.Pp
+The wheel carries the catalogue, the systems and the apparatus files, and installs this manual page as
+.Pa share/man/man1/compass.1
+under the environment's prefix.
+Outside a clone a record's git line reads
+.Dq not-a-clone .
 .Sh CATALOGUE
 .Nm
 .Cm hold
@@ -68,7 +82,7 @@ The one override.
 The command writes a copy of the world with this seed and runs the copy;
 the record says the seed was overridden.
 .It Fl -wall Ar SECONDS
-Wall-clock limit in seconds, 1800 by default.
+Wall-clock limit in seconds, greater than 0, 1800 by default.
 At the limit the run is stopped, nothing is left listening on its port, a record is still written, and the exit status is 3.
 .It Fl -out Ar DIR
 Where records go.
@@ -83,7 +97,12 @@ Print the resolved input and write nothing.
 Print the catalogue.
 .It Fl -verify Ar RECORD
 Recompute every hash a record lists.
-It names each file that is missing or differs and exits 1, or exits 0.
+It names each file that is missing, differs, or is in the record but not listed in
+.Pa run.json ,
+and exits 1; otherwise it prints "verified: every file matches run.json" and exits 0.
+A
+.Pa run.json
+that lists no outputs is refused (exit 2).
 .El
 .Sh ENVIRONMENT
 .Bl -tag -width Ds
@@ -127,9 +146,15 @@ was written, whatever the outcome.
 infrastructure-failure: the run could not be carried out.
 An exit code of the orchestrator that this table does not hold is recorded as unknown-exit and also exits 1.
 .It 2
-refused: the run was refused before it started, or no needle was named.
+refused: the run was refused before it started (no needle named, a world file with no top-level seed, a system with no tau file), no arguments were given (the usage is printed), or
+.Fl -verify
+was given a run.json that lists no outputs.
 .It 3
 wall-clock: the wall-clock limit stopped the run.
+.It 64
+usage-error: an option or argument the command does not take, or a
+.Fl -wall
+that is not greater than 0.
 .El
 .Pp
 .Fl -verify
@@ -154,7 +179,7 @@ Look at what a run would read, and write nothing:
 $ compass hold --dry ising production --needle settled
 INPUT
   system ising  world production  needle settled  seed 500 (from the world file)
-  env    environment/environment-apparatus-ising.toml  sha256 0ab0802582ae
+  world  system-instantiated/plugins/ising/ising-apparatus.toml  sha256 93587cb627b5
 …
   needle needle-settings/ising/hold-settled.toml  sha256 c2159cac0b3e
   needle params: needle_structure=hold-pair-v1 g=12 step=6 S=1500 n_eq=450
@@ -164,11 +189,17 @@ dry run: nothing written
 .Pp
 Run it.
 The lines marked with an ellipsis are left out here; the run printed 53 RUN lines.
+In the OUTPUT line,
+.Dv HORIZON
+means the run reached its horizon, lock=
+.Dv HELD
+that the lock was held at the end (
+.Dv LOST
+if it was not), and in_fraction the share of the hold steps inside the window.
 .Bd -literal -offset indent
 $ compass hold ising production --needle settled
 INPUT
   system ising  world production  needle settled  seed 500 (from the world file)
-  env    environment/environment-apparatus-ising.toml  sha256 0ab0802582ae
   world  system-instantiated/plugins/ising/ising-apparatus.toml  sha256 93587cb627b5
   needle needle-settings/ising/hold-settled.toml  sha256 c2159cac0b3e
   needle params: needle_structure=hold-pair-v1 g=12 step=6 S=1500 n_eq=450
@@ -216,4 +247,4 @@ The commands run, check and freeze need the external structure checker named by
 .Ev CC_STRUCTURE_CHECKS
 and refuse without it.
 .Sh SEE ALSO
-README.md (Run a system by hand; The first hour), HOWTO.md, TUTORIAL.md, docs/ARCHITECTURE.md (The hold path).
+README.md (Run a system by hand), docs/ARCHITECTURE.md (The hold path).

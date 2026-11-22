@@ -23,23 +23,48 @@ ELIDE = ("…", "...")
 READONLY = {
     ("README.md", "compass help", 0): None, ("README.md", "bin/cc help", 0): None, ("README.md", "bin/cc show b7-at-line", 0): None,
     ("README.md", "bin/cc explain w2-potts 5", 0): None, ("README.md", "bin/cc validate", 0): None,
-    ("README.md", "compass hold --list", 0): None, ("README.md", "compass hold --help", 0): None,
+    ("README.md", "compass hold --list", 0): None,
     ("HOWTO.md", "bin/cc help --advanced", 0): None, ("HOWTO.md", "bin/cc explain b7-at-line-2 0.14->0.21", 0): None, ("HOWTO.md", "bin/cc explain x7a-bc 1.0->1.5", 0): None,
     ("HOWTO.md", "bin/cc explain x5n-bilayer-2 0.0 --tables v04-rules", 0): None, ("HOWTO.md", "bin/cc show x2-xy-line-3 --tables v04-rules", 0): None,
     ("TUTORIAL.md", "bin/cc show w2-potts", 0): None, ("TUTORIAL.md", "bin/cc explain w2-potts 5", 0): None,
     ("man", "compass hold --list", 0): None, ("man", "compass hold --dry ising production --needle settled", 0): None,
-    ("man", "compass hold --help", 0): None,
+    ("man", "compass hold --verify compass-runs/<record>", 0): "verify",   # run on a record the test makes first
 }
-# A line starting `compass hold --verify RECORD` in the man page is run on a record the test makes first.
-STATE = "needs a rulebook or file an earlier step of the document made"
-NOT_RUN_OCC = {  # (document, command, n) of a command that is also READONLY elsewhere, or whose output depends on an earlier step
-    ("README.md", "bin/cc show b7-at-line", 1): STATE, ("HOWTO.md", "bin/cc validate", 0): STATE, ("HOWTO.md", "bin/cc validate", 1): STATE,
-    ("TUTORIAL.md", "bin/cc validate", 0): STATE, ("TUTORIAL.md", "bin/cc validate", 1): STATE,
-    ("HOWTO.md", "bin/cc validate --input b7-at-line-2 --tables nomem", 0): STATE, ("HOWTO.md", "bin/cc validate --mvt", 0): "runs minutes; a test of its own covers it",
+NOT_RUN = {  # every other command line of the documents, one by one: (document, command, n-th occurrence) -> why it is not run. A command in neither table FAILS the test.
+    ('README.md', 'compass hold ising production --needle settled', 0): 'runs a hold: minutes of compute',
+    ('README.md', 'bin/cc tables fork v01-rules my-rules', 0): 'writes a rulebook',
+    ('README.md', 'bin/cc run w2-potts --tables my-rules --dry', 0): 'measures; needs the data root',
+    ('README.md', 'bin/cc tables drop my-rules', 0): 'writes a rulebook',
+    ('README.md', 'bin/cc new case potts-q4', 0): 'writes a file',
+    ('HOWTO.md', 'bin/cc new case potts-q4', 0): 'writes a file',
+    ('HOWTO.md', 'bin/cc new input w2b --like w2-potts --points 6,7', 0): 'writes a file',
+    ('HOWTO.md', 'bin/cc new input b7c --like b7-at-line --add-instrument along', 0): 'writes a file',
+    ('HOWTO.md', 'bin/cc data add w2-potts', 0): 'pins data files',
+    ('HOWTO.md', 'bin/cc tables split mine --column two_start --value UNRES --verdict REFUSE-EQUIL', 0): 'writes a rulebook',
+    ('HOWTO.md', 'bin/cc tables drop v01-rules', 0): 'writes a rulebook',
+    ('HOWTO.md', 'bin/cc reverdict w2-potts --tables rv', 0): 'needs a stored result and a rulebook of an earlier step',
+    ('HOWTO.md', 'bin/cc reverdict b7-at-line-2 --tables rv', 0): 'needs a stored result and a rulebook of an earlier step',
+    ('HOWTO.md', 'bin/cc validate --input b7-at-line-2 --tables nomem', 0): 'needs a rulebook or file an earlier step of the document made',
+    ('HOWTO.md', 'bin/cc new family b7-demo', 0): 'writes a file',
+    ('HOWTO.md', 'bin/cc family x7a-bc-lambda', 0): 'measures; needs the data root',
+    ('HOWTO.md', 'bin/cc family x2b-xy --tables v05-rules', 0): 'measures; needs the data root',
+    ('HOWTO.md', 'bin/cc new instrument foo', 0): 'writes a file',
+    ('HOWTO.md', 'bin/cc tabulate --diff verdict-x-rules v01-rules', 0): 'writes SIGNATURE-TABLE.md',
+    ('HOWTO.md', 'bin/cc run w2-potts --tables verdict-x-rules', 0): 'measures; needs the data root',
+    ('HOWTO.md', 'bin/cc freeze w2-potts@verdict-x-rules', 0): 'writes read-only files; needs the structure checker',
+    ('HOWTO.md', 'bin/cc tabulate', 0): 'writes SIGNATURE-TABLE.md',
+    ('HOWTO.md', 'bin/cc tabulate --diff v01-rules scratch', 0): 'writes SIGNATURE-TABLE.md',
+    ('HOWTO.md', 'bin/cc validate --mvt', 0): 'runs minutes; a test of its own covers it',
+    ('HOWTO.md', 'bin/cc family x5n-g --tables v04-rules', 0): 'measures; needs the data root',
+    ('TUTORIAL.md', 'bin/cc tables fork v01-rules scratch', 0): 'writes a rulebook',
+    ('TUTORIAL.md', 'bin/cc run --all --tables scratch', 0): 'measures; needs the data root',
+    ('TUTORIAL.md', 'bin/cc tables drop scratch --with-results', 0): 'writes a rulebook',
+    ('TUTORIAL.md', 'bin/cc family b7-at-line-2', 0): 'measures; needs the data root',
+    ('man', 'compass hold ising production --needle settled', 0): 'runs a hold: minutes of compute',
+    ('HOWTO.md', 'bin/cc validate', 0): 'needs a rulebook or file an earlier step of the document made',
+    ('TUTORIAL.md', 'bin/cc validate', 0): 'needs a rulebook or file an earlier step of the document made',
+    ('TUTORIAL.md', 'bin/cc validate', 1): 'needs a rulebook or file an earlier step of the document made',
 }
-NOT_RUN_VERB = {"run": "measures; needs the data root", "new": "writes a file", "tables": "writes a rulebook", "data": "pins data files", "reverdict": "needs a stored result and a rulebook of an earlier step",
-                "freeze": "writes read-only files; needs the structure checker", "tabulate": "writes SIGNATURE-TABLE.md", "family": "measures; needs the data root", "validate": STATE,
-                "hold": "runs a hold: minutes of compute", "check": "runs every test", "navigate": "walks a stored map; needs the data root", "show": STATE, "explain": STATE}
 
 
 def cmd_args(cmd):
@@ -51,7 +76,7 @@ def run_cc(args, cwd=ROOT):
     out = [x.rstrip() for x in (r.stdout + r.stderr).split("\n")]
     while out and not out[-1]:
         out.pop()
-    return out
+    return r.returncode, out
 
 
 def man_text():
@@ -105,7 +130,7 @@ def section(text, name):
 
 def t10():
     text = man_text()
-    helped = {o for o in re.findall(r"--[a-z][a-z-]*", "\n".join(run_cc(["hold", "--help"])))} - {"--help"}
+    helped = {o for o in re.findall(r"--[a-z][a-z-]*", "\n".join(run_cc(["hold", "--help"])[1]))} - {"--help"}
     doc = {o for o in re.findall(r"--[a-z][a-z-]*", section(text, "OPTIONS"))} - {"--help"}
     check("T10 options: `compass hold --help` and the man page OPTIONS name the same options", bool(doc) and helped == doc, f"only in --help: {sorted(helped - doc)}; only in the man page: {sorted(doc - helped)}")
     sys.path.insert(0, str(ROOT))
@@ -116,7 +141,7 @@ def t10():
     except ImportError:
         codes, names = set(), set()
     ex = section(text, "EXIT STATUS")
-    doc_codes = set(re.findall(r"(?m)^\s+(\d)\s", ex))
+    doc_codes = set(re.findall(r"(?m)^\s+(\d+)\s", ex))
     check("T10 exit codes: the man page EXIT STATUS lists exactly the wrapper's codes", bool(codes) and doc_codes == codes, f"man {sorted(doc_codes)} vs wrapper {sorted(codes)}")
     check("T10 exit codes: every status word is named in EXIT STATUS", bool(names) and all(n in ex for n in names), str(sorted(n for n in names if n not in ex)))
 
@@ -133,30 +158,30 @@ def t11():
         items.append(("man", cmd, seen[cmd], shown))
         seen[cmd] += 1
     check("T11 the documents hold commands to check", len(items) > 20, str(len(items)))
-    both = [k for k in READONLY if k in NOT_RUN_OCC]
+    both = [k for k in READONLY if k in NOT_RUN]
     check("T11 no command is in both tables", not both, str(both))
     recdir = tempfile.mkdtemp(prefix="t-docs-rec-")
     rec = None
     for d, cmd, n, shown in items:
         key = (d, cmd, n)
-        verb = cmd_args(cmd)[0] if len(cmd_args(cmd)) else ""
         if key in READONLY:
             args = cmd_args(cmd)
             if args[:2] == ["hold", "--verify"]:
                 if rec is None:
                     world = Path(recdir) / "w.toml"
                     world.write_text(re.sub(r"(?m)^horizon\s*=.*$", "horizon = 1", (ROOT / "system-instantiated/plugins/ising/ising-apparatus-static.toml").read_text()))
-                    run_cc(["hold", "ising", str(world), "--needle", "settled", "--out", recdir])
+                    run_cc(["hold", "ising", str(world), "--needle", "settled", "--out", recdir])[0]
                     rec = next(p for p in Path(recdir).iterdir() if p.is_dir())
                 args = args[:2] + [str(rec)]
-            actual = run_cc(args)
+            rc, actual = run_cc(args)
+            check(f"T11 {d}: `{cmd}` exits 0", rc == 0, f"rc={rc} {' / '.join(actual[-3:])[:200]}")
             norm = (lambda xs: [re.sub(r"\s+", " ", x).strip() for x in xs]) if d == "man" else (lambda xs: xs)   # the man renderer turns runs of spaces into tabs and indents literal blocks
             why = differs(norm(shown), norm(actual)) if shown else None
             check(f"T11 {d}: `{cmd}` runs and its shown output matches", why is None, why or "")
-        elif key in NOT_RUN_OCC:
-            continue
         else:
-            check(f"T11 {d}: `{cmd}` is in a declared table", verb in NOT_RUN_VERB, f"no table row for verb '{verb}'")
+            check(f"T11 {d}: `{cmd}` (occurrence {n}) is in a declared table, READONLY or NOT_RUN", key in NOT_RUN, "in neither table: add it with a reason, or fix the document")
+    stale = [k for k in list(READONLY) + list(NOT_RUN) if k not in {(d, c, n) for d, c, n, _ in items}]
+    check("T11 no table row names a command the documents no longer hold", not stale, str(stale))
 
 
 for name, fn in (("T9", t9), ("T10", t10), ("T11", t11)):

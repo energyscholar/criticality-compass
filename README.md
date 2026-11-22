@@ -38,8 +38,6 @@ output was captured from a run that took 284 s on an 8-core machine at 1-minute 
 $ compass hold ising production --needle settled
 INPUT
   system ising  world production  needle settled  seed 500 (from the world file)
-  env    environment/environment-apparatus-ising.toml  sha256 0ab0802582ae
-  env params: system=ising port=8790 run_dir_root=runs/
   world  system-instantiated/plugins/ising/ising-apparatus.toml  sha256 93587cb627b5
   world params: kind=critical L_blocks=27 seed=500 horizon=200000 dials=[{'name': 'K', 'lo': 0.42, 'hi': 0.545, 'T': 500, 'max_nudge': 32, 'start': 0} …
   needle needle-settings/ising/hold-settled.toml  sha256 c2159cac0b3e
@@ -59,13 +57,13 @@ exit 0: scored  (status scored)
 The record is `compass-runs/<time>-ising-production-<run id>-<4 hex>/` under the directory you ran in (`--out DIR` or `COMPASS_RUNS` move it). It holds `run.json` (what was
 run, with which code, the status, a summary of the score, the sha256 of every file), `run.json.sha256`, `terminal.txt` (what was printed), `input/` (the exact files the run read)
 and `run/` (what the orchestrator wrote). Every path in it is relative to the record. Two identical runs leave two records. `compass hold --verify RECORD` recomputes the hashes
-and names the first file that differs (exit 1) or says nothing is wrong (exit 0).
+and names every file that is missing, differs or is not listed (exit 1), or prints `verified: every file matches run.json` (exit 0).
 
 An installed wheel runs the same command from any directory and writes only under the current directory. Build and install one (measured with `--no-deps`, numpy already importable):
 
 ```
 $ python3 -m pip wheel --no-deps --no-build-isolation -w dist .
-$ python3 -m venv hold-venv && hold-venv/bin/python -m pip install --no-deps dist/criticality_compass-*.whl
+$ python3 -m venv hold-venv && hold-venv/bin/python -m pip install dist/criticality_compass-*.whl
 ```
 
 The rulebook commands in the rest of this document (`show`, `explain`, `run`, `validate`, ...) are a second surface of the same tool, unchanged. `run`, `check` and `freeze` need
@@ -99,7 +97,7 @@ $ pip install -e .
 $ compass help
 ```
 
-You need Python >= 3.11 (3.12 is the version tested) and numpy, which `pip install -e .` brings. `compass` is the console script; it runs this clone's `bin/cc` in the venv's interpreter, and `bin/cc` starts every script and test with that same interpreter (`sys.executable`). Called directly, `bin/cc` runs under whichever `python3` your PATH gives it, so activate the venv first. Run everything below from the repository root.
+You need Python >= 3.11 (3.12 is the version tested) and numpy and scipy, which `pip install -e .` brings. `compass` is the console script; it runs this clone's `bin/cc` in the venv's interpreter, and `bin/cc` starts every script and test with that same interpreter (`sys.executable`). Called directly, `bin/cc` runs under whichever `python3` your PATH gives it, so activate the venv first. Run everything below from the repository root.
 
 Two places are never defaults, because a default would be one person's machine: **the data** (the simulation outputs live outside the repository; name them with `--data-root PATH` or `CC_DATA_ROOT=PATH`, else CC looks only in the clone's `data/`, which holds the redistributable l8 files) and **the structure checker** that `run`, `check` and `freeze` call (`CC_STRUCTURE_CHECKS=<directory that holds checks.py>`; without it those commands REFUSE and say so). Every stored data path starts with the name `<data-root>` (cc.toml `[data] name`), which is a name, never a location.
 

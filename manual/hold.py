@@ -28,13 +28,26 @@ MEANING = {0: "scored", 2: "refused", 1: "infrastructure failure", 3: "wall cloc
 TERM_GRACE = 30   # seconds between SIGTERM and SIGKILL of the orchestrator
 
 
+def positive(text):
+    if not float(text) > 0:
+        raise argparse.ArgumentTypeError(f"{text} is not greater than 0")
+    return float(text)
+
+
+class Parser(argparse.ArgumentParser):
+    def error(self, message):   # a usage error exits 64, distinct from REFUSED's 2
+        self.print_usage(sys.stderr)
+        print(f"compass hold: error: {message}", file=sys.stderr)
+        sys.exit(64)
+
+
 def parser():
-    ap = argparse.ArgumentParser(prog="compass hold", description="Run one hold of a catalogue system and save the run as a record.")
+    ap = Parser(prog="compass hold", description="Run one hold of a catalogue system and save the run as a record.")
     ap.add_argument("system", nargs="?")
     ap.add_argument("world", nargs="?", help="a catalogue world name, or the path of a world .toml file")
     ap.add_argument("--needle", help="hold mode: a catalogue needle name or a .toml path (required; no mode is the default)")
     ap.add_argument("--seed", type=int, help="the one override: write a copy of the world with this seed")
-    ap.add_argument("--wall", type=float, default=1800.0, help="wall-clock limit in seconds (default 1800)")
+    ap.add_argument("--wall", type=positive, default=1800.0, help="wall-clock limit in seconds (default 1800)")
     ap.add_argument("--out", help="where records go (default $COMPASS_RUNS, else ./compass-runs)")
     ap.add_argument("--dry", action="store_true", help="print the resolved input and write nothing")
     ap.add_argument("--list", action="store_true", help="print the catalogue")
@@ -81,7 +94,7 @@ def keyline(role, text, keys):
     return f"  {role} params: " + " ".join(f"{k}={d[k]}" for k in (keys or d) if k in d)
 
 
-def run(a, base, lines):
+def run(a, base, lines, argv):
     sysn = SYSTEMS.get(a.system)
     if sysn is None:
         return refuse(lines, f"unknown system '{a.system}' (choose one)", [f"{k}" for k in SYSTEMS] + [f"{k} (pending: {v['reason']})" for k, v in CAT.get("pending", {}).items()])
@@ -92,25 +105,35 @@ def run(a, base, lines):
         if got is None:
             return refuse(lines, f"no {kind} '{a.world if kind == 'world' else a.needle}' for {a.system} (a catalogue name or a .toml path)", list(tab))
     wtext = world[2].decode()
-    wtext = re.sub(r"(?m)^seed\s*=.*$", f"seed = {a.seed}", wtext) if a.seed is not None and re.search(r"(?m)^seed\s*=", wtext) else (f"seed = {a.seed}\n" + wtext if a.seed is not None else wtext)
+    if a.seed is not None:   # only the top-level seed: the text before the first [table] header
+        head, tail = re.split(r"(?m)^(?=\[)", wtext, maxsplit=1) if re.search(r"(?m)^\[", wtext) else (wtext, "")
+        head = re.sub(r"(?m)^seed\s*=.*$", f"seed = {a.seed}", head) if re.search(r"(?m)^seed\s*=", head) else f"seed = {a.seed}\n" + head
+        wtext = head + tail
+    try:
+        seed = tomllib.loads(wtext).get("seed")
+    except tomllib.TOMLDecodeError as e:
+        return refuse(lines, f"the world file is not valid TOML: {e}")
+    if seed is None:
+        return refuse(lines, "the world file has no top-level seed (add `seed = N` above its first table, or pass --seed)")
     files = {"env": (sysn["env"], (ROOT / sysn["env"]).read_text()), "world": (world[1], wtext), "needle": (needle[1], needle[2].decode()), "score": (sysn["score"], (ROOT / sysn["score"]).read_text())}
     tau = ROOT / sysn["plugin"] / "tau-v0.toml"
     vendor = ROOT / sysn["plugin"] / "vendor" / "VENDOR.toml"
-    seed = tomllib.loads(wtext)["seed"]
+    if not tau.is_file():
+        return refuse(lines, f"{a.system} has no {tau.relative_to(ROOT).as_posix()}: the orchestrator reads it beside the world file")
     vs = REC.versions(ROOT)
     say(lines, "INPUT")
     say(lines, f"  system {a.system}  world {world[0]}  needle {needle[0]}  seed {seed} ({'overridden' if a.seed is not None else 'from the world file'})")
-    for role, (src, text) in files.items():
+    for role, (src, text) in ((r, f) for r, f in files.items() if r != "env"):   # the env file is rewritten for the record (port, run_dir_root): it is plumbing, not a chosen input
         say(lines, f"  {role:6} {src}  sha256 {REC.hashlib.sha256(text.encode()).hexdigest()[:12]}")
         say(lines, keyline(role, text, KEYS.get(role)))
     say(lines, f"  code   compass {vs['compass']}  git {vs['git'] if isinstance(vs['git'], str) else vs['git']['head'][:12]}  digest {vs['code_digest'][:12]}")
     if a.dry:
         say(lines, "dry run: nothing written")
         return 0, lines
-    return execute(a, base, lines, sysn, files, (world, needle), seed, vs, tau, vendor)
+    return execute(a, base, lines, sysn, files, (world, needle), seed, vs, tau, vendor, argv)
 
 
-def execute(a, base, lines, sysn, files, picked, seed, vs, tau, vendor):
+def execute(a, base, lines, sysn, files, picked, seed, vs, tau, vendor, argv):
     out = Path(os.path.expanduser(a.out or os.environ.get("COMPASS_RUNS") or "compass-runs"))
     out = out if out.is_absolute() else base / out
     stage, port = Path(tempfile.mkdtemp(prefix="compass-hold-")), free_port()
@@ -160,13 +183,20 @@ def execute(a, base, lines, sysn, files, picked, seed, vs, tau, vendor):
     inputs = [{"role": r, "record_path": f"input/{names[r]}", "source": files[r][0], "sha256": REC.sha(rec / "input" / names[r])} for r in names]
     inputs += [{"role": "tau", "record_path": "input/tau-v0.toml", "source": tau.relative_to(ROOT).as_posix(), "sha256": REC.sha(rec / "input" / "tau-v0.toml")},
                {"role": "vendor", "record_path": "absent", "source": vendor.relative_to(ROOT).as_posix() if vendor.is_file() else "absent", "sha256": REC.sha(vendor) if vendor.is_file() else "absent"}]
-    argv = ["hold", a.system, picked[0][0], "--needle", picked[1][0], "--wall", str(a.wall)] + (["--seed", str(a.seed)] if a.seed is not None else [])
+    argv = ["hold", *[relative(t, base) for t in argv]]   # the argv as given; an absolute path is made relative to where you stood (a record holds none)
     REC.write(rec, {"argv": argv, "started_utc": started.isoformat(timespec="seconds").replace("+00:00", "Z"),
                     "finished_utc": datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z"), "wall_s": round(time.monotonic() - t0, 3),
                     "wall_limit_s": a.wall, "status": status, "exit": code, "orchestrator_exit": proc.returncode, "system": a.system, "world": picked[0][0],
                     "needle": picked[1][0], "seed": seed, "seed_overridden": a.seed is not None, "port": port, "inputs": inputs, "run_id": rid, "summary": shown, "versions": vs})
     shutil.rmtree(stage, ignore_errors=True)
     return code, lines
+
+
+def relative(token, base):
+    if not token.startswith(("/", "~")):
+        return token
+    r = os.path.relpath(os.path.expanduser(token), base)
+    return r if not r.startswith("..") else "<path outside the working directory>"
 
 
 def scrub(text, stage):
@@ -188,16 +218,24 @@ def progress(stage, seen, t0, lines):
 
 
 def main(argv=None):
-    a, lines = parser().parse_args(argv), []
+    argv = sys.argv[1:] if argv is None else argv
+    ap = parser()
+    a, lines = ap.parse_args(argv), []
     base = Path(os.environ.get("COMPASS_CWD") or os.getcwd())
     if a.verify:
-        bad = REC.verify(base / a.verify)
+        try:
+            bad = REC.verify(base / a.verify)
+        except REC.Malformed as e:
+            return refuse(lines, str(e))[0]
         print("\n".join(bad) if bad else "verified: every file matches run.json")
         return 1 if bad else 0
     if a.list:
         listing(lines)
         return 0
-    return run(a, base, lines)[0]
+    if not argv:
+        ap.print_usage()
+        return 2
+    return run(a, base, lines, argv)[0]
 
 
 if __name__ == "__main__":

@@ -76,10 +76,11 @@ def t2():
     dt = time.time() - t0
     check("T2 dry: exit 0 and an INPUT block", rc == 0 and "INPUT" in out, f"rc={rc} {out[:200]}")
     import hashlib
-    paths = {"env": "environment/environment-apparatus-ising.toml", "world": "system-instantiated/plugins/ising/ising-apparatus-static.toml",
+    paths = {"world": "system-instantiated/plugins/ising/ising-apparatus-static.toml",
              "needle": "needle-settings/ising/hold-settled.toml", "score": "environment/hold-score-ising.toml"}
     wrong = [r for r, p in paths.items() if hashlib.sha256((ROOT / p).read_bytes()).hexdigest()[:12] not in out]
-    check("T2 dry: the four sha256[:12] equal the files' own", not wrong, str(wrong))
+    check("T2 dry: the three sha256[:12] (world, needle, score) equal the files' own", not wrong, str(wrong))
+    check("T2 dry: no env line (A13: the env file is rewritten for the record)", not re.search(r"(?m)^  env", out), out[:300])
     check("T2 dry: --out is still empty", not list(o.iterdir()), str(list(o.iterdir())))
     if LOAD <= 8:
         check("T2 dry: returns in under 5 s", dt < 5, f"{dt:.1f} s at load {LOAD:.1f}")
@@ -179,6 +180,79 @@ def t7b():
         check("T7b wall clock: a record exists", False, "no record")
 
 
+def refused_with(args, why, what, cwd=None, env=None):
+    rc, out = hold(*args, cwd=cwd, env=env)
+    check(f"{what}: exit 2", rc == 2, f"rc={rc} {out[-200:]}")
+    check(f"{what}: a REFUSED line that names the reason, no traceback", "REFUSED:" in out and why in out and "Traceback" not in out, out[-300:])
+
+
+def t12(rec):
+    """A13: terminal.txt and run.json agree on every printed sha."""
+    shas = dict(re.findall(r"(?m)^  (world|needle|score) +\S+ +sha256 ([0-9a-f]{12})$", (rec / "terminal.txt").read_text()))
+    by = {i["role"]: i["sha256"] for i in j(rec)["inputs"]}
+    check("T12 terminal.txt prints sha256 for world, needle and score", set(shas) == {"world", "needle", "score"}, str(shas))
+    check("T12 terminal.txt and run.json agree on every printed sha", all(by[r].startswith(v) for r, v in shas.items()), f"{shas} vs {by}")
+    check("T12 terminal.txt prints no env line", "  env " not in (rec / "terminal.txt").read_text())
+
+
+def t13():
+    d = T / "a14"
+    d.mkdir()
+    noseed = d / "noseed.toml"
+    noseed.write_text(re.sub(r"(?m)^seed\s*=.*\n", "", W.read_text()))
+    refused_with(["ising", noseed, "--needle", "settled", "--out", d / "o1"], "no top-level seed", "T13 world with no seed (A14)")
+    check("T13 world with no seed: nothing written", not (d / "o1").exists() or not list((d / "o1").iterdir()))
+    rc, out = hold("ising", noseed, "--needle", "settled", "--seed", 7, "--dry")
+    check("T13 world with no seed but --seed given: the dry run resolves seed 7", rc == 0 and "seed 7 (overridden)" in out, out[:200])
+    tbl = d / "table-seed.toml"
+    tbl.write_text("seed = 5\n[other]\nseed = 3\n")
+    import hashlib
+    rc, out = hold("ising", tbl, "--needle", "settled", "--seed", 7, "--dry")
+    want = hashlib.sha256(b"seed = 7\n[other]\nseed = 3\n").hexdigest()[:12]
+    check("T13 --seed rewrites only the top-level seed (A15)", rc == 0 and want in out, out[:300])
+    ok = d / "ok-record"
+    shutil.copytree(good[0], ok)
+    m = json.loads((ok / "run.json").read_text())
+    del m["outputs"]
+    (ok / "run.json").write_text(json.dumps(m))
+    import hashlib as h
+    (ok / "run.json.sha256").write_text(f"{h.sha256((ok / 'run.json').read_bytes()).hexdigest()}  run.json\n")
+    refused_with(["--verify", ok], "outputs", "T13 --verify of a run.json with no outputs (A14)")
+    extra = d / "extra-record"
+    shutil.copytree(good[0], extra)
+    (extra / "run" / "stray.txt").write_text("x")
+    rc, out = hold("--verify", extra)
+    check("T13 --verify names a file that is in the record but not in run.json (A15)", rc == 1 and "run/stray.txt" in out, f"rc={rc} {out[:200]}")
+    # a tree with no tau-v0.toml beside the catalogue's plugin directory
+    tree = d / "tree"
+    shutil.copytree(ROOT / "manual", tree / "manual", ignore=shutil.ignore_patterns("__pycache__"))
+    for f in ("environment/environment-apparatus-ising.toml", "environment/hold-score-ising.toml"):
+        (tree / f).parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(ROOT / f, tree / f)
+    (tree / "system-instantiated" / "plugins" / "ising").mkdir(parents=True)
+    r = subprocess.run([sys.executable, "-m", "manual.hold", "ising", str(W), "--needle", str(ROOT / "needle-settings/ising/hold-settled.toml"), "--out", str(d / "o3")], capture_output=True, text=True, cwd=tree)
+    check("T13 a system with no tau file (A14): REFUSED, exit 2, no traceback", r.returncode == 2 and "REFUSED:" in r.stdout and "tau-v0.toml" in r.stdout and "Traceback" not in r.stdout + r.stderr, f"rc={r.returncode} {(r.stdout + r.stderr)[-300:]}")
+
+
+def t14():
+    rc, out = hold()
+    check("T14 no arguments: usage, exit 2", rc == 2 and "usage:" in out and "unknown system" not in out, f"rc={rc} {out[:200]}")
+    rc, out = hold("--bogus")
+    check("T14 an unknown option: usage error, exit 64", rc == 64, f"rc={rc} {out[-200:]}")
+    for w in ("0", "-5"):
+        rc, out = hold("ising", "static", "--needle", "settled", "--wall", w, "--dry")
+        check(f"T14 --wall {w}: usage error, exit 64", rc == 64 and "greater than 0" in out, f"rc={rc} {out[-200:]}")
+
+
+def t15():
+    """A15: argv in run.json is the argv as given (relative to where the run was started)."""
+    rc, out = hold("ising", W.name, "--needle", "settled", "--out", "rel-out", cwd=T)
+    recs = records(T / "rel-out")
+    check("T15 a run from a working directory with relative arguments: exit 0, one record", rc == 0 and len(recs) == 1, f"rc={rc} {out[-200:]}")
+    if recs:
+        check("T15 argv in run.json is the real argv", j(recs[0])["argv"] == ["hold", "ising", W.name, "--needle", "settled", "--out", "rel-out"], str(j(recs[0])["argv"]))
+
+
 guarded("T1", t1)
 guarded("T2", t2)
 guarded("T3", t3)
@@ -188,6 +262,10 @@ good = []
 guarded("T6", lambda: good.append(t6()))
 guarded("T7", lambda: t7(good[0]) if good and good[0] else check("T7 verify can fail: needs T6's record", False, "no T6 record"))
 guarded("T7b", t7b)
+guarded("T12", lambda: t12(good[0]) if good and good[0] else check("T12 needs T6's record", False, "no T6 record"))
+guarded("T13", lambda: t13() if good and good[0] else check("T13 needs T6's record", False, "no T6 record"))
+guarded("T14", t14)
+guarded("T15", t15)
 shutil.rmtree(T, ignore_errors=True)
 print("test_manual_hold: " + ("FAILED " + "; ".join(bad) if bad else "ok"))
 sys.exit(1 if bad else 0)
