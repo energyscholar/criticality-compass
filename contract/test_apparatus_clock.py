@@ -45,9 +45,10 @@ LINES = [{"op": "declare"}, *TW.SEQUENCE, "not json", {"op": "move", "d": [1]}, 
          {"op": "nudge", "d": [5000], **RQ}, {"op": "read", **RQ}]
 C = 50   # the charge of c03 - c07: 10 settle + 40 samples of one sweep is a read of exactly C sweeps
 FROZEN = {  # sha256 at plan 1565's base (compass-main 4df8a87); plan 1565 edits none of these
-    "environment/apparatus_wire.py": "6a003c3ec34f212d8033d605fd18b6cbb49b993c36ca70c37755e2869760c074",
+    # apparatus_wire.py and at/apparatus.py re-taken after the 1569 merge (its intended edits); the AT wire bytes are unchanged: B-AT is byte-identical in both modes.
+    "environment/apparatus_wire.py": "042823032dda015c080013ecd908d93e7b90abec868561e8d8b653f36b845615",
     "environment/dial.py": "71f5d17ee7d596c1178b50044045822600ed202c71cb3e9d36ddb2db253132b4",
-    "system-instantiated/plugins/at/apparatus.py": "7fe53ccb58e5760ac637043063bb1bac0b363dd312b46bb02f2aa4d0676ef6b4",
+    "system-instantiated/plugins/at/apparatus.py": "be6d2772c4a45b3f9a5a0273a018a553e1059e6cec8f6d4e900dcf4c65918435",
 }
 
 
