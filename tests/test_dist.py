@@ -221,8 +221,8 @@ def t10():
     rc, o = sh([sys.executable, hc, "--no-run"], ROOT)   # --no-run: the checks include this very test
     tab = tomllib.loads((ROOT / "release" / "blockers.toml").read_text()) if (ROOT / "release" / "blockers.toml").is_file() else {"row": []}
     tab.setdefault("row", [])
-    open_rows = [r["id"] for r in tab["row"] if r.get("state") == "open"]
-    check("T10 the hand-off check exits 1 on this tree and names every open row", rc == 1 and bool(open_rows) and all(i in o for i in open_rows), f"rc={rc} {o[-300:]}")
+    open_rows = [r["id"] for r in tab["row"] if r.get("state") == "open" or r.get("state") in ("owner-gated", "deferred", "latent") and not r.get("ruling", "").strip()]   # plan 1639 phase 4 (declared edit): Phase 4 closed the last `open` rows; the rows that still block are the owner-gated ones with no recorded ruling
+    check("T10 the hand-off check exits 1 on this tree and names every open row and every owner-gated row with no ruling", rc == 1 and bool(open_rows) and all(i in o for i in open_rows), f"rc={rc} {o[-300:]}")
     exp = re.search(r"(?s)EXPECTED\s*=\s*(\[.*?\])", hc.read_text())
     ids = ast.literal_eval(exp.group(1)) if exp else []
     check("T10 the check holds a closed list of expected rows", len(ids) > 20, str(len(ids)))
@@ -240,6 +240,17 @@ def t10():
         (Path(t) / "noruling.toml").write_text(full.replace('ruling = "ruled"', 'ruling = ""', 1))
         rc, o = sh([sys.executable, hc, "--blockers", Path(t) / "noruling.toml"], ROOT)
         check("T10 an owner-gated row without a ruling exits 1", rc == 1, o[-200:])
+        for st in ("deferred", "latent"):   # plan 1639 phase 10 (A7): two non-blocking states, each only with a recorded ruling
+            row = lambda r: f'[[row]]\nid = "x-{st}"\nstate = "{st}"\nruling = "{r}"\ncheck = ""\n'
+            (Path(t) / f"{st}.toml").write_text(full + row("ruled: why"))
+            rc, o = sh([sys.executable, hc, "--blockers", Path(t) / f"{st}.toml"], ROOT)
+            check(f"T10 a {st} row with a recorded ruling does not block (exit 0)", rc == 0, o[-200:])
+            (Path(t) / f"{st}0.toml").write_text(full + row(""))
+            rc, o = sh([sys.executable, hc, "--blockers", Path(t) / f"{st}0.toml"], ROOT)
+            check(f"T10 a {st} row without a ruling exits 1", rc == 1 and f"x-{st}" in o, o[-200:])
+    for i, st in (("fhn-in-catalogue", "deferred"), ("latent-eager-arm-may-raise", "latent")):
+        rows = {r["id"]: r for r in tab["row"]}
+        check(f"T10 release/blockers.toml carries the row {i} in the state {st} with a ruling", rows.get(i, {}).get("state") == st and bool(rows.get(i, {}).get("ruling", "").strip()) and i in ids, str(rows.get(i)))
 
 
 def t12(a):
@@ -264,6 +275,8 @@ def t11_constants():
     shown = re.findall(r"run_id=([0-9a-f]{16})|ising-path-([0-9a-f]{16})-", (ROOT / "docs" / "FIRST-HOUR.md").read_text())
     shown = {x for t in shown for x in t if x}
     check("T11 docs/FIRST-HOUR.md shows the run_id that release/cleanroom.sh expects (and no other)", bool(want) and shown == {want.group(1)}, f"cleanroom {want and want.group(1)}; document {sorted(shown)}")
+    fh = (ROOT / "docs" / "FIRST-HOUR.md").read_text()
+    check("T11 docs/FIRST-HOUR.md says FHN is not yet in the catalogue (plan 1639 phase 10)", bool(re.search(r"FHN[^.\n]*not yet in the catalogue", fh)), "no such sentence")
 
 
 def main():

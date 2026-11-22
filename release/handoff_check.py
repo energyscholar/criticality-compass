@@ -1,5 +1,6 @@
 """handoff_check - plan 1639 phase 8: the hand-off checklist. Reads release/blockers.toml, runs the named check of every closed row (never trusts the row), prints the table.
-Exit 1 if a row is open, a check fails, an owner-gated row has no ruling, or an expected row is missing. --no-run skips the checks (the table only); --blockers FILE reads another table."""
+A `deferred` row (work put off by a ruling) and a `latent` row (a known, non-blocking limit) do not block, but each needs its ruling text.
+Exit 1 if a row is open, a check fails, an owner-gated or deferred or latent row has no ruling, or an expected row is missing. --no-run skips the checks (the table only); --blockers FILE reads another table."""
 import os
 import subprocess
 import sys
@@ -8,7 +9,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = Path(os.environ.get("HANDOFF_OUT", Path.home() / "1639-out"))
-EXPECTED = ['test-wheel-green', 'env-file-host-paths', '1569-stamps', 'scan-extended', 'records-clean', 'R4', 'R5', 'R8', 'D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'O1', 'O2', 'O3', 'O4', 'O5', 'stub-0.0.1-uploaded', 'upload-go-0.1.0', 'repo-url-at-release', 'plan-numbers-rejudged', 'opsec-review', 'notice-names-kernel-port', 'kernel-extra-dropped', 'cleanroom-macos-arm64', 'cleanroom-linux-x86_64', 'a2-section4-list-ruled']
+EXPECTED = ['test-wheel-green', 'env-file-host-paths', '1569-stamps', 'scan-extended', 'records-clean', 'R4', 'R5', 'R8', 'D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'O1', 'O2', 'O3', 'O4', 'O5', 'stub-0.0.1-uploaded', 'upload-go-0.1.0', 'repo-url-at-release', 'plan-numbers-rejudged', 'opsec-review', 'notice-names-kernel-port', 'kernel-extra-dropped', 'cleanroom-macos-arm64', 'cleanroom-linux-x86_64', 'a2-section4-list-ruled', 'fhn-in-catalogue', 'latent-eager-arm-may-raise']
 
 
 def run_test(stem, cache):
@@ -48,7 +49,9 @@ def main(argv):
             ok, note = evaluate(r.get("check", ""), cache) if r.get("check") else (False, "a closed row names no check")
             if not ok:
                 trouble.append(f"{i}: closed but its check fails ({note})")
-        elif s not in ("closed", "owner-gated"):
+        elif s in ("deferred", "latent") and not r.get("ruling", "").strip():
+            trouble.append(f"{i}: {s}, no recorded ruling")
+        elif s not in ("closed", "owner-gated", "deferred", "latent"):
             trouble.append(f"{i}: unknown state {s!r}")
         print(f"{i:28} {s:12} {'FAIL' if any(t.startswith(i + ':') for t in trouble) else 'ok'}")
     print(f"{len(rows)} rows, {len(trouble)} problem(s)")

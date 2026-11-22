@@ -24,6 +24,8 @@ ising  static      needles: settled mid settled-off   (system-instantiated/plugi
 
 Each line is a simulated system (`ising`, `at`), a world to run it in, and the needles that can steer it. A needle moves one dial on the simulated system, over a wire protocol, and the run is scored against what the server knows to be true.
 
+The list also shows a system `fhn` as pending: FHN is not yet in the catalogue of this version, and it cannot be run.
+
 ## 3. Run one hold
 
 The `static` world has a long horizon (minutes of compute). For a first run, copy its world file and shorten the horizon to 1. The world file is in the install, under `criticality_compass/workspace/system-instantiated/plugins/ising/`:

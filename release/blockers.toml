@@ -3,8 +3,8 @@
 
 [[row]]
 id = "test-wheel-green"
-state = "open"
-ruling = "Awaits Phase 4: 1569's stamps are the remaining hits in the wheel."
+state = "closed"
+ruling = "Closed in Phase 4 (declared tau-v0 stamps and VENDOR text neutral)."
 check = "tests/test_wheel.py"
 
 [[row]]
@@ -15,20 +15,20 @@ check = "tests/test_no_host_paths.py"
 
 [[row]]
 id = "1569-stamps"
-state = "open"
-ruling = "Phase 4, gated on 1569 merging into compass-main."
-check = ""
+state = "closed"
+ruling = "Phase 4 landed on compass-main after 1569 merged: the tau-v0 stamps and VENDOR vendored_by are neutral, the contract pins re-pinned."
+check = "tests/test_wheel.py#no text file of the wheel"
 
 [[row]]
 id = "scan-extended"
-state = "open"
-ruling = "Scan extended in Phases 1 and 3; closes when the wheel scan is clean (Phase 4)."
+state = "closed"
+ruling = "The extended scan finds nothing in the wheel, the sdist or the data wheel."
 check = "tests/test_dist.py#T8 the scan of every file of the wheel"
 
 [[row]]
 id = "records-clean"
-state = "open"
-ruling = "T8 fresh records: closes after Phase 4 (tau-v0 stamp)."
+state = "closed"
+ruling = "A fresh Ising and a fresh AT horizon-1 record carry no vocabulary or host path (T8)."
 check = "tests/test_dist.py#T8 the ising record"
 
 [[row]]
@@ -179,4 +179,16 @@ check = "file:cleanroom-linux.txt"
 id = "a2-section4-list-ruled"
 state = "owner-gated"
 ruling = "DECLARED by G-1639: the two convention-not-necessity items of docs/READING-THE-CODE.md section 4 (the bool-keyed EXT, the print-or-0 dispatch) are style, left as they are; replacing them with plain code is a follow-on outside plan 1639, not done. The Auditor rules."
+check = ""
+
+[[row]]
+id = "fhn-in-catalogue"
+state = "deferred"
+ruling = "deferred: plan 1633 parked as depth (owner 2026-11-22). FHN has no run_wall.py path, so it does not enter 0.1.0; no FHN world is stubbed in. docs/FIRST-HOUR.md says it is not yet in the catalogue."
+check = ""
+
+[[row]]
+id = "latent-eager-arm-may-raise"
+state = "latent"
+ruling = "latent: unselected eager arm may raise (10 sites). Where a conditional picks between two calls, both calls run today; the unselected one can raise: intake_blind (5 sites), intake_say, intake_seal, navigate, navmap, intake_convert. A known, non-blocking limit; not a release gate."
 check = ""
