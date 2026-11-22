@@ -19,16 +19,26 @@ import intake_profile  # noqa: E402
 import intake_read  # noqa: E402
 import oracle_measured  # noqa: E402
 
-BASE = "94c2e49aeb38752d15ddc951ba8f6b299b47ff4c"   # the TREE of the plan-1639-dist tip c9954ba this plan branched from (D0): a tree sha survives the public rewrite, a commit sha does not
+# The base is five BLOBS of the plan-1639-dist tip c9954ba this plan branched from (D0). Not a commit sha (the public rewrite moves it) and not that
+# commit's tree sha either: c9954ba is not an ancestor of compass-main, so the public history holds none of its trees, only its blobs. A blob is
+# content-addressed, survives the rewrite, and is present wherever the file's content ever was committed.
+BASE_BLOBS = {
+    "intake_against": "8c135b8200e78c229307929ca5c94cc4830b6fa2",
+    "intake_differs": "0b4800c91e5824d916eac0a341a24908c7d9ab4f",
+    "intake_profile": "33925aceef6efa8f2f41a412218eb5668a9a1c83",
+    "intake_read": "215c9a4548851d36e68cd38ea69fddf191f739c5",
+    "oracle_measured": "82ab35a7e40856fc5917d505b38032bb6fabcd03",
+}
 
 
 def base_module(name):
-    r = subprocess.run(["git", "-C", str(ROOT), "show", f"{BASE}:cc/{name}.py"], capture_output=True, text=True)
+    blob = BASE_BLOBS[name]
+    r = subprocess.run(["git", "-C", str(ROOT), "cat-file", "blob", blob], capture_output=True, text=True)
     if r.returncode != 0:
-        raise RuntimeError(f"the base commit {BASE} is not in this clone: {r.stderr.strip()[:120]}\n  Next: fetch the plan-1639-dist history (git fetch), then rerun")
+        raise RuntimeError(f"the base blob {blob} of cc/{name}.py is not in this clone: {r.stderr.strip()[:120]}\n  Next: fetch the plan-1639-dist history (git fetch), then rerun")
     m = types.ModuleType(f"base_{name}")
     m.__file__ = str(ROOT / "cc" / f"{name}.py")
-    exec(compile(r.stdout, f"{BASE}:cc/{name}.py", "exec"), m.__dict__)
+    exec(compile(r.stdout, f"{blob}:cc/{name}.py", "exec"), m.__dict__)
     return m
 
 
