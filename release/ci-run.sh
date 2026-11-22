@@ -26,7 +26,7 @@ print("\n".join([f"RUN {s}" for s in run] + [skip[s] for s in fast if s in skip]
 PYEOF
 ) || { echo "ci-run: REFUSED: the run set could not be derived from checks.toml and cc.toml"; exit 1; }
 if [ "${1:-}" = "--list" ]; then echo "$SETS"; exit 0; fi
-echo "$SETS" | grep '^SKIPPED '
+echo "$SETS" | sed -n '/^SKIPPED /p'   # sed prints the matching lines and exits 0 when there are none (grep exits 1, which `set -e` turns into a failed run)
 STEMS=$(echo "$SETS" | sed -n 's/^RUN //p' | tr '\n' ' ')
 CC_SLOTS=$(mktemp -d "${TMPDIR:-/tmp}/cc-slots.XXXXXX"); CC_JOBS=${CC_JOBS:-2}   # two workers unless the caller says more: the 2-core limit of the hosts the suite is measured on (plan 1640 F3)
 export CC_SLOTS CC_JOBS

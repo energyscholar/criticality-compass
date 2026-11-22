@@ -346,19 +346,20 @@ if cr.is_file():
     check("T10 ci-run.sh --list: RUN and SKIPPED are disjoint, total over the fast set, SKIPPED = fast and (needs_data or needs_rust)", rc == 0 and totality(run, list(sk), fast), f"exit {rc} run {len(run)} skipped {len(sk)} fast {len(fast)}")
     check("T10 every SKIPPED line cites the list it came from", all(skip_want.get(k) and skip_want[k] in v for k, v in sk.items()) and bool(sk), "reason missing")
 
-    def jobs_seen(env):   # F3: the worker count a planted tree's `bin/cc test` receives from ci-run.sh, with or without CC_JOBS in the caller's environment
+    def jobs_seen(env, rust="['test_b']"):   # F3: the worker count a planted tree's `bin/cc test` receives from ci-run.sh, with or without CC_JOBS in the caller's environment
         with tempfile.TemporaryDirectory() as td:
             r = Path(td)
             (r / "release").mkdir(); (r / "bin").mkdir(); (r / "tests").mkdir()
             shutil.copy(cr, r / "release" / "ci-run.sh")
             (r / "checks.toml").write_text('[roles]\ntests = ["tests/test_a.py", "tests/test_b.py"]\n')
-            (r / "cc.toml").write_text("[check]\nslow = []\nneeds_data = []\nneeds_rust = [\'test_b\']\nneeds_commit_host = []\n")
+            (r / "cc.toml").write_text("[check]\nslow = []\nneeds_data = []\nneeds_rust = " + rust + "\nneeds_commit_host = []\n")
             (r / "bin" / "cc").write_text("import os, sys\nprint('STUB', sys.argv[1], 'JOBS=' + os.environ.get('CC_JOBS', 'unset'))\n")
             e = {k: v for k, v in os.environ.items() if k != "CC_JOBS"}
             e.update(env, PYTHON=sys.executable)
             q = subprocess.run(["bash", str(r / "release" / "ci-run.sh")], capture_output=True, text=True, env=e)
             return re.findall(r"STUB test JOBS=(\S+)", q.stdout), q.returncode
     check("T10 F3: ci-run.sh gives bin/cc test 2 workers by default (the 2-core limit), and honours CC_JOBS", jobs_seen({}) == (["2"], 0) and jobs_seen({"CC_JOBS": "5"}) == (["5"], 0), f"{jobs_seen({})} {jobs_seen({'CC_JOBS': '5'})}")
+    check("T10 F-C5: ci-run.sh over a tree whose every skip list is empty prints no SKIPPED line and still runs every test (exit 0)", jobs_seen({}, "[]") == (["2"], 0), f"{jobs_seen({}, '[]')}")
 else:
     check("T10 release/ci-run.sh exists", False, "missing")
 res = need("T10 ci-local result", "CC_CI_LOCAL_RESULT")
