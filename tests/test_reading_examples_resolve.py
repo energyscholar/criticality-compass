@@ -56,10 +56,10 @@ def main():
     rows = ROW.findall(side)
     p0, n0, k0 = rows[0]
     check("breaker: a reference shifted by one line is found", bool(problems(f"`{p0}:{int(n0.split('-')[0]) + 1}`", f"ref {p0}:{int(n0.split('-')[0]) + 1} = {k0}")))
-    check("breaker: a reference with no row is found", bool(problems("`cc/admit.py:39`", "")))
+    check("breaker: a reference with no row is found", bool(problems("`cc/admit.py:66`", "")))
     check("breaker: a missing file is found", bool(problems("`cc/nope.py:1`", "ref cc/nope.py:1 = x")))
     check("breaker: a line beyond the file is found", bool(problems("`cc/admit.py:99999`", "ref cc/admit.py:99999 = x")))
-    check("breaker: a true reference is not flagged", not problems("`cc/admit.py:39`", "ref cc/admit.py:39 = cycle"))
+    check("breaker: a true reference is not flagged", not problems("`cc/admit.py:66`", "ref cc/admit.py:66 = cycle"))
 
 
 guarded("test_reading_examples_resolve", main)

@@ -489,11 +489,13 @@ def _reference_kernel(x):
     """A and B of the kernel reference (cc/kernel.py) over the declared path: edge j runs from reading j + 1 to reading j."""
     import importlib.util
     import numpy as np
+    sys.path.insert(0, str(ROOT / "cc"))   # plan 1644 (declared edit): the kernel's types are the door's, so the relation is declared through the door
+    import admit
     spec = importlib.util.spec_from_file_location("cc_kernel_reference", ROOT / "cc" / "kernel.py")
     K = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(K)
     n = len(x)
-    rel = K.Relations(n, np.arange(1, n), np.arange(0, n - 1), ("steering",) * (n - 1))   # built directly: V8 names no provenance for it yet
+    rel = admit.declare(n, list(zip(range(1, n), range(0, n - 1))), [admit.Provenance.STEERING] * (n - 1))   # declared as STEERING (Origin, pending kernel revision)
     a = K.A(K.NodeField(np.array([x])), rel)
     b = K.B(a, rel)
     return [float(v) for v in a.spatial[0]], [float(v) for v in b.spatial[0]]

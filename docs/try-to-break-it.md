@@ -124,4 +124,4 @@ ValueError: REFUSED: a cycle (ring/torus) is inadmissible: a node would be its o
 
 ## What is not refused yet
 
-Two things are not stopped by the code today, and are kept by review: an element of an edge array inside a declared relation can be written in place (the types are frozen, the arrays are not yet read-only), and a kernel type can be built directly, without going through `cc/admit.py` (`cc/kernel.py:36`). This page has no command for them because they are not refused.
+Two things are not stopped by the code today, and are kept by review: an element of an edge array inside a declared relation can be written in place (the types are frozen, the arrays are not yet read-only), and a kernel type can be built directly, without going through `cc/admit.py` (`cc/admit.py:46`). This page has no command for them because they are not refused.

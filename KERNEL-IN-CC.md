@@ -6,11 +6,11 @@ enough). Read it when you want to know what a number means, or before you touch 
 
 ## Why CC uses relational math
 
-A is the graph incidence operator (`cc/kernel.py:72`); B and R build on it; the maths is standard. What CC takes from the relational method (credited in `README.md`, "Acknowledgements") is a rule about what may reach them:
+A is the graph incidence operator (`cc/kernel.py:39`); B and R build on it; the maths is standard. What CC takes from the relational method (credited in `README.md`, "Acknowledgements") is a rule about what may reach them:
 
 - Before A, only an added constant, `x + c` (`cc/intake_terminal.py:152`).
-- Every relation is declared, with its provenance, before any data are touched (`cc/admit.py:28`).
-- Input the door cannot admit is refused with a stated reason: a cycle, an undeclared provenance, a non-finite value, an endpoint outside the nodes (`cc/admit.py:33-58`). Past the door a refusal is a value that carries its reason (`cc/door.py:22`).
+- Every relation is declared, with its provenance, before any data are touched (`cc/admit.py:138`).
+- Input the door cannot admit is refused with a stated reason: a cycle, an undeclared provenance, a non-finite value, an endpoint outside the nodes (`cc/admit.py:57-88`). Past the door a refusal is a value that carries its reason (`cc/door.py:22`).
 
 The method (structure, not control) is that invalid states cannot be reached, instead of being checked for afterwards. That is what makes the needle hard to fool: a cycle, an undeclared provenance, a non-finite value and an out-of-range endpoint are refused at the door before they reach A, and a smoothed or interpolated series is not admitted before A. So `cc/kernel.py` holds no `if`: it is written to receive only values the door built, as frozen types. Limits today: the arrays inside those types are not yet read-only, and code can build a kernel type without going through the door; the rule is kept by review. The idioms are explained in `docs/READING-THE-CODE.md`; `docs/try-to-break-it.md` has commands that try to break the door.
 
@@ -23,6 +23,7 @@ If an input is wrong, extend the refusal in `cc/admit.py`. Do not add smoothing,
 - A **declared relation** is a set of nodes and directed edges, each edge with its provenance, declared before any
   data are touched; the kernel refuses a relation with a cycle. On the current inputs the one candidate is the
   `control` edge between two neighbouring points (`along`, `across_delta`, `stability_delta`), pending an external verifier (ruling R2).
+- CC has one provenance beyond `operators.rs`: `Provenance.STEERING`, an Origin-declared steering relation, pending kernel revision (V8's `operators.rs` names no such provenance); `contract/test_hold_needle.py` declares its reference relation as STEERING.
 - A **declared comparison** (an external verifier, 2026-10-06) is a set of ordered differences between values observed
   independently, each through its own M, that the analysis supplies: the blocking-map comparison of independent
   sizes (`size`, `matched`, `chain`: one blocking step relates L to L/3) and the two-start difference (`start`,

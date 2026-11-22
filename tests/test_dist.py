@@ -29,6 +29,7 @@ DATA_WHEEL_MAX = 60 * 1024 * 1024
 TOOLS = os.environ.get("CC_RELEASE_TOOLS") or sys.executable
 EMAIL = "energyscholar+criticality-compass@gmail.com"
 # T3: the AST digest (docstrings removed) of every .py file this plan edits, at the contract base 16a21fb. A pin follows an edit only by the Auditor's re-pin.
+# plan 1644 re-pins (Auditor answer 2), each declared in its phase's commit: cc/kernel.py + cc/admit.py (phase 2: the four types move into the door).
 AST_BASE = {
     "cc/registry.py": "96548206ffd82395b4bb009b2ef99729a177def4d7c84df44aa0df9873b19dad",
     "cc/oracle_reweight.py": "47cc58df26189c49f325fb0cdcefb1be77a4e74cb3447995a0048c5936973fb2",
@@ -36,8 +37,8 @@ AST_BASE = {
     "cc/scorewords.py": "d35bd35eba05ac15a8985b8a64c47367faf956749f007bdc6f786d32cab134d5",
     "cc/linenav.py": "fa623461a5e35af5bbdba9644ccad9c895b030cc9042933d58e00bb2dfa67a95",
     "cc/sampler.py": "cb1771994db96829f9d976d22ab77fa86e4e64920ba4de30ba3afc8bed0abb99",
-    "cc/kernel.py": "80a8d5a4943d9f30aa21d9ff853c178ad004c43dafbb26aadb1337d98bb7fdf6",
-    "cc/admit.py": "657a9e5e1a00583dd3f039168c25d0c1f24ac77421f1976771236f6e46bbe7a8",
+    "cc/kernel.py": "3492c4f0cb03a8867486a1e11b07dcfc3977c26f5a345bd1637741c98b8981e9",
+    "cc/admit.py": "b3293c9420946f2d25c21f79847d698abbdda2595df53112e4b24d0d89780035",
     "cc/instruments/along.py": "f9abf4b568614307ca4752e172c0bbdc8ef5a5b663e4dfdf29447d879440bc67",
     "cc/instruments/across_delta.py": "cbbe05d363ee619962967f683cccc415f6dd82e065e76d11e88f182ea9634f8f",
     "cc/instruments/stability_delta.py": "e7811256b0f894e00f979fa1506701ed4865ff5f36bc84f35317b2a626e8a43e",

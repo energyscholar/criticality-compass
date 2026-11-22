@@ -92,7 +92,7 @@ tests = [
 ]
 
 [allow]
-modules = ["numpy", "dataclasses", "enum", "kernel", "sign", "resample", "project", "readout", "fingerprint", "gamma"]
+modules = ["numpy", "dataclasses", "enum", "admit", "kernel", "sign", "resample", "project", "readout", "fingerprint", "gamma"]
 numpy = [
   "array", "bincount", "zeros", "abs", "maximum", "maximum.at", "searchsorted", "asarray",
   "atleast_1d", "arange", "log", "exp", "mean", "stack", "hstack", "quantile", "reshape", "sign",

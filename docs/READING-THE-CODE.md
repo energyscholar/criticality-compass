@@ -6,10 +6,10 @@ You know numpy and dataclasses. This code will look odd to you: no `if` in the m
 
 These hold at the door. Where a limit is known today, it is stated.
 
-1. **Declare a cyclic relation.** A ring or torus makes a node its own predecessor. `admit.declare` refuses it before a relation exists: `cc/admit.py:39`.
-2. **Declare an edge with no declared provenance.** A relation is a set of edges, each a `Continuation` or a `Coupling`; any other value is refused, and `Provenance` has no member for "smoothed" or "inferred": `cc/admit.py:35`, `cc/kernel.py:30`.
-3. **Admit a non-finite value as a `NodeField`.** `admit.nodefield` refuses a NaN: `cc/admit.py:49`. In the measurement path the same condition returns a typed null that carries its reason instead of a number: `cc/door.py:290`.
-4. **Reassign a field of a declared relation.** The types are frozen; assigning to a field raises: `cc/kernel.py:35`. Limits today: the edge arrays inside a relation are not yet read-only, so an element can still be written in place, and nothing yet stops code from constructing a kernel type directly instead of through the door (`cc/kernel.py:36`). Both are kept by review and by `AGENTS.md`.
+1. **Declare a cyclic relation.** A ring or torus makes a node its own predecessor. `admit.declare` refuses it before a relation exists: `cc/admit.py:66`.
+2. **Declare an edge with no declared provenance.** A relation is a set of edges, each a `Continuation` or a `Coupling`; any other value is refused, and `Provenance` has no member for "smoothed" or "inferred": `cc/admit.py:62`, `cc/admit.py:15`.
+3. **Admit a non-finite value as a `NodeField`.** `admit.nodefield` refuses a NaN: `cc/admit.py:88`. In the measurement path the same condition returns a typed null that carries its reason instead of a number: `cc/door.py:290`.
+4. **Reassign a field of a declared relation.** The types are frozen; assigning to a field raises: `cc/admit.py:45`. Limits today: the edge arrays inside a relation are not yet read-only, so an element can still be written in place, and nothing yet stops code from constructing a kernel type directly instead of through the door (`cc/admit.py:46`). Both are kept by review and by `AGENTS.md`.
 5. **Take a default for a missing key in a total table.** In the tables named in `AGENTS.md`, a key that is not there is a `KeyError`: `cc/intake_feasible.py:18`. Not every dictionary in `cc/` is total: `.get(key, default)` is used elsewhere, for example `cc/intake_against.py:49`.
 6. **Apply anything before A except `x + c`.** The one pre-A transform in the measurement path adds a constant and nothing else: `cc/intake_terminal.py:154`.
 
@@ -27,22 +27,22 @@ Two ways to keep invalid states out of a computation.
 - **Bresenham's line**, the same idea as the method: The line is drawn by stepping integer coordinates with an integer error term, so every plotted point is a grid point. No rounding is applied afterwards because no real-valued point exists.
 - **Symplectic integration**, the same idea as the method: The update map is chosen to preserve the phase-space structure exactly at each step, so energy error stays bounded; it is not corrected after the run.
 
-The relational kernel (the ABR operators; credited to Robin Macomber and Metatron Dynamics, Inc., see `README.md`, "Acknowledgements") is CC's instance of the method at the point where data enters. A is the graph incidence operator, a difference along each declared edge (`cc/kernel.py:72`); B and R build on it; the maths is standard. What the kernel supplies is the rule about what may reach those operators: before A only `x + c`, every relation declared with its provenance, inadmissible input refused with a reason. `KERNEL-IN-CC.md` has the full account.
+The relational kernel (the ABR operators; credited to Robin Macomber and Metatron Dynamics, Inc., see `README.md`, "Acknowledgements") is CC's instance of the method at the point where data enters. A is the graph incidence operator, a difference along each declared edge (`cc/kernel.py:39`); B and R build on it; the maths is standard. What the kernel supplies is the rule about what may reach those operators: before A only `x + c`, every relation declared with its provenance, inadmissible input refused with a reason. `KERNEL-IN-CC.md` has the full account.
 
 ## The idioms
 
 | You expect | CC does | Example | What it buys | Do not "fix" it into |
 |---|---|---|---|---|
-| `if` and `try` in the maths | no branch at all in the operators; the door builds every input | `cc/kernel.py:72` (A), `cc/admit.py:28` (the door) | the operators are written to receive only what the door built, so they carry no check | a guard inside an operator |
-| validation inside the function that uses a value | frozen types that only the door builds | `cc/kernel.py:36`, `cc/admit.py:40` | a value the door built is valid when built, and its fields cannot be reassigned (the arrays inside are not yet read-only) | a mutable class, or a constructor that accepts anything |
-| an exception, a NaN, or a default for bad input | the refusal is a value with a reason | `cc/door.py:22`, `cc/door.py:290`, `cc/registry.py:38` | the reason travels with the result and is printed in its cell (`KERNEL-IN-CC.md:198`); nothing is replaced by a number | `0`, `np.nan`, a clamp, a bare `except` |
+| `if` and `try` in the maths | no branch at all in the operators; the door builds every input | `cc/kernel.py:39` (A), `cc/admit.py:138` (the door) | the operators are written to receive only what the door built, so they carry no check | a guard inside an operator |
+| validation inside the function that uses a value | frozen types that only the door builds | `cc/admit.py:46`, `cc/admit.py:141` | a value the door built is valid when built, and its fields cannot be reassigned (the arrays inside are not yet read-only) | a mutable class, or a constructor that accepts anything |
+| an exception, a NaN, or a default for bad input | the refusal is a value with a reason | `cc/door.py:22`, `cc/door.py:290`, `cc/registry.py:38` | the reason travels with the result and is printed in its cell (`KERNEL-IN-CC.md:199`); nothing is replaced by a number | `0`, `np.nan`, a clamp, a bare `except` |
 | `if/elif` over a set of cases | a dictionary keyed by the case, declared total | `cc/intake_feasible.py:16`, `cc/intake_feasible.py:18` | a case added without its row fails at the lookup | `.get(key, default)` |
 | a typed error code checked against a list | a `Typed` refusal whose `code` must be a key of its own table | `cc/intake_blind.py:245`, `cc/chain.py:48` | the code is looked up when the refusal is printed, so an unknown code fails at print, not when the refusal is built; every known code has a sentence | a free string for the code |
-| relations and comparisons chosen after looking at data | declared first, with provenance, before any data are read | `cc/admit.py:28`, `cc/kernel.py:30` | relations are declared with provenance before data are admitted, and nothing in CC derives them from the data | building edges from the data |
+| relations and comparisons chosen after looking at data | declared first, with provenance, before any data are read | `cc/admit.py:138`, `cc/admit.py:15` | relations are declared with provenance before data are admitted, and nothing in CC derives them from the data | building edges from the data |
 | smoothing, detrending, interpolation | none before A; only `x + c` | `cc/intake_terminal.py:154` | pairwise differences are what A reads, and a shift leaves them unchanged | a filter or resample before the door |
 | a test that a number is close to a stored one | a hash of the code that measures, and frozen results | `cc/schema.py:185`, `tests/test_dist.py` (T3) | a result is tied to the code that made it. A comment edit changes a file hash and so the reuse key; the identity of the code itself is checked on the syntax tree, comments and docstrings excluded | loosening a pin, or re-pinning without the identity test |
 
-Two refusal styles exist today. `cc/admit.py` raises `ValueError("REFUSED: ...")` when a relation or a field is declared (`cc/admit.py:39`); `cc/door.py` returns a `Null` value that carries its reason when a measurement cannot be evaluated (`cc/door.py:290`).
+Two refusal styles exist today. `cc/admit.py` raises `ValueError("REFUSED: ...")` when a relation or a field is declared (`cc/admit.py:66`); `cc/door.py` returns a `Null` value that carries its reason when a measurement cannot be evaluated (`cc/door.py:290`).
 
 ## One function, two ways
 
@@ -72,22 +72,22 @@ These idioms do not buy a structural property; they are style, and are candidate
 - **`lambda ...: print(...) or 0` as a dispatch entry.** `cc/intake.py:123`. The entry prints and returns 0, written as an expression so that it can sit in the dictionary. No refusal or guard happens in it.
 
 <!-- refs: each visible file:line above must resolve and its line(s) must contain the keyword.
-ref cc/admit.py:39 = cycle
-ref cc/admit.py:35 = provenance
-ref cc/kernel.py:30 = Provenance
-ref cc/admit.py:49 = finite
+ref cc/admit.py:66 = cycle
+ref cc/admit.py:62 = provenance
+ref cc/admit.py:15 = Provenance
+ref cc/admit.py:88 = finite
 ref cc/door.py:290 = Null
-ref cc/kernel.py:35 = dataclass
+ref cc/admit.py:45 = dataclass
 ref cc/intake_feasible.py:18 = HAS_FLOOR
 ref cc/intake_terminal.py:154 = np.array
-ref cc/kernel.py:72 = def A
-ref cc/admit.py:28 = def declare
-ref cc/kernel.py:36 = class Relations
-ref cc/admit.py:40 = Relations(
+ref cc/kernel.py:39 = def A
+ref cc/admit.py:138 = def declare
+ref cc/admit.py:46 = class Relations
+ref cc/admit.py:141 = Relations(
 ref cc/door.py:22 = class Null
 ref cc/intake_terminal.py:152 = x + c
-ref cc/admit.py:33-58 = REFUSED
-ref KERNEL-IN-CC.md:198 = NOT-EVALUATED
+ref cc/admit.py:57-88 = REFUSED
+ref KERNEL-IN-CC.md:199 = NOT-EVALUATED
 ref cc/registry.py:38 = class Refuse
 ref cc/intake_feasible.py:16 = REPLICATED
 ref cc/intake_blind.py:245 = class Typed
