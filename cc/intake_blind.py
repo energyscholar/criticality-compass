@@ -88,12 +88,12 @@ class Declaration(Evidence):
 
 def look(table, key, absent):
     """Total lookup: the row of `key`, or `absent` when `key` is no row. Membership is the boolean key of a two-row table (no default value)."""
-    return {True: lambda: table[key], False: lambda: absent}[key in table]()
+    return table[key] if key in table else absent
 
 
 def flag(args, name, absent):
     """The word after `name` in a command line, or `absent` when the flag is not there or is the last word."""
-    return {True: lambda: args[args.index(name) + 1], False: lambda: absent}[name in args and args.index(name) + 1 < len(args)]()
+    return args[args.index(name) + 1] if name in args and args.index(name) + 1 < len(args) else absent
 
 
 TYPE = {   # a FORMAT field's type word -> its membership test; total over the type words FORMAT.toml uses (tests/test_intake.py)
@@ -160,14 +160,14 @@ CHECK = {   # a FORMAT field's check word -> its findings for a value of the rig
 def typed(spec, v, loc, tables):
     """A present field: VALUE_STILL_TODO when it is the template's "TODO" (whatever its type: `bin/cc new intake` writes TODO in
     every field), else FIELD_TYPE_WRONG, or the findings of its check."""
-    return {True: lambda: [Finding("VALUE_STILL_TODO", loc, "TODO")],
-            False: lambda: {True: lambda: CHECK[spec["check"]](spec, v, loc, tables),
-                            False: lambda: [Finding("FIELD_TYPE_WRONG", loc, f"{type(v).__name__}, want {spec['type']}")]}[TYPE[spec["type"]](v)]()}[v == TODO]()
+    return ([Finding("VALUE_STILL_TODO", loc, "TODO")] if v == TODO
+            else {True: lambda: CHECK[spec["check"]](spec, v, loc, tables),
+                            False: lambda: [Finding("FIELD_TYPE_WRONG", loc, f"{type(v).__name__}, want {spec['type']}")]}[TYPE[spec["type"]](v)]())
 
 
 def field(spec, d, key, loc, tables, required=True):
     """One field of a section: absent (FIELD_MISSING when required, nothing when optional) or present (typed)."""
-    return {True: lambda: typed(spec, d[key], loc, tables), False: lambda: {True: [Finding("FIELD_MISSING", loc, "absent")], False: []}[required]}[key in d]()
+    return typed(spec, d[key], loc, tables) if key in d else {True: [Finding("FIELD_MISSING", loc, "absent")], False: []}[required]
 
 
 def unknown(d, rows, loc, tables):
@@ -224,8 +224,7 @@ def format_stage(text, transducer_findings, tables):
     Invariant: PASS exactly when there is no finding; a REFUSE names the first finding's reason and lists every finding."""
     p = {str: parse, Absent: lambda a: a}[type(text)](text)
     found = p.findings(tuple(transducer_findings), tables)
-    return {True: lambda: Pass(Declaration(p.data["id"], p.data["intake"]["mode"], p.data)),
-            False: lambda: Refuse(found[0].reason, detail(words=[f"{f.reason} at {f.loc or 'the file'}: {f.detail}" for f in found]))}[not found]()
+    return Pass(Declaration(p.data["id"], p.data["intake"]["mode"], p.data)) if not found else Refuse(found[0].reason, detail(words=[f"{f.reason} at {f.loc or 'the file'}: {f.detail}" for f in found]))
 
 
 def gate(checks, then, refuse=Refuse):
@@ -238,7 +237,7 @@ def gate(checks, then, refuse=Refuse):
 
 def bind(x, f, kinds):
     """f(x), or x when x is already one of the typed refusals `kinds`: the first refusal of a chain is its result."""
-    return {True: lambda: x, False: lambda: f(x)}[isinstance(x, kinds)]()
+    return x if isinstance(x, kinds) else f(x)
 
 
 @dataclass(frozen=True)

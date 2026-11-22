@@ -96,8 +96,7 @@ def reading(order, K, move_table):
     """The navigate.Reading at K: order(K) is a Sign or None; move_table is total over Sign + {None}. median_diff/interval None (no sampled interval), m 0."""
     cell = order(K)
     status = {type(None): lambda: navigate.NE, Refusal: lambda: f"NOT_ESTABLISHED ({cell.reason})"}.get(type(cell), lambda: "ESTABLISHED")()   # a Refusal carries WHY in the status string; cell stays None
-    return {True: lambda: Reading("REFUSE", None, None, None, 0, None, status, move_table[None]),
-            False: lambda: Reading(navigate.SIDE[cell], cell, None, None, 0, None, status, move_table[cell])}[type(cell) in (type(None), Refusal)]()
+    return Reading("REFUSE", None, None, None, 0, None, status, move_table[None]) if type(cell) in (type(None), Refusal) else Reading(navigate.SIDE[cell], cell, None, None, 0, None, status, move_table[cell])
 
 
 @dataclass(frozen=True)
@@ -158,7 +157,7 @@ def _measured(root, big):
     order = lambda: Measured(big, PARTNER[big], 10, 2, lambda K: load_rehearsal(data, K, big), lambda K: file_shas(data, K, big))   # noqa: E731  r = readout.rank(10, 22/1024) = 2
     go = lambda: run(Declared(st, order(), log))   # noqa: E731
     refusal = ([f"REFUSED: {'; '.join(why)}.\n  Next: bin/cc --data-root <dir> navigate --oracle measured --L 243"], 2)
-    return {True: lambda: refusal, False: lambda: _report(st, big, *go())}[bool(why)]()
+    return refusal if bool(why) else _report(st, big, *go())
 
 
 def _report(st, big, w, bracket):
@@ -172,8 +171,7 @@ def _reweight(root, big):
     why = [w for w, ok in ((f"no 1282/<run>/ chain files under {data}", bool(list((data / "1282").glob("*/*.npz")))), (f"L {big} has no declared partner {PARTNER}", big in PARTNER)) if not ok]
     st = dense_start(KC)
     log = OracleLog(Path(root) / "results" / "navigate" / "reweight.access.jsonl", f"reweight:{st.start_id()}", schema.git_head(root))
-    return {True: lambda: ([f"REFUSED: {'; '.join(why)}.\n  Next: bin/cc --data-root <dir> navigate --oracle reweight --L 243"], 2),
-            False: lambda: report_dense(st, big, *run(Declared(st, make_reweight(data, big, 10, 2), log)))}[bool(why)]()   # noqa: E731  r = readout.rank(10, 22/1024) = 2
+    return ([f"REFUSED: {'; '.join(why)}.\n  Next: bin/cc --data-root <dir> navigate --oracle reweight --L 243"], 2) if bool(why) else report_dense(st, big, *run(Declared(st, make_reweight(data, big, 10, 2), log)))   # noqa: E731  r = readout.rank(10, 22/1024) = 2
 
 
 def cli(root, argv):

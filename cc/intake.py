@@ -46,7 +46,7 @@ def _findings(root, d, ident):
     import schema
     import transducer
     data, bad = schema.load(d / "transducer.toml", root)
-    found = {True: lambda: bad, False: lambda: transducer.chk_transducer(f"declarations/{ident}/transducer.toml", data, schema.Ctx(root), ident)}[data is None]()
+    found = bad if data is None else transducer.chk_transducer(f"declarations/{ident}/transducer.toml", data, schema.Ctx(root), ident)
     return [f"{f.loc}: {f.msg} (Next: {f.nxt})" for f in found]
 
 
@@ -77,7 +77,7 @@ def seal(root, ident, args):
     usage = [u for ok, u in ((blind.flag(args, "--author", "") != "", "--author NAME"), (blind.flag(args, "--as", "") in intake_seal.AUTHOR_KIND, "--as human|ai-draft"),
                              ((blind.flag(args, "--confirmed-by", "") != "") != ("--unconfirmed" in args), "exactly one of --confirmed-by NAME | --unconfirmed"),
                              ("--universe" not in args, "no --universe (the universe is the declared [source] root)")) if not ok]
-    return {True: lambda: _usage(f"seal needs {'; '.join(usage)}"), False: lambda: _seal(root, ident, args)}[len(usage) > 0]()
+    return _usage(f"seal needs {'; '.join(usage)}") if len(usage) > 0 else _seal(root, ident, args)
 
 
 def _seal(root, ident, args):
@@ -122,10 +122,10 @@ def _handoff(pick):
 
 INTAKE = {"explain": lambda root, a: print(intake_say.explain(tables(root)), end="") or 0, "lint": _with_id(lint), "seal": _with_id(seal), "run": _with_id(run),
           "synth": synth, "convert": _handoff(lambda c, b, p: c.convert_cli), "peek": _handoff(lambda c, b, p: c.peek_cli),
-          "blind": _handoff(lambda c, b, p: b.blind_cli), "profile": _handoff(lambda c, b, p: lambda r, i, a, t: {True: p.check_cli, False: p.profile_cli}["--check" in a](r, i, a, t))}
+          "blind": _handoff(lambda c, b, p: b.blind_cli), "profile": _handoff(lambda c, b, p: lambda r, i, a, t: (p.check_cli if "--check" in a else p.profile_cli)(r, i, a, t))}
 
 
 def cli(root, args):
     """bin/cc intake <sub>: a total lookup over the subcommands of INTAKE; any other word is a usage refusal."""
-    sub = {True: lambda: args[0], False: lambda: ""}[len(args) > 0]()
+    sub = args[0] if len(args) > 0 else ""
     return blind.look(INTAKE, sub, lambda root, a: _usage(f"unknown subcommand '{sub}'"))(root, args[1:])

@@ -60,7 +60,7 @@ numeric = lambda t: [r for r in t.rows if r.kind in NUMERIC_KINDS]   # a table's
 
 def tables_of(f):
     """(sheet position, Table) of a file: its text table (sheet 0) or each sheet of an XLSX."""
-    return [(0, t) for t in f.tables] + [(x.position, x.table) for x in {True: f.sheets, False: ()}[isinstance(f.sheets, tuple)]]
+    return [(0, t) for t in f.tables] + [(x.position, x.table) for x in (f.sheets if isinstance(f.sheets, tuple) else ())]
 
 
 def body(t):

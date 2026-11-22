@@ -78,14 +78,13 @@ def census(root, ident):
     """(tables, S5's Census, S2's seal state) of the declaration's intake run, or Refusal INTAKE_REFUSED_AT naming the first refused stage."""
     t, d, out = intake._go(root, ident, lambda t: t["stages"]["stage"])
     p = verdicts(t, out)[0]
-    return {True: lambda: Refusal("INTAKE_REFUSED_AT", f"stage {p.at}: {out[p.at].text(t) if p.at else ''}"),
-            False: lambda: (t, out["S5"].result.evidence, out["S2"].result.evidence)}[p.kind is Primary.PRIMARY_REFUSED_AT]()
+    return Refusal("INTAKE_REFUSED_AT", f"stage {p.at}: {out[p.at].text(t) if p.at else ''}") if p.kind is Primary.PRIMARY_REFUSED_AT else (t, out["S5"].result.evidence, out["S2"].result.evidence)
 
 
 def declared(root, ident):
     """ident, when it names a directory of declarations/ (a name, never a path), else Refusal NO_DECLARATION."""
     names = {p.name for p in (Path(root) / "declarations").iterdir() if p.is_dir()}
-    return {True: lambda: ident, False: lambda: Refusal("NO_DECLARATION", f"declarations/{ident}/")}[ident in names]()
+    return ident if ident in names else Refusal("NO_DECLARATION", f"declarations/{ident}/")
 
 
 def oracle_for(t, cells, census, seal):
@@ -111,7 +110,7 @@ def walk(root, ident):
 
 def path_of(rec):
     """The traced polyline as a list of cell pairs (empty when the line was not acquired)."""
-    return {True: lambda: [tuple(float(x) for x in p) for p in rec["path"]], False: lambda: []}[rec["path"] is not None]()
+    return [tuple(float(x) for x in p) for p in rec["path"]] if rec["path"] is not None else []
 
 
 def cell_text(p):
@@ -119,8 +118,7 @@ def cell_text(p):
 
 
 def terminals(rec):
-    return {True: lambda: ", ".join(f"{DIRS[k]} {v['term'].name}" for k, v in sorted(rec["dirs"].items())),
-            False: lambda: "none (the line was not acquired)"}[len(rec["dirs"]) > 0]()
+    return ", ".join(f"{DIRS[k]} {v['term'].name}" for k, v in sorted(rec["dirs"].items())) if len(rec["dirs"]) > 0 else "none (the line was not acquired)"
 
 
 def rank_text(o, u):
@@ -180,13 +178,13 @@ def _wrote(root, w, log):
 def _family(root, ident):
     log = logged(root, ident, "family")
     w = walk(root, ident)
-    return {True: lambda: (refusal_text(w), 1), False: lambda: _wrote(root, w, log)}[isinstance(w, REFUSED)]()
+    return (refusal_text(w), 1) if isinstance(w, REFUSED) else _wrote(root, w, log)
 
 
 def family(root, ident):
     """(lines, exit status) of `bin/cc navigate family <id>`. It takes no checkpoints: the hold-out is out of its reach by signature."""
     have = declared(root, ident)
-    return {True: lambda: (refusal_text(have), 1), False: lambda: _family(root, ident)}[isinstance(have, REFUSED)]()
+    return (refusal_text(have), 1) if isinstance(have, REFUSED) else _family(root, ident)
 
 
 def points(root, f):
@@ -200,7 +198,7 @@ def points(root, f):
 
 def distance(path, u):
     """Distance in span units from a checkpoint to the traced polyline (linenav.seg_dist); None when no line was traced."""
-    return {True: lambda: linenav.seg_dist(np.asarray(u, float), path), False: lambda: None}[len(path) > 0]()
+    return linenav.seg_dist(np.asarray(u, float), path) if len(path) > 0 else None
 
 
 WC = linenav.PARAMS["continuous"]["wc"]   # the frozen continuous corridor, in span units
@@ -220,4 +218,4 @@ def score(root, ident, f):
     w = then(have, lambda i: (logged(root, i, "score"), walk(root, i))[1])
     pts = then(w, lambda _: points(root, f))
     cps = then(pts, lambda ps: (lambda each: ([c for c in each if isinstance(c, REFUSED)] + [tuple(w.oracle.span.u(v) for v in ps)])[0])([intake_suspect.cell(w.cells.plane, i, v) for i, v in enumerate(ps)]))
-    return {True: lambda: (refusal_text(cps), 1), False: lambda: _scored(w, cps, tomllib.loads(intake_seal.declared(Path(root) / 'declarations' / ident)))}[isinstance(cps, REFUSED)]()
+    return (refusal_text(cps), 1) if isinstance(cps, REFUSED) else _scored(w, cps, tomllib.loads(intake_seal.declared(Path(root) / 'declarations' / ident)))

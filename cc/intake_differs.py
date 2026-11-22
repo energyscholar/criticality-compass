@@ -17,7 +17,7 @@ SPEC = {"csv-curve-v1": lambda d: CSV_CURVE, "table-curve-v1": lambda d: d["read
 def _line(data, spec, kind, at):
     """The cells of the `at`-th non-blank line under format `kind`, as names; None when that format's cell layer refuses the bytes."""
     cells = CELLS[kind](data, spec)
-    return {True: lambda: None, False: lambda: tuple(_name(x) for x in dict(enumerate(c for _, c in cells if not all(_blank(x) for x in c))).get(at, ()))}[isinstance(cells, Unreadable)]()
+    return None if isinstance(cells, Unreadable) else tuple(_name(x) for x in dict(enumerate(c for _, c in cells if not all(_blank(x) for x in c))).get(at, ()))
 
 
 def lined(data, d):

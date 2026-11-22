@@ -35,9 +35,8 @@ def explain(t):
     for s in st["stage"]:
         out += ["", f"## {s['id']} {s['name']} ({state(s)})", "", s["purpose"], "", "| reason | live | what it means |", "|---|---|---|"]
         out += [f"| {r['code']} | {LIVE[r['live']]} | {r['sentence']} |" for r in s["reason"]]
-        out += {True: lambda: ["", "| reader reason (READER_REFUSED) | live | what it means |", "|---|---|---|"] + [f"| {r['code']} | {LIVE[r['live']]} | {r['sentence']} |" for r in s["reader_reason"]],
-                False: lambda: []}["reader_reason" in s]()
-        out += {True: lambda: ["", "| seal status | what it means |", "|---|---|"] + [f"| {r['code']} | {r['sentence']} |" for r in s["status"]], False: lambda: []}["status" in s]()
+        out += (["", "| reader reason (READER_REFUSED) | live | what it means |", "|---|---|---|"] + [f"| {r['code']} | {LIVE[r['live']]} | {r['sentence']} |" for r in s["reader_reason"]] if "reader_reason" in s else [])
+        out += (["", "| seal status | what it means |", "|---|---|"] + [f"| {r['code']} | {r['sentence']} |" for r in s["status"]] if "status" in s else [])
     out += ["", f"## Policy ({po['status']}, {po['version']})", "", po["evidence_note"], ""]
     for link in ("projection", "bridge"):
         out += [f"- {link} **{k}**: " + "; ".join(f"{f} = {v}" for f, v in row.items()) for k, row in po[link].items()]
@@ -62,11 +61,10 @@ def report(t, ident, out, note):
     handoff = scoped(t, Scope.HANDOFF)[0]
     lines = [f"# Intake report: {ident}", "", f"Written by `bin/cc intake run {ident}`. Stage table {t['stages']['version']}, policy {t['policy']['version']}.", "",
              f"- **Mode** (the declarer's sealed statement of what they had seen): {out['S0'].result.mode()}",
-             f"- **PRIMARY verdict: {p.kind.name}**" + {True: f" at {p.at}", False: ""}[p.at != ""] + f". Missing: {words(p)}.",
-             f"- **ROBUSTNESS verdict: {r.kind.name}**" + {True: f" at {r.at}", False: ""}[r.at != ""] + f". Missing: {words(r)}.",
+             f"- **PRIMARY verdict: {p.kind.name}**" + (f" at {p.at}" if p.at != "" else "") + f". Missing: {words(p)}.",
+             f"- **ROBUSTNESS verdict: {r.kind.name}**" + (f" at {r.at}" if r.at != "" else "") + f". Missing: {words(r)}.",
              f"- **{handoff} {names[handoff]}** (the terminal; it counts toward PRIMARY): {out[handoff].atom.name}.",
-             "- **Seal status** (advisory; sealing is recommended and not enforced): " + {True: lambda: out[seal].result.evidence.summary(),
-                                                                                           False: lambda: "not reported: " + out[seal].text(t)}[out[seal].mark is Mark.PASSED](),
+             "- **Seal status** (advisory; sealing is recommended and not enforced): " + (out[seal].result.evidence.summary() if out[seal].mark is Mark.PASSED else "not reported: " + out[seal].text(t)),
              f"- **Profile** (plan 1165): {profiled(t, out)}", f"- **Ordering** (information, never a refusal): {note[0].name}. {note[1]}"]
     lines += {True: [f"- **confirmation**: {t['stages']['report']['confirmation']}"], False: []}["confirmation" in p.missing]
     lines += ["",
@@ -74,7 +72,6 @@ def report(t, ident, out, note):
     lines += [f"| {s['id']} | {s['name']} | {state(s)} | {s['reads_bytes']} | {out[s['id']].atom.name} |" for s in t["stages"]["stage"]]
     lines += [""] + [f"- **{s['id']} {s['name']}** ({state(s)}): {out[s['id']].text(t)}" for s in t["stages"]["stage"]]
     census = [s["id"] for s in t["stages"]["stage"] if s["name"] == "CENSUS"][0]   # the census section: only when the census passed
-    lines += {True: lambda: ["", "## Census", "", f"The curves of {census} CENSUS, by ordinal and file name (never by slow value):", ""] + out[census].result.evidence.listing(),
-              False: lambda: []}[out[census].mark is Mark.PASSED]()
+    lines += (["", "## Census", "", f"The curves of {census} CENSUS, by ordinal and file name (never by slow value):", ""] + out[census].result.evidence.listing() if out[census].mark is Mark.PASSED else [])
     lines += ["", "## What the seal proves", "", t["stages"]["report"]["seal_claim"], ""] + unseen(t)
     return "\n".join(lines) + "\n"

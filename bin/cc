@@ -708,7 +708,7 @@ def cmd_navigate(args):
     """navigate <input> [--access-log PATH]: stored-map mode (plan 1114); navigate family <id> | score <id> <checkpoints.toml>: family mode
     (plan 1176, cc/navfamily.py over the frozen cc/linenav.py). docs/navigate.md. UNTESTED: every output's first line says so."""
     sub = (args + [""])[0]
-    lines, status = {True: lambda: NAVIGATE[sub](args[1:]), False: lambda: _stored_map(args)}[sub in NAVIGATE]()
+    lines, status = NAVIGATE[sub](args[1:]) if sub in NAVIGATE else _stored_map(args)
     print("\n".join(lines))
     return status
 

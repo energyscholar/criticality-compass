@@ -66,7 +66,7 @@ def hook_log(path, base):
     path.parent.mkdir(parents=True, exist_ok=True)
     fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o644)   # plumbing: append-only by open mode
     line = lambda a: (json.dumps({**base, "t_ns": time.time_ns(), "path": str(a[0]), "mode": str(a[1])}, sort_keys=True) + "\n").encode()   # noqa: E731
-    sys.addaudithook(lambda event, a: {True: lambda: os.write(fd, line(a)), False: lambda: 0}[event == "open"]())
+    sys.addaudithook(lambda event, a: os.write(fd, line(a)) if event == "open" else 0)
     return path
 
 
@@ -108,7 +108,7 @@ def _declared(root, input_id):
 def open_map(root, input_id):
     """StoredMap or Refusal for an input id."""
     known = {q.parent.name for q in (root / "inputs").glob("*/m.toml")}
-    return {True: _declared, False: _no_input}[input_id in known](root, input_id)
+    return (_declared if input_id in known else _no_input)(root, input_id)
 
 
 def node_reader(smap, ctx, log, found):
@@ -133,12 +133,11 @@ def _f(x):
 
 
 def _line(smap, j, rd, found):
-    return {True: lambda: (f"  read {smap.nodes[j]} (node {j}): side {rd.side}, cell {rd.cell.value}, median d {_f(rd.median_diff)}, "
+    return (f"  read {smap.nodes[j]} (node {j}): side {rd.side}, cell {rd.cell.value}, median d {_f(rd.median_diff)}, "
                            f"interval [{_f(rd.interval[0])}, {_f(rd.interval[1])}], pinned L{navigate.BIG} {rd.pinned[navigate.BIG]} / "
-                           f"L{navigate.SMALL} {rd.pinned[navigate.SMALL]} -> {rd.move}"),
-            False: lambda: (f"  read {smap.nodes[j]} (node {j}): {rd.status}: {found[j][0]} chains stored at L{navigate.BIG}, {found[j][1]} at L{navigate.SMALL}, "
-                            f"fewer than m {rd.m} -> {rd.move}")}[
-        rd.status == "ESTABLISHED"]()
+                           f"L{navigate.SMALL} {rd.pinned[navigate.SMALL]} -> {rd.move}" if rd.status == "ESTABLISHED"
+            else f"  read {smap.nodes[j]} (node {j}): {rd.status}: {found[j][0]} chains stored at L{navigate.BIG}, {found[j][1]} at L{navigate.SMALL}, "
+                            f"fewer than m {rd.m} -> {rd.move}")
 
 
 OUTCOME = {

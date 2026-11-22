@@ -32,7 +32,7 @@ def located(text, roots):
     """The directory a declared source root names ("<name>/<relative path>", the name a row of intake/ROOTS.toml), or "" when it names none.
     The pattern admits only a declared name (the never-matching (?!) keeps the alternation total) and no ".." part."""
     m = re.fullmatch("(" + "|".join([*map(re.escape, roots), "(?!)"]) + r")((?:/(?!\.\.(?:/|$))[\w.-]+)*)", text)
-    return {True: lambda: str(Path(roots[m[1]]) / m[2].lstrip("/")), False: lambda: ""}[m is not None]()
+    return str(Path(roots[m[1]]) / m[2].lstrip("/")) if m is not None else ""
 
 
 ADMIT = (   # the loader's admission of one selected name before any byte is read, one row per reason, in this order

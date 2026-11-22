@@ -102,11 +102,10 @@ def _xlsx_cells(data, spec):
     try:   # the decoding boundary: openpyxl raises zipfile, KeyError, ValueError and its own errors for bytes that are no readable workbook
         book = openpyxl.load_workbook(io.BytesIO(data), read_only=True, data_only=True)
         address = {**dict(enumerate(book.sheetnames, 1)), **{n: n for n in book.sheetnames}}   # position or name -> the sheet's name
-        rows = {True: lambda: list(book[address[sheet]].iter_rows(values_only=True)), False: lambda: []}[sheet in address]()
+        rows = list(book[address[sheet]].iter_rows(values_only=True)) if sheet in address else []
     except Exception as e:
         return Unreadable("NOT_AN_XLSX", detail(words=[type(e).__name__]))   # the error's type only: its message can quote a cell
-    return {False: lambda: Unreadable("SHEET_ABSENT", detail(words=[f"sheet '{sheet}'"], counts={"sheets in the workbook": len(book.sheetnames)})),
-            True: lambda: [(i, list(r)) for i, r in enumerate(rows, 1) if not (len(r) > 0 and _comment(r[0], spec["comment"]))]}[sheet in address]()
+    return [(i, list(r)) for i, r in enumerate(rows, 1) if not (len(r) > 0 and _comment(r[0], spec["comment"]))] if sheet in address else Unreadable("SHEET_ABSENT", detail(words=[f"sheet '{sheet}'"], counts={"sheets in the workbook": len(book.sheetnames)}))
 
 
 XLSX = {   # is openpyxl installed -> the xlsx cell reader (xlsx is read with openpyxl or not at all)
@@ -129,7 +128,7 @@ NOT_A_NUMBER = (lambda c: False, float)
 
 
 def _numeric(c):
-    return {True: lambda: NUMERIC[type(c)], False: lambda: NOT_A_NUMBER}[type(c) in NUMERIC]()
+    return NUMERIC[type(c)] if type(c) in NUMERIC else NOT_A_NUMBER
 
 
 def _blank(cell):
@@ -137,14 +136,14 @@ def _blank(cell):
 
 
 def _name(cell):
-    return {True: lambda: cell.strip(), False: lambda: ""}[isinstance(cell, str)]()
+    return cell.strip() if isinstance(cell, str) else ""
 
 
 SAID = {str: lambda c: c.strip(), int: repr, float: repr}   # a header cell's type -> its text as written (an xlsx number by repr); others: ""
 
 
 def _said(cell):
-    return {True: lambda: SAID[type(cell)](cell), False: lambda: ""}[type(cell) in SAID]()
+    return SAID[type(cell)](cell) if type(cell) in SAID else ""
 
 
 def keyed(grid, key):
@@ -191,8 +190,8 @@ def table(cells, spec, roles):
 
 def _columns(head, body, lines, roles, h):
     named = NAMED[h["kind"]](h, {k: [_name(x) for x in head[n - 1][1]] for k, n in lines.items()})
-    names = {True: lambda: named["names"], False: lambda: []}["names" in named]()
-    width = {True: lambda: len(head[lines["names"] - 1][1]), False: lambda: len(body[0][1])}["names" in lines]()
+    names = named["names"] if "names" in named else []
+    width = len(head[lines["names"] - 1][1]) if "names" in lines else len(body[0][1])
     short = [(i, len(c)) for i, c in body if len(c) != width]
     checks = [(lambda: not short, "ROW_WIDTH_DIFFERS", lambda: detail(rows=[short[0][0]], counts={"cells in the row": short[0][1], "table width": width}))]
     checks += [row for _, ref in roles for row in _resolve(ref, names, width)]
@@ -202,7 +201,7 @@ def _columns(head, body, lines, roles, h):
 def _numbers(body, named, roles, names, head):
     at = [_index(ref, names) for _, ref in roles]
     bad = [(i, ref) for i, c in body for (_, ref), k in zip(roles, at) if not _numeric(c[k])[0](c[k])]
-    units = {True: lambda: tuple((r, named["units"][k]) for (r, _), k in zip(roles, at)), False: lambda: ()}["units" in named]()
+    units = tuple((r, named["units"][k]) for (r, _), k in zip(roles, at)) if "units" in named else ()
     return first([(lambda: not bad, "CELL_NOT_A_NUMBER", lambda: detail(rows=[bad[0][0]], columns=[bad[0][1]], counts={"cells of declared columns that are not numbers": len(bad)}))],
                  lambda: Grid(tuple(ref for _, ref in roles), units, tuple(tuple(_numeric(c[k])[1](c[k]) for k in at) for _, c in body), head))
 
@@ -241,15 +240,14 @@ def _hdf5_rows(ds, roles, names):
 
 def read_hdf5(data, d):
     """hdf5-table-v1: the one 2-D float dataset, columns by NAME from its `column_names` attribute, to a Grid | Unreadable (HDF5_READER_ABSENT without h5py)."""
-    return {True: lambda: _hdf5(data, d),
-            False: lambda: Unreadable("HDF5_READER_ABSENT", detail(words=["h5py is not installed on this machine, so an hdf5 file cannot be read here"]))}[importlib.util.find_spec("h5py") is not None]()
+    return _hdf5(data, d) if importlib.util.find_spec("h5py") is not None else Unreadable("HDF5_READER_ABSENT", detail(words=["h5py is not installed on this machine, so an hdf5 file cannot be read here"]))
 
 
 def read_table(data, d):
     """table-curve-v1: the declared format, comment prefixes, header and columns (role_columns) to a Grid | Unreadable."""
     spec = d["reader"]
     cells = CELLS[spec["format"]["kind"]](data, spec)
-    return {True: lambda: cells, False: lambda: table(cells, spec, lambda head: role_columns(d))}[isinstance(cells, Unreadable)]()
+    return cells if isinstance(cells, Unreadable) else table(cells, spec, lambda head: role_columns(d))
 
 
 CSV_CURVE = {"comment": [], "format": {"kind": "COMMA"}, "header": {"kind": "NAMES", "rows": 1, "names": 1}}
@@ -260,7 +258,7 @@ def read_csv(data, d):
     the WHOLE header, in its order: its Grid's columns are the header, which S4 compares with the declared columns (COLUMNS_DIFFER)."""
     cells = CELLS["COMMA"](data, CSV_CURVE)
     whole = lambda head: tuple((n, n) for n in (_name(x) for x in head[0][1]))
-    return {True: lambda: cells, False: lambda: table(cells, CSV_CURVE, whole)}[isinstance(cells, Unreadable)]()
+    return cells if isinstance(cells, Unreadable) else table(cells, CSV_CURVE, whole)
 
 
 def readers(t):

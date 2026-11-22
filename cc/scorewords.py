@@ -39,7 +39,7 @@ READ_RANGE = ("the slow range a trace covered is that of the measured curves its
 def read_range(o, path):
     """(least, greatest) curve rank the traced points read (READ_RANGE), or None when no line was traced."""
     ks = [o.curve(u) for u in path]
-    return {True: lambda: (min(ks), max(ks)), False: lambda: None}[len(ks) > 0]()
+    return (min(ks), max(ks)) if len(ks) > 0 else None
 
 
 def reach(o, path, u, wc):
@@ -67,8 +67,7 @@ def stop_text(o, rec, path, sgn, unit):
     k = o.ranks(u)[0]
     sl = o.span.x(u)[0]
     beyond = [r for r in (k + sgn,) if 0 <= r < len(o.slows)]   # the first curve past the nearest one in this direction: a curve it did not read
-    nxt = {True: lambda: f"next curve rank {beyond[0]} ({type(o.features[beyond[0]]).__name__}, {o.slows[beyond[0]]:g} {unit})",
-           False: lambda: "no curve beyond (the family's end)"}[len(beyond) > 0]()
+    nxt = f"next curve rank {beyond[0]} ({type(o.features[beyond[0]]).__name__}, {o.slows[beyond[0]]:g} {unit})" if len(beyond) > 0 else "no curve beyond (the family's end)"
     return f"{DIRS[sgn]} stopped at {sl:.4g} {unit} (terminal {rec['dirs'][sgn]['term'].name}; nearest curve rank {k}, {type(o.features[k]).__name__}, {o.slows[k]:g} {unit}; {nxt})"
 
 
@@ -78,12 +77,13 @@ def lines(ident, verdict, o, rec, path, cps, suspect, wc, unit, tiering, unteste
     atoms = [a for a, _ in each]
     s = np.asarray(path, float).reshape(-1, 2)[:, 0]
     sus = sorted(o.span.x(v)[0] for v in suspect)
-    traced = {True: lambda: (o.span.x((s.min(), 0))[0], o.span.x((s.max(), 0))[0]), False: lambda: None}[len(path) > 0]()
+    traced = (o.span.x((s.min(), 0))[0], o.span.x((s.max(), 0))[0]) if len(path) > 0 else None
     rr = read_range(o, path)
-    encl = {True: lambda: (f"; the curves read: ranks {rr[0]} .. {rr[1]}, {o.slows[rr[0]]:g} -> {o.slows[rr[1]]:g} {unit} (the checkpoints' reach range); "
+    encl = (f"; the curves read: ranks {rr[0]} .. {rr[1]}, {o.slows[rr[0]]:g} -> {o.slows[rr[1]]:g} {unit} (the checkpoints' reach range); "
                            f"enclosing measured curves of the traced ends {o.measured((s.min(), 0.5))[0][0]:g}|{o.measured((s.min(), 0.5))[0][1]:g} and "
-                           f"{o.measured((s.max(), 0.5))[0][0]:g}|{o.measured((s.max(), 0.5))[0][1]:g} {unit}"), False: lambda: ""}[traced is not None]()
-    tr = {True: lambda: f"{traced[0]:.4g} -> {traced[1]:.4g} {unit}", False: lambda: "none (no line traced)"}[traced is not None]()
+                           f"{o.measured((s.max(), 0.5))[0][0]:g}|{o.measured((s.max(), 0.5))[0][1]:g} {unit}" if traced is not None
+            else "")
+    tr = f"{traced[0]:.4g} -> {traced[1]:.4g} {unit}" if traced is not None else "none (no line traced)"
     n_in, n_be, n_nr = (sum(a is x for a in atoms) for x in Reach)
     stops = "; ".join(stop_text(o, rec, path, k, unit) for k in sorted(rec["dirs"])) if len(path) else "no direction was traced"
     sentence = (f"{LEAD[verdict]} (navigator verdict {verdict.name}): traced {tr} of the suspect line's {sus[0]:g} -> {sus[-1]:g} {unit}; "

@@ -45,7 +45,7 @@ def scan(read, n):
     first_hi = min(his_above, default=n)
     disordered = any(j < last_lo for j in his)   # an ORD node below a DIS node already falsifies faithfulness: refused, never bracketed
     outcome = {(True, True, False): "BRACKET"}.get((bool(los), bool(his_above), disordered), "REFUSE")
-    lo = {True: last_lo, False: 0}[outcome == "BRACKET"]
+    lo = last_lo if outcome == "BRACKET" else 0
     hi = {True: first_hi, False: n - 1}[outcome == "BRACKET"]
     return navigate.Walk(outcome, lo, hi, tuple(enumerate(readings)))
 

@@ -143,7 +143,7 @@ def _cells(p, s):
     """Every vertex in cells, or the first vertex's refusal."""
     each = [cell(p, i, v) for i, v in enumerate(s["vertices"])]
     bad = [c for c in each if isinstance(c, Refused)] + [None]
-    return {True: lambda: Cells(tuple(each), s["corridor"], len(p.curves), max(len(f) for _, f in p.curves), p), False: lambda: bad[0]}[bad[0] is None]()
+    return Cells(tuple(each), s["corridor"], len(p.curves), max(len(f) for _, f in p.curves), p) if bad[0] is None else bad[0]
 
 
 ON_PLANE = {Plane: lambda p, s: _cells(p, s), Refused: lambda p, s: p}   # the plane's outcome type -> (it, [suspect]) -> Cells | Refused

@@ -13,9 +13,12 @@ from intake_evidence import Census, Feasibility, IntervalPlan, SecondLane
 
 ROOT = Path(__file__).resolve().parent.parent
 AT = "intake.toml [interval]"   # where CC's floor findings are located
-REPLICATED = {"block": True, "iid": True, "gamma": True, "chains": True, "STATED": False, "NONE": False}   # method -> are its intervals drawn from the readings of a point; total
-TIERING = {"block": "REPLICATES", "iid": "REPLICATES", "gamma": "REPLICATES", "chains": "REPLICATES", "STATED": "STATED", "NONE": "NONE"}   # method -> the terminal's tiering; total
-HAS_FLOOR = {"block": True, "iid": False, "gamma": True, "chains": True, "STATED": True, "NONE": True}   # iid: k* undefined (plans 1134, 1117); STATED, NONE need none; total
+# method -> are its intervals drawn from the readings of a point; total
+REPLICATED = {"block": True, "iid": True, "gamma": True, "chains": True, "STATED": False, "NONE": False}
+# method -> the terminal's tiering; total
+TIERING = {"block": "REPLICATES", "iid": "REPLICATES", "gamma": "REPLICATES", "chains": "REPLICATES", "STATED": "STATED", "NONE": "NONE"}
+# iid: k* undefined (plans 1134, 1117); STATED, NONE need none; total
+HAS_FLOOR = {"block": True, "iid": False, "gamma": True, "chains": True, "STATED": True, "NONE": True}
 FLOOR = {   # method -> (its [interval] table, the points as (curve, ordinal, readings), the tables) -> CC's floor findings on the readings per point; total
     "block": lambda iv, pts, t: declare.block_floor(AT, iv, pts),   # n // b >= min_blocks per point (min_blocks is REQUIRED at S0 since plan 1160 A4, so the "not declared" case is unreachable here)
     "gamma": lambda iv, pts, t: declare.gamma_floor(AT, iv, pts, t["interval_fields"]["gamma"]["k_gamma"]),   # n >= k_gamma * tau_declared per point

@@ -1974,10 +1974,10 @@ text = "{True: lambda: Cells(tuple(each), s['corridor'], len(p.curves), max((len
 file = "cc/intake_synth.py"
 scope = "cli"
 category = "R-lazy-if"
-ruling = "REWRITE"
+ruling = "KEEP"
 n = 1
 line = 134
-reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+reason = "the file hashes itself into a transducer update pin that the held toolset must carry: an edit fails test_intake_loop4 and test_intake_leak until the toolset copy moves too (finding F10)"
 text = "{True: lambda: args[0], False: lambda: ''}"
 
 [[row]]
@@ -1994,10 +1994,10 @@ text = "{False: lambda: write(bank, truth, ident, int(seed), int(k)), True: lamb
 file = "cc/intake_synth.py"
 scope = "cli"
 category = "R-lazy-if"
-ruling = "REWRITE"
+ruling = "KEEP"
 n = 2
 line = 145
-reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+reason = "the file hashes itself into a transducer update pin that the held toolset must carry: an edit fails test_intake_loop4 and test_intake_leak until the toolset copy moves too (finding F10)"
 text = "{True: lambda: refuse('needs ' + '; '.join(usage)), False: lambda: {True: exists, False: lambda: _do"
 
 [[row]]

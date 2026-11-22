@@ -125,7 +125,7 @@ def order(pairs):
 
 def _column(k, name, cells):
     """ColumnProfile of position k (1-based) over (line, cell) pairs."""
-    cls = [(n, {True: "empty", False: {True: "numeric", False: "text"}[NUMBER.fullmatch(c.strip()) is not None]}[c.strip() == ""], c) for n, c in cells]
+    cls = [(n, {True: "empty", False: "numeric" if NUMBER.fullmatch(c.strip()) is not None else "text"}[c.strip() == ""], c) for n, c in cells]
     count = lambda w: [n for n, x, _ in cls if x == w]
     return ColumnProfile(k, name, len(count("numeric")), len(count("empty")), len(count("text")), rle(count("text")), rle(count("empty")),
                          **order([(n, float(c)) for n, x, c in cls if x == "numeric"]))
@@ -147,11 +147,11 @@ def cells_table(cut, delimiter, widths):
     keyed = [(n, (kind(cs), len(cs), p, int(any(NUMBER.fullmatch(c.strip()) for c in cs)))) for n, cs, p in cut]
     runs = tuple(RowRun(g[0][0], g[-1][0], *key) for key, g in ((k, list(g)) for k, g in itertools.groupby(keyed, key=lambda x: x[1])))
     body = [r for r in runs if r.kind in NUMERIC_KINDS]
-    start = {True: lambda: body[0].first, False: lambda: len(cut) + 1}[len(body) > 0]()
+    start = body[0].first if len(body) > 0 else len(cut) + 1
     dominant = max([(r.last - r.first + 1, -i, r.width) for i, r in enumerate(body)], default=(0, 0, 0))[2]   # the longest NUMERIC run's width
     head = [(n, cs) for n, cs, _ in cut if n < start]
     names = [cs for n, cs in head if kind(cs) == "TEXT"][-1:]
-    named = lambda k: {True: lambda: _name(names[0], k), False: lambda: "NONE"}[len(names) == 1 and len(names[0]) >= k]()
+    named = lambda k: _name(names[0], k) if len(names) == 1 and len(names[0]) >= k else "NONE"
     within = [(n, cs) for n, cs, _ in cut if n >= start and len(cs) == dominant and any(NUMBER.fullmatch(c.strip()) for c in cs)]
     columns = tuple(_column(k, named(k), [(n, cs[k - 1]) for n, cs in within]) for k in range(1, dominant + 1))
     prefixes = Counter(p for _, _, p in cut if p != "")
@@ -162,7 +162,7 @@ def cells_table(cut, delimiter, widths):
 def decoded(raw):
     """(Encoding, text): the first of ENCODINGS that holds and decodes every byte; ("UNDECODABLE", None) for empty bytes or a binary format."""
     enc, text = next((e, t) for e, holds, code in ENCODINGS if holds(raw) for t in [_decoded(raw, code)] if t is not None)
-    return {True: (enc, text), False: ("UNDECODABLE", None)}[text != "" and not BINARY.search(text)]
+    return (enc, text) if text != "" and not BINARY.search(text) else ("UNDECODABLE", None)
 
 
 ENCODING_LINES = {   # (fix F4) Encoding -> (the decoded lines) -> where ENCODING_NOT_UTF8 is: the lines no utf-8 decode reads; total over the text decodings
@@ -246,7 +246,7 @@ def _cells(h):
 def _table_md(t, title):
     names, blanks = body(t)[3], [n for a, b in t.blank_lines for n in range(a, b + 1)]
     row = lambda n: n - names - sum(names < b <= n for b in blanks)   # RANGES' data-row number: rows after the names line, blank lines not rows
-    rows = lambda r: {True: lambda: f"{row(r.first)}-{row(r.last)}", False: lambda: "-"}[r.first > names and r.kind != "BLANK"]()
+    rows = lambda r: f"{row(r.first)}-{row(r.last)}" if r.first > names and r.kind != "BLANK" else "-"
     out = [f"### {title}", f"- delimiter {t.delimiter}; evidence " + "; ".join(f"{d} " + " ".join(f"{w}x{n}" for w, n in h) for d, h in t.widths),
            f"- {t.lines} lines; blank lines " + (", ".join(f"{a}-{b}" for a, b in t.blank_lines) or "none") + "; comment prefixes "
            + (", ".join(f"'{c}' x{n}" for c, n in t.comment_prefixes) or "none"), "", "| lines | data rows | kind | width |", "|---|---|---|---|"]
@@ -264,9 +264,8 @@ def md(p, sha):
     out = [f"# Profile of {p.path}", "", f"PROFILE.json sha256 {sha}; {len(p.files)} files; {len(p.findings)} findings.", ""]
     for f in p.files:
         out += [f"## {f.name}", f"- {f.kind}; encoding {f.encoding}; {f.bytes} bytes; sha256 {f.sha256}"] + [f"- member {m} ({n} bytes)" for m, n in f.members]
-        out += {True: lambda: [f"- sheets: {({READER_ABSENT: 'openpyxl is not installed here', CELLS_UNREADABLE: 'a sheet whose cells do not parse (the reader refuses NOT_AN_XLSX)'}[f.sheets])} ({f.sheets})"],
-                False: lambda: [f"- sheet #{x.position} '{x.name}': {x.rows} rows, {x.columns} columns" for x in f.sheets]}[isinstance(f.sheets, str)]() + [""]
-        out += [x for k, t in tables_of(f) for x in _table_md(t, {True: "the table", False: f"sheet #{k}"}[k == 0])]
+        out += ([f"- sheets: {({READER_ABSENT: 'openpyxl is not installed here', CELLS_UNREADABLE: 'a sheet whose cells do not parse (the reader refuses NOT_AN_XLSX)'}[f.sheets])} ({f.sheets})"] if isinstance(f.sheets, str) else [f"- sheet #{x.position} '{x.name}': {x.rows} rows, {x.columns} columns" for x in f.sheets]) + [""]
+        out += [x for k, t in tables_of(f) for x in _table_md(t, "the table" if k == 0 else f"sheet #{k}")]
     where = lambda x: "".join(" lines " + ", ".join(f"{a}-{b}" for a, b in x.ranges[:12]) for _ in x.ranges[:1]) + f" (+{len(x.ranges) - 12} more in PROFILE.json)" * (len(x.ranges) > 12)
     out += ["## Findings", ""] + [f"- {x.code}: {x.file}" + f" sheet #{x.sheet}" * (x.sheet > 0) + where(x) + f" column {x.column}" * (x.column > 0)   # (fix F4) every range
             + f" against {x.compared}" * (x.compared != "") + f" -> {x.response}: {x.does}" + f" (or {x.otherwise})" * (x.otherwise != "") for x in p.findings]
@@ -281,7 +280,7 @@ def section(text, p, sha, now):
     new = "\n".join([f"## Profile", "", f"Profiled {now} (bin/cc intake profile); PROFILE.json sha256 {sha}.", "",
                      "| file | kind | encoding | delimiter | lines | numeric rows | text runs in body | widths | findings |", "|" + "---|" * 9] + rows) + "\n"
     m = re.search(r"^## Profile[ \t]*$.*?(?=^## |\Z)", text, re.M | re.S)
-    return {True: lambda: text[:m.start()] + new + "\n" * (m.end() < len(text)) + text[m.end():], False: lambda: text.rstrip("\n") + "\n\n" + new}[m is not None]()
+    return text[:m.start()] + new + "\n" * (m.end() < len(text)) + text[m.end():] if m is not None else text.rstrip("\n") + "\n\n" + new
 
 
 
@@ -299,7 +298,7 @@ def _said(ident, p, out):
 def profile_cli(root, ident, args, t):
     """bin/cc intake profile <id> [--raw] <root-named path>: the profile and its findings printed, exit 0; a refusal or usage, exit 1 (--check: check_cli)."""
     import intake_convert
-    path, out = [a for a in args if a != "--raw"], {True: "PROFILE-raw.json", False: "PROFILE.json"}["--raw" in args]
+    path, out = [a for a in args if a != "--raw"], "PROFILE-raw.json" if "--raw" in args else "PROFILE.json"
     ok = len(path) == 1 and not path[0].startswith("--")
     got = {True: lambda: profile(root, ident, path[0], t, out), False: lambda: None}[ok]()
     print({(True, True): lambda: f"profile {ident}: " + got.text(intake_convert.ctables()["sentences"]),
@@ -314,15 +313,16 @@ EMPTY = {"path": "", "files": [], "findings": []}   # (fix F6) the profile value
 def read(d, bank, get):
     """[PROFILE.json of declarations/<id>, its sha256, the bank's CONVERSION-MANIFEST.json (intake_convert._manifest, {} when not of its shape), its sha256]; EMPTY / {} and "" for a file not there (absent: the sha is ""); `get` reads the manifest (S3: the run's loader)."""
     got = [{True: lambda: g(f), False: lambda: None}[f.is_file()]() for f, g in ((Path(d) / "PROFILE.json", Path.read_bytes), (Path(bank) / MANIFEST, get))]
-    return [x for b, v, e in zip(got, (json.loads, lambda b: _manifest(b.decode("utf-8", "replace")) or {}), (EMPTY, {})) for x in {True: lambda: (v(b), hashlib.sha256(b).hexdigest()), False: lambda: (e, "")}[b is not None]()]
+    return [x for b, v, e in zip(got, (json.loads, lambda b: _manifest(b.decode("utf-8", "replace")) or {}), (EMPTY, {})) for x in ((v(b), hashlib.sha256(b).hexdigest()) if b is not None else (e, ""))]
 
 
 def check_cli(root, ident, args, t):
     """bin/cc intake profile <id> --check, the declarer's gate before lint: the declaration (S0) against PROFILE.json and its bank's manifest (intake_against.against); every contradiction printed (code, file, where), exit 1 on any or on no profile."""
     d = Path(root) / "declarations" / ident
     s0 = format_stage(intake_seal.declared(d), (), t)
-    p, sha, m, _ = {True: lambda: [EMPTY, "", {}, ""], False: lambda: read(d, intake_bytes.located(s0.evidence.data["source"]["root"], t["roots"]), Path.read_bytes)}[isinstance(s0, Refuse)]()
-    found = {True: lambda: (), False: lambda: intake_bytes.intake_against.against(p, m, s0.evidence.data)}[sha == ""]()
-    print(f"profile {ident} --check: " + {True: lambda: f"REFUSE {s0.reason}: the declaration does not pass FORMAT (bin/cc intake lint {ident})", False: lambda: {True: f"PROFILE_ABSENT: run bin/cc intake profile {ident} <root-named path> first",
-          False: f"{len(found)} contradictions" + "".join(f"\n  {c.name} {f}: {w}" for c, f, w in found)}[sha == ""]}[isinstance(s0, Refuse)]())
+    p, sha, m, _ = [EMPTY, "", {}, ""] if isinstance(s0, Refuse) else read(d, intake_bytes.located(s0.evidence.data["source"]["root"], t["roots"]), Path.read_bytes)
+    found = () if sha == "" else intake_bytes.intake_against.against(p, m, s0.evidence.data)
+    print(f"profile {ident} --check: " + (f"REFUSE {s0.reason}: the declaration does not pass FORMAT (bin/cc intake lint {ident})" if isinstance(s0, Refuse)
+                                          else {True: f"PROFILE_ABSENT: run bin/cc intake profile {ident} <root-named path> first",
+          False: f"{len(found)} contradictions" + "".join(f"\n  {c.name} {f}: {w}" for c, f, w in found)}[sha == ""]))
     return int(isinstance(s0, Refuse) or sha == "" or len(found) > 0)

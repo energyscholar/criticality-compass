@@ -30,12 +30,12 @@ TOOLS = os.environ.get("CC_RELEASE_TOOLS") or sys.executable
 EMAIL = "energyscholar+criticality-compass@gmail.com"
 # T3: the AST digest (docstrings removed) of every .py file this plan edits, at the contract base 16a21fb. A pin follows an edit only by the Auditor's re-pin.
 # plan 1644 re-pins (Auditor answer 2), each declared in its phase's commit: cc/kernel.py + cc/admit.py (phase 2: the four types move into the door).
-# phase 4: cc/chain.py (_edges takes the value door, SAMPLE_NOT_FINITE).
+# phase 4: cc/chain.py (_edges takes the value door, SAMPLE_NOT_FINITE). phase 5: cc/chain.py and cc/scorewords.py (the D5 bool-dispatch rewrite, transformer-checked by test_dispatch_rewrite).
 AST_BASE = {
     "cc/registry.py": "96548206ffd82395b4bb009b2ef99729a177def4d7c84df44aa0df9873b19dad",
     "cc/oracle_reweight.py": "47cc58df26189c49f325fb0cdcefb1be77a4e74cb3447995a0048c5936973fb2",
-    "cc/chain.py": "f4064ddc530d69ccae8e6b18819e8f48349d5dbdd605cc65055edc6e8f7e86de",
-    "cc/scorewords.py": "d35bd35eba05ac15a8985b8a64c47367faf956749f007bdc6f786d32cab134d5",
+    "cc/chain.py": "6b69fd29f13cdb0b633b63ee950f75b771a491d6f5234720fe0df9f4e8515c78",
+    "cc/scorewords.py": "0ba88d044a6d3285dfc303b0b1a60e289498fe3d640f991a5fa496adaecabed3",
     "cc/linenav.py": "fa623461a5e35af5bbdba9644ccad9c895b030cc9042933d58e00bb2dfa67a95",
     "cc/sampler.py": "cb1771994db96829f9d976d22ab77fa86e4e64920ba4de30ba3afc8bed0abb99",
     "cc/kernel.py": "3492c4f0cb03a8867486a1e11b07dcfc3977c26f5a345bd1637741c98b8981e9",

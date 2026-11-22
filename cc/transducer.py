@@ -16,7 +16,7 @@ def routed(tools, m):
     """(the git tree a pin resolves in, its path there, its sha) for an UPDATE match: no route = the toolset root `tools`; a route = its
     directory of cc.toml [transducer] update_routes. An undeclared route resolves to None (update_findings reports it)."""
     routes = {**ROUTES, "": tools}
-    return {True: lambda: routes[m[1]], False: lambda: None}[m[1] in routes](), m[2], m[3]
+    return routes[m[1]] if m[1] in routes else None, m[2], m[3]
 RECORD = ("apparatus", "preparation", "observation", "authors_projection", "source")
 
 

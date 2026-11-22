@@ -14,8 +14,8 @@ def fill(text, values, dropped=frozenset()):
     out, sec = [], ""
     for ln in text.splitlines():
         sec, m, head = {True: ln.strip("[] "), False: sec}[ln.startswith("[")], re.match(r'(\w+) = "TODO"(.*)', ln), re.match(r"# \[([\w.]+)\]:", ln)
-        about = {True: lambda: [head[1]], False: lambda: [sec] + [f"{sec}.{x[1]}" for x in [m] if x is not None]}[head is not None]()
-        kept = {True: lambda: [], False: lambda: [{True: lambda: f"{m[1]} = {values[sec + '.' + m[1]]}{m[2]}", False: lambda: ln}[m is not None and f"{sec}.{m[1]}" in values]()]}
+        about = [head[1]] if head is not None else [sec] + [f"{sec}.{x[1]}" for x in [m] if x is not None]
+        kept = {True: lambda: [], False: lambda: [f"{m[1]} = {values[sec + '.' + m[1]]}{m[2]}" if m is not None and f"{sec}.{m[1]}" in values else ln]}
         out += kept[any(n in dropped for n in about)]()
     return "\n".join(out) + "\n"
 
@@ -48,4 +48,4 @@ def new(root, ident, sid):
                              (not d.exists(), f"declarations/{ident} exists; a declaration is never overwritten (choose another id)"),
                              (sid == "" or synth.is_file(), f"no synthetic bank '{sid}' (run bin/cc intake synth {sid} --seed N first)")) if not ok]
     return {True: lambda: (1, f"bin/cc new intake: refused, {'; '.join(usage)}\n  Next: bin/cc new intake <id> [--from-synth <synth-id>]"),
-            False: {True: blank, False: filled}[sid == ""]}[len(usage) > 0]()
+            False: blank if sid == "" else filled}[len(usage) > 0]()

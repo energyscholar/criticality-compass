@@ -47,7 +47,7 @@ def ctables():
 
 def _in(where, got):
     """got, a Refuse placed in the file `where` names (plan 1160 A12: a conversion refusal's Detail names the file), else got unchanged."""
-    return {True: lambda: Refuse(got.reason, replace(got.evidence, file=where)), False: lambda: got}[isinstance(got, Refuse)]()
+    return Refuse(got.reason, replace(got.evidence, file=where)) if isinstance(got, Refuse) else got
 
 
 def _entry(f):
@@ -104,23 +104,22 @@ def _split(text):
 
 
 def _member(z, fr, step):
-    return {True: lambda: replace(fr, raw=z.read(step["member"])),
-            False: lambda: Refuse("SOURCE_FILE_ABSENT", detail(words=[f"member '{step['member']}'"], counts={"members in the archive": len(z.namelist())}))}[step["member"] in z.namelist()]()
+    return replace(fr, raw=z.read(step["member"])) if step["member"] in z.namelist() else Refuse("SOURCE_FILE_ABSENT", detail(words=[f"member '{step['member']}'"], counts={"members in the archive": len(z.namelist())}))
 
 
 def _unpack(fr, step, k):
     z = _zipped(fr.raw)
-    return {True: lambda: Refuse("CONTAINER_UNREADABLE", detail(words=["UNPACK: the bytes are no zip archive"])), False: lambda: _member(z, fr, step)}[z is None]()
+    return Refuse("CONTAINER_UNREADABLE", detail(words=["UNPACK: the bytes are no zip archive"])) if z is None else _member(z, fr, step)
 
 
 def _decode(fr, step, k):
     text = _decoded(fr.raw, step["encoding"])
-    return {True: lambda: Refuse("ENCODING_INVALID", detail(words=[f"encoding {step['encoding']}"])), False: lambda: replace(fr, raw=b"", lines=_split(text))}[text is None]()
+    return Refuse("ENCODING_INVALID", detail(words=[f"encoding {step['encoding']}"])) if text is None else replace(fr, raw=b"", lines=_split(text))
 
 
 def _marker(rule, lines):
     at = [i for i, (_, t) in enumerate(lines) if t.strip() == rule["marker"]] + [None]
-    return {True: lambda: None, False: lambda: set(range(at[0] + 1))}[at[0] is None]()
+    return None if at[0] is None else set(range(at[0] + 1))
 
 
 DROP = {   # DROP_LINES rule kind -> (rule, lines) -> the indices of the lines it drops, or None (MARKER_LINE_ABSENT); total over its kinds
@@ -132,9 +131,9 @@ DROP = {   # DROP_LINES rule kind -> (rule, lines) -> the indices of the lines i
 
 def _drop(fr, step, k):
     gone = DROP[step["rule"]["kind"]](step["rule"], fr.lines)
-    return {True: lambda: Refuse("MARKER_LINE_ABSENT", detail(words=[f"DROP_LINES MARKER '{step['rule']['marker']}'"], counts={"lines": len(fr.lines)})),
-            False: lambda: replace(fr, lines=tuple(x for i, x in enumerate(fr.lines) if i not in gone),
-                                   dropped=fr.dropped + tuple((fr.lines[i][0], k) for i in sorted(gone)))}[gone is None]()
+    return (Refuse("MARKER_LINE_ABSENT", detail(words=[f"DROP_LINES MARKER '{step['rule']['marker']}'"], counts={"lines": len(fr.lines)})) if gone is None
+            else replace(fr, lines=tuple(x for i, x in enumerate(fr.lines) if i not in gone),
+                                   dropped=fr.dropped + tuple((fr.lines[i][0], k) for i in sorted(gone))))
 
 
 SPLIT = {**intake_read.SPLIT, "SEMICOLON": lambda ln: next(csv.reader([ln], delimiter=";"))}   # DELIMITER from -> one line to its cells; total
@@ -164,8 +163,7 @@ XLSX_REASON = {"NOT_AN_XLSX": "CONTAINER_UNREADABLE", "SHEET_ABSENT": "SHEET_ABS
 def sheet_rows(raw, sheet):
     """[(row number, cell texts)] of one xlsx sheet through intake_read's xlsx table (openpyxl or XLSX_READER_ABSENT), or a Refuse."""
     got = intake_read.CELLS["XLSX"](raw, {"format": {"sheet": sheet}, "comment": []})
-    return {True: lambda: Refuse(XLSX_REASON[got.reason], got.detail), False: lambda: [(n, [look(CELL_TEXT, type(v), str)(v) for v in r]) for n, r in got]}[
-        isinstance(got, intake_read.Unreadable)]()
+    return Refuse(XLSX_REASON[got.reason], got.detail) if isinstance(got, intake_read.Unreadable) else [(n, [look(CELL_TEXT, type(v), str)(v) for v in r]) for n, r in got]
 
 
 def _sheet(fr, step, k):
@@ -320,7 +318,7 @@ def plan(steps, ct):
 def _step(parts, x):
     got = [OPS[x[0]["op"]](name, fr, x[0], x[1]) for name, fr in parts]
     bad = [g for g in got if isinstance(g, Refuse)]
-    return {True: lambda: bad[0], False: lambda: [p for g in got for p in g]}[len(bad) > 0]()
+    return bad[0] if len(bad) > 0 else [p for g in got for p in g]
 
 
 def run(raw, name, steps):
@@ -389,7 +387,7 @@ def _mapped(files, units, outputs, frames, data, grid, lines, blank):
     entries = lambda us: ", ".join(_entry(files[u]) for u in sorted(set(us))[:3])   # plan 1160 A12: the Detail names the file
     held = lambda u: sorted(per[u].mapped) + sorted(n for n, _ in units[u]["dropped"]) + sorted(units[u]["names"])
     why = {"DROP_LINES": lambda u, n: True, "DROP_ROWS_NOT_NUMERIC": lambda u, n: n in per[u].nonnumber}   # plan 1160 A11: a row's drop needs its cell no number
-    unjustified = lambda u: [n for n, s in units[u]["dropped"] if not ({True: lambda: n in blank[u], False: lambda: look(why, files[u]["steps"][s]["op"], lambda u, n: False)(u, n)}[s == -1]())]
+    unjustified = lambda u: [n for n, s in units[u]["dropped"] if not ((n in blank[u] if s == -1 else look(why, files[u]["steps"][s]["op"], lambda u, n: False)(u, n)))]
     unpartitioned = [u for u in range(len(frames)) if sorted(held(u)) != sorted(lines[u]) or len(set(held(u))) != len(held(u)) or unjustified(u)]
     differ = lambda: [(u, c) for u, _, c, out in cells if not _same(out, src(u, c))]
     hollow = lambda: [r for r, _ in outputs if any(all(j in r["broadcast"] for j in range(len(row))) for row in r["cells"])]
@@ -437,7 +435,7 @@ def declared(text, ct):
     """S0 of a conversion: the declaration as plain values, or the first finding's Refuse (every finding listed)."""
     p = parse(text)
     found = p.findings((), {"format": ct, "admit": {}})
-    return {True: lambda: p.data, False: lambda: Refuse(found[0].reason, detail(file="CONVERSION.toml", words=[f"{f.reason} at {f.loc or 'the file'}: {f.detail}" for f in found]))}[not found]()
+    return p.data if not found else Refuse(found[0].reason, detail(file="CONVERSION.toml", words=[f"{f.reason} at {f.loc or 'the file'}: {f.detail}" for f in found]))
 
 
 def _text(p):
@@ -472,7 +470,7 @@ def _built(conv, ct, raws):
     """Every file entry planned and run: [(entry index, [(name, frame)])], or the first Refuse."""
     got = [_in(_entry(f), _bind(plan(f["steps"], ct), lambda p, f=f: run(raws[f["from"]], f["to"], p))) for f in conv["file"]]
     bad = [g for g in got if isinstance(g, Refuse)]
-    return {True: lambda: bad[0], False: lambda: [(u, parts) for u, parts in enumerate(got)]}[len(bad) > 0]()
+    return bad[0] if len(bad) > 0 else [(u, parts) for u, parts in enumerate(got)]
 
 
 def _records(conv, ct, raws, built):
@@ -551,14 +549,13 @@ def _manifest(text):
 
 def _manifest_in(read):
     """The manifest a reader of a bank finds: _manifest of its text, or None when the bank holds no manifest file."""
-    return _bind(read(MANIFEST), lambda b: {True: lambda: None, False: lambda: _manifest(b.decode("utf-8", "replace"))}[b is None]())
+    return _bind(read(MANIFEST), lambda b: None if b is None else _manifest(b.decode("utf-8", "replace")))
 
 
 def chained(m, raw_of, bank_of, ct, want):
     """The chain of a bank: its manifest (m, or None), each raw file's sha256 and each bank file's against it, `want` (key -> declared value)
     against it, then the identity test on those very bytes. Pass(Verified) | Refuse (CONVERSION_CHAIN_BROKEN, or the identity's reason)."""
-    return {True: lambda: Refuse("CONVERSION_CHAIN_BROKEN", detail(words=[f"no {MANIFEST} the converter wrote"])),
-            False: lambda: _chained(m, raw_of, bank_of, ct, want)}[m is None]()
+    return Refuse("CONVERSION_CHAIN_BROKEN", detail(words=[f"no {MANIFEST} the converter wrote"])) if m is None else _chained(m, raw_of, bank_of, ct, want)
 
 
 def _chained(m, raw_of, bank_of, ct, want):
@@ -572,7 +569,7 @@ def _chained(m, raw_of, bank_of, ct, want):
 
 
 def _reader(base, loader):
-    return lambda rel: {True: lambda: None, False: lambda: loader.read(_inside(base, rel))}[_inside(base, rel) is None]()
+    return lambda rel: None if _inside(base, rel) is None else loader.read(_inside(base, rel))
 
 
 def verified(root, ident, t, ct):
@@ -600,30 +597,29 @@ def s3(declaration, d, t, then):
         broken = {True: lambda: got, False: lambda: Refuse("CONVERSION_CHAIN_BROKEN", got.evidence.within(got.evidence.file, got.reason))}
         dropped = lambda: tuple((f"{m['files'][u['file']]['from']} -> {m['files'][u['file']]['to']}", u["not_numeric_count"]) for u in m["units"]
                                 if "DROP_ROWS_NOT_NUMERIC" in [x["op"] for x in m["files"][u["file"]]["steps"]])   # plan 1160 A11: the census prints the count
-        return {True: lambda: _bind(then(loader), lambda p: Pass(replace(p.evidence, dropped=dropped()))),
-                False: lambda: broken[got.reason == "CONVERSION_CHAIN_BROKEN"]()}[isinstance(got, Pass)]()
+        return _bind(then(loader), lambda p: Pass(replace(p.evidence, dropped=dropped()))) if isinstance(got, Pass) else broken[got.reason == "CONVERSION_CHAIN_BROKEN"]()
     return gate([(lambda: "" not in (bank, raw) and Path(bank).is_dir() and Path(raw).is_dir(), "ROOT_UNRESOLVED",
                   lambda: detail(words=[f"root '{src['root']}'", f"converted_from '{src['converted_from']}'"]))], go)
 
 
 def convert_cli(root, ident, args, t):
     ct = ctables()
-    res = {True: lambda: verified(root, ident, t, ct), False: lambda: convert(root, ident, t, ct)}["--verify" in args]()
+    res = verified(root, ident, t, ct) if "--verify" in args else convert(root, ident, t, ct)
     print(f"convert {ident}{' --verify' * ('--verify' in args)}: " + res.text(ct["sentences"]))
-    return {True: 1, False: 0}[isinstance(res, Refuse)]
+    return 1 if isinstance(res, Refuse) else 0
 
 
 def _cells(line):
     """A head line's cells, for peek: cut as a CSV line at , ; or tab when the line holds one (quotes honoured, as DELIMITER cuts), else at
     runs of blanks; empty cells are no cells, and a blank line (blank) has none."""
-    cut = {True: lambda: next(csv.reader([re.sub(r"[;\t]", ",", line)]), []), False: lambda: line.split()}[re.search(r"[,;\t]", line) is not None]()
+    cut = next(csv.reader([re.sub(r"[;\t]", ",", line)]), []) if re.search(r"[,;\t]", line) is not None else line.split()
     return {True: [], False: [c.strip() for c in cut if c.strip()]}[blank(cut)]
 
 
 def _named(cs):
     """Names as peek prints them: counts, and each TEXT name masked (a numeral in it as #); a NUMERIC name is counted, never printed."""
     text = [c for c in cs if classify(c) is Name.TEXT]
-    named = {True: lambda: ": " + ", ".join(f"'{masked(c)}'" for c in text), False: lambda: ""}[len(text) > 0]()
+    named = ": " + ", ".join(f"'{masked(c)}'" for c in text) if len(text) > 0 else ""
     return f"{len(text)} text name{'s' * (len(text) != 1)} + {len(cs) - len(text)} numeric name{'s' * (len(cs) - len(text) != 1)}{named}"
 
 
@@ -687,13 +683,13 @@ def decodes(raw, codes):
 def peek(raw, sheet, depth, encoding, delim="COMMA"):
     """The lines peek prints: at most depth + 2 head lines, stopping before the first line whose every cell is a number (a data line); (plan
     1160 A43) each with its cell count, a text line cut by SPLIT[delim] (an xlsx row: its cells), and the file's line count. Counts only."""
-    text = {True: lambda: dict(_split(raw.decode(encoding, "replace"))), False: lambda: {}}[sheet == "" and not _xlsx(raw)]()
+    text = dict(_split(raw.decode(encoding, "replace"))) if sheet == "" and not _xlsx(raw) else {}
     count = {True: lambda n, cs: f"; {len(SPLIT[delim](text[n]))} cells under {delim}", False: lambda n, cs: f"; {len(cs)} cells"}[text != {}]
 
     def lines(rows):
         stop = [i for i, (_, cs) in enumerate(rows) if cs and all(classify(c) is Name.NUMERIC for c in cs)] + [len(rows)]
         shown_ = rows[:min(stop[0], depth + 2)]
-        return ([_said(n, cs) + count(n, cs) for n, cs in shown_], {True: "a line of numbers (not printed)", False: "depth + 2 lines"}[stop[0] <= depth + 2 and stop[0] < len(rows)],
+        return ([_said(n, cs) + count(n, cs) for n, cs in shown_], "a line of numbers (not printed)" if stop[0] <= depth + 2 and stop[0] < len(rows) else "depth + 2 lines",
                 len(rows))
     return _bind(_head(raw, sheet, encoding), lines)
 
@@ -716,23 +712,22 @@ def peek_cli(root, ident, args, t):
     d, ct = Path(root) / "declarations" / ident, ctables()
     codes, enc = list(ct["fields"]["file"]["fields"]["steps"]["variants"]["DECODE"]["encoding"]["values"]), flag(args, "--encoding", "utf-8-sig")   # (A22)
     delim = flag(args, "--delimiter", "COMMA")   # (A43) a key of SPLIT: what each shown line's cell count is cut by
-    rel, depth = {True: lambda: args[0], False: lambda: ""}[len(args) > 0](), flag(args, "--depth", "1")
-    sheet = {True: int, False: str}[re.fullmatch(r"[1-9]\d*", flag(args, "--sheet", "")) is not None](flag(args, "--sheet", ""))   # (A21) a position, or a name
+    rel, depth = args[0] if len(args) > 0 else "", flag(args, "--depth", "1")
+    sheet = (int if re.fullmatch(r"[1-9]\d*", flag(args, "--sheet", "")) is not None else str)(flag(args, "--sheet", ""))   # (A21) a position, or a name
     base = t["roots"]["<cc-datasets>"]
     at = listed(rel, base)   # (A42: was intake_bytes.located, a character class) "" for any other root, an absolute path, a ".." part or a bare name
     ok = rel != "" and not rel.startswith("--") and re.fullmatch(r"\d+", depth) is not None
     def go():
         loader = intake_bytes._t23().Loader({base: "converted-from"}, d / "conversion-access.log")
-        raw = {True: lambda: None, False: lambda: _reader(base, loader)(Path(at).relative_to(base))}[at == ""]()
+        raw = None if at == "" else _reader(base, loader)(Path(at).relative_to(base))
         got = gate([(lambda: raw is not None, "SOURCE_FILE_ABSENT", lambda: detail(words=[f"'{rel}' (a file under the <cc-datasets> root)"])),
                     (lambda: enc in codes, "VALUE_NOT_LISTED", lambda: detail(words=[f"--encoding '{enc}'", f"DECODE's alphabet: {', '.join(codes)}"])),
                     (lambda: delim in SPLIT, "VALUE_NOT_LISTED", lambda: detail(words=[f"--delimiter '{delim}'", f"one of: {', '.join(SPLIT)}"]))],   # (A43)
                    lambda: _bind(_in(f"file '{rel}'", peek(raw, sheet, int(depth), enc, delim)), lambda g: (g[0], g[1], decodes(raw, codes) + f"; lines in the file: {g[2]}")))
         with open(d / "peek.log", "a") as f:
             f.write(json.dumps({"time": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "file": rel, "sheet": sheet, "depth": depth, "encoding": enc,
-                                "printed": {True: lambda: 0, False: lambda: len(got[0])}[isinstance(got, Refuse)](),
-                                "stopped": {True: lambda: got.reason, False: lambda: got[1]}[isinstance(got, Refuse)]()}) + "\n")
-        print({True: lambda: f"peek {ident} {rel}: " + got.text(ct["sentences"]),
-               False: lambda: f"peek {ident} {rel}:\n  {got[2]}\n" + "".join(f"  {x}\n" for x in got[0]) + f"  stopped: {got[1]}"}[isinstance(got, Refuse)]())
-        return {True: 1, False: 0}[isinstance(got, Refuse)]
+                                "printed": 0 if isinstance(got, Refuse) else len(got[0]),
+                                "stopped": got.reason if isinstance(got, Refuse) else got[1]}) + "\n")
+        print(f"peek {ident} {rel}: " + got.text(ct["sentences"]) if isinstance(got, Refuse) else f"peek {ident} {rel}:\n  {got[2]}\n" + "".join(f"  {x}\n" for x in got[0]) + f"  stopped: {got[1]}")
+        return 1 if isinstance(got, Refuse) else 0
     return {True: go, False: lambda: print("bin/cc intake peek: usage: peek <id> <cc-datasets>/<name>/raw/<file> [--sheet NAME|k] [--depth N] [--encoding E] [--delimiter D]") or 1}[ok]()

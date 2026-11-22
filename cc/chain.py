@@ -125,11 +125,11 @@ class Stride:
 
     def k(self, m):
         """k in samples for a curve of m in-window samples (m - 1 intervals)."""
-        return {True: lambda: max(1, int(self.samples)), False: lambda: max(1, int(np.floor(self.span * max(m - 1, 0) + 0.5)))}[self.samples is not None]()
+        return max(1, int(self.samples)) if self.samples is not None else max(1, int(np.floor(self.span * max(m - 1, 0) + 0.5)))
 
     @property
     def label(self):
-        return {True: lambda: f"{self.samples}smp", False: lambda: f"{self.span:g}span"}[self.samples is not None]()
+        return f"{self.samples}smp" if self.samples is not None else f"{self.span:g}span"
 
 
 S1 = Stride(samples=1)   # the v3 lane: adjacent samples
@@ -156,8 +156,7 @@ def _sample_lane(sign):
         a = sorted(rows, key=lambda r: r[0])
         f = F.feature([(r[0], sign * r[1], *r[2:]) for r in rows], z, kind, wc, sp.width[1], ends)
         u = lambda i: (a[i][0] - sp.lo[1]) / sp.width[1]   # noqa: E731
-        return {True: lambda: Placed("Absent", -1, f.lo, f.hi, None, None),
-                False: lambda: Placed(type(f).__name__, f.rank, f.lo, f.hi, u(f.rank), (u(f.lo), u(f.hi)))}[isinstance(f, F.Absent)]()
+        return Placed("Absent", -1, f.lo, f.hi, None, None) if isinstance(f, F.Absent) else Placed(type(f).__name__, f.rank, f.lo, f.hi, u(f.rank), (u(f.lo), u(f.hi)))
     return lane
 
 
@@ -233,15 +232,15 @@ class Grid:
 
 def keys(g, lane):
     """A lane's cell keys in declared order: a w_c float, or (Stride, w_c) for the edge lane when the grid declares strides."""
-    return {True: lambda: [(s, w) for s in g.strides for w in g.wc], False: lambda: list(g.wc)}[lane is Lane.ARGMAX_ABS_A_FAST and len(g.strides) > 0]()
+    return [(s, w) for s in g.strides for w in g.wc] if lane is Lane.ARGMAX_ABS_A_FAST and len(g.strides) > 0 else list(g.wc)
 
 
 def wc_of(key):
-    return {True: lambda: key[1], False: lambda: key}[isinstance(key, tuple)]()
+    return key[1] if isinstance(key, tuple) else key
 
 
 def stride_of(key):
-    return {True: lambda: key[0], False: lambda: S1}[isinstance(key, tuple)]()
+    return key[0] if isinstance(key, tuple) else S1
 
 
 def grid(path):
@@ -297,7 +296,7 @@ def _family(ident, t, d, p):
 def undeclared(t, g):
     """Refusal LANE_UNDECLARED naming the grid's lanes POLICY has no row for, or None."""
     miss = [ln.name for ln in g.lanes if f"FEATURE_{ln.name}" not in look(t["policy"], "feature_projection", {})]
-    return {True: lambda: None, False: lambda: Refusal("LANE_UNDECLARED", ", ".join(f"FEATURE_{m}" for m in miss))}[len(miss) == 0]()
+    return None if len(miss) == 0 else Refusal("LANE_UNDECLARED", ", ".join(f"FEATURE_{m}" for m in miss))
 
 
 def evaluate(fam, g):
@@ -321,16 +320,16 @@ def colocate(a, b, wc):
 def stride_row(key):
     """The stride fields of an edge-lane cell that has a stride axis (none for any other cell): the declared stride, and per curve its k in
     samples and as a fraction of the fast span."""
-    return {True: lambda: {"stride": key[0].label, "stride_declared": {"samples": key[0].samples, "span": key[0].span}}, False: lambda: {}}[isinstance(key, tuple)]()
+    return {"stride": key[0].label, "stride_declared": {"samples": key[0].samples, "span": key[0].span}} if isinstance(key, tuple) else {}
 
 
 def curve_stride(key, p):
-    return {True: lambda: {"stride_samples": p.k, "stride_span": p.frac}, False: lambda: {}}[isinstance(key, tuple)]()
+    return {"stride_samples": p.k, "stride_span": p.frac} if isinstance(key, tuple) else {}
 
 
 def label(c):
     """A cell's name in a sentence: its w_c, and its stride when the cell has one."""
-    return f"{c['wc']:g}" + {True: lambda: f"@{c['stride']}", False: lambda: ""}["stride" in c]()
+    return f"{c['wc']:g}" + (f"@{c['stride']}" if "stride" in c else "")
 
 
 def rows(fam, g, ev):
@@ -363,7 +362,7 @@ def sentence(fam, g, lane, cells, atoms):
     [breaks.setdefault((st["step"], st["slow"][0], st["slow"][1]), []).append(label(c)) for c in mine for st in c["steps"] if st["step"] != "STEP_WITHIN_WC"]
     br = "; ".join(f"{k[0]} at {k[1]:g}|{k[2]:g} {u} (w_c {', '.join(v)})" for k, v in breaks.items()) or "none"
     at = ", ".join(f"{a} in {v['cells']} of {nl} cells ({v['robustness']})" for a, v in atoms[lane.name].items())
-    axes = {True: lambda: f"{nl} cells ({len(g.strides)} strides x {len(g.wc)} w_c)", False: lambda: f"{nl} w_c cells"}["stride" in mine[0]]()
+    axes = f"{nl} cells ({len(g.strides)} strides x {len(g.wc)} w_c)" if "stride" in mine[0] else f"{nl} w_c cells"
     return (f"Lane {lane.name} over {len(fam.slows)} curves ({fam.slows[0]:g} -> {fam.slows[-1]:g} {u}), {axes}: {at}. "
             f"Per cell, {per}. Breaks: {br}. Nothing is walked or bridged between curves; {NOT_A_CLASS}.")
 
@@ -405,9 +404,9 @@ def run(root, ident, grid_path, other=None):
     g = then(t_have, lambda _: grid(grid_path))
     fam = then(g, lambda _: family(root, ident))
     lanes = then(fam, lambda _: undeclared(_tables(root), g) or fam)
-    fb = then(lanes, lambda f: {True: lambda: None, False: lambda: _second(root, f, other, g)}[other is None]())
+    fb = then(lanes, lambda f: None if other is None else _second(root, f, other, g))
     bad = [x for x in (t_have, g, fam, lanes, fb) if isinstance(x, REFUSED)]
-    return {True: lambda: ([f"REFUSED {bad[0].words()}"], 1), False: lambda: _done(root, fam, g, fb)}[len(bad) > 0]()
+    return ([f"REFUSED {bad[0].words()}"], 1) if len(bad) > 0 else _done(root, fam, g, fb)
 
 
 def _tables(root):
@@ -418,7 +417,7 @@ def _tables(root):
 def _done(root, fam, g, fb):
     ev = evaluate(fam, g)
     cells, atoms = rows(fam, g, ev)
-    co = {True: lambda: [], False: lambda: co_rows(cells, fb)}[fb is None]()
+    co = [] if fb is None else co_rows(cells, fb)
     out = Path(root) / "results" / "chain" / f"{fam.ident}.json"
     doc = {"schema": 1, "kind": "chain", "id": fam.ident, "grid": {"wc": list(g.wc), "lanes": [ln.name for ln in g.lanes], "sha256": g.sha256,
                     **({"strides": [{"label": x.label, "samples": x.samples, "span": x.span} for x in g.strides]} if g.strides else {})},

@@ -39,14 +39,14 @@ def _facts(fp, spec, d, ops):
     """What the declared reader meets in one profiled file, from its profile alone (intake_read's steps): the table (an XLSX's declared sheet, by
     position or masked name), the live runs (no BLANK, no declared comment prefix), the lines before the first NUMERIC run, the masked names
     (None when the names line lies beyond the 12 header lines profiled: then no column is checked), the width, each declared column's profile."""
-    want = {True: lambda: spec["format"]["sheet"], False: lambda: 0}[spec["format"]["kind"] == "XLSX"]()
+    want = spec["format"]["sheet"] if spec["format"]["kind"] == "XLSX" else 0
     tabs = [(0, "", t) for t in fp["tables"]] + [(s["position"], s["name"], s["table"]) for s in {True: fp["sheets"], False: []}[isinstance(fp["sheets"], list)]]
     t = next((t for k, n, t in tabs if k == want or n == masked(str(want))), NONE)
     live = [r for r in t["rows"] if r["kind"] != "BLANK" and not any(r["prefix"].startswith(p) for p in spec["comment"])]
     i, h = next((i for i, r in enumerate(live) if r["kind"] in NUMERIC), len(live)), spec["header"]
     head, at = [n for r in live[:i] for n in range(r["first"], r["last"] + 1)], {"names": 0, **intake_read.HEADER[h["kind"]](h)}["names"]
-    cells = next((x["cells"] for x in t["header_lines"] if x["line"] == ([0] + head)[at * (at <= len(head))]), {True: [], False: None}[at * (at <= len(head)) == 0])
-    names = {True: lambda: NAMES.get(h["kind"], lambda h, cs: list(cs))(h, cells), False: lambda: None}[cells is not None]()
+    cells = next((x["cells"] for x in t["header_lines"] if x["line"] == ([0] + head)[at * (at <= len(head))]), [] if at * (at <= len(head)) == 0 else None)
+    names = NAMES.get(h["kind"], lambda h, cs: list(cs))(h, cells) if cells is not None else None
     k = {str: lambda r: ([j for j, n in enumerate(names or [], 1) if n == masked(r)] + [0])[0], int: lambda r: r}
     return dict(fp=fp, t=t, live=live, body=live[i:], i=i, head=head, names=names, width={True: len(cells or ()), False: ([r["width"] for r in live[i:]] + [0])[0]}[bool(cells)],
                 col=lambda r: next((c for c in t["columns"] if c["position"] == k[type(r)](r)), COLUMN), spec=spec, d=d, ops=ops,
@@ -58,7 +58,7 @@ ONE = lambda c: c["d"]["selection"]["layout"] == "PER_FILE"   # ORDER, REPEATS, 
 FAST = lambda c: c["col"]((c["refs"] + [0])[0])   # the fast column's profile (role_columns: the fast column first; no column: COLUMN)
 HOLDS = {   # Contradiction -> (holds over one file's facts, where it is: positions, counts, masked names); every row but FILE_NOT_PROFILED, FILES (in against)
     R.ENCODING_CONTRADICTS_PROFILE: (lambda c: c["fp"]["encoding"] in ("UTF16", "LATIN1_ONLY") and "DECODE" not in c["ops"], lambda c: f"encoding {c['fp']['encoding']}, no DECODE"),
-    R.DELIMITER_CONTRADICTS_PROFILE: (lambda c: "DELIMITER" not in c["ops"] and (c["fp"]["kind"] != {True: "XLSX", False: "TEXT_TABLE"}[c["spec"]["format"]["kind"] == "XLSX"] or c["score"].get(
+    R.DELIMITER_CONTRADICTS_PROFILE: (lambda c: "DELIMITER" not in c["ops"] and (c["fp"]["kind"] != ("XLSX" if c["spec"]["format"]["kind"] == "XLSX" else "TEXT_TABLE") or c["score"].get(
         c["spec"]["format"]["kind"], 0) < c["score"].get(c["t"]["delimiter"], 0)), lambda c: f"{c['fp']['kind']}, delimiter {c['t']['delimiter']}; declared {c['spec']['format']['kind']}"),
     R.SHEET_CONTRADICTS_PROFILE: (lambda c: c["fp"]["kind"] == "XLSX" == c["spec"]["format"]["kind"] and isinstance(c["fp"]["sheets"], list) and c["t"] is NONE,
                                   lambda c: f"sheet {masked(str(c['spec']['format'].get('sheet', '')))} declared, {len(c['fp']['sheets'])} sheets"),

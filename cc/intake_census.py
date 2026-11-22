@@ -158,7 +158,7 @@ def label(curves, points, fast):
     ns, xs, rs = [len(p) for p in points], [x for p in points for _, x, _ in p], [n for p in points for _, _, n in p]
     seqs = {tuple(x for _, x, _ in p) for p in points}
     return Sampling(len(curves), sum(len(c.slow) for c in curves), min(ns), statistics.median(ns), max(ns), fast, len(set(xs)),
-                    {True: Alignment.ALIGNED, False: Alignment.MISALIGNED}[len(seqs) == 1], (min(rs), max(rs)), max(c.drift for c in curves))
+                    Alignment.ALIGNED if len(seqs) == 1 else Alignment.MISALIGNED, (min(rs), max(rs)), max(c.drift for c in curves))
 
 
 def bodies(t, d):

@@ -50,7 +50,7 @@ class SealState:
     record: dict
 
     def summary(self):
-        return f"{self.status.name}. {self.sentence}" + {True: lambda: f" {_said(self.record)}", False: lambda: ""}[self.record != {}]()
+        return f"{self.status.name}. {self.sentence}" + (f" {_said(self.record)}" if self.record != {} else "")
 
     def confirmed(self):
         return self.status is SealStatus.SEALED and self.record["confirmed_by"] != ""
@@ -108,8 +108,9 @@ def ordering(d, t):
     from profile-access.log (plan 1165): information, never a refusal (converting and profiling before declaring is the designed order; no seal, no read precedes one)."""
     rec, reads = record(d), [a["t_ns"] for a in lines(Path(d) / "access.log") if a["route"] == "loader"]
     before = lambda log, part: {a["path"] for a in lines(Path(d) / log) if a["partition"] == part and a["t_ns"] < rec["sealed_at_ns"]}
-    o, conv = {False: lambda: (Ordering.NOT_SEALED, (set(), set())), True: lambda: (list(Ordering)[1 + (len(reads) > 0) + any(r < rec["sealed_at_ns"] for r in reads)],
-                                                                         (before("conversion-access.log", "converted-from"), before("profile-access.log", "profiled")))}[rec != {}]()
+    o, conv = ((list(Ordering)[1 + (len(reads) > 0) + any(r < rec["sealed_at_ns"] for r in reads)],
+                                                                         (before("conversion-access.log", "converted-from"), before("profile-access.log", "profiled"))) if rec != {}
+               else (Ordering.NOT_SEALED, (set(), set())))
     said = "".join({True: f" {a} ({len(c)} file{'s' * (len(c) != 1)}). {t['stages']['report'][k]}", False: ""}[len(c) > 0]   # plan 1165: and PROFILE_READ_BEFORE_SEAL
                    for a, k, c in zip(("CONVERSION_READ_BEFORE_SEAL", "PROFILE_READ_BEFORE_SEAL"), ("conversion_read", "profile_read"), conv))
     return o, {r["code"]: r["sentence"] for r in t["stages"]["report"]["ordering"]}[o.name] + said
@@ -182,7 +183,7 @@ def _stamp(d, decl, universe, have, who, root, tables, schema, counts):
         **who, "mode": decl.mode, "declaration_sha256": sha, **dict(zip(("profile_sha256", "conversion_manifest_sha256"), intake_bytes.intake_profile.read(d, universe, Path.read_bytes)[1::2])),   # plan 1165, A1
         "files": {n: registry.sha256_of(Path(d) / n) for n in FILES},
         "code_identity": {"commit": schema.git_head(root), "code_hash": schema.code_hash(root),
-                          "tree": {True: "CLEAN", False: "UNCOMMITTED_CHANGES"}[_git(root, "status", "--porcelain", "--", "cc", "bin/cc") == ""]},
+                          "tree": "CLEAN" if _git(root, "status", "--porcelain", "--", "cc", "bin/cc") == "" else "UNCOMMITTED_CHANGES"},
         "protocol_identity": {n: {"sha256": registry.sha256_of(Path(root) / "intake" / n), "version": tables[k]["version"]}
                               for n, k in (("STAGES.toml", "stages"), ("POLICY.toml", "policy"), ("FORMAT.toml", "format"))},
         "universe": {"root": decl.data["source"]["root"], "location_name": Path(universe).resolve().name, "glob": decl.data["source"]["universe"], "listing": have,

@@ -6,7 +6,9 @@ Usage: dispatch_rewrite.py sweep [ROOT]  -> the rows as TOML on stdout;  dispatc
 import ast
 import collections
 import hashlib
+import io
 import sys
+import tokenize
 import tomllib
 from pathlib import Path
 
@@ -90,6 +92,14 @@ def _offsets(src):
     return starts
 
 
+def _has_comment(text):
+    """A COMMENT token inside the site's text (a `#` inside a string is not one)."""
+    try:
+        return any(t.type == tokenize.COMMENT for t in tokenize.generate_tokens(io.StringIO("(" + text + "\n)").readline))
+    except (tokenize.TokenError, SyntaxError, IndentationError):
+        return "#" in text
+
+
 def rewrite_text(src):
     """-> (new source, [(line, why) left for a hand edit]). The text edit of the Rewrite: outermost sites first, repeated until none remain."""
     left = []
@@ -104,14 +114,14 @@ def rewrite_text(src):
             a, b = starts[n.lineno - 1] + n.col_offset, starts[n.end_lineno - 1] + n.end_col_offset
             if any(a <= s and e <= b for s, e, _ in edits) or any(s <= a and b <= e for s, e, _ in edits):
                 continue   # an enclosing or enclosed site is edited this pass; this one is next pass
-            if b"#" in data[a:b]:
+            if _has_comment(data[a:b].decode()):
                 left.append((n.lineno, "a comment inside the site"))
                 continue
             seg = lambda x: data[starts[x.lineno - 1] + x.col_offset:starts[x.end_lineno - 1] + x.end_col_offset].decode()   # noqa: E731
             wrap = lambda x, s: f"({s})" if isinstance(x, (ast.IfExp, ast.Lambda, ast.NamedExpr, ast.Yield, ast.YieldFrom)) else s   # noqa: E731
             parts = (wrap(got[1], seg(got[1])), wrap(got[0], seg(got[0])), wrap(got[2], seg(got[2])))
             flat = f"{parts[0]} if {parts[1]} else {parts[2]}"
-            text = flat if "\n" not in flat and len(flat) < 140 else f"{parts[0]}\n{' ' * (n.col_offset + 1)}if {parts[1]}\n{' ' * (n.col_offset + 1)}else {parts[2]}"
+            text = flat if "\n" not in flat else f"{parts[0]} if {parts[1]}\n{' ' * (n.col_offset + 1)}else {parts[2]}"   # a site that spanned lines keeps two, never more
             p = parent.get(n)
             if "\n" in text or not (isinstance(p, (ast.Assign, ast.AnnAssign, ast.Return, ast.keyword, ast.Lambda, ast.Dict, ast.Tuple, ast.List)) or isinstance(p, ast.Call) and n in p.args):
                 text = f"({text})"
@@ -135,8 +145,12 @@ def files(root=ROOT):
     return [p for p in out if p.is_file()]
 
 
+SELF_PINNED = {"cc/intake_synth.py"}   # files whose own sha256 is pinned in a toolset update list: not rewritten here (finding F10)
+
+
 def maths(root=ROOT):
-    return set(tomllib.loads((root / "checks.toml").read_text())["roles"]["maths"])
+    """The files this plan never rewrites: the maths role, and the self-pinned ones."""
+    return set(tomllib.loads((root / "checks.toml").read_text())["roles"]["maths"]) | SELF_PINNED
 
 
 def scope(parent, n):
@@ -164,6 +178,8 @@ def classify(n, parent, rel, is_maths):
     lam = all(isinstance(v, ast.Lambda) for v in d.values)
     cat = ("R-lazy-if" if lam and call else "X-eager-arms" if not lam and not all(pure(v) for v in d.values) else "R-pure-ternary" if not lam else "X-other")
     node = parent[sub] if call else sub
+    if rel in SELF_PINNED:
+        return cat, "KEEP", "the file hashes itself into a transducer update pin that the held toolset must carry: an edit fails test_intake_loop4 and test_intake_leak until the toolset copy moves too (finding F10)"
     if is_maths:
         return cat, "KEEP", "a maths-role file: a style edit there is out of scope (C1 reports and tags its comparisons)"
     if cat == "X-eager-arms":

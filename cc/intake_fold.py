@@ -201,7 +201,7 @@ def verdicts(t, out):
     p = PRIMARY[(Mark.REFUSED in marks, len(_missing(ids, out)) > 0, out[t["stages"]["seal_stage"]].confirmed())](ids, out)
     rob = scoped(t, Scope.ROBUSTNESS)[0]
     r = ROBUSTNESS[(p.kind, out[rob].mark)](out[rob])
-    return p, Verdict(r, {True: (rob,), False: ()}[r is Robustness.ROBUSTNESS_INCOMPLETE], {True: rob, False: ""}[r is Robustness.ROBUSTNESS_REFUSED])
+    return p, Verdict(r, (rob,) if r is Robustness.ROBUSTNESS_INCOMPLETE else (), rob if r is Robustness.ROBUSTNESS_REFUSED else "")
 
 
 def closure(t, sid):

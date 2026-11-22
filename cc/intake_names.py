@@ -20,12 +20,12 @@ class Name(enum.Enum):
 
 
 def classify(name):
-    return {True: Name.NUMERIC, False: Name.TEXT}[NUMBER.fullmatch(str(name).strip()) is not None]
+    return Name.NUMERIC if NUMBER.fullmatch(str(name).strip()) is not None else Name.TEXT
 
 
 def masked(text):
     """A text a file states, as a Detail prints it: each NUMERIC token (a numeral anywhere in it) as #; a text with no character as (none)."""
-    return {True: lambda: NUMBER.sub("#", text), False: lambda: "(none)"}[text.strip() != ""]()
+    return NUMBER.sub("#", text) if text.strip() != "" else "(none)"
 
 
 SHOW_COLUMN = {   # (the column's type, its Name class) -> how a Detail prints it; total over (str, int) x Name
@@ -54,7 +54,7 @@ UNIT_SYNTAX = {   # [reader.header] NAMES_UNITS_IN_NAMES unit_syntax -> a names 
 def split_unit(cell, syntax):
     """A names cell to (name, unit) by the declared unit syntax; a cell that holds no unit in that syntax is (the cell, "") - it states none."""
     m = UNIT_SYNTAX[syntax].fullmatch(cell)
-    return {True: lambda: (m[1].strip(), m[2].strip()), False: lambda: (cell, "")}[m is not None]()
+    return (m[1].strip(), m[2].strip()) if m is not None else (cell, "")
 
 
 OPPOSITE = {"ASCENDING": "DESCENDING", "DESCENDING": "ASCENDING", "ACQUISITION": "ACQUISITION"}   # [acquisition] row_order -> its reverse; total

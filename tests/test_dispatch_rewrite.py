@@ -16,6 +16,9 @@ import dispatch_rewrite as D  # noqa: E402
 
 BASE = "c9954ba"   # the plan-1639-dist tip this plan branched from (D0)
 EDITED = {   # file -> top-level names another phase of plan 1644 edited on purpose (declared in that phase's commit); compared nowhere else
+    "cc/chain.py": {"=REFUSAL", "_edges", "_edge_feature"},   # phase 4 (D4): the value door and SAMPLE_NOT_FINITE
+    "cc/intake_blind.py": {"Typed"},   # phase 3 (D3): the code is an Enum member
+    "cc/intake_feature.py": {"#0", "Unprojected", "=Unprojected.Reason"},   # phase 3 (D3)
 }
 
 
@@ -48,7 +51,7 @@ def units(tree):
 
 def differing(rel, head_src):
     """Top-level units of `rel` at head that are not the rewrite of base's, minus the declared EDITED ones."""
-    t = D.Rewrite().visit(ast.parse(git_show(rel)))
+    t = ast.parse(git_show(rel)) if rel in D.maths(ROOT) else D.Rewrite().visit(ast.parse(git_show(rel)))   # a maths-role file is never rewritten (D5): it must equal its base
     want, got = units(ast.fix_missing_locations(t)), units(ast.parse(head_src))
     skip = EDITED.get(rel, set())
     return sorted(k for k in set(want) | set(got) if k not in skip and want.get(k) != got.get(k))

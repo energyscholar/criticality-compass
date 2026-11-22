@@ -145,7 +145,7 @@ def result(e, r, cands, tiers, rel):
     inner = [m for m in cands if 0 < m < n - 1]
     near = lambda tied: sorted(set(tied) | {int(a) for a, b in zip(rel.src, rel.tgt) if b in tied} | {int(b) for a, b in zip(rel.src, rel.tgt) if a in tied})
     loc = lambda m, tied: MaxLocated(m, near(tied)[0], near(tied)[-1], tiers.tier(e, m), tiers.count(tied))
-    return {True: lambda: loc(inner[0], tiers.tied(r, inner[0])), False: lambda: {True: lambda: MaxAtPathEnd(cands[0]), False: NoInteriorMaximum}[len(cands) > 0]()}[len(inner) > 0]()
+    return loc(inner[0], tiers.tied(r, inner[0])) if len(inner) > 0 else {True: lambda: MaxAtPathEnd(cands[0]), False: NoInteriorMaximum}[len(cands) > 0]()
 
 
 def values(cs, bias, tiering, c):
@@ -163,7 +163,7 @@ def chain(n):
 
 def reduce(xs, bias, z, rel):
     """Plan 1118's REDUCE as A over the chain: xs are the admitted NodeFields (r + c, and sigma when tiered); the edges are A's."""
-    tiers = {True: lambda: Untiered(), False: lambda: Tiered(z, xs[-1].data[0])}[len(xs) == 1]()
+    tiers = Untiered() if len(xs) == 1 else Tiered(z, xs[-1].data[0])
     e, r = kernel.A(xs[0], rel).spatial[0], xs[0].data[0]
     return result(e, r, LOCATE[bias](e, r), tiers, rel)
 
