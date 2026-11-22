@@ -1,0 +1,14 @@
+# .gitleaks.toml - plan 1640: the default gitleaks rules over every ref of the history; release/public-verify.sh V1 runs it with this file.
+title = "criticality-compass: gitleaks"
+
+[extend]
+useDefault = true
+
+# The only known false positive: a golden `*.reads.toml` records `key = "<sha256>"`, the content hash of a stored result; the default
+# generic-api-key rule reads a 64-hex value as a key. Narrowed to that rule, that path and that exact shape (all 1476 hits on 466 commits were these).
+[[allowlists]]
+description = "sha256 content hashes in golden reads files"
+targetRules = ["generic-api-key"]
+condition = "AND"
+paths = ['''^tests/golden/[^/]+\.reads\.toml$''']
+regexes = ['''^[0-9a-f]{64}$''']
