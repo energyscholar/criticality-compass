@@ -19,7 +19,7 @@ import intake_profile  # noqa: E402
 import intake_read  # noqa: E402
 import oracle_measured  # noqa: E402
 
-BASE = "c9954ba"   # the plan-1639-dist tip this plan branched from (D0)
+BASE = "94c2e49aeb38752d15ddc951ba8f6b299b47ff4c"   # the TREE of the plan-1639-dist tip c9954ba this plan branched from (D0): a tree sha survives the public rewrite, a commit sha does not
 
 
 def base_module(name):

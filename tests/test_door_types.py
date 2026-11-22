@@ -21,7 +21,7 @@ bootstrap(ROOT, "cc")
 import admit  # noqa: E402
 import kernel  # noqa: E402
 
-BASE = "55eba02"   # the plan-1639-dist tip this plan branched from (D0)
+BASE = "209dda85f554ea91c2b31400b4343980d42b5a3f"   # the TREE of the plan-1639-dist tip 55eba02 this plan branched from (D0): a tree sha survives the public rewrite, a commit sha does not
 C = admit.Provenance.CONTINUATION
 OPERATORS = {   # T3: the AST digest (docstring removed) of each operator's FunctionDef at BASE
     "_out_sum": "e22dd2e07b6f6433605b93031a7f0bc348c67cec90b3b053030d5252e57fd1af", "_in_sum": "60addf791ea324797ff400d92115cde5516fa123326e563544d14300df7055a4",

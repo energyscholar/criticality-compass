@@ -87,8 +87,13 @@ check = 'git merge-base --is-ancestor compass-main HEAD'
 
 [[row]]
 name = "moved-base-shas"
-state = "open"
-ruling = "Three tests of the merged base name a base commit by sha, and the rewrite moves that sha (the commit carries the machine-name identity): tests/test_dispatch_rewrite.py (55eba02, T7), tests/test_door_types.py (55eba02, T3 and T4), tests/test_get_fix.py (c9954ba, T9). In a clone of the rewritten copy they fail with: the base commit is not in this clone. So the rehearsal fails at V7 (V6 reads only a sha on a line that calls git; these are held in a constant). Not edited here: the reviewer rules a declared fix (resolve the base through the commit map, or skip with a stated reason when the object is absent)."
+state = "closed"
+ruling = "Amendment C2: the three tests of the merged base (tests/test_dispatch_rewrite.py and tests/test_door_types.py, BASE 55eba02; tests/test_get_fix.py, BASE c9954ba) read their base by the TREE sha of that commit, which the rewrite preserves (V4), not by the commit sha it moves. V6 of release/public-verify.sh now fails any python test of the rewritten tree that holds a moved commit sha as a string constant, whatever line it sits on. The three tests run in a clone of the rewritten copy as part of V7 of history-rehearsal."
+check = '''
+for t in test_dispatch_rewrite test_door_types test_get_fix; do
+  "$PY" tests/$t.py 2>&1 | tail -1 | grep -q "all passed" || { echo "$t does not pass"; exit 1; }
+done
+'''
 
 [[row]]
 name = "undeclared-failing-test_claims"

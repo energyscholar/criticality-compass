@@ -115,7 +115,7 @@ if want V6; then
   if [ -z "$MAIN" ] || [ ! -f "$OUT/filter-repo/commit-map" ]; then fail V6 "the copy has no main or no commit map"
   else
     "$PY" - "$OUT" "$ORIGIN" <<'PYEOF'
-import bisect, re, subprocess, sys
+import ast, bisect, re, subprocess, sys
 out, origin = sys.argv[1:3]
 def g(repo, *a, inp=None): return subprocess.run(["git", "-C", repo, *a], input=inp, capture_output=True, check=True).stdout
 mp = dict(ln.split() for ln in open(out + "/filter-repo/commit-map").read().splitlines()[1:])
@@ -138,9 +138,23 @@ for n in names:
             if mp.get(hit[0], hit[0]) == hit[0]: kept += 1; continue
             moved_hits.append((n, i, m))
             if isTest.search(n) and callx.search(ln): test_bad.append((n, i, m))
-for n, i, m in test_bad: print(f"V6 FAIL {n}:{i} passes the moved sha {m} to git")
+    # the M3 scan, at rehearsal time: a moved sha held as DATA (a string constant that is not a docstring and IS a revision: BASE = "55eba02") of a python test is a base the test
+    # can hand to git whatever line it sits on (BASE = "55eba02"); prose (comments, docstrings, docs) naming a moved sha is only counted
+    if isTest.search(n) and n.endswith(".py"):
+        try: tree = ast.parse(t)
+        except SyntaxError: continue
+        doc = {id(b[0].value) for b in (x.body for x in ast.walk(tree) if isinstance(x, (ast.Module, ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)))
+               if b and isinstance(b[0], ast.Expr) and isinstance(b[0].value, ast.Constant) and isinstance(b[0].value.value, str)}
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Constant) and isinstance(node.value, str) and id(node) not in doc:
+                head = re.match(r"\s*([0-9a-f]{7,40})(?:[~^:.@]\S*)?\s*$", node.value)   # the constant IS a revision (a sha, or a sha with a suffix); a sentence that names one is prose
+                for m in ([head.group(1)] if head else []):
+                    if not re.search(r"[a-f]", m) or not re.search(r"\d", m): continue
+                    k = bisect.bisect_left(olds, m); hit = [c for c in olds[k:k + 2] if c.startswith(m)]
+                    if len(hit) == 1 and mp.get(hit[0], hit[0]) != hit[0] and (n, node.lineno, m) not in test_bad: test_bad.append((n, node.lineno, m))
+for n, i, m in test_bad: print(f"V6 FAIL {n}:{i} holds the moved sha {m} where a test can pass it to git")
 if test_bad: sys.exit(1)
-print(f"V6 ok {kept} self-shas preserved; {len(moved_hits)} moved (all in the commit map, none passed to git by a test)")
+print(f"V6 ok {kept} self-shas preserved; {len(moved_hits)} moved (all in the commit map, none held by a test as data)")
 PYEOF
     [ $? -eq 0 ] || BAD=1
   fi
