@@ -30,10 +30,11 @@ TOOLS = os.environ.get("CC_RELEASE_TOOLS") or sys.executable
 EMAIL = "energyscholar+criticality-compass@gmail.com"
 # T3: the AST digest (docstrings removed) of every .py file this plan edits, at the contract base 16a21fb. A pin follows an edit only by the Auditor's re-pin.
 # plan 1644 re-pins (Auditor answer 2), each declared in its phase's commit: cc/kernel.py + cc/admit.py (phase 2: the four types move into the door).
+# phase 4: cc/chain.py (_edges takes the value door, SAMPLE_NOT_FINITE).
 AST_BASE = {
     "cc/registry.py": "96548206ffd82395b4bb009b2ef99729a177def4d7c84df44aa0df9873b19dad",
     "cc/oracle_reweight.py": "47cc58df26189c49f325fb0cdcefb1be77a4e74cb3447995a0048c5936973fb2",
-    "cc/chain.py": "72b4786cb673826f65ac16868aa0e017b3db95d77787d212831e540ab876b7cd",
+    "cc/chain.py": "f4064ddc530d69ccae8e6b18819e8f48349d5dbdd605cc65055edc6e8f7e86de",
     "cc/scorewords.py": "d35bd35eba05ac15a8985b8a64c47367faf956749f007bdc6f786d32cab134d5",
     "cc/linenav.py": "fa623461a5e35af5bbdba9644ccad9c895b030cc9042933d58e00bb2dfa67a95",
     "cc/sampler.py": "cb1771994db96829f9d976d22ab77fa86e4e64920ba4de30ba3afc8bed0abb99",

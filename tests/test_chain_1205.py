@@ -226,6 +226,10 @@ try:
     cli_checks()
 except Exception as e:   # a crash is a named FAIL, never a silent pass
     check("H7-H9. the CLI checks run to the end", False, repr(e)[:300])
+# plan 1644 phase 4 (declared edit): SAMPLE_NOT_FINITE is not reachable through the CLI (measured, M4: the intake's door refuses a non-finite sample at S10 first), so it is reached by a direct call
+_w = np.column_stack([np.arange(8.0), np.array([1.0, 2.0, float("nan"), 4.0, 5.0, 6.0, 7.0, 8.0]), np.ones(8)])
+_o = chain._edges(_w, np.arange(8), 2.0, "NONE", 0.15, type("Sp", (), {"lo": (0.0, 0.0), "width": (1.0, 8.0)})(), 1)
+reached.update({_o.code} if isinstance(_o, chain.Refusal) else set())
 check("H9. every REFUSAL row of chain was reached through the CLI", set(chain.REFUSAL) <= reached, str(sorted(set(chain.REFUSAL) - reached)))
 print(f"{len(bad)} failed" if bad else "test_chain_1205: all passed")
 sys.exit(1 if bad else 0)

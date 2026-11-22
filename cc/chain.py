@@ -41,6 +41,7 @@ REFUSAL = {   # code -> sentence; every code this module emits is a row (tests/t
     "LANE_UNDECLARED": "A grid lane has no intake/POLICY.toml [feature_projection.FEATURE_<lane>] row: no projection is used undeclared.",
     "CO_LOCATION_UNRUN": "--with names an id with no results/chain/<id2>.json: run `bin/cc chain <id2> --grid <grid.toml>` first (each intake runs in its own process).",
     "CO_LOCATION_GRID_DIFFERS": "The second id's chain ran under another grid (its grid sha256 differs), so its cells are not this run's cells.",
+    "SAMPLE_NOT_FINITE": "A fast sample reached the edge lane non-finite (the intake's door refuses these first): no |A_fast| is formed over it.",
     "CO_LOCATION_SPANS_DIFFER": "The two observables' planes have different fast spans, so one w_c cannot be read in both.",
 }
 
@@ -165,7 +166,13 @@ def _edges(a, i, z, kind, wc, sp, k):
     w = np.asarray(a, float)[i]
     m = len(w)
     rel = admit.declare(m, [(j, j + k) for j in range(m - k)], [kernel.Provenance.CONTINUATION] * (m - k))
-    g = np.abs(kernel.A(admit.nodefield(w[:, 1]), rel).spatial[0])   # A over the declared fast relation; |.| is a projection after A
+    nf = admit.admitted(w[:, 1])   # DATA: a refusal is a value (plan 1644 D4), the declaration above raises
+    return Refusal("SAMPLE_NOT_FINITE", nf.sentence) if isinstance(nf, admit.Refused) else _edge_feature(w, i, z, kind, wc, sp, k, rel, nf)
+
+
+def _edge_feature(w, i, z, kind, wc, sp, k, rel, nf):
+    m = len(w)
+    g = np.abs(kernel.A(nf, rel).spatial[0])   # A over the declared fast relation; |.| is a projection after A
     s = F.SIGMA_COL[kind](w)
     se = np.sqrt(s[:-k] ** 2 + s[k:] ** 2)   # an edge's sigma: of a difference of two independent readings
     place = (w[:-k, 0] + w[k:, 0]) / 2   # an edge's place: the midpoint of its two measured fast values (its coordinate, no value is formed)

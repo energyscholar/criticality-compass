@@ -287,7 +287,8 @@ def nodefield(x, ctx):
         raise ValueError("a Gamma-method statistic (SE, window W, tau_int) is a projection C output: it feeds the sign cell only and is never an operator input\n"
                          "  Next: read it through readout.reading_se; do not route it into a stage or a door")
     x = x.reshape(-1, x.shape[-1])
-    return admit.nodefield(x) if np.isfinite(x).all() else Null("NOT-EVALUATED", "non-finite value")
+    r = admit.admitted(x)   # the one finiteness test lives in admit.py; here data refuses as a value (plan 1644 D4)
+    return Null("NOT-EVALUATED", "non-finite value") if isinstance(r, admit.Refused) else r
 
 
 def sign_resampled(x, s, ctx):
