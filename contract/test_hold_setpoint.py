@@ -217,6 +217,10 @@ FROZEN_1552 = {
     "navigator/hold-settled.toml": "50e53bdbd9911418d82255d8eaf7cf548ccf0645ffa28df9d59869f0db9a2bc2",
     "navigator/hold-mid.toml": "568146d27ee2f468fa4b7c8f821a06acf7bd66998d60b4d1dbd38d2d89ed1773",
 }
+# declared, authorised edits of plan 1552 files: file -> {sha256 of the edited file: why}. T16 forbids an UNDECLARED edit, not a declared one.
+AUTHORISED_EDITS = {
+    "contract/test_hold_needle.py": {"272c7321321559572a6be69a3712c2636fe07aba6311c3050d088eff17696562": "plan 1644 phase 2 (Auditor answer 1): Provenance.STEERING declared through admit.declare; assertions unchanged"},
+}
 # t14: sha256 of (stdout + "\n#MAP\n" + map) of plan 1552's needle (navigator/hold.py sha256 45ac04ef..., the same at 8ad9bbe, 9535e0c, e3790a0 and the base 4df8a87), on the worlds of _v1_worlds()
 V1_PINS = {
     ("settled", "sign"): "06dc81873a1170d134ca7bc827d6a2a361b28e0c81b5cdda5e52363edd984d96",
@@ -741,7 +745,8 @@ def test_t16_the_shipped_setpoint_files_and_plan_1552s_files():
         got = tomllib.loads((ROOT / "navigator" / f"{name}.toml").read_text())
         assert got == want, (name, sorted(set(got) ^ set(want)))
     for rel, sha in FROZEN_1552.items():
-        assert hashlib.sha256((ROOT / rel).read_bytes()).hexdigest() == sha, f"{rel} was edited: plan 1558 adds files and edits none of plan 1552's contract"
+        have = hashlib.sha256((ROOT / rel).read_bytes()).hexdigest()
+        assert have == sha or have in AUTHORISED_EDITS.get(rel, {}), f"{rel} was edited: plan 1558 adds files and edits none of plan 1552's contract (an edit must be declared in AUTHORISED_EDITS)"
 
 
 

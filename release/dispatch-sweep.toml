@@ -2439,3 +2439,43 @@ n = 1
 line = 711
 reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
 text = "{True: lambda: NAVIGATE[sub](args[1:]), False: lambda: _stored_map(args)}"
+
+[[row]]
+file = "environment/drift_score.py"
+scope = "motion"
+category = "R-pure-ternary"
+ruling = "KEEP"
+n = 1
+line = 80
+reason = "outside the transformer's form (a lambda with parameters, or an arm that is not effect-free)"
+text = "{False: empty, True: _moving}"
+
+[[row]]
+file = "environment/drift_score.py"
+scope = "motion"
+category = "R-pure-ternary"
+ruling = "REWRITE"
+n = 1
+line = 81
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{False: NO_STEPS, True: None}"
+
+[[row]]
+file = "environment/drift_score.py"
+scope = "motion"
+category = "X-eager-arms"
+ruling = "KEEP"
+n = 1
+line = 84
+reason = "both arms run today; a rewrite stops evaluating one (plan 1644 O2 names the lazy and pure sites only); reported per site"
+text = "{False: NO_RUNS, True: max(ended) if ended else 'never'}"
+
+[[row]]
+file = "environment/drift_score.py"
+scope = "breakpoint"
+category = "X-other"
+ruling = "KEEP"
+n = 1
+line = 139
+reason = "the dict is bound to a name and indexed elsewhere: not a literal dispatch, outside the transformer's form"
+text = "{True: lambda: Break('INCOMPLETE', '', '', blind), False: lambda: _SHAPE.get(shape, lambda r: Break("

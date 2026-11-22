@@ -77,8 +77,8 @@ def motion(score, start):
     # steps? -> pairs? : the answer for each is one row
     empty = (_no_pairs(NO_STEPS), _no_pairs(NO_MOVING))[bool(steps)]
     pairs = _pairs(steps)
-    stats = {False: empty, True: _moving}[bool(pairs)](pairs, top, score["g"])
-    token = {False: NO_STEPS, True: None}[bool(steps)]
+    stats = (_moving if bool(pairs) else empty)(pairs, top, score["g"])
+    token = None if bool(steps) else NO_STEPS
     return {
         "lock": score["lock"], "outcome": score["outcome"], "hold_steps": len(steps), "top_speed": top, "out_runs": runs,
         "recovery_max": token or {False: NO_RUNS, True: (max(ended) if ended else "never")}[bool(runs)],

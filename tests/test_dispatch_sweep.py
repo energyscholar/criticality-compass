@@ -38,7 +38,7 @@ def unlisted(root, rows):
 
 def t8():
     rows = table()
-    check("T8 the table has a row per site of the base sweep (244)", len(rows) == 244, str(len(rows)))
+    check("T8 the table has a row per site of the base sweep (248: 244 at the base + 4 of environment/drift_score.py, plan 1644 phase R)", len(rows) == 248, str(len(rows)))
     check("T8 every row has a known category and a ruling", all(r["category"] in CATEGORIES and r["ruling"] in ("KEEP", "REWRITE") and r["reason"] for r in rows), "")
     check("T8 every site of the tree is a row", unlisted(ROOT, rows) == [], str(unlisted(ROOT, rows)[:5]))
     check("T8 the sites of head that remain are KEEP rows (no REWRITE row stays)", all(r["ruling"] == "KEEP" for r in D.sweep(ROOT)), "")
