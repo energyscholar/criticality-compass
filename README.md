@@ -1,5 +1,25 @@
 # Criticality Compass (CC)
 
+CC reads what was measured at a set of points and says, by a rulebook you can edit, what each reading supports, or `BLANK` and why.
+
+What CC cannot do, and why that is the point:
+
+- It cannot fill a gap: a point that was not measured prints `BLANK` with its reason, never a guess ([where that is enforced](docs/READING-THE-CODE.md)).
+- It cannot change a stored result: a frozen result and every file it read are read-only and hash-checked, and you fork to change one ([how the freeze works](docs/READING-THE-CODE.md)).
+- It cannot hide a rule: every possible signature row falls in exactly one row of the verdict table, and each row says why ([the table, row by row](docs/READING-THE-CODE.md)).
+- It cannot vouch for its own checks: the suite plants faults to see each check fail, and finding one it misses is a welcome report ([try to break it](docs/try-to-break-it.md)).
+
+## Install
+
+From a clone, with Python 3.11 or later (`<the repository>` is filled in when the repository is published):
+
+```
+git clone <the repository> criticality-compass && cd criticality-compass
+python3 -m venv .venv && . .venv/bin/activate && pip install -e .
+```
+
+Code: Apache-2.0 (`LICENSE`, `NOTICE`). Data in `benchmark/` and `results/`: CC BY 4.0 (`DATA-LICENSE`). How to cite: `CITATION.cff`.
+
 CC reads what was measured at a set of points, codes each reading by where its interval sits against
 declared margins, and looks the codes up in a rulebook you can edit. When something was
 not measured, or the interval cannot decide between two codes (the cell `UNRES`, `cc/sign.py:19`), CC prints `BLANK` and says why. The cases (what each model is
@@ -11,8 +31,6 @@ The code that `compass hold` runs is written in an unusual style, on purpose; `d
 To run a system by hand, start with "Run a system by hand" below. For the rulebook, start with the first hour. `TUTORIAL.md` walks one point
 from data to verdict, `HOWTO.md` covers the weekly loop and the advanced commands, and `KERNEL-IN-CC.md`
 explains what the instruments compute.
-
-Licences: the code is Apache-2.0 (`LICENSE`, `NOTICE`); the data in `benchmark/` and `results/` are CC BY 4.0 (`DATA-LICENSE`).
 
 ## Run a system by hand (`compass hold`)
 

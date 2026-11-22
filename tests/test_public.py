@@ -22,6 +22,7 @@ PENDING = ("AGENTS.md", "docs/READING-THE-CODE.md", "docs/try-to-break-it.md")  
 PLANTED_WORD = "Arg" + "us"
 OWNER = "energyscholar"   # the identities below are spelt from parts: this file is a tracked file the tree scan reads
 GMAIL, NOREPLY = OWNER + "@gmail.com", OWNER + "@users.noreply.github.com"
+TAIL = "CJDk5ZDNhYjEtNzE4ZC00YjQ5LWI2ZmQtNDc4MTFkODRlNjEyAAIqWzMsIjhkZjJlMzY0LTJhNWItNGQ1Ny1iZDgxLWM3ZDkzNGRkYzJkNCJdAAAGIJ2pT4"   # the tail a real upload token has; an all-A tail is not read as one by gitleaks
 NOBODY = "t" + "@users.noreply.github.com"
 OWNER_ROWS = ["OQ1", "OQ2", "OQ3", "OQ4", "gh-noreply-form", "create-repo", "flip", "project-urls-0.1.0", "readme-clone-url"]
 LEAKS = ["release/public", "release/ci-", "release/turn-public-check.sh", ".github/", "CONTRIBUTING.md", "CODE_OF_CONDUCT.md", "SECURITY.md", ".gitleaks.toml"]
@@ -111,7 +112,7 @@ if mirror and PAT:
         sh("git", "clone", "-q", "--bare", mirror, p)
         sh("git", "clone", "-q", "-b", "compass-main", p, w)
         (w / "data" / "ta").mkdir(parents=True)
-        (w / "tok.txt").write_text("t = " + "pypi-" + "AgEIcHlwaS5vcmc" + "A" * 60 + "\n")
+        (w / "tok.txt").write_text("t = " + "pypi-" + "AgEIcHlwaS5vcmc" + TAIL + "\n")
         (w / "data" / "ta" / ("rij" + "ke.csv")).write_text("thermo" + "acoustic,x\n1,2\n")
         (w / "note.txt").write_text("host " + "ex.ts" + ".net\n")
         sh("git", "-C", w, "add", "-A")
@@ -122,7 +123,7 @@ if mirror and PAT:
         check("T1 breaker: a planted token, a research-use-only path and header, and a private host are each a HARD class", {"secret", "ruo-path", "ruo-content", "private-hard"} <= got, str(sorted(got)))
         gl = shutil.which("gitleaks") or str(Path.home() / "1640-out/bin/gitleaks")
         if Path(gl).exists():
-            rc, out = sh(gl, "git", "--no-banner", "--exit-code", "7", "--log-opts=--all", p)
+            rc, out = sh(gl, "git", "--no-banner", "--exit-code", "7", "--config", ROOT / ".gitleaks.toml", "--log-opts=--all", p)
             check("T1 breaker: gitleaks also finds the planted token", rc == 7, f"exit {rc}")
         else:
             print("NOT RUN: T1 gitleaks half: no gitleaks")
@@ -149,7 +150,7 @@ if reh and mirror and PAT:
         q, w = Path(t) / "q.git", Path(t) / "w"
         sh("git", "clone", "-q", "--bare", out_, q)
         sh("git", "clone", "-q", "-b", "main", q, w)
-        (w / "tok.txt").write_text("t = " + "pypi-" + "AgEIcHlwaS5vcmc" + "A" * 60 + "\n")
+        (w / "tok.txt").write_text("t = " + "pypi-" + "AgEIcHlwaS5vcmc" + TAIL + "\n")
         sh("git", "-C", w, "add", "-A")
         sh("git", "-C", w, "-c", "user.name=t", "-c", f"user.email={NOBODY}", "commit", "-qm", "plant")
         sh("git", "-C", w, "push", "-q", "origin", "HEAD:main")
@@ -168,7 +169,7 @@ if reh and mirror and PAT:
         check("V8 breaker: a corrupt object fails git fsck", rc != 0, f"exit {rc}")
     with tempfile.TemporaryDirectory() as t:   # breaker: a planted --replace-text on a scratch copy
         pl = Path(t) / "planted.git"
-        sh("git", "clone", "-q", "--bare", "--single-branch", "-b", "compass-main", origin, pl)
+        sh("git", "clone", "-q", "--bare", "--no-local", "--single-branch", "-b", "compass-main", origin, pl)
         (Path(t) / "r.txt").write_text("BLANK==>BLANKED\n")
         rc, o = sh("git", "filter-repo", "--replace-text", Path(t) / "r.txt", cwd=pl)
         rc, o = sh("bash", V, "--only", "V4", pl, origin)
