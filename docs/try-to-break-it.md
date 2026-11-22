@@ -124,4 +124,4 @@ ValueError: REFUSED: a cycle (ring/torus) is inadmissible: a node would be its o
 
 ## What is not refused yet
 
-Two things are not stopped by the code today, and are kept by review: an element of an edge array inside a declared relation can be written in place (the types are frozen, the arrays are not yet read-only), and a kernel type can be built directly, without going through `cc/admit.py` (`cc/admit.py:46`). This page has no command for them because they are not refused.
+Two things are not stopped by the code, and are kept by review. Code that goes round the language can still build a kernel type without its constructor (`object.__new__`), or make a type's array writable again (`setflags(write=True)`); the types stop every ordinary route (attacks 7 to 10), not a deliberate one. And an `EdgeField` carries no record of the relation it was computed on: that it came from A over a declared relation is provenance, which `cc/admit.py:106` cannot check. This page has no command for them because they are not refused.
