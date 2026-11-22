@@ -251,24 +251,9 @@ sha256 = "ead2098c63b1de27ad20a39d33f640d169076d6c3efa327b3533bf9b502e37bc"
 reason = "string values of the table the dispatch sweep pins; an edit changes the table, not a comment"
 
 [[exempt]]
-path = "tests/navigator/conftest.py"
-sha256 = "c2748ab8970529521080dd66b3dd27622ae255ae3491a00d94c7dd5f04f48ab4"
-reason = "a string value in code, not a comment or docstring: an AST-changing edit is outside plan 1640; the reviewer rules"
-
-[[exempt]]
-path = "tests/tau_1282_rung0.py"
-sha256 = "8bc6cf61d1fd5adc53560ea2da9c83ae035968874b0445e560d9e11fa02325e1"
-reason = "a string value in code, not a comment or docstring: an AST-changing edit is outside plan 1640; the reviewer rules"
-
-[[exempt]]
 path = "tests/test_dist.py"
 sha256 = "797caf2d75732ccae46b50b9322fbf5557de0f2371dc9b55b81087f73d7c8a76"
 reason = "plan 1639's test, not edited by plan 1640; it names the words it forbids"
-
-[[exempt]]
-path = "tests/test_navfamily.py"
-sha256 = "e4dca317c52d868936ade71b1064fed87622570c5d56eec9f0d61fc32b36b248"
-reason = "a string value in code, not a comment or docstring: an AST-changing edit is outside plan 1640; the reviewer rules"
 
 [[exempt]]
 path = "tests/test_wheel.py"

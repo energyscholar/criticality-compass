@@ -45,7 +45,7 @@ def toml_dumps(d):
 GOLDEN_AT = dict(L_blocks=9, L4=0.14, burn=400, seed=22, k=6, nlev=1, knobs_K=[0.20, 0.50], w=0.02,
                  index_unit="sweep", index_kind="sample_counter")
 GOLDEN_TAU = dict(value=67, source="inputs/b7-at-line/m.toml interval b=400 > 6*tau_int => tau_int<66.7; v0 uses the implied ceiling",
-                  stamp="Argus 2026-11-14")
+                  stamp="the reviewer 2026-11-14")
 GOLDEN_NEEDLE = dict(host="127.0.0.1", port=8787, needle_structure="margin-constant-v0", u=0.0, du=0.01, N=8, n=450)
 
 

@@ -533,7 +533,7 @@ def cost(rung0_path, pilot_path, bench_path, out):
     md = ["# cost-DERIVATION", "", "All numbers are produced by tests/tau_1282_rung0.py --cost; hand-check them against these inputs.", "",
           "## Formula (verbatim)",
           "core-h(N) = f * sum_c 10 * [ burn_c * b(L) + N * y(L, s*_c) * skip_c / s*_c ] / 3.6e6   (y, b in ms; 1-process median process_time; 10 chains per cell)",
-          "skip_c = ceil(2 tau_c); burn_c = ceil(20 tau_c), except `ordered-of` cells: burn_c = max(ceil(20 tau_c), L^2) (the burn rule Argus will declare in A5: an assumption);",
+          "skip_c = ceil(2 tau_c); burn_c = ceil(20 tau_c), except `ordered-of` cells: burn_c = max(ceil(20 tau_c), L^2) (the burn rule the reviewer will declare in A5: an assumption);",
           "s*_c = the largest of {1,10,100,1000} <= skip_c; f = 1 (QUIET) or f_final (CONTENDED); a lower-bound tau is used as is and flagged FLOOR.", "",
           "## Input shas", f"PILOT {sha(pilot_path)}", f"bench.tsv {sha(bench_path)}", f"rung0.tsv {sha(rung0_path)}", "",
           "## Bench rows used (host build numpy python L s n y_med y_min b_med wall_med procs load_before load_after cpu_over_wall)"]
