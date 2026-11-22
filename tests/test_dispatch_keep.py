@@ -14,13 +14,13 @@ from lib import bad, check, guarded  # noqa: E402
 
 import dispatch_rewrite as D  # noqa: E402
 
-BASE = "55eba02"
+BASE = "209dda85f554ea91c2b31400b4343980d42b5a3f"   # the TREE of the plan-1639-dist tip 55eba02 this plan branched from (D0): a tree sha survives the public rewrite, a commit sha does not
 
 
 def base_text(rel):
     r = subprocess.run(["git", "-C", str(ROOT), "show", f"{BASE}:{rel}"], capture_output=True, text=True)
     if r.returncode != 0:
-        raise RuntimeError(f"the base commit {BASE} is not in this clone: {r.stderr.strip()[:120]}\n  Next: fetch the plan-1639-dist history (git fetch), then rerun")
+        raise RuntimeError(f"the base tree {BASE} is not in this clone: {r.stderr.strip()[:120]}\n  Next: fetch the plan-1639-dist history (git fetch), then rerun")
     return r.stdout
 
 
