@@ -1,0 +1,2441 @@
+# release/dispatch-sweep.toml: every bool or bool-tuple keyed dict literal of cc/, bin/cc, manual/ (plan 1644 D5). `line` is where the row was at the base; identity is (file, scope, category, ruling, n).
+
+[[row]]
+file = "cc/chain.py"
+scope = "<module>"
+category = "K-named-table"
+ruling = "KEEP"
+n = 1
+line = 100
+reason = "a named table over a discrete signature: the class is a lookup in a total table"
+text = "{(False, False): Step.UNMEASURED_BETWEEN, (False, True): Step.UNMEASURED_BETWEEN, (True, True): Step"
+
+[[row]]
+file = "cc/chain.py"
+scope = "<module>"
+category = "K-named-table"
+ruling = "KEEP"
+n = 2
+line = 102
+reason = "a named table over a discrete signature: the class is a lookup in a total table"
+text = "{(False, False): FamilyAtom.NO_SEGMENT, (False, True): FamilyAtom.NO_SEGMENT, (True, True): FamilyAt"
+
+[[row]]
+file = "cc/chain.py"
+scope = "<module>"
+category = "K-named-table"
+ruling = "KEEP"
+n = 3
+line = 104
+reason = "a named table over a discrete signature: the class is a lookup in a total table"
+text = "{(True, True): Robustness.ROBUST, (True, False): Robustness.ROBUST, (False, True): Robustness.FRAGIL"
+
+[[row]]
+file = "cc/chain.py"
+scope = "<module>"
+category = "K-named-table"
+ruling = "KEEP"
+n = 4
+line = 106
+reason = "a named table over a discrete signature: the class is a lookup in a total table"
+text = "{(False, False): CoLocation.NOT_COMPARABLE, (False, True): CoLocation.NOT_COMPARABLE, (True, True): "
+
+[[row]]
+file = "cc/chain.py"
+scope = "<module>"
+category = "K-named-table"
+ruling = "KEEP"
+n = 5
+line = 108
+reason = "a named table over a discrete signature: the class is a lookup in a total table"
+text = "{True: StrideFit.STRIDE_FITS_WINDOW, False: StrideFit.STRIDE_EXCEEDS_WINDOW}"
+
+[[row]]
+file = "cc/chain.py"
+scope = "Stride.k"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 127
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: max(1, int(self.samples)), False: lambda: max(1, int(np.floor(self.span * max(m - 1, "
+
+[[row]]
+file = "cc/chain.py"
+scope = "Stride.label"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 131
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: f'{self.samples}smp', False: lambda: f'{self.span:g}span'}"
+
+[[row]]
+file = "cc/chain.py"
+scope = "_sample_lane.lane"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 158
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: Placed('Absent', -1, f.lo, f.hi, None, None), False: lambda: Placed(type(f).__name__,"
+
+[[row]]
+file = "cc/chain.py"
+scope = "keys"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 229
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: [(s, w) for s in g.strides for w in g.wc], False: lambda: list(g.wc)}"
+
+[[row]]
+file = "cc/chain.py"
+scope = "wc_of"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 233
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: key[1], False: lambda: key}"
+
+[[row]]
+file = "cc/chain.py"
+scope = "stride_of"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 237
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: key[0], False: lambda: S1}"
+
+[[row]]
+file = "cc/chain.py"
+scope = "grid"
+category = "R-lazy-if"
+ruling = "KEEP"
+n = 1
+line = 243
+reason = "the key is not provably bool by its syntax: a ternary would accept a truthy non-bool where the table raises KeyError"
+text = "{True: lambda: _toml(p), False: lambda: None}"
+
+[[row]]
+file = "cc/chain.py"
+scope = "grid"
+category = "K-inline-signature"
+ruling = "KEEP"
+n = 1
+line = 252
+reason = "total over the product of its bools"
+text = "{(False, False): lambda: Refusal('GRID_UNDECLARED', 'no --grid <file>'), (False, True): lambda: Refu"
+
+[[row]]
+file = "cc/chain.py"
+scope = "undeclared"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 293
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: None, False: lambda: Refusal('LANE_UNDECLARED', ', '.join((f'FEATURE_{m}' for m in mi"
+
+[[row]]
+file = "cc/chain.py"
+scope = "stride_row"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 317
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: {'stride': key[0].label, 'stride_declared': {'samples': key[0].samples, 'span': key[0"
+
+[[row]]
+file = "cc/chain.py"
+scope = "curve_stride"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 321
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: {'stride_samples': p.k, 'stride_span': p.frac}, False: lambda: {}}"
+
+[[row]]
+file = "cc/chain.py"
+scope = "label"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 326
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: f\"@{c['stride']}\", False: lambda: ''}"
+
+[[row]]
+file = "cc/chain.py"
+scope = "sentence"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 359
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: f'{nl} cells ({len(g.strides)} strides x {len(g.wc)} w_c)', False: lambda: f'{nl} w_c"
+
+[[row]]
+file = "cc/chain.py"
+scope = "_second"
+category = "R-lazy-if"
+ruling = "KEEP"
+n = 1
+line = 381
+reason = "the key is not provably bool by its syntax: a ternary would accept a truthy non-bool where the table raises KeyError"
+text = "{True: lambda: json.loads(p.read_text()), False: lambda: None}"
+
+[[row]]
+file = "cc/chain.py"
+scope = "run"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 401
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: None, False: lambda: _second(root, f, other, g)}"
+
+[[row]]
+file = "cc/chain.py"
+scope = "run"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 2
+line = 403
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: ([f'REFUSED {bad[0].words()}'], 1), False: lambda: _done(root, fam, g, fb)}"
+
+[[row]]
+file = "cc/chain.py"
+scope = "_done"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 414
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: [], False: lambda: co_rows(cells, fb)}"
+
+[[row]]
+file = "cc/host.py"
+scope = "probe"
+category = "X-eager-arms"
+ruling = "KEEP"
+n = 1
+line = 63
+reason = "both arms run today; a rewrite stops evaluating one (plan 1644 O2 names the lazy and pure sites only); reported per site"
+text = "{True: f\"the toolset at {ts} holds neither registry.toml's source_commit {str(reg.get('source_commit"
+
+[[row]]
+file = "cc/host.py"
+scope = "probe"
+category = "X-eager-arms"
+ruling = "KEEP"
+n = 2
+line = 65
+reason = "both arms run today; a rewrite stops evaluating one (plan 1644 O2 names the lazy and pure sites only); reported per site"
+text = "{True: Held('data_root', root), False: Absent('data_root', f'the data root {root} ({c.data_root_sour"
+
+[[row]]
+file = "cc/host.py"
+scope = "probe"
+category = "X-eager-arms"
+ruling = "KEEP"
+n = 3
+line = 66
+reason = "both arms run today; a rewrite stops evaluating one (plan 1644 O2 names the lazy and pure sites only); reported per site"
+text = "{True: Held('toolset', ts), False: Absent('toolset', why)}"
+
+[[row]]
+file = "cc/host.py"
+scope = "holder"
+category = "X-eager-arms"
+ruling = "KEEP"
+n = 1
+line = 71
+reason = "both arms run today; a rewrite stops evaluating one (plan 1644 O2 names the lazy and pure sites only); reported per site"
+text = "{True: Held('repo', Path(c.root) / 'data'), False: probe(c)[0]}"
+
+[[row]]
+file = "cc/intake.py"
+scope = "_findings"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 49
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: bad, False: lambda: transducer.chk_transducer(f'declarations/{ident}/transducer.toml'"
+
+[[row]]
+file = "cc/intake.py"
+scope = "lint"
+category = "R-pure-ternary"
+ruling = "KEEP"
+n = 1
+line = 66
+reason = "the key is not provably bool by its syntax: a ternary would accept a truthy non-bool where the table raises KeyError"
+text = "{True: 1, False: 0}"
+
+[[row]]
+file = "cc/intake.py"
+scope = "seal"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 80
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: _usage(f\"seal needs {'; '.join(usage)}\"), False: lambda: _seal(root, ident, args)}"
+
+[[row]]
+file = "cc/intake.py"
+scope = "_seal"
+category = "R-lazy-if"
+ruling = "KEEP"
+n = 1
+line = 85
+reason = "the key is not provably bool by its syntax: a ternary would accept a truthy non-bool where the table raises KeyError"
+text = "{True: lambda: 1, False: lambda: _mint(root, ident, args, t, d, out)}"
+
+[[row]]
+file = "cc/intake.py"
+scope = "_with_id"
+category = "R-lazy-if"
+ruling = "KEEP"
+n = 1
+line = 105
+reason = "the key is not provably bool by its syntax: a ternary would accept a truthy non-bool where the table raises KeyError"
+text = "{True: lambda: f(root, a[0], a[1:]), False: lambda: _usage('name a declaration: declarations/<id>/ m"
+
+[[row]]
+file = "cc/intake.py"
+scope = "<module>"
+category = "R-pure-ternary"
+ruling = "KEEP"
+n = 1
+line = 125
+reason = "outside the transformer's form (a lambda with parameters, or an arm that is not effect-free)"
+text = "{True: p.check_cli, False: p.profile_cli}"
+
+[[row]]
+file = "cc/intake.py"
+scope = "cli"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 130
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: args[0], False: lambda: ''}"
+
+[[row]]
+file = "cc/intake_against.py"
+scope = "_facts"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 42
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: spec['format']['sheet'], False: lambda: 0}"
+
+[[row]]
+file = "cc/intake_against.py"
+scope = "_facts"
+category = "X-eager-arms"
+ruling = "KEEP"
+n = 1
+line = 43
+reason = "both arms run today; a rewrite stops evaluating one (plan 1644 O2 names the lazy and pure sites only); reported per site"
+text = "{True: fp['sheets'], False: []}"
+
+[[row]]
+file = "cc/intake_against.py"
+scope = "_facts"
+category = "R-pure-ternary"
+ruling = "REWRITE"
+n = 1
+line = 48
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: [], False: None}"
+
+[[row]]
+file = "cc/intake_against.py"
+scope = "_facts"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 2
+line = 49
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: NAMES.get(h['kind'], lambda h, cs: list(cs))(h, cells), False: lambda: None}"
+
+[[row]]
+file = "cc/intake_against.py"
+scope = "_facts"
+category = "X-eager-arms"
+ruling = "KEEP"
+n = 2
+line = 51
+reason = "both arms run today; a rewrite stops evaluating one (plan 1644 O2 names the lazy and pure sites only); reported per site"
+text = "{True: len(cells or ()), False: ([r['width'] for r in live[i:]] + [0])[0]}"
+
+[[row]]
+file = "cc/intake_against.py"
+scope = "<module>"
+category = "R-pure-ternary"
+ruling = "REWRITE"
+n = 1
+line = 61
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: 'XLSX', False: 'TEXT_TABLE'}"
+
+[[row]]
+file = "cc/intake_against.py"
+scope = "unpredicted"
+category = "R-lazy-if"
+ruling = "KEEP"
+n = 1
+line = 92
+reason = "the key is not provably bool by its syntax: a ternary would accept a truthy non-bool where the table raises KeyError"
+text = "{True: lambda: Refuse(got.reason, replace(got.evidence, words=got.evidence.words + (PREDICTED,))), F"
+
+[[row]]
+file = "cc/intake_blind.py"
+scope = "look"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 91
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: table[key], False: lambda: absent}"
+
+[[row]]
+file = "cc/intake_blind.py"
+scope = "flag"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 96
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: args[args.index(name) + 1], False: lambda: absent}"
+
+[[row]]
+file = "cc/intake_blind.py"
+scope = "_closed"
+category = "X-eager-arms"
+ruling = "KEEP"
+n = 1
+line = 118
+reason = "both arms run today; a rewrite stops evaluating one (plan 1644 O2 names the lazy and pure sites only); reported per site"
+text = "{True: [], False: [Finding(code, loc, f\"'{v}'\")]}"
+
+[[row]]
+file = "cc/intake_blind.py"
+scope = "<module>"
+category = "X-eager-arms"
+ruling = "KEEP"
+n = 1
+line = 141
+reason = "both arms run today; a rewrite stops evaluating one (plan 1644 O2 names the lazy and pure sites only); reported per site"
+text = "{True: [Finding('VALUE_STILL_TODO', loc, 'TODO')], False: []}"
+
+[[row]]
+file = "cc/intake_blind.py"
+scope = "<module>"
+category = "X-eager-arms"
+ruling = "KEEP"
+n = 2
+line = 142
+reason = "both arms run today; a rewrite stops evaluating one (plan 1644 O2 names the lazy and pure sites only); reported per site"
+text = "{True: [], False: [Finding(spec['refused'], loc, f\"want '{spec['under']}{spec['want']}'\")]}"
+
+[[row]]
+file = "cc/intake_blind.py"
+scope = "<module>"
+category = "X-eager-arms"
+ruling = "KEEP"
+n = 3
+line = 144
+reason = "both arms run today; a rewrite stops evaluating one (plan 1644 O2 names the lazy and pure sites only); reported per site"
+text = "{True: [Finding('VALUE_STILL_TODO', loc, 'TODO')], False: []}"
+
+[[row]]
+file = "cc/intake_blind.py"
+scope = "<module>"
+category = "R-lazy-if"
+ruling = "KEEP"
+n = 1
+line = 150
+reason = "the key is not provably bool by its syntax: a ternary would accept a truthy non-bool where the table raises KeyError"
+text = "{True: lambda: section(spec['fields'], x, f'{loc}[{i}]', tables), False: lambda: [Finding('FIELD_TYP"
+
+[[row]]
+file = "cc/intake_blind.py"
+scope = "<module>"
+category = "R-lazy-if"
+ruling = "KEEP"
+n = 2
+line = 155
+reason = "the key is not provably bool by its syntax: a ternary would accept a truthy non-bool where the table raises KeyError"
+text = "{True: lambda: _variant(spec, x, f'{loc}[{i}]', tables), False: lambda: [Finding('FIELD_TYPE_WRONG',"
+
+[[row]]
+file = "cc/intake_blind.py"
+scope = "typed"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 163
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: [Finding('VALUE_STILL_TODO', loc, 'TODO')], False: lambda: {True: lambda: CHECK[spec["
+
+[[row]]
+file = "cc/intake_blind.py"
+scope = "typed"
+category = "R-lazy-if"
+ruling = "KEEP"
+n = 1
+line = 164
+reason = "the key is not provably bool by its syntax: a ternary would accept a truthy non-bool where the table raises KeyError"
+text = "{True: lambda: CHECK[spec['check']](spec, v, loc, tables), False: lambda: [Finding('FIELD_TYPE_WRONG"
+
+[[row]]
+file = "cc/intake_blind.py"
+scope = "field"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 170
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: typed(spec, d[key], loc, tables), False: lambda: {True: [Finding('FIELD_MISSING', loc"
+
+[[row]]
+file = "cc/intake_blind.py"
+scope = "field"
+category = "X-eager-arms"
+ruling = "KEEP"
+n = 1
+line = 170
+reason = "both arms run today; a rewrite stops evaluating one (plan 1644 O2 names the lazy and pure sites only); reported per site"
+text = "{True: [Finding('FIELD_MISSING', loc, 'absent')], False: []}"
+
+[[row]]
+file = "cc/intake_blind.py"
+scope = "section"
+category = "X-eager-arms"
+ruling = "KEEP"
+n = 1
+line = 181
+reason = "both arms run today; a rewrite stops evaluating one (plan 1644 O2 names the lazy and pure sites only); reported per site"
+text = "{True: '', False: loc + '.'}"
+
+[[row]]
+file = "cc/intake_blind.py"
+scope = "format_stage"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 227
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: Pass(Declaration(p.data['id'], p.data['intake']['mode'], p.data)), False: lambda: Ref"
+
+[[row]]
+file = "cc/intake_blind.py"
+scope = "gate"
+category = "X-eager-arms"
+ruling = "KEEP"
+n = 1
+line = 236
+reason = "both arms run today; a rewrite stops evaluating one (plan 1644 O2 names the lazy and pure sites only); reported per site"
+text = "{True: then, False: lambda: refuse(failed[0][1], failed[0][2]())}"
+
+[[row]]
+file = "cc/intake_blind.py"
+scope = "bind"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 241
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: x, False: lambda: f(x)}"
+
+[[row]]
+file = "cc/intake_blindview.py"
+scope = "<module>"
+category = "K-named-table"
+ruling = "KEEP"
+n = 1
+line = 19
+reason = "a named table over a discrete signature: the class is a lookup in a total table"
+text = "{True: lambda n: Path(n).suffix, False: lambda n: ''}"
+
+[[row]]
+file = "cc/intake_blindview.py"
+scope = "blind_cli"
+category = "R-lazy-if"
+ruling = "KEEP"
+n = 1
+line = 59
+reason = "the key is not provably bool by its syntax: a ternary would accept a truthy non-bool where the table raises KeyError"
+text = "{True: lambda: blind(ident, args[0], args[1:], t), False: lambda: None}"
+
+[[row]]
+file = "cc/intake_blindview.py"
+scope = "blind_cli"
+category = "X-inline-partial-signature"
+ruling = "KEEP"
+n = 1
+line = 60
+reason = "a missing combination is a crash on purpose (an upstream refusal makes it unreachable)"
+text = "{(True, True): lambda: f'blind {ident}: ' + got.text(say), (True, False): lambda: f'blind {ident}: {"
+
+[[row]]
+file = "cc/intake_blindview.py"
+scope = "blind_cli"
+category = "R-pure-ternary"
+ruling = "KEEP"
+n = 1
+line = 66
+reason = "the key is not provably bool by its syntax: a ternary would accept a truthy non-bool where the table raises KeyError"
+text = "{True: 0, False: 1}"
+
+[[row]]
+file = "cc/intake_bytes.py"
+scope = "located"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 35
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: str(Path(roots[m[1]]) / m[2].lstrip('/')), False: lambda: ''}"
+
+[[row]]
+file = "cc/intake_census.py"
+scope = "label"
+category = "R-pure-ternary"
+ruling = "REWRITE"
+n = 1
+line = 161
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: Alignment.ALIGNED, False: Alignment.MISALIGNED}"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "_in"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 50
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: Refuse(got.reason, replace(got.evidence, file=where)), False: lambda: got}"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "_member"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 107
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: replace(fr, raw=z.read(step['member'])), False: lambda: Refuse('SOURCE_FILE_ABSENT', "
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "_unpack"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 113
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: Refuse('CONTAINER_UNREADABLE', detail(words=['UNPACK: the bytes are no zip archive'])"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "_decode"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 118
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: Refuse('ENCODING_INVALID', detail(words=[f\"encoding {step['encoding']}\"])), False: la"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "_marker"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 123
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: None, False: lambda: set(range(at[0] + 1))}"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "_drop"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 135
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: Refuse('MARKER_LINE_ABSENT', detail(words=[f\"DROP_LINES MARKER '{step['rule']['marker"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "sheet_rows"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 167
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: Refuse(XLSX_REASON[got.reason], got.detail), False: lambda: [(n, [look(CELL_TEXT, typ"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "_prefixed"
+category = "R-lazy-if"
+ruling = "KEEP"
+n = 1
+line = 183
+reason = "the key is not provably bool by its syntax: a ternary would accept a truthy non-bool where the table raises KeyError"
+text = "{False: lambda: Refuse('MARKER_LINE_ABSENT', detail(words=['NAMES_LINE REPLACE_PREFIXED: the first r"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "<module>"
+category = "X-eager-arms"
+ruling = "KEEP"
+n = 1
+line = 219
+reason = "both arms run today; a rewrite stops evaluating one (plan 1644 O2 names the lazy and pure sites only); reported per site"
+text = "{True: ref - 1, False: None}"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "<module>"
+category = "K-named-table"
+ruling = "KEEP"
+n = 1
+line = 276
+reason = "a named table over a discrete signature: the class is a lookup in a total table"
+text = "{True: 'EMPTY', False: 'TEXT'}"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "_step"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 323
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: bad[0], False: lambda: [p for g in got for p in g]}"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "render"
+category = "R-lazy-if"
+ruling = "KEEP"
+n = 1
+line = 337
+reason = "outside the transformer's form (a lambda with parameters, or an arm that is not effect-free)"
+text = "{True: lambda a=a: list(a), False: lambda a=a: None}"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "_same"
+category = "R-lazy-if"
+ruling = "KEEP"
+n = 1
+line = 343
+reason = "the key is not provably bool by its syntax: a ternary would accept a truthy non-bool where the table raises KeyError"
+text = "{True: lambda: struct.pack('<d', float(out)) == struct.pack('<d', float(src)), False: lambda: out =="
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "_mapped"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 392
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: n in blank[u], False: lambda: look(why, files[u]['steps'][s]['op'], lambda u, n: Fals"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "declared"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 440
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: p.data, False: lambda: Refuse(found[0].reason, detail(file='CONVERSION.toml', words=["
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "_text"
+category = "R-lazy-if"
+ruling = "KEEP"
+n = 1
+line = 444
+reason = "the key is not provably bool by its syntax: a ternary would accept a truthy non-bool where the table raises KeyError"
+text = "{True: lambda: Path(p).read_text(), False: lambda: ''}"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "_inside"
+category = "R-pure-ternary"
+ruling = "KEEP"
+n = 1
+line = 454
+reason = "the key is not provably bool by its syntax: a ternary would accept a truthy non-bool where the table raises KeyError"
+text = "{True: q, False: None}"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "_built"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 475
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: bad[0], False: lambda: [(u, parts) for u, parts in enumerate(got)]}"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "_records"
+category = "R-lazy-if"
+ruling = "KEEP"
+n = 1
+line = 484
+reason = "outside the transformer's form (a lambda with parameters, or an arm that is not effect-free)"
+text = "{True: lambda c=c: list(c), False: lambda: None}"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "_frames_ok"
+category = "X-eager-arms"
+ruling = "KEEP"
+n = 1
+line = 504
+reason = "both arms run today; a rewrite stops evaluating one (plan 1644 O2 names the lazy and pure sites only); reported per site"
+text = "{True: lambda: bad[0], False: then}"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "_manifest"
+category = "R-pure-ternary"
+ruling = "KEEP"
+n = 1
+line = 547
+reason = "the key is not provably bool by its syntax: a ternary would accept a truthy non-bool where the table raises KeyError"
+text = "{True: m, False: None}"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "_manifest_in"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 554
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: None, False: lambda: _manifest(b.decode('utf-8', 'replace'))}"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "chained"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 560
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: Refuse('CONVERSION_CHAIN_BROKEN', detail(words=[f'no {MANIFEST} the converter wrote']"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "_reader"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 575
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: None, False: lambda: loader.read(_inside(base, rel))}"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "s3.go"
+category = "X-other"
+ruling = "KEEP"
+n = 1
+line = 600
+reason = "the dict is bound to a name and indexed elsewhere: not a literal dispatch, outside the transformer's form"
+text = "{True: lambda: got, False: lambda: Refuse('CONVERSION_CHAIN_BROKEN', got.evidence.within(got.evidenc"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "s3.go"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 603
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: _bind(then(loader), lambda p: Pass(replace(p.evidence, dropped=dropped()))), False: l"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "convert_cli"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 611
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: verified(root, ident, t, ct), False: lambda: convert(root, ident, t, ct)}"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "convert_cli"
+category = "R-pure-ternary"
+ruling = "REWRITE"
+n = 1
+line = 613
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: 1, False: 0}"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "_cells"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 619
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: next(csv.reader([re.sub('[;\\\\t]', ',', line)]), []), False: lambda: line.split()}"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "_cells"
+category = "X-eager-arms"
+ruling = "KEEP"
+n = 1
+line = 620
+reason = "both arms run today; a rewrite stops evaluating one (plan 1644 O2 names the lazy and pure sites only); reported per site"
+text = "{True: [], False: [c.strip() for c in cut if c.strip()]}"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "_named"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 626
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: ': ' + ', '.join((f\"'{masked(c)}'\" for c in text)), False: lambda: ''}"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "_said"
+category = "R-lazy-if"
+ruling = "KEEP"
+n = 1
+line = 632
+reason = "the key is not provably bool by its syntax: a ternary would accept a truthy non-bool where the table raises KeyError"
+text = "{True: lambda: f'line {k}: blank', False: lambda: f'line {k}: {_named(cs)}'}"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "<module>"
+category = "K-named-table"
+ruling = "KEEP"
+n = 2
+line = 653
+reason = "a named table over a discrete signature: the class is a lookup in a total table"
+text = "{(True, True): lambda names: [f\"the workbook's sheets: {_addressed(names)}; name one with --sheet k "
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "_sheets"
+category = "R-lazy-if"
+ruling = "KEEP"
+n = 1
+line = 663
+reason = "the key is not provably bool by its syntax: a ternary would accept a truthy non-bool where the table raises KeyError"
+text = "{True: lambda: _book_names(raw), False: lambda: None}"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "_head"
+category = "K-inline-signature"
+ruling = "KEEP"
+n = 1
+line = 677
+reason = "total over the product of its bools"
+text = "{(True, False): lambda: [(n, _cells(t)) for n, t in _split(raw.decode(encoding, 'replace'))], (True,"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "peek"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 690
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: dict(_split(raw.decode(encoding, 'replace'))), False: lambda: {}}"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "peek"
+category = "X-other"
+ruling = "KEEP"
+n = 1
+line = 691
+reason = "outside the transformer's form (a lambda with parameters, or an arm that is not effect-free)"
+text = "{True: lambda n, cs: f'; {len(SPLIT[delim](text[n]))} cells under {delim}', False: lambda n, cs: f';"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "peek.lines"
+category = "R-pure-ternary"
+ruling = "REWRITE"
+n = 1
+line = 696
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: 'a line of numbers (not printed)', False: 'depth + 2 lines'}"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "listed"
+category = "X-eager-arms"
+ruling = "KEEP"
+n = 1
+line = 706
+reason = "both arms run today; a rewrite stops evaluating one (plan 1644 O2 names the lazy and pure sites only); reported per site"
+text = "{True: lambda: {c.name: c for c in at.iterdir()}, False: dict}"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "listed"
+category = "X-eager-arms"
+ruling = "KEEP"
+n = 2
+line = 707
+reason = "both arms run today; a rewrite stops evaluating one (plan 1644 O2 names the lazy and pure sites only); reported per site"
+text = "{True: Path(base), False: None}"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "listed"
+category = "R-lazy-if"
+ruling = "KEEP"
+n = 1
+line = 708
+reason = "the key is not provably bool by its syntax: a ternary would accept a truthy non-bool where the table raises KeyError"
+text = "{True: lambda: str(at), False: lambda: ''}"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "peek_cli"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 719
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: args[0], False: lambda: ''}"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "peek_cli"
+category = "R-pure-ternary"
+ruling = "KEEP"
+n = 1
+line = 720
+reason = "outside the transformer's form (a lambda with parameters, or an arm that is not effect-free)"
+text = "{True: int, False: str}"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "peek_cli.go"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 726
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: None, False: lambda: _reader(base, loader)(Path(at).relative_to(base))}"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "peek_cli.go"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 2
+line = 733
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: 0, False: lambda: len(got[0])}"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "peek_cli.go"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 3
+line = 734
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: got.reason, False: lambda: got[1]}"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "peek_cli.go"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 4
+line = 735
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: f'peek {ident} {rel}: ' + got.text(ct['sentences']), False: lambda: f'peek {ident} {r"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "peek_cli.go"
+category = "R-pure-ternary"
+ruling = "REWRITE"
+n = 1
+line = 737
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: 1, False: 0}"
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "peek_cli"
+category = "X-eager-arms"
+ruling = "KEEP"
+n = 1
+line = 738
+reason = "both arms run today; a rewrite stops evaluating one (plan 1644 O2 names the lazy and pure sites only); reported per site"
+text = "{True: go, False: lambda: print('bin/cc intake peek: usage: peek <id> <cc-datasets>/<name>/raw/<file"
+
+[[row]]
+file = "cc/intake_differs.py"
+scope = "_line"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 20
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: None, False: lambda: tuple((_name(x) for x in dict(enumerate((c for _, c in cells if "
+
+[[row]]
+file = "cc/intake_feasible.py"
+scope = "<module>"
+category = "K-named-table"
+ruling = "KEEP"
+n = 1
+line = 47
+reason = "a named table over a discrete signature: the class is a lookup in a total table"
+text = "{True: 'VALIDATED_BRACKET', False: 'CANDIDATE_BRACKET'}"
+
+[[row]]
+file = "cc/intake_feature.py"
+scope = "<module>"
+category = "K-named-table"
+ruling = "KEEP"
+n = 1
+line = 97
+reason = "a named table over a discrete signature: the class is a lookup in a total table"
+text = "{True: lambda look_up: 'SINGLE', False: lambda look_up: look_up()}"
+
+[[row]]
+file = "cc/intake_feature.py"
+scope = "<module>"
+category = "K-named-table"
+ruling = "KEEP"
+n = 2
+line = 102
+reason = "a named table over a discrete signature: the class is a lookup in a total table"
+text = "{True: lambda x, v, f: PLACE[int(x >= v[f.lo]) + int(x > v[f.hi])], False: lambda x, v, f: Locus.Off"
+
+[[row]]
+file = "cc/intake_feature.py"
+scope = "<module>"
+category = "K-named-table"
+ruling = "KEEP"
+n = 3
+line = 115
+reason = "a named table over a discrete signature: the class is a lookup in a total table"
+text = "{(True, True): AtSpanEnd, (True, False): AtSpanEnd, (False, True): Broad, (False, False): Located}"
+
+[[row]]
+file = "cc/intake_feature.py"
+scope = "<module>"
+category = "K-named-table"
+ruling = "KEEP"
+n = 4
+line = 130
+reason = "a named table over a discrete signature: the class is a lookup in a total table"
+text = "{False: lambda a, z, kind, wc, width, i: Absent(len(a)), True: located}"
+
+[[row]]
+file = "cc/intake_feature.py"
+scope = "<module>"
+category = "K-named-table"
+ruling = "KEEP"
+n = 5
+line = 142
+reason = "a named table over a discrete signature: the class is a lookup in a total table"
+text = "{True: lambda lo, hi: 1.0, False: lambda lo, hi: hi - lo}"
+
+[[row]]
+file = "cc/intake_feature.py"
+scope = "<module>"
+category = "K-named-table"
+ruling = "KEEP"
+n = 6
+line = 160
+reason = "a named table over a discrete signature: the class is a lookup in a total table"
+text = "{True: lambda cs, w: (min((r[0] for c in cs for r in c.rows)), max((r[0] for c in cs for r in c.rows"
+
+[[row]]
+file = "cc/intake_feature.py"
+scope = "<module>"
+category = "K-named-table"
+ruling = "KEEP"
+n = 7
+line = 238
+reason = "a named table over a discrete signature: the class is a lookup in a total table"
+text = "{(True, True): lambda *a: _build(*a), (True, False): lambda *a: Unprojected('COORDINATE_UNDECLARED')"
+
+[[row]]
+file = "cc/intake_findings.py"
+scope = "tables_of"
+category = "R-pure-ternary"
+ruling = "REWRITE"
+n = 1
+line = 63
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: f.sheets, False: ()}"
+
+[[row]]
+file = "cc/intake_findings.py"
+scope = "<module>"
+category = "X-eager-arms"
+ruling = "KEEP"
+n = 1
+line = 78
+reason = "both arms run today; a rewrite stops evaluating one (plan 1644 O2 names the lazy and pure sites only); reported per site"
+text = "{True: lambda: (ls[0][0], ls[-1][1]), False: tuple}"
+
+[[row]]
+file = "cc/intake_fold.py"
+scope = "<module>"
+category = "K-named-table"
+ruling = "KEEP"
+n = 1
+line = 120
+reason = "a named table over a discrete signature: the class is a lookup in a total table"
+text = "{(True, True): Upstream.REFUSED_EARLIER, (True, False): Upstream.REFUSED_EARLIER, (False, True): Ups"
+
+[[row]]
+file = "cc/intake_fold.py"
+scope = "<module>"
+category = "K-named-table"
+ruling = "KEEP"
+n = 2
+line = 162
+reason = "a named table over a discrete signature: the class is a lookup in a total table"
+text = "{(False, False, True): lambda ids, out: Verdict(Primary.PRIMARY_READY), (False, False, False): lambd"
+
+[[row]]
+file = "cc/intake_fold.py"
+scope = "verdicts"
+category = "R-pure-ternary"
+ruling = "REWRITE"
+n = 1
+line = 204
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: (rob,), False: ()}"
+
+[[row]]
+file = "cc/intake_fold.py"
+scope = "verdicts"
+category = "R-pure-ternary"
+ruling = "REWRITE"
+n = 2
+line = 204
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: rob, False: ''}"
+
+[[row]]
+file = "cc/intake_names.py"
+scope = "classify"
+category = "R-pure-ternary"
+ruling = "REWRITE"
+n = 1
+line = 23
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: Name.NUMERIC, False: Name.TEXT}"
+
+[[row]]
+file = "cc/intake_names.py"
+scope = "masked"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 28
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: NUMBER.sub('#', text), False: lambda: '(none)'}"
+
+[[row]]
+file = "cc/intake_names.py"
+scope = "split_unit"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 57
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: (m[1].strip(), m[2].strip()), False: lambda: (cell, '')}"
+
+[[row]]
+file = "cc/intake_names.py"
+scope = "<module>"
+category = "K-named-table"
+ruling = "KEEP"
+n = 1
+line = 61
+reason = "a named table over a discrete signature: the class is a lookup in a total table"
+text = "{(True, True): 'in the declared order', (True, False): 'in the declared order', (False, True): 'in t"
+
+[[row]]
+file = "cc/intake_new.py"
+scope = "fill"
+category = "X-eager-arms"
+ruling = "KEEP"
+n = 1
+line = 16
+reason = "both arms run today; a rewrite stops evaluating one (plan 1644 O2 names the lazy and pure sites only); reported per site"
+text = "{True: ln.strip('[] '), False: sec}"
+
+[[row]]
+file = "cc/intake_new.py"
+scope = "fill"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 17
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: [head[1]], False: lambda: [sec] + [f'{sec}.{x[1]}' for x in [m] if x is not None]}"
+
+[[row]]
+file = "cc/intake_new.py"
+scope = "fill"
+category = "X-other"
+ruling = "KEEP"
+n = 1
+line = 18
+reason = "the dict is bound to a name and indexed elsewhere: not a literal dispatch, outside the transformer's form"
+text = "{True: lambda: [], False: lambda: [{True: lambda: f\"{m[1]} = {values[sec + '.' + m[1]]}{m[2]}\", Fals"
+
+[[row]]
+file = "cc/intake_new.py"
+scope = "fill"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 2
+line = 18
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: f\"{m[1]} = {values[sec + '.' + m[1]]}{m[2]}\", False: lambda: ln}"
+
+[[row]]
+file = "cc/intake_new.py"
+scope = "new"
+category = "X-eager-arms"
+ruling = "KEEP"
+n = 1
+line = 50
+reason = "both arms run today; a rewrite stops evaluating one (plan 1644 O2 names the lazy and pure sites only); reported per site"
+text = "{True: lambda: (1, f\"bin/cc new intake: refused, {'; '.join(usage)}\\n  Next: bin/cc new intake <id> "
+
+[[row]]
+file = "cc/intake_new.py"
+scope = "new"
+category = "R-pure-ternary"
+ruling = "REWRITE"
+n = 1
+line = 51
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: blank, False: filled}"
+
+[[row]]
+file = "cc/intake_profile.py"
+scope = "kind"
+category = "X-inline-partial-signature"
+ruling = "KEEP"
+n = 1
+line = 80
+reason = "a missing combination is a crash on purpose (an upstream refusal makes it unreachable)"
+text = "{(False, True): 'BLANK', (True, False): 'TEXT', (True, True): ('NUMERIC', 'NUMERIC_WITH_EMPTY')[len("
+
+[[row]]
+file = "cc/intake_profile.py"
+scope = "_column"
+category = "X-eager-arms"
+ruling = "KEEP"
+n = 1
+line = 128
+reason = "both arms run today; a rewrite stops evaluating one (plan 1644 O2 names the lazy and pure sites only); reported per site"
+text = "{True: 'empty', False: {True: 'numeric', False: 'text'}[NUMBER.fullmatch(c.strip()) is not None]}"
+
+[[row]]
+file = "cc/intake_profile.py"
+scope = "_column"
+category = "R-pure-ternary"
+ruling = "REWRITE"
+n = 1
+line = 128
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: 'numeric', False: 'text'}"
+
+[[row]]
+file = "cc/intake_profile.py"
+scope = "_name"
+category = "X-eager-arms"
+ruling = "KEEP"
+n = 1
+line = 137
+reason = "both arms run today; a rewrite stops evaluating one (plan 1644 O2 names the lazy and pure sites only); reported per site"
+text = "{True: lambda: '', False: {Name.TEXT: lambda: masked(c), Name.NUMERIC: lambda: f'#{k}'}[classify(c)]"
+
+[[row]]
+file = "cc/intake_profile.py"
+scope = "cells_table"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 150
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: body[0].first, False: lambda: len(cut) + 1}"
+
+[[row]]
+file = "cc/intake_profile.py"
+scope = "cells_table"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 2
+line = 154
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: _name(names[0], k), False: lambda: 'NONE'}"
+
+[[row]]
+file = "cc/intake_profile.py"
+scope = "decoded"
+category = "R-pure-ternary"
+ruling = "REWRITE"
+n = 1
+line = 165
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: (enc, text), False: ('UNDECODABLE', None)}"
+
+[[row]]
+file = "cc/intake_profile.py"
+scope = "sheets"
+category = "R-lazy-if"
+ruling = "KEEP"
+n = 1
+line = 188
+reason = "the key is not provably bool by its syntax: a ternary would accept a truthy non-bool where the table raises KeyError"
+text = "{True: lambda: _book_names(raw) or [], False: lambda: []}"
+
+[[row]]
+file = "cc/intake_profile.py"
+scope = "sheets"
+category = "X-inline-partial-signature"
+ruling = "KEEP"
+n = 1
+line = 189
+reason = "a missing combination is a crash on purpose (an upstream refusal makes it unreachable)"
+text = "{(True, False): lambda: tuple((_sheet(k, n, g) for k, n, g in got)), (True, True): lambda: CELLS_UNR"
+
+[[row]]
+file = "cc/intake_profile.py"
+scope = "profile.go"
+category = "R-lazy-if"
+ruling = "KEEP"
+n = 1
+line = 233
+reason = "the key is not provably bool by its syntax: a ternary would accept a truthy non-bool where the table raises KeyError"
+text = "{True: lambda: manifest.write_text(section(manifest.read_text(), p, sha, now)), False: lambda: None}"
+
+[[row]]
+file = "cc/intake_profile.py"
+scope = "_cells"
+category = "X-eager-arms"
+ruling = "KEEP"
+n = 1
+line = 242
+reason = "both arms run today; a rewrite stops evaluating one (plan 1644 O2 names the lazy and pure sites only); reported per site"
+text = "{True: f'line {h.line}: blank', False: f\"line {h.line}: {len(text)} text name{'s' * (len(text) != 1)"
+
+[[row]]
+file = "cc/intake_profile.py"
+scope = "_table_md"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 249
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: f'{row(r.first)}-{row(r.last)}', False: lambda: '-'}"
+
+[[row]]
+file = "cc/intake_profile.py"
+scope = "md"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 267
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: [f\"- sheets: { {READER_ABSENT: 'openpyxl is not installed here', CELLS_UNREADABLE: 'a"
+
+[[row]]
+file = "cc/intake_profile.py"
+scope = "md"
+category = "R-pure-ternary"
+ruling = "REWRITE"
+n = 1
+line = 269
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: 'the table', False: f'sheet #{k}'}"
+
+[[row]]
+file = "cc/intake_profile.py"
+scope = "section"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 284
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: text[:m.start()] + new + '\\n' * (m.end() < len(text)) + text[m.end():], False: lambda"
+
+[[row]]
+file = "cc/intake_profile.py"
+scope = "profile_cli"
+category = "R-pure-ternary"
+ruling = "REWRITE"
+n = 1
+line = 302
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: 'PROFILE-raw.json', False: 'PROFILE.json'}"
+
+[[row]]
+file = "cc/intake_profile.py"
+scope = "profile_cli"
+category = "R-lazy-if"
+ruling = "KEEP"
+n = 1
+line = 304
+reason = "the key is not provably bool by its syntax: a ternary would accept a truthy non-bool where the table raises KeyError"
+text = "{True: lambda: profile(root, ident, path[0], t, out), False: lambda: None}"
+
+[[row]]
+file = "cc/intake_profile.py"
+scope = "profile_cli"
+category = "X-inline-partial-signature"
+ruling = "KEEP"
+n = 1
+line = 305
+reason = "a missing combination is a crash on purpose (an upstream refusal makes it unreachable)"
+text = "{(True, True): lambda: f'profile {ident}: ' + got.text(intake_convert.ctables()['sentences']), (True"
+
+[[row]]
+file = "cc/intake_profile.py"
+scope = "profile_cli"
+category = "R-pure-ternary"
+ruling = "KEEP"
+n = 1
+line = 307
+reason = "the key is not provably bool by its syntax: a ternary would accept a truthy non-bool where the table raises KeyError"
+text = "{True: 0, False: 1}"
+
+[[row]]
+file = "cc/intake_profile.py"
+scope = "read"
+category = "R-lazy-if"
+ruling = "KEEP"
+n = 1
+line = 316
+reason = "the key is not provably bool by its syntax: a ternary would accept a truthy non-bool where the table raises KeyError"
+text = "{True: lambda: g(f), False: lambda: None}"
+
+[[row]]
+file = "cc/intake_profile.py"
+scope = "read"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 317
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: (v(b), hashlib.sha256(b).hexdigest()), False: lambda: (e, '')}"
+
+[[row]]
+file = "cc/intake_profile.py"
+scope = "check_cli"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 324
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: [EMPTY, '', {}, ''], False: lambda: read(d, intake_bytes.located(s0.evidence.data['so"
+
+[[row]]
+file = "cc/intake_profile.py"
+scope = "check_cli"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 2
+line = 325
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: (), False: lambda: intake_bytes.intake_against.against(p, m, s0.evidence.data)}"
+
+[[row]]
+file = "cc/intake_profile.py"
+scope = "check_cli"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 3
+line = 326
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: f'REFUSE {s0.reason}: the declaration does not pass FORMAT (bin/cc intake lint {ident"
+
+[[row]]
+file = "cc/intake_profile.py"
+scope = "check_cli"
+category = "X-eager-arms"
+ruling = "KEEP"
+n = 1
+line = 326
+reason = "both arms run today; a rewrite stops evaluating one (plan 1644 O2 names the lazy and pure sites only); reported per site"
+text = "{True: f'PROFILE_ABSENT: run bin/cc intake profile {ident} <root-named path> first', False: f'{len(f"
+
+[[row]]
+file = "cc/intake_read.py"
+scope = "_text_cells.cells"
+category = "R-lazy-if"
+ruling = "KEEP"
+n = 1
+line = 90
+reason = "the key is not provably bool by its syntax: a ternary would accept a truthy non-bool where the table raises KeyError"
+text = "{False: lambda: text, True: lambda: [(i, SPLIT[kind](ln)) for i, ln in enumerate(text.splitlines(), "
+
+[[row]]
+file = "cc/intake_read.py"
+scope = "_xlsx_cells"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 105
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: list(book[address[sheet]].iter_rows(values_only=True)), False: lambda: []}"
+
+[[row]]
+file = "cc/intake_read.py"
+scope = "_xlsx_cells"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 2
+line = 108
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{False: lambda: Unreadable('SHEET_ABSENT', detail(words=[f\"sheet '{sheet}'\"], counts={'sheets in the"
+
+[[row]]
+file = "cc/intake_read.py"
+scope = "<module>"
+category = "K-named-table"
+ruling = "KEEP"
+n = 1
+line = 112
+reason = "a named table over a discrete signature: the class is a lookup in a total table"
+text = "{True: _xlsx_cells, False: lambda data, spec: Unreadable('XLSX_READER_ABSENT', detail(words=['openpy"
+
+[[row]]
+file = "cc/intake_read.py"
+scope = "_numeric"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 132
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: NUMERIC[type(c)], False: lambda: NOT_A_NUMBER}"
+
+[[row]]
+file = "cc/intake_read.py"
+scope = "_name"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 140
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: cell.strip(), False: lambda: ''}"
+
+[[row]]
+file = "cc/intake_read.py"
+scope = "_said"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 147
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: SAID[type(cell)](cell), False: lambda: ''}"
+
+[[row]]
+file = "cc/intake_read.py"
+scope = "_columns"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 194
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: named['names'], False: lambda: []}"
+
+[[row]]
+file = "cc/intake_read.py"
+scope = "_columns"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 2
+line = 195
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: len(head[lines['names'] - 1][1]), False: lambda: len(body[0][1])}"
+
+[[row]]
+file = "cc/intake_read.py"
+scope = "_numbers"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 205
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: tuple(((r, named['units'][k]) for (r, _), k in zip(roles, at))), False: lambda: ()}"
+
+[[row]]
+file = "cc/intake_read.py"
+scope = "read_hdf5"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 244
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: _hdf5(data, d), False: lambda: Unreadable('HDF5_READER_ABSENT', detail(words=['h5py i"
+
+[[row]]
+file = "cc/intake_read.py"
+scope = "read_table"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 252
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: cells, False: lambda: table(cells, spec, lambda head: role_columns(d))}"
+
+[[row]]
+file = "cc/intake_read.py"
+scope = "read_csv"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 263
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: cells, False: lambda: table(cells, CSV_CURVE, whole)}"
+
+[[row]]
+file = "cc/intake_say.py"
+scope = "state"
+category = "R-pure-ternary"
+ruling = "KEEP"
+n = 1
+line = 10
+reason = "the key is not provably bool by its syntax: a ternary would accept a truthy non-bool where the table raises KeyError"
+text = "{True: 'LIVE', False: 'STUB'}"
+
+[[row]]
+file = "cc/intake_say.py"
+scope = "<module>"
+category = "K-named-table"
+ruling = "KEEP"
+n = 1
+line = 13
+reason = "a named table over a discrete signature: the class is a lookup in a total table"
+text = "{True: 'live', False: 'NOT LIVE'}"
+
+[[row]]
+file = "cc/intake_say.py"
+scope = "explain"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 38
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: ['', '| reader reason (READER_REFUSED) | live | what it means |', '|---|---|---|'] + "
+
+[[row]]
+file = "cc/intake_say.py"
+scope = "explain"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 2
+line = 40
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: ['', '| seal status | what it means |', '|---|---|'] + [f\"| {r['code']} | {r['sentenc"
+
+[[row]]
+file = "cc/intake_say.py"
+scope = "profiled"
+category = "X-inline-partial-signature"
+ruling = "KEEP"
+n = 1
+line = 51
+reason = "a missing combination is a crash on purpose (an upstream refusal makes it unreachable)"
+text = "{(True, False): lambda: (lambda p: f\"PROFILED {p['sha256'][:12]} ({len(p['files'])} files, {len(p['f"
+
+[[row]]
+file = "cc/intake_say.py"
+scope = "report"
+category = "R-pure-ternary"
+ruling = "REWRITE"
+n = 1
+line = 65
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: f' at {p.at}', False: ''}"
+
+[[row]]
+file = "cc/intake_say.py"
+scope = "report"
+category = "R-pure-ternary"
+ruling = "REWRITE"
+n = 2
+line = 66
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: f' at {r.at}', False: ''}"
+
+[[row]]
+file = "cc/intake_say.py"
+scope = "report"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 68
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: out[seal].result.evidence.summary(), False: lambda: 'not reported: ' + out[seal].text"
+
+[[row]]
+file = "cc/intake_say.py"
+scope = "report"
+category = "X-eager-arms"
+ruling = "KEEP"
+n = 1
+line = 71
+reason = "both arms run today; a rewrite stops evaluating one (plan 1644 O2 names the lazy and pure sites only); reported per site"
+text = "{True: [f\"- **confirmation**: {t['stages']['report']['confirmation']}\"], False: []}"
+
+[[row]]
+file = "cc/intake_say.py"
+scope = "report"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 2
+line = 77
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: ['', '## Census', '', f'The curves of {census} CENSUS, by ordinal and file name (neve"
+
+[[row]]
+file = "cc/intake_seal.py"
+scope = "<module>"
+category = "K-named-table"
+ruling = "KEEP"
+n = 1
+line = 40
+reason = "a named table over a discrete signature: the class is a lookup in a total table"
+text = "{(False, False): SealStatus.UNSEALED, (False, True): SealStatus.UNSEALED, (True, True): SealStatus.S"
+
+[[row]]
+file = "cc/intake_seal.py"
+scope = "SealState.summary"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 53
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: f' {_said(self.record)}', False: lambda: ''}"
+
+[[row]]
+file = "cc/intake_seal.py"
+scope = "declared"
+category = "R-lazy-if"
+ruling = "KEEP"
+n = 1
+line = 62
+reason = "the key is not provably bool by its syntax: a ternary would accept a truthy non-bool where the table raises KeyError"
+text = "{True: lambda: f.read_text(), False: lambda: Absent(f'declarations/{Path(d).name}/intake.toml')}"
+
+[[row]]
+file = "cc/intake_seal.py"
+scope = "lines"
+category = "R-lazy-if"
+ruling = "KEEP"
+n = 1
+line = 79
+reason = "the key is not provably bool by its syntax: a ternary would accept a truthy non-bool where the table raises KeyError"
+text = "{True: lambda: [json.loads(x) for x in Path(p).read_text().splitlines()], False: lambda: []}"
+
+[[row]]
+file = "cc/intake_seal.py"
+scope = "record"
+category = "R-lazy-if"
+ruling = "KEEP"
+n = 1
+line = 90
+reason = "the key is not provably bool by its syntax: a ternary would accept a truthy non-bool where the table raises KeyError"
+text = "{True: lambda: json.loads((Path(d) / 'SEAL.json').read_text()), False: lambda: {}}"
+
+[[row]]
+file = "cc/intake_seal.py"
+scope = "ordering"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 111
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{False: lambda: (Ordering.NOT_SEALED, (set(), set())), True: lambda: (list(Ordering)[1 + (len(reads)"
+
+[[row]]
+file = "cc/intake_seal.py"
+scope = "ordering"
+category = "X-eager-arms"
+ruling = "KEEP"
+n = 1
+line = 113
+reason = "both arms run today; a rewrite stops evaluating one (plan 1644 O2 names the lazy and pure sites only); reported per site"
+text = "{True: f\" {a} ({len(c)} file{'s' * (len(c) != 1)}). {t['stages']['report'][k]}\", False: ''}"
+
+[[row]]
+file = "cc/intake_seal.py"
+scope = "_git"
+category = "X-eager-arms"
+ruling = "KEEP"
+n = 1
+line = 120
+reason = "both arms run today; a rewrite stops evaluating one (plan 1644 O2 names the lazy and pure sites only); reported per site"
+text = "{True: r.stdout.strip(), False: 'none'}"
+
+[[row]]
+file = "cc/intake_seal.py"
+scope = "_stamp"
+category = "R-pure-ternary"
+ruling = "REWRITE"
+n = 1
+line = 185
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: 'CLEAN', False: 'UNCOMMITTED_CHANGES'}"
+
+[[row]]
+file = "cc/intake_seal.py"
+scope = "mint"
+category = "R-lazy-if"
+ruling = "KEEP"
+n = 1
+line = 201
+reason = "the key is not provably bool by its syntax: a ternary would accept a truthy non-bool where the table raises KeyError"
+text = "{True: lambda: Refuse('ALREADY_SEALED', detail(words=['SEAL.json exists; a seal is never replaced'])"
+
+[[row]]
+file = "cc/intake_seal.py"
+scope = "mint"
+category = "R-lazy-if"
+ruling = "KEEP"
+n = 2
+line = 202
+reason = "the key is not provably bool by its syntax: a ternary would accept a truthy non-bool where the table raises KeyError"
+text = "{False: lambda: Refuse('UNIVERSE_ROOT_ABSENT', detail(words=[f\"root '{declaration.data['source']['ro"
+
+[[row]]
+file = "cc/intake_suspect.py"
+scope = "<module>"
+category = "K-named-table"
+ruling = "KEEP"
+n = 1
+line = 92
+reason = "a named table over a discrete signature: the class is a lookup in a total table"
+text = "{(False, False): lambda d, keyed: _plane(keyed), (True, False): lambda d, keyed: Refused('PLANE_NEED"
+
+[[row]]
+file = "cc/intake_suspect.py"
+scope = "_cells"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 146
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: Cells(tuple(each), s['corridor'], len(p.curves), max((len(f) for _, f in p.curves)), "
+
+[[row]]
+file = "cc/intake_synth.py"
+scope = "cli"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 134
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: args[0], False: lambda: ''}"
+
+[[row]]
+file = "cc/intake_synth.py"
+scope = "cli"
+category = "X-other"
+ruling = "KEEP"
+n = 1
+line = 144
+reason = "the dict is bound to a name and indexed elsewhere: not a literal dispatch, outside the transformer's form"
+text = "{False: lambda: write(bank, truth, ident, int(seed), int(k)), True: lambda: plane_write(bank, truth,"
+
+[[row]]
+file = "cc/intake_synth.py"
+scope = "cli"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 2
+line = 145
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: refuse('needs ' + '; '.join(usage)), False: lambda: {True: exists, False: lambda: _do"
+
+[[row]]
+file = "cc/intake_synth.py"
+scope = "cli"
+category = "X-eager-arms"
+ruling = "KEEP"
+n = 1
+line = 146
+reason = "both arms run today; a rewrite stops evaluating one (plan 1644 O2 names the lazy and pure sites only); reported per site"
+text = "{True: exists, False: lambda: _done(bank, truth, ident, made[fam != '']())}"
+
+[[row]]
+file = "cc/intake_terminal.py"
+scope = "<module>"
+category = "K-named-table"
+ruling = "KEEP"
+n = 1
+line = 32
+reason = "a named table over a discrete signature: the class is a lookup in a total table"
+text = "{True: lambda xs: float(np.std(xs, ddof=1)), False: lambda xs: float('nan')}"
+
+[[row]]
+file = "cc/intake_terminal.py"
+scope = "<module>"
+category = "K-named-table"
+ruling = "KEEP"
+n = 2
+line = 39
+reason = "a named table over a discrete signature: the class is a lookup in a total table"
+text = "{True: 'RESOLVED', False: 'EXPLORATORY'}"
+
+[[row]]
+file = "cc/intake_terminal.py"
+scope = "result"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 148
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: loc(inner[0], tiers.tied(r, inner[0])), False: lambda: {True: lambda: MaxAtPathEnd(ca"
+
+[[row]]
+file = "cc/intake_terminal.py"
+scope = "result"
+category = "X-eager-arms"
+ruling = "KEEP"
+n = 1
+line = 148
+reason = "both arms run today; a rewrite stops evaluating one (plan 1644 O2 names the lazy and pure sites only); reported per site"
+text = "{True: lambda: MaxAtPathEnd(cands[0]), False: NoInteriorMaximum}"
+
+[[row]]
+file = "cc/intake_terminal.py"
+scope = "reduce"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 166
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: Untiered(), False: lambda: Tiered(z, xs[-1].data[0])}"
+
+[[row]]
+file = "cc/intake_terminal.py"
+scope = "_record"
+category = "R-pure-ternary"
+ruling = "KEEP"
+n = 1
+line = 229
+reason = "the key is not provably bool by its syntax: a ternary would accept a truthy non-bool where the table raises KeyError"
+text = "{True: 'CONFIRMED', False: 'UNCONFIRMED'}"
+
+[[row]]
+file = "cc/navfamily.py"
+scope = "census"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 81
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: Refusal('INTAKE_REFUSED_AT', f\"stage {p.at}: {(out[p.at].text(t) if p.at else '')}\"),"
+
+[[row]]
+file = "cc/navfamily.py"
+scope = "declared"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 88
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: ident, False: lambda: Refusal('NO_DECLARATION', f'declarations/{ident}/')}"
+
+[[row]]
+file = "cc/navfamily.py"
+scope = "path_of"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 114
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: [tuple((float(x) for x in p)) for p in rec['path']], False: lambda: []}"
+
+[[row]]
+file = "cc/navfamily.py"
+scope = "terminals"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 122
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: ', '.join((f\"{DIRS[k]} {v['term'].name}\" for k, v in sorted(rec['dirs'].items()))), F"
+
+[[row]]
+file = "cc/navfamily.py"
+scope = "_family"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 183
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: (refusal_text(w), 1), False: lambda: _wrote(root, w, log)}"
+
+[[row]]
+file = "cc/navfamily.py"
+scope = "family"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 189
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: (refusal_text(have), 1), False: lambda: _family(root, ident)}"
+
+[[row]]
+file = "cc/navfamily.py"
+scope = "points"
+category = "R-lazy-if"
+ruling = "KEEP"
+n = 1
+line = 195
+reason = "the key is not provably bool by its syntax: a ternary would accept a truthy non-bool where the table raises KeyError"
+text = "{True: lambda: tomllib.loads(p.read_text()), False: lambda: {}}"
+
+[[row]]
+file = "cc/navfamily.py"
+scope = "points"
+category = "K-inline-signature"
+ruling = "KEEP"
+n = 1
+line = 196
+reason = "total over the product of its bools"
+text = "{(False, True): lambda: data['points'], (False, False): lambda: Refusal('CHECKPOINTS_UNREADABLE', p."
+
+[[row]]
+file = "cc/navfamily.py"
+scope = "distance"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 203
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: linenav.seg_dist(np.asarray(u, float), path), False: lambda: None}"
+
+[[row]]
+file = "cc/navfamily.py"
+scope = "score"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 223
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: (refusal_text(cps), 1), False: lambda: _scored(w, cps, tomllib.loads(intake_seal.decl"
+
+[[row]]
+file = "cc/navigate.py"
+scope = "_read"
+category = "X-eager-arms"
+ruling = "KEEP"
+n = 1
+line = 66
+reason = "a maths-role file: a style edit there is out of scope (C1 reports and tags its comparisons)"
+text = "{True: 'ORD', False: SIDE[s]}"
+
+[[row]]
+file = "cc/navigate.py"
+scope = "_read"
+category = "X-eager-arms"
+ruling = "KEEP"
+n = 2
+line = 66
+reason = "a maths-role file: a style edit there is out of scope (C1 reports and tags its comparisons)"
+text = "{True: 'hi', False: MOVE[s]}"
+
+[[row]]
+file = "cc/navigate.py"
+scope = "needle"
+category = "R-pure-ternary"
+ruling = "KEEP"
+n = 1
+line = 75
+reason = "a maths-role file: a style edit there is out of scope (C1 reports and tags its comparisons)"
+text = "{True: _read, False: _refuse}"
+
+[[row]]
+file = "cc/navmap.py"
+scope = "hook_log"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 69
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: os.write(fd, line(a)), False: lambda: 0}"
+
+[[row]]
+file = "cc/navmap.py"
+scope = "<module>"
+category = "K-named-table"
+ruling = "KEEP"
+n = 1
+line = 85
+reason = "a named table over a discrete signature: the class is a lookup in a total table"
+text = "{True: 'on every file', False: 'missing on some files'}"
+
+[[row]]
+file = "cc/navmap.py"
+scope = "open_map"
+category = "R-pure-ternary"
+ruling = "KEEP"
+n = 1
+line = 111
+reason = "outside the transformer's form (a lambda with parameters, or an arm that is not effect-free)"
+text = "{True: _declared, False: _no_input}"
+
+[[row]]
+file = "cc/navmap.py"
+scope = "node_reader"
+category = "X-eager-arms"
+ruling = "KEEP"
+n = 1
+line = 118
+reason = "both arms run today; a rewrite stops evaluating one (plan 1644 O2 names the lazy and pure sites only); reported per site"
+text = "{True: 'data/', False: ctx.cfg['data']['name'] + '/'}"
+
+[[row]]
+file = "cc/navmap.py"
+scope = "_line"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 136
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: f'  read {smap.nodes[j]} (node {j}): side {rd.side}, cell {rd.cell.value}, median d {"
+
+[[row]]
+file = "cc/navmap.py"
+scope = "_run"
+category = "R-lazy-if"
+ruling = "KEEP"
+n = 1
+line = 180
+reason = "the key is not provably bool by its syntax: a ternary would accept a truthy non-bool where the table raises KeyError"
+text = "{True: lambda: str(Path(log_path).resolve().relative_to(root.resolve())), False: lambda: Path(log_pa"
+
+[[row]]
+file = "cc/oracle.py"
+scope = "reading"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 99
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: Reading('REFUSE', None, None, None, 0, None, status, move_table[None]), False: lambda"
+
+[[row]]
+file = "cc/oracle.py"
+scope = "_measured"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 161
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: refusal, False: lambda: _report(st, big, *go())}"
+
+[[row]]
+file = "cc/oracle.py"
+scope = "_reweight"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 175
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: ([f\"REFUSED: {'; '.join(why)}.\\n  Next: bin/cc --data-root <dir> navigate --oracle re"
+
+[[row]]
+file = "cc/oracle_measured.py"
+scope = "scan"
+category = "X-inline-partial-signature"
+ruling = "KEEP"
+n = 1
+line = 47
+reason = "a missing combination is a crash on purpose (an upstream refusal makes it unreachable)"
+text = "{(True, True, False): 'BRACKET'}"
+
+[[row]]
+file = "cc/oracle_measured.py"
+scope = "scan"
+category = "R-pure-ternary"
+ruling = "REWRITE"
+n = 1
+line = 48
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: last_lo, False: 0}"
+
+[[row]]
+file = "cc/oracle_measured.py"
+scope = "scan"
+category = "X-eager-arms"
+ruling = "KEEP"
+n = 1
+line = 49
+reason = "both arms run today; a rewrite stops evaluating one (plan 1644 O2 names the lazy and pure sites only); reported per site"
+text = "{True: first_hi, False: n - 1}"
+
+[[row]]
+file = "cc/oracle_measured.py"
+scope = "load_rehearsal"
+category = "R-lazy-if"
+ruling = "KEEP"
+n = 1
+line = 73
+reason = "the key is not provably bool by its syntax: a ternary would accept a truthy non-bool where the table raises KeyError"
+text = "{True: lambda: (pick(big), pick(PARTNER[big])), False: lambda: ([], [])}"
+
+[[row]]
+file = "cc/oracle_reweight.py"
+scope = "Reweight.__call__"
+category = "X-inline-partial-signature"
+ruling = "KEEP"
+n = 1
+line = 160
+reason = "a missing combination is a crash on purpose (an upstream refusal makes it unreachable)"
+text = "{(False, False, False): lambda: Refusal('under_replication'), (True, False, False): lambda: Refusal("
+
+[[row]]
+file = "cc/scorewords.py"
+scope = "<module>"
+category = "K-named-table"
+ruling = "KEEP"
+n = 1
+line = 26
+reason = "a named table over a discrete signature: the class is a lookup in a total table"
+text = "{(False, False): Reach.NOT_REACHED, (False, True): Reach.NOT_REACHED, (True, True): Reach.REACHED_WI"
+
+[[row]]
+file = "cc/scorewords.py"
+scope = "read_range"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 42
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: (min(ks), max(ks)), False: lambda: None}"
+
+[[row]]
+file = "cc/scorewords.py"
+scope = "reach"
+category = "R-lazy-if"
+ruling = "KEEP"
+n = 1
+line = 50
+reason = "the key is not provably bool by its syntax: a ternary would accept a truthy non-bool where the table raises KeyError"
+text = "{True: lambda: float(linenav.seg_dist(np.asarray(u, float), path)), False: lambda: None}"
+
+[[row]]
+file = "cc/scorewords.py"
+scope = "stop_text"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 70
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: f'next curve rank {beyond[0]} ({type(o.features[beyond[0]]).__name__}, {o.slows[beyon"
+
+[[row]]
+file = "cc/scorewords.py"
+scope = "lines"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 81
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: (o.span.x((s.min(), 0))[0], o.span.x((s.max(), 0))[0]), False: lambda: None}"
+
+[[row]]
+file = "cc/scorewords.py"
+scope = "lines"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 2
+line = 83
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: f\"; the curves read: ranks {rr[0]} .. {rr[1]}, {o.slows[rr[0]]:g} -> {o.slows[rr[1]]:"
+
+[[row]]
+file = "cc/scorewords.py"
+scope = "lines"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 3
+line = 86
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: f'{traced[0]:.4g} -> {traced[1]:.4g} {unit}', False: lambda: 'none (no line traced)'}"
+
+[[row]]
+file = "cc/transducer.py"
+scope = "routed"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 19
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: routes[m[1]], False: lambda: None}"
+
+[[row]]
+file = "manual/record.py"
+scope = "status_of"
+category = "R-pure-ternary"
+ruling = "KEEP"
+n = 1
+line = 22
+reason = "the key is not provably bool by its syntax: a ternary would accept a truthy non-bool where the table raises KeyError"
+text = "{True: 'wall', False: orch_exit}"
+
+[[row]]
+file = "bin/cc"
+scope = "cmd_navigate"
+category = "R-lazy-if"
+ruling = "REWRITE"
+n = 1
+line = 711
+reason = "a two-way branch spelt as a table, provably bool key, lazy or effect-free arms"
+text = "{True: lambda: NAVIGATE[sub](args[1:]), False: lambda: _stored_map(args)}"

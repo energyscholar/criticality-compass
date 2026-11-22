@@ -1,4 +1,4 @@
-"""test_try_to_break_it - plan 1639 amendment A4: docs/try-to-break-it.md shows six attacks on CC, each a command and the last line it prints. This runs every command from the
+"""test_try_to_break_it - plan 1639 amendment A4: docs/try-to-break-it.md shows ten attacks on CC, each a command and the last line it prints. This runs every command from the
 root of the clone and checks that it exits non-zero and that its last output line equals the one shown, so the page cannot drift from the code. Commands only: it adds no code path.
 Breakers: a changed expected line, an attack that exits 0, and a document with fewer attacks than the amendment asks for are each found."""
 import re
@@ -32,7 +32,7 @@ def judge(cmd, shown, root=ROOT):
 def main():
     text = (ROOT / "docs" / "try-to-break-it.md").read_text()
     rows = attacks(text)
-    check("the page shows 4 to 6 attacks", 4 <= len(rows) <= 6, str(len(rows)))
+    check("the page shows 4 to 12 attacks", 4 <= len(rows) <= 12, str(len(rows)))
     for i, (cmd, shown) in enumerate(rows, 1):
         got = judge(cmd, shown)
         check(f"attack {i} is refused with the line the page shows", not got, "; ".join(got))

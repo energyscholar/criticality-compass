@@ -1,0 +1,4954 @@
+# release/get-sweep.toml: every `.get(` call of cc/ (plan 1644 D6). `line` is where the row was at the base; identity is (file, scope, recv, n). class O with schema = "" is an F4 finding (reported, not fixed here).
+
+[[row]]
+file = "cc/author.py"
+scope = "split"
+recv = "alpha"
+n = 1
+line = 339
+key = ""
+default = "[]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/author.py"
+scope = "split"
+recv = "w"
+n = 1
+line = 349
+key = ""
+default = "alpha[col]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/bench.py"
+scope = "load_rows"
+recv = "d"
+n = 1
+line = 38
+key = "roles"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/bench.py"
+scope = "load_rows"
+recv = "d"
+n = 2
+line = 39
+key = "schema"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line/couplings.toml:4"
+
+[[row]]
+file = "cc/bench.py"
+scope = "load_rows"
+recv = "d"
+n = 3
+line = 41
+key = "row"
+default = "[]"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line-2-ch/transducer.toml:24"
+
+[[row]]
+file = "cc/bench.py"
+scope = "load_rows"
+recv = "d"
+n = 4
+line = 41
+key = "set"
+default = "[]"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/l8-tetris-600/transducer.toml:25"
+
+[[row]]
+file = "cc/bench.py"
+scope = "load_rows"
+recv = "r"
+n = 1
+line = 42
+key = "role"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line/transducer.toml:1"
+
+[[row]]
+file = "cc/bench.py"
+scope = "load_rows"
+recv = "r"
+n = 2
+line = 43
+key = "id"
+default = "r.get('path')"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line/couplings.toml:6"
+
+[[row]]
+file = "cc/bench.py"
+scope = "load_rows"
+recv = "r"
+n = 3
+line = 43
+key = "path"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line/m.toml:66"
+
+[[row]]
+file = "cc/bench.py"
+scope = "load_rows"
+recv = "r"
+n = 4
+line = 43
+key = "role"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line/transducer.toml:1"
+
+[[row]]
+file = "cc/bench.py"
+scope = "load_rows"
+recv = "r"
+n = 5
+line = 44
+key = "root"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "intake/CONVERSION.toml:11"
+
+[[row]]
+file = "cc/bench.py"
+scope = "load_rows"
+recv = "r"
+n = 6
+line = 45
+key = "id"
+default = "r.get('path')"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line/couplings.toml:6"
+
+[[row]]
+file = "cc/bench.py"
+scope = "load_rows"
+recv = "r"
+n = 7
+line = 45
+key = "path"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line/m.toml:66"
+
+[[row]]
+file = "cc/bench.py"
+scope = "load_rows"
+recv = "r"
+n = 8
+line = 45
+key = "root"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "intake/CONVERSION.toml:11"
+
+[[row]]
+file = "cc/bench.py"
+scope = "_listed"
+recv = "s"
+n = 1
+line = 52
+key = "extra"
+default = "[]"
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/bench.py"
+scope = "_listed"
+recv = "s"
+n = 2
+line = 62
+key = "extra"
+default = "[]"
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/bench.py"
+scope = "expand"
+recv = "rows"
+n = 1
+line = 67
+key = "row"
+default = "[]"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line-2-ch/transducer.toml:24"
+
+[[row]]
+file = "cc/bench.py"
+scope = "expand"
+recv = "rows"
+n = 2
+line = 68
+key = "set"
+default = "[]"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/l8-tetris-600/transducer.toml:25"
+
+[[row]]
+file = "cc/bench.py"
+scope = "generate"
+recv = "rows"
+n = 1
+line = 110
+key = "set"
+default = "[]"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/l8-tetris-600/transducer.toml:25"
+
+[[row]]
+file = "cc/bench.py"
+scope = "load_manifest"
+recv = "m"
+n = 1
+line = 126
+key = "roles"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/bench.py"
+scope = "load_manifest"
+recv = "m"
+n = 2
+line = 127
+key = "schema"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line/couplings.toml:4"
+
+[[row]]
+file = "cc/bench.py"
+scope = "load_manifest"
+recv = "m"
+n = 3
+line = 129
+key = "entry"
+default = "[]"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line/m.toml:60"
+
+[[row]]
+file = "cc/bench.py"
+scope = "load_manifest"
+recv = "e"
+n = 1
+line = 132
+key = "id"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line/couplings.toml:6"
+
+[[row]]
+file = "cc/bench.py"
+scope = "verify"
+recv = "m"
+n = 1
+line = 144
+key = "entry"
+default = "[]"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line/m.toml:60"
+
+[[row]]
+file = "cc/bench.py"
+scope = "verify"
+recv = "m"
+n = 2
+line = 154
+key = "set"
+default = "[]"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/l8-tetris-600/transducer.toml:25"
+
+[[row]]
+file = "cc/bench.py"
+scope = "main"
+recv = "load_manifest(repo / 'benchmark/MANIFEST.toml')"
+n = 1
+line = 176
+key = "entry"
+default = "[]"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line/m.toml:60"
+
+[[row]]
+file = "cc/chain.py"
+scope = "grid"
+recv = "data or {}"
+n = 1
+line = 244
+key = "wc"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "intake/grids/ll1-pre-v3.toml:6"
+
+[[row]]
+file = "cc/chain.py"
+scope = "grid"
+recv = "data or {}"
+n = 2
+line = 244
+key = "lanes"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "intake/POLICY.toml:7"
+
+[[row]]
+file = "cc/chain.py"
+scope = "grid"
+recv = "data or {}"
+n = 3
+line = 245
+key = "stride_samples"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "intake/grids/ll1-pre-v6.toml:11"
+
+[[row]]
+file = "cc/chain.py"
+scope = "grid"
+recv = "data or {}"
+n = 4
+line = 245
+key = "stride_span"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "intake/grids/ll1-pre-v6.toml:12"
+
+[[row]]
+file = "cc/chain.py"
+scope = "_family"
+recv = "look(look(d, 'knobs', {}), 'slow', {})"
+n = 1
+line = 287
+key = "unit"
+default = "''"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/k4-m1/m.toml:41"
+
+[[row]]
+file = "cc/chain.py"
+scope = "colocate"
+recv = "other"
+n = 1
+line = 311
+key = ""
+default = ""
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/chain.py"
+scope = "colocate"
+recv = "other"
+n = 2
+line = 311
+key = ""
+default = ""
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/chain.py"
+scope = "co_rows"
+recv = "c"
+n = 1
+line = 366
+key = "stride"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "intake/grids/ll1-pre-v6.toml:3"
+
+[[row]]
+file = "cc/chain.py"
+scope = "co_rows"
+recv = "c"
+n = 2
+line = 368
+key = "stride"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "intake/grids/ll1-pre-v6.toml:3"
+
+[[row]]
+file = "cc/declare.py"
+scope = "header"
+recv = "d"
+n = 1
+line = 67
+key = "schema"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "header"
+recv = "d"
+n = 2
+line = 68
+key = "schema"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "header"
+recv = "d"
+n = 3
+line = 69
+key = "kind"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "header"
+recv = "d"
+n = 4
+line = 69
+key = "kind"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "todos"
+recv = "SECTION_HINT"
+n = 1
+line = 80
+key = ""
+default = ""
+class = "T"
+ruling = "KEEP"
+why = "G-KEEP-1: advisory message text, partial by design"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "todos"
+recv = "HINT"
+n = 1
+line = 80
+key = ""
+default = "'the real value'"
+class = "T"
+ruling = "KEEP"
+why = "G-KEEP-2: advisory message text, partial by design"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_registry"
+recv = "al"
+n = 1
+line = 159
+key = "interval_method"
+default = "[]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_cc"
+recv = "d['data']"
+n = 1
+line = 180
+key = "local"
+default = "[]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_cc"
+recv = "d['alphabets']"
+n = 1
+line = 186
+key = "interval_method"
+default = "[]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_cc"
+recv = "d"
+n = 1
+line = 186
+key = "interval_fields"
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_cc"
+recv = "d['interval_binding']"
+n = 1
+line = 189
+key = "default"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_cc"
+recv = "v"
+n = 1
+line = 193
+key = "chained"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_cc"
+recv = "d"
+n = 2
+line = 196
+key = "conventional"
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_cc"
+recv = "d"
+n = 3
+line = 197
+key = "report"
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_cc"
+recv = "d"
+n = 4
+line = 197
+key = "step_labels"
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_cc"
+recv = "d"
+n = 5
+line = 197
+key = "projections"
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_cc"
+recv = "rep"
+n = 1
+line = 200
+key = ""
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_cc"
+recv = "i"
+n = 1
+line = 203
+key = "relations"
+default = "[]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_cc"
+recv = "labels"
+n = 1
+line = 203
+key = ""
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_cc"
+recv = "pj"
+n = 1
+line = 206
+key = ""
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_cc"
+recv = "pj[n]"
+n = 1
+line = 206
+key = ""
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_cc"
+recv = "d"
+n = 6
+line = 208
+key = "levels"
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_cc"
+recv = "d['transducer']"
+n = 1
+line = 212
+key = "kinds"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_cc"
+recv = "d['transducer']"
+n = 2
+line = 212
+key = "kinds"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_cc"
+recv = "d"
+n = 7
+line = 216
+key = "formats"
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_cc"
+recv = "v"
+n = 2
+line = 219
+key = "readers"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_cc"
+recv = "d['basic']"
+n = 1
+line = 220
+key = "keeps"
+default = "[]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_cc"
+recv = "d['basic']"
+n = 2
+line = 220
+key = "discards"
+default = "[]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_cc"
+recv = "d['alphabets']"
+n = 2
+line = 231
+key = "replay"
+default = "[]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_cc"
+recv = "d"
+n = 8
+line = 233
+key = "refusal_fields"
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_cc"
+recv = "d"
+n = 9
+line = 234
+key = "refusal_fields"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_cc"
+recv = "d['golden']"
+n = 1
+line = 235
+key = "classes"
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_cc"
+recv = "v"
+n = 3
+line = 238
+key = ""
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_cc"
+recv = "v"
+n = 4
+line = 240
+key = "match"
+default = "[]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_cc"
+recv = "d['check']"
+n = 1
+line = 243
+key = "slow"
+default = "[]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_cc"
+recv = "d['check']"
+n = 2
+line = 245
+key = "exclusive"
+default = "[]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_cc"
+recv = "d['check']"
+n = 3
+line = 247
+key = ""
+default = "[]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_case"
+recv = "c.cfg.get('sources', {})"
+n = 1
+line = 277
+key = "roots"
+default = "[]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_case"
+recv = "c.cfg"
+n = 1
+line = 277
+key = "sources"
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_points"
+recv = "c.over"
+n = 1
+line = 287
+key = "input"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "stored"
+recv = "h"
+n = 1
+line = 320
+key = ""
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_array"
+recv = "m.get('observable', {})"
+n = 1
+line = 329
+key = "levels"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_array"
+recv = "m"
+n = 1
+line = 329
+key = "observable"
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_array"
+recv = "formats.schemas(str(c.root))"
+n = 1
+line = 337
+key = ""
+default = "{'reduces': ()}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "series_length"
+recv = "formats.schemas(str(c.root))"
+n = 1
+line = 358
+key = ""
+default = "{'reduces': ()}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "block_floor"
+recv = "iv"
+n = 1
+line = 365
+key = "min_blocks"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "block_floor"
+recv = "iv"
+n = 2
+line = 365
+key = "b"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "block_floor"
+recv = "iv"
+n = 3
+line = 366
+key = "method"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "gamma_floor"
+recv = "iv"
+n = 1
+line = 382
+key = "tau_declared"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "gamma_floor"
+recv = "iv"
+n = 2
+line = 383
+key = "method"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_file"
+recv = "m['data']"
+n = 1
+line = 403
+key = "format"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_data"
+recv = "c.cfg['interval_fields']"
+n = 1
+line = 413
+key = ""
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_data"
+recv = "m['interval']"
+n = 1
+line = 413
+key = "method"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_data"
+recv = "c_spec"
+n = 1
+line = 414
+key = "chained"
+default = "False"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_data"
+recv = "d"
+n = 1
+line = 416
+key = "format"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_data"
+recv = "d"
+n = 2
+line = 417
+key = "files"
+default = "[]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_data"
+recv = "iv"
+n = 1
+line = 421
+key = "method"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_data"
+recv = "b"
+n = 1
+line = 427
+key = "chain"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_data"
+recv = "blocks"
+n = 1
+line = 441
+key = ""
+default = "[{}]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_relations"
+recv = "d"
+n = 1
+line = 471
+key = "relations"
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_relations"
+recv = "TEMPLATES"
+n = 1
+line = 475
+key = ""
+default = ""
+class = "T"
+ruling = "KEEP"
+why = "G-FIX-5: the validator's membership test; the None becomes a finding"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_relations"
+recv = "r"
+n = 1
+line = 475
+key = "template"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_relations"
+recv = "r"
+n = 2
+line = 477
+key = "template"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_relations"
+recv = "r"
+n = 3
+line = 482
+key = "big"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_relations"
+recv = "r"
+n = 4
+line = 482
+key = "small"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "limited"
+recv = "d.get('block_map', {})"
+n = 1
+line = 499
+key = "limited"
+default = "'none'"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "limited"
+recv = "d"
+n = 1
+line = 499
+key = "block_map"
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "limited"
+recv = "d.get('observable', {})"
+n = 1
+line = 499
+key = "level_floor"
+default = "0"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "limited"
+recv = "d"
+n = 2
+line = 499
+key = "observable"
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "limited"
+recv = "c.alpha"
+n = 1
+line = 500
+key = "limited"
+default = "('none',)"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_windows"
+recv = "d"
+n = 1
+line = 508
+key = "windows"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_windows"
+recv = "d.get('data', {})"
+n = 1
+line = 514
+key = "format"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_windows"
+recv = "d"
+n = 2
+line = 514
+key = "data"
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_windows"
+recv = "c.alpha"
+n = 1
+line = 515
+key = "window_origin"
+default = "()"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_windows"
+recv = "formats.schemas(str(c.root)).get(fm, {})"
+n = 1
+line = 516
+key = "reduces"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_windows"
+recv = "formats.schemas(str(c.root))"
+n = 1
+line = 516
+key = ""
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_windows"
+recv = "d"
+n = 3
+line = 519
+key = "relations"
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "geometry_reports"
+recv = "m"
+n = 1
+line = 529
+key = "id"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_expect"
+recv = "d"
+n = 1
+line = 553
+key = "id"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "score_expected"
+recv = "load(mp, root)[0] or {}"
+n = 1
+line = 578
+key = "expect"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_input"
+recv = "d"
+n = 1
+line = 619
+key = "id"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_input"
+recv = "d"
+n = 2
+line = 621
+key = "instruments"
+default = "[]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_input"
+recv = "d"
+n = 3
+line = 622
+key = "axes"
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_input"
+recv = "c.reg.get(i, {})"
+n = 1
+line = 632
+key = "unit"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_input"
+recv = "c.reg"
+n = 1
+line = 632
+key = ""
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_input"
+recv = "SIDECAR_OPT"
+n = 1
+line = 645
+key = ""
+default = ""
+class = "T"
+ruling = "KEEP"
+why = "G-KEEP-3: advisory, partial by design"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_input"
+recv = "d['two_start']"
+n = 1
+line = 647
+key = "unit_scale"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_input"
+recv = "d['kernel']"
+n = 1
+line = 663
+key = "uses"
+default = "[]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_input"
+recv = "d['kernel']"
+n = 2
+line = 664
+key = "uses"
+default = "[]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_input"
+recv = "iv"
+n = 1
+line = 667
+key = "method"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_input"
+recv = "c.cfg['interval_fields']"
+n = 1
+line = 668
+key = ""
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_input"
+recv = "iv"
+n = 2
+line = 668
+key = "method"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_input"
+recv = "spec"
+n = 1
+line = 669
+key = "required"
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_input"
+recv = "spec"
+n = 2
+line = 669
+key = "optional"
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_input"
+recv = "iv"
+n = 3
+line = 671
+key = "level"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_input"
+recv = "iv"
+n = 4
+line = 672
+key = "level"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_input"
+recv = "spec"
+n = 3
+line = 672
+key = "level_in"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_input"
+recv = "spec"
+n = 4
+line = 673
+key = "level_in"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_input"
+recv = "iv"
+n = 5
+line = 674
+key = "method"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_input"
+recv = "iv"
+n = 6
+line = 674
+key = "tau_declared"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_manifest"
+recv = "c.over"
+n = 1
+line = 697
+key = "input"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_instrument"
+recv = "d"
+n = 1
+line = 722
+key = "member_default"
+default = "''"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_instrument"
+recv = "d"
+n = 2
+line = 722
+key = "door_values"
+default = "[]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_instrument"
+recv = "d"
+n = 3
+line = 722
+key = "member_default"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_instrument"
+recv = "d"
+n = 4
+line = 722
+key = "door_values"
+default = "[]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_instrument"
+recv = "d"
+n = 5
+line = 726
+key = "requires"
+default = "[]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_instrument"
+recv = "c.reg[r]"
+n = 1
+line = 726
+key = "requires"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_column"
+recv = "col"
+n = 1
+line = 763
+key = "nullable"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_column"
+recv = "c.reg.get(inst, {})"
+n = 1
+line = 773
+key = "columns"
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_column"
+recv = "c.reg"
+n = 1
+line = 773
+key = ""
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_column"
+recv = "allc[src[1]]"
+n = 1
+line = 786
+key = "alphabet"
+default = "[]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_column"
+recv = "allc[src[0]]"
+n = 1
+line = 787
+key = "alphabet"
+default = "[]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_column"
+recv = "col"
+n = 2
+line = 790
+key = "combine"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_column"
+recv = "cb"
+n = 1
+line = 800
+key = "prefer_door"
+default = "''"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_column"
+recv = "c.reg.get(src.partition('.')[0] if isinstance(src, str) else '', {})"
+n = 1
+line = 800
+key = "door_values"
+default = "[]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_column"
+recv = "c.reg"
+n = 2
+line = 800
+key = ""
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_column"
+recv = "cb"
+n = 2
+line = 801
+key = "prefer_door"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_column"
+recv = "cb"
+n = 3
+line = 803
+key = ""
+default = "[]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_column"
+recv = "cb"
+n = 4
+line = 806
+key = "disagree"
+default = "alpha[0] if alpha else ''"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_column"
+recv = "cb"
+n = 5
+line = 806
+key = "disagree"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_column"
+recv = "cb"
+n = 6
+line = 807
+key = "rank"
+default = "[]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_codes"
+recv = "d['columns']"
+n = 1
+line = 822
+key = ""
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_partition"
+recv = "w"
+n = 1
+line = 847
+key = ""
+default = "dom[ci]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_rows"
+recv = "r"
+n = 1
+line = 870
+key = "when"
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_rows"
+recv = "r"
+n = 2
+line = 875
+key = "verdict"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_rows"
+recv = "r"
+n = 3
+line = 876
+key = "verdict"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_rows"
+recv = "r"
+n = 4
+line = 877
+key = "why"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_classes"
+recv = "d"
+n = 1
+line = 884
+key = "class_of"
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_verdict"
+recv = "c.over"
+n = 1
+line = 898
+key = "codes"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_verdict"
+recv = "d"
+n = 1
+line = 904
+key = "ignores_reason"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_family"
+recv = "d"
+n = 1
+line = 935
+key = "columns"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_family"
+recv = "c.over"
+n = 1
+line = 941
+key = "codes"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_family"
+recv = "sig.get(b['reads'], {})"
+n = 1
+line = 956
+key = "alphabet"
+default = "[]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_family"
+recv = "sig"
+n = 1
+line = 956
+key = ""
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_family"
+recv = "reg.get(inst, {})"
+n = 1
+line = 967
+key = "columns"
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_family"
+recv = "reg"
+n = 1
+line = 967
+key = ""
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_family"
+recv = "reg.get(inst, {}).get('columns', {})"
+n = 1
+line = 969
+key = ""
+default = "d['f1']['eps']"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_family"
+recv = "reg.get(inst, {})"
+n = 2
+line = 969
+key = "columns"
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_family"
+recv = "reg"
+n = 2
+line = 969
+key = ""
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_family"
+recv = "reg.get(d['f2']['reads'], {})"
+n = 1
+line = 973
+key = "unit"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_family"
+recv = "reg"
+n = 3
+line = 973
+key = ""
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_family"
+recv = "reg.get(d['f2']['reads'], {})"
+n = 2
+line = 974
+key = "door_values"
+default = "[]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_family"
+recv = "reg"
+n = 4
+line = 974
+key = ""
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_sides"
+recv = "probe[0] or load(here / 'geometry.toml', c.root)[0] or {}"
+n = 1
+line = 999
+key = "verdicts"
+default = "[]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_family_decl"
+recv = "m"
+n = 1
+line = 1037
+key = "obtained"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_family_decl"
+recv = "c.reg.get(i, {})"
+n = 1
+line = 1045
+key = "unit"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_family_decl"
+recv = "c.reg"
+n = 1
+line = 1045
+key = ""
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_membership"
+recv = "c.over"
+n = 1
+line = 1069
+key = "codes"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_membership"
+recv = "c.reg"
+n = 1
+line = 1074
+key = ""
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_membership"
+recv = "inst"
+n = 1
+line = 1075
+key = "pipeline"
+default = "[]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_membership"
+recv = "inst"
+n = 2
+line = 1087
+key = "door_values"
+default = "[]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_membership"
+recv = "inst"
+n = 3
+line = 1092
+key = "requires"
+default = "[]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "axis_cols"
+recv = "c.over"
+n = 1
+line = 1099
+key = "codes"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_probe"
+recv = "c.over"
+n = 1
+line = 1127
+key = "codes"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_probe"
+recv = "(codes or {}).get('columns', {})"
+n = 1
+line = 1129
+key = "signature"
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_probe"
+recv = "codes or {}"
+n = 1
+line = 1129
+key = "columns"
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "scalar_keys"
+recv = "formats.schemas(str(c.root)).get(m['data']['format'], {})"
+n = 1
+line = 1141
+key = "readers"
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "scalar_keys"
+recv = "formats.schemas(str(c.root))"
+n = 1
+line = 1141
+key = ""
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "scalar_keys"
+recv = "readers"
+n = 1
+line = 1143
+key = ""
+default = "'numpy'"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_couplings"
+recv = "d"
+n = 1
+line = 1152
+key = "id"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_couplings"
+recv = "m"
+n = 1
+line = 1154
+key = "data"
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_couplings"
+recv = "m.get('relations', {}).get('control', {})"
+n = 1
+line = 1166
+key = "coupling"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_couplings"
+recv = "m.get('relations', {})"
+n = 1
+line = 1166
+key = "control"
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_couplings"
+recv = "m"
+n = 2
+line = 1166
+key = "relations"
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_order"
+recv = "d"
+n = 1
+line = 1181
+key = "score"
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_order"
+recv = "d"
+n = 2
+line = 1181
+key = "values"
+default = "[]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_compose"
+recv = "tabs.get('probe', tabs['geometry'])[0]"
+n = 1
+line = 1196
+key = "verdicts"
+default = "[]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_compose"
+recv = "tabs"
+n = 1
+line = 1196
+key = "probe"
+default = "tabs['geometry']"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "chk_compose"
+recv = "o"
+n = 1
+line = 1196
+key = "values"
+default = "[]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "table_values"
+recv = "row['when']"
+n = 1
+line = 1207
+key = ""
+default = "dom[x]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "factorisation"
+recv = "dom"
+n = 1
+line = 1233
+key = "probe"
+default = "[]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "factorisation"
+recv = "voc"
+n = 1
+line = 1237
+key = "@geometry"
+default = "-1"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "check_file"
+recv = "d"
+n = 1
+line = 1271
+key = "kind"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "check_file"
+recv = "d"
+n = 2
+line = 1272
+key = "kind"
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "_validate"
+recv = "load(m, root)[0] or {}"
+n = 1
+line = 1288
+key = "instruments"
+default = "[]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "_validate"
+recv = "load(f, root)[0] or {}"
+n = 1
+line = 1308
+key = "kind"
+default = "'?'"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "_validate"
+recv = "n"
+n = 1
+line = 1309
+key = ""
+default = "0"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "member_need"
+recv = "m"
+n = 1
+line = 1326
+key = "instruments"
+default = "[]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "member_need"
+recv = "c.reg.get(n, {})"
+n = 1
+line = 1326
+key = "pipeline"
+default = "[]"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "member_need"
+recv = "c.reg"
+n = 1
+line = 1326
+key = ""
+default = "{}"
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/declare.py"
+scope = "member_need"
+recv = "have"
+n = 1
+line = 1329
+key = ""
+default = ""
+class = "V"
+ruling = "KEEP"
+why = "(a) the validator probes a declaration for a missing key in order to refuse it"
+schema = ""
+
+[[row]]
+file = "cc/detect.py"
+scope = "codes_of.val"
+recv = "cells"
+n = 1
+line = 180
+key = ""
+default = "[None] * len(got)"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/detect.py"
+scope = "codes_of.val"
+recv = "c['combine']"
+n = 1
+line = 180
+key = "prefer_door"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "tables/v07-rules/codes.toml:266"
+
+[[row]]
+file = "cc/detect.py"
+scope = "codes_of.val"
+recv = "c['combine']"
+n = 2
+line = 181
+key = "top_only"
+default = "[]"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "tables/v04-rules/codes.toml:275"
+
+[[row]]
+file = "cc/detect.py"
+scope = "codes_of.val"
+recv = "c['combine']"
+n = 3
+line = 183
+key = "agree"
+default = "[]"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "instruments/across_delta.toml:3"
+
+[[row]]
+file = "cc/detect.py"
+scope = "codes_of.val"
+recv = "c"
+n = 1
+line = 188
+key = "nullable"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "tables/v04-rules/codes.toml:214"
+
+[[row]]
+file = "cc/detect.py"
+scope = "codes_of.val"
+recv = "c"
+n = 2
+line = 188
+key = "nullable"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "tables/v04-rules/codes.toml:214"
+
+[[row]]
+file = "cc/detect.py"
+scope = "verdict_of"
+recv = "tables.verdict.get('class_of', {})"
+n = 1
+line = 205
+key = ""
+default = "v"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/detect.py"
+scope = "verdict_of"
+recv = "tables.verdict"
+n = 1
+line = 205
+key = "class_of"
+default = "{}"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "tables/v01-rules/family.toml:9"
+
+[[row]]
+file = "cc/detect.py"
+scope = "read_hashes"
+recv = "pinned"
+n = 1
+line = 280
+key = ""
+default = ""
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/detect.py"
+scope = "measure"
+recv = "reg[u[0]][0]"
+n = 1
+line = 369
+key = "requires"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "intake/CONVERSION.toml:98"
+
+[[row]]
+file = "cc/detect.py"
+scope = "measure"
+recv = "reg[n][0]"
+n = 1
+line = 370
+key = "requires"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "intake/CONVERSION.toml:98"
+
+[[row]]
+file = "cc/detect.py"
+scope = "measure"
+recv = "ctxs"
+n = 1
+line = 372
+key = ""
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/detect.py"
+scope = "measure"
+recv = "reg[u[0]][0]"
+n = 2
+line = 374
+key = "requires"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "intake/CONVERSION.toml:98"
+
+[[row]]
+file = "cc/detect.py"
+scope = "reading_dict"
+recv = "codes"
+n = 1
+line = 435
+key = ""
+default = "r0.cell"
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/detect.py"
+scope = "reading_dict"
+recv = "direct"
+n = 1
+line = 435
+key = ""
+default = ""
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/detect.py"
+scope = "keyed"
+recv = "st"
+n = 1
+line = 471
+key = "measure_hash"
+default = ""
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/detect.py"
+scope = "keyed"
+recv = "st"
+n = 2
+line = 471
+key = "vectors"
+default = "''"
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/detect.py"
+scope = "stored"
+recv = "st"
+n = 1
+line = 485
+key = "derived_from"
+default = ""
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/detect.py"
+scope = "run_keyed"
+recv = "out[n, pt, None][1]"
+n = 1
+line = 534
+key = ""
+default = ""
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/door.py"
+scope = "context"
+recv = "m"
+n = 1
+line = 134
+key = "relations"
+default = "{}"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line/m.toml:35"
+
+[[row]]
+file = "cc/door.py"
+scope = "context"
+recv = "inst"
+n = 1
+line = 142
+key = "quantity"
+default = "'Delta' if pair else 'R'"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "intake/FORMAT.toml:31"
+
+[[row]]
+file = "cc/door.py"
+scope = "context"
+recv = "m['interval']"
+n = 1
+line = 143
+key = "r"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line-2-ch/m.toml:50"
+
+[[row]]
+file = "cc/door.py"
+scope = "context"
+recv = "m.get('sinks', {})"
+n = 1
+line = 147
+key = "ordered"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line-4/m.toml:4"
+
+[[row]]
+file = "cc/door.py"
+scope = "context"
+recv = "m"
+n = 2
+line = 147
+key = "sinks"
+default = "{}"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line-4/m.toml:214"
+
+[[row]]
+file = "cc/door.py"
+scope = "context"
+recv = "m.get('sinks', {})"
+n = 2
+line = 147
+key = "disordered"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line-4/m.toml:216"
+
+[[row]]
+file = "cc/door.py"
+scope = "context"
+recv = "m"
+n = 3
+line = 147
+key = "sinks"
+default = "{}"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line-4/m.toml:214"
+
+[[row]]
+file = "cc/door.py"
+scope = "context"
+recv = "m.get('two_start', {}).get('unit_scale', {})"
+n = 1
+line = 148
+key = ""
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/door.py"
+scope = "context"
+recv = "m.get('two_start', {})"
+n = 1
+line = 148
+key = "unit_scale"
+default = "{}"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line-3/m.toml:190"
+
+[[row]]
+file = "cc/door.py"
+scope = "context"
+recv = "m"
+n = 4
+line = 148
+key = "two_start"
+default = "{}"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line-3/m.toml:187"
+
+[[row]]
+file = "cc/door.py"
+scope = "context"
+recv = "m.get('two_start', {}).get('unit_scale', {})"
+n = 2
+line = 149
+key = ""
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/door.py"
+scope = "context"
+recv = "m.get('two_start', {})"
+n = 2
+line = 149
+key = "unit_scale"
+default = "{}"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line-3/m.toml:190"
+
+[[row]]
+file = "cc/door.py"
+scope = "context"
+recv = "m"
+n = 5
+line = 149
+key = "two_start"
+default = "{}"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line-3/m.toml:187"
+
+[[row]]
+file = "cc/door.py"
+scope = "reduced"
+recv = "m"
+n = 1
+line = 163
+key = "windows"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/l8-tetris-600/m.toml:53"
+
+[[row]]
+file = "cc/door.py"
+scope = "reduced"
+recv = "m"
+n = 2
+line = 166
+key = "windows"
+default = "{}"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/l8-tetris-600/m.toml:53"
+
+[[row]]
+file = "cc/door.py"
+scope = "reduced"
+recv = "m"
+n = 3
+line = 169
+key = "windows"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/l8-tetris-600/m.toml:53"
+
+[[row]]
+file = "cc/door.py"
+scope = "load_blocks"
+recv = "formats.schemas(str(schema.ROOT))"
+n = 1
+line = 194
+key = ""
+default = "{'reduces': ()}"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/family.py"
+scope = "bracket_of"
+recv = "b['rank']"
+n = 1
+line = 35
+key = ""
+default = "0"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/family.py"
+scope = "side_of"
+recv = "e['needle_code']"
+n = 1
+line = 116
+key = ""
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/family.py"
+scope = "interior_of"
+recv = "fam.get('side', {})"
+n = 1
+line = 139
+key = "needle_code"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "tables/v05-rules/family.toml:115"
+
+[[row]]
+file = "cc/family.py"
+scope = "interior_of"
+recv = "fam"
+n = 1
+line = 139
+key = "side"
+default = "{}"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/l8-tetris-600/m.toml:3"
+
+[[row]]
+file = "cc/family.py"
+scope = "interior_of"
+recv = "code"
+n = 1
+line = 143
+key = ""
+default = ""
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/family.py"
+scope = "interior_of"
+recv = "m"
+n = 1
+line = 152
+key = "relations"
+default = "{}"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line/m.toml:35"
+
+[[row]]
+file = "cc/family.py"
+scope = "end_notes"
+recv = "got"
+n = 1
+line = 232
+key = "ends"
+default = "[]"
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/family.py"
+scope = "note_lines"
+recv = "notes"
+n = 1
+line = 239
+key = ""
+default = "[]"
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/family.py"
+scope = "show"
+recv = "out"
+n = 1
+line = 255
+key = "ends"
+default = "[]"
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/formats.py"
+scope = "schemas"
+recv = "registry.config(root)"
+n = 1
+line = 20
+key = "formats"
+default = "{}"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "cc.toml:22"
+
+[[row]]
+file = "cc/formats.py"
+scope = "problems"
+recv = "sch['readers']"
+n = 1
+line = 137
+key = ""
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/formats.py"
+scope = "problems"
+recv = "sch.get('pip', {})"
+n = 1
+line = 142
+key = ""
+default = "mod"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/formats.py"
+scope = "problems"
+recv = "sch"
+n = 1
+line = 142
+key = "pip"
+default = "{}"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/formats.py"
+scope = "problems"
+recv = "m"
+n = 1
+line = 146
+key = "windows"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/l8-tetris-600/m.toml:53"
+
+[[row]]
+file = "cc/formats.py"
+scope = "problems"
+recv = "m"
+n = 2
+line = 154
+key = "observable"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line/m.toml:3"
+
+[[row]]
+file = "cc/formats.py"
+scope = "problems"
+recv = "m"
+n = 3
+line = 154
+key = "block_map"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line/m.toml:29"
+
+[[row]]
+file = "cc/formats.py"
+scope = "problems"
+recv = "a"
+n = 1
+line = 166
+key = "level"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line/m.toml:45"
+
+[[row]]
+file = "cc/host.py"
+scope = "probe"
+recv = "c.cfg['data']"
+n = 1
+line = 58
+key = "local"
+default = "[]"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line/m.toml:32"
+
+[[row]]
+file = "cc/host.py"
+scope = "probe"
+recv = "reg"
+n = 1
+line = 61
+key = "source_commit"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "registry.toml:6"
+
+[[row]]
+file = "cc/host.py"
+scope = "probe"
+recv = "reg"
+n = 2
+line = 62
+key = "source_blob"
+default = "''"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "registry.toml:5"
+
+[[row]]
+file = "cc/host.py"
+scope = "probe"
+recv = "reg"
+n = 3
+line = 63
+key = "source_commit"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "registry.toml:6"
+
+[[row]]
+file = "cc/intake_against.py"
+scope = "_facts"
+recv = "NAMES"
+n = 1
+line = 49
+key = ""
+default = "lambda h, cs: list(cs)"
+class = "T"
+ruling = "FIX"
+why = "G-FIX-1: row for every header kind of the alphabet, then index"
+schema = ""
+
+[[row]]
+file = "cc/intake_against.py"
+scope = "<module>"
+recv = "{'ACQUISITION': d['acquisition']['direction']}"
+n = 1
+line = 56
+key = ""
+default = "d['acquisition']['row_order']"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/intake_against.py"
+scope = "<module>"
+recv = "c['score']"
+n = 1
+line = 61
+key = ""
+default = "0"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/intake_against.py"
+scope = "<module>"
+recv = "c['score']"
+n = 2
+line = 62
+key = ""
+default = "0"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/intake_against.py"
+scope = "<module>"
+recv = "c['spec']['format']"
+n = 1
+line = 64
+key = "sheet"
+default = "''"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "intake/CONVERSION.toml:22"
+
+[[row]]
+file = "cc/intake_against.py"
+scope = "against"
+recv = "m"
+n = 1
+line = 82
+key = "files"
+default = "[]"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line/couplings.toml:3"
+
+[[row]]
+file = "cc/intake_against.py"
+scope = "against"
+recv = "ops"
+n = 1
+line = 83
+key = ""
+default = "[]"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/intake_bytes.py"
+scope = "_read"
+recv = "{x['name']: x['sha256'] for x in p['files']}"
+n = 1
+line = 92
+key = ""
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/intake_bytes.py"
+scope = "_read"
+recv = "rec"
+n = 1
+line = 96
+key = "conversion_manifest_sha256"
+default = "''"
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/intake_bytes.py"
+scope = "_read"
+recv = "rec"
+n = 2
+line = 96
+key = "conversion_manifest_sha256"
+default = "''"
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/intake_census.py"
+scope = "<module>"
+recv = "dict(enumerate(re.split(re.escape(d['replicate']['key']['separator']), re.sub('\\\\.[^.]*$', '', c.where)), 1))"
+n = 1
+line = 104
+key = ""
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/intake_census.py"
+scope = "<module>"
+recv = "{1: min(vs, default=None)}"
+n = 1
+line = 105
+key = ""
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/intake_convert.py"
+scope = "listed"
+recv = "{True: lambda: {c.name: c for c in at.iterdir()}, False: dict}[at is not None and at.is_dir()]()"
+n = 1
+line = 706
+key = ""
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/intake_differs.py"
+scope = "_line"
+recv = "dict(enumerate((c for _, c in cells if not all((_blank(x) for x in c)))))"
+n = 1
+line = 20
+key = ""
+default = "()"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/intake_differs.py"
+scope = "lined"
+recv = "HEADER[spec['header']['kind']](spec['header'])"
+n = 1
+line = 27
+key = "names"
+default = "1"
+class = "T"
+ruling = "FIX"
+why = "G-FIX-4: every header row returns names, then index"
+schema = ""
+
+[[row]]
+file = "cc/intake_profile.py"
+scope = "segments"
+recv = "{None: (st[0], up), up: (st[0], up)}"
+n = 1
+line = 101
+key = ""
+default = "(st[0] + 1, None)"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/intake_profile.py"
+scope = "starts"
+recv = "{None: (st[0], iu[1]), iu[1]: (st[0], iu[1])}"
+n = 1
+line = 106
+key = ""
+default = "(st[0] + (iu[0] + 1,), None)"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/intake_profile.py"
+scope = "order"
+recv = "BIN"
+n = 1
+line = 115
+key = ""
+default = ""
+class = "T"
+ruling = "FIX"
+why = "G-FIX-3: every key 0..10 present, then index"
+schema = ""
+
+[[row]]
+file = "cc/intake_profile.py"
+scope = "table"
+recv = "CUT"
+n = 1
+line = 142
+key = ""
+default = "lambda t: [t]"
+class = "T"
+ruling = "FIX"
+why = "G-FIX-2: explicit no-delimiter row(s), then index"
+schema = ""
+
+[[row]]
+file = "cc/intake_read.py"
+scope = "_hdf5"
+recv = "ds.attrs"
+n = 1
+line = 223
+key = "column_names"
+default = "[]"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "intake/FORMAT.toml:157"
+
+[[row]]
+file = "cc/linenav.py"
+scope = "end_evidence"
+recv = "reads"
+n = 1
+line = 392
+key = ""
+default = ""
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/linenav.py"
+scope = "end_evidence"
+recv = "reads"
+n = 2
+line = 395
+key = ""
+default = ""
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/linenav.py"
+scope = "end_evidence"
+recv = "reads"
+n = 3
+line = 398
+key = ""
+default = ""
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/linenav.py"
+scope = "same_flank"
+recv = "reads"
+n = 1
+line = 410
+key = ""
+default = ""
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/linenav.py"
+scope = "same_flank"
+recv = "reads"
+n = 2
+line = 412
+key = ""
+default = ""
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/linenav.py"
+scope = "same_flank.flank"
+recv = "reads"
+n = 1
+line = 417
+key = ""
+default = ""
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/linenav.py"
+scope = "cross"
+recv = "rank"
+n = 1
+line = 566
+key = ""
+default = "False"
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/linenav.py"
+scope = "cross"
+recv = "rank"
+n = 2
+line = 594
+key = ""
+default = "False"
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/navfamily.py"
+scope = "points"
+recv = "data"
+n = 1
+line = 198
+key = "points"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line/points.toml:1"
+
+[[row]]
+file = "cc/navfamily.py"
+scope = "points"
+recv = "data"
+n = 2
+line = 198
+key = "points"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line/points.toml:1"
+
+[[row]]
+file = "cc/navmap.py"
+scope = "_stored"
+recv = "f['arrays']['G']"
+n = 1
+line = 80
+key = "level"
+default = "0"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line/m.toml:45"
+
+[[row]]
+file = "cc/navmap.py"
+scope = "_declared"
+recv = "{STORED: _stored}"
+n = 1
+line = 105
+key = ""
+default = "_not_a_map"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/navmap.py"
+scope = "node_reader"
+recv = "ctx.cfg['data']"
+n = 1
+line = 117
+key = "local"
+default = "[]"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line/m.toml:32"
+
+[[row]]
+file = "cc/navmap.py"
+scope = "node_reader.series"
+recv = "smap.files"
+n = 1
+line = 122
+key = ""
+default = "()"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/navmap.py"
+scope = "transcript"
+recv = "smap.files"
+n = 1
+line = 156
+key = ""
+default = "()"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/navmap.py"
+scope = "transcript"
+recv = "smap.files"
+n = 2
+line = 156
+key = ""
+default = "()"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/oracle.py"
+scope = "reading"
+recv = "{type(None): lambda: navigate.NE, Refusal: lambda: f'NOT_ESTABLISHED ({cell.reason})'}"
+n = 1
+line = 98
+key = ""
+default = "lambda: 'ESTABLISHED'"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/oracle_measured.py"
+scope = "scan"
+recv = "{(True, True, False): 'BRACKET'}"
+n = 1
+line = 47
+key = ""
+default = "'REFUSE'"
+class = "T"
+ruling = "FIX"
+why = "G-FIX-6: a total 8-row table over the three bools, then index"
+schema = ""
+
+[[row]]
+file = "cc/registry.py"
+scope = "dispatch"
+recv = "rows"
+n = 1
+line = 113
+key = ""
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/registry.py"
+scope = "lookup"
+recv = "dispatch(Path(root))"
+n = 1
+line = 124
+key = ""
+default = "REFUSE_UNAVAILABLE"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/registry.py"
+scope = "project"
+recv = "s"
+n = 1
+line = 154
+key = "release_module"
+default = "''"
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/registry.py"
+scope = "project"
+recv = "s"
+n = 2
+line = 155
+key = "scope"
+default = ""
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/registry.py"
+scope = "project"
+recv = "s"
+n = 3
+line = 155
+key = "awaiting"
+default = "[]"
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/resources.py"
+scope = "<module>"
+recv = "PLATFORMS"
+n = 1
+line = 27
+key = ""
+default = ""
+class = "T"
+ruling = "KEEP"
+why = "G-KEEP-4: the None becomes a typed refusal at once (_no_row)"
+schema = ""
+
+[[row]]
+file = "cc/resources.py"
+scope = "recorded_peaks"
+recv = "json.loads(p.read_text())"
+n = 1
+line = 45
+key = "peak_rss_mb"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "cc.toml:177"
+
+[[row]]
+file = "cc/reverdict.py"
+scope = "cells_of"
+recv = "res"
+n = 1
+line = 14
+key = "declared"
+default = "{}"
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/reverdict.py"
+scope = "reverdict_refusal"
+recv = "tomllib.loads(m.read_text())"
+n = 1
+line = 50
+key = "instruments"
+default = "[]"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line/couplings.toml:2"
+
+[[row]]
+file = "cc/reverdict.py"
+scope = "recode"
+recv = "cols[direct[src]]['map']"
+n = 1
+line = 71
+key = ""
+default = "q['cell']"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/reverdict.py"
+scope = "recode"
+recv = "codes"
+n = 1
+line = 72
+key = ""
+default = "first"
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/reverdict.py"
+scope = "recode"
+recv = "direct"
+n = 1
+line = 72
+key = ""
+default = ""
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/schema.py"
+scope = "resolve_data_root"
+recv = "os.environ"
+n = 1
+line = 58
+key = "CC_DATA_ROOT"
+default = ""
+class = "E"
+ruling = "KEEP"
+why = "(d) environment / option: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/schema.py"
+scope = "Ctx.__init__"
+recv = "over"
+n = 1
+line = 73
+key = "checks"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line/couplings.toml:3"
+
+[[row]]
+file = "cc/schema.py"
+scope = "Ctx.__init__"
+recv = "over"
+n = 2
+line = 74
+key = "data_root"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/schema.py"
+scope = "Ctx.is_local"
+recv = "self.cfg['data']"
+n = 1
+line = 84
+key = "local"
+default = "[]"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line/m.toml:32"
+
+[[row]]
+file = "cc/schema.py"
+scope = "unit_blocks"
+recv = "m"
+n = 1
+line = 94
+key = "relations"
+default = "{}"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line/m.toml:35"
+
+[[row]]
+file = "cc/schema.py"
+scope = "unit_blocks"
+recv = "rels.get('start', {})"
+n = 1
+line = 97
+key = "pairs"
+default = "[[ax['main_start']]]"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line-5/m.toml:57"
+
+[[row]]
+file = "cc/schema.py"
+scope = "unit_blocks"
+recv = "rels"
+n = 1
+line = 97
+key = "start"
+default = "{}"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line/m.toml:65"
+
+[[row]]
+file = "cc/schema.py"
+scope = "unit_blocks"
+recv = "inst"
+n = 1
+line = 98
+key = "start"
+default = "ax['main_start']"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line/m.toml:65"
+
+[[row]]
+file = "cc/schema.py"
+scope = "code_cols"
+recv = "d['columns']"
+n = 1
+line = 216
+key = "helper"
+default = "{}"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "instruments/transform.toml:2"
+
+[[row]]
+file = "cc/schema.py"
+scope = "code_cols"
+recv = "d['columns']"
+n = 2
+line = 216
+key = "signature"
+default = "{}"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "instruments/along.toml:14"
+
+[[row]]
+file = "cc/schema.py"
+scope = "declared_cols"
+recv = "v"
+n = 1
+line = 221
+key = "from"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line/couplings.toml:1"
+
+[[row]]
+file = "cc/score.py"
+scope = "axis_tallies"
+recv = "T.axes"
+n = 1
+line = 40
+key = "probe"
+default = "T.axes['geometry']"
+class = "T"
+ruling = "KEEP"
+why = "G-KEEP-5 (Auditor A3): reads a FROZEN rule set; making it total edits sealed tables (F5)"
+schema = ""
+
+[[row]]
+file = "cc/score.py"
+scope = "axis_tallies"
+recv = "g.get('class_of', {})"
+n = 1
+line = 41
+key = ""
+default = "v"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/score.py"
+scope = "axis_tallies"
+recv = "g"
+n = 1
+line = 41
+key = "class_of"
+default = "{}"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "tables/v01-rules/family.toml:9"
+
+[[row]]
+file = "cc/score.py"
+scope = "end_scores"
+recv = "truth"
+n = 1
+line = 56
+key = ""
+default = ""
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/score.py"
+scope = "family_ends"
+recv = "joins or {}"
+n = 1
+line = 70
+key = ""
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/score.py"
+scope = "family_ends"
+recv = "tr"
+n = 1
+line = 71
+key = ""
+default = ""
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/score.py"
+scope = "table_rows"
+recv = "jn or {}"
+n = 1
+line = 90
+key = ""
+default = "'none'"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/score.py"
+scope = "table_rows"
+recv = "tr"
+n = 1
+line = 95
+key = ""
+default = "'none' if case == 'none' else 'UNJOINED'"
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/score.py"
+scope = "tabulate"
+recv = "joins or {}"
+n = 1
+line = 116
+key = ""
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/score.py"
+scope = "tabulate"
+recv = "sig['flags']"
+n = 1
+line = 118
+key = ""
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/score.py"
+scope = "mvt"
+recv = "c"
+n = 1
+line = 156
+key = "breaker_verdict"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/score.py"
+scope = "mvt"
+recv = "c"
+n = 2
+line = 158
+key = "blind_seal"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/score.py"
+scope = "owners"
+recv = "row['when']"
+n = 1
+line = 176
+key = ""
+default = "dom[i]"
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/score.py"
+scope = "diff"
+recv = "other"
+n = 1
+line = 206
+key = ""
+default = ""
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/score.py"
+scope = "page"
+recv = "T.verdict.get('class_of', {})"
+n = 1
+line = 237
+key = ""
+default = "v"
+class = "T"
+ruling = "KEEP"
+why = "G-KEEP-6 (Auditor A3): reads a FROZEN rule set (F5)"
+schema = ""
+
+[[row]]
+file = "cc/score.py"
+scope = "page"
+recv = "T.verdict"
+n = 1
+line = 237
+key = "class_of"
+default = "{}"
+class = "T"
+ruling = "KEEP"
+why = "G-KEEP-6 (Auditor A3): reads a FROZEN rule set (F5)"
+schema = ""
+
+[[row]]
+file = "cc/score.py"
+scope = "page"
+recv = "hits"
+n = 1
+line = 244
+key = ""
+default = "[]"
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/seal_reach.py"
+scope = "why_instrument.relation"
+recv = "m"
+n = 1
+line = 89
+key = "relations"
+default = "{}"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line/m.toml:35"
+
+[[row]]
+file = "cc/slots.py"
+scope = "pool_dir"
+recv = "os.environ"
+n = 1
+line = 26
+key = "CC_SLOTS"
+default = ""
+class = "E"
+ruling = "KEEP"
+why = "(d) environment / option: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/slots.py"
+scope = "jobs"
+recv = "os.environ"
+n = 1
+line = 42
+key = "CC_JOBS"
+default = ""
+class = "E"
+ruling = "KEEP"
+why = "(d) environment / option: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/slots.py"
+scope = "held"
+recv = "out"
+n = 1
+line = 140
+key = ""
+default = "0"
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/slots.py"
+scope = "ancestors"
+recv = "parent"
+n = 1
+line = 151
+key = ""
+default = "0"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/transducer.py"
+scope = "chk_transducer"
+recv = "c.cfg"
+n = 1
+line = 25
+key = "transducer"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line/transducer.toml:1"
+
+[[row]]
+file = "cc/transducer.py"
+scope = "chk_transducer"
+recv = "d"
+n = 1
+line = 28
+key = "kind"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line/couplings.toml:5"
+
+[[row]]
+file = "cc/transducer.py"
+scope = "chk_transducer"
+recv = "{'transducer': {'transducer': dict}, 'record': {'record': dict}}"
+n = 1
+line = 30
+key = ""
+default = "{}"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/transducer.py"
+scope = "chk_transducer"
+recv = "d"
+n = 2
+line = 39
+key = "provenance_note"
+default = "{}"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line/transducer.toml:22"
+
+[[row]]
+file = "cc/transducer.py"
+scope = "chk_transducer"
+recv = "t"
+n = 1
+line = 46
+key = "output"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line/transducer.toml:10"
+
+[[row]]
+file = "cc/transducer.py"
+scope = "chk_transducer"
+recv = "t"
+n = 2
+line = 48
+key = "update"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line/transducer.toml:8"
+
+[[row]]
+file = "cc/transducer.py"
+scope = "chk_transducer"
+recv = "t"
+n = 3
+line = 48
+key = "update"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line/transducer.toml:8"
+
+[[row]]
+file = "cc/transducer.py"
+scope = "chk_transducer"
+recv = "d['interval']"
+n = 1
+line = 51
+key = "role"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line/transducer.toml:1"
+
+[[row]]
+file = "cc/view.py"
+scope = "label_of"
+recv = "detect.instrument(r['instrument'])[0]"
+n = 1
+line = 50
+key = "door_label"
+default = "'door'"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "instruments/across_delta.toml:21"
+
+[[row]]
+file = "cc/view.py"
+scope = "column_line"
+recv = "sig['flags']"
+n = 1
+line = 79
+key = ""
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/view.py"
+scope = "conventional_lines"
+recv = "cfg.get('conventional', {})"
+n = 1
+line = 91
+key = ""
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/view.py"
+scope = "conventional_lines"
+recv = "cfg"
+n = 1
+line = 91
+key = "conventional"
+default = "{}"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "cc.toml:130"
+
+[[row]]
+file = "cc/view.py"
+scope = "conventional_lines"
+recv = "r['unit']"
+n = 1
+line = 92
+key = "point"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "inputs/b7-at-line/couplings.toml:2"
+
+[[row]]
+file = "cc/view.py"
+scope = "pair_lines"
+recv = "res"
+n = 1
+line = 128
+key = "pair_readings"
+default = ""
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/view.py"
+scope = "pair_lines"
+recv = "res"
+n = 2
+line = 129
+key = "pair_readings"
+default = "[]"
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/view.py"
+scope = "identity"
+recv = "json.loads((ROOT / key).read_text())"
+n = 1
+line = 150
+key = "measure_hash"
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "cc.toml:177"
+
+[[row]]
+file = "cc/view.py"
+scope = "units_of"
+recv = "res"
+n = 1
+line = 156
+key = "readings"
+default = "[]"
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/view.py"
+scope = "units_of"
+recv = "res"
+n = 2
+line = 156
+key = "pair_readings"
+default = "[]"
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/view.py"
+scope = "units_of"
+recv = "res"
+n = 3
+line = 156
+key = "reports"
+default = "[]"
+class = "R"
+ruling = "KEEP"
+why = "(c) a stored record: a field added after the record was written"
+schema = ""
+
+[[row]]
+file = "cc/view.py"
+scope = "show"
+recv = "join or {}"
+n = 1
+line = 179
+key = ""
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/view.py"
+scope = "explain"
+recv = "cols[dcol]['combine']"
+n = 1
+line = 305
+key = ""
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/view.py"
+scope = "pair_section"
+recv = "T.membership"
+n = 1
+line = 353
+key = ""
+default = ""
+class = "T"
+ruling = "KEEP"
+why = "G-KEEP-7 (Auditor A3): reads a FROZEN rule set (F5)"
+schema = ""
+
+[[row]]
+file = "cc/view.py"
+scope = "pair_section"
+recv = "code_map"
+n = 1
+line = 378
+key = ""
+default = ""
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = ""
+
+[[row]]
+file = "cc/view.py"
+scope = "explain_pair"
+recv = "tomllib.loads(text).get('f2', {})"
+n = 1
+line = 397
+key = "code"
+default = "{}"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "intake/CONVERSION.toml:88"
+
+[[row]]
+file = "cc/view.py"
+scope = "explain_pair"
+recv = "tomllib.loads(text)"
+n = 1
+line = 397
+key = "f2"
+default = "{}"
+class = "O"
+ruling = "KEEP"
+why = "(b) a field the input declares optional: absence is a declared state"
+schema = "families/x8-ising-compass.toml:1"
