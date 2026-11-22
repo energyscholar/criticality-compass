@@ -16,7 +16,7 @@ from lib import bad, check, guarded  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 MAN = ROOT / "docs" / "man" / "compass.1"
-DOCS = ("README.md", "HOWTO.md", "TUTORIAL.md", "docs/FIRST-HOUR.md")   # plan 1639 T11 (declared edit): docs/FIRST-HOUR.md joins the documents run here
+DOCS = ("README.md", "HOWTO.md", "TUTORIAL.md", "docs/FIRST-HOUR.md", "docs/READING-THE-CODE.md", "docs/try-to-break-it.md", "AGENTS.md")   # plan 1639 T11 (declared edit): docs/FIRST-HOUR.md, docs/READING-THE-CODE.md, docs/try-to-break-it.md and AGENTS.md join the documents run here (plan 1639 5b)
 ELIDE = ("…", "...")
 
 # READONLY: (document, command, n-th occurrence of that command in the document) -> None (run as written) or "verify" (the record argument is replaced by a record the test made).

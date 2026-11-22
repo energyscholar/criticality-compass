@@ -326,7 +326,7 @@ The tests need the test extra, and two of them the kernel wheel: `pip install -e
 
 ## Acknowledgements
 
-The ABR relational-kernel method that CC computes with is credited to Robin Macomber and Metatron Dynamics, Inc. / Relational Relativity Corp. `cc/kernel.py` is a Python port of their `abr-kernel` (`metatron_kernel_v8`), licensed Apache-2.0, and the Rust binding `kernel_rs` (`rust/`) uses the same crate at a pinned revision. `NOTICE` gives the revision and the changes, and `CITATION.cff` the reference; if you use CC, please cite the kernel as well.
+The ABR relational-kernel method that CC computes with is credited to Robin Macomber and Metatron Dynamics, Inc. / Relational Relativity Corp. `cc/kernel.py` is a Python port of their `abr-kernel` (`metatron_kernel_v8`), licensed Apache-2.0, and the Rust binding `kernel_rs` (`rust/`) uses the same crate at a pinned revision. `NOTICE` gives the revision and the changes, and `CITATION.cff` the reference; if you use CC, please cite the kernel as well. Why CC computes this way, and how to read its code, is in `KERNEL-IN-CC.md` ("Why CC uses relational math") and `docs/READING-THE-CODE.md`.
 
 ## Adding a case
 

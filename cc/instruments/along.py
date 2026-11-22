@@ -1,7 +1,7 @@
 """along.py - the B7 statistic: growth with size of the difference of a declared control pair (maths)."""
 import numpy as np
 import project
-from kernel import A
+from kernel import A   # A is the only step from nodes to edges; why the input is shaped for it: KERNEL-IN-CC.md, "Why CC uses relational math"
 
 
 def reduce(arrays, ctx):

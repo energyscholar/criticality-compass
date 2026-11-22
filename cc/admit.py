@@ -1,6 +1,9 @@
 """admit.py - the DOOR (plumbing; may branch). Declared relations are built here and nowhere else.
 Refuses, with a reason, what Kernel V8 declares inadmissible: a missing provenance, an endpoint outside the declared
-nodes, and any CYCLE (section 4: a ring/torus makes a node its own relational predecessor)."""
+nodes, and any CYCLE (section 4: a ring/torus makes a node its own relational predecessor).
+This is where refusal lives: what passes here is built as a frozen kernel type, and what does not is refused with a reason that travels on as a value.
+Code downstream of the door must not add guards, clamps or defaults for input the door should have refused; extend the refusal here instead.
+See KERNEL-IN-CC.md ("Why CC uses relational math") and docs/READING-THE-CODE.md."""
 import numpy as np
 from kernel import Relations, Provenance, NodeField, M
 

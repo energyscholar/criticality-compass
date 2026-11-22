@@ -45,7 +45,7 @@ intake_new = ["cc/intake_new.py"]   # plan 1164: `bin/cc new intake`, moved out 
 test_infrastructure = ["tests/lib.py", "cc/intake_synth.py", "tests/test_chain_1205_p2b_bank.py", "tests/intake_plant.py", "tests/plane_plant.py", "tests/tau_1282_p1.py", "tests/tau_1282_rung0.py", "tests/kernel_identity_l.py", "tests/frozen_run_1282.py"]   # plan 1176 C: the planted plane banks walked and scored; plan 1139: the planted synthetic bank of `bin/cc intake synth`; plan 1145: the planted inputs of the intake tests; outside the measurement closure
 methods = ["cc/detect.py"]
 tests = [
-  "tests/test_manual_hold.py", "tests/test_wheel_hold.py", "tests/test_docs_match.py", "tests/test_dist.py",   # plan 1634: compass hold, the wheel that runs it, the documents
+  "tests/test_manual_hold.py", "tests/test_wheel_hold.py", "tests/test_docs_match.py", "tests/test_dist.py", "tests/test_reading_examples_resolve.py", "tests/test_try_to_break_it.py",   # plan 1634: compass hold, the wheel that runs it, the documents
   "contract/test_needleview_reader.py", "contract/test_needleview_page.py", "contract/test_needleview_blind.py",   # plan 1529
   "contract/test_needleplayer_stream.py", "contract/test_needleplayer_page.py", "contract/test_needleplayer_blind.py",   # plan 1531
   "contract/test_needleplayer_v2.py",   # plan 1535

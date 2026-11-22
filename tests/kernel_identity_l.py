@@ -5,6 +5,7 @@ The relation is the level chain, finer to coarser, one Coupling edge per step. R
 Scope: identity of the kernel arithmetic on one declared one-Coupling relation per L; it does not cover the input's control relation over points.
 It never skips: a missing or in-repo kernel_rs prints FAIL with a Next line and exits 1."""
 import argparse
+import ast
 import hashlib
 import sys
 from pathlib import Path
@@ -25,8 +26,27 @@ assert kernel_rs.KERNEL_REV == "5c7941e0ce644dba844d3732fc25f9063db40f33", kerne
 from kernel import A, B, R, rho, Provenance  # noqa: E402
 import admit  # noqa: E402
 
-KERNEL_SHA = "1b8b1936ca4658de13ebf153cdae78f68c9bb2b10e4eba05ffaaef8eba90a9d2"
-assert hashlib.sha256((ROOT / "cc" / "kernel.py").read_bytes()).hexdigest() == KERNEL_SHA, "cc/kernel.py is not the kernel of record"
+KERNEL_SHA = "1b8b1936ca4658de13ebf153cdae78f68c9bb2b10e4eba05ffaaef8eba90a9d2"   # the kernel of record's bytes: provenance only (plan 1639: comments and docstrings were added after it)
+KERNEL_AST = "80a8d5a4943d9f30aa21d9ff853c178ad004c43dafbb26aadb1337d98bb7fdf6"   # its AST digest, docstrings and comments excluded; the identity this tool asserts
+
+
+def _ser(n):
+    if isinstance(n, ast.AST):
+        return n.__class__.__name__ + "(" + ",".join(f"{f}={_ser(v)}" for f, v in ast.iter_fields(n) if v is not None and v != []) + ")"
+    if isinstance(n, list):
+        return "[" + ",".join(_ser(x) for x in n) + "]"
+    return repr(n)
+
+
+def ast_digest(src):   # the same digest as tests/test_dist.py T3
+    t = ast.parse(src)
+    for n in ast.walk(t):
+        if isinstance(n, (ast.Module, ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)) and n.body and isinstance(n.body[0], ast.Expr) and isinstance(getattr(n.body[0], "value", None), ast.Constant) and isinstance(n.body[0].value.value, str):
+            n.body = n.body[1:] or [ast.Pass()]
+    return hashlib.sha256(_ser(t).encode()).hexdigest()
+
+
+assert ast_digest((ROOT / "cc" / "kernel.py").read_text()) == KERNEL_AST, "the code of cc/kernel.py is not the kernel of record"
 
 
 def identical(g, w):

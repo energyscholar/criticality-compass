@@ -64,7 +64,7 @@ def t8():
     py = venv / "bin" / "python"
     sp = Path(run([py, "-c", "import sysconfig;print(sysconfig.get_paths()['purelib'])"], T)[1].strip())
     meta = next(n for n in z.namelist() if n.endswith(".dist-info/METADATA"))
-    check("T8 the wheel declares numpy and scipy as requirements (A11; scipy.sparse is imported by both plugins)", all(re.search(rf"(?m)^Requires-Dist: {r}\s*$", z.read(meta).decode()) for r in ("numpy", "scipy")))
+    check("T8 the wheel declares numpy and scipy as requirements (A11; scipy.sparse is imported by both plugins)", all(re.search(rf"(?m)^Requires-Dist: {r}(\s*[<>=!~][^;\n]*)?\s*$", z.read(meta).decode()) for r in ("numpy", "scipy")))
     rc, out = run([py, "-m", "pip", "install", "-q", wheels[0]], T)   # no --no-deps, no .pth: numpy must come from the wheel's own requirement
     check("T8 the wheel installs into a fresh venv and brings numpy and scipy (A11)", rc == 0 and (run([py, "-c", "import numpy, scipy.sparse"], T)[0] == 0), out[-300:])
     rc, out = run([py, "-c", "import criticality_compass as c;print(c.__file__)"], T)

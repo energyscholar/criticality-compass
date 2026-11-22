@@ -2,7 +2,7 @@
 reduce and delta are across_delta's; growth reports the step exponents; curvature is stability's, on the Delta basis."""
 import numpy as np
 import project
-from kernel import A
+from kernel import A   # A is the only step from nodes to edges; why the input is shaped for it: KERNEL-IN-CC.md, "Why CC uses relational math"
 
 
 def reduce(arrays, ctx):

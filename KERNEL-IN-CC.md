@@ -4,6 +4,18 @@ What the nine instruments of the verdict path compute, and the family fingerprin
 cannot be reached instead of being checked for afterwards. You do not need this to use CC (`README.md` is
 enough). Read it when you want to know what a number means, or before you touch an instrument.
 
+## Why CC uses relational math
+
+A is the graph incidence operator (`cc/kernel.py:72`); B and R build on it; the maths is standard. What CC takes from the relational method (credited in `README.md`, "Acknowledgements") is a rule about what may reach them:
+
+- Before A, only an added constant, `x + c` (`cc/intake_terminal.py:152`).
+- Every relation is declared, with its provenance, before any data are touched (`cc/admit.py:28`).
+- Input the door cannot admit is refused with a stated reason: a cycle, an undeclared provenance, a non-finite value, an endpoint outside the nodes (`cc/admit.py:33-58`). Past the door a refusal is a value that carries its reason (`cc/door.py:22`).
+
+The method (structure, not control) is that invalid states cannot be reached, instead of being checked for afterwards. That is what makes the needle hard to fool: a cycle, an undeclared provenance, a non-finite value and an out-of-range endpoint never reach A, and a smoothed or interpolated series is not admitted before A. So `cc/kernel.py` holds no `if`: each value it receives was built by the door as a frozen type. The idioms are explained in `docs/READING-THE-CODE.md`; `docs/try-to-break-it.md` has commands that try to break the door.
+
+If an input is wrong, extend the refusal in `cc/admit.py`. Do not add smoothing, interpolation, clamps or guards downstream.
+
 ## Kernel V8 on one page
 
 - A **NodeField** is one scalar for each node of a declared set of nodes: the 27, 81 and 243 sizes with one
