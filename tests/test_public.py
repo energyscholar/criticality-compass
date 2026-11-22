@@ -352,6 +352,7 @@ if cr.is_file():
             (r / "release").mkdir(); (r / "bin").mkdir(); (r / "tests").mkdir()
             shutil.copy(cr, r / "release" / "ci-run.sh")
             (r / "checks.toml").write_text('[roles]\ntests = ["tests/test_a.py", "tests/test_b.py"]\n')
+            (r / "pyproject.toml").write_text('[build-system]\nrequires = ["pip"]\n')   # plan 1640 D4: ci-run.sh reads [build-system].requires; pip is already there, so the planted tree needs no network
             (r / "cc.toml").write_text("[check]\nslow = []\nneeds_data = []\nneeds_rust = " + rust + "\nneeds_commit_host = []\n")
             (r / "bin" / "cc").write_text("import os, sys\nprint('STUB', sys.argv[1], 'JOBS=' + os.environ.get('CC_JOBS', 'unset'))\n")
             e = {k: v for k, v in os.environ.items() if k != "CC_JOBS"}

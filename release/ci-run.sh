@@ -3,7 +3,10 @@
 # the fast set = checks.toml [roles].tests minus cc.toml [check].slow; of it, a stem in [check].needs_data, [check].needs_rust or [check].needs_commit_host is SKIPPED (one
 # line each, saying which list), the rest RUN through `bin/cc test`. The two sets are checked to be disjoint and total over the fast set (a stem
 # in neither, or in both, is a refusal, exit 1).
-# usage: release/ci-run.sh [--list]     --list prints RUN / SKIPPED lines and exits 0 (or 1 if the sets are not total and disjoint)
+# Before the tests it installs the build backend the wheel tests need (they build with --no-build-isolation, and a Python 3.12 venv ships no setuptools): the
+# packages are [build-system].requires of pyproject.toml, read with tomllib, never listed here.
+# usage: release/ci-run.sh [--list|--build-deps]     --list prints RUN / SKIPPED lines and exits 0 (or 1 if the sets are not total and disjoint)
+#        --build-deps installs [build-system].requires into this interpreter's environment and exits (the pre-step alone)
 set -eu
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 PY=${PYTHON:-python3}; command -v "$PY" >/dev/null 2>&1 || PY=python
@@ -26,6 +29,14 @@ print("\n".join([f"RUN {s}" for s in run] + [skip[s] for s in fast if s in skip]
 PYEOF
 ) || { echo "ci-run: REFUSED: the run set could not be derived from checks.toml and cc.toml"; exit 1; }
 if [ "${1:-}" = "--list" ]; then echo "$SETS"; exit 0; fi
+"$PY" - "$ROOT" "$PY" <<'PYEOF' || { echo "ci-run: REFUSED: the build backend named by pyproject.toml could not be installed"; exit 1; }
+import subprocess, sys, tomllib
+from pathlib import Path
+reqs = tomllib.loads((Path(sys.argv[1]) / "pyproject.toml").read_text())["build-system"]["requires"]
+print("ci-run: build backend (pyproject.toml [build-system].requires): " + ", ".join(reqs))
+subprocess.run([sys.argv[2], "-m", "pip", "install", "-q", *reqs], check=True)
+PYEOF
+[ "${1:-}" = "--build-deps" ] && exit 0
 echo "$SETS" | sed -n '/^SKIPPED /p'   # sed prints the matching lines and exits 0 when there are none (grep exits 1, which `set -e` turns into a failed run)
 STEMS=$(echo "$SETS" | sed -n 's/^RUN //p' | tr '\n' ' ')
 CC_SLOTS=$(mktemp -d "${TMPDIR:-/tmp}/cc-slots.XXXXXX"); CC_JOBS=${CC_JOBS:-2}   # two workers unless the caller says more: the 2-core limit of the hosts the suite is measured on (plan 1640 F3)
