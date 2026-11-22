@@ -189,7 +189,42 @@ def t11():
     check("T11 no table row names a command the documents no longer hold", not stale, str(stale))
 
 
-for name, fn in (("T9", t9), ("T10", t10), ("T11", t11)):
+SWEEP_GROUPS = (   # (the start of the sweep row's `reason`, the phrase the bullet's clause carries)
+    ("a named table over a discrete signature", "a named table"), ("total over the product of its bools", "over every combination"),
+    ("a missing combination is a crash on purpose", "partial on purpose"), ("both arms run today", "run an effect"),
+    ("the key is not provably bool", "not provably bool"), ("outside the transformer's form", "outside the rewrite's form"),
+    ("the dict is bound to a name", "bound to a name"), ("a maths-role file", "maths-role file"), ("the file hashes itself", "hashes itself"))
+
+
+def sweep_mismatches(doc_text, rows):
+    """plan 1651 item 1 (a declared addition): the numbers of the bool-keyed bullet of READING-THE-CODE.md equal the counts of release/dispatch-sweep.toml, computed from the file now."""
+    b = next((x for x in doc_text.split("\n") if x.startswith("- **Bool-keyed dictionaries")), "")
+    keep = [r for r in rows if r["ruling"] == "KEEP"]
+    want = [("rewritten", len([r for r in rows if r["ruling"] == "REWRITE"]), r"\((\d+) sites rewritten"), ("kept in all", len(keep), r"(\d+) sites stay as dictionaries")]
+    for head, phrase in SWEEP_GROUPS:
+        want.append((phrase, len([r for r in keep if r["reason"].startswith(head)]), re.escape(phrase) + r"[^;()]*\((\d+),"))
+    out = []
+    for name, n, pat in want:
+        m = re.search(pat, b)
+        if not m or int(m.group(1)) != n:
+            out.append(f"{name}: the sweep has {n}, the bullet has {m.group(1) if m else 'none'}")
+    if sum(len([r for r in keep if r["reason"].startswith(h)]) for h, _ in SWEEP_GROUPS) != len(keep):
+        out.append("a KEEP reason has no group in the bullet")
+    return out
+
+
+def t12():
+    import tomllib
+    rows = tomllib.loads((ROOT / "release" / "dispatch-sweep.toml").read_text())["row"]
+    doc = (ROOT / "docs" / "READING-THE-CODE.md").read_text()
+    got = sweep_mismatches(doc, rows)
+    check("T12 the numbers of the bool-keyed bullet equal the counts of release/dispatch-sweep.toml", got == [], "; ".join(got))
+    check("T12 breaker: a wrong rewritten count in a copy of the doc is found", sweep_mismatches(doc.replace("(124 sites rewritten", "(123 sites rewritten"), rows) != [], "")
+    check("T12 breaker: a wrong group count in a copy of the doc is found", sweep_mismatches(doc.replace("(27, `cc/intake_seal", "(26, `cc/intake_seal"), rows) != [], "")
+    check("T12 breaker: a row added to the sweep without the bullet is found", sweep_mismatches(doc, rows + [dict(rows[0], ruling="KEEP")]) != [], "")
+
+
+for name, fn in (("T9", t9), ("T10", t10), ("T11", t11), ("T12", t12)):
     guarded(name, fn)
 print("test_docs_match: " + ("FAILED " + "; ".join(bad) if bad else "ok"))
 sys.exit(1 if bad else 0)

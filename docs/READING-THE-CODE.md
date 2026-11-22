@@ -72,7 +72,7 @@ The CC function returns one of two typed values: a `NodeField` whose values are 
 
 These idioms do not buy a structural property; they are style. Listed so a reader does not look for a property that is not there.
 
-- **Bool-keyed dictionaries standing in for a two-way `if`.** A boolean has two values, so `{True: a, False: b}[cond]` is a two-way branch with no key that could be missing. Where the key is provably a bool and the arms are lazy or effect-free, these are written as a conditional expression (123 sites; `release/dispatch-sweep.toml` lists every site and its ruling, and `tests/test_dispatch_rewrite.py` checks that each rewrite changes nothing else). What stays as a dictionary, and why (117 sites): a named table over a discrete signature is a lookup in a total table (27); an inline table over booleans is the same (3), or is partial on purpose so that the missing combination is a crash (6); arms that run an effect or are costly to build would run eagerly in a conditional expression, so they stay lazy (35); a key that is not provably bool, a maths-role file, which is never rewritten, or `cc/intake_synth.py`, which hashes itself into a pin the toolset must carry (42); a shape the rewrite does not cover (4).
+- **Bool-keyed dictionaries standing in for a two-way `if`.** A boolean has two values, so `{True: a, False: b}[cond]` is a two-way branch with no key that could be missing. Where the key is provably a bool and the arms are lazy or effect-free, the site is written as a conditional expression (124 sites rewritten; `release/dispatch-sweep.toml` lists every site and its ruling, and `tests/test_dispatch_rewrite.py` checks that each rewrite changes nothing else). 124 sites stay as dictionaries, for these reasons: a named table over a discrete signature is a lookup in a total table (27, `cc/intake_seal.py:40`); an inline table over every combination of its booleans is the same (3, `cc/chain.py:258`); an inline table that is partial on purpose, so that the missing combination is a crash (7, `cc/intake_profile.py:189`); arms that run an effect or are costly to build would run eagerly in a conditional expression, so they stay lazy (34, `cc/intake_blind.py:118`); a key that is not provably bool by its syntax would let a truthy non-bool through where the table raises (37, `cc/intake_blindview.py:66`); a site outside the rewrite's form, a lambda with parameters or a call with arguments (7, `environment/drift_score.py:80`); a dictionary bound to a name and indexed elsewhere is not a literal dispatch (4, `cc/intake_synth.py:144`); a maths-role file is never restyled (3, `cc/navigate.py:75`); and `cc/intake_synth.py` hashes itself into a pin the toolset must carry (2, `cc/intake_synth.py:134`).
 - **`lambda ...: print(...) or 0` as a dispatch entry.** `cc/intake.py:123`. An entry that prints and returns 0, written as an expression so that it can sit in a dictionary. No refusal or guard happens in it.
 
 <!-- refs: each visible file:line above must resolve and its line(s) must contain the keyword.
@@ -102,6 +102,15 @@ ref cc/door.py:285-291 = Null
 ref cc/intake_blindview.py:19 = EXT
 ref cc/intake_blindview.py:25 = EXT[
 ref cc/intake.py:123 = INTAKE
+ref cc/intake_seal.py:40 = UNSEALED
+ref cc/chain.py:258 = GRID_UNDECLARED
+ref cc/intake_profile.py:189 = _sheet
+ref cc/intake_blind.py:118 = Finding
+ref cc/intake_blindview.py:66 = False: 1
+ref environment/drift_score.py:80 = _moving
+ref cc/intake_synth.py:144 = made
+ref cc/navigate.py:75 = _read
+ref cc/intake_synth.py:134 = args[0]
 ref cc/sign.py:19 = UNRES
 ref cc/door.py:104 = STANDING
 ref cc/declare.py:69 = .get(
