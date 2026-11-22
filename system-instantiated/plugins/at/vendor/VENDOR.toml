@@ -5,7 +5,7 @@
 
 rev = "82ee4d2"                 # compass-toolset git head at vendor time
 source_repo = "compass-toolset"
-vendored_by = "Argus (Auditor)"
+vendored_by = "project maintainer"
 vendored_utc = "2026-11-14"
 
 [sha256]

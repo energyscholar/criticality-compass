@@ -112,7 +112,7 @@ PINS = {         # sha256 at main 61fb241
     "environment/environment-apparatus.toml": "8d6f1962219fe08ba4cc2a460c5947bf01c160374f7e8925d3d1d9557a4c4b9a",
     "system-instantiated/plugins/at/at-apparatus.toml": "8db2ceab38f5d2f20c2e8b411d8ef96160f0b32d8ca9fd7adc105c4499129eb3",
     "system-instantiated/plugins/at/at-apparatus-static.toml": "788bb649d187f6e85072c942ff7bbbbaf37db5249be2be424713e0e94a33a623",
-    "system-instantiated/plugins/at/tau-v0.toml": "e72cf18bd425fb8afc83e9cfa6914084aaf1bc8e0f0149bbd31a917e7f608af8",
+    "system-instantiated/plugins/at/tau-v0.toml": "d6ba2037f76ce275515a6a7e56b066413267c1611c7682fe5291012d04981729",
     "environment/server.py": "ebb91c4333b0097a4016e5a6175b8f60538a6e592cb74acf624de95256b532b0",
     "environment/wire.py": "5c3628bf3d75720d66639e76fc6021c1e5c6bfbffbd0e9c71beac38a679a4d78",
     "navigator/reader.py": "0f655fbfcc0cb4be7f9bd7ed89c9e94222830968d148f57d1f59a1194cfd54f8",

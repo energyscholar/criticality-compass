@@ -73,13 +73,13 @@ FROZEN = {
     "system-instantiated/plugins/at/blind.py": "f261eb6a12c5d7858b31f4dc036a83767af32ae81de143783effcbc6e1504885",
     "system-instantiated/plugins/at/plugin.py": "667ea692febe23bd393a9d00a8cfddb669b1660a5cdf4c25cb4065307a57bc00",
     "system-instantiated/plugins/at/at-blind.toml": "8675e15c291bfeb5288a1dd9a316869e9c8358591437eda60249bcb12956263d",
-    "system-instantiated/plugins/at/tau-v0.toml": "e72cf18bd425fb8afc83e9cfa6914084aaf1bc8e0f0149bbd31a917e7f608af8",
+    "system-instantiated/plugins/at/tau-v0.toml": "d6ba2037f76ce275515a6a7e56b066413267c1611c7682fe5291012d04981729",
     "system-instantiated/plugins/ising/blind.py": "a15e651dff2ac1987cba7d6277b741803d7c32ad47129e8218eaa203e95c20eb",
     "system-instantiated/plugins/ising/plugin.py": "ee43557207ab6b62fd84627487952282c28b225f53b645fcefbb8732746fa5e5",
     "system-instantiated/plugins/ising/ising-blind.toml": "970df0b840f3a7447bb9ad113a6be94a06fdd6e010fc605fc6a22d091b595ba8",
     "system-instantiated/plugins/ising/ising-field-blind.toml": "b70e56818b2c384d66ea129ffb2e4be448b57945087e7333298eadc67ec703d0",
     "system-instantiated/plugins/ising/ising-field-hard-blind.toml": "cdced4f6f567bc7e5fbab6630339f8d31269f255b41d64515542d6fbbb155090",
-    "system-instantiated/plugins/ising/tau-v0.toml": "1a82b99b9a55ab933bdeef8b4abf5f311a4ad0ad12cb23fffb81c457397f6d47",
+    "system-instantiated/plugins/ising/tau-v0.toml": "d08682254bbd3d763fe5e8c295bca4bdd86135f2728643656ad3352289316068",
 }
 
 

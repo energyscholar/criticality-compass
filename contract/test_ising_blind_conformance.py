@@ -69,7 +69,7 @@ FROZEN = {
     "system-instantiated/plugins/at/blind.py": "f261eb6a12c5d7858b31f4dc036a83767af32ae81de143783effcbc6e1504885",
     "system-instantiated/plugins/at/plugin.py": "667ea692febe23bd393a9d00a8cfddb669b1660a5cdf4c25cb4065307a57bc00",
     "system-instantiated/plugins/at/at-blind.toml": "8675e15c291bfeb5288a1dd9a316869e9c8358591437eda60249bcb12956263d",
-    "system-instantiated/plugins/at/tau-v0.toml": "e72cf18bd425fb8afc83e9cfa6914084aaf1bc8e0f0149bbd31a917e7f608af8",
+    "system-instantiated/plugins/at/tau-v0.toml": "d6ba2037f76ce275515a6a7e56b066413267c1611c7682fe5291012d04981729",
 }
 
 
