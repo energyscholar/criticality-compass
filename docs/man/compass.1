@@ -48,17 +48,29 @@ The command wraps
 and changes nothing in it.
 A run needs numpy and scipy, and the wheel declares both.
 .Sh INSTALL
-Build the wheel from a clone and install it into a fresh virtual environment; pip brings numpy and scipy:
+Python 3.11 or later is needed.
+If you have the wheel, install it into a fresh virtual environment; pip brings numpy and scipy:
 .Bd -literal -offset indent
-$ python3 -m pip wheel --no-deps --no-build-isolation -w dist .
 $ python3 -m venv hold-venv
-$ hold-venv/bin/python -m pip install dist/criticality_compass-*.whl
+$ hold-venv/bin/python -m pip install criticality_compass-1.0.0a0-py3-none-any.whl
 $ hold-venv/bin/compass hold --list
 .Ed
 .Pp
-The wheel carries the catalogue, the systems and the apparatus files, and installs this manual page as
-.Pa share/man/man1/compass.1
-under the environment's prefix.
+.Nm
+is installed in
+.Pa hold-venv/bin :
+activate the environment
+.Pq Li ". hold-venv/bin/activate"
+or give the full path.
+This manual page is installed under the environment's prefix; read it with
+.Li man -M hold-venv/share/man compass .
+.Pp
+To build the wheel from a clone instead:
+.Bd -literal -offset indent
+$ python3 -m pip wheel --no-deps --no-build-isolation -w dist .
+.Ed
+.Pp
+The wheel carries the catalogue, the systems and the apparatus files.
 Outside a clone a record's git line reads
 .Dq not-a-clone .
 .Sh CATALOGUE
@@ -174,7 +186,10 @@ at     static      needles: settled mid settled-off mid-off mid-null   (system-i
 fhn    pending     not in this release
 .Ed
 .Pp
-Look at what a run would read, and write nothing:
+Look at what a run would read, and write nothing.
+The line with an ellipsis stands for the
+.Dq world params
+line, which is long:
 .Bd -literal -offset indent
 $ compass hold --dry ising production --needle settled
 INPUT
@@ -188,7 +203,7 @@ dry run: nothing written
 .Ed
 .Pp
 Run it.
-The lines marked with an ellipsis are left out here; the run printed 53 RUN lines.
+The lines marked with an ellipsis are left out here (the world params line, and the RUN lines); the run printed 53 RUN lines.
 In the OUTPUT line,
 .Dv HORIZON
 means the run reached its horizon, lock=
@@ -201,6 +216,7 @@ $ compass hold ising production --needle settled
 INPUT
   system ising  world production  needle settled  seed 500 (from the world file)
   world  system-instantiated/plugins/ising/ising-apparatus.toml  sha256 93587cb627b5
+…
   needle needle-settings/ising/hold-settled.toml  sha256 c2159cac0b3e
   needle params: needle_structure=hold-pair-v1 g=12 step=6 S=1500 n_eq=450
   score  environment/hold-score-ising.toml  sha256 158dbcc14f0e
@@ -215,7 +231,12 @@ record: 20261122T001603Z-ising-production-0811b05bffd7880d-0622
 exit 0: scored  (status scored)
 .Ed
 .Pp
-Check the record:
+Check the record.
+The record path is relative to the directory you are in; a run with no
+.Fl -out
+leaves its record under
+.Pa ./compass-runs
+of the directory it was run in, so run this from the same directory:
 .Bd -literal -offset indent
 $ compass hold --verify compass-runs/<record>
 .Ed
