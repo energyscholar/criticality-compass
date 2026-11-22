@@ -1,7 +1,7 @@
 #!/bin/sh
 # turn-public-check.sh - plan 1640 phase 6: may this branch be turned public? Reads release/public-blockers.toml, runs the check of every closed row, prints
 # the table. Exit 0: no row is open, every closed row's check passed, every expected row is present, the built-in tree scan is clean (owner-gated rows are
-# listed and do not fail it: they are the owner's steps). Exit 1: any other state. Exit 2: refused, CC_PRIVATE_PATTERNS (the private patterns file, never
+# listed and do not fail it: they are the owner's steps; so are latent rows: findings about something outside the public tree, reported and not run). Exit 1: any other state. Exit 2: refused, CC_PRIVATE_PATTERNS (the private patterns file, never
 # committed) is not set to a file. The built-in tree scan runs whatever the table says; on a directory that is not a git checkout it scans a scratch git
 # copy of it (and says so), never nothing.
 # usage: release/turn-public-check.sh        env: CC_PRIVATE_PATTERNS (required), PYTHON (3.11 or newer), whatever a row's check needs (its ruling names it)
@@ -25,10 +25,10 @@ from pathlib import Path
 ROOT = Path(os.environ["ROOT"])
 PY = os.environ["PY"]
 PAT = os.environ["CC_PRIVATE_PATTERNS"]
-STATES = ("closed", "open", "owner-gated")
+STATES = ("closed", "open", "owner-gated", "latent")
 EXPECTED = ["1639-handoff", "idiom-followon", "tree-scan", "history-rehearsal", "gitleaks-tree", "ci-file", "ci-local-macos", "ci-local-linux", "public-face", "base", "moved-base-shas",
             "undeclared-failing-test_claims", "undeclared-failing-test_intake_example", "undeclared-failing-test_intake_reach", "undeclared-failing-test_intake_leak",
-            "undeclared-failing-test_intake_terminal",
+            "undeclared-failing-test_intake_terminal", "toolset-commit-missing",
             "OQ1", "OQ2", "OQ3", "OQ4", "OQ5", "gh-noreply-form", "create-repo", "flip", "project-urls-0.1.0", "readme-clone-url"]
 problems = []
 lines = []
@@ -61,6 +61,8 @@ for r in rows:
         problems.append(f"OPEN row {n}")
     elif st == "owner-gated":
         lines.append((n, "OWNER-GATED", ""))
+    elif st == "latent":
+        lines.append((n, "LATENT", "a finding outside the public tree; listed, never run"))
     else:
         chk = r.get("check")
         if not chk:

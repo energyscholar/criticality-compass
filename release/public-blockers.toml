@@ -1,8 +1,9 @@
 # plan 1640 phase 6: the closed table of what stands between this branch and a public repository. One [[row]] per blocker; `release/turn-public-check.sh`
-# holds the list of names that must be present (a deleted row is a failure, never a pass). state = closed | open | owner-gated.
+# holds the list of names that must be present (a deleted row is a failure, never a pass). state = closed | open | owner-gated | latent.
 #   closed       `check` is a shell command run from the repository root with PY and CC_PRIVATE_PATTERNS exported; exit 0 proves the row. The script runs it; it never reads a result it did not produce.
 #   open         work that is not done. The script exits 1 while any row is open.
 #   owner-gated  a step only the owner can take, with its recorded ruling. It is listed, never run, and does not fail the check.
+#   latent       a finding about something OUTSIDE the public tree (the private toolset, say), with its ruling. It is listed, never run, and does not fail the check.
 # The tree scan (public_scan.py --tree) also runs unconditionally inside the script, so no edit of this table can route around it.
 
 [[row]]
@@ -97,13 +98,19 @@ done
 
 [[row]]
 name = "undeclared-failing-test_claims"
-state = "open"
-ruling = "Amendment C3(iii), diagnosed; nothing edited. CLAIMS.md line 24 (the detector interval coverage row) names the stored results as the prose tick `cc:results/*-ch@v10-rules.json`, a glob. tests/test_claims.py ANYTICK matches every `kind:...@...` tick; CELL requires `@` plus 64 hex, so the glob is reported as a malformed evidence cell. The tick has been in CLAIMS.md since before compass-main c628e52 (the same line is there); the failure is the same on compass-main. The fix is a ruling: write the glob without the kind and at-sign, or give the row real evidence cells."
+state = "closed"
+ruling = "Amendment D3: the test was right and CLAIMS.md line 24 was wrong (the prose cell wrote a backticked glob that reads as an evidence cell); the prose no longer ticks it. test_claims passes."
+check = '''
+"$PY" tests/test_claims.py 2>&1 | tail -1 | grep -q "^test_claims: ok"
+'''
 
 [[row]]
 name = "undeclared-failing-test_intake_example"
-state = "open"
-ruling = "Amendment C3(ii), a finding; nothing edited. With the data root it still fails: S0 FORMAT refuses TRANSDUCER_FILE_REFUSED because studies/DIAL1118/bank/sim.py (sha256 8a88f370...) is in no commit of the toolset at the commit host (the toolset at HEAD df17c83); the later stages are withheld after S0 and the committed report no longer reproduces. Same cause as test_intake_terminal: the toolset history the tests declare is not the history present. Not a skip: the requirement is a toolset COMMIT, and it is absent here."
+state = "closed"
+ruling = "Amendment D2: the test needs the PRIVATE toolset at a declared commit, so it is needs_data by nature (cc.toml [check].needs_data); public CI SKIPs it with that reason printed, and it still runs on the commit host. The missing commit itself is the row toolset-commit-missing."
+check = '''
+sh release/ci-run.sh --list | grep -q "^SKIPPED test_intake_example: .*needs_data"
+'''
 
 [[row]]
 name = "undeclared-failing-test_intake_reach"
@@ -123,8 +130,16 @@ sh release/ci-run.sh --list | grep -q "^SKIPPED test_intake_leak: .*needs_commit
 
 [[row]]
 name = "undeclared-failing-test_intake_terminal"
-state = "open"
-ruling = "Amendment C3(ii), a finding; nothing edited. Declared commit ce46e7631921f8a555a8ff89ce373f9f720eca0c (tests/test_intake_terminal.py DIAL_COMMIT, plan 1281 B5, toolset plan-1118-dial); actual: that object does not exist in the toolset at the commit host (git cat-file: not a valid object name; toolset HEAD df17c83, no commit touches studies/DIAL1118). The six DIAL1118 trees under the home directory are plain copies, not git repositories. The tests need the toolset commit to be fetched, or the declaration to be re-pointed by a ruling."
+state = "closed"
+ruling = "Amendment D2: the test needs the PRIVATE toolset at a declared commit, so it is needs_data by nature (cc.toml [check].needs_data); public CI SKIPs it with that reason printed, and it still runs on the commit host. The missing commit itself is the row toolset-commit-missing."
+check = '''
+sh release/ci-run.sh --list | grep -q "^SKIPPED test_intake_terminal: .*needs_data"
+'''
+
+[[row]]
+name = "toolset-commit-missing"
+state = "latent"
+ruling = "Amendment D2, a PRIVATE-repository finding outside the public tree: tests/test_intake_terminal.py declares the toolset commit ce46e7631921f8a555a8ff89ce373f9f720eca0c (plan 1281 B5, branch plan-1118-dial), and the commit host's toolset no longer holds it: not in any ref (its master, its work-in-progress branch, its one remote ref, its bundle ref, its archive tag), not in --all history, not in any reflog, not among its unreachable objects. Toolset HEAD df17c83. Private toolset integrity: the owner restores the commit or re-points the declaration by a ruling."
 
 [[row]]
 name = "OQ1"

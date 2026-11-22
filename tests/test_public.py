@@ -329,8 +329,8 @@ fast = [x for x in stems if x not in cfgt["slow"]]
 skip_want = {x: n for n in ("needs_data", "needs_rust", "needs_commit_host") for x in cfgt[n] if x in fast}
 
 
-UNDECLARED_FAILING = ["test_claims", "test_intake_example", "test_intake_terminal"]   # AQ3: fail with the data root too, so they are a real failure and an open blocker row, never a skip
-check("T10 AQ3: test_frozen_run_1282 and test_docs_match (pass with the data root, fail without it) are in needs_data; the five that fail with it are in no skip list", {"test_frozen_run_1282", "test_docs_match"} <= set(cfgt["needs_data"]) and not set(UNDECLARED_FAILING) & (set(cfgt["needs_data"]) | set(cfgt["needs_rust"]) | set(cfgt["needs_commit_host"])), str(cfgt["needs_data"][-3:]))
+UNDECLARED_FAILING = ["test_claims"]   # AQ3, amended by D2 and D3: a test that fails with the data root too is a real failure and an open blocker row, never a skip. test_claims failed so, was fixed (D3) and passes; it is in no skip list. test_intake_example and test_intake_terminal need the private toolset, so they ARE needs_data (D2)
+check("T10 AQ3/D2: test_frozen_run_1282, test_docs_match, test_intake_example and test_intake_terminal (they need the data root or the private toolset) are in needs_data; test_claims, which passes, is in no skip list", {"test_frozen_run_1282", "test_docs_match", "test_intake_example", "test_intake_terminal"} <= set(cfgt["needs_data"]) and not set(UNDECLARED_FAILING) & (set(cfgt["needs_data"]) | set(cfgt["needs_rust"]) | set(cfgt["needs_commit_host"])), str(cfgt["needs_data"][-3:]))
 
 
 def totality(run, skipped, fast_):
@@ -400,6 +400,9 @@ if tp.is_file() and PAT:
         blk.write_text(synth.split("[[row]]", 2)[0] + "[[row]]" + synth.split("[[row]]", 3)[2] if len(names) > 2 else synth)
         rc, o = sh("bash", cp / "release" / "turn-public-check.sh", cwd=cp, env=env)
         check("T11 a deleted row exits 1 naming the missing row", rc == 1 and names[0] in o, f"exit {rc}: {o[-200:]}")
+        blk.write_text(synth + '[[row]]\nname = "zz-latent"\nstate = "latent"\nruling = "planted: a finding outside the public tree"\n')
+        rc, o = sh("bash", cp / "release" / "turn-public-check.sh", cwd=cp, env=env)
+        check("T11 a latent row (a finding outside the public tree) is listed LATENT and does not fail the check", rc == 0 and "LATENT" in o and "zz-latent" in o, f"exit {rc}: {o[-200:]}")
         blk.write_text(synth)
         (cp / "tests" / "zz_planted.txt").write_text(PLANTED_WORD + "\n")
         sh("git", "init", "-q", cwd=cp)
