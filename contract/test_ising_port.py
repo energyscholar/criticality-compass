@@ -68,7 +68,7 @@ AT_SEQUENCE = [{"op": "declare"}, {"op": "read", **RQ}, {"op": "nudge", "d": [7]
                {"op": "read", "n_eq": 0, "S": 40, "skip": 1}, {"op": "nudge", "d": [40], **RQ}, {"op": "read", "n_eq": 3, "S": 39, "skip": 1}]
 # ---- pinned at base 4df8a87 (the Auditor re-pins at the real base in a dated section of the plan before handoff) ----
 AT_BYTES = "658f7d53f2d69521bfdc09cfe5480dcf13cffefdb0e8fe59503ac93ed482b3d8"
-TREE_PINS = "314190c2a2a565385d3d9fb1fb519d49315f73ae4526af492ee8124bf4e2e4df"
+TREE_PINS = "1afc8bb5734b45cb864c4720db836a5dca02c30e7b19cc1f7068db26a3800d94"
 HOST = ("environment/apparatus_wire.py", "environment/apparatus_server.py", "environment/apparatus_config.py",
         "environment/run_hold.py", "environment/hold_score.py")
 NAMES = {"D", "C", "Gs", "G", "dU4", "U4", "chi", "M", "E", "heal", "L4", "dK", "h", "h_ticks", "field", "critical"}
