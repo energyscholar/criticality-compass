@@ -27,10 +27,12 @@ READONLY = {
     ("HOWTO.md", "bin/cc help --advanced", 0): None, ("HOWTO.md", "bin/cc explain b7-at-line-2 0.14->0.21", 0): None, ("HOWTO.md", "bin/cc explain x7a-bc 1.0->1.5", 0): None,
     ("HOWTO.md", "bin/cc explain x5n-bilayer-2 0.0 --tables v04-rules", 0): None, ("HOWTO.md", "bin/cc show x2-xy-line-3 --tables v04-rules", 0): None,
     ("TUTORIAL.md", "bin/cc show w2-potts", 0): None, ("TUTORIAL.md", "bin/cc explain w2-potts 5", 0): None,
+    ("docs/FIRST-HOUR.md", "compass hold --list", 0): None, ("docs/FIRST-HOUR.md", "compass hold --verify compass-runs/<record>", 0): "verify",
     ("man", "compass hold --list", 0): None, ("man", "compass hold --dry ising production --needle settled", 0): None,
     ("man", "compass hold --verify compass-runs/<record>", 0): "verify",   # run on a record the test makes first
 }
-NOT_RUN = {  # every other command line of the documents, one by one: (document, command, n-th occurrence) -> why it is not run. A command in neither table FAILS the test.
+NOT_RUN = {
+    ('docs/FIRST-HOUR.md', 'compass hold ising quick.toml --needle settled', 0): 'runs a hold and needs the quick.toml of the step before; its output carries a timestamp and a wall time',  # every other command line of the documents, one by one: (document, command, n-th occurrence) -> why it is not run. A command in neither table FAILS the test.
     ('README.md', 'compass hold ising production --needle settled', 0): 'runs a hold: minutes of compute',
     ('README.md', 'bin/cc tables fork v01-rules my-rules', 0): 'writes a rulebook',
     ('README.md', 'bin/cc run w2-potts --tables my-rules --dry', 0): 'measures; needs the data root',
