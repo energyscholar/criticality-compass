@@ -73,6 +73,19 @@ AT_SEQUENCE = [{"op": "declare"}, {"op": "read", **RQ}, {"op": "nudge", "d": [7]
 # truth.json is pinned as a parsed document (TRUTH_PIN) and compared by _truth_diffs: its K_c values are arcsinh(exp(-2 Lc)) / 2 of a hidden real, and the platform libm
 # does not round those correctly, so the truth values are reproducible to 4 ulp across platforms, and bit-identical on one platform.
 AT_BYTES = "887de304a3ad5a8d87dca98d3b64a0e1e224a61f1c345d9a5a227adca082a97e"   # sha256 of replies + edge.json + the call log of perf.json (the base's sha with truth.json taken out)
+# plan 1640 amendment H': the three parts of that blob, pinned raw, so that a sha mismatch can name the leaf that moved (p04). test_p04d proves they ARE the blob of AT_BYTES.
+WIRE_PIN = [
+    '{"op": "declared", "wire": "compass-apparatus/1", "dials": [{"name": "K", "lo": 0.2, "hi": 0.5, "T": 1200, "max_nudge": 32}], "pos": [400], "fixed": {}, "ordered_side": {"K": "+"}, "roles": [{"name": "D", "role": "crossing", "ordered_sign": "+"}, {"name": "C", "role": "peak"}], "index": 0, "horizon": 20000, "lag": 2, "tau": 3.0, "k": 2, "L": 9, "index_unit": "sweep", "index_kind": "sample_counter", "clock": "algorithmic (Swendsen-Wang)"}\n',
+    '{"op": "reading", "pos": [[400]], "window": [[4, 43]], "values": {"D": [-0.054166666666666585], "C": [14.938765432098766]}, "errors": {"D": [0.06478051863440058], "C": [2.025180084656623]}, "index": 43}\n',
+    '{"op": "reading", "pos": [[407]], "window": [[47, 86]], "values": {"D": [-0.0986111111111112], "C": [10.77716049382716]}, "errors": {"D": [0.0645292721604858], "C": [3.215228237558521]}, "index": 86}\n',
+    '{"op": "reading", "pos": [[375]], "window": [[90, 170]], "values": {"D": [-0.16598915989159885], "C": [11.053267822651126]}, "errors": {"D": [0.057122607032899925], "C": [3.0239093784391784]}, "index": 170}\n',
+    '{"op": "reading", "pos": [[100], [900], [410]], "window": [[174, 213], [217, 256], [260, 299]], "values": {"D": [-0.17777777777777776, 0.06631944444444449, -0.043055555555555625], "C": [5.506666666666666, 11.641358024691359, 22.372222222222224]}, "errors": {"D": [0.05143973697406524, 0.020274391640293706, 0.09279689327536499], "C": [1.375190964240504, 8.501809562656737, 4.19189375242485]}, "index": 299}\n',
+    '{"op": "reading", "pos": [[410]], "window": [[300, 339]], "values": {"D": [-0.09027777777777785], "C": [14.066049382716049]}, "errors": {"D": [0.08772799359924208], "C": [4.377222695959092]}, "index": 339}\n',
+    '{"op": "nev", "index": 339}\n',
+    '{"op": "nev", "index": 339}\n',
+]   # the raw reply lines, one per AT_SEQUENCE message
+EDGE_PIN = '{"K_c": 0.3488838761833377, "drift": {"law": "linear", "rate": 5e-06, "target": "L4"}, "hidden": {"L4": 0.14}, "index": 0, "time": "lag and drift are in algorithmic (Swendsen-Wang) time", "wire": "compass-apparatus/1"}'   # edge.json as the server wrote it
+PERF_PIN = '{"calls": [{"op": "declare"}, {"op": "read"}, {"op": "nudge"}, {"op": "nudge"}, {"op": "scan"}, {"op": "read"}, {"op": "nudge"}, {"op": "read"}], "time": "lag and drift are in algorithmic (Swendsen-Wang) time"}'   # the perf string _at_parts builds: the call log with every "sec"/"time" key taken out
 ULP_BOUND = 4   # the libm accuracy bound for one exp plus one arcsinh plus one exact halving: at most 1 ulp each, and one more for the composition
 TRUTH_PIN = r'''{"time": "lag and drift are in algorithmic (Swendsen-Wang) time", "wire": "compass-apparatus/1", "rows": [{"call": 1, "op": "read", "index": 43, "K_c": 0.34875425989391357, "pos": [400], "actual": [0.30000000000000004], "points": [{"pos": [400], "window": [4, 43], "K_c": [0.348871817357449, 0.34875425989391357], "sampling": 3, "dial": [[0, [400]]]}]}, {"call": 2, "op": "nudge", "index": 86, "K_c": 0.3486246790834067, "pos": [407], "actual": [0.30175], "points": [{"pos": [407], "window": [47, 86], "K_c": [0.34874220436833114, 0.3486246790834067], "sampling": 46, "dial": [[43, [400]], [45, [407]]]}]}, {"call": 3, "op": "nudge", "index": 170, "K_c": 0.34837164683170535, "pos": [375], "actual": [0.29375], "points": [{"pos": [375], "window": [90, 170], "K_c": [0.3486126268582585, 0.34837164683170535], "sampling": 88, "dial": [[86, [407]], [88, [375]]]}]}, {"call": 4, "op": "scan", "index": 299, "K_c": 0.3479833252379394, "pos": [410], "actual": [0.3025], "points": [{"pos": [100], "window": [174, 213], "K_c": [0.3483596010542822, 0.3482421708157279], "sampling": 173, "dial": [[170, [375]], [172, [100]]]}, {"pos": [900], "window": [217, 256], "K_c": [0.3482301283391113, 0.34811273028402806], "sampling": 216, "dial": [[213, [100]], [215, [900]]]}, {"pos": [410], "window": [260, 299], "K_c": [0.3481006911083425, 0.3479833252379394], "sampling": 259, "dial": [[256, [900]], [258, [410]]]}]}, {"call": 5, "op": "read", "index": 339, "K_c": 0.3478629803104053, "pos": [410], "actual": [0.3025], "points": [{"pos": [410], "window": [300, 339], "K_c": [0.3479803162404928, 0.3478629803104053], "sampling": 299, "dial": [[299, [410]]]}]}]}'''   # truth.json as the base wrote it (macOS), unchanged
 TREE_PINS = "1afc8bb5734b45cb864c4720db836a5dca02c30e7b19cc1f7068db26a3800d94"
@@ -205,16 +218,72 @@ def _truth_diffs(want, got, path="truth"):
     return [] if type(want) is type(got) and want == got else [f"{path}: {want!r} != {got!r}"]
 
 
-def _at_bytes(tmp):
+def _at_parts(tmp):
+    """The three parts of the AT blob, as _at_bytes has always joined them: (the raw reply lines, edge.json text, the perf string). Plan 1640 amendment H': p04 names the part and leaf that differ."""
     proc, c, run = _server(tmp, AT_WORLD, "at")
     try:
         lines = [c.raw(json.dumps(m)) for m in AT_SEQUENCE]
     finally:
         _stop(proc, c)
-    blob = "".join(lines) + (run / "edge.json").read_text()
     perf = json.loads((run / "perf.json").read_text())
-    blob += json.dumps({"time": perf["time"], "calls": [{k: v for k, v in r.items() if "sec" not in k and "time" not in k} for r in perf["calls"]]}, sort_keys=True)
-    return hashlib.sha256(blob.encode()).hexdigest(), json.loads((run / "truth.json").read_text())
+    perf_s = json.dumps({"time": perf["time"], "calls": [{k: v for k, v in r.items() if "sec" not in k and "time" not in k} for r in perf["calls"]]}, sort_keys=True)
+    return lines, (run / "edge.json").read_text(), perf_s
+
+
+def _parts_sha(parts):
+    replies, edge, perf = parts
+    return hashlib.sha256(("".join(replies) + edge + perf).encode()).hexdigest()
+
+
+def _at_bytes(tmp):
+    parts = _at_parts(tmp)
+    return _parts_sha(parts), json.loads((tmp / "run" / "truth.json").read_text())
+
+
+def _leaf_diffs(want, got, path=""):
+    """Every differing leaf of two parsed documents, with NO tolerance: 'path: want ... got ...' (and the ulp distance for two finite floats). A missing key, a length change or a type change is a leaf too."""
+    if isinstance(want, dict) and isinstance(got, dict):
+        out = []
+        for k in list(want) + [k for k in got if k not in want]:
+            if k in want and k in got:
+                out += _leaf_diffs(want[k], got[k], f"{path}/{k}")
+            else:
+                out.append(f"{path}/{k}: want {want.get(k, '<absent>')!r} got {got.get(k, '<absent>')!r}")
+        return out
+    if isinstance(want, list) and isinstance(got, list):
+        out = [f"{path}: length want {len(want)} got {len(got)}"] if len(want) != len(got) else []
+        for i, (a, b) in enumerate(zip(want, got)):
+            out += _leaf_diffs(a, b, f"{path}[{i}]")
+        return out
+    if isinstance(want, float) and isinstance(got, float) and math.isfinite(want) and math.isfinite(got):
+        return [] if want == got and repr(want) == repr(got) else [f"{path}: want {want!r} got {got!r} ({_ulp_distance(want, got)} ulp)"]
+    return [] if type(want) is type(got) and repr(want) == repr(got) else [f"{path}: want {want!r} got {got!r}"]
+
+
+def _parts_diffs(want, got):
+    """The leaf differences between two (replies, edge, perf) triples, each part parsed as JSON; a part that does not parse is compared as text."""
+    def parse(x):
+        try:
+            return json.loads(x)
+        except ValueError:
+            return x
+    out = []
+    for i in range(max(len(want[0]), len(got[0]))):
+        if i >= len(want[0]) or i >= len(got[0]):
+            out.append(f"reply[{i}]: present in only one of the two")
+        else:
+            out += _leaf_diffs(parse(want[0][i]), parse(got[0][i]), f"reply[{i}]")
+    out += _leaf_diffs(parse(want[1]), parse(got[1]), "edge")
+    out += _leaf_diffs(parse(want[2]), parse(got[2]), "perf")
+    return out
+
+
+def _fail_report(name, e):
+    """The runner's report of one failure: the one-line FAIL (first line of the message, cut to 300), then the rest of the message, each line indented 4 spaces and cut to 200, up to 30 lines (plan 1640 amendment H')."""
+    lines = str(e).splitlines() or [""]
+    out = [f"FAIL {name}: {type(e).__name__}: {lines[0][:300]}"]
+    out += ["    " + ln[:200] for ln in lines[1:31]]
+    return "\n".join(out)
 
 
 # ---------------------------------------------------------------- the tests
@@ -257,10 +326,81 @@ def test_p03_the_host_names_no_observable_and_no_dynamics():
 
 
 def test_p04_at_is_unchanged_on_the_wire(tmp_path):
-    got, truth = _at_bytes(tmp_path)
-    assert got == AT_BYTES, f"the AT replies, edge or perf differ from the base (sha256 {got[:12]}…)"
+    parts = _at_parts(tmp_path)
+    got = _parts_sha(parts)
+    if got != AT_BYTES:
+        diffs = _parts_diffs((WIRE_PIN, EDGE_PIN, PERF_PIN), parts)
+        raise AssertionError(f"the AT replies, edge or perf differ from the base (sha256 {got[:12]}…); {len(diffs)} differing leaves, the first {min(len(diffs), 10)}:\n" + "\n".join(diffs[:10]))
+    truth = json.loads((tmp_path / "run" / "truth.json").read_text())
     diffs = _truth_diffs(json.loads(TRUTH_PIN), truth)
     assert not diffs, "the AT truth differs from the base: " + "; ".join(diffs[:3])
+
+
+def _first_leaf(x, path, kinds):
+    """(path, container, key) of the first leaf whose type is in kinds, in document order."""
+    if isinstance(x, dict):
+        items = list(x.items())
+    elif isinstance(x, list):
+        items = list(enumerate(x))
+    else:
+        return None
+    for k, v in items:
+        if isinstance(v, (dict, list)):
+            r = _first_leaf(v, f"{path}/{k}" if isinstance(x, dict) else f"{path}[{k}]", kinds)
+            if r:
+                return r
+        elif type(v) in kinds:
+            return (f"{path}/{k}" if isinstance(x, dict) else f"{path}[{k}]", x, k)
+    return None
+
+
+def test_p04c_p04_names_the_leaf_it_differs_in(tmp_path):
+    """RED, run against p04 itself on the live server run: (a) one edge float moved 1 ulp, (b) one reply field changed. p04 must raise and its message must name the leaf's path."""
+    live = _at_parts(tmp_path)
+    saved = globals()["_at_parts"]
+    try:
+        # (a) an edge float, one ulp
+        edge = json.loads(live[1]); path, box, key = _first_leaf({"edge": edge}, "", (float,))
+        moved = _step_ulp(box[key], 1) if isinstance(box[key], float) else None
+        assert moved is not None, "the live edge.json has a float leaf to move"
+        box[key] = moved
+        want_path = path.replace("/edge", "edge", 1)
+        globals()["_at_parts"] = lambda tmp: (live[0], json.dumps(edge), live[2])
+        try:
+            test_p04_at_is_unchanged_on_the_wire(tmp_path)
+            raise AssertionError("p04 must fail when an edge float moves one ulp")
+        except AssertionError as e:
+            assert want_path in str(e) and "1 ulp" in str(e) and "differing leaves" in str(e), ("p04 did not name the edge leaf", want_path, str(e)[:600])
+        # (b) a reply field
+        replies = list(live[0]); rep = json.loads(replies[1]); path, box, key = _first_leaf({"reply[1]": rep}, "", (float, str))
+        box[key] = box[key] + 1 if isinstance(box[key], float) else box[key] + "X"
+        replies[1] = json.dumps(rep) + "\n"
+        want_path = "reply[1]" + path[len("/reply[1]"):]
+        globals()["_at_parts"] = lambda tmp: (replies, live[1], live[2])
+        try:
+            test_p04_at_is_unchanged_on_the_wire(tmp_path)
+            raise AssertionError("p04 must fail when a reply field changes")
+        except AssertionError as e:
+            assert want_path in str(e) and "differing leaves" in str(e), ("p04 did not name the reply leaf", want_path, str(e)[:600])
+    finally:
+        globals()["_at_parts"] = saved
+
+
+def test_p04d_the_pinned_parts_are_the_pinned_sha():
+    """Provenance: the pins, serialised exactly as _at_parts joins them (replies, edge.json, the perf string), are the blob whose sha is AT_BYTES."""
+    assert hashlib.sha256(("".join(WIRE_PIN) + EDGE_PIN + PERF_PIN).encode()).hexdigest() == AT_BYTES
+    assert len(WIRE_PIN) == len(AT_SEQUENCE) and all(x.endswith("\n") for x in WIRE_PIN), "one raw reply line per message"
+
+
+def test_p04e_leaf_diffs_has_no_tolerance_and_a_failure_prints_whole():
+    assert _leaf_diffs({"a": [1.0, {"b": "x"}]}, {"a": [1.0, {"b": "x"}]}) == []
+    d = _leaf_diffs({"a": [1.0, {"b": "x"}]}, {"a": [_step_ulp(1.0, 1), {"b": "y"}]})
+    assert len(d) == 2 and d[0].startswith("/a[0]:") and "1 ulp" in d[0] and d[1].startswith("/a[1]/b:"), d
+    assert _leaf_diffs({"a": 1}, {"a": 1.0}) != [] and _leaf_diffs({"a": 1}, {}) != [] and _leaf_diffs([1], [1, 2]) != []
+    msg = "\n".join(["head"] + [f"leaf{i}" for i in range(11)])
+    rep = _fail_report("test_x", AssertionError(msg)).splitlines()
+    assert rep[0] == "FAIL test_x: AssertionError: head" and [r.strip() for r in rep[1:]] == [f"leaf{i}" for i in range(11)] and all(r.startswith("    ") for r in rep[1:]), rep
+    assert "_fail_report(t.__name__, e)" in Path(__file__).read_text().split("if __name__")[-1], "the runner must use _fail_report"
 
 
 def test_p04b_the_truth_comparison_can_fail():
@@ -587,6 +727,6 @@ if __name__ == "__main__":
                 t()
             print("PASS", t.__name__); passed += 1
         except Exception as e:  # noqa: BLE001
-            print(f"FAIL {t.__name__}: {type(e).__name__}: {str(e)[:300]}")
+            print(_fail_report(t.__name__, e))
     print(f"{passed}/{len(TESTS)} passed")
     sys.exit(0 if passed == len(TESTS) else 1)
