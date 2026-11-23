@@ -117,6 +117,12 @@ def run_tests(names, skip=()):
     return [done[t.stem] for t in picked], missing, allt   # the printed order is the checks.toml order, as before
 
 
+def failed_view(tail, full):
+    """What a failing test prints: every line of its output that is not a PASS line (so a FAIL, Traceback or Error line the 8-line tail cut off still appears), then the usual tail, unchanged (plan 1640 amendment G1)."""
+    cut = full[:len(full) - len(tail)]
+    return [ln for ln in cut if ln.strip() and not ln.strip().startswith(("ok", "PASS"))] + tail
+
+
 def tests_absent():
     """The refusal text when a test checks.toml names is not on disk (a wheel carries only the tests the freeze gate names), else None."""
     gone = [t for t in tomllib.loads((ROOT / "checks.toml").read_text())["roles"]["tests"] if not (ROOT / t).is_file()]
@@ -143,10 +149,10 @@ def cmd_test(names):
     for n in missing:
         print(f"no test '{n}' in checks.toml [roles].tests\n  Next: bin/cc test <one of: "
               f"{' '.join(t.stem for t in allt)}>")
-    for stem, ok, tail, _, _ in res:
+    for stem, ok, tail, _, full in res:
         print(f"{'ok  ' if ok else 'FAIL'} {stem}")
         if not ok or (VERBOSE and not regold):
-            print("\n".join("    " + ln for ln in tail))
+            print("\n".join("    " + ln for ln in (tail if ok else failed_view(tail, full))))
     if regold:
         lines = [ln.strip() for _, _, tail, _, _ in res for ln in tail if ln.strip().startswith("REGOLDENED")]
         print("\n".join(lines) + f"\nregoldened {len(lines)} files: review them with git diff tests/golden/")
@@ -282,8 +288,8 @@ def cmd_check(args):
     print(f"check: {len(res) - len(bad)} tests passed, {len(bad)} failed{skipped}")
     print("\n".join("check: " + ln.strip() for _, _, _, _, full in res for ln in full if ln.strip().startswith("scoreboard ")))
     print("check: seconds per test\n" + "\n".join(f"  {sec:7.1f} s  {stem}" for stem, _, _, sec, _ in res))
-    for stem, _, tail, _, _ in bad:
-        print(f"check: FAILED: {stem}\n" + "\n".join("    " + ln for ln in tail) + f"\n  Next: bin/cc test {stem}")
+    for stem, _, tail, _, full in bad:
+        print(f"check: FAILED: {stem}\n" + "\n".join("    " + ln for ln in failed_view(tail, full)) + f"\n  Next: bin/cc test {stem}")
     took, budget = time.time() - t0, registry.config(ROOT)["check"]["fast_budget_s"]
     if not bad:
         print(f"check: clean in {took:.0f} s (fast budget {budget} s)")
