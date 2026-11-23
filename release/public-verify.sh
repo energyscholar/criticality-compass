@@ -88,7 +88,7 @@ for o, a in A.items():
     if norm(a["msg"]) != norm(b["msg"]): errs.append((o, "message differs")); continue
     for who in (0, 2):
         an, ae = a["id"][who], a["id"][who + 1]; bn, be = b["id"][who], b["id"][who + 1]
-        if ae.endswith(".local"):
+        if ae.endswith(".local") or ae == re.sub(r"^[0-9]+\+", "", NOREPLY):
             if (bn, be) != (PUBNAME, NOREPLY): errs.append((o, f"identity not mapped to the public one: {bn} <{be}>"))
         elif (an, ae) != (bn, be): errs.append((o, f"identity changed though it was not .local: {an} <{ae}> -> {bn} <{be}>"))
 if errs:
