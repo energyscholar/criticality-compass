@@ -1,5 +1,5 @@
 """test_schedule - `bin/cc check` runs the tests named in cc.toml [check] exclusive ALONE, after the parallel batch (plan 0881 P1.2).
-A scratch copy with 1-second tests (WORKERS ordinary, one exclusive; WORKERS = max(2, cpu_count - 2), the pool bin/cc builds) logs each one's start and end; the exclusive one must start
+A scratch copy with 1-second tests (two ordinary, one exclusive; the pool is the test's own CC_JOBS, which bin/cc fans out on, so the host's core count does not matter) logs each one's start and end; the exclusive one must start
 after every other has ended, and the ordinary ones must still overlap. Planted: an empty exclusive list lets it overlap (RED). The exclusive test is listed FIRST so it is in the pool's first batch whatever the host's core count."""
 import os
 import shutil
@@ -10,8 +10,7 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-WORKERS = max(2, (os.cpu_count() or 3) - 2)   # bin/cc: ThreadPoolExecutor(max(1, cpu_count - 2)); two ordinary tests are the least the parallel check needs
-ORD = [f"t_{i}" for i in range(WORKERS)]
+ORD = ["t_0", "t_1"]   # two ordinary tests are the least the parallel check needs; the pool is declared by CC_JOBS below
 NAMES = ["t_x"] + ORD
 
 
