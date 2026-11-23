@@ -1,0 +1,12 @@
+ok   the planted test fails the run
+FAIL the first FAIL line of a failing test is printed though 19 lines follow it: FAIL t_plant
+    ok   p11
+    ok   p12
+    ok   p13
+    ok   p14
+    ok   p15
+    ok   p16
+    ok   p17
+    ok   p18
+
+test_fail_lines: FAILED

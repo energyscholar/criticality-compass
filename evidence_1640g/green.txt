@@ -1,0 +1,3 @@
+ok   the planted test fails the run
+ok   the first FAIL line of a failing test is printed though 19 lines follow it
+test_fail_lines: all passed
