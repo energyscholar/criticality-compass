@@ -369,6 +369,78 @@ def _first_leaf(x, path, kinds):
     return None
 
 
+def _p04_outcome(tmp, parts):
+    """Run p04 (looked up by name at call time) with _at_parts returning `parts`: None if it passes, else its AssertionError message. It never catches its own assertion."""
+    saved = globals()["_at_parts"]
+    globals()["_at_parts"] = lambda t: parts
+    try:
+        try:
+            globals()["test_p04_at_is_unchanged_on_the_wire"](tmp)
+        except AssertionError as e:
+            return str(e)
+        return None
+    finally:
+        globals()["_at_parts"] = saved
+
+
+def _p04_plants():
+    """The ten plants of plan 1640 amendment I, built from the pins alone (so they do not depend on the host's libm): {name: (parts, None for 'p04 passes' | the text its message must hold)}."""
+    pin_kc = json.loads(EDGE_PIN)["K_c"]
+    tok = f'"K_c": {pin_kc!r}'
+    def edge_kc(x):
+        return EDGE_PIN.replace(tok, f'"K_c": {x!r}')
+    def parts_of(edge, replies=None):
+        return (list(WIRE_PIN) if replies is None else replies, edge, PERF_PIN)
+    plants = {}
+    for name, n, expect in (("a", 4, None), ("b", -4, None), ("c", 5, "edge/K_c"), ("d", -5, "edge/K_c")):
+        assert _ulp_distance(pin_kc, _step_ulp(pin_kc, n)) == abs(n)
+        plants[name] = (parts_of(edge_kc(_step_ulp(pin_kc, n))), expect)
+    ubuntu_kc = _step_ulp(pin_kc, -1)           # the value the ubuntu cells give
+    l4 = '"L4": 0.14'
+    assert EDGE_PIN.count(l4) == 1
+    plants["e"] = (parts_of(edge_kc(ubuntu_kc).replace(l4, f'"L4": {_step_ulp(0.14, 1)!r}')), "edge/hidden/L4")   # one named NON-K_c edge float, 1 ulp
+    # (f) the first float leaf, in document order, of the first WIRE_PIN reply that has one: reply[0] edge/dials[0]/lo (0.2); it is looked up, not named, and the assert below pins what it found
+    for i, raw in enumerate(WIRE_PIN):
+        doc = json.loads(raw)
+        hit = _first_leaf({f"reply[{i}]": doc}, "", (float,))
+        if hit:
+            break
+    fpath, box, key = hit
+    fpath = fpath.lstrip("/")
+    box[key] = _step_ulp(box[key], 1)
+    replies = list(WIRE_PIN); replies[i] = json.dumps(doc) + "\n"
+    plants["f"] = (parts_of(edge_kc(ubuntu_kc), replies), fpath)
+    # (g) one reply re-serialised: the same leaves, different bytes
+    replies = list(WIRE_PIN); replies[1] = json.dumps(json.loads(WIRE_PIN[1]), separators=(",", ":")) + "\n"
+    assert replies[1] != WIRE_PIN[1]
+    plants["g"] = (parts_of(EDGE_PIN, replies), "same leaves, different bytes")
+    # (h) K_c absent, (i) null, (j) a string
+    e = json.loads(EDGE_PIN); del e["K_c"]
+    plants["h"] = (parts_of(json.dumps(e)), "edge/K_c absent")
+    e = json.loads(EDGE_PIN); e["K_c"] = None
+    plants["i"] = (parts_of(json.dumps(e)), "not a finite float")
+    e = json.loads(EDGE_PIN); e["K_c"] = "0.3488838761833377"
+    plants["j"] = (parts_of(json.dumps(e)), "not a finite float")
+    return plants
+
+
+def test_p04c_p04_passes_and_fails_where_the_plants_say(tmp_path):
+    """Plan 1640 amendment I, I2: ten plants, each run through p04 itself via the _at_parts monkeypatch. PASS plants (a) K_c +4 ulp, (b) -4 ulp; FAIL plants naming their leaf:
+    (c) +5 ulp and (d) -5 ulp (edge/K_c), (e) K_c -1 ulp and edge/hidden/L4 moved 1 ulp, (f) K_c -1 ulp and the first float leaf of the first WIRE_PIN reply that has one
+    (reply[0]/dials[0]/lo) moved 1 ulp, (g) one reply re-serialised (same leaves, different bytes), (h) K_c absent, (i) K_c null, (j) K_c a string. One live run supplies truth.json."""
+    _at_parts(tmp_path)
+    bad = []
+    for name, (parts, expect) in _p04_plants().items():
+        out = _p04_outcome(tmp_path, parts)
+        if expect is None:
+            ok = out is None
+        else:
+            ok = out is not None and expect in out
+        if not ok:
+            bad.append(f"plant ({name}): wanted " + ("p04 to pass" if expect is None else f"p04 to fail naming {expect!r}") + f", got {'a pass' if out is None else repr(out[:200])}")
+    assert not bad, "plants went wrong:\n" + "\n".join(bad)
+
+
 def test_p04d_the_pinned_parts_are_the_pinned_sha():
     """Provenance: the pins, serialised exactly as _at_parts joins them (replies, edge.json, the perf string), are the blob whose sha is AT_BYTES."""
     assert hashlib.sha256(("".join(WIRE_PIN) + EDGE_PIN + PERF_PIN).encode()).hexdigest() == AT_BYTES
