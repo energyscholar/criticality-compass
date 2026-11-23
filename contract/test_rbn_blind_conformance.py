@@ -149,7 +149,21 @@ def _server(tmp, name="w", **over):
 
 
 def _stop(proc, conn):
-    conn.close(); proc.terminate(); proc.wait(timeout=10)
+    conn.close(); proc.terminate()
+    t0 = time.monotonic()
+    try:
+        proc.wait(timeout=10)
+    except subprocess.TimeoutExpired:
+        # plan 1640 amendment H': name the stall. The kill and the stderr read are cleanup for the diagnosis; the test still fails, and the 10 s is unchanged.
+        waited = time.monotonic() - t0
+        alive = proc.poll() is None
+        proc.kill()
+        try:
+            err = proc.communicate(timeout=5)[1] or ""
+        except subprocess.TimeoutExpired:
+            err = "(stderr unreadable: the server did not close it within 5 s of the kill)"
+        tail = "\n".join(err.splitlines()[-20:])
+        raise AssertionError(f"the blind server did not exit within {waited:.2f} s of SIGTERM (still alive at that point: {alive}); the last 20 lines of its stderr:\n{tail}") from None
 
 
 # ---- the declared computation (SCHEMA-1560 §2-§3, §7), written out a second time with loops: the test's own oracle ---------
@@ -488,6 +502,42 @@ def test_b08_nothing_frozen_moved_and_the_shipped_worlds():
     assert 1.0 - lam[0] > 0.3 and 1.0 - lam[-1] < -0.5, "the critical world's section lies inside the knobs"
 
 
+def _fail_report(name, e):
+    """The runner's report of one failure: the one-line FAIL (first line of the message, cut to 300), then the rest of the message, each line indented 4 spaces and cut to 200, up to 30 lines (plan 1640 amendment H')."""
+    lines = str(e).splitlines() or [""]
+    return "\n".join([f"FAIL {name}: {type(e).__name__}: {lines[0][:300]}"] + ["    " + ln[:200] for ln in lines[1:31]])
+
+
+def test_b09_stop_names_its_stall(tmp_path):
+    """RED on 6b67f16: a server that ignores SIGTERM makes _stop raise TimeoutExpired, which names nothing. Now it raises AssertionError carrying the seconds, whether the process was alive, and the stderr tail."""
+    code = ("import signal,sys,time\nsignal.signal(signal.SIGTERM, signal.SIG_IGN)\n"
+            "print('ready', flush=True)\n" + "".join(f"print('stderr-line-{i}', file=sys.stderr, flush=True)\n" for i in range(25)) + "time.sleep(60)\n")
+    proc = subprocess.Popen([sys.executable, "-c", code], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    assert proc.stdout.readline().strip() == "ready"   # (stdout, so that stderr stays unread) the handler is installed before the SIGTERM
+
+    class _NoConn:
+        def close(self):
+            pass
+    try:
+        _stop(proc, _NoConn())
+    except AssertionError as e:
+        m = str(e)
+        assert "did not exit within 1" in m and "still alive at that point: True" in m, m[:300]   # 10.0x s
+        assert "stderr-line-24" in m and "stderr-line-5" in m and "stderr-line-4\n" not in m + "\n", "the last 20 lines of stderr, no more"
+    else:
+        raise AssertionError("a server that ignores SIGTERM must make _stop fail")
+    finally:
+        if proc.poll() is None:
+            proc.kill(); proc.communicate()
+
+
+def test_b10_a_failure_prints_its_whole_message():
+    msg = "\n".join(["head"] + [f"leaf{i}" for i in range(11)])
+    rep = _fail_report("test_x", AssertionError(msg)).splitlines()
+    assert rep[0] == "FAIL test_x: AssertionError: head" and [r.strip() for r in rep[1:]] == [f"leaf{i}" for i in range(11)] and all(r.startswith("    ") for r in rep[1:]), rep
+    assert "_fail_report(_t.__name__, _e)" in Path(__file__).read_text().split("if __name__")[-1], "the runner must use _fail_report"
+
+
 if __name__ == "__main__":
     import tempfile
     _tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
@@ -497,6 +547,6 @@ if __name__ == "__main__":
             try:
                 (_t(Path(_d)) if _t.__code__.co_argcount else _t()); print(f"PASS {_t.__name__}")
             except Exception as _e:  # noqa: BLE001
-                _fail += 1; print(f"FAIL {_t.__name__}: {type(_e).__name__}: {str(_e)[:300]}")
+                _fail += 1; print(_fail_report(_t.__name__, _e))
     print(f"{len(_tests) - _fail}/{len(_tests)} passed")
     sys.exit(1 if _fail else 0)
