@@ -184,8 +184,9 @@ check = 'grep -q "OQ5" release/TURN-PUBLIC.md'
 
 [[row]]
 name = "gh-noreply-form"
-state = "owner-gated"
-ruling = "The owner reads the noreply address in GitHub, Settings, Emails, and confirms its form (with or without a numeric id prefix) before the rewrite; release/TURN-PUBLIC.md step 1."
+state = "closed"
+ruling = "Ruled by the owner 2026-11-23T03:02Z: the address carries the numeric id prefix; release/public-identity.toml declares it once"
+check = '''grep -Eq '^email = "[0-9]+\+energyscholar@users\.noreply\.github\.com"$' release/public-identity.toml'''
 
 [[row]]
 name = "create-repo"

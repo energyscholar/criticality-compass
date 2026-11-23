@@ -5,7 +5,7 @@ The owner runs every step. Nothing here is run by a script on its own, and nothi
 Settled (OQ5): the plain author address on its commits is kept; only the commits made under a machine-name identity are rewritten.
 
 0. Run `release/turn-public-check.sh`. Only rows marked `owner-gated` may be open.
-1. In GitHub, Settings, Emails, read the noreply address. If it carries a numeric id prefix before the owner's name (the form `<id>+<owner>`) and is not the older form with no prefix, say so: the one constant in `release/public-rewrite.sh` changes and the rehearsal is run again before step 2.
+1. Settled (owner, 2026-11-23): the public identity is declared once in `release/public-identity.toml`, with the noreply address in its numeric-id-prefixed form. Nothing to change here.
 2. Rewrite a copy, then verify it:
    - `release/public-rewrite.sh --origin <private-origin> --out <out>`
    - `release/public-verify.sh <out> <private-origin>` must exit 0 (checks V1 to V8).

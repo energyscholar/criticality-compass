@@ -1,7 +1,7 @@
 """public_scan - plan 1640: the tree and history scans for a public release. A closed table of pattern classes, HARD or SOFT, plus the private name list
 the caller supplies (`--private-patterns FILE`, sections [hard] and [soft], one regex per line; never committed: it would publish the names it hides).
   --tree DIR                         every tracked text file: HARD and SOFT hits all fail, except a file listed by sha256 in DIR/release/public-tree-exempt.toml
-                                     (a row whose file changed or is missing is itself a hit) and the one public project email, matched exactly.
+                                     (a row whose file changed or is missing is itself a hit) and the project email and the declared public identity (release/public-identity.toml), matched exactly.
   --history BARE --private-era REV   every blob, message and identity of every ref: a HARD hit fails; a SOFT hit (kept in history by ruling) is counted, and fails
                                      only in a blob that REV (or several, comma-joined) does not reach (a SOFT class that entered after the private era).
 Lines: SEV<TAB>class<TAB>where<TAB>detail, untruncated; exit 0 clean, 1 hits, 2 refused. Patterns that would match this file are spelt from parts."""
@@ -14,6 +14,7 @@ from collections import Counter
 from pathlib import Path
 
 EMAIL = "energyscholar+criticality-compass@gmail.com"   # the one email any tracked file may carry
+PUBLIC_ID = tomllib.loads((Path(__file__).resolve().parent / "public-identity.toml").read_text())["email"]   # plan 1640 amendment E: the declared public identity is public by ruling; read, never spelt here
 TABLE = [   # (class, severity, regex): the closed table of what a public release must not carry
     ("secret", "HARD", re.compile(r"pypi-[A-Za-z0-9_-]{20,}|gh[pousr]_[A-Za-z0-9]{30,}|AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY|xox[abp]-[A-Za-z0-9-]{10,}")),
     ("ruo-content", "HARD", re.compile(r"(?i)thermo" + r"[-_ ]?acoustic|rij" + r"ke tube|western " + r"systems coordinating|\bws" + r"cc\b|IEEE.9" + r".bus")),
@@ -50,7 +51,7 @@ def load_patterns(path):
 
 def line_hits(text, table):
     """(class, severity, line number, line) for every line of `text` a class matches; the project email is removed first, matched exactly."""
-    text = text.replace(EMAIL, "")
+    text = text.replace(EMAIL, "").replace(PUBLIC_ID, "")
     out = []
     for cls, sev, rx in table:
         if rx.search(text):   # one pass over the whole text first: only a matching text is walked line by line

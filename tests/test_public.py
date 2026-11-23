@@ -25,7 +25,7 @@ _ID = tomllib.loads((ROOT / "release" / "public-identity.toml").read_text())   #
 GMAIL, NOREPLY = OWNER + "@gmail.com", _ID["email"]
 TAIL = "CJDk5ZDNhYjEtNzE4ZC00YjQ5LWI2ZmQtNDc4MTFkODRlNjEyAAIqWzMsIjhkZjJlMzY0LTJhNWItNGQ1Ny1iZDgxLWM3ZDkzNGRkYzJkNCJdAAAGIJ2pT4"   # the tail a real upload token has; an all-A tail is not read as one by gitleaks
 NOBODY = "t" + "@users.noreply.github.com"
-OWNER_ROWS = ["OQ1", "OQ2", "OQ3", "OQ4", "gh-noreply-form", "create-repo", "flip", "project-urls-0.1.0", "readme-clone-url"]
+OWNER_ROWS = ["OQ1", "OQ2", "OQ3", "OQ4", "create-repo", "flip", "project-urls-0.1.0", "readme-clone-url"]
 LEAKS = ["release/public", "release/ci-", "release/turn-public-check.sh", ".github/", "CONTRIBUTING.md", "CODE_OF_CONDUCT.md", "SECURITY.md", ".gitleaks.toml"]
 from lib import bad, check as _check  # noqa: E402
 

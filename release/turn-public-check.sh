@@ -29,7 +29,7 @@ STATES = ("closed", "open", "owner-gated", "latent")
 EXPECTED = ["1639-handoff", "idiom-followon", "tree-scan", "history-rehearsal", "gitleaks-tree", "ci-file", "ci-local-macos", "ci-local-linux", "public-face", "base", "moved-base-shas",
             "undeclared-failing-test_claims", "undeclared-failing-test_intake_example", "undeclared-failing-test_intake_reach", "undeclared-failing-test_intake_leak",
             "undeclared-failing-test_intake_terminal", "toolset-commit-missing",
-            "OQ1", "OQ2", "OQ3", "OQ4", "OQ5", "gh-noreply-form", "create-repo", "flip", "project-urls-0.1.0", "readme-clone-url"]
+            "OQ1", "OQ2", "OQ3", "OQ4", "OQ5", "create-repo", "flip", "project-urls-0.1.0", "readme-clone-url"]
 problems = []
 lines = []
 
