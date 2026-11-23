@@ -1,0 +1,6 @@
+ok   the exclusive test starts after every other test has ended
+FAIL the other tests still run in parallel: {'t_0': {'start': 1795418295.336267, 'end': 1795418296.346657}, 't_1': {'start': 1795418296.389431, 'end': 1795418297.399884}, 't_x': {'start': 1795418297.458941, 'end': 1795418298.469337}}
+ok   results print in checks.toml order
+ok   PLANT: with no exclusive list the exclusive test overlaps the others (the check above can fail)
+test_schedule: FAILED
+rc=1

@@ -1,0 +1,6 @@
+ok   the exclusive test starts after every other test has ended
+ok   the other tests still run in parallel
+ok   results print in checks.toml order
+ok   PLANT: with no exclusive list the exclusive test overlaps the others (the check above can fail)
+test_schedule: all passed
+rc=0
