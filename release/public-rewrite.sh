@@ -34,9 +34,12 @@ snapshot() {   # refs and the hash of every file git keeps its history in, relat
   (cd "$1" && find HEAD packed-refs objects refs -type f ! -name '*.lock' 2>/dev/null | LC_ALL=C sort | while read -r f; do hash256 "$f"; done)
 }
 
-U=energyscholar
-NEW_NAME="$U"
-NEW_MAIL="${U}@users.noreply.github.com"   # the one public identity (the owner confirms it at the flip: runbook step 1)
+IDENT="$(cd "$(dirname "$0")" && pwd)/public-identity.toml"
+PYT=${PYTHON:-python3}; command -v "$PYT" >/dev/null 2>&1 || PYT=python
+idval() { "$PYT" -c 'import sys, tomllib; print(tomllib.load(open(sys.argv[1], "rb"))[sys.argv[2]])' "$IDENT" "$1"; }
+NEW_NAME=$(idval name) || die "cannot read name from $IDENT (needs Python 3.11+ with tomllib)"
+NEW_MAIL=$(idval email) || die "cannot read email from $IDENT (needs Python 3.11+ with tomllib)"
+[ -n "$NEW_NAME" ] && [ -n "$NEW_MAIL" ] || die "$IDENT declares no name or email"   # the one public identity: release/public-identity.toml
 git clone -q --bare --no-local --single-branch -b compass-main "$ORIGIN" "$OUT"
 mkdir "$OUT/public-rewrite-meta"
 snapshot "$ORIGIN" > "$OUT/public-rewrite-meta/origin-before.txt"

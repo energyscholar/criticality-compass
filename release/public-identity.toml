@@ -1,0 +1,3 @@
+# plan 1640 amendment E: the one public identity, declared once. public-rewrite.sh, public-verify.sh and tests/test_public.py read it; no other file spells the address.
+name = "energyscholar"
+email = "948575+energyscholar@users.noreply.github.com"
