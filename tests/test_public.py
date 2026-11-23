@@ -223,6 +223,31 @@ if reh and mirror and PAT:
 
 # ---- T7 the public-face files
 files = set(sh("git", "ls-files", "--cached", "--others", "--exclude-standard")[1].splitlines())
+# plan 1640 amendment E3: the noreply address is spelt only in release/public-identity.toml
+_NR = re.compile(r"[0-9]*\+?" + OWNER + "@users" + r"\.no" + "reply" + r"\.github\.com")
+
+
+def spellers(texts):
+    """the paths in {path: text} that spell an owner noreply address (either form, or the declared one) outside release/public-identity.toml"""
+    return sorted(n for n, t in texts.items() if n != "release/public-identity.toml" and (_NR.search(t) or _ID["email"] in t))
+
+
+def tracked_texts(root, names):
+    out = {}
+    for n in names:
+        try:
+            out[n] = (root / n).read_text()
+        except (UnicodeDecodeError, OSError):
+            pass
+    return out
+
+
+_texts = tracked_texts(ROOT, [n for n in files if (ROOT / n).is_file()])
+check("T7 the noreply address is spelt only in release/public-identity.toml", spellers(_texts) == [] and "release/public-identity.toml" in _texts, str(spellers(_texts)[:5]))
+for _n in ("release/public-verify.sh", "release/public-rewrite.sh", "tests/test_public.py"):   # breakers: a literal, either form, planted in a scratch copy of a script
+    for _lit in (_ID["email"], OWNER + "@users." + "noreply.github.com"):
+        _p = dict(_texts); _p[_n] = _p.get(_n, "") + "\nMAIL=" + _lit + "\n"
+        check(f"T7 breaker: the address {_lit.split('@')[0][:3]}... planted in a copy of {_n} is caught", spellers(_p) == [_n], str(spellers(_p)))
 coc = ROOT / "CODE_OF_CONDUCT.md"
 if coc.is_file():
     c = coc.read_text()
