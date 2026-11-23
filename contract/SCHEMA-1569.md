@@ -59,7 +59,7 @@ The host serves exactly the plugin directories that hold an `apparatus.py` (`app
 None of the five holds a role name, an update-rule name, `CLOCK`/`TIME_LABEL`, or (in the wire) the literal 40 (p03).
 
 **AT stays byte-identical**: a fixed sequence of eight calls gives the same reply bytes, truth.json, edge.json and perf.json
-(timings excluded) as at the base (p04, pinned). All of plan 1545's and 1553's tests stay green, except one declared edit
+(timings excluded) as at the base (p04, pinned): exact bytes, except the one K_c token within ULP_BOUND (amendment I). All of plan 1545's and 1553's tests stay green, except one declared edit
 (section 8).
 
 ## 4. The Ising engine (`plugins/ising/apparatus.py`)

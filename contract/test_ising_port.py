@@ -7,8 +7,8 @@ What it pins:
        serves exactly the plugin directories that hold an apparatus.py;
   p02  the port is carried by the declaration: navigator/ and needlestream/ are byte-identical to the base, no file added;
   p03  the host names no observable and no dynamics: the five host files hold no role name, no update rule, no sample floor;
-  p04  AT is unchanged on the wire: a fixed call sequence gives byte-identical replies, edge.json and perf.json (pinned at base), and a truth.json whose floats
-       are within 4 ulp of the base's and whose every other leaf is identical (the truth values are reproducible to 4 ulp across platforms, and bit-identical on one platform);
+  p04  AT is unchanged on the wire: a fixed call sequence gives exact bytes for the replies, edge.json and perf.json (pinned at base), except the one K_c token of
+       edge.json, which is within ULP_BOUND ulp of the pin (amendment I); and a truth.json whose floats are within 4 ulp of the base's and whose every other leaf is identical;
   p05  the Ising declaration: the key set of SCHEMA-1545, the Ising roles, its dynamics, and nothing of its kind, field or offset;
   p06  the Ising reading: one list per declared role in the declared order; the sample floor, the roles and the label are the
        plugin's (S = 39 is `nev`; a stub engine with S_MIN 20 and roles of its own is served by the same wire);
@@ -69,9 +69,10 @@ AT_SEQUENCE = [{"op": "declare"}, {"op": "read", **RQ}, {"op": "nudge", "d": [7]
                {"op": "nudge", "d": [-32], "n_eq": 2, "S": 41, "skip": 2}, {"op": "scan", "ticks": [[100], [900], [410]], **RQ},
                {"op": "read", "n_eq": 0, "S": 40, "skip": 1}, {"op": "nudge", "d": [40], **RQ}, {"op": "read", "n_eq": 3, "S": 39, "skip": 1}]
 # ---- pinned at base 4df8a87 (the reviewer re-pins at the real base in a dated section of the plan before handoff) ----
-# plan 1640 amendment D1: the wire is pinned in two parts. The replies, edge.json and the call log of perf.json are pinned by sha256 (byte-identical on every platform);
-# truth.json is pinned as a parsed document (TRUTH_PIN) and compared by _truth_diffs: its K_c values are arcsinh(exp(-2 Lc)) / 2 of a hidden real, and the platform libm
-# does not round those correctly, so the truth values are reproducible to 4 ulp across platforms, and bit-identical on one platform.
+# plan 1640 amendment D1: the wire is pinned in two parts. The replies, edge.json and the call log of perf.json are pinned as exact bytes, except the one K_c token of edge.json
+# (amendment I: it is compared within ULP_BOUND ulp, then the bytes are compared exactly with that one token substituted); truth.json is pinned as a parsed document (TRUTH_PIN)
+# and compared by _truth_diffs: the K_c values are arcsinh(exp(-2 Lc)) / 2 of a hidden real, and the platform libm does not round those correctly, so they are reproducible
+# to 4 ulp across platforms, and bit-identical on one platform.
 AT_BYTES = "887de304a3ad5a8d87dca98d3b64a0e1e224a61f1c345d9a5a227adca082a97e"   # sha256 of replies + edge.json + the call log of perf.json (the base's sha with truth.json taken out)
 # plan 1640 amendment H': the three parts of that blob, pinned raw, so that a sha mismatch can name the leaf that moved (p04). test_p04d proves they ARE the blob of AT_BYTES.
 WIRE_PIN = [
@@ -86,6 +87,7 @@ WIRE_PIN = [
 ]   # the raw reply lines, one per AT_SEQUENCE message
 EDGE_PIN = '{"K_c": 0.3488838761833377, "drift": {"law": "linear", "rate": 5e-06, "target": "L4"}, "hidden": {"L4": 0.14}, "index": 0, "time": "lag and drift are in algorithmic (Swendsen-Wang) time", "wire": "compass-apparatus/1"}'   # edge.json as the server wrote it
 PERF_PIN = '{"calls": [{"op": "declare"}, {"op": "read"}, {"op": "nudge"}, {"op": "nudge"}, {"op": "scan"}, {"op": "read"}, {"op": "nudge"}, {"op": "read"}], "time": "lag and drift are in algorithmic (Swendsen-Wang) time"}'   # the perf string _at_parts builds: the call log with every "sec"/"time" key taken out
+ULP_LEAVES = ("edge/K_c",)   # the one leaf of the AT parts that is compared within ULP_BOUND (ruling D1 and plan 1640 amendment I); documentation: p04 reads the leaf by name, and every other leaf is exact
 ULP_BOUND = 4   # the libm accuracy bound for one exp plus one arcsinh plus one exact halving: at most 1 ulp each, and one more for the composition
 TRUTH_PIN = r'''{"time": "lag and drift are in algorithmic (Swendsen-Wang) time", "wire": "compass-apparatus/1", "rows": [{"call": 1, "op": "read", "index": 43, "K_c": 0.34875425989391357, "pos": [400], "actual": [0.30000000000000004], "points": [{"pos": [400], "window": [4, 43], "K_c": [0.348871817357449, 0.34875425989391357], "sampling": 3, "dial": [[0, [400]]]}]}, {"call": 2, "op": "nudge", "index": 86, "K_c": 0.3486246790834067, "pos": [407], "actual": [0.30175], "points": [{"pos": [407], "window": [47, 86], "K_c": [0.34874220436833114, 0.3486246790834067], "sampling": 46, "dial": [[43, [400]], [45, [407]]]}]}, {"call": 3, "op": "nudge", "index": 170, "K_c": 0.34837164683170535, "pos": [375], "actual": [0.29375], "points": [{"pos": [375], "window": [90, 170], "K_c": [0.3486126268582585, 0.34837164683170535], "sampling": 88, "dial": [[86, [407]], [88, [375]]]}]}, {"call": 4, "op": "scan", "index": 299, "K_c": 0.3479833252379394, "pos": [410], "actual": [0.3025], "points": [{"pos": [100], "window": [174, 213], "K_c": [0.3483596010542822, 0.3482421708157279], "sampling": 173, "dial": [[170, [375]], [172, [100]]]}, {"pos": [900], "window": [217, 256], "K_c": [0.3482301283391113, 0.34811273028402806], "sampling": 216, "dial": [[213, [100]], [215, [900]]]}, {"pos": [410], "window": [260, 299], "K_c": [0.3481006911083425, 0.3479833252379394], "sampling": 259, "dial": [[256, [900]], [258, [410]]]}]}, {"call": 5, "op": "read", "index": 339, "K_c": 0.3478629803104053, "pos": [410], "actual": [0.3025], "points": [{"pos": [410], "window": [300, 339], "K_c": [0.3479803162404928, 0.3478629803104053], "sampling": 299, "dial": [[299, [410]]]}]}]}'''   # truth.json as the base wrote it (macOS), unchanged
 TREE_PINS = "1afc8bb5734b45cb864c4720db836a5dca02c30e7b19cc1f7068db26a3800d94"
@@ -326,11 +328,24 @@ def test_p03_the_host_names_no_observable_and_no_dynamics():
 
 
 def test_p04_at_is_unchanged_on_the_wire(tmp_path):
+    """Exact bytes against the pins, except the one K_c token of edge.json (ULP_LEAVES, plan 1640 amendment I): K_c must be a finite float within ULP_BOUND ulp of the pin;
+    the expected blob is then the pins with the pin's K_c token replaced by repr(live K_c), and its sha must equal the live blob's EXACTLY."""
     parts = _at_parts(tmp_path)
-    got = _parts_sha(parts)
-    if got != AT_BYTES:
-        diffs = _parts_diffs((WIRE_PIN, EDGE_PIN, PERF_PIN), parts)
-        raise AssertionError(f"the AT replies, edge or perf differ from the base (sha256 {got[:12]}…); {len(diffs)} differing leaves, the first {min(len(diffs), 10)}:\n" + "\n".join(diffs[:10]))
+    edge = json.loads(parts[1])
+    assert isinstance(edge, dict) and "K_c" in edge, "edge/K_c absent from the live edge.json"
+    kc = edge["K_c"]
+    assert type(kc) is float and math.isfinite(kc), f"edge/K_c is not a finite float: {kc!r}"
+    pin_kc = json.loads(EDGE_PIN)["K_c"]
+    ulp = _ulp_distance(pin_kc, kc)
+    assert ulp <= ULP_BOUND, f"edge/K_c: want {pin_kc!r} got {kc!r} is {ulp} ulp apart (bound {ULP_BOUND})"
+    token = f'"K_c": {pin_kc!r}'
+    assert EDGE_PIN.count(token) == 1, f"the pinned K_c token {token} must occur exactly once in EDGE_PIN"
+    want_parts = (WIRE_PIN, EDGE_PIN.replace(token, f'"K_c": {kc!r}'), PERF_PIN)
+    if _parts_sha(parts) != _parts_sha(want_parts):
+        diffs = _parts_diffs(want_parts, parts)
+        if not diffs:
+            raise AssertionError(f"the AT replies, edge or perf: same leaves, different bytes (sha256 {_parts_sha(parts)[:12]}… want {_parts_sha(want_parts)[:12]}…)")
+        raise AssertionError(f"the AT replies, edge or perf differ from the base (sha256 {_parts_sha(parts)[:12]}…); {len(diffs)} differing leaves, the first {min(len(diffs), 10)}:\n" + "\n".join(diffs[:10]))
     truth = json.loads((tmp_path / "run" / "truth.json").read_text())
     diffs = _truth_diffs(json.loads(TRUTH_PIN), truth)
     assert not diffs, "the AT truth differs from the base: " + "; ".join(diffs[:3])
@@ -352,38 +367,6 @@ def _first_leaf(x, path, kinds):
         elif type(v) in kinds:
             return (f"{path}/{k}" if isinstance(x, dict) else f"{path}[{k}]", x, k)
     return None
-
-
-def test_p04c_p04_names_the_leaf_it_differs_in(tmp_path):
-    """RED, run against p04 itself on the live server run: (a) one edge float moved 1 ulp, (b) one reply field changed. p04 must raise and its message must name the leaf's path."""
-    live = _at_parts(tmp_path)
-    saved = globals()["_at_parts"]
-    try:
-        # (a) an edge float, one ulp
-        edge = json.loads(live[1]); path, box, key = _first_leaf({"edge": edge}, "", (float,))
-        moved = _step_ulp(box[key], 1) if isinstance(box[key], float) else None
-        assert moved is not None, "the live edge.json has a float leaf to move"
-        box[key] = moved
-        want_path = path.replace("/edge", "edge", 1)
-        globals()["_at_parts"] = lambda tmp: (live[0], json.dumps(edge), live[2])
-        try:
-            test_p04_at_is_unchanged_on_the_wire(tmp_path)
-            raise AssertionError("p04 must fail when an edge float moves one ulp")
-        except AssertionError as e:
-            assert want_path in str(e) and "1 ulp" in str(e) and "differing leaves" in str(e), ("p04 did not name the edge leaf", want_path, str(e)[:600])
-        # (b) a reply field
-        replies = list(live[0]); rep = json.loads(replies[1]); path, box, key = _first_leaf({"reply[1]": rep}, "", (float, str))
-        box[key] = box[key] + 1 if isinstance(box[key], float) else box[key] + "X"
-        replies[1] = json.dumps(rep) + "\n"
-        want_path = "reply[1]" + path[len("/reply[1]"):]
-        globals()["_at_parts"] = lambda tmp: (replies, live[1], live[2])
-        try:
-            test_p04_at_is_unchanged_on_the_wire(tmp_path)
-            raise AssertionError("p04 must fail when a reply field changes")
-        except AssertionError as e:
-            assert want_path in str(e) and "differing leaves" in str(e), ("p04 did not name the reply leaf", want_path, str(e)[:600])
-    finally:
-        globals()["_at_parts"] = saved
 
 
 def test_p04d_the_pinned_parts_are_the_pinned_sha():
