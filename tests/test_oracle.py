@@ -139,8 +139,9 @@ check("Exact.read_digest is the constant sha256(decl_str): the P3 log record is 
 tree = ast.parse((ROOT / "cc" / "oracle_measured.py").read_text())
 imported = {a.name.split(".")[0] for n in ast.walk(tree) if isinstance(n, ast.Import) for a in n.names} | {n.module.split(".")[0] for n in ast.walk(tree) if isinstance(n, ast.ImportFrom)}
 check("oracle_measured imports nothing from oracle, detect or door (outside the measure_hash closure; no cycle)", not imported & {"oracle", "detect", "door"} and {"navigate", "sampler"} <= imported, str(sorted(imported)))
-r5 = subprocess.run(["git", "diff", "150b3fe", "--", "cc/navigate.py"], cwd=ROOT, capture_output=True, text=True)
-check("cc/navigate.py byte-unchanged against the P3 tip 150b3fe", r5.returncode == 0 and r5.stdout == "", r5.stderr or r5.stdout[:200])
+NAVIGATE_P3_BLOB = "537477f6752139ebabf287d05e1ebf6b710f65d7"   # git's blob sha of cc/navigate.py at the P3 tip: a blob sha does not move when history is rewritten for the public repository (plan 1640 amendment E; the commit sha 150b3fe did)
+r5 = subprocess.run(["git", "hash-object", "cc/navigate.py"], cwd=ROOT, capture_output=True, text=True)
+check("cc/navigate.py byte-unchanged against the P3 tip (blob " + NAVIGATE_P3_BLOB[:7] + ")", r5.returncode == 0 and r5.stdout.strip() == NAVIGATE_P3_BLOB, r5.stderr or r5.stdout[:200])
 check("MeasuredStart spans the 7 non-uniform labels", oracle_measured.MeasuredStart(oracle_measured.GRID, KCV).n() == 7 and oracle_measured.MeasuredStart(oracle_measured.GRID, KCV).k(3) == oracle_measured.sampler.LABELS["1.00"])
 
 # ---- the loader fixture: production layout (1282/<run>/<STEM>), real load_rehearsal -> navigate.needle, then the whole CLI
